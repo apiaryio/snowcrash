@@ -1,0 +1,451 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		BB167D1D172931330030D1D5 /* test-BlueprintParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA01FF817292F9C0050B603 /* test-BlueprintParser.cc */; };
+		BB740993171C05B20023105F /* MarkdownParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB740991171C05B20023105F /* MarkdownParser.cc */; };
+		BB740994171C05B20023105F /* MarkdownParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BB740992171C05B20023105F /* MarkdownParser.h */; };
+		BB740997171C065C0023105F /* MarkdownBlock.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB740995171C065C0023105F /* MarkdownBlock.cc */; };
+		BB740998171C065C0023105F /* MarkdownBlock.h in Headers */ = {isa = PBXBuildFile; fileRef = BB740996171C065C0023105F /* MarkdownBlock.h */; };
+		BB74099A171C08240023105F /* test-MarkdownBlock.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB740999171C08240023105F /* test-MarkdownBlock.cc */; };
+		BB74099C171C08860023105F /* test-MarkdownParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB74099B171C08850023105F /* test-MarkdownParser.cc */; };
+		BB86DEC11723E3A700063644 /* src_map.c in Sources */ = {isa = PBXBuildFile; fileRef = BB86DEC01723E3A700063644 /* src_map.c */; };
+		BB86DEC31723E3C600063644 /* src_map.h in Headers */ = {isa = PBXBuildFile; fileRef = BB86DEC21723E3C600063644 /* src_map.h */; };
+		BBA889A71712FF37005A9570 /* Parser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA889A51712FF37005A9570 /* Parser.cc */; };
+		BBA889A81712FF37005A9570 /* Parser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA889A61712FF37005A9570 /* Parser.h */; };
+		BBA889AA17130239005A9570 /* test-Parser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA889A917130239005A9570 /* test-Parser.cc */; };
+		BBA889B517131AFF005A9570 /* autolink.c in Sources */ = {isa = PBXBuildFile; fileRef = BBA889AC17131AFF005A9570 /* autolink.c */; };
+		BBA889B617131AFF005A9570 /* autolink.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA889AD17131AFF005A9570 /* autolink.h */; };
+		BBA889B717131AFF005A9570 /* buffer.c in Sources */ = {isa = PBXBuildFile; fileRef = BBA889AE17131AFF005A9570 /* buffer.c */; };
+		BBA889B817131AFF005A9570 /* buffer.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA889AF17131AFF005A9570 /* buffer.h */; };
+		BBA889B917131AFF005A9570 /* html_blocks.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA889B017131AFF005A9570 /* html_blocks.h */; };
+		BBA889BA17131AFF005A9570 /* markdown.c in Sources */ = {isa = PBXBuildFile; fileRef = BBA889B117131AFF005A9570 /* markdown.c */; };
+		BBA889BB17131AFF005A9570 /* markdown.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA889B217131AFF005A9570 /* markdown.h */; };
+		BBA889BC17131AFF005A9570 /* stack.c in Sources */ = {isa = PBXBuildFile; fileRef = BBA889B317131AFF005A9570 /* stack.c */; };
+		BBA889BD17131AFF005A9570 /* stack.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA889B417131AFF005A9570 /* stack.h */; };
+		BBA889C517131B19005A9570 /* houdini.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA889BF17131B19005A9570 /* houdini.h */; };
+		BBA889C617131B19005A9570 /* html.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA889C017131B19005A9570 /* html.h */; };
+		BBA889C717131B19005A9570 /* houdini_href_e.c in Sources */ = {isa = PBXBuildFile; fileRef = BBA889C117131B19005A9570 /* houdini_href_e.c */; };
+		BBA889C817131B19005A9570 /* houdini_html_e.c in Sources */ = {isa = PBXBuildFile; fileRef = BBA889C217131B19005A9570 /* houdini_html_e.c */; };
+		BBA889C917131B19005A9570 /* html_smartypants.c in Sources */ = {isa = PBXBuildFile; fileRef = BBA889C317131B19005A9570 /* html_smartypants.c */; };
+		BBA889CA17131B19005A9570 /* html.c in Sources */ = {isa = PBXBuildFile; fileRef = BBA889C417131B19005A9570 /* html.c */; };
+		BBA91DC1171D402600649B05 /* BlueprintParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA91DBF171D402600649B05 /* BlueprintParser.cc */; };
+		BBA91DC2171D402600649B05 /* BlueprintParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA91DC0171D402600649B05 /* BlueprintParser.h */; };
+		BBFF48CA170B3C49001E5FB2 /* test-snowcrash.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBFF48C9170B3C49001E5FB2 /* test-snowcrash.cc */; };
+		BBFF48CD170B3EDE001E5FB2 /* snowcrash.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBFF48CC170B3EDE001E5FB2 /* snowcrash.cc */; };
+		BBFF48D0170B3FBB001E5FB2 /* libsnowcrash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBFF4898170B34E6001E5FB2 /* libsnowcrash.a */; };
+		BBFF48D2170B4224001E5FB2 /* snowcrash.h in Headers */ = {isa = PBXBuildFile; fileRef = BBFF48D1170B4224001E5FB2 /* snowcrash.h */; };
+		BBFF48D5170C4F30001E5FB2 /* Blueprint.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBFF48D3170C4F30001E5FB2 /* Blueprint.cc */; };
+		BBFF48D6170C4F30001E5FB2 /* Blueprint.h in Headers */ = {isa = PBXBuildFile; fileRef = BBFF48D4170C4F30001E5FB2 /* Blueprint.h */; };
+		BBFF48D9170C57F1001E5FB2 /* test-Blueprint.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBFF48D7170C57F1001E5FB2 /* test-Blueprint.cc */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		BBFF48BE170B3C30001E5FB2 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		BB740991171C05B20023105F /* MarkdownParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = MarkdownParser.cc; path = src/MarkdownParser.cc; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
+		BB740992171C05B20023105F /* MarkdownParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = MarkdownParser.h; path = src/MarkdownParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		BB740995171C065C0023105F /* MarkdownBlock.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MarkdownBlock.cc; path = src/MarkdownBlock.cc; sourceTree = "<group>"; };
+		BB740996171C065C0023105F /* MarkdownBlock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MarkdownBlock.h; path = src/MarkdownBlock.h; sourceTree = "<group>"; };
+		BB740999171C08240023105F /* test-MarkdownBlock.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-MarkdownBlock.cc"; path = "test/test-MarkdownBlock.cc"; sourceTree = "<group>"; };
+		BB74099B171C08850023105F /* test-MarkdownParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-MarkdownParser.cc"; path = "test/test-MarkdownParser.cc"; sourceTree = "<group>"; };
+		BB86DEC01723E3A700063644 /* src_map.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = src_map.c; path = sundown/src/src_map.c; sourceTree = "<group>"; };
+		BB86DEC21723E3C600063644 /* src_map.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = src_map.h; path = sundown/src/src_map.h; sourceTree = "<group>"; };
+		BBA01FF817292F9C0050B603 /* test-BlueprintParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-BlueprintParser.cc"; path = "test/test-BlueprintParser.cc"; sourceTree = "<group>"; };
+		BBA889A51712FF37005A9570 /* Parser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = Parser.cc; path = src/Parser.cc; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
+		BBA889A61712FF37005A9570 /* Parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = Parser.h; path = src/Parser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		BBA889A917130239005A9570 /* test-Parser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-Parser.cc"; path = "test/test-Parser.cc"; sourceTree = "<group>"; };
+		BBA889AC17131AFF005A9570 /* autolink.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = autolink.c; path = sundown/src/autolink.c; sourceTree = "<group>"; };
+		BBA889AD17131AFF005A9570 /* autolink.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = autolink.h; path = sundown/src/autolink.h; sourceTree = "<group>"; };
+		BBA889AE17131AFF005A9570 /* buffer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = buffer.c; path = sundown/src/buffer.c; sourceTree = "<group>"; };
+		BBA889AF17131AFF005A9570 /* buffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = buffer.h; path = sundown/src/buffer.h; sourceTree = "<group>"; };
+		BBA889B017131AFF005A9570 /* html_blocks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = html_blocks.h; path = sundown/src/html_blocks.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		BBA889B117131AFF005A9570 /* markdown.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = markdown.c; path = sundown/src/markdown.c; sourceTree = "<group>"; };
+		BBA889B217131AFF005A9570 /* markdown.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = markdown.h; path = sundown/src/markdown.h; sourceTree = "<group>"; };
+		BBA889B317131AFF005A9570 /* stack.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = stack.c; path = sundown/src/stack.c; sourceTree = "<group>"; };
+		BBA889B417131AFF005A9570 /* stack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = stack.h; path = sundown/src/stack.h; sourceTree = "<group>"; };
+		BBA889BF17131B19005A9570 /* houdini.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = houdini.h; path = sundown/html/houdini.h; sourceTree = "<group>"; };
+		BBA889C017131B19005A9570 /* html.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = html.h; path = sundown/html/html.h; sourceTree = "<group>"; };
+		BBA889C117131B19005A9570 /* houdini_href_e.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = houdini_href_e.c; path = sundown/html/houdini_href_e.c; sourceTree = "<group>"; };
+		BBA889C217131B19005A9570 /* houdini_html_e.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = houdini_html_e.c; path = sundown/html/houdini_html_e.c; sourceTree = "<group>"; };
+		BBA889C317131B19005A9570 /* html_smartypants.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = html_smartypants.c; path = sundown/html/html_smartypants.c; sourceTree = "<group>"; };
+		BBA889C417131B19005A9570 /* html.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = html.c; path = sundown/html/html.c; sourceTree = "<group>"; };
+		BBA91DBF171D402600649B05 /* BlueprintParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = BlueprintParser.cc; path = src/BlueprintParser.cc; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
+		BBA91DC0171D402600649B05 /* BlueprintParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = BlueprintParser.h; path = src/BlueprintParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		BBFF4898170B34E6001E5FB2 /* libsnowcrash.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libsnowcrash.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		BBFF48C0170B3C30001E5FB2 /* test-snowcrash */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "test-snowcrash"; sourceTree = BUILT_PRODUCTS_DIR; };
+		BBFF48C9170B3C49001E5FB2 /* test-snowcrash.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-snowcrash.cc"; path = "test/test-snowcrash.cc"; sourceTree = "<group>"; };
+		BBFF48CC170B3EDE001E5FB2 /* snowcrash.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = snowcrash.cc; path = src/snowcrash.cc; sourceTree = "<group>"; };
+		BBFF48D1170B4224001E5FB2 /* snowcrash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = snowcrash.h; path = src/snowcrash.h; sourceTree = "<group>"; };
+		BBFF48D3170C4F30001E5FB2 /* Blueprint.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Blueprint.cc; path = src/Blueprint.cc; sourceTree = "<group>"; };
+		BBFF48D4170C4F30001E5FB2 /* Blueprint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Blueprint.h; path = src/Blueprint.h; sourceTree = "<group>"; };
+		BBFF48D7170C57F1001E5FB2 /* test-Blueprint.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-Blueprint.cc"; path = "test/test-Blueprint.cc"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		BBFF4895170B34E6001E5FB2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BBFF48BD170B3C30001E5FB2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BBFF48D0170B3FBB001E5FB2 /* libsnowcrash.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		BBA889AB17131AEB005A9570 /* sundown */ = {
+			isa = PBXGroup;
+			children = (
+				BBA889BE17131B06005A9570 /* html */,
+				BBA889AC17131AFF005A9570 /* autolink.c */,
+				BBA889AD17131AFF005A9570 /* autolink.h */,
+				BBA889AE17131AFF005A9570 /* buffer.c */,
+				BBA889AF17131AFF005A9570 /* buffer.h */,
+				BBA889B017131AFF005A9570 /* html_blocks.h */,
+				BBA889B117131AFF005A9570 /* markdown.c */,
+				BBA889B217131AFF005A9570 /* markdown.h */,
+				BB86DEC01723E3A700063644 /* src_map.c */,
+				BB86DEC21723E3C600063644 /* src_map.h */,
+				BBA889B317131AFF005A9570 /* stack.c */,
+				BBA889B417131AFF005A9570 /* stack.h */,
+			);
+			name = sundown;
+			sourceTree = "<group>";
+		};
+		BBA889BE17131B06005A9570 /* html */ = {
+			isa = PBXGroup;
+			children = (
+				BBA889BF17131B19005A9570 /* houdini.h */,
+				BBA889C017131B19005A9570 /* html.h */,
+				BBA889C117131B19005A9570 /* houdini_href_e.c */,
+				BBA889C217131B19005A9570 /* houdini_html_e.c */,
+				BBA889C317131B19005A9570 /* html_smartypants.c */,
+				BBA889C417131B19005A9570 /* html.c */,
+			);
+			name = html;
+			sourceTree = "<group>";
+		};
+		BBFF488F170B34E6001E5FB2 = {
+			isa = PBXGroup;
+			children = (
+				BBA889AB17131AEB005A9570 /* sundown */,
+				BBFF48CB170B3ECB001E5FB2 /* src */,
+				BBFF48B9170B3AF6001E5FB2 /* test */,
+				BBFF4899170B34E6001E5FB2 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		BBFF4899170B34E6001E5FB2 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				BBFF4898170B34E6001E5FB2 /* libsnowcrash.a */,
+				BBFF48C0170B3C30001E5FB2 /* test-snowcrash */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		BBFF48B9170B3AF6001E5FB2 /* test */ = {
+			isa = PBXGroup;
+			children = (
+				BBFF48D7170C57F1001E5FB2 /* test-Blueprint.cc */,
+				BBA01FF817292F9C0050B603 /* test-BlueprintParser.cc */,
+				BB740999171C08240023105F /* test-MarkdownBlock.cc */,
+				BB74099B171C08850023105F /* test-MarkdownParser.cc */,
+				BBA889A917130239005A9570 /* test-Parser.cc */,
+				BBFF48C9170B3C49001E5FB2 /* test-snowcrash.cc */,
+			);
+			name = test;
+			sourceTree = "<group>";
+		};
+		BBFF48CB170B3ECB001E5FB2 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				BBFF48D3170C4F30001E5FB2 /* Blueprint.cc */,
+				BBFF48D4170C4F30001E5FB2 /* Blueprint.h */,
+				BBA91DBF171D402600649B05 /* BlueprintParser.cc */,
+				BBA91DC0171D402600649B05 /* BlueprintParser.h */,
+				BB740995171C065C0023105F /* MarkdownBlock.cc */,
+				BB740996171C065C0023105F /* MarkdownBlock.h */,
+				BB740991171C05B20023105F /* MarkdownParser.cc */,
+				BB740992171C05B20023105F /* MarkdownParser.h */,
+				BBA889A51712FF37005A9570 /* Parser.cc */,
+				BBA889A61712FF37005A9570 /* Parser.h */,
+				BBFF48CC170B3EDE001E5FB2 /* snowcrash.cc */,
+				BBFF48D1170B4224001E5FB2 /* snowcrash.h */,
+			);
+			name = src;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		BBFF4896170B34E6001E5FB2 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BBFF48D2170B4224001E5FB2 /* snowcrash.h in Headers */,
+				BBFF48D6170C4F30001E5FB2 /* Blueprint.h in Headers */,
+				BBA889A81712FF37005A9570 /* Parser.h in Headers */,
+				BBA889B617131AFF005A9570 /* autolink.h in Headers */,
+				BBA889B817131AFF005A9570 /* buffer.h in Headers */,
+				BBA889B917131AFF005A9570 /* html_blocks.h in Headers */,
+				BBA889BB17131AFF005A9570 /* markdown.h in Headers */,
+				BBA889BD17131AFF005A9570 /* stack.h in Headers */,
+				BBA889C517131B19005A9570 /* houdini.h in Headers */,
+				BBA889C617131B19005A9570 /* html.h in Headers */,
+				BB740994171C05B20023105F /* MarkdownParser.h in Headers */,
+				BB740998171C065C0023105F /* MarkdownBlock.h in Headers */,
+				BBA91DC2171D402600649B05 /* BlueprintParser.h in Headers */,
+				BB86DEC31723E3C600063644 /* src_map.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		BBFF4897170B34E6001E5FB2 /* snowcrash */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BBFF489C170B34E6001E5FB2 /* Build configuration list for PBXNativeTarget "snowcrash" */;
+			buildPhases = (
+				BBFF4894170B34E6001E5FB2 /* Sources */,
+				BBFF4895170B34E6001E5FB2 /* Frameworks */,
+				BBFF4896170B34E6001E5FB2 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = snowcrash;
+			productName = snowcrash;
+			productReference = BBFF4898170B34E6001E5FB2 /* libsnowcrash.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		BBFF48BF170B3C30001E5FB2 /* test-snowcrash */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BBFF48C6170B3C30001E5FB2 /* Build configuration list for PBXNativeTarget "test-snowcrash" */;
+			buildPhases = (
+				BBFF48BC170B3C30001E5FB2 /* Sources */,
+				BBFF48BD170B3C30001E5FB2 /* Frameworks */,
+				BBFF48BE170B3C30001E5FB2 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "test-snowcrash";
+			productName = "test-snowcrash";
+			productReference = BBFF48C0170B3C30001E5FB2 /* test-snowcrash */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		BBFF4890170B34E6001E5FB2 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0460;
+				ORGANIZATIONNAME = Apiary.io;
+			};
+			buildConfigurationList = BBFF4893170B34E6001E5FB2 /* Build configuration list for PBXProject "snowcrash" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = BBFF488F170B34E6001E5FB2;
+			productRefGroup = BBFF4899170B34E6001E5FB2 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				BBFF4897170B34E6001E5FB2 /* snowcrash */,
+				BBFF48BF170B3C30001E5FB2 /* test-snowcrash */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		BBFF4894170B34E6001E5FB2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BBFF48CD170B3EDE001E5FB2 /* snowcrash.cc in Sources */,
+				BBFF48D5170C4F30001E5FB2 /* Blueprint.cc in Sources */,
+				BBA889A71712FF37005A9570 /* Parser.cc in Sources */,
+				BBA889B517131AFF005A9570 /* autolink.c in Sources */,
+				BBA889B717131AFF005A9570 /* buffer.c in Sources */,
+				BBA889BA17131AFF005A9570 /* markdown.c in Sources */,
+				BBA889BC17131AFF005A9570 /* stack.c in Sources */,
+				BBA889C717131B19005A9570 /* houdini_href_e.c in Sources */,
+				BBA889C817131B19005A9570 /* houdini_html_e.c in Sources */,
+				BBA889C917131B19005A9570 /* html_smartypants.c in Sources */,
+				BBA889CA17131B19005A9570 /* html.c in Sources */,
+				BB740993171C05B20023105F /* MarkdownParser.cc in Sources */,
+				BB740997171C065C0023105F /* MarkdownBlock.cc in Sources */,
+				BBA91DC1171D402600649B05 /* BlueprintParser.cc in Sources */,
+				BB86DEC11723E3A700063644 /* src_map.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BBFF48BC170B3C30001E5FB2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BBFF48CA170B3C49001E5FB2 /* test-snowcrash.cc in Sources */,
+				BBFF48D9170C57F1001E5FB2 /* test-Blueprint.cc in Sources */,
+				BBA889AA17130239005A9570 /* test-Parser.cc in Sources */,
+				BB74099A171C08240023105F /* test-MarkdownBlock.cc in Sources */,
+				BB74099C171C08860023105F /* test-MarkdownParser.cc in Sources */,
+				BB167D1D172931330030D1D5 /* test-BlueprintParser.cc in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		BBFF489A170B34E6001E5FB2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		BBFF489B170B34E6001E5FB2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		BBFF489D170B34E6001E5FB2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		BBFF489E170B34E6001E5FB2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		BBFF48C7170B3C30001E5FB2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = "./test/**";
+			};
+			name = Debug;
+		};
+		BBFF48C8170B3C30001E5FB2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = "./test/**";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		BBFF4893170B34E6001E5FB2 /* Build configuration list for PBXProject "snowcrash" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BBFF489A170B34E6001E5FB2 /* Debug */,
+				BBFF489B170B34E6001E5FB2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BBFF489C170B34E6001E5FB2 /* Build configuration list for PBXNativeTarget "snowcrash" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BBFF489D170B34E6001E5FB2 /* Debug */,
+				BBFF489E170B34E6001E5FB2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BBFF48C6170B3C30001E5FB2 /* Build configuration list for PBXNativeTarget "test-snowcrash" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BBFF48C7170B3C30001E5FB2 /* Debug */,
+				BBFF48C8170B3C30001E5FB2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = BBFF4890170B34E6001E5FB2 /* Project object */;
+}
