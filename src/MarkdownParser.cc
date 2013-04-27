@@ -44,9 +44,9 @@ void MarkdownParser::parse(const SourceData& source, const MarkdownParser::Parse
         markdownAst.blocks = std::move(m_renderContext.back());
         m_renderContext.clear();
         
-#ifdef DEBUG
-        printMarkdownBlock(markdownAst, 0);
-#endif
+//#ifdef DEBUG
+//        printMarkdownBlock(markdownAst, 0);
+//#endif
 
     }
     else {

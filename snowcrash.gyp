@@ -72,6 +72,31 @@
           '-stdlib=libc++'
         ]
       }
-    }
+    },
+
+    {
+      'target_name': 'snowcrash',
+      'type': 'executable',
+      'include_dirs': [
+        'src',
+        'src/snowcrash'
+      ],
+      'sources': [
+        'src/snowcrash/snowcrash.cc',
+        'src/snowcrash/Serialize.cc'
+      ],
+      'dependencies': [
+        'libsnowcrash',
+        'sundown'
+      ],
+      'ldflags': [
+        '-stdlib=libc++'
+      ],
+      'xcode_settings': {
+        'OTHER_LDFLAGS': [
+          '-stdlib=libc++'
+        ]
+      }
+    }    
   ]
 }

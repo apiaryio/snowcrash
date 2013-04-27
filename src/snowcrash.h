@@ -9,7 +9,6 @@
 #ifndef SNOWCRASH_H
 #define SNOWCRASH_H
 
-#include "Blueprint.h"
 #include "Parser.h"
 
 namespace snowcrash {

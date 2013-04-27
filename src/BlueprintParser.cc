@@ -94,7 +94,7 @@ ParseSectionResult ParseOverview(const BlockStackIterator& begin, const BlockSta
         else {
             if (currentBlock == begin) {
                 // WARN: No API name specified
-                result.warnings.emplace_back("No API name specified", 0, currentBlock->sourceMap);
+                result.warnings.emplace_back("expected API name", 0, currentBlock->sourceMap);
             }
              
             if (currentBlock->type == MarkdownBlockType::HRule) {
@@ -113,7 +113,7 @@ ParseSectionResult ParseOverview(const BlockStackIterator& begin, const BlockSta
         currentSection = BlockSection(currentBlock, currentSection);
     }
     
-    return std::make_pair(Result(), currentBlock);
+    return std::make_pair(result, currentBlock);
 }
 
 // Parse Resource Group descending into Resources
@@ -136,7 +136,7 @@ ParseSectionResult ParseResourceGroup(const BlockStackIterator& begin, const Blo
             
             if (currentBlock == begin) {
                 // WARN: No group name specified
-                result.warnings.emplace_back("Unnamed Resource Group", 0, currentBlock->sourceMap);
+                result.warnings.emplace_back("expected resources group name", 0, currentBlock->sourceMap);
             }
             
             resourceGroup.description += MapSourceData(sourceData, currentBlock->sourceMap);
@@ -147,7 +147,7 @@ ParseSectionResult ParseResourceGroup(const BlockStackIterator& begin, const Blo
     }
     
     blueprint.resourceGroups.emplace_back(std::move(resourceGroup));
-    return std::make_pair(Result(), currentBlock);
+    return std::make_pair(result, currentBlock);
 }
 
 
