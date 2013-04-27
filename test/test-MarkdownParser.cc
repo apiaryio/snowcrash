@@ -540,3 +540,26 @@ R"(
     REQUIRE(didEnterCallback);
 }
 
+TEST_CASE("mdparser/parse-header-only", "parsing asserting header one liner")
+{
+    MarkdownParser parser;
+    const std::string source = "# My API";
+    
+    bool didEnterCallback = false;
+    parser.parse(source, [&](const Result& report, const MarkdownBlock& ast){
+        didEnterCallback = true;
+        
+        REQUIRE(report.error.code == Error::OK);
+        
+        REQUIRE(ast.type == MarkdownBlockType::Undefined);
+        REQUIRE(ast.blocks.size() == 1);
+        
+        REQUIRE(ast.blocks[0].type == MarkdownBlockType::Header);
+        REQUIRE(ast.blocks[0].content == "My API");
+        REQUIRE(ast.blocks[0].data == 1);
+        REQUIRE(ast.blocks[0].blocks.size() == 0);
+    });
+    
+    REQUIRE(didEnterCallback);
+}
+
