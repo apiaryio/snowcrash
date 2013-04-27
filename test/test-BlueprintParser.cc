@@ -21,10 +21,10 @@ TEST_CASE("bpparser/init", "Blueprint parser construction")
 TEST_CASE("bpparser/parse-params", "parse() method parameters.")
 {
     BlueprintParser parser;
-    REQUIRE_NOTHROW(parser.parse(MarkdownBlock(), nullptr));
+    REQUIRE_NOTHROW(parser.parse("", MarkdownBlock(), nullptr));
     
     bool didEnterCallback = false;
-    parser.parse(MarkdownBlock(), [&](const Result& report, const Blueprint& blueprint){
+    parser.parse("", MarkdownBlock(), [&](const Result& report, const Blueprint& blueprint){
         didEnterCallback = true;
         
         REQUIRE(report.error.code == Error::OK);
@@ -39,7 +39,7 @@ TEST_CASE("bpparser/parse-bp-name", "Parse blueprint name.")
     markdown.blocks = { MarkdownBlock(MarkdownBlockType::Header, "API Name", 1) };
     
     bool didEnterCallback = false;
-    parser.parse(markdown, [&](const Result& report, const Blueprint& blueprint){
+    parser.parse("", markdown, [&](const Result& report, const Blueprint& blueprint){
         didEnterCallback = true;
         
         REQUIRE(report.error.code == Error::OK);
@@ -60,7 +60,7 @@ TEST_CASE("bpparser/parse-overview", "Parse blueprint overview section.")
                         MarkdownBlock(MarkdownBlockType::Paragraph, "p2")};
     
     bool didEnterCallback = false;
-    parser.parse(markdown, [&](const Result& report, const Blueprint& blueprint){
+    parser.parse("", markdown, [&](const Result& report, const Blueprint& blueprint){
         didEnterCallback = true;
         
         REQUIRE(report.error.code == Error::OK);
@@ -85,7 +85,7 @@ TEST_CASE("bpparser/parse-group", "Parse resource group.")
                         MarkdownBlock(MarkdownBlockType::Paragraph, "p3", 1)};
     
     bool didEnterCallback = false;
-    parser.parse(markdown, [&](const Result& report, const Blueprint& blueprint){
+    parser.parse("", markdown, [&](const Result& report, const Blueprint& blueprint){
         didEnterCallback = true;
         
         REQUIRE(report.error.code == Error::OK);

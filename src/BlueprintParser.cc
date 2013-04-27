@@ -76,7 +76,7 @@ Section BlockSection(const BlockStackIterator& block, const Section& context)
 }
 
 // Parse Overview section
-ParseSectionResult ParseOverview(const BlockStackIterator& begin, const BlockStackIterator& end, Blueprint &blueprint)
+ParseSectionResult ParseOverview(const BlockStackIterator& begin, const BlockStackIterator& end, const SourceData& sourceData, Blueprint &blueprint)
 {
     Result result;
     auto currentSection = Section::Overview;
@@ -94,7 +94,7 @@ ParseSectionResult ParseOverview(const BlockStackIterator& begin, const BlockSta
         else {
             if (currentBlock == begin) {
                 // WARN: No API name specified
-                result.warnings.emplace_back("No API name specified", currentBlock->sourceMap);
+                result.warnings.emplace_back("No API name specified", 0, currentBlock->sourceMap);
             }
              
             if (currentBlock->type == MarkdownBlockType::HRule) {
@@ -105,7 +105,7 @@ ParseSectionResult ParseOverview(const BlockStackIterator& begin, const BlockSta
             }
             else {
                 // Arbitrary markdown content, add to description
-                blueprint.description += MapSourceData("TODO:", currentBlock->sourceMap);
+                blueprint.description += MapSourceData(sourceData, currentBlock->sourceMap);
             }
         }
 
@@ -117,7 +117,7 @@ ParseSectionResult ParseOverview(const BlockStackIterator& begin, const BlockSta
 }
 
 // Parse Resource Group descending into Resources
-ParseSectionResult ParseResourceGroup(const BlockStackIterator& begin, const BlockStackIterator& end, Blueprint &blueprint)
+ParseSectionResult ParseResourceGroup(const BlockStackIterator& begin, const BlockStackIterator& end, const SourceData& sourceData, Blueprint &blueprint)
 {
     Result result;    
     auto currentSection = Section::ResourceGroup;
@@ -136,10 +136,10 @@ ParseSectionResult ParseResourceGroup(const BlockStackIterator& begin, const Blo
             
             if (currentBlock == begin) {
                 // WARN: No group name specified
-                result.warnings.emplace_back("Unnamed Resource Group", currentBlock->sourceMap);
+                result.warnings.emplace_back("Unnamed Resource Group", 0, currentBlock->sourceMap);
             }
             
-            resourceGroup.description += MapSourceData("TODO:", currentBlock->sourceMap);
+            resourceGroup.description += MapSourceData(sourceData, currentBlock->sourceMap);
         }
         
         ++currentBlock;
@@ -150,8 +150,8 @@ ParseSectionResult ParseResourceGroup(const BlockStackIterator& begin, const Blo
     return std::make_pair(Result(), currentBlock);
 }
 
-//
-void BlueprintParser::parse(const MarkdownBlock& source, const ParseHandler& callback)
+
+void BlueprintParser::parse(const SourceData& sourceData, const MarkdownBlock& source, const ParseHandler& callback)
 {
     Blueprint blueprint;
     Result result;
@@ -167,10 +167,10 @@ void BlueprintParser::parse(const MarkdownBlock& source, const ParseHandler& cal
         currentSection = BlockSection(currentBlock, currentSection);
         
         if (currentSection == Section::Overview) {
-            sectionResult = ParseOverview(currentBlock, source.blocks.end(), blueprint);
+            sectionResult = ParseOverview(currentBlock, source.blocks.end(), sourceData, blueprint);
         }
         if (currentSection == Section::ResourceGroup) {
-            sectionResult = ParseResourceGroup(currentBlock, source.blocks.end(), blueprint);
+            sectionResult = ParseResourceGroup(currentBlock, source.blocks.end(), sourceData, blueprint);
         }
         
         // Append result error & warning data

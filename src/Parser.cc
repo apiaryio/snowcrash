@@ -21,13 +21,13 @@ void Parser::parse(const SourceData &source, const ParseHandler &callback)
         return;
     
     MarkdownParser markdownParser;
-    markdownParser.parse(source, [&](const Result& markdownResult, const MarkdownBlock& markdownAst){
+    markdownParser.parse(source, [&](const Result& markdownResult, const MarkdownBlock& markdownAST) {
         
         BlueprintParser blueprintParser;
-        blueprintParser.parse(markdownAst, [&](const Result& blueprintResult, const Blueprint& blueprintAst){
+        blueprintParser.parse(source, markdownAST, [&](const Result& blueprintResult, const Blueprint& blueprintAST) {
 
             // Finalize
-            callback(blueprintResult, blueprintAst);
+            callback(blueprintResult, blueprintAST);
 
         });
 

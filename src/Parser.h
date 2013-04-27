@@ -29,8 +29,8 @@ namespace snowcrash {
         
         SourceAnnotation(SourceAnnotation&&) = default;
         
-        SourceAnnotation(const std::string& msg, const SourceDataBlock& loc = SourceDataBlock())
-        : SourceAnnotation() { message = msg; location = loc; }
+        SourceAnnotation(const std::string& message, int code = OK, const SourceDataBlock& location = SourceDataBlock())
+        : SourceAnnotation() { this->message = message; this->code = code; this->location = location; }
         
         ~SourceAnnotation() = default;
 

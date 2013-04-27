@@ -23,7 +23,7 @@ namespace snowcrash {
         using ParseHandler = std::function<void(const Result&, const Blueprint&)>;
         
         // Parse Markdown AST into API Blueprint AST
-        void parse(const MarkdownBlock& source, const ParseHandler& callback);
+        void parse(const SourceData& sourceData, const MarkdownBlock& source, const ParseHandler& callback);
     };
 }
 
