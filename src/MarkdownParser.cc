@@ -44,14 +44,13 @@ void MarkdownParser::parse(const SourceData& source, const MarkdownParser::Parse
         markdownAst.blocks = std::move(m_renderContext.back());
         m_renderContext.clear();
         
-        // TODO: remove
-//#ifdef DEBUG
-//        printMarkdownBlock(markdownAst, 0);
-//#endif
+#ifdef DEBUG
+        printMarkdownBlock(markdownAst, 0);
+#endif
+
     }
     else {
-        // error
-        // TODO:
+        result.error = { "mismatched markdown block element(s)", 1 };
     }
     
     if (callback)
@@ -278,9 +277,6 @@ void MarkdownParser::renderQuote(const std::string& text)
 
 void MarkdownParser::blockDidParse(const src_map* map, const uint8_t *txt_data, size_t size, void *opaque)
 {
-    // TODO: remove
-    std::string textData(reinterpret_cast<const char *>(txt_data), size);
-
     if (!opaque || !map)
         return;
     
