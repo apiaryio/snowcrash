@@ -58,7 +58,7 @@ namespace snowcrash {
         // Append another result to this one, replacing error.
         Result& operator+=(const Result& rhs) {
             error = rhs.error;
-            warnings.insert(warnings.end(), rhs.warnings.begin(), rhs.warnings.end());
+            warnings.insert(std::end(warnings), std::begin(rhs.warnings), std::end(rhs.warnings));
             return *this;
         }
         

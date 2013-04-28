@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		BB167D1D172931330030D1D5 /* test-BlueprintParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA01FF817292F9C0050B603 /* test-BlueprintParser.cc */; };
+		BB4D8E57172D15CA0024EB04 /* libsnowcrash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBFF4898170B34E6001E5FB2 /* libsnowcrash.a */; };
 		BB740993171C05B20023105F /* MarkdownParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB740991171C05B20023105F /* MarkdownParser.cc */; };
 		BB740994171C05B20023105F /* MarkdownParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BB740992171C05B20023105F /* MarkdownParser.h */; };
 		BB740997171C065C0023105F /* MarkdownBlock.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB740995171C065C0023105F /* MarkdownBlock.cc */; };
@@ -18,7 +19,6 @@
 		BB86DEC11723E3A700063644 /* src_map.c in Sources */ = {isa = PBXBuildFile; fileRef = BB86DEC01723E3A700063644 /* src_map.c */; };
 		BB86DEC31723E3C600063644 /* src_map.h in Headers */ = {isa = PBXBuildFile; fileRef = BB86DEC21723E3C600063644 /* src_map.h */; };
 		BBA25671172BFEB800C1AD5E /* snowcrash.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA25670172BFEB800C1AD5E /* snowcrash.cc */; };
-		BBA25674172C26D500C1AD5E /* liblibsnowcrash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBFF4898170B34E6001E5FB2 /* liblibsnowcrash.a */; };
 		BBA889A71712FF37005A9570 /* Parser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA889A51712FF37005A9570 /* Parser.cc */; };
 		BBA889A81712FF37005A9570 /* Parser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA889A61712FF37005A9570 /* Parser.h */; };
 		BBA889AA17130239005A9570 /* test-Parser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA889A917130239005A9570 /* test-Parser.cc */; };
@@ -41,7 +41,7 @@
 		BBA91DC2171D402600649B05 /* BlueprintParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA91DC0171D402600649B05 /* BlueprintParser.h */; };
 		BBFF48CA170B3C49001E5FB2 /* test-snowcrash.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBFF48C9170B3C49001E5FB2 /* test-snowcrash.cc */; };
 		BBFF48CD170B3EDE001E5FB2 /* snowcrash.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBFF48CC170B3EDE001E5FB2 /* snowcrash.cc */; };
-		BBFF48D0170B3FBB001E5FB2 /* liblibsnowcrash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBFF4898170B34E6001E5FB2 /* liblibsnowcrash.a */; };
+		BBFF48D0170B3FBB001E5FB2 /* libsnowcrash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBFF4898170B34E6001E5FB2 /* libsnowcrash.a */; };
 		BBFF48D2170B4224001E5FB2 /* snowcrash.h in Headers */ = {isa = PBXBuildFile; fileRef = BBFF48D1170B4224001E5FB2 /* snowcrash.h */; };
 		BBFF48D5170C4F30001E5FB2 /* Blueprint.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBFF48D3170C4F30001E5FB2 /* Blueprint.cc */; };
 		BBFF48D6170C4F30001E5FB2 /* Blueprint.h in Headers */ = {isa = PBXBuildFile; fileRef = BBFF48D4170C4F30001E5FB2 /* Blueprint.h */; };
@@ -49,14 +49,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		BBA25679172C2BCA00C1AD5E /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = BBFF4890170B34E6001E5FB2 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = BBFF4897170B34E6001E5FB2;
-			remoteInfo = libsnowcrash;
-		};
-		BBA2567B172C2BD200C1AD5E /* PBXContainerItemProxy */ = {
+		BB4D8E55172D15AA0024EB04 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = BBFF4890170B34E6001E5FB2 /* Project object */;
 			proxyType = 1;
@@ -120,7 +113,7 @@
 		BBA889C417131B19005A9570 /* html.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = html.c; path = sundown/html/html.c; sourceTree = "<group>"; };
 		BBA91DBF171D402600649B05 /* BlueprintParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = BlueprintParser.cc; path = src/BlueprintParser.cc; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		BBA91DC0171D402600649B05 /* BlueprintParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = BlueprintParser.h; path = src/BlueprintParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
-		BBFF4898170B34E6001E5FB2 /* liblibsnowcrash.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liblibsnowcrash.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		BBFF4898170B34E6001E5FB2 /* libsnowcrash.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libsnowcrash.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BBFF48C0170B3C30001E5FB2 /* test-snowcrash */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "test-snowcrash"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BBFF48C9170B3C49001E5FB2 /* test-snowcrash.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-snowcrash.cc"; path = "test/test-snowcrash.cc"; sourceTree = "<group>"; };
 		BBFF48CC170B3EDE001E5FB2 /* snowcrash.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = snowcrash.cc; path = src/snowcrash.cc; sourceTree = "<group>"; };
@@ -135,7 +128,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BBA25674172C26D500C1AD5E /* liblibsnowcrash.a in Frameworks */,
+				BB4D8E57172D15CA0024EB04 /* libsnowcrash.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -150,7 +143,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BBFF48D0170B3FBB001E5FB2 /* liblibsnowcrash.a in Frameworks */,
+				BBFF48D0170B3FBB001E5FB2 /* libsnowcrash.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -212,7 +205,7 @@
 		BBFF4899170B34E6001E5FB2 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				BBFF4898170B34E6001E5FB2 /* liblibsnowcrash.a */,
+				BBFF4898170B34E6001E5FB2 /* libsnowcrash.a */,
 				BBFF48C0170B3C30001E5FB2 /* test-snowcrash */,
 				BBA25667172BFE4C00C1AD5E /* snowcrash */,
 			);
@@ -290,7 +283,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				BBA2567A172C2BCA00C1AD5E /* PBXTargetDependency */,
+				BB4D8E56172D15AA0024EB04 /* PBXTargetDependency */,
 			);
 			name = snowcrash;
 			productName = snowcrash;
@@ -311,7 +304,7 @@
 			);
 			name = libsnowcrash;
 			productName = snowcrash;
-			productReference = BBFF4898170B34E6001E5FB2 /* liblibsnowcrash.a */;
+			productReference = BBFF4898170B34E6001E5FB2 /* libsnowcrash.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 		BBFF48BF170B3C30001E5FB2 /* test-snowcrash */ = {
@@ -325,7 +318,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				BBA2567C172C2BD200C1AD5E /* PBXTargetDependency */,
 			);
 			name = "test-snowcrash";
 			productName = "test-snowcrash";
@@ -408,15 +400,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		BBA2567A172C2BCA00C1AD5E /* PBXTargetDependency */ = {
+		BB4D8E56172D15AA0024EB04 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = BBFF4897170B34E6001E5FB2 /* libsnowcrash */;
-			targetProxy = BBA25679172C2BCA00C1AD5E /* PBXContainerItemProxy */;
-		};
-		BBA2567C172C2BD200C1AD5E /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = BBFF4897170B34E6001E5FB2 /* libsnowcrash */;
-			targetProxy = BBA2567B172C2BD200C1AD5E /* PBXContainerItemProxy */;
+			targetProxy = BB4D8E55172D15AA0024EB04 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -495,7 +482,7 @@
 		BBFF489D170B34E6001E5FB2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				EXECUTABLE_PREFIX = lib;
+				EXECUTABLE_PREFIX = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -503,7 +490,7 @@
 		BBFF489E170B34E6001E5FB2 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				EXECUTABLE_PREFIX = lib;
+				EXECUTABLE_PREFIX = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

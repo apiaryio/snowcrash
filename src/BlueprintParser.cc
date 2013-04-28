@@ -150,7 +150,18 @@ ParseSectionResult ParseResourceGroup(const BlockStackIterator& begin, const Blo
     return std::make_pair(result, currentBlock);
 }
 
+// Parse Resource
+ParseSectionResult ParseResource(const BlockStackIterator& begin, const BlockStackIterator& end, const SourceData& sourceData, Blueprint &blueprint)
+{
+    Result result;
+    auto currentSection = Section::ResourceGroup;
+    BlockStackIterator currentBlock = begin;
 
+
+    return std::make_pair(result, currentBlock);
+}
+
+// Top-level parse
 void BlueprintParser::parse(const SourceData& sourceData, const MarkdownBlock& source, const ParseHandler& callback)
 {
     Blueprint blueprint;
@@ -160,17 +171,20 @@ void BlueprintParser::parse(const SourceData& sourceData, const MarkdownBlock& s
     auto currentSection = Section::Overview;
     
     // Iterate over top-level blocks & parse any sections recognized
-    auto currentBlock = source.blocks.begin();
-    while (currentBlock != source.blocks.end()) {
+    auto currentBlock = std::begin(source.blocks);
+    while (currentBlock != std::end(source.blocks)) {
+
+        currentSection = BlockSection(currentBlock, currentSection);
 
         ParseSectionResult sectionResult;
-        currentSection = BlockSection(currentBlock, currentSection);
-        
         if (currentSection == Section::Overview) {
-            sectionResult = ParseOverview(currentBlock, source.blocks.end(), sourceData, blueprint);
+            sectionResult = ParseOverview(currentBlock, std::end(source.blocks), sourceData, blueprint);
         }
-        if (currentSection == Section::ResourceGroup) {
-            sectionResult = ParseResourceGroup(currentBlock, source.blocks.end(), sourceData, blueprint);
+        else if (currentSection == Section::ResourceGroup) {
+            sectionResult = ParseResourceGroup(currentBlock, std::end(source.blocks), sourceData, blueprint);
+        }
+        else if (currentSection == Section::Resource) {
+            sectionResult = ParseResource(currentBlock, std::end(source.blocks), sourceData, blueprint);
         }
         
         // Append result error & warning data

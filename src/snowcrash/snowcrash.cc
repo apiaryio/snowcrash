@@ -27,7 +27,7 @@ void PrintAnnotation(const std::string& prefix, const snowcrash::SourceAnnotatio
     }
     
     if (!annotation.location.empty()) {
-        for (auto it = annotation.location.begin(); it != annotation.location.end(); ++it) {
+        for (auto it = std::begin(annotation.location); it != std::end(annotation.location); ++it) {
             std::cerr << ((it == annotation.location.begin()) ? " :" : ";");
             std::cerr << it->location << ":" << it->length;
         }

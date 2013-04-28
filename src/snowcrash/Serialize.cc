@@ -57,8 +57,8 @@ void serialize(const Collection<ResourceGroup> resourceGroups, std::ostream &os)
     serialize("groups", os);
     os << ": [ ";
     
-    for (auto it = resourceGroups.begin(); it != resourceGroups.end(); ++it) {
-        if (it != resourceGroups.begin())
+    for (auto it = std::begin(resourceGroups); it != std::end(resourceGroups); ++it) {
+        if (it != std::begin(resourceGroups))
             os << ", ";
         
         serialize(*it, os);        

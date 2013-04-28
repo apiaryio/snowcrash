@@ -23,14 +23,14 @@ void snowcrash::AppendSourceDataBlock(SourceDataBlock& destination, const Source
     
     if (destination.empty() ||
         append.front().location != destination.back().location + destination.back().length) {
-        destination.insert(destination.end(), append.begin(), append.end());
+        destination.insert(std::end(destination), std::begin(append), std::end(append));
     }
     else {
         // merge
         destination.back().length += append.front().length;
         
         if (append.size() > 1) {
-            destination.insert(destination.end(), ++append.begin(), append.end());
+            destination.insert(std::end(destination), ++std::begin(append), std::end(append));
         }
     }
 }
@@ -42,7 +42,7 @@ std::string snowcrash::MapSourceData(const SourceData& source, const SourceDataB
     
     auto length = source.length();
     std::stringstream ss;
-    for (auto it = sourceMap.begin(); it != sourceMap.end(); ++it) {
+    for (auto it = std::begin(sourceMap); it != std::end(sourceMap); ++it) {
         
         if (it->location + it->length > length)
             return std::string();   // wrong map
@@ -67,7 +67,7 @@ void snowcrash::printMarkdownBlock(const MarkdownBlock& block, unsigned int leve
     else
         std::cout << std::endl;
     
-    for (auto it = block.blocks.begin(); it != block.blocks.end(); ++it) {
+    for (auto it = std::begin(block.blocks); it != std::end(block.blocks); ++it) {
         printMarkdownBlock(*it, level + 1);
     }
     
