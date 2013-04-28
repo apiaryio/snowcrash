@@ -16,6 +16,11 @@
 
 using namespace snowcrash;
 
+SourceDataBlock snowcrash::MakeSourceDataBlock(size_t loc, size_t len)
+{
+    return SourceDataBlock(1, {loc, len});
+}
+
 void snowcrash::AppendSourceDataBlock(SourceDataBlock& destination, const SourceDataBlock& append)
 {
     if (append.empty())

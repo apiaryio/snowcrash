@@ -23,6 +23,8 @@ namespace snowcrash {
         size_t length;
     };
     using SourceDataBlock = std::vector<SourceDataRange>;
+    
+    SourceDataBlock MakeSourceDataBlock(size_t loc, size_t len);
     void AppendSourceDataBlock(SourceDataBlock& destination, const SourceDataBlock& append);
     
     //
@@ -55,8 +57,8 @@ namespace snowcrash {
         MarkdownBlock()
         : type(MarkdownBlockType::Undefined), data(0) {}
         
-        MarkdownBlock(MarkdownBlockType t, Content c = Content(), Data d = Data())
-        : MarkdownBlock() { type = t; content = c; data = d; }
+        MarkdownBlock(MarkdownBlockType t, Content c = Content(), Data d = Data(), SourceDataBlock map = SourceDataBlock())
+        : MarkdownBlock() { type = t; content = c; data = d; sourceMap = map; }
         
         MarkdownBlock(const MarkdownBlock& b) = default;
         
