@@ -6,10 +6,12 @@
 //  Copyright (c) 2013 Apiary.io. All rights reserved.
 //
 
+#include <regex>
 #include "BlueprintParser.h"
 
 using namespace snowcrash;
 
+// Parse sections
 enum class Section : int {
     Undefined,
     Overview,
@@ -17,14 +19,29 @@ enum class Section : int {
     Resource
 };
 
+// Parser iterator
 using BlockStackIterator = MarkdownBlock::Stack::const_iterator;
+
+// Parsing sub routine result
 using ParseSectionResult = std::pair<Result, BlockStackIterator>;
+
+// HTTP Methods
+static const std::string HTTPMethods = "GET|POST|PUT|DELETE|OPTIONS|PATCH|PROPPATCH|LOCK|UNLOCK|COPY|MOVE|MKCOL";
+
+// Method header regex
+static const std::regex MethodHeaderRegex("^(" + HTTPMethods + R"()\s*$)");
+
+// Resource header regex
+static const std::regex ResourceHeaderRegex("^((" + HTTPMethods + R"()\s+)?\/(.*?)\s*$)");
 
 // Returns true if block represents a resource header, false otherwise
 bool IsResourceHeader(const BlockStackIterator& block)
 {
-    // TODO:
-    return false;
+    if (block->type != MarkdownBlockType::Header ||
+        block->content.empty())
+        return false;
+    
+    return std::regex_match(block->content, ResourceHeaderRegex);
 }
 
 // Returns section for given block and context

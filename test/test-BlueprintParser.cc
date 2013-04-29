@@ -113,7 +113,7 @@ TEST_CASE("bpparser/parse-resource", "Parse simple resource.")
     list.blocks = { listItem };
     
     MarkdownBlock markdown;
-    markdown.blocks = { MarkdownBlock(MarkdownBlockType::Header, "# GET /resource", 1),
+    markdown.blocks = { MarkdownBlock(MarkdownBlockType::Header, "GET /resource", 1),
                         MarkdownBlock(MarkdownBlockType::Paragraph, "p1", 0, MakeSourceDataBlock(1, 1)),
                         list };
     
