@@ -16,7 +16,11 @@ enum class Section : int {
     Undefined,
     Overview,
     ResourceGroup,
-    Resource
+    ResourceGroupTerminating,
+    Resource,
+    ResourceTerminating,
+    Method,
+    MethodTerminating
 };
 
 // Parser iterator
@@ -42,6 +46,16 @@ bool IsResourceHeader(const BlockStackIterator& block)
         return false;
     
     return std::regex_match(block->content, ResourceHeaderRegex);
+}
+
+// Returns true if block represents a HTTP Method header, false otherwise
+bool IsMethodHeader(const BlockStackIterator& block)
+{
+    if (block->type != MarkdownBlockType::Header ||
+        block->content.empty())
+        return false;
+    
+    return std::regex_match(block->content, MethodHeaderRegex);
 }
 
 // Returns section for given block and context
@@ -88,6 +102,31 @@ Section BlockSection(const BlockStackIterator& block, const Section& context)
         else
             return Section::ResourceGroup;
     }
+    else if (context == Section::Resource) {
+        
+        // We are in Resource section
+        // exclusive terminator: Parameters List, Headers List, Method Header, Resource Header
+        
+        if (block->type != MarkdownBlockType::Header &&
+            block->type != MarkdownBlockType::List)
+            return Section::Resource;
+        
+        if (block->type == MarkdownBlockType::Header) {
+            if (IsResourceHeader(block)) {
+                return Section::ResourceTerminating;
+            }
+            else if (IsMethodHeader(block)) {
+                return Section::Method;
+            }
+            
+            return Section::Resource;
+        }
+        
+        if (block->type == MarkdownBlockType::List) {
+            /// TODO:
+            return Section::Resource;
+        }
+    }
     
     return Section::Undefined;
 }
@@ -133,6 +172,16 @@ ParseSectionResult ParseOverview(const BlockStackIterator& begin, const BlockSta
     return std::make_pair(result, currentBlock);
 }
 
+// Finds a group in blueprint by name
+auto FindResourceGroup(Blueprint& blueprint, const Name& name) -> Collection<ResourceGroup>::iterator
+{
+    auto group = std::find_if(std::begin(blueprint.resourceGroups),
+                              std::end(blueprint.resourceGroups),
+                              [=](const ResourceGroup& rg) { return rg.name == name; });
+    
+    return group;
+}
+
 // Parse Resource Group descending into Resources
 ParseSectionResult ParseResourceGroup(const BlockStackIterator& begin, const BlockStackIterator& end, const SourceData& sourceData, Blueprint &blueprint)
 {
@@ -140,22 +189,33 @@ ParseSectionResult ParseResourceGroup(const BlockStackIterator& begin, const Blo
     auto currentSection = Section::ResourceGroup;
     BlockStackIterator currentBlock = begin;
     ResourceGroup resourceGroup;
+    auto duplicate = std::end(blueprint.resourceGroups);
     
     while (currentSection == Section::ResourceGroup &&
            currentBlock != end) {
         
-        if (currentBlock == begin &&
-            currentBlock->type == MarkdownBlockType::Header) {
-            
-            resourceGroup.name = currentBlock->content;
-        }
-        else {
-            
-            if (currentBlock == begin) {
+        // Name
+        if (currentBlock == begin) {
+            if (currentBlock->type == MarkdownBlockType::Header) {
+                resourceGroup.name = currentBlock->content;
+            }
+            else {
                 // WARN: No group name specified
                 result.warnings.emplace_back("expected resources group name", 0, currentBlock->sourceMap);
+                
+                // Add as description
+                resourceGroup.description += MapSourceData(sourceData, currentBlock->sourceMap);
             }
             
+            // Check duplicate
+            auto duplicate = FindResourceGroup(blueprint, resourceGroup.name);
+            if (duplicate != std::end(blueprint.resourceGroups)) {
+                // WARN: existing group
+                result.warnings.emplace_back("group '" + resourceGroup.name + "' already exists", 0, currentBlock->sourceMap);
+            }
+        }
+        else {
+            // Description
             resourceGroup.description += MapSourceData(sourceData, currentBlock->sourceMap);
         }
         
@@ -163,7 +223,15 @@ ParseSectionResult ParseResourceGroup(const BlockStackIterator& begin, const Blo
         currentSection = BlockSection(currentBlock, currentSection);
     }
     
-    blueprint.resourceGroups.emplace_back(std::move(resourceGroup));
+    if (duplicate != std::end(blueprint.resourceGroups)) {
+        
+        duplicate->description += resourceGroup.description;
+    }
+    else {
+        
+        blueprint.resourceGroups.emplace_back(std::move(resourceGroup));
+    }
+    
     return std::make_pair(result, currentBlock);
 }
 
@@ -171,9 +239,20 @@ ParseSectionResult ParseResourceGroup(const BlockStackIterator& begin, const Blo
 ParseSectionResult ParseResource(const BlockStackIterator& begin, const BlockStackIterator& end, const SourceData& sourceData, Blueprint &blueprint)
 {
     Result result;
-    auto currentSection = Section::ResourceGroup;
+    auto currentSection = Section::Resource;
     BlockStackIterator currentBlock = begin;
+    
+    while (currentSection == Section::Resource &&
+           currentBlock != end) {
+        
+        // TODO:
+        // Collect URI
+        // Collect description
+        // Construct method ? 
 
+        ++currentBlock;
+        currentSection = BlockSection(currentBlock, currentSection);
+    }
 
     return std::make_pair(result, currentBlock);
 }
@@ -201,6 +280,8 @@ void BlueprintParser::parse(const SourceData& sourceData, const MarkdownBlock& s
             sectionResult = ParseResourceGroup(currentBlock, std::end(source.blocks), sourceData, blueprint);
         }
         else if (currentSection == Section::Resource) {
+            
+            // TODO: Construct anonymous resource group and parse it from there
             sectionResult = ParseResource(currentBlock, std::end(source.blocks), sourceData, blueprint);
         }
         
