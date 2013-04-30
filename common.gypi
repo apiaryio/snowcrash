@@ -5,12 +5,16 @@
 
   'target_defaults': {
     'cppflags': [ 
-      '-std=gnu++11',
+      '-std=c++11',
+      '-stdlib=libc++' 
+    ],
+    'cflags_cc': [ 
+      '-std=c++11',
       '-stdlib=libc++' 
     ],
     'xcode_settings': {
       'OTHER_CPLUSPLUSFLAGS': [
-        '-std=gnu++11',
+        '-std=c++11',
         '-stdlib=libc++'
       ]
     }
