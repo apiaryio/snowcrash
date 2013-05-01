@@ -10,8 +10,8 @@
 
 using namespace snowcrash;
 
-void snowcrash::parse(const SourceData& source, const Parser::ParseHandler& callback)
+void snowcrash::parse(const SourceData& source, Result& result, Blueprint& blueprint)
 {
     Parser p;
-    p.parse(source, callback);
+    p.parse(source, result, blueprint);
 }

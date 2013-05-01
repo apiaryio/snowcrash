@@ -25,7 +25,7 @@ void serialize(const std::string& key, const std::string& value, std::ostream &o
 }
 
 // Serialize Metadata
-void serialize(const Collection<Metadata>& metadata, std::ostream &os)
+void serialize(const Collection<Metadata>::type& metadata, std::ostream &os)
 {
     if (metadata.empty())
         return;
@@ -49,7 +49,7 @@ void serialize(const ResourceGroup& group, std::ostream &os)
 }
 
 // Serialize Resource Groups
-void serialize(const Collection<ResourceGroup> resourceGroups, std::ostream &os)
+void serialize(const Collection<ResourceGroup>::type& resourceGroups, std::ostream &os)
 {
     if (resourceGroups.empty())
         return;
@@ -57,8 +57,8 @@ void serialize(const Collection<ResourceGroup> resourceGroups, std::ostream &os)
     serialize("groups", os);
     os << ": [ ";
     
-    for (auto it = std::begin(resourceGroups); it != std::end(resourceGroups); ++it) {
-        if (it != std::begin(resourceGroups))
+    for (Collection<ResourceGroup>::type::const_iterator it = resourceGroups.begin(); it != resourceGroups.end(); ++it) {
+        if (it != resourceGroups.begin())
             os << ", ";
         
         serialize(*it, os);        

@@ -19,7 +19,11 @@ static std::string BufText(const struct buf *text)
     return std::string(reinterpret_cast<char *>(text->data), text->size);
 }
 
-void MarkdownParser::parse(const SourceData& source, const MarkdownParser::ParseHandler& callback)
+const size_t MarkdownParser::OutputUnitSize = 64;
+const size_t MarkdownParser::MaxNesting = 16;
+const int MarkdownParser::ParserExtensions = MKDEXT_FENCED_CODE | MKDEXT_NO_INTRA_EMPHASIS /*| MKDEXT_TABLES */;
+
+void MarkdownParser::parse(const SourceData& source, Result& result, MarkdownBlock& markdown)
 {
     // Push default render stack
     m_renderContext.clear();
@@ -27,21 +31,20 @@ void MarkdownParser::parse(const SourceData& source, const MarkdownParser::Parse
     
     // Build render callbacks & setup parser
     RenderCallbacks callbacks = renderCallbacks();
-	sd_markdown *markdown = sd_markdown_new(ParserExtensions, MaxNesting, &callbacks, renderCallbackData());
+	sd_markdown *sundown = sd_markdown_new(ParserExtensions, MaxNesting, &callbacks, renderCallbackData());
     
     buf *output = bufnew(OutputUnitSize);
 
     // Parse & build AST
-    sd_markdown_render(output, reinterpret_cast<const uint8_t *>(source.c_str()), source.length(), markdown);
+    sd_markdown_render(output, reinterpret_cast<const uint8_t *>(source.c_str()), source.length(), sundown);
 
     bufrelease(output);
-    sd_markdown_free(markdown);
+    sd_markdown_free(sundown);
 
     // Compose final Markdown object
     MarkdownBlock markdownAst;
-    Result result;
     if (m_renderContext.size() == 1) {
-        markdownAst.blocks = std::move(m_renderContext.back());
+        markdown.blocks = m_renderContext.back(); // FIXME: C++11 move
         m_renderContext.clear();
         
 //#ifdef DEBUG
@@ -50,11 +53,8 @@ void MarkdownParser::parse(const SourceData& source, const MarkdownParser::Parse
 
     }
     else {
-        result.error = { "mismatched markdown block element(s)", 1 };
-    }
-    
-    if (callback)
-        callback(result, markdownAst);
+        result.error = Error("mismatched markdown block element(s)", 1);
+    }    
 }
 
 MarkdownParser::RenderCallbacks MarkdownParser::renderCallbacks()
@@ -117,7 +117,7 @@ void MarkdownParser::renderHeader(struct buf *ob, const struct buf *text, int le
 
 void MarkdownParser::renderHeader(const std::string& text, int level)
 {
-    m_renderContext.back().emplace_back(MarkdownBlockType::Header, text, level);
+    m_renderContext.back().push_back(MarkdownBlock(HeaderBlockType, text, level));
 }
 
 void MarkdownParser::beginList(int flags, void *opaque)
@@ -145,12 +145,12 @@ void MarkdownParser::renderList(struct buf *ob, const struct buf *text, int flag
 
 void MarkdownParser::renderList(const std::string& text, int flags)
 {
-    MarkdownBlock::Stack context = std::move(m_renderContext.back());
+    MarkdownBlock::Stack context = m_renderContext.back(); // FIXME: C++11 move
     
     popRenderContext();
     
-    m_renderContext.back().emplace_back(MarkdownBlockType::List, text, 0);
-    m_renderContext.back().back().blocks = std::move(context);
+    m_renderContext.back().push_back(MarkdownBlock(ListBlockType, text, 0));
+    m_renderContext.back().back().blocks = context; // FIXME: C++11 move
 }
 
 void MarkdownParser::beginListItem(int flags, void *opaque)
@@ -178,12 +178,12 @@ void MarkdownParser::renderListItem(struct buf *ob, const struct buf *text, int 
 
 void MarkdownParser::renderListItem(const std::string& text, int flags)
 {
-    MarkdownBlock::Stack context = std::move(m_renderContext.back());
+    MarkdownBlock::Stack context = m_renderContext.back(); // FIXME: C++11 move
     
     popRenderContext();
     
-    m_renderContext.back().emplace_back(MarkdownBlockType::ListItem, text, 0);
-    m_renderContext.back().back().blocks = std::move(context);
+    m_renderContext.back().push_back(MarkdownBlock(ListItemBlockType, text, 0));
+    m_renderContext.back().back().blocks = context; // FIXME: C++11 move
 }
 
 void MarkdownParser::renderBlockCode(struct buf *ob, const struct buf *text, const struct buf *lang, void *opaque)
@@ -197,7 +197,7 @@ void MarkdownParser::renderBlockCode(struct buf *ob, const struct buf *text, con
 
 void MarkdownParser::renderBlockCode(const std::string& text, const std::string& language)
 {
-    m_renderContext.back().emplace_back(MarkdownBlockType::Code, text);
+    m_renderContext.back().push_back(MarkdownBlock(CodeBlockType, text));
 }
 
 void MarkdownParser::renderParagraph(struct buf *ob, const struct buf *text, void *opaque)
@@ -211,7 +211,7 @@ void MarkdownParser::renderParagraph(struct buf *ob, const struct buf *text, voi
 
 void MarkdownParser::renderParagraph(const std::string& text)
 {
-    m_renderContext.back().emplace_back(MarkdownBlockType::Paragraph, text);
+    m_renderContext.back().push_back(MarkdownBlock(ParagraphBlockType, text));
 }
 
 void MarkdownParser::renderHorizontalRule(struct buf *ob, void *opaque)
@@ -225,7 +225,7 @@ void MarkdownParser::renderHorizontalRule(struct buf *ob, void *opaque)
 
 void MarkdownParser::renderHorizontalRule()
 {
-    m_renderContext.back().emplace_back(MarkdownBlockType::HRule);
+    m_renderContext.back().push_back(MarkdownBlock(HRuleBlockType));
 }
 
 void MarkdownParser::renderHTML(struct buf *ob, const struct buf *text, void *opaque)
@@ -239,7 +239,7 @@ void MarkdownParser::renderHTML(struct buf *ob, const struct buf *text, void *op
 
 void MarkdownParser::renderHTML(const std::string& text)
 {
-    m_renderContext.back().emplace_back(MarkdownBlockType::HTML, text);
+    m_renderContext.back().push_back(MarkdownBlock(HTMLBlockType, text));
 }
 
 void MarkdownParser::beginQuote(void *opaque)
@@ -267,12 +267,12 @@ void MarkdownParser::renderQuote(struct buf *ob, const struct buf *text, void *o
 
 void MarkdownParser::renderQuote(const std::string& text)
 {
-    MarkdownBlock::Stack context = std::move(m_renderContext.back());
+    MarkdownBlock::Stack context = m_renderContext.back(); // FIXME: C++11 move
     
     popRenderContext();
     
-    m_renderContext.back().emplace_back(MarkdownBlockType::Quote, text, 0);
-    m_renderContext.back().back().blocks = std::move(context);
+    m_renderContext.back().push_back(MarkdownBlock(QuoteBlockType, text, 0));
+    m_renderContext.back().back().blocks = context; // FIXME: C++11 move
 }
 
 void MarkdownParser::blockDidParse(const src_map* map, const uint8_t *txt_data, size_t size, void *opaque)
@@ -283,7 +283,7 @@ void MarkdownParser::blockDidParse(const src_map* map, const uint8_t *txt_data, 
     SourceDataBlock sourceMap;
     for (size_t i = 0; i < map->size; ++i) {
         SourceDataRange sourceRange = {((range *)map->item[i])->loc, ((range *)map->item[i])->len};
-        sourceMap.emplace_back(sourceRange);
+        sourceMap.push_back(sourceRange);
     }
     
     MarkdownParser *p = static_cast<MarkdownParser *>(opaque);

@@ -34,3 +34,4 @@ DerivedData
 # Generated files
 config.mk
 bin/
+vendor/

@@ -20,43 +20,36 @@ TEST_CASE("parser/init", "Parser construction")
 
 TEST_CASE("parser/params", "parse() method parameters.")
 {
-
     Parser parser;
-    REQUIRE_NOTHROW(parser.parse("", nullptr));
+    Result result;
+    Blueprint blueprint;
     
-    bool didEnterCallback = false;
-    parser.parse("", [&](const Result& report, const Blueprint& blueprint){
-        didEnterCallback = true;
-        REQUIRE(report.error.code == Error::OK);
-    });
-    REQUIRE(didEnterCallback);
+    parser.parse("", result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
 }
 
 TEST_CASE("parser/parse-api-name", "Parse API name.")
 {
-    
     Parser parser;
-    const std::string bluerpintSource =
-R"(
-# Snowcrash API
+    Result result;
+    Blueprint blueprint;
     
-# GET /resource
-Resource **description**
-    
-+ Response 200
-    + Body
+    const std::string bluerpintSource = \
+"# Snowcrash API \n\
+\n\
+# GET /resource\n\
+Resource **description**\n\
+\n\
++ Response 200\n\
+    + Body\n\
+\n\
+        Text\n\
+\n\
+            { ... }\n\
+";
+        
+    parser.parse(bluerpintSource, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(blueprint.name == "Snowcrash API");
 
-        Text
-    
-            { ... }
-)";
-        
-    bool didEnterCallback = false;
-    parser.parse(bluerpintSource, [&](const Result& report, const Blueprint& blueprint){
-        didEnterCallback = true;
-        
-        REQUIRE(report.error.code == Error::OK);
-        REQUIRE(blueprint.name == "Snowcrash API");
-    });
-    REQUIRE(didEnterCallback);    
 }

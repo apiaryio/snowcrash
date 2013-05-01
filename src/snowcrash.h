@@ -14,7 +14,7 @@
 namespace snowcrash {
     
     // Convenience wrapper for Parser's parse method
-    void parse(const SourceData& source, const Parser::ParseHandler& callback);
+    void parse(const SourceData& source, Result& result, Blueprint& blueprint);
 }
 
 #endif

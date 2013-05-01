@@ -15,14 +15,14 @@
 namespace snowcrash {
 
     // Markdown source data
-    using SourceData = std::string;
+    typedef std::string SourceData;
 
     // Range of source data
     struct SourceDataRange {
         size_t location;
         size_t length;
     };
-    using SourceDataBlock = std::vector<SourceDataRange>;
+    typedef std::vector<SourceDataRange> SourceDataBlock;
     
     SourceDataBlock MakeSourceDataBlock(size_t loc, size_t len);
     void AppendSourceDataBlock(SourceDataBlock& destination, const SourceDataBlock& append);
@@ -30,19 +30,19 @@ namespace snowcrash {
     //
     // Markdown Block Type
     //
-    enum class MarkdownBlockType : int {
-        Undefined = 0,
-        Code,
-        Quote,
-        HTML,
-        Header,
-        HRule,
-        List,
-        ListItem,
-        Paragraph,
-        Table,
-        TableRow,
-        TableCell
+    enum MarkdownBlockType {
+        UndefinedBlockType = 0,
+        CodeBlockType,
+        QuoteBlockType,
+        HTMLBlockType,
+        HeaderBlockType,
+        HRuleBlockType,
+        ListBlockType,
+        ListItemBlockType,
+        ParagraphBlockType,
+        TableBlockType,
+        TableRowBlockType,
+        TableCellBlockType
     };
 
     //
@@ -50,23 +50,23 @@ namespace snowcrash {
     //
     struct MarkdownBlock {
 
-        using Stack = std::vector<MarkdownBlock>;
-        using Content = SourceData;
-        using Data = int;
-        
+        typedef std::vector<MarkdownBlock> Stack;
+        typedef SourceData Content;
+        typedef int Data;
+
         MarkdownBlock()
-        : type(MarkdownBlockType::Undefined), data(0) {}
+        : type(UndefinedBlockType), data(0) {}
         
         MarkdownBlock(MarkdownBlockType t, Content c = Content(), Data d = Data(), SourceDataBlock map = SourceDataBlock())
-        : MarkdownBlock() { type = t; content = c; data = d; sourceMap = map; }
+        { type = t; content = c; data = d; sourceMap = map; }
         
-        MarkdownBlock(const MarkdownBlock& b) = default;
+        MarkdownBlock(const MarkdownBlock& b)
+        { type = b.type; content = b.content; data = b.data; blocks = b.blocks; sourceMap = b.sourceMap; }
         
-        MarkdownBlock(MarkdownBlock&& b) = default;
+        virtual ~MarkdownBlock() {}
         
-        virtual ~MarkdownBlock() = default;
-        
-        MarkdownBlock& operator=(const MarkdownBlock& b) = default;
+        MarkdownBlock& operator=(const MarkdownBlock& b)
+        { type = b.type; content = b.content; data = b.data; blocks = b.blocks; sourceMap = b.sourceMap; return *this; }
         
         // Type of the Markdown Block
         MarkdownBlockType type;

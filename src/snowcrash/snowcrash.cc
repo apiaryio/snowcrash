@@ -27,7 +27,7 @@ void PrintAnnotation(const std::string& prefix, const snowcrash::SourceAnnotatio
     }
     
     if (!annotation.location.empty()) {
-        for (auto it = std::begin(annotation.location); it != std::end(annotation.location); ++it) {
+        for (snowcrash::SourceDataBlock::const_iterator it = annotation.location.begin(); it != annotation.location.end(); ++it) {
             std::cerr << ((it == annotation.location.begin()) ? " :" : ";");
             std::cerr << it->location << ":" << it->length;
         }
@@ -47,7 +47,7 @@ void PrintResult(const snowcrash::Result& result)
         PrintAnnotation("error:", result.error);
     }
     
-    for (auto it = result.warnings.begin(); it != result.warnings.end(); ++it) {
+    for (snowcrash::Warnigns::const_iterator it = result.warnings.begin(); it != result.warnings.end(); ++it) {
         PrintAnnotation("warning:", *it);
     }
 }
@@ -57,12 +57,12 @@ int main(int argc, const char *argv[])
     std::stringstream ss;
     ss << std::cin.rdbuf();
 
-    snowcrash::parse(ss.str(), [](const snowcrash::Result& result, const snowcrash::Blueprint& blueprint){
+    snowcrash::Result result;
+    snowcrash::Blueprint blueprint;
+    snowcrash::parse(ss.str(), result, blueprint);
         
-        PrintResult(result);
-        Serialize(blueprint, std::cout);
-
-    });
+    PrintResult(result);
+    Serialize(blueprint, std::cout);
 
     return 0;
 }

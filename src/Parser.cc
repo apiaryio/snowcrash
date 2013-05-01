@@ -14,23 +14,17 @@ using namespace snowcrash;
 
 const int SourceAnnotation::OK;
 
-void Parser::parse(const SourceData &source, const ParseHandler &callback)
+void Parser::parse(const SourceData& source, Result& result, Blueprint& blueprint)
 {
-    // Do not procceed without callback, silent
-    if (!callback)
+    // Parse Markdown
+    MarkdownBlock markdown;
+    MarkdownParser markdownParser;
+    markdownParser.parse(source, result, markdown);
+    
+    if (result.error.code != Error::OK)
         return;
     
-    MarkdownParser markdownParser;
-    markdownParser.parse(source, [&](const Result& markdownResult, const MarkdownBlock& markdownAST) {
-        
-        BlueprintParser blueprintParser;
-        blueprintParser.parse(source, markdownAST, [&](const Result& blueprintResult, const Blueprint& blueprintAST) {
-
-            // Finalize
-            callback(blueprintResult, blueprintAST);
-
-        });
-
-    });
-
+    // Parse Blueprint
+    BlueprintParser blueprintParser;
+    blueprintParser.parse(source, markdown, result, blueprint);
 }

@@ -18,7 +18,10 @@ using namespace snowcrash;
 
 SourceDataBlock snowcrash::MakeSourceDataBlock(size_t loc, size_t len)
 {
-    return SourceDataBlock(1, {loc, len});
+    SourceDataRange r;
+    r.location = loc;
+    r.length = len;
+    return SourceDataBlock(1, r);
 }
 
 void snowcrash::AppendSourceDataBlock(SourceDataBlock& destination, const SourceDataBlock& append)
@@ -28,14 +31,14 @@ void snowcrash::AppendSourceDataBlock(SourceDataBlock& destination, const Source
     
     if (destination.empty() ||
         append.front().location != destination.back().location + destination.back().length) {
-        destination.insert(std::end(destination), std::begin(append), std::end(append));
+        destination.insert(destination.end(), append.begin(), append.end());
     }
     else {
         // merge
         destination.back().length += append.front().length;
         
         if (append.size() > 1) {
-            destination.insert(std::end(destination), ++std::begin(append), std::end(append));
+            destination.insert(destination.end(), ++append.begin(), append.end());
         }
     }
 }
@@ -45,9 +48,9 @@ std::string snowcrash::MapSourceData(const SourceData& source, const SourceDataB
     if (source.empty())
         return std::string();
     
-    auto length = source.length();
+    size_t length = source.length();
     std::stringstream ss;
-    for (auto it = std::begin(sourceMap); it != std::end(sourceMap); ++it) {
+    for (SourceDataBlock::const_iterator it = sourceMap.begin(); it != sourceMap.end(); ++it) {
         
         if (it->location + it->length > length)
             return std::string();   // wrong map
@@ -72,7 +75,7 @@ void snowcrash::printMarkdownBlock(const MarkdownBlock& block, unsigned int leve
     else
         std::cout << std::endl;
     
-    for (auto it = std::begin(block.blocks); it != std::end(block.blocks); ++it) {
+    for (MarkdownBlock::Stack::const_iterator it = block.blocks.begin(); it != block.blocks.end(); ++it) {
         printMarkdownBlock(*it, level + 1);
     }
     

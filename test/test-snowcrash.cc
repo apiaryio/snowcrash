@@ -14,7 +14,8 @@
 using namespace snowcrash;
 
 TEST_CASE( "snowcrash/parse", "snowcrash parse test" )
-{    
-    snowcrash::parse("", [](const Result& r, const Blueprint& b){
-    });
+{
+    Result result;
+    Blueprint blueprint;
+    snowcrash::parse("", result, blueprint);
 }

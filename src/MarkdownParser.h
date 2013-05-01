@@ -21,23 +21,21 @@ namespace snowcrash {
     class MarkdownParser {
     public:
         // Default sundown parser configuration
-        const size_t OutputUnitSize = 64;
-        const size_t MaxNesting = 16;
-        const int ParserExtensions = MKDEXT_FENCED_CODE | MKDEXT_NO_INTRA_EMPHASIS /*| MKDEXT_TABLES */;
-        
-        using ParseHandler = std::function<void(const Result&, const MarkdownBlock&)>;
+        static const size_t OutputUnitSize; // = 64;
+        static const size_t MaxNesting;// = 16;
+        static const int ParserExtensions;// = MKDEXT_FENCED_CODE | MKDEXT_NO_INTRA_EMPHASIS /*| MKDEXT_TABLES */;
         
         // Parse source Markdown into Markdown AST
-        void parse(const SourceData& source, const ParseHandler& callback);
+        void parse(const SourceData& source, Result& result, MarkdownBlock& markdown);
     
     private:
-        using RenderCallbacks = sd_callbacks;
-        using RenderCallbackData = void *;
+        typedef sd_callbacks RenderCallbacks;
+        typedef void * RenderCallbackData;
     
         RenderCallbacks renderCallbacks();
         RenderCallbackData renderCallbackData();
         
-        using RenderStack = std::vector<MarkdownBlock::Stack>;
+        typedef std::vector<MarkdownBlock::Stack> RenderStack;
         RenderStack m_renderContext;
         
         void pushRenderContext();

@@ -25,16 +25,16 @@ namespace snowcrash {
         SourceAnnotation()
         : code(OK) {}
 
-        SourceAnnotation(const SourceAnnotation&) = default;
-        
-        SourceAnnotation(SourceAnnotation&&) = default;
+        SourceAnnotation(const SourceAnnotation& rhs)
+        { this->message = rhs.message; this->code = rhs.code; this->location = rhs.location; }
         
         SourceAnnotation(const std::string& message, int code = OK, const SourceDataBlock& location = SourceDataBlock())
-        : SourceAnnotation() { this->message = message; this->code = code; this->location = location; }
+        { this->message = message; this->code = code; this->location = location; }
         
-        ~SourceAnnotation() = default;
+        ~SourceAnnotation() {}
 
-        SourceAnnotation& operator=(const SourceAnnotation&) = default;
+        SourceAnnotation& operator=(const SourceAnnotation& rhs)
+        { this->message = rhs.message; this->code = rhs.code; this->location = rhs.location; return *this; }
         
         // Location of this annotation
         SourceDataBlock location;
@@ -46,9 +46,9 @@ namespace snowcrash {
         std::string message;
     };
     
-    using Error = SourceAnnotation;
-    using Warning = SourceAnnotation;
-    using Warnigns = std::vector<Warning>;
+    typedef SourceAnnotation Error;
+    typedef SourceAnnotation Warning;
+    typedef std::vector<Warning> Warnigns;
     
     //
     // Module parsing report
@@ -58,7 +58,7 @@ namespace snowcrash {
         // Append another result to this one, replacing error.
         Result& operator+=(const Result& rhs) {
             error = rhs.error;
-            warnings.insert(std::end(warnings), std::begin(rhs.warnings), std::end(rhs.warnings));
+            warnings.insert(warnings.end(), rhs.warnings.begin(), rhs.warnings.end());
             return *this;
         }
         
@@ -71,10 +71,10 @@ namespace snowcrash {
     //
     class Parser {
     public:
-        using ParseHandler = std::function<void(const Result&, const Blueprint&)>;
+        // using ParseHandler = std::function<void(const Result&, const Blueprint&)>;
         
         // Parse source data into Blueprint AST
-        void parse(const SourceData& source, const ParseHandler& callback);
+        void parse(const SourceData& source, Result& result, Blueprint& blueprint);
     };
 }
 

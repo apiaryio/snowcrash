@@ -20,36 +20,39 @@ namespace snowcrash {
     //
     
     // Name of section / element. Plain text
-    using Name = std::string;
+    typedef std::string Name;
 
     // Section Description. Rendered HTML from Markdown
-    using Description = std::string;
+    typedef std::string Description;
     
     // URI
-    using URI = std::string;
+    typedef std::string URI;
     
     // URI template
-    using URITemplate = std::string;
+    typedef std::string URITemplate;
     
     // HTTP Method
-    using HTTPMethod = std::string;
+    typedef std::string HTTPMethod;
     
     // Default Container for collections
+    // FIXME: C++11 template aliases
     template<typename T>
-    using Collection = std::vector<T>;
+    struct Collection {
+        typedef std::vector<T> type;
+    };
     
     //
     // API Blueprint sections
     //
     
     // Asset data
-    using Asset = std::string;
+    typedef std::string Asset;
 
     // Metadata key-value pair, e.g. "HOST: http://acme.com"
-    using Metadata = std::pair<std::string, std::string>;
+    typedef std::pair<std::string, std::string> Metadata;
 
     // Header key-value pair, e.g. "Content-Type: application/json"
-    using Header = std::pair<std::string, std::string>;
+    typedef std::pair<std::string, std::string> Header;
     
     // Parameter
     struct Parameter {
@@ -86,10 +89,10 @@ namespace snowcrash {
     };
     
     // Request
-    using Request = Payload;
+    typedef Payload Request;
     
     // Response, a payload where name is HTTP status code
-    using Response = Payload;
+    typedef Payload Response;
     
     // Method
     struct Method {
@@ -123,13 +126,13 @@ namespace snowcrash {
         Description description;
         
         // Parameters
-        Collection<Parameter> parameters;
+        Collection<Parameter>::type parameters;
         
         // Headers
-        Collection<Header> headers;
+        Collection<Header>::type headers;
         
         // Methods
-        Collection<Method> methods;
+        Collection<Method>::type methods;
     };
     
     // Group of resources
@@ -142,14 +145,14 @@ namespace snowcrash {
         Description description;
         
         // Resources
-        Collection<Resource> resources;
+        Collection<Resource>::type resources;
     };
     
     // API Blueprint
     struct Blueprint {
         
         // Metadata
-        Collection<Metadata> metadata;
+        Collection<Metadata>::type metadata;
         
         // API Name
         Name name;
@@ -158,7 +161,7 @@ namespace snowcrash {
         Description description;
         
         // Resource Groups
-        Collection<ResourceGroup> resourceGroups;
+        Collection<ResourceGroup>::type resourceGroups;
     };
 }
 

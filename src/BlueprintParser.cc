@@ -6,143 +6,146 @@
 //  Copyright (c) 2013 Apiary.io. All rights reserved.
 //
 
-#include <regex>
+//#include <regex>
 #include "BlueprintParser.h"
+//#include <boost/regex.hpp>
 
 using namespace snowcrash;
 
 // Parse sections
-enum class Section : int {
-    Undefined,
-    Overview,
-    ResourceGroup,
-    ResourceGroupTerminating,
-    Resource,
-    ResourceTerminating,
-    Method,
-    MethodTerminating
+enum Section {
+    UndefinedSection,
+    OverviewSection,
+    ResourceGroupSection,
+    ResourceGroupTerminatingSection,
+    ResourceSection,
+    ResourceTerminatingSection,
+    MethodSection,
+    MethodTerminatingSection
 };
 
 // Parser iterator
-using BlockStackIterator = MarkdownBlock::Stack::const_iterator;
+typedef MarkdownBlock::Stack::const_iterator BlockStackIterator;
 
 // Parsing sub routine result
-using ParseSectionResult = std::pair<Result, BlockStackIterator>;
+typedef std::pair<Result, BlockStackIterator> ParseSectionResult;
 
 // HTTP Methods
 static const std::string HTTPMethods = "GET|POST|PUT|DELETE|OPTIONS|PATCH|PROPPATCH|LOCK|UNLOCK|COPY|MOVE|MKCOL";
 
 // Method header regex
-static const std::regex MethodHeaderRegex("^(" + HTTPMethods + R"()\s*$)");
+//static const std::regex MethodHeaderRegex("^(" + HTTPMethods + R"()\s*$)");
 
 // Resource header regex
-static const std::regex ResourceHeaderRegex("^((" + HTTPMethods + R"()\s+)?\/(.*?)\s*$)");
+//static const std::regex ResourceHeaderRegex("^((" + HTTPMethods + R"()\s+)?\/(.*?)\s*$)");
 
 // Returns true if block represents a resource header, false otherwise
 bool IsResourceHeader(const BlockStackIterator& block)
 {
-    if (block->type != MarkdownBlockType::Header ||
+    if (block->type != HeaderBlockType ||
         block->content.empty())
         return false;
     
-    return std::regex_match(block->content, ResourceHeaderRegex);
+//    return std::regex_match(block->content, ResourceHeaderRegex);
+    return false;
 }
 
 // Returns true if block represents a HTTP Method header, false otherwise
 bool IsMethodHeader(const BlockStackIterator& block)
 {
-    if (block->type != MarkdownBlockType::Header ||
+    if (block->type != HeaderBlockType ||
         block->content.empty())
         return false;
     
-    return std::regex_match(block->content, MethodHeaderRegex);
+//    return std::regex_match(block->content, MethodHeaderRegex);
+    return false;
 }
 
 // Returns section for given block and context
 Section BlockSection(const BlockStackIterator& block, const Section& context)
 {   
-    if (context == Section::Overview) {
+    if (context == OverviewSection) {
 
         // We are in Overview section
         // inclusive terminator: HR
         // exclusive terminator: Resource Header
         
-        if (block->type != MarkdownBlockType::Header)
-            return Section::Overview;
+        if (block->type != HeaderBlockType)
+            return OverviewSection;
         
         if (IsResourceHeader(block))
-            return Section::Resource;
+            return ResourceSection;
         else
-            return Section::Overview;
+            return OverviewSection;
     }
-    else if (context == Section::Undefined) {
+    else if (context == UndefinedSection) {
 
         // We are in an undefined top-level section
         // Entering after parsed top level section. Which implies
         // only expected sections are Resource or Resource group.
         
-        if (block->type != MarkdownBlockType::Header)
-            return Section::ResourceGroup;
+        if (block->type != HeaderBlockType)
+            return ResourceGroupSection;
         
         if (IsResourceHeader(block))
-            return Section::Resource;
+            return ResourceSection;
         else
-            return Section::ResourceGroup;
+            return ResourceGroupSection;
     }
-    else if (context == Section::ResourceGroup) {
+    else if (context == ResourceGroupSection) {
         
         // We are in Resource Group section
         // exclusive terminator: Resource Header
         
-        if (block->type != MarkdownBlockType::Header)
-            return Section::ResourceGroup;
+        if (block->type != HeaderBlockType)
+            return ResourceGroupSection;
         
         if (IsResourceHeader(block))
-            return Section::Resource;
+            return ResourceSection;
         else
-            return Section::ResourceGroup;
+            return ResourceGroupSection;
     }
-    else if (context == Section::Resource) {
+    else if (context == ResourceSection) {
         
         // We are in Resource section
         // exclusive terminator: Parameters List, Headers List, Method Header, Resource Header
         
-        if (block->type != MarkdownBlockType::Header &&
-            block->type != MarkdownBlockType::List)
-            return Section::Resource;
+        if (block->type != HeaderBlockType &&
+            block->type != ListBlockType)
+            return ResourceSection;
         
-        if (block->type == MarkdownBlockType::Header) {
+        if (block->type == HeaderBlockType) {
             if (IsResourceHeader(block)) {
-                return Section::ResourceTerminating;
+                return ResourceTerminatingSection;
             }
             else if (IsMethodHeader(block)) {
-                return Section::Method;
+                return MethodSection;
             }
             
-            return Section::Resource;
+            return ResourceSection;
         }
         
-        if (block->type == MarkdownBlockType::List) {
+        if (block->type == ListBlockType) {
             /// TODO:
-            return Section::Resource;
+            return ResourceSection;
         }
     }
     
-    return Section::Undefined;
+    return UndefinedSection;
 }
 
 // Parse Overview section
 ParseSectionResult ParseOverview(const BlockStackIterator& begin, const BlockStackIterator& end, const SourceData& sourceData, Blueprint &blueprint)
 {
     Result result;
-    auto currentSection = Section::Overview;
+    Section currentSection = OverviewSection;
     BlockStackIterator currentBlock = begin;
 
-    while (currentSection == Section::Overview &&
+    while (currentSection == OverviewSection &&
            currentBlock != end) {
         
         if (currentBlock == begin &&
-            currentBlock->type == MarkdownBlockType::Header) {
+            currentBlock->type == HeaderBlockType) {
 
             // Blueprint Name
             blueprint.name = currentBlock->content;
@@ -150,10 +153,10 @@ ParseSectionResult ParseOverview(const BlockStackIterator& begin, const BlockSta
         else {
             if (currentBlock == begin) {
                 // WARN: No API name specified
-                result.warnings.emplace_back("expected API name", 0, currentBlock->sourceMap);
+                result.warnings.push_back(Warning("expected API name", 0, currentBlock->sourceMap));
             }
              
-            if (currentBlock->type == MarkdownBlockType::HRule) {
+            if (currentBlock->type == HRuleBlockType) {
                 
                 // Section terminator, eat it and bail out
                 ++currentBlock;
@@ -173,11 +176,14 @@ ParseSectionResult ParseOverview(const BlockStackIterator& begin, const BlockSta
 }
 
 // Finds a group in blueprint by name
-auto FindResourceGroup(Blueprint& blueprint, const Name& name) -> Collection<ResourceGroup>::iterator
+Collection<ResourceGroup>::type::iterator FindResourceGroup(Blueprint& blueprint, const Name& name)
 {
-    auto group = std::find_if(std::begin(blueprint.resourceGroups),
-                              std::end(blueprint.resourceGroups),
-                              [=](const ResourceGroup& rg) { return rg.name == name; });
+    Collection<ResourceGroup>::type::iterator group = blueprint.resourceGroups.end();
+    
+    // TODO:
+//    = std::find_if(blueprint.resourceGroups.begin(),
+//                              blueprint.resourceGroups.end(),
+//                              [=](const ResourceGroup& rg) { return rg.name == name; });
     
     return group;
 }
@@ -185,33 +191,33 @@ auto FindResourceGroup(Blueprint& blueprint, const Name& name) -> Collection<Res
 // Parse Resource Group descending into Resources
 ParseSectionResult ParseResourceGroup(const BlockStackIterator& begin, const BlockStackIterator& end, const SourceData& sourceData, Blueprint &blueprint)
 {
-    Result result;    
-    auto currentSection = Section::ResourceGroup;
+    Result result;
+    Section currentSection = ResourceGroupSection;
     BlockStackIterator currentBlock = begin;
     ResourceGroup resourceGroup;
-    auto duplicate = std::end(blueprint.resourceGroups);
+    Collection<ResourceGroup>::type::iterator duplicate = blueprint.resourceGroups.end();
     
-    while (currentSection == Section::ResourceGroup &&
+    while (currentSection == ResourceGroupSection &&
            currentBlock != end) {
         
         // Name
         if (currentBlock == begin) {
-            if (currentBlock->type == MarkdownBlockType::Header) {
+            if (currentBlock->type == HeaderBlockType) {
                 resourceGroup.name = currentBlock->content;
             }
             else {
                 // WARN: No group name specified
-                result.warnings.emplace_back("expected resources group name", 0, currentBlock->sourceMap);
+                result.warnings.push_back(Warning("expected resources group name", 0, currentBlock->sourceMap));
                 
                 // Add as description
                 resourceGroup.description += MapSourceData(sourceData, currentBlock->sourceMap);
             }
             
             // Check duplicate
-            auto duplicate = FindResourceGroup(blueprint, resourceGroup.name);
-            if (duplicate != std::end(blueprint.resourceGroups)) {
+            Collection<ResourceGroup>::type::iterator duplicate = FindResourceGroup(blueprint, resourceGroup.name);
+            if (duplicate != blueprint.resourceGroups.end()) {
                 // WARN: existing group
-                result.warnings.emplace_back("group '" + resourceGroup.name + "' already exists", 0, currentBlock->sourceMap);
+                result.warnings.push_back(Warning("group '" + resourceGroup.name + "' already exists", 0, currentBlock->sourceMap));
             }
         }
         else {
@@ -223,13 +229,13 @@ ParseSectionResult ParseResourceGroup(const BlockStackIterator& begin, const Blo
         currentSection = BlockSection(currentBlock, currentSection);
     }
     
-    if (duplicate != std::end(blueprint.resourceGroups)) {
+    if (duplicate != blueprint.resourceGroups.end()) {
         
         duplicate->description += resourceGroup.description;
     }
     else {
         
-        blueprint.resourceGroups.emplace_back(std::move(resourceGroup));
+        blueprint.resourceGroups.push_back(resourceGroup); // FIXME: C++11 move
     }
     
     return std::make_pair(result, currentBlock);
@@ -239,10 +245,10 @@ ParseSectionResult ParseResourceGroup(const BlockStackIterator& begin, const Blo
 ParseSectionResult ParseResource(const BlockStackIterator& begin, const BlockStackIterator& end, const SourceData& sourceData, Blueprint &blueprint)
 {
     Result result;
-    auto currentSection = Section::Resource;
+    Section currentSection = ResourceSection;
     BlockStackIterator currentBlock = begin;
     
-    while (currentSection == Section::Resource &&
+    while (currentSection == ResourceSection &&
            currentBlock != end) {
         
         // TODO:
@@ -258,31 +264,31 @@ ParseSectionResult ParseResource(const BlockStackIterator& begin, const BlockSta
 }
 
 // Top-level parse
-void BlueprintParser::parse(const SourceData& sourceData, const MarkdownBlock& source, const ParseHandler& callback)
+void BlueprintParser::parse(const SourceData& sourceData, const MarkdownBlock& source, Result& result, Blueprint& blueprint)
 {
-    Blueprint blueprint;
-    Result result;
+    //Blueprint blueprint;
+    //Result result;
     
     // Initial section
-    auto currentSection = Section::Overview;
+    Section currentSection = OverviewSection;
     
     // Iterate over top-level blocks & parse any sections recognized
-    auto currentBlock = std::begin(source.blocks);
-    while (currentBlock != std::end(source.blocks)) {
+    MarkdownBlock::Stack::const_iterator currentBlock = source.blocks.begin();
+    while (currentBlock != source.blocks.end()) {
 
         currentSection = BlockSection(currentBlock, currentSection);
 
         ParseSectionResult sectionResult;
-        if (currentSection == Section::Overview) {
-            sectionResult = ParseOverview(currentBlock, std::end(source.blocks), sourceData, blueprint);
+        if (currentSection == OverviewSection) {
+            sectionResult = ParseOverview(currentBlock, source.blocks.end(), sourceData, blueprint);
         }
-        else if (currentSection == Section::ResourceGroup) {
-            sectionResult = ParseResourceGroup(currentBlock, std::end(source.blocks), sourceData, blueprint);
+        else if (currentSection == ResourceGroupSection) {
+            sectionResult = ParseResourceGroup(currentBlock, source.blocks.end(), sourceData, blueprint);
         }
-        else if (currentSection == Section::Resource) {
+        else if (currentSection == ResourceSection) {
             
             // TODO: Construct anonymous resource group and parse it from there
-            sectionResult = ParseResource(currentBlock, std::end(source.blocks), sourceData, blueprint);
+            sectionResult = ParseResource(currentBlock, source.blocks.end(), sourceData, blueprint);
         }
         
         // Append result error & warning data
@@ -294,7 +300,7 @@ void BlueprintParser::parse(const SourceData& sourceData, const MarkdownBlock& s
         }
         
         // Proceed to the next block
-        currentSection = Section::Undefined;
+        currentSection = UndefinedSection;
         if (currentBlock != sectionResult.second) {
             currentBlock = sectionResult.second;
         }
@@ -302,7 +308,4 @@ void BlueprintParser::parse(const SourceData& sourceData, const MarkdownBlock& s
             ++currentBlock;
         }
     }
-    
-    if (callback)
-        callback(result, blueprint);
 }
