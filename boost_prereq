@@ -1,0 +1,111 @@
+#!/usr/bin/env python
+#
+# Fetch & build boost script for OS X & linux
+#
+import platform
+import sys
+import os
+import errno
+import subprocess
+import shutil
+
+boost_src_url = 'http://sourceforge.net/projects/boost/files/boost/1.53.0/boost_1_53_0.tar.bz2/download'
+boost_archive = 'boost_1_53_0.tar.bz2'
+boost_dir = 'boost_1_53_0'
+cleanup = True
+
+# Check OS
+current_os = platform.system()
+if current_os != 'Darwin' and current_os != 'Linux':
+    sys.exit("unsupported system, please contribute")
+
+# mkdir -p, pre Python 3.2
+def mkdir_p(path):
+    try:
+        os.makedirs(path)
+    except OSError as exc: # Python >2.5
+        if exc.errno == errno.EEXIST and os.path.isdir(path):
+            pass
+        else: raise
+
+# Get boost
+def fetch_boost():
+  print "downloading boost..."
+  result = 0
+  if current_os == 'Darwin':
+    subprocess.call(['curl', '-L', boost_src_url, '-o', boost_archive])
+  else:
+    subprocess.call(['wget', '-c', boost_src_url, '-O', boost_archive])
+
+  if result != 0:
+    sys.exit("error downloading boost (" + result + ")")
+
+# Change to script's dir
+abs_path = os.path.abspath(__file__)
+dir_name = os.path.dirname(abs_path)
+os.chdir(dir_name)
+
+# Directories
+build_dir = os.path.abspath('./build/boost')
+install_dir = os.path.abspath('./vendor')
+
+# Check if we are needed
+if os.path.isfile(os.path.join(install_dir, 'lib/libboost_regex.a')) and \
+   os.path.isfile(os.path.join(install_dir, 'include/boost/version.hpp')):
+  print "nothing to be done for boost_prereq"
+  sys.exit(0)
+
+# Prepare build directory
+mkdir_p(build_dir)
+
+# Prepare output directory
+mkdir_p(install_dir)
+
+# Change to build_dir
+os.chdir(build_dir)
+
+# Fetch boost
+if os.path.isfile(boost_archive) or os.path.isdir(boost_dir):
+  print "found boost archive, skipping download"
+else:
+  fetch_boost()
+
+# Unpack
+if os.path.isdir(boost_dir):
+  print "found boost directory"
+else:
+  print "unpacking boost..."
+  #mkdir_p(boost_dir)
+  result = subprocess.call(['tar', '-jxf', boost_archive, boost_dir])
+  if result != 0:
+    sys.exit("error unpacking boost (" + result + ")")
+
+# Configure
+os.chdir(boost_dir)
+print "bootstrap..."
+result = 0
+with open(os.devnull, "w") as fnull:
+  result = subprocess.call(['./bootstrap.sh', '--with-libraries=regex', '--without-icu', '--prefix=' + install_dir], stdout = fnull, stderr = fnull)
+
+if result != 0:
+  sys.exit("error configuring boost (" + result + ")")
+
+# Build
+print "building boost..."
+result = 0
+with open(os.devnull, "w") as fnull:
+  result = subprocess.call(['./b2', 'install', 'link=static'], stdout = fnull, stderr = fnull)
+  
+if result != 0:
+  sys.exit("error building boost (" + result + ")")
+
+# Cleanup
+if cleanup:
+  print "cleaning up..."
+
+  print dir_name  
+  os.chdir(dir_name)  
+  shutil.rmtree(build_dir)
+
+# All done
+print "All OK."
