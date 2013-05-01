@@ -6,6 +6,7 @@
 //  Copyright (c) 2013 Apiary.io. All rights reserved.
 //
 
+#include <cstring>
 #include "MarkdownParser.h"
 
 using namespace snowcrash;

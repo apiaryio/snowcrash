@@ -65,11 +65,11 @@
         'sundown'
       ],
       'ldflags': [
-        '-stdlib=libc++'
+        '-stdlib=libstdc++'
       ],
       'xcode_settings': {
         'OTHER_LDFLAGS': [
-          '-stdlib=libc++'
+          '-stdlib=libstdc++'
         ]
       }
     },
@@ -90,11 +90,11 @@
         'sundown'
       ],
       'ldflags': [
-        '-stdlib=libc++'
+        '-stdlib=libstdc++'
       ],
       'xcode_settings': {
         'OTHER_LDFLAGS': [
-          '-stdlib=libc++'
+          '-stdlib=libstdc++'
         ]
       }
     }    
