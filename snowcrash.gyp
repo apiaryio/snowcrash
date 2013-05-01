@@ -38,6 +38,7 @@
         'src/MarkdownBlock.cc',
         'src/MarkdownParser.cc',
         'src/Parser.cc',
+        'src/RegexMatch.cc',
         'src/snowcrash.cc'
       ],
     },
@@ -58,6 +59,7 @@
         'test/test-MarkdownBlock.cc',
         'test/test-MarkdownParser.cc',
         'test/test-Parser.cc',
+        'test/test-RegexMatch.cc',
         'test/test-snowcrash.cc'
       ],
       'dependencies': [
