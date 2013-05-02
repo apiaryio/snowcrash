@@ -2,9 +2,10 @@ language: cpp
 compiler:
   - gcc
   - clang
-before_script:
-  - git submodule update --init --recursive  
 script: ./configure && make test
+before_install:
+  - git submodule update --init --recursive
+  - sudo apt-get install gyp
 branches:
   only:
     - master
