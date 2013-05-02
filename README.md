@@ -1,6 +1,9 @@
-# Snow Crash – API Blueprint Parser [![Build Status](https://travis-ci.org/apiaryio/snowcrash.png?branch=master)](https://travis-ci.org/apiaryio/snowcrash)
+# Snow Crash [![Build Status](https://travis-ci.org/apiaryio/snowcrash.png?branch=master)](https://travis-ci.org/apiaryio/snowcrash)
+### API Blueprint Parser
 
 Snow Crash is [**API Blueprint Parser**](http://apiblueprint.org) built on top of [Sundown](https://github.com/vmg/sundown) Markdown parser.
+
+Full API Blueprint documentation can be found on the [API Blueprint site](http://apiblueprint.org).
 
 ## Bindings
 * [Protagonist](https://github.com/apiaryio/protagonist) (Node.js)
@@ -10,12 +13,11 @@ Snow Crash uses [Gyp](http://code.google.com/p/gyp/) build automation tool to ge
 	
 1. Clone the repo + fetch the submodules:
 
-		$ git clone git@github.com:apiaryio/snowcrash.git
+		$ git clone git://github.com/apiaryio/snowcrash.git
 		$ cd snowcrash
-		$ git submodule init
-		$ git submodule update
+		$ git submodule update --init --recursive
 
-2. If needed install Gyp. Either from its package:
+2. If needed, install Gyp. Either from its package:
 	
 		$ sudo apt-get install gyp
 
@@ -30,8 +32,18 @@ Snow Crash uses [Gyp](http://code.google.com/p/gyp/) build automation tool to ge
 3. Build Snow Crash:
 
 		$ ./configure
-		$ make
 		$ make test
+
+		
+## Test
+To run bundled test simply run:
+
+	$ make test
+	
+To build & run Snow Crash command line tool use:
+
+	$ make snowcrash
+	$ ./bin/snowcrash
 
 ## License
 See LICENSE file.
