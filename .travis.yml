@@ -1,0 +1,16 @@
+language: cpp
+compiler:
+  - gcc
+  - clang
+before_script:
+  - git submodule update --init --recursive  
+script: ./configure && make test
+branches:
+  only:
+    - master
+notifications:
+  recipients:
+    - z@apiary.io
+  email:
+    on_success: change
+    on_failure: always
