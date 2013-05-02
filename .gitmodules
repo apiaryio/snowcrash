@@ -1,9 +1,9 @@
 [submodule "test/vendor/Catch"]
 	path = test/vendor/Catch
-	url = git@github.com:philsquared/Catch.git
+	url = https://github.com/philsquared/Catch.git
 [submodule "sundown"]
 	path = sundown
-	url = git@github.com:apiaryio/sundown.git
+	url = https://github.com/apiaryio/sundown.git
 [submodule "houdini"]
 	path = houdini
 	url = https://github.com/vmg/houdini
