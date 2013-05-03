@@ -1,11 +1,13 @@
 # Snow Crash [![Build Status](https://travis-ci.org/apiaryio/snowcrash.png?branch=master)](https://travis-ci.org/apiaryio/snowcrash)
 ### API Blueprint Parser
 
-Snow Crash is [API Blueprint](http://apiblueprint.org) Parser built on top of [Sundown](https://github.com/vmg/sundown) Markdown parser.
+Snow Crash is reference [API Blueprint](http://apiblueprint.org) parser built on top of [Sundown](https://github.com/vmg/sundown) Markdown parser.
 
-Full API Blueprint documentation can be found on the [API Blueprint site](http://apiblueprint.org).
+API Blueprint is REST API documentation language. Full API Blueprint documentation can be found on the [API Blueprint site](http://apiblueprint.org).
 
 ## Bindings
+Snow Crash has build for following languages:
+
 * [Protagonist](https://github.com/apiaryio/protagonist) (Node.js)
 
 ## Build
@@ -46,4 +48,4 @@ To build & run Snow Crash command line tool use:
 	$ ./bin/snowcrash
 
 ## License
-See LICENSE file.
+See [LICENSE](https://github.com/apiaryio/snowcrash/blob/master/LICENSE) file.
