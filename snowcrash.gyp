@@ -85,6 +85,8 @@
       ],
       'sources': [
         'src/snowcrash/snowcrash.cc',
+        'src/snowcrash/SerializeJSON.cc',
+        'src/snowcrash/SerializeYAML.cc',
         'src/snowcrash/Serialize.cc'
       ],
       'dependencies': [

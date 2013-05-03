@@ -2,17 +2,26 @@
 //  Serialize.h
 //  snowcrash
 //
-//  Created by Zdenek Nemec on 4/27/13.
+//  Created by Zdenek Nemec on 5/3/13.
 //  Copyright (c) 2013 Apiary.io. All rights reserved.
 //
 
 #ifndef SNOWCRASH_SERIALIZE_H
 #define SNOWCRASH_SERIALIZE_H
 
-#include <ostream>
-#include "Blueprint.h"
+#include <string>
+#include "SerializeJSON.h"
+#include "SerializeYAML.h"
 
-// Naive serialization to ostream
-void Serialize(const snowcrash::Blueprint& blueprint, std::ostream &os);
+namespace snowcrash {
+    
+    std::string EscapeNewlines(const std::string& input);
+    
+    struct SerializeKey {
+        static const std::string Name;
+        static const std::string Description;
+        static const std::string Groups;
+    };
+}
 
-#endif 
+#endif

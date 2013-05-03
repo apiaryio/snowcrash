@@ -9,7 +9,8 @@
 #include <iostream>
 #include <sstream>
 #include "snowcrash.h"
-#include "Serialize.h"
+#include "SerializeJSON.h"
+#include "SerializeYAML.h"
 
 using snowcrash::SourceAnnotation;
 using snowcrash::Error;
@@ -62,7 +63,7 @@ int main(int argc, const char *argv[])
     snowcrash::parse(ss.str(), result, blueprint);
         
     PrintResult(result);
-    Serialize(blueprint, std::cout);
+    SerializeYAML(blueprint, std::cout);
 
     return 0;
 }
