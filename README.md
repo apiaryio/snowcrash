@@ -6,7 +6,7 @@ Snow Crash is reference [API Blueprint](http://apiblueprint.org) parser built on
 API Blueprint is REST API documentation language. Full API Blueprint documentation can be found on the [API Blueprint site](http://apiblueprint.org).
 
 ## Bindings
-Snow Crash has build for following languages:
+Snow Crash bindings in other languages:
 
 * [Protagonist](https://github.com/apiaryio/protagonist) (Node.js)
 
