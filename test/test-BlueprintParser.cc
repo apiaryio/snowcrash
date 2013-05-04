@@ -90,7 +90,6 @@ TEST_CASE("bpparser/parse-group", "Parse resource group.")
     REQUIRE(group.description == "456");
 }
 
-// TODO: regex
 //TEST_CASE("bpparser/parse-resource", "Parse simple resource.")
 //{
 //    BlueprintParser parser;

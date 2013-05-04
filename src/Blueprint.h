@@ -39,6 +39,8 @@ namespace snowcrash {
     template<typename T>
     struct Collection {
         typedef std::vector<T> type;
+        typedef typename std::vector<T>::iterator iterator;
+        typedef typename std::vector<T>::const_iterator const_iterator;
     };
     
     //
@@ -76,10 +78,10 @@ namespace snowcrash {
         Description description;
         
         // Parameters
-        Collection<Parameter> parameters;
+        Collection<Parameter>::type parameters;
         
         // Headers
-        Collection<Header> headers;
+        Collection<Header>::type headers;
         
         // Body
         Asset body;
@@ -104,16 +106,16 @@ namespace snowcrash {
         Description description;
         
         // Parameters
-        Collection<Parameter> parameters;
+        Collection<Parameter>::type parameters;
         
         // Headers
-        Collection<Header> headers;
+        Collection<Header>::type headers;
 
         // Requests
-        Collection<Request> requests;
+        Collection<Request>::type requests;
         
         // Responses
-        Collection<Response> responses;
+        Collection<Response>::type responses;
     };
     
     // Resource

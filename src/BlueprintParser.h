@@ -9,9 +9,9 @@
 #ifndef SNOWCRASH_BLUEPRINTPARSER_H
 #define SNOWCRASH_BLUEPRINTPARSER_H
 
-#include "Parser.h"
+#include <functional>
+#include "BlueprintParserCore.h"
 #include "Blueprint.h"
-#include "MarkdownBlock.h"
 
 namespace snowcrash {
 
@@ -20,9 +20,8 @@ namespace snowcrash {
     //
     class BlueprintParser {
     public:
-        //using ParseHandler = std::function<void(const Result&, const Blueprint&)>;
-        
         // Parse Markdown AST into API Blueprint AST
+        // TODO make result return value
         void parse(const SourceData& sourceData, const MarkdownBlock& source, Result& result, Blueprint& blueprint);
     };
 }

@@ -9,7 +9,7 @@
 #ifndef SNOWCRASH_MARKDOWNPARSER_H
 #define SNOWCRASH_MARKDOWNPARSER_H
 
-#include "Parser.h"
+#include "ParserCore.h"
 #include "MarkdownBlock.h"
 #include "markdown.h"
 

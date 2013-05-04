@@ -74,11 +74,8 @@ MarkdownParser::RenderCallbacks MarkdownParser::renderCallbacks()
     callbacks.paragraph = &MarkdownParser::renderParagraph;
     
     // TODO: Table support
-	// void (*table)(struct buf *ob, const struct buf *header, const struct buf *body, void *opaque);
     callbacks.table = NULL;
-	//void (*table_row)(struct buf *ob, const struct buf *text, void *opaque);
     callbacks.table_row = NULL;
-	// void (*table_cell)(struct buf *ob, const struct buf *text, int flags, void *opaque);
     callbacks.table_cell = NULL;
     
     // AST building extensions

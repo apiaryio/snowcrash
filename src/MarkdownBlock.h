@@ -11,21 +11,9 @@
 
 #include <vector>
 #include <string>
+#include "ParserCore.h"
 
 namespace snowcrash {
-
-    // Markdown source data
-    typedef std::string SourceData;
-
-    // Range of source data
-    struct SourceDataRange {
-        size_t location;
-        size_t length;
-    };
-    typedef std::vector<SourceDataRange> SourceDataBlock;
-    
-    SourceDataBlock MakeSourceDataBlock(size_t loc, size_t len);
-    void AppendSourceDataBlock(SourceDataBlock& destination, const SourceDataBlock& append);
     
     //
     // Markdown Block Type
