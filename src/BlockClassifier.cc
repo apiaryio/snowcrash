@@ -66,7 +66,7 @@ Section snowcrash::ClassifyBlock(const MarkdownBlock& block, const Section& cont
         
         if (block.type == HeaderBlockType) {
             if (HasResourceSignature(block)) {
-                return ResourceTerminatingSection;
+                return ResourceSection;
             }
             else if (HasMethodSignature(block)) {
                 return MethodSection;

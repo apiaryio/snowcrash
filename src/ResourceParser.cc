@@ -24,22 +24,44 @@ bool snowcrash::HasResourceSignature(const MarkdownBlock& block)
     return RegexMatch(block.content, ResourceHeaderRegex);
 }
 
-ParseSectionResult snowcrash::ParseResource(const BlockIterator& begin, const BlockIterator& end, const SourceData& sourceData, Blueprint &blueprint)
+// Finds a group in blueprint by name
+ResourceMatch snowcrash::FindResource(const Blueprint& blueprint, const Resource& resource)
+{
+    for (Collection<ResourceGroup>::const_iterator it = blueprint.resourceGroups.begin(); it != blueprint.resourceGroups.end(); ++it) {
+        Collection<Resource>::const_iterator match = std::find_if(it->resources.begin(),
+                                                                  it->resources.end(),
+                                                                  std::bind2nd(MatchURI<Resource>(), resource));
+        if (match != it->resources.end()) {
+            return std::make_pair(it, match);
+        }
+            
+    }
+    
+
+    return std::make_pair(blueprint.resourceGroups.end(), Collection<Resource>::iterator());
+}
+
+ParseSectionResult snowcrash::ParseResource(const BlockIterator& begin, const BlockIterator& end, const SourceData& sourceData, Resource &resource)
 {
     Result result;
     Section currentSection = ResourceSection;
     BlockIterator currentBlock = begin;
     
-    while (currentSection == ResourceSection &&
+    while ((currentSection = ClassifyBlock(*currentBlock, currentSection)) == ResourceSection &&
            currentBlock != end) {
         
-        // TODO:
-        // Collect URI
-        // Collect description
-        // Construct method ?
+        // URI
+        if (currentBlock == begin) {
+            resource.uri = currentBlock->content;
+        }
+        else {
+            // Description
+            resource.description += MapSourceData(sourceData, currentBlock->sourceMap);
+        }
+        
+        // TODO: parameters, headers, methods
         
         ++currentBlock;
-        currentSection = ClassifyBlock(*currentBlock, currentSection);
     }
     
     return std::make_pair(result, currentBlock);

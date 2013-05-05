@@ -30,6 +30,14 @@ namespace snowcrash {
             return first.name == second.name;
         }
     };
+    
+    // URI matching predicate
+    template <class T>
+    struct MatchURI : std::binary_function<T, T, bool> {
+        bool operator()(const T& first, const T& second) const {
+            return first.uri == second.uri;
+        }
+    };
 }
 
 #endif

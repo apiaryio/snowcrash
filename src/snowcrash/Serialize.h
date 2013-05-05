@@ -20,7 +20,9 @@ namespace snowcrash {
     struct SerializeKey {
         static const std::string Name;
         static const std::string Description;
-        static const std::string Groups;
+        static const std::string ResourceGroups;
+        static const std::string Resources;
+        static const std::string URI;
     };
 }
 

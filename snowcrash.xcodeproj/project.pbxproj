@@ -57,6 +57,9 @@
 		BBD5F9D4173548F40049BBEE /* BlueprintParserCore.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD5F9D3173548F40049BBEE /* BlueprintParserCore.cc */; };
 		BBD5F9D717354B460049BBEE /* MethodParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD5F9D517354B450049BBEE /* MethodParser.cc */; };
 		BBD5F9D817354B460049BBEE /* MethodParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD5F9D617354B450049BBEE /* MethodParser.h */; };
+		BBD5F9DA17355DAA0049BBEE /* test-OverviewParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD5F9D917355DAA0049BBEE /* test-OverviewParser.cc */; };
+		BBD5F9DC173561DA0049BBEE /* test-ResouceGroupParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD5F9DB173561DA0049BBEE /* test-ResouceGroupParser.cc */; };
+		BBD5F9DE173578210049BBEE /* test-ResourceParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD5F9DD173578210049BBEE /* test-ResourceParser.cc */; };
 		BBFF48CA170B3C49001E5FB2 /* test-snowcrash.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBFF48C9170B3C49001E5FB2 /* test-snowcrash.cc */; };
 		BBFF48CD170B3EDE001E5FB2 /* snowcrash.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBFF48CC170B3EDE001E5FB2 /* snowcrash.cc */; };
 		BBFF48D0170B3FBB001E5FB2 /* libsnowcrash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBFF4898170B34E6001E5FB2 /* libsnowcrash.a */; };
@@ -152,6 +155,9 @@
 		BBD5F9D3173548F40049BBEE /* BlueprintParserCore.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BlueprintParserCore.cc; path = src/BlueprintParserCore.cc; sourceTree = "<group>"; };
 		BBD5F9D517354B450049BBEE /* MethodParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MethodParser.cc; path = src/MethodParser.cc; sourceTree = "<group>"; };
 		BBD5F9D617354B450049BBEE /* MethodParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MethodParser.h; path = src/MethodParser.h; sourceTree = "<group>"; };
+		BBD5F9D917355DAA0049BBEE /* test-OverviewParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-OverviewParser.cc"; path = "test/test-OverviewParser.cc"; sourceTree = "<group>"; };
+		BBD5F9DB173561DA0049BBEE /* test-ResouceGroupParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-ResouceGroupParser.cc"; path = "test/test-ResouceGroupParser.cc"; sourceTree = "<group>"; };
+		BBD5F9DD173578210049BBEE /* test-ResourceParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-ResourceParser.cc"; path = "test/test-ResourceParser.cc"; sourceTree = "<group>"; };
 		BBFF4898170B34E6001E5FB2 /* libsnowcrash.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libsnowcrash.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BBFF48C0170B3C30001E5FB2 /* test-snowcrash */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "test-snowcrash"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BBFF48C9170B3C49001E5FB2 /* test-snowcrash.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-snowcrash.cc"; path = "test/test-snowcrash.cc"; sourceTree = "<group>"; };
@@ -262,8 +268,11 @@
 				BBA01FF817292F9C0050B603 /* test-BlueprintParser.cc */,
 				BB740999171C08240023105F /* test-MarkdownBlock.cc */,
 				BB74099B171C08850023105F /* test-MarkdownParser.cc */,
+				BBD5F9D917355DAA0049BBEE /* test-OverviewParser.cc */,
 				BBA889A917130239005A9570 /* test-Parser.cc */,
 				BBB0F42B1731D04900C92465 /* test-RegexMatch.cc */,
+				BBD5F9DB173561DA0049BBEE /* test-ResouceGroupParser.cc */,
+				BBD5F9DD173578210049BBEE /* test-ResourceParser.cc */,
 				BBFF48C9170B3C49001E5FB2 /* test-snowcrash.cc */,
 			);
 			name = test;
@@ -472,6 +481,9 @@
 				BB74099C171C08860023105F /* test-MarkdownParser.cc in Sources */,
 				BB167D1D172931330030D1D5 /* test-BlueprintParser.cc in Sources */,
 				BBB0F42C1731D04900C92465 /* test-RegexMatch.cc in Sources */,
+				BBD5F9DA17355DAA0049BBEE /* test-OverviewParser.cc in Sources */,
+				BBD5F9DC173561DA0049BBEE /* test-ResouceGroupParser.cc in Sources */,
+				BBD5F9DE173578210049BBEE /* test-ResourceParser.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

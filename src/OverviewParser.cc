@@ -18,8 +18,8 @@ ParseSectionResult snowcrash::ParseOverview(const BlockIterator& begin, const Bl
     Section currentSection = OverviewSection;
     BlockIterator currentBlock = begin;
     
-    while ((currentSection = ClassifyBlock(*currentBlock, currentSection)) == OverviewSection &&
-           currentBlock != end) {
+    while (currentBlock != end &&
+           (currentSection = ClassifyBlock(*currentBlock, currentSection)) == OverviewSection) {
         
         if (currentBlock == begin &&
             currentBlock->type == HeaderBlockType) {
@@ -46,7 +46,6 @@ ParseSectionResult snowcrash::ParseOverview(const BlockIterator& begin, const Bl
         }
         
         ++currentBlock;
-        currentSection = ClassifyBlock(*currentBlock, currentSection);
     }
     
     return std::make_pair(result, currentBlock);

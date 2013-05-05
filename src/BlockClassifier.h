@@ -18,11 +18,11 @@ namespace snowcrash {
         UndefinedSection,
         OverviewSection,
         ResourceGroupSection,
-        ResourceGroupTerminatingSection,
+        //ResourceGroupTerminatingSection,
         ResourceSection,
-        ResourceTerminatingSection,
-        MethodSection,
-        MethodTerminatingSection
+        //ResourceTerminatingSection,
+        MethodSection
+        //MethodTerminatingSection
     };
     
     // Classifies Markdown Block to one of the Sections

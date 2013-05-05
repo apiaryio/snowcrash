@@ -47,27 +47,28 @@ static void serialize(const Collection<Metadata>::type& metadata, std::ostream &
     }
 }
 
-// Serialize Resource Groups
-static void serialize(const ResourceGroup& group, std::ostream &os)
+// Serialize Resource
+static void serialize(const Resource& resource, std::ostream &os)
 {
-    // Group Name
-    serialize(SerializeKey::Name, group.name, 1, os);
+    os << "    - ";   // indent 3
+    serialize(SerializeKey::URI, resource.uri, 0, os);
+    serialize(SerializeKey::Description, resource.description, 3, os);
     
-    // Group Description
-    serialize(SerializeKey::Description, group.description, 1, os);
-
-    // TODO: resources
+    //TODO: params, headers, methods
 }
 
-// Serialize Resource Groups
-static void serialize(const Collection<ResourceGroup>::type& resourceGroups, std::ostream &os)
+// Serialize Resource Group
+static void serialize(const ResourceGroup& group, std::ostream &os)
 {
-    if (resourceGroups.empty())
+    os << "- ";   // indent 1
+    serialize(SerializeKey::Name, group.name, 0, os);
+    serialize(SerializeKey::Description, group.description, 1, os);
+
+    if (group.resources.empty())
         return;
     
-    serialize("groups", std::string(), 0, os);
-    
-    for (Collection<ResourceGroup>::type::const_iterator it = resourceGroups.begin(); it != resourceGroups.end(); ++it) {
+    serialize(SerializeKey::Resources, std::string(), 2, os);
+    for (Collection<Resource>::const_iterator it = group.resources.begin(); it != group.resources.end(); ++it) {
         serialize(*it, os);
     }
 }
@@ -75,17 +76,20 @@ static void serialize(const Collection<ResourceGroup>::type& resourceGroups, std
 // Serialize Blueprint
 static void serialize(const Blueprint& blueprint, std::ostream &os)
 {
-    // Metadata
     serialize(blueprint.metadata, os);
-    
-    // Name
     serialize(SerializeKey::Name, blueprint.name, 0, os);
-    
-    // Description
     serialize(SerializeKey::Description, blueprint.description, 0, os);
     
-    // Resource Groups
-    serialize(blueprint.resourceGroups, os);
+    if (blueprint.resourceGroups.empty())
+        return;
+    
+    serialize(SerializeKey::ResourceGroups, std::string(), 0, os);
+    for (Collection<ResourceGroup>::type::const_iterator it = blueprint.resourceGroups.begin();
+         it != blueprint.resourceGroups.end();
+         ++it) {
+        
+        serialize(*it, os);
+    }
 }
 
 void snowcrash::SerializeYAML(const snowcrash::Blueprint& blueprint, std::ostream &os)

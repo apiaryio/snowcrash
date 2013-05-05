@@ -90,6 +90,41 @@ TEST_CASE("bpparser/parse-group", "Parse resource group.")
     REQUIRE(group.description == "456");
 }
 
+TEST_CASE("bpparser/parse-name-resource", "Parse API with Name and resouce")
+{
+    // Blueprint in question:
+    //R"(# API
+    //A
+    //
+    //# /resource
+    //B)";
+
+    BlueprintParser parser;
+    Result result;
+    Blueprint blueprint;
+    
+    SourceData source = "0123";
+    MarkdownBlock markdown;
+    markdown.blocks.push_back(MarkdownBlock(HeaderBlockType, "API Name", 1, MakeSourceDataBlock(0, 1)));
+    markdown.blocks.push_back(MarkdownBlock(ParagraphBlockType, "p1", 0, MakeSourceDataBlock(1, 1)));
+    markdown.blocks.push_back(MarkdownBlock(HeaderBlockType, "/resource", 1, MakeSourceDataBlock(2, 1)));
+    markdown.blocks.push_back(MarkdownBlock(ParagraphBlockType, "p2", 0, MakeSourceDataBlock(3, 1)));
+    
+    parser.parse(source, markdown, result, blueprint);
+    
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    
+    ResourceGroup group = blueprint.resourceGroups.front();
+    REQUIRE(group.name.empty());
+    REQUIRE(group.description.empty());
+    REQUIRE(group.resources.size() == 1);
+    
+    Resource resource = group.resources.front();
+    REQUIRE(resource.uri == "/resource");
+    REQUIRE(resource.description == "3");
+}
+
 //TEST_CASE("bpparser/parse-resource", "Parse simple resource.")
 //{
 //    BlueprintParser parser;

@@ -14,7 +14,32 @@
 
 using namespace snowcrash;
 
-// Top-level parse
+static ParseSectionResult processResourceGroup(const BlockIterator& begin, const BlockIterator& end, const SourceData& sourceData, Blueprint &blueprint)
+{
+    ResourceGroup resourceGroup;
+    ParseSectionResult result;
+    result = ParseResourceGroup(begin, end, sourceData, blueprint, resourceGroup);
+    
+    // Check for duplicate & emplace group into blueprint
+    if (result.first.error.code != Error::OK)
+        return result;
+        
+    Collection<ResourceGroup>::iterator duplicate = FindResourceGroup(blueprint, resourceGroup);
+    if (duplicate != blueprint.resourceGroups.end()) {
+        
+        // WARN: duplicate group
+        result.first.warnings.push_back(Warning("group '" + resourceGroup.name + "' already exists", 0, begin->sourceMap));
+        duplicate->description += resourceGroup.description;
+    }
+    else {
+        
+        blueprint.resourceGroups.push_back(resourceGroup); // FIXME: C++11 move
+    }
+    
+    return result;
+}
+
+// Top-level parse, start here
 void BlueprintParser::parse(const SourceData& sourceData, const MarkdownBlock& source, Result& result, Blueprint& blueprint)
 {
     // Initial section
@@ -27,16 +52,24 @@ void BlueprintParser::parse(const SourceData& sourceData, const MarkdownBlock& s
         currentSection = ClassifyBlock(*currentBlock, currentSection);
 
         ParseSectionResult sectionResult;
+        sectionResult.second = currentBlock;
+        
         if (currentSection == OverviewSection) {
+            
             sectionResult = ParseOverview(currentBlock, source.blocks.end(), sourceData, blueprint);
         }
-        else if (currentSection == ResourceGroupSection) {
-            sectionResult = ParseResourceGroup(currentBlock, source.blocks.end(), sourceData, blueprint);
-        }
-        else if (currentSection == ResourceSection) {
+        else if (currentSection == ResourceGroupSection ||
+                 currentSection == ResourceSection) {
             
-            // TODO: Construct anonymous resource group and parse it from there
-            sectionResult = ParseResource(currentBlock, source.blocks.end(), sourceData, blueprint);
+            // Parse resource group and its resources
+            // Top-level resource is treated as anonymous group
+            sectionResult = processResourceGroup(currentBlock, source.blocks.end(), sourceData, blueprint);
+        }
+        else {
+            
+            // Sanity check
+            result.error = Error("unexpected block", 1, currentBlock->sourceMap);
+            break;
         }
         
         // Append result error & warning data
@@ -49,7 +82,7 @@ void BlueprintParser::parse(const SourceData& sourceData, const MarkdownBlock& s
         
         // Proceed to the next block
         currentSection = UndefinedSection;
-        if (currentBlock != sectionResult.second) {
+        if (sectionResult.second != currentBlock) {
             currentBlock = sectionResult.second;
         }
         else {

@@ -16,7 +16,9 @@ using namespace snowcrash;
 
 const std::string SerializeKey::Name = "name";
 const std::string SerializeKey::Description = "description";
-const std::string SerializeKey::Groups = "groups";
+const std::string SerializeKey::ResourceGroups = "resourceGroups";
+const std::string SerializeKey::Resources = "resources";
+const std::string SerializeKey::URI = "uri";
 
 std::string snowcrash::EscapeNewlines(const std::string& input)
 {

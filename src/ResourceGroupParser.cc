@@ -9,8 +9,70 @@
 #include <algorithm>
 #include "ResourceGroupParser.h"
 #include "BlockClassifier.h"
+#include "ResourceParser.h"
 
 using namespace snowcrash;
+
+// Parse group's name and description
+static ParseSectionResult parseResourceGroupOverview(const BlockIterator& begin, const BlockIterator& end, const SourceData& sourceData, ResourceGroup& group)
+{
+    Result result;
+    Section currentSection = ResourceGroupSection;
+    BlockIterator currentBlock = begin;
+    
+    while (currentBlock != end &&
+           (currentSection = ClassifyBlock(*currentBlock, currentSection)) == ResourceGroupSection) {
+
+        // Name
+        if (currentBlock == begin) {
+            if (currentBlock->type == HeaderBlockType) {
+                group.name = currentBlock->content;
+            }
+            else {
+                // WARN: No group name specified
+                result.warnings.push_back(Warning("expected resources group name", 0, currentBlock->sourceMap));
+                
+                // Add as description
+                group.description += MapSourceData(sourceData, currentBlock->sourceMap);
+            }
+        }
+        else {
+            // Description
+            group.description += MapSourceData(sourceData, currentBlock->sourceMap);
+        }
+        
+        ++currentBlock;
+    }
+    
+    return std::make_pair(result, currentBlock);
+}
+
+// Parse & and append resource
+static ParseSectionResult processResource(const BlockIterator& begin,
+                                          const BlockIterator& end,
+                                          const SourceData& sourceData,
+                                          const Blueprint& blueprint,
+                                          ResourceGroup& group)
+{
+    Resource resource;
+    ParseSectionResult result = ParseResource(begin, end, sourceData, resource);
+    
+    if (result.first.error.code != Error::OK)
+        return result;
+    
+    ResourceMatch duplicate = FindResource(blueprint, resource);
+    if (duplicate.first != blueprint.resourceGroups.end()) {
+
+        // WARN: duplicate resource
+        // Just warn, consider merge or error
+        result.first.warnings.push_back(Warning("resource '" + resource.uri + "' already exists", 0, begin->sourceMap));
+    }
+    
+    // Insert resource
+    group.resources.push_back(resource);
+    
+    return result;
+}
 
 // Finds a group in blueprint by name
 Collection<ResourceGroup>::iterator snowcrash::FindResourceGroup(Blueprint& blueprint, const ResourceGroup& group)
@@ -22,53 +84,56 @@ Collection<ResourceGroup>::iterator snowcrash::FindResourceGroup(Blueprint& blue
 }
 
 // Parse Resource Group descending into Resources
-ParseSectionResult snowcrash::ParseResourceGroup(const BlockIterator& begin, const BlockIterator& end, const SourceData& sourceData, Blueprint &blueprint)
+ParseSectionResult snowcrash::ParseResourceGroup(const BlockIterator& begin,
+                                                 const BlockIterator& end,
+                                                 const SourceData& sourceData,
+                                                 const Blueprint& blueprint,
+                                                 ResourceGroup& group)
+
 {
     Result result;
     Section currentSection = ResourceGroupSection;
     BlockIterator currentBlock = begin;
-    ResourceGroup resourceGroup;
-    Collection<ResourceGroup>::type::iterator duplicate = blueprint.resourceGroups.end();
     
-    while ((currentSection = ClassifyBlock(*currentBlock, currentSection)) == ResourceGroupSection &&
-           currentBlock != end) {
+    while (currentBlock != end &&
+           ((currentSection = ClassifyBlock(*currentBlock, currentSection)) == ResourceGroupSection ||
+           currentSection == ResourceSection)) {
         
-        // Name
-        if (currentBlock == begin) {
-            if (currentBlock->type == HeaderBlockType) {
-                resourceGroup.name = currentBlock->content;
-            }
-            else {
-                // WARN: No group name specified
-                result.warnings.push_back(Warning("expected resources group name", 0, currentBlock->sourceMap));
-                
-                // Add as description
-                resourceGroup.description += MapSourceData(sourceData, currentBlock->sourceMap);
-            }
-            
-            // Check duplicate
-            Collection<ResourceGroup>::type::iterator duplicate = FindResourceGroup(blueprint, resourceGroup);
-            if (duplicate != blueprint.resourceGroups.end()) {
-                // WARN: existing group
-                result.warnings.push_back(Warning("group '" + resourceGroup.name + "' already exists", 0, currentBlock->sourceMap));
-            }
+        ParseSectionResult sectionResult;
+        sectionResult.second = currentBlock;
+               
+        if (currentSection == ResourceGroupSection) {
+
+            sectionResult = parseResourceGroupOverview(currentBlock, end, sourceData, group);
+        }
+        else if (currentSection == ResourceSection) {
+
+            sectionResult = processResource(currentBlock, end, sourceData, blueprint, group);
         }
         else {
-            // Description
-            resourceGroup.description += MapSourceData(sourceData, currentBlock->sourceMap);
+
+            // Sanity check
+            result.error = Error("unexpected block", 1, currentBlock->sourceMap);
+            break;
         }
-        
-        ++currentBlock;
+               
+        // Append result error & warning data
+        result += sectionResult.first;
+       
+        // Check error
+        if (result.error.code != Error::OK) {
+            break;
+        }
+               
+        // Proceed to the next block
+        currentSection = ResourceGroupSection;
+        if (sectionResult.second != currentBlock) {
+            currentBlock = sectionResult.second;
+        }
+        else {
+            ++currentBlock;
+        }
     }
-    
-    if (duplicate != blueprint.resourceGroups.end()) {
-        
-        duplicate->description += resourceGroup.description;
-    }
-    else {
-        
-        blueprint.resourceGroups.push_back(resourceGroup); // FIXME: C++11 move
-    }
-    
+
     return std::make_pair(result, currentBlock);
 }

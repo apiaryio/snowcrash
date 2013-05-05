@@ -73,7 +73,7 @@ MarkdownParser::RenderCallbacks MarkdownParser::renderCallbacks()
     callbacks.listitem = &MarkdownParser::renderListItem;
     callbacks.paragraph = &MarkdownParser::renderParagraph;
     
-    // TODO: Table support
+    // FUTURE: Table support
     callbacks.table = NULL;
     callbacks.table_row = NULL;
     callbacks.table_cell = NULL;

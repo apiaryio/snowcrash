@@ -18,7 +18,11 @@ namespace snowcrash {
     Collection<ResourceGroup>::iterator FindResourceGroup(Blueprint& blueprint, const ResourceGroup& group);
     
     // Parse Resource Group descending into Resources
-    ParseSectionResult ParseResourceGroup(const BlockIterator& begin, const BlockIterator& end, const SourceData& sourceData, Blueprint &blueprint);
+    ParseSectionResult ParseResourceGroup(const BlockIterator& begin,
+                                          const BlockIterator& end,
+                                          const SourceData& sourceData,
+                                          const Blueprint& blueprint,
+                                          ResourceGroup& group);
 }
 
 #endif
