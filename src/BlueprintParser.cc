@@ -7,14 +7,62 @@
 //
 
 #include "BlueprintParser.h"
-#include "BlockClassifier.h"
-#include "OverviewParser.h"
 #include "ResourceGroupParser.h"
 #include "ResourceParser.h"
 
 using namespace snowcrash;
 
-static ParseSectionResult processResourceGroup(const BlockIterator& begin, const BlockIterator& end, const SourceData& sourceData, Blueprint &blueprint)
+static Section ClassifyBlock(const MarkdownBlock& block, Section previousContext)
+{
+    if (block.type == HRuleBlockType)
+        return TerminatorSection;
+    
+    if (HasResourceSignature(block))
+        return ResourceGroupSection; // Treat Resource as anonymous resource group
+    
+    if (previousContext == BlueprintSection)
+        return BlueprintSection;
+    
+    if (previousContext == ResourceGroupSection ||
+        previousContext == TerminatorSection)
+        return ResourceGroupSection;
+    
+    return BlueprintSection;
+}
+
+static ParseSectionResult ParseBlueprintOverview(const BlockIterator& begin, const BlockIterator& end, const SourceData& sourceData, Blueprint& blueprint)
+{
+    Result result;
+    Section currentSection = UndefinedSection;
+    BlockIterator currentBlock = begin;
+    
+    while (currentBlock != end &&
+           (currentSection = ClassifyBlock(*currentBlock, currentSection)) == BlueprintSection) {
+        
+        if (currentBlock == begin &&
+            currentBlock->type == HeaderBlockType) {
+            
+            // Blueprint Name
+            blueprint.name = currentBlock->content;
+        }
+        else {
+            if (currentBlock == begin) {
+                // WARN: No API name specified
+                result.warnings.push_back(Warning("expected API name", 0, currentBlock->sourceMap));
+            }
+            else {
+                // Arbitrary markdown content, add to description
+                blueprint.description += MapSourceData(sourceData, currentBlock->sourceMap);
+            }
+        }
+        
+        ++currentBlock;
+    }
+    
+    return std::make_pair(result, currentBlock);
+}
+
+static ParseSectionResult ProcessResourceGroup(const BlockIterator& begin, const BlockIterator& end, const SourceData& sourceData, Blueprint& blueprint)
 {
     ResourceGroup resourceGroup;
     ParseSectionResult result;
@@ -42,28 +90,29 @@ static ParseSectionResult processResourceGroup(const BlockIterator& begin, const
 // Top-level parse, start here
 void BlueprintParser::parse(const SourceData& sourceData, const MarkdownBlock& source, Result& result, Blueprint& blueprint)
 {
-    // Initial section
-    Section currentSection = OverviewSection;
+    Section currentSection = UndefinedSection;
     
     // Iterate over top-level blocks & parse any sections recognized
     MarkdownBlock::Stack::const_iterator currentBlock = source.blocks.begin();
     while (currentBlock != source.blocks.end()) {
 
         currentSection = ClassifyBlock(*currentBlock, currentSection);
-
+        if (currentSection == TerminatorSection) {
+            ++currentBlock;
+            continue;
+        }
+            
         ParseSectionResult sectionResult;
         sectionResult.second = currentBlock;
-        
-        if (currentSection == OverviewSection) {
+        if (currentSection == BlueprintSection) {
             
-            sectionResult = ParseOverview(currentBlock, source.blocks.end(), sourceData, blueprint);
+            sectionResult = ParseBlueprintOverview(currentBlock, source.blocks.end(), sourceData, blueprint);
         }
-        else if (currentSection == ResourceGroupSection ||
-                 currentSection == ResourceSection) {
+        else if (currentSection == ResourceGroupSection) {
             
             // Parse resource group and its resources
             // Top-level resource is treated as anonymous group
-            sectionResult = processResourceGroup(currentBlock, source.blocks.end(), sourceData, blueprint);
+            sectionResult = ProcessResourceGroup(currentBlock, source.blocks.end(), sourceData, blueprint);
         }
         else {
             
@@ -74,19 +123,13 @@ void BlueprintParser::parse(const SourceData& sourceData, const MarkdownBlock& s
         
         // Append result error & warning data
         result += sectionResult.first;
-        
-        // Check error
-        if (result.error.code != Error::OK) {
+        if (result.error.code != Error::OK)
             break;
-        }
         
         // Proceed to the next block
-        currentSection = UndefinedSection;
-        if (sectionResult.second != currentBlock) {
+        if (sectionResult.second != currentBlock)
             currentBlock = sectionResult.second;
-        }
-        else {
+        else
             ++currentBlock;
-        }
     }
 }

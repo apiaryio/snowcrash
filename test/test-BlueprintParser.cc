@@ -61,6 +61,7 @@ TEST_CASE("bpparser/parse-overview", "Parse blueprint overview section.")
     REQUIRE(result.error.code == Error::OK);
     REQUIRE(blueprint.name == "API Name");
     REQUIRE(blueprint.description == "123");
+    REQUIRE(blueprint.resourceGroups.empty());
     
 }
 

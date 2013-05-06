@@ -7,7 +7,6 @@
 //
 
 #include "MethodParser.h"
-#include "BlockClassifier.h"
 #include "RegexMatch.h"
 
 using namespace snowcrash;

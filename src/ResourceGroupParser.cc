@@ -8,16 +8,28 @@
 
 #include <algorithm>
 #include "ResourceGroupParser.h"
-#include "BlockClassifier.h"
 #include "ResourceParser.h"
 
 using namespace snowcrash;
 
+static Section ClassifyBlock(const MarkdownBlock& block, Section previousContext)
+{
+    // We are in Resource Group section
+    // exclusive terminator: Other Resource Group, Resource Header
+    
+    if (HasResourceSignature(block))
+        return ResourceSection;
+    else if (previousContext == ResourceSection)
+        return UndefinedSection;
+    else
+        return ResourceGroupSection;
+}
+
 // Parse group's name and description
-static ParseSectionResult parseResourceGroupOverview(const BlockIterator& begin, const BlockIterator& end, const SourceData& sourceData, ResourceGroup& group)
+static ParseSectionResult ParseResourceGroupOverview(const BlockIterator& begin, const BlockIterator& end, const SourceData& sourceData, ResourceGroup& group)
 {
     Result result;
-    Section currentSection = ResourceGroupSection;
+    Section currentSection = UndefinedSection;
     BlockIterator currentBlock = begin;
     
     while (currentBlock != end &&
@@ -48,7 +60,7 @@ static ParseSectionResult parseResourceGroupOverview(const BlockIterator& begin,
 }
 
 // Parse & and append resource
-static ParseSectionResult processResource(const BlockIterator& begin,
+static ParseSectionResult ProcessResource(const BlockIterator& begin,
                                           const BlockIterator& end,
                                           const SourceData& sourceData,
                                           const Blueprint& blueprint,
@@ -92,23 +104,22 @@ ParseSectionResult snowcrash::ParseResourceGroup(const BlockIterator& begin,
 
 {
     Result result;
-    Section currentSection = ResourceGroupSection;
+    Section currentSection = UndefinedSection;
     BlockIterator currentBlock = begin;
     
-    while (currentBlock != end &&
-           ((currentSection = ClassifyBlock(*currentBlock, currentSection)) == ResourceGroupSection ||
-           currentSection == ResourceSection)) {
+    while (currentBlock != end) {
+        
+        currentSection = ClassifyBlock(*currentBlock, currentSection);
         
         ParseSectionResult sectionResult;
         sectionResult.second = currentBlock;
-               
         if (currentSection == ResourceGroupSection) {
 
-            sectionResult = parseResourceGroupOverview(currentBlock, end, sourceData, group);
+            sectionResult = ParseResourceGroupOverview(currentBlock, end, sourceData, group);
         }
         else if (currentSection == ResourceSection) {
 
-            sectionResult = processResource(currentBlock, end, sourceData, blueprint, group);
+            sectionResult = ProcessResource(currentBlock, end, sourceData, blueprint, group);
         }
         else {
 
@@ -116,23 +127,15 @@ ParseSectionResult snowcrash::ParseResourceGroup(const BlockIterator& begin,
             result.error = Error("unexpected block", 1, currentBlock->sourceMap);
             break;
         }
-               
-        // Append result error & warning data
+        
         result += sectionResult.first;
-       
-        // Check error
-        if (result.error.code != Error::OK) {
+        if (result.error.code != Error::OK)
             break;
-        }
-               
-        // Proceed to the next block
-        currentSection = ResourceGroupSection;
-        if (sectionResult.second != currentBlock) {
+
+        if (sectionResult.second != currentBlock)
             currentBlock = sectionResult.second;
-        }
-        else {
+        else
             ++currentBlock;
-        }
     }
 
     return std::make_pair(result, currentBlock);

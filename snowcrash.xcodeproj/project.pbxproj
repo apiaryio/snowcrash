@@ -45,10 +45,6 @@
 		BBB0F4291731CE0D00C92465 /* RegexMatch.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB0F4271731CE0D00C92465 /* RegexMatch.cc */; };
 		BBB0F42A1731CE0D00C92465 /* RegexMatch.h in Headers */ = {isa = PBXBuildFile; fileRef = BBB0F4281731CE0D00C92465 /* RegexMatch.h */; };
 		BBB0F42C1731D04900C92465 /* test-RegexMatch.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB0F42B1731D04900C92465 /* test-RegexMatch.cc */; };
-		BBD5F9BD173539630049BBEE /* BlockClassifier.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD5F9BB173539620049BBEE /* BlockClassifier.cc */; };
-		BBD5F9BE173539630049BBEE /* BlockClassifier.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD5F9BC173539620049BBEE /* BlockClassifier.h */; };
-		BBD5F9C117353BAB0049BBEE /* OverviewParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD5F9BF17353BAB0049BBEE /* OverviewParser.cc */; };
-		BBD5F9C217353BAB0049BBEE /* OverviewParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD5F9C017353BAB0049BBEE /* OverviewParser.h */; };
 		BBD5F9C917353C310049BBEE /* ResourceGroupParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD5F9C717353C300049BBEE /* ResourceGroupParser.h */; };
 		BBD5F9CA17353C310049BBEE /* ResourceGroupParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD5F9C817353C310049BBEE /* ResourceGroupParser.cc */; };
 		BBD5F9CD17353CE00049BBEE /* ResourceParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD5F9CB17353CE00049BBEE /* ResourceParser.cc */; };
@@ -57,7 +53,6 @@
 		BBD5F9D4173548F40049BBEE /* BlueprintParserCore.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD5F9D3173548F40049BBEE /* BlueprintParserCore.cc */; };
 		BBD5F9D717354B460049BBEE /* MethodParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD5F9D517354B450049BBEE /* MethodParser.cc */; };
 		BBD5F9D817354B460049BBEE /* MethodParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD5F9D617354B450049BBEE /* MethodParser.h */; };
-		BBD5F9DA17355DAA0049BBEE /* test-OverviewParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD5F9D917355DAA0049BBEE /* test-OverviewParser.cc */; };
 		BBD5F9DC173561DA0049BBEE /* test-ResouceGroupParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD5F9DB173561DA0049BBEE /* test-ResouceGroupParser.cc */; };
 		BBD5F9DE173578210049BBEE /* test-ResourceParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD5F9DD173578210049BBEE /* test-ResourceParser.cc */; };
 		BBFF48CA170B3C49001E5FB2 /* test-snowcrash.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBFF48C9170B3C49001E5FB2 /* test-snowcrash.cc */; };
@@ -141,10 +136,6 @@
 		BBB0F4271731CE0D00C92465 /* RegexMatch.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RegexMatch.cc; path = src/RegexMatch.cc; sourceTree = "<group>"; };
 		BBB0F4281731CE0D00C92465 /* RegexMatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RegexMatch.h; path = src/RegexMatch.h; sourceTree = "<group>"; };
 		BBB0F42B1731D04900C92465 /* test-RegexMatch.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-RegexMatch.cc"; path = "test/test-RegexMatch.cc"; sourceTree = "<group>"; };
-		BBD5F9BB173539620049BBEE /* BlockClassifier.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BlockClassifier.cc; path = src/BlockClassifier.cc; sourceTree = "<group>"; };
-		BBD5F9BC173539620049BBEE /* BlockClassifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BlockClassifier.h; path = src/BlockClassifier.h; sourceTree = "<group>"; };
-		BBD5F9BF17353BAB0049BBEE /* OverviewParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OverviewParser.cc; path = src/OverviewParser.cc; sourceTree = "<group>"; };
-		BBD5F9C017353BAB0049BBEE /* OverviewParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OverviewParser.h; path = src/OverviewParser.h; sourceTree = "<group>"; };
 		BBD5F9C717353C300049BBEE /* ResourceGroupParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ResourceGroupParser.h; path = src/ResourceGroupParser.h; sourceTree = "<group>"; };
 		BBD5F9C817353C310049BBEE /* ResourceGroupParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ResourceGroupParser.cc; path = src/ResourceGroupParser.cc; sourceTree = "<group>"; };
 		BBD5F9CB17353CE00049BBEE /* ResourceParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ResourceParser.cc; path = src/ResourceParser.cc; sourceTree = "<group>"; };
@@ -155,7 +146,6 @@
 		BBD5F9D3173548F40049BBEE /* BlueprintParserCore.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BlueprintParserCore.cc; path = src/BlueprintParserCore.cc; sourceTree = "<group>"; };
 		BBD5F9D517354B450049BBEE /* MethodParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MethodParser.cc; path = src/MethodParser.cc; sourceTree = "<group>"; };
 		BBD5F9D617354B450049BBEE /* MethodParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MethodParser.h; path = src/MethodParser.h; sourceTree = "<group>"; };
-		BBD5F9D917355DAA0049BBEE /* test-OverviewParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-OverviewParser.cc"; path = "test/test-OverviewParser.cc"; sourceTree = "<group>"; };
 		BBD5F9DB173561DA0049BBEE /* test-ResouceGroupParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-ResouceGroupParser.cc"; path = "test/test-ResouceGroupParser.cc"; sourceTree = "<group>"; };
 		BBD5F9DD173578210049BBEE /* test-ResourceParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-ResourceParser.cc"; path = "test/test-ResourceParser.cc"; sourceTree = "<group>"; };
 		BBFF4898170B34E6001E5FB2 /* libsnowcrash.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libsnowcrash.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -268,7 +258,6 @@
 				BBA01FF817292F9C0050B603 /* test-BlueprintParser.cc */,
 				BB740999171C08240023105F /* test-MarkdownBlock.cc */,
 				BB74099B171C08850023105F /* test-MarkdownParser.cc */,
-				BBD5F9D917355DAA0049BBEE /* test-OverviewParser.cc */,
 				BBA889A917130239005A9570 /* test-Parser.cc */,
 				BBB0F42B1731D04900C92465 /* test-RegexMatch.cc */,
 				BBD5F9DB173561DA0049BBEE /* test-ResouceGroupParser.cc */,
@@ -281,8 +270,6 @@
 		BBFF48CB170B3ECB001E5FB2 /* src */ = {
 			isa = PBXGroup;
 			children = (
-				BBD5F9BB173539620049BBEE /* BlockClassifier.cc */,
-				BBD5F9BC173539620049BBEE /* BlockClassifier.h */,
 				BBFF48D3170C4F30001E5FB2 /* Blueprint.cc */,
 				BBFF48D4170C4F30001E5FB2 /* Blueprint.h */,
 				BBA91DBF171D402600649B05 /* BlueprintParser.cc */,
@@ -295,8 +282,6 @@
 				BB740992171C05B20023105F /* MarkdownParser.h */,
 				BBD5F9D517354B450049BBEE /* MethodParser.cc */,
 				BBD5F9D617354B450049BBEE /* MethodParser.h */,
-				BBD5F9BF17353BAB0049BBEE /* OverviewParser.cc */,
-				BBD5F9C017353BAB0049BBEE /* OverviewParser.h */,
 				BBA889A51712FF37005A9570 /* Parser.cc */,
 				BBA889A61712FF37005A9570 /* Parser.h */,
 				BBD5F9D11735439B0049BBEE /* ParserCore.cc */,
@@ -337,8 +322,6 @@
 				BB86DEC31723E3C600063644 /* src_map.h in Headers */,
 				BBB0F42A1731CE0D00C92465 /* RegexMatch.h in Headers */,
 				BB7DD93517343AA30012DBD7 /* SerializeJSON.h in Headers */,
-				BBD5F9BE173539630049BBEE /* BlockClassifier.h in Headers */,
-				BBD5F9C217353BAB0049BBEE /* OverviewParser.h in Headers */,
 				BBD5F9C917353C310049BBEE /* ResourceGroupParser.h in Headers */,
 				BBD5F9CE17353CE00049BBEE /* ResourceParser.h in Headers */,
 				BBD5F9D817354B460049BBEE /* MethodParser.h in Headers */,
@@ -460,8 +443,6 @@
 				BB86DEC11723E3A700063644 /* src_map.c in Sources */,
 				BBB0F4291731CE0D00C92465 /* RegexMatch.cc in Sources */,
 				BB7DD93417343AA30012DBD7 /* SerializeJSON.cc in Sources */,
-				BBD5F9BD173539630049BBEE /* BlockClassifier.cc in Sources */,
-				BBD5F9C117353BAB0049BBEE /* OverviewParser.cc in Sources */,
 				BBD5F9CA17353C310049BBEE /* ResourceGroupParser.cc in Sources */,
 				BBD5F9CD17353CE00049BBEE /* ResourceParser.cc in Sources */,
 				BBD5F9D21735439B0049BBEE /* ParserCore.cc in Sources */,
@@ -481,7 +462,6 @@
 				BB74099C171C08860023105F /* test-MarkdownParser.cc in Sources */,
 				BB167D1D172931330030D1D5 /* test-BlueprintParser.cc in Sources */,
 				BBB0F42C1731D04900C92465 /* test-RegexMatch.cc in Sources */,
-				BBD5F9DA17355DAA0049BBEE /* test-OverviewParser.cc in Sources */,
 				BBD5F9DC173561DA0049BBEE /* test-ResouceGroupParser.cc in Sources */,
 				BBD5F9DE173578210049BBEE /* test-ResourceParser.cc in Sources */,
 			);

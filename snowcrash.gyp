@@ -33,8 +33,6 @@
         'sundown/src/html'
       ],
       'sources': [
-        'src/BlockClassifier.cc',
-        'src/BlockClassifier.h',
         'src/Blueprint.cc',
         'src/Blueprint.h',
         'src/BlueprintParser.cc',
@@ -47,8 +45,6 @@
         'src/MarkdownParser.h',
         'src/MethodParser.cc',
         'src/MethodParser.h',
-        'src/OverviewParser.cc',
-        'src/OverviewParser.h',
         'src/Parser.cc',
         'src/Parser.h',
         'src/ParserCore.cc',
@@ -80,7 +76,6 @@
         'test/test-BlueprintParser.cc',
         'test/test-MarkdownBlock.cc',
         'test/test-MarkdownParser.cc',
-        'test/test-OverviewParser.cc',
         'test/test-Parser.cc',
         'test/test-RegexMatch.cc',
         'test/test-ResouceGroupParser.cc',

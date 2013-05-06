@@ -17,6 +17,16 @@
 
 namespace snowcrash {
     
+    // Block Classification Section
+    enum Section {
+        UndefinedSection,
+        BlueprintSection,
+        ResourceGroupSection,
+        ResourceSection,
+        MethodSection,
+        TerminatorSection
+    };
+    
     // Parser iterator
     typedef MarkdownBlock::Stack::const_iterator BlockIterator;
     
