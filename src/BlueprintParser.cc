@@ -30,6 +30,7 @@ static Section ClassifyBlock(const MarkdownBlock& block, Section previousContext
     return BlueprintSection;
 }
 
+// Parse overview
 static ParseSectionResult ParseBlueprintOverview(const BlockIterator& begin, const BlockIterator& end, const SourceData& sourceData, Blueprint& blueprint)
 {
     Result result;
@@ -62,6 +63,7 @@ static ParseSectionResult ParseBlueprintOverview(const BlockIterator& begin, con
     return std::make_pair(result, currentBlock);
 }
 
+// Parse & append resource group
 static ParseSectionResult ProcessResourceGroup(const BlockIterator& begin, const BlockIterator& end, const SourceData& sourceData, Blueprint& blueprint)
 {
     ResourceGroup resourceGroup;

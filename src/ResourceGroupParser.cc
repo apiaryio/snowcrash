@@ -12,6 +12,14 @@
 
 using namespace snowcrash;
 
+Collection<ResourceGroup>::iterator snowcrash::FindResourceGroup(Blueprint& blueprint, const ResourceGroup& group)
+{
+    Collection<ResourceGroup>::iterator match = std::find_if(blueprint.resourceGroups.begin(),
+                                                             blueprint.resourceGroups.end(),
+                                                             std::bind2nd(MatchName<ResourceGroup>(), group));
+    return match;
+}
+
 static Section ClassifyBlock(const MarkdownBlock& block, Section previousContext)
 {
     // We are in Resource Group section
@@ -59,7 +67,7 @@ static ParseSectionResult ParseResourceGroupOverview(const BlockIterator& begin,
     return std::make_pair(result, currentBlock);
 }
 
-// Parse & and append resource
+// Parse & append resource
 static ParseSectionResult ProcessResource(const BlockIterator& begin,
                                           const BlockIterator& end,
                                           const SourceData& sourceData,
@@ -86,16 +94,6 @@ static ParseSectionResult ProcessResource(const BlockIterator& begin,
     return result;
 }
 
-// Finds a group in blueprint by name
-Collection<ResourceGroup>::iterator snowcrash::FindResourceGroup(Blueprint& blueprint, const ResourceGroup& group)
-{
-    Collection<ResourceGroup>::iterator match = std::find_if(blueprint.resourceGroups.begin(),
-                                                             blueprint.resourceGroups.end(),
-                                                             std::bind2nd(MatchName<ResourceGroup>(), group));
-    return match;
-}
-
-// Parse Resource Group descending into Resources
 ParseSectionResult snowcrash::ParseResourceGroup(const BlockIterator& begin,
                                                  const BlockIterator& end,
                                                  const SourceData& sourceData,

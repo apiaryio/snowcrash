@@ -50,7 +50,6 @@
 		BBD5F9CD17353CE00049BBEE /* ResourceParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD5F9CB17353CE00049BBEE /* ResourceParser.cc */; };
 		BBD5F9CE17353CE00049BBEE /* ResourceParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD5F9CC17353CE00049BBEE /* ResourceParser.h */; };
 		BBD5F9D21735439B0049BBEE /* ParserCore.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD5F9D11735439B0049BBEE /* ParserCore.cc */; };
-		BBD5F9D4173548F40049BBEE /* BlueprintParserCore.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD5F9D3173548F40049BBEE /* BlueprintParserCore.cc */; };
 		BBD5F9D717354B460049BBEE /* MethodParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD5F9D517354B450049BBEE /* MethodParser.cc */; };
 		BBD5F9D817354B460049BBEE /* MethodParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD5F9D617354B450049BBEE /* MethodParser.h */; };
 		BBD5F9DC173561DA0049BBEE /* test-ResouceGroupParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD5F9DB173561DA0049BBEE /* test-ResouceGroupParser.cc */; };
@@ -59,7 +58,6 @@
 		BBFF48CD170B3EDE001E5FB2 /* snowcrash.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBFF48CC170B3EDE001E5FB2 /* snowcrash.cc */; };
 		BBFF48D0170B3FBB001E5FB2 /* libsnowcrash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBFF4898170B34E6001E5FB2 /* libsnowcrash.a */; };
 		BBFF48D2170B4224001E5FB2 /* snowcrash.h in Headers */ = {isa = PBXBuildFile; fileRef = BBFF48D1170B4224001E5FB2 /* snowcrash.h */; };
-		BBFF48D5170C4F30001E5FB2 /* Blueprint.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBFF48D3170C4F30001E5FB2 /* Blueprint.cc */; };
 		BBFF48D6170C4F30001E5FB2 /* Blueprint.h in Headers */ = {isa = PBXBuildFile; fileRef = BBFF48D4170C4F30001E5FB2 /* Blueprint.h */; };
 		BBFF48D9170C57F1001E5FB2 /* test-Blueprint.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBFF48D7170C57F1001E5FB2 /* test-Blueprint.cc */; };
 /* End PBXBuildFile section */
@@ -143,7 +141,6 @@
 		BBD5F9CF1735413A0049BBEE /* BlueprintParserCore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BlueprintParserCore.h; path = src/BlueprintParserCore.h; sourceTree = "<group>"; };
 		BBD5F9D0173542D60049BBEE /* ParserCore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ParserCore.h; path = src/ParserCore.h; sourceTree = "<group>"; };
 		BBD5F9D11735439B0049BBEE /* ParserCore.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ParserCore.cc; path = src/ParserCore.cc; sourceTree = "<group>"; };
-		BBD5F9D3173548F40049BBEE /* BlueprintParserCore.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BlueprintParserCore.cc; path = src/BlueprintParserCore.cc; sourceTree = "<group>"; };
 		BBD5F9D517354B450049BBEE /* MethodParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MethodParser.cc; path = src/MethodParser.cc; sourceTree = "<group>"; };
 		BBD5F9D617354B450049BBEE /* MethodParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MethodParser.h; path = src/MethodParser.h; sourceTree = "<group>"; };
 		BBD5F9DB173561DA0049BBEE /* test-ResouceGroupParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-ResouceGroupParser.cc"; path = "test/test-ResouceGroupParser.cc"; sourceTree = "<group>"; };
@@ -153,7 +150,6 @@
 		BBFF48C9170B3C49001E5FB2 /* test-snowcrash.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-snowcrash.cc"; path = "test/test-snowcrash.cc"; sourceTree = "<group>"; };
 		BBFF48CC170B3EDE001E5FB2 /* snowcrash.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = snowcrash.cc; path = src/snowcrash.cc; sourceTree = "<group>"; };
 		BBFF48D1170B4224001E5FB2 /* snowcrash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = snowcrash.h; path = src/snowcrash.h; sourceTree = "<group>"; };
-		BBFF48D3170C4F30001E5FB2 /* Blueprint.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Blueprint.cc; path = src/Blueprint.cc; sourceTree = "<group>"; };
 		BBFF48D4170C4F30001E5FB2 /* Blueprint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Blueprint.h; path = src/Blueprint.h; sourceTree = "<group>"; };
 		BBFF48D7170C57F1001E5FB2 /* test-Blueprint.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-Blueprint.cc"; path = "test/test-Blueprint.cc"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -270,11 +266,9 @@
 		BBFF48CB170B3ECB001E5FB2 /* src */ = {
 			isa = PBXGroup;
 			children = (
-				BBFF48D3170C4F30001E5FB2 /* Blueprint.cc */,
 				BBFF48D4170C4F30001E5FB2 /* Blueprint.h */,
 				BBA91DBF171D402600649B05 /* BlueprintParser.cc */,
 				BBA91DC0171D402600649B05 /* BlueprintParser.h */,
-				BBD5F9D3173548F40049BBEE /* BlueprintParserCore.cc */,
 				BBD5F9CF1735413A0049BBEE /* BlueprintParserCore.h */,
 				BB740995171C065C0023105F /* MarkdownBlock.cc */,
 				BB740996171C065C0023105F /* MarkdownBlock.h */,
@@ -427,7 +421,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				BBFF48CD170B3EDE001E5FB2 /* snowcrash.cc in Sources */,
-				BBFF48D5170C4F30001E5FB2 /* Blueprint.cc in Sources */,
 				BBA889A71712FF37005A9570 /* Parser.cc in Sources */,
 				BBA889B517131AFF005A9570 /* autolink.c in Sources */,
 				BBA889B717131AFF005A9570 /* buffer.c in Sources */,
@@ -446,7 +439,6 @@
 				BBD5F9CA17353C310049BBEE /* ResourceGroupParser.cc in Sources */,
 				BBD5F9CD17353CE00049BBEE /* ResourceParser.cc in Sources */,
 				BBD5F9D21735439B0049BBEE /* ParserCore.cc in Sources */,
-				BBD5F9D4173548F40049BBEE /* BlueprintParserCore.cc in Sources */,
 				BBD5F9D717354B460049BBEE /* MethodParser.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

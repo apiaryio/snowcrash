@@ -33,11 +33,9 @@
         'sundown/src/html'
       ],
       'sources': [
-        'src/Blueprint.cc',
         'src/Blueprint.h',
         'src/BlueprintParser.cc',
         'src/BlueprintParser.h',
-        'src/BlueprintParserCore.cc',
         'src/BlueprintParserCore.h',
         'src/MarkdownBlock.cc',
         'src/MarkdownBlock.h',
