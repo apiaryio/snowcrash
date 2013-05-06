@@ -51,10 +51,9 @@ static ParseSectionResult ParseBlueprintOverview(const BlockIterator& begin, con
                 // WARN: No API name specified
                 result.warnings.push_back(Warning("expected API name", 0, currentBlock->sourceMap));
             }
-            else {
-                // Arbitrary markdown content, add to description
-                blueprint.description += MapSourceData(sourceData, currentBlock->sourceMap);
-            }
+
+            // Arbitrary markdown content, add to description
+            blueprint.description += MapSourceData(sourceData, currentBlock->sourceMap);
         }
         
         ++currentBlock;

@@ -18,17 +18,21 @@ TEST_CASE("parser/init", "Parser construction")
     REQUIRE_NOTHROW(delete parser);
 }
 
-TEST_CASE("parser/params", "parse() method parameters.")
+TEST_CASE("parser/parse-empty", "Parse empty blueprint.")
 {
     Parser parser;
     Result result;
     Blueprint blueprint;
     
-    parser.parse("", result, blueprint);
+    const std::string bluerpintSource = "";
+    
+    parser.parse(bluerpintSource, result, blueprint);
     REQUIRE(result.error.code == Error::OK);
+    REQUIRE(blueprint.name.empty());
+    REQUIRE(blueprint.description.empty());
 }
 
-TEST_CASE("parser/parse-api-name", "Parse API name.")
+TEST_CASE("parser/parse-simple", "Parse simple blueprint.")
 {
     Parser parser;
     Result result;
@@ -51,5 +55,4 @@ Resource **description**\n\
     parser.parse(bluerpintSource, result, blueprint);
     REQUIRE(result.error.code == Error::OK);
     REQUIRE(blueprint.name == "Snowcrash API");
-
 }

@@ -41,7 +41,6 @@ TEST_CASE("bpparser/parse-bp-name", "Parse blueprint name.")
     REQUIRE(result.error.code == Error::OK);
     REQUIRE(blueprint.name == "API Name");
     REQUIRE(blueprint.description.length() == 0);
-
 }
 
 TEST_CASE("bpparser/parse-overview", "Parse blueprint overview section.")
@@ -62,7 +61,6 @@ TEST_CASE("bpparser/parse-overview", "Parse blueprint overview section.")
     REQUIRE(blueprint.name == "API Name");
     REQUIRE(blueprint.description == "123");
     REQUIRE(blueprint.resourceGroups.empty());
-    
 }
 
 TEST_CASE("bpparser/parse-group", "Parse resource group.")
@@ -124,6 +122,56 @@ TEST_CASE("bpparser/parse-name-resource", "Parse API with Name and resouce")
     Resource resource = group.resources.front();
     REQUIRE(resource.uri == "/resource");
     REQUIRE(resource.description == "3");
+}
+
+TEST_CASE("bpparser/parse-nameless-description", "Parse nameless blueprint description")
+{
+    // Blueprint in question:
+    //R"(A
+    //# B
+    //");
+    
+    BlueprintParser parser;
+    Result result;
+    Blueprint blueprint;
+    
+    SourceData source = "01";
+    MarkdownBlock markdown;
+    markdown.blocks.push_back(MarkdownBlock(ParagraphBlockType, "A", 1, MakeSourceDataBlock(0, 1)));
+    markdown.blocks.push_back(MarkdownBlock(HeaderBlockType, "B", 0, MakeSourceDataBlock(1, 1)));
+    
+    parser.parse(source, markdown, result, blueprint);
+    
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(blueprint.resourceGroups.size() == 0);
+    
+    REQUIRE(blueprint.description == "01");
+}
+
+TEST_CASE("bpparser/parse-list-only", "Parse nameless blueprint with a list description")
+{
+    // Blueprint in question:
+    //R"(+ list
+    //");
+    
+    BlueprintParser parser;
+    Result result;
+    Blueprint blueprint;
+    
+    SourceData source = "01";
+    
+    MarkdownBlock listItem(ListItemBlockType, "list", 0, MakeSourceDataBlock(0, 1));
+    MarkdownBlock list(ListBlockType, SourceData(), 0, MakeSourceDataBlock(0, 2));
+    list.blocks.push_back(listItem);
+    
+    MarkdownBlock markdown;
+    markdown.blocks.push_back(list);
+    
+    parser.parse(source, markdown, result, blueprint);
+    
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(blueprint.resourceGroups.size() == 0);
+    REQUIRE(blueprint.description == "01");
 }
 
 //TEST_CASE("bpparser/parse-resource", "Parse simple resource.")
