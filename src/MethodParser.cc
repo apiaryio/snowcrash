@@ -6,6 +6,7 @@
 //  Copyright (c) 2013 Apiary.io. All rights reserved.
 //
 
+#include <algorithm>
 #include "MethodParser.h"
 #include "RegexMatch.h"
 
