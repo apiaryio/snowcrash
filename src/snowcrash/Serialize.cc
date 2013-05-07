@@ -19,6 +19,8 @@ const std::string SerializeKey::Description = "description";
 const std::string SerializeKey::ResourceGroups = "resourceGroups";
 const std::string SerializeKey::Resources = "resources";
 const std::string SerializeKey::URI = "uri";
+const std::string SerializeKey::Methods = "methods";
+const std::string SerializeKey::Method = "method";
 
 std::string snowcrash::EscapeNewlines(const std::string& input)
 {

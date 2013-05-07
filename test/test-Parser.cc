@@ -55,4 +55,15 @@ Resource **description**\n\
     parser.parse(bluerpintSource, result, blueprint);
     REQUIRE(result.error.code == Error::OK);
     REQUIRE(blueprint.name == "Snowcrash API");
+    REQUIRE(blueprint.description.empty());
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    
+    ResourceGroup& resourceGroup = blueprint.resourceGroups.front();
+    REQUIRE(resourceGroup.name.empty());
+    REQUIRE(resourceGroup.description.empty());
+    REQUIRE(resourceGroup.resources.size() == 1);
+    
+    // TODO:
+    //Resource& resource = resourceGroup.resources.front();
+    //REQUIRE(resource.uri == "/resource");
 }

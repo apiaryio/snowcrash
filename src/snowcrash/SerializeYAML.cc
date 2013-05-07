@@ -47,6 +47,16 @@ static void serialize(const Collection<Metadata>::type& metadata, std::ostream &
     }
 }
 
+// Serialize Method
+static void serialize(const Method& method, std::ostream &os)
+{
+    os << "      - ";   // indent 4
+    serialize(SerializeKey::Method, method.method, 0, os);
+    serialize(SerializeKey::Description, method.description, 4, os);
+    
+    // TODO: parameters, headers, requests, responses
+}
+
 // Serialize Resource
 static void serialize(const Resource& resource, std::ostream &os)
 {
@@ -54,7 +64,12 @@ static void serialize(const Resource& resource, std::ostream &os)
     serialize(SerializeKey::URI, resource.uri, 0, os);
     serialize(SerializeKey::Description, resource.description, 3, os);
     
-    //TODO: params, headers, methods
+    //TODO: params, headers
+    
+    serialize(SerializeKey::Methods, std::string(), 3, os);
+    for (Collection<Method>::const_iterator it = resource.methods.begin(); it != resource.methods.end(); ++it) {
+        serialize(*it, os);
+    }
 }
 
 // Serialize Resource Group

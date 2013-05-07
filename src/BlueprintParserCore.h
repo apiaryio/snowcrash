@@ -13,7 +13,7 @@
 #include "MarkdownBlock.h"
 
 // Recognized HTTP headers, regex string
-#define HTTP_METHODS "GET|POST|PUT|DELETE|OPTIONS|PATCH|PROPPATCH|LOCK|UNLOCK|COPY|MOVE|MKCOL"
+#define HTTP_METHODS "GET|POST|PUT|DELETE|OPTIONS|PATCH|PROPPATCH|LOCK|UNLOCK|COPY|MOVE|MKCOL|HEAD"
 
 namespace snowcrash {
     
@@ -46,6 +46,14 @@ namespace snowcrash {
     struct MatchURI : std::binary_function<T, T, bool> {
         bool operator()(const T& first, const T& second) const {
             return first.uri == second.uri;
+        }
+    };
+    
+    // Method matching predicate
+    template <class T>
+    struct MatchMethod : std::binary_function<T, T, bool> {
+        bool operator()(const T& first, const T& second) const {
+            return first.method == second.method;
         }
     };
 }

@@ -16,9 +16,12 @@ namespace snowcrash {
     
     // Returns true if block has HTTP Method signature, false otherwise
     bool HasMethodSignature(const MarkdownBlock& block);
+    
+    // Finds a method inside resource
+    Collection<Method>::iterator FindMethod(Resource& resource, const Method& method);
 
     // Parse method
-
+    ParseSectionResult ParseMethod(const BlockIterator& begin, const BlockIterator& end, const SourceData& sourceData, Method& method);
 }
 
 #endif

@@ -74,6 +74,7 @@
         'test/test-BlueprintParser.cc',
         'test/test-MarkdownBlock.cc',
         'test/test-MarkdownParser.cc',
+        'test/test-MethodParser.cc',
         'test/test-Parser.cc',
         'test/test-RegexMatch.cc',
         'test/test-ResouceGroupParser.cc',
