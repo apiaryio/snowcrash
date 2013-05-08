@@ -38,20 +38,22 @@ static Section ClassifyBlock(const MarkdownBlock& block, Section previousContext
     // Exclusive terminator: Other Method Header, Parameters List, Headers List,
     // Request List, Response List and any other block after previous headers
     
-    if (block.type != HeaderBlockType &&
-        block.type != ListBlockType)
-        return (previousContext != MethodSection) ? UndefinedSection : MethodSection;
-
-    if (block.type == HeaderBlockType && HasMethodSignature(block)) {
-        return (previousContext != MethodSection) ? MethodSection : UndefinedSection;
-    }
-
-    if (block.type == ListBlockType) {
-        /// TODO:
-        return MethodSection;
-    }
+//    if (block.type != HeaderBlockType &&
+//        block.type != ListBlockType)
+//        return (previousContext != MethodSection) ? UndefinedSection : MethodSection;
+//
+//    if (block.type == HeaderBlockType && HasMethodSignature(block)) {
+//        return (previousContext != MethodSection) ? MethodSection : UndefinedSection;
+//    }
+//
+//    if (block.type == ListBlockType) {
+//        /// TODO:
+//        return MethodSection;
+//    }
+//    
+//    return (previousContext != MethodSection) ? UndefinedSection : MethodSection;
     
-    return (previousContext != MethodSection) ? UndefinedSection : MethodSection;
+    return UndefinedSection;
 }
 
 // Parse method and description

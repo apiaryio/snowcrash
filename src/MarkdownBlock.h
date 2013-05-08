@@ -21,12 +21,15 @@ namespace snowcrash {
     enum MarkdownBlockType {
         UndefinedBlockType = 0,
         CodeBlockType,
-        QuoteBlockType,
+        QuoteBlockBeginType,
+        QuoteBlockEndType,
         HTMLBlockType,
         HeaderBlockType,
         HRuleBlockType,
-        ListBlockType,
-        ListItemBlockType,
+        ListBlockBeginType,
+        ListBlockEndType,
+        ListItemBlockBeginType,
+        ListItemBlockEndType,
         ParagraphBlockType,
         TableBlockType,
         TableRowBlockType,
@@ -49,12 +52,12 @@ namespace snowcrash {
         { type = t; content = c; data = d; sourceMap = map; }
         
         MarkdownBlock(const MarkdownBlock& b)
-        { type = b.type; content = b.content; data = b.data; blocks = b.blocks; sourceMap = b.sourceMap; }
+        { type = b.type; content = b.content; data = b.data; sourceMap = b.sourceMap; }
         
         virtual ~MarkdownBlock() {}
         
         MarkdownBlock& operator=(const MarkdownBlock& b)
-        { type = b.type; content = b.content; data = b.data; blocks = b.blocks; sourceMap = b.sourceMap; return *this; }
+        { type = b.type; content = b.content; data = b.data; sourceMap = b.sourceMap; return *this; }
         
         // Type of the Markdown Block
         MarkdownBlockType type;
@@ -65,9 +68,6 @@ namespace snowcrash {
         // Arbitrary data from parser
         Data data;
         
-        // Nested blocks (Quote, List, ListItem Only)
-        Stack blocks;
-        
         // Position of this block in source module
         SourceDataBlock sourceMap;
     };
@@ -77,7 +77,7 @@ namespace snowcrash {
         
 #ifdef DEBUG
     // Prints markdown block recursively to stdout
-    void printMarkdownBlock(const MarkdownBlock& block, unsigned int level = 0);
+    void printMarkdown(const MarkdownBlock::Stack& markdown, unsigned int level = 0);
 #endif
 
 }

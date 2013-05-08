@@ -17,7 +17,7 @@ const int SourceAnnotation::OK;
 void Parser::parse(const SourceData& source, Result& result, Blueprint& blueprint)
 {
     // Parse Markdown
-    MarkdownBlock markdown;
+    MarkdownBlock::Stack markdown;
     MarkdownParser markdownParser;
     markdownParser.parse(source, result, markdown);
     

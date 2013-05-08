@@ -22,7 +22,7 @@ namespace snowcrash {
     public:
         // Parse Markdown AST into API Blueprint AST
         // TODO make result return value
-        void parse(const SourceData& sourceData, const MarkdownBlock& source, Result& result, Blueprint& blueprint);
+        void parse(const SourceData& sourceData, const MarkdownBlock::Stack& source, Result& result, Blueprint& blueprint);
     };
 }
 

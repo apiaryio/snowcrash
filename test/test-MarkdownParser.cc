@@ -22,7 +22,7 @@ TEST_CASE("mdparser/parse-params", "parse() method parameters.")
 {
     MarkdownParser parser;
     Result result;
-    MarkdownBlock markdown;
+    MarkdownBlock::Stack markdown;
     
     parser.parse("", result, markdown);
     REQUIRE(result.error.code == Error::OK);
@@ -32,7 +32,7 @@ TEST_CASE("mdparser/parse-flat", "parsing flat Markdown into AST")
 {
     MarkdownParser parser;
     Result result;
-    MarkdownBlock markdown;
+    MarkdownBlock::Stack markdown;
     
     const std::string source = \
 "\n\
@@ -43,46 +43,40 @@ paragraph\n\
 ";
 
     parser.parse(source, result, markdown);
-
     REQUIRE(result.error.code == Error::OK);
     
-    REQUIRE(markdown.type == UndefinedBlockType);
-    REQUIRE(markdown.blocks.size() == 3);
+    REQUIRE(markdown.size() == 3);
     
     // Header block
-    REQUIRE(markdown.blocks[0].type == HeaderBlockType);
-    REQUIRE(markdown.blocks[0].content == "header");
-    REQUIRE(markdown.blocks[0].data == 1);
-    REQUIRE(markdown.blocks[0].blocks.size() == 0);
-    REQUIRE(markdown.blocks[0].sourceMap.size() == 1);
-    REQUIRE(markdown.blocks[0].sourceMap.back().location == 1);
-    REQUIRE(markdown.blocks[0].sourceMap.back().length == 9);
-    std::string sourceData = MapSourceData(source, markdown.blocks[0].sourceMap);
+    REQUIRE(markdown[0].type == HeaderBlockType);
+    REQUIRE(markdown[0].content == "header");
+    REQUIRE(markdown[0].data == 1);
+    REQUIRE(markdown[0].sourceMap.size() == 1);
+    REQUIRE(markdown[0].sourceMap.back().location == 1);
+    REQUIRE(markdown[0].sourceMap.back().length == 9);
+    std::string sourceData = MapSourceData(source, markdown[0].sourceMap);
     REQUIRE(sourceData == "# header\n");
     
     // Paragraph block
-    REQUIRE(markdown.blocks[1].type == ParagraphBlockType);
-    REQUIRE(markdown.blocks[1].content == "paragraph");
-    REQUIRE(markdown.blocks[1].data == 0);
-    REQUIRE(markdown.blocks[1].blocks.size() == 0);
-    sourceData = MapSourceData(source, markdown.blocks[1].sourceMap);
+    REQUIRE(markdown[1].type == ParagraphBlockType);
+    REQUIRE(markdown[1].content == "paragraph");
+    REQUIRE(markdown[1].data == 0);
+    sourceData = MapSourceData(source, markdown[1].sourceMap);
     REQUIRE(sourceData == "paragraph\n\n");
     
     // Code block
-    REQUIRE(markdown.blocks[2].type == CodeBlockType);
-    REQUIRE(markdown.blocks[2].content == "code\n");
-    REQUIRE(markdown.blocks[2].data == 0);
-    REQUIRE(markdown.blocks[2].blocks.size() == 0);
-    sourceData = MapSourceData(source, markdown.blocks[2].sourceMap);
+    REQUIRE(markdown[2].type == CodeBlockType);
+    REQUIRE(markdown[2].content == "code\n");
+    REQUIRE(markdown[2].data == 0);
+    sourceData = MapSourceData(source, markdown[2].sourceMap);
     REQUIRE(sourceData == "    code\n");
-
 }
 
 TEST_CASE("mdparser/parse-html", "parsing Markdown with HTML into AST")
 {
     MarkdownParser parser;
     Result result;
-    MarkdownBlock markdown;
+    MarkdownBlock::Stack markdown;
     
     const std::string source = \
 "# header\n\
@@ -92,29 +86,25 @@ TEST_CASE("mdparser/parse-html", "parsing Markdown with HTML into AST")
     parser.parse(source, result, markdown);
     
     REQUIRE(result.error.code == Error::OK);
-    
-    REQUIRE(markdown.type == UndefinedBlockType);
-    REQUIRE(markdown.blocks.size() == 2);
+    REQUIRE(markdown.size() == 2);
     
     // Header block
-    REQUIRE(markdown.blocks[0].type == HeaderBlockType);
-    REQUIRE(markdown.blocks[0].content == "header");
-    REQUIRE(markdown.blocks[0].data == 1);
-    REQUIRE(markdown.blocks[0].blocks.size() == 0);
+    REQUIRE(markdown[0].type == HeaderBlockType);
+    REQUIRE(markdown[0].content == "header");
+    REQUIRE(markdown[0].data == 1);
     
     // HTML block
-    REQUIRE(markdown.blocks[1].type == HTMLBlockType);
-    REQUIRE(markdown.blocks[1].content == "<p>some text</p>\n");
-    REQUIRE(markdown.blocks[1].data == 0);
-    REQUIRE(markdown.blocks[1].blocks.size() == 0);
-    std::string sourceData = MapSourceData(source, markdown.blocks[1].sourceMap);
+    REQUIRE(markdown[1].type == HTMLBlockType);
+    REQUIRE(markdown[1].content == "<p>some text</p>\n");
+    REQUIRE(markdown[1].data == 0);
+    std::string sourceData = MapSourceData(source, markdown[1].sourceMap);
     REQUIRE(sourceData == "<p>some text</p>\n");
 }
 
 TEST_CASE("mdparser/parse-hr", "parsing Markdown with horizontal rule into AST")
 {
     Result result;
-    MarkdownBlock markdown;
+    MarkdownBlock::Stack markdown;
     MarkdownParser parser;
     
     const std::string source = \
@@ -126,22 +116,18 @@ TEST_CASE("mdparser/parse-hr", "parsing Markdown with horizontal rule into AST")
     parser.parse(source, result, markdown);
     
     REQUIRE(result.error.code == Error::OK);
-    
-    REQUIRE(markdown.type == UndefinedBlockType);
-    REQUIRE(markdown.blocks.size() == 2);
+    REQUIRE(markdown.size() == 2);
     
     // Header block
-    REQUIRE(markdown.blocks[0].type == HeaderBlockType);
-    REQUIRE(markdown.blocks[0].content == "header");
-    REQUIRE(markdown.blocks[0].data == 1);
-    REQUIRE(markdown.blocks[0].blocks.size() == 0);
+    REQUIRE(markdown[0].type == HeaderBlockType);
+    REQUIRE(markdown[0].content == "header");
+    REQUIRE(markdown[0].data == 1);
     
     // HR block
-    REQUIRE(markdown.blocks[1].type == HRuleBlockType);
-    REQUIRE(markdown.blocks[1].content == "");
-    REQUIRE(markdown.blocks[1].data == 0);
-    REQUIRE(markdown.blocks[1].blocks.size() == 0);
-    std::string sourceData = MapSourceData(source, markdown.blocks[1].sourceMap);
+    REQUIRE(markdown[1].type == HRuleBlockType);
+    REQUIRE(markdown[1].content.empty());
+    REQUIRE(markdown[1].data == 0);
+    std::string sourceData = MapSourceData(source, markdown[1].sourceMap);
     REQUIRE(sourceData == "---\n");
 
 }
@@ -150,7 +136,7 @@ TEST_CASE("mdparser/parse-blockquote", "parsing Markdown with blockquote into AS
 {
     MarkdownParser parser;
     Result result;
-    MarkdownBlock markdown;
+    MarkdownBlock::Stack markdown;
     
     const std::string source = \
 "\n\
@@ -168,17 +154,61 @@ paragraph-1\n\
     parser.parse(source, result, markdown);
         
     REQUIRE(result.error.code == Error::OK);
-    
-    REQUIRE(markdown.type == UndefinedBlockType);
-    REQUIRE(markdown.blocks.size() == 2);
+    REQUIRE(markdown.size() == 9);
     
     // First quote
-    REQUIRE(markdown.blocks[0].type == QuoteBlockType);
-    REQUIRE(markdown.blocks[0].content == "");
-    REQUIRE(markdown.blocks[0].data == 0);
-    REQUIRE(markdown.blocks[0].blocks.size() == 4);
-    std::string sourceData = MapSourceData(source, markdown.blocks[0].sourceMap);
-    REQUIRE(sourceData == \
+    REQUIRE(markdown[0].type == QuoteBlockBeginType);
+    REQUIRE(markdown[0].content.empty());
+    REQUIRE(markdown[0].data == 0);
+    REQUIRE(markdown[0].sourceMap.empty());
+    
+    // header
+    REQUIRE(markdown[1].type == HeaderBlockType);
+    REQUIRE(markdown[1].content == "header");
+    REQUIRE(markdown[1].data == 2);
+    std::string sourceData1 = MapSourceData(source, markdown[1].sourceMap);
+    REQUIRE(sourceData1 == "## header\n");
+    
+    // blockquote-1
+    REQUIRE(markdown[2].type == ParagraphBlockType);
+    REQUIRE(markdown[2].content == "blockquote-1");
+    REQUIRE(markdown[2].data == 0);
+    std::string sourceData2 = MapSourceData(source, markdown[2].sourceMap);
+    REQUIRE(sourceData2 == "blockquote-1\n\n");
+    
+    // Second quote    
+    REQUIRE(markdown[3].type == QuoteBlockBeginType);
+    REQUIRE(markdown[3].content.empty());
+    REQUIRE(markdown[3].data == 0);
+    REQUIRE(markdown[3].sourceMap.empty());
+    
+    // blockquote-2
+    REQUIRE(markdown[4].type == ParagraphBlockType);
+    REQUIRE(markdown[4].content == "blockquote-2");
+    REQUIRE(markdown[4].data == 0);
+    std::string sourceData3 = MapSourceData(source, markdown[4].sourceMap);
+    REQUIRE(sourceData3 == "blockquote-2\n");
+
+    // Second quote end
+    REQUIRE(markdown[5].type == QuoteBlockEndType);
+    REQUIRE(markdown[5].content.empty());
+    REQUIRE(markdown[5].data == 0);
+    std::string sourceData4 = MapSourceData(source, markdown[5].sourceMap);
+    REQUIRE(sourceData4 == "> blockquote-2\n\n");
+    
+    // blockquote-3
+    REQUIRE(markdown[6].type == ParagraphBlockType);
+    REQUIRE(markdown[6].content == "blockquote-3");
+    REQUIRE(markdown[6].data == 0);
+    std::string sourceData5 = MapSourceData(source, markdown[6].sourceMap);
+    REQUIRE(sourceData5 == "blockquote-3\n");
+    
+    // First quote end
+    REQUIRE(markdown[7].type == QuoteBlockEndType);
+    REQUIRE(markdown[7].content.empty());
+    REQUIRE(markdown[7].data == 0);
+    std::string sourceData6 = MapSourceData(source, markdown[7].sourceMap);
+    REQUIRE(sourceData6 == \
 "> ## header\n\
 > blockquote-1\n\
 >\n\
@@ -187,64 +217,20 @@ paragraph-1\n\
 > blockquote-3\n\
 \n\
 ");
-        
-    MarkdownBlock quote1 = markdown.blocks[0];
-
-    // header
-    REQUIRE(quote1.blocks[0].type == HeaderBlockType);
-    REQUIRE(quote1.blocks[0].content == "header");
-    REQUIRE(quote1.blocks[0].data == 2);
-    REQUIRE(quote1.blocks[0].blocks.size() == 0);
-    std::string sourceData1 = MapSourceData(source, quote1.blocks[0].sourceMap);
-    REQUIRE(sourceData1 == "## header\n");
-    
-    // blockquote-1
-    REQUIRE(quote1.blocks[1].type == ParagraphBlockType);
-    REQUIRE(quote1.blocks[1].content == "blockquote-1");
-    REQUIRE(quote1.blocks[1].data == 0);
-    REQUIRE(quote1.blocks[1].blocks.size() == 0);
-    std::string sourceData2 = MapSourceData(source, quote1.blocks[1].sourceMap);
-    REQUIRE(sourceData2 == "blockquote-1\n\n");
-    
-    // Second quote
-    REQUIRE(quote1.blocks[2].type == QuoteBlockType);
-    REQUIRE(quote1.blocks[2].content == "");
-    REQUIRE(quote1.blocks[2].data == 0);
-    REQUIRE(quote1.blocks[2].blocks.size() == 1);
-    std::string sourceData3 = MapSourceData(source, quote1.blocks[2].sourceMap);
-    REQUIRE(sourceData3 == "> blockquote-2\n\n");
-    
-    // blockquote-2
-    MarkdownBlock quote2 = quote1.blocks[2];
-    REQUIRE(quote2.blocks[0].type == ParagraphBlockType);
-    REQUIRE(quote2.blocks[0].content == "blockquote-2");
-    REQUIRE(quote2.blocks[0].data == 0);
-    REQUIRE(quote2.blocks[0].blocks.size() == 0);
-    std::string sourceData4 = MapSourceData(source, quote2.blocks[0].sourceMap);
-    REQUIRE(sourceData4 == "blockquote-2\n");
-    
-    // blockquote-3
-    REQUIRE(quote1.blocks[3].type == ParagraphBlockType);
-    REQUIRE(quote1.blocks[3].content == "blockquote-3");
-    REQUIRE(quote1.blocks[3].data == 0);
-    REQUIRE(quote1.blocks[3].blocks.size() == 0);
-    std::string sourceData5 = MapSourceData(source, quote1.blocks[3].sourceMap);
-    REQUIRE(sourceData5 == "blockquote-3\n");
     
     // paragraph-1
-    REQUIRE(markdown.blocks[1].type == ParagraphBlockType);
-    REQUIRE(markdown.blocks[1].content == "paragraph-1");
-    REQUIRE(markdown.blocks[1].data == 0);
-    REQUIRE(markdown.blocks[1].blocks.size() == 0);
-    std::string sourceData6 = MapSourceData(source, markdown.blocks[1].sourceMap);
-    REQUIRE(sourceData6 == "paragraph-1\n\n");
+    REQUIRE(markdown[8].type == ParagraphBlockType);
+    REQUIRE(markdown[8].content == "paragraph-1");
+    REQUIRE(markdown[8].data == 0);
+    std::string sourceData7 = MapSourceData(source, markdown[8].sourceMap);
+    REQUIRE(sourceData7 == "paragraph-1\n\n");
 }
 
 TEST_CASE("mdparser/parse-src-map", "parsing simple nested Markdown into AST and testing its source mapping")
 {
     MarkdownParser parser;
     Result result;
-    MarkdownBlock markdown;
+    MarkdownBlock::Stack markdown;
     
     const std::string source = \
 "\n\
@@ -260,64 +246,63 @@ TEST_CASE("mdparser/parse-src-map", "parsing simple nested Markdown into AST and
     parser.parse(source, result, markdown);
     
     REQUIRE(result.error.code == Error::OK);
+    REQUIRE(markdown.size() == 10);
     
-    REQUIRE(markdown.type == UndefinedBlockType);
-    REQUIRE(markdown.blocks.size() == 1);
-    
-    MarkdownBlock list = markdown.blocks[0];
-    REQUIRE(list.type == ListBlockType);
-    REQUIRE(list.blocks.size() == 1);
-    REQUIRE(list.sourceMap.size() == 1);
-    REQUIRE(list.sourceMap.back().location == 1);
-    REQUIRE(list.sourceMap.back().length == 69);
+    REQUIRE(markdown[0].type == ListBlockBeginType);
+    REQUIRE(markdown[0].sourceMap.empty());
 
-    MarkdownBlock listItem = list.blocks[0];
-    REQUIRE(listItem.type == ListItemBlockType);
-    REQUIRE(listItem.blocks.size() == 3);
-    REQUIRE(listItem.sourceMap.size() == 1);
-    REQUIRE(listItem.sourceMap.back().location == 1);
-    REQUIRE(listItem.sourceMap.back().length == 69);
+    REQUIRE(markdown[1].type == ListItemBlockBeginType);
+    REQUIRE(markdown[1].sourceMap.empty());
     
-    MarkdownBlock para1 = listItem.blocks[0];
-    REQUIRE(para1.type == ParagraphBlockType);
-    REQUIRE(para1.blocks.size() == 0);
-    REQUIRE(para1.sourceMap.size() == 1);
-    REQUIRE(para1.sourceMap.back().location == 3);
-    REQUIRE(para1.sourceMap.back().length == 6);
+    REQUIRE(markdown[2].type == ParagraphBlockType);
+    REQUIRE(markdown[2].sourceMap.size() == 1);
+    REQUIRE(markdown[2].sourceMap.back().location == 3);
+    REQUIRE(markdown[2].sourceMap.back().length == 6);
     
-    MarkdownBlock para2 = listItem.blocks[1];
-    REQUIRE(para2.type == ParagraphBlockType);
-    REQUIRE(para2.blocks.size() == 0);
-    REQUIRE(para2.sourceMap.size() == 2);
-    REQUIRE(para2.sourceMap[0].location == 13);
-    REQUIRE(para2.sourceMap[0].length == 10);
-    REQUIRE(para2.sourceMap[1].location == 27);
-    REQUIRE(para2.sourceMap[1].length == 10);
+    REQUIRE(markdown[3].type == ParagraphBlockType);
+    REQUIRE(markdown[3].sourceMap.size() == 2);
+    REQUIRE(markdown[3].sourceMap[0].location == 13);
+    REQUIRE(markdown[3].sourceMap[0].length == 10);
+    REQUIRE(markdown[3].sourceMap[1].location == 27);
+    REQUIRE(markdown[3].sourceMap[1].length == 10);
     
-    MarkdownBlock list2 = listItem.blocks[2];
-    REQUIRE(list2.type == ListBlockType);
-    REQUIRE(list2.blocks.size() == 1);
-    REQUIRE(list2.sourceMap.size() == 2);
-    REQUIRE(list2.sourceMap[0].location == 46);
-    REQUIRE(list2.sourceMap[0].length == 8);
-    REQUIRE(list2.sourceMap[1].location == 58);
-    REQUIRE(list2.sourceMap[1].length == 12);
+    REQUIRE(markdown[4].type == ListBlockBeginType);
+    REQUIRE(markdown[4].sourceMap.empty());
 
-    MarkdownBlock listItem2 = list2.blocks[0];
-    REQUIRE(listItem2.type == ListItemBlockType);
-    REQUIRE(listItem2.blocks.size() == 0);
-    REQUIRE(listItem2.sourceMap.size() == 2);
-    REQUIRE(listItem2.sourceMap[0].location == 46); // 48:6 without marks
-    REQUIRE(listItem2.sourceMap[0].length == 8);
-    REQUIRE(listItem2.sourceMap[1].location == 58);
-    REQUIRE(listItem2.sourceMap[1].length == 12);
+    REQUIRE(markdown[5].type == ListItemBlockBeginType);
+    REQUIRE(markdown[5].sourceMap.empty());
+    
+    REQUIRE(markdown[6].type == ListItemBlockEndType);
+    REQUIRE(markdown[6].sourceMap.size() == 2);
+    REQUIRE(markdown[6].sourceMap[0].location == 46);
+    REQUIRE(markdown[6].sourceMap[0].length == 8);
+    REQUIRE(markdown[6].sourceMap[1].location == 58);
+    REQUIRE(markdown[6].sourceMap[1].length == 12);
+    
+    REQUIRE(markdown[7].type == ListBlockEndType);
+    REQUIRE(markdown[7].sourceMap.size() == 2);
+    REQUIRE(markdown[7].sourceMap[0].location == 46);
+    REQUIRE(markdown[7].sourceMap[0].length == 8);
+    REQUIRE(markdown[7].sourceMap[1].location == 58);
+    REQUIRE(markdown[7].sourceMap[1].length == 12);
+
+    REQUIRE(markdown[8].type == ListItemBlockEndType);
+    REQUIRE(markdown[8].sourceMap.size() == 1);
+    REQUIRE(markdown[8].sourceMap.back().location == 1);
+    REQUIRE(markdown[8].sourceMap.back().length == 69);
+    
+    REQUIRE(markdown[9].type == ListBlockEndType);
+    REQUIRE(markdown[9].sourceMap.size() == 1);
+    REQUIRE(markdown[9].sourceMap.back().location == 1);
+    REQUIRE(markdown[9].sourceMap.back().length == 69);
+    
 }
 
 TEST_CASE("mdparser/parse-nested", "parsing complex nested Markdown into AST")
 {
     MarkdownParser parser;
     Result result;
-    MarkdownBlock markdown;
+    MarkdownBlock::Stack markdown;
     
     const std::string source = \
 "\n\
@@ -348,121 +333,119 @@ paragraph-2\n\
     parser.parse(source, result, markdown);
     
     REQUIRE(result.error.code == Error::OK);
-
-    REQUIRE(markdown.type == UndefinedBlockType);
-    REQUIRE(markdown.blocks.size() == 4);
+    REQUIRE(markdown.size() == 25);
 
     // paragraph-1
-    REQUIRE(markdown.blocks[0].type == ParagraphBlockType);
-    REQUIRE(markdown.blocks[0].content == "paragraph-1");
-    REQUIRE(markdown.blocks[0].data == 0);
-    REQUIRE(markdown.blocks[0].blocks.size() == 0);
+    REQUIRE(markdown[0].type == ParagraphBlockType);
+    REQUIRE(markdown[0].content == "paragraph-1");
+    REQUIRE(markdown[0].data == 0);
     
-    // list1 (listitem-1 & listitem-2)
-    MarkdownBlock list1 = markdown.blocks[1];
-    REQUIRE(list1.type == ListBlockType);
-    REQUIRE(list1.content == "");
-    REQUIRE(list1.data == 0);
-    REQUIRE(list1.blocks.size() == 2);
+    // list1 (: & listitem-2)
+    REQUIRE(markdown[1].type == ListBlockBeginType);
+    REQUIRE(markdown[1].content.empty());
+    REQUIRE(markdown[1].data == 0);
     
     // listitem-1
-    MarkdownBlock listItem1 = list1.blocks[0];
-    REQUIRE(listItem1.type == ListItemBlockType);
-    REQUIRE(listItem1.content == "");
-    REQUIRE(listItem1.data == 0);
-    REQUIRE(listItem1.blocks.size() == 2);
+    REQUIRE(markdown[2].type == ListItemBlockBeginType);
+    REQUIRE(markdown[2].content.empty());
+    REQUIRE(markdown[2].data == 0);
     
-    REQUIRE(listItem1.blocks[0].type == ParagraphBlockType);
-    REQUIRE(listItem1.blocks[0].content == "listitem-1-paragraph-1");
-    REQUIRE(listItem1.blocks[0].data == 0);
-    REQUIRE(listItem1.blocks[0].blocks.size() == 0);
+    REQUIRE(markdown[3].type == ParagraphBlockType);
+    REQUIRE(markdown[3].content == "listitem-1-paragraph-1");
+    REQUIRE(markdown[3].data == 0);
     
-    REQUIRE(listItem1.blocks[1].type == ParagraphBlockType);
-    REQUIRE(listItem1.blocks[1].content == "listitem-1-paragraph-2");
-    REQUIRE(listItem1.blocks[1].data == 0);
-    REQUIRE(listItem1.blocks[1].blocks.size() == 0);
+    REQUIRE(markdown[4].type == ParagraphBlockType);
+    REQUIRE(markdown[4].content == "listitem-1-paragraph-2");
+    REQUIRE(markdown[4].data == 0);
+    
+    REQUIRE(markdown[5].type == ListItemBlockEndType);
+    REQUIRE(markdown[5].content.empty());
     
     // listitem-2
-    MarkdownBlock listItem2 = list1.blocks[1];
-    REQUIRE(listItem2.type == ListItemBlockType);
-    REQUIRE(listItem2.content == "");
-    REQUIRE(listItem2.data == 0);
-    REQUIRE(listItem2.blocks.size() == 2);
+    REQUIRE(markdown[6].type == ListItemBlockBeginType);
+    REQUIRE(markdown[6].content.empty());
     
-    REQUIRE(listItem2.blocks[0].type == ParagraphBlockType);
-    REQUIRE(listItem2.blocks[0].content == "listitem-2-paragraph-1");
-    REQUIRE(listItem2.blocks[0].data == 0);
-    REQUIRE(listItem2.blocks[0].blocks.size() == 0);
+    REQUIRE(markdown[7].type == ParagraphBlockType);
+    REQUIRE(markdown[7].content == "listitem-2-paragraph-1");
+    REQUIRE(markdown[7].data == 0);
     
-    REQUIRE(listItem2.blocks[1].type == ParagraphBlockType);
-    REQUIRE(listItem2.blocks[1].content == "listitem-2-paragraph-2");
-    REQUIRE(listItem2.blocks[1].data == 0);
-    REQUIRE(listItem2.blocks[1].blocks.size() == 0);
+    REQUIRE(markdown[8].type == ParagraphBlockType);
+    REQUIRE(markdown[8].content == "listitem-2-paragraph-2");
+    REQUIRE(markdown[8].data == 0);
+    
+    REQUIRE(markdown[9].type == ListItemBlockEndType);
+    REQUIRE(markdown[9].content.empty());
+    
+    // list1 end
+    REQUIRE(markdown[10].type == ListBlockEndType);
+    REQUIRE(markdown[10].content.empty());
     
     // paragraph-2
-    MarkdownBlock paragraph2 = markdown.blocks[2];
-    REQUIRE(paragraph2.type == ParagraphBlockType);
-    REQUIRE(paragraph2.content == "paragraph-2");
-    REQUIRE(paragraph2.data == 0);
-    REQUIRE(paragraph2.blocks.size() == 0);
+    REQUIRE(markdown[11].type == ParagraphBlockType);
+    REQUIRE(markdown[11].content == "paragraph-2");
+    REQUIRE(markdown[11].data == 0);
     
     // list2 (listitem-3)
-    MarkdownBlock list2 = markdown.blocks[3];
-    REQUIRE(list2.type == ListBlockType);
-    REQUIRE(list2.content == "");
-    REQUIRE(list2.data == 0);
-    REQUIRE(list2.blocks.size() == 1);
+    REQUIRE(markdown[12].type == ListBlockBeginType);
+    REQUIRE(markdown[12].content.empty());
+    REQUIRE(markdown[12].data == 0);
     
     // listitem-3
-    MarkdownBlock listItem3 = list2.blocks[0];
-    REQUIRE(listItem3.type == ListItemBlockType);
-    REQUIRE(listItem3.content == "");
-    REQUIRE(listItem3.data == 0);
-    REQUIRE(listItem3.blocks.size() == 3);
+    REQUIRE(markdown[13].type == ListItemBlockBeginType);
+    REQUIRE(markdown[13].content.empty());
+    REQUIRE(markdown[13].data == 0);
     
-    REQUIRE(listItem3.blocks[0].type == ParagraphBlockType);
-    REQUIRE(listItem3.blocks[0].content == "listitem-3-paragraph-1");
-    REQUIRE(listItem3.blocks[0].data == 0);
-    REQUIRE(listItem3.blocks[0].blocks.size() == 0);
+    REQUIRE(markdown[14].type == ParagraphBlockType);
+    REQUIRE(markdown[14].content == "listitem-3-paragraph-1");
+    REQUIRE(markdown[14].data == 0);
     
-    REQUIRE(listItem3.blocks[1].type == ParagraphBlockType);
-    REQUIRE(listItem3.blocks[1].content == "listitem-3-paragraph-2");
-    REQUIRE(listItem3.blocks[1].data == 0);
-    REQUIRE(listItem3.blocks[1].blocks.size() == 0);
+    REQUIRE(markdown[15].type == ParagraphBlockType);
+    REQUIRE(markdown[15].content == "listitem-3-paragraph-2");
+    REQUIRE(markdown[15].data == 0);
     
-    REQUIRE(listItem3.blocks[2].type == ListBlockType);
-    REQUIRE(listItem3.blocks[2].content == "");
-    REQUIRE(listItem3.blocks[2].data == 0);
-    REQUIRE(listItem3.blocks[2].blocks.size() == 1);
+    // list3 (listitem-4)
+    REQUIRE(markdown[16].type == ListBlockBeginType);
+    REQUIRE(markdown[16].content.empty());
+    REQUIRE(markdown[16].data == 0);
     
     // listitem-4
-    MarkdownBlock listItem4 = listItem3.blocks[2].blocks[0];
-    REQUIRE(listItem4.type == ListItemBlockType);
-    REQUIRE(listItem4.content == "");
-    REQUIRE(listItem4.data == 0);
-    REQUIRE(listItem4.blocks.size() == 3);
+    REQUIRE(markdown[17].type == ListItemBlockBeginType);
+    REQUIRE(markdown[17].content.empty());
+    REQUIRE(markdown[17].data == 0);
     
-    REQUIRE(listItem4.blocks[0].type == ParagraphBlockType);
-    REQUIRE(listItem4.blocks[0].content == "listitem-4-paragraph-1");
-    REQUIRE(listItem4.blocks[0].data == 0);
-    REQUIRE(listItem4.blocks[0].blocks.size() == 0);
+    REQUIRE(markdown[18].type == ParagraphBlockType);
+    REQUIRE(markdown[18].content == "listitem-4-paragraph-1");
+    REQUIRE(markdown[18].data == 0);
     
-    REQUIRE(listItem4.blocks[1].type == ParagraphBlockType);
-    REQUIRE(listItem4.blocks[1].content == "listitem-4-paragraph-2");
-    REQUIRE(listItem4.blocks[1].data == 0);
-    REQUIRE(listItem4.blocks[1].blocks.size() == 0);
+    REQUIRE(markdown[19].type == ParagraphBlockType);
+    REQUIRE(markdown[19].content == "listitem-4-paragraph-2");
+    REQUIRE(markdown[19].data == 0);
     
-    REQUIRE(listItem4.blocks[2].type == CodeBlockType);
-    REQUIRE(listItem4.blocks[2].content == "listitem-4-code\n");
-    REQUIRE(listItem4.blocks[2].data == 0);
-    REQUIRE(listItem4.blocks[2].blocks.size() == 0);
+    REQUIRE(markdown[20].type == CodeBlockType);
+    REQUIRE(markdown[20].content == "listitem-4-code\n");
+    REQUIRE(markdown[20].data == 0);
+    
+    REQUIRE(markdown[21].type == ListItemBlockEndType);
+    REQUIRE(markdown[21].content.empty());
+
+    // list3 end
+    REQUIRE(markdown[22].type == ListBlockEndType);
+    REQUIRE(markdown[22].content.empty());
+    
+    // listitem-3 end
+    REQUIRE(markdown[23].type == ListItemBlockEndType);
+    REQUIRE(markdown[23].content.empty());
+
+    // list2 end
+    REQUIRE(markdown[24].type == ListBlockEndType);
+    REQUIRE(markdown[24].content.empty());
 }
 
 TEST_CASE("mdparser/parse-fenced-code", "parsing fenced code block into AST")
 {
     MarkdownParser parser;
     Result result;
-    MarkdownBlock markdown;
+    MarkdownBlock::Stack markdown;
 
     const std::string source = \
 "\n\
@@ -474,21 +457,18 @@ code\n\
     parser.parse(source, result, markdown);
     
     REQUIRE(result.error.code == Error::OK);
+    REQUIRE(markdown.size() == 1);
     
-    REQUIRE(markdown.type == UndefinedBlockType);
-    REQUIRE(markdown.blocks.size() == 1);
-    
-    REQUIRE(markdown.blocks[0].type == CodeBlockType);
-    REQUIRE(markdown.blocks[0].content == "code\n");
-    REQUIRE(markdown.blocks[0].data == 0);
-    REQUIRE(markdown.blocks[0].blocks.size() == 0);
+    REQUIRE(markdown[0].type == CodeBlockType);
+    REQUIRE(markdown[0].content == "code\n");
+    REQUIRE(markdown[0].data == 0);
 }
 
 TEST_CASE("mdparser/parse-inline-list", "parsing inplace-list")
 {
     MarkdownParser parser;
     Result result;
-    MarkdownBlock markdown;
+    MarkdownBlock::Stack markdown;
 
     const std::string source = \
 "\n\
@@ -498,40 +478,40 @@ TEST_CASE("mdparser/parse-inline-list", "parsing inplace-list")
     parser.parse(source, result, markdown);
     
     REQUIRE(result.error.code == Error::OK);
+    REQUIRE(markdown.size() == 4);
     
-    REQUIRE(markdown.type == UndefinedBlockType);
-    REQUIRE(markdown.blocks.size() == 1);
+    REQUIRE(markdown[0].type == ListBlockBeginType);
+    REQUIRE(markdown[0].content.empty());
+    REQUIRE(markdown[0].data == 0);
     
-    REQUIRE(markdown.blocks[0].type == ListBlockType);
-    REQUIRE(markdown.blocks[0].content == "");
-    REQUIRE(markdown.blocks[0].data == 0);
-    REQUIRE(markdown.blocks[0].blocks.size() == 1);
+    REQUIRE(markdown[1].type == ListItemBlockBeginType);
+    REQUIRE(markdown[1].content.empty());
+    REQUIRE(markdown[1].data == 0);
     
-    REQUIRE(markdown.blocks[0].blocks[0].type == ListItemBlockType);
-    REQUIRE(markdown.blocks[0].blocks[0].content == "list1\n");
-    REQUIRE(markdown.blocks[0].blocks[0].data == 0);
-    REQUIRE(markdown.blocks[0].blocks[0].blocks.size() == 0);
+    REQUIRE(markdown[2].type == ListItemBlockEndType);
+    REQUIRE(markdown[2].content == "list1\n");
+    REQUIRE(markdown[2].data == 0);
+
+    REQUIRE(markdown[3].type == ListBlockEndType);
+    REQUIRE(markdown[3].content.empty());
+    REQUIRE(markdown[3].data == 0);
 }
 
 TEST_CASE("mdparser/parse-header-only", "parsing asserting header one liner")
 {
     MarkdownParser parser;
     Result result;
-    MarkdownBlock markdown;
+    MarkdownBlock::Stack markdown;
 
     const std::string source = "# My API";
     
-
     parser.parse(source, result, markdown);
     
     REQUIRE(result.error.code == Error::OK);
+    REQUIRE(markdown.size() == 1);
     
-    REQUIRE(markdown.type == UndefinedBlockType);
-    REQUIRE(markdown.blocks.size() == 1);
-    
-    REQUIRE(markdown.blocks[0].type == HeaderBlockType);
-    REQUIRE(markdown.blocks[0].content == "My API");
-    REQUIRE(markdown.blocks[0].data == 1);
-    REQUIRE(markdown.blocks[0].blocks.size() == 0);
+    REQUIRE(markdown[0].type == HeaderBlockType);
+    REQUIRE(markdown[0].content == "My API");
+    REQUIRE(markdown[0].data == 1);
 }
 

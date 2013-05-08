@@ -15,7 +15,6 @@
 
 #endif
 
-
 std::string snowcrash::MapSourceData(const SourceData& source, const SourceDataBlock& sourceMap)
 {
     if (source.empty())
@@ -38,24 +37,25 @@ std::string snowcrash::MapSourceData(const SourceData& source, const SourceDataB
 
 using namespace snowcrash;
 
-void snowcrash::printMarkdownBlock(const MarkdownBlock& block, unsigned int level)
+void snowcrash::printMarkdown(const MarkdownBlock::Stack& markdown, unsigned int level)
 {
     std::string indent;
     for (unsigned int i = 0; i < level; ++i) {
         indent += "  ";
     }
 
-    std::cout << indent << "block: " << (int)block.type;
-    if (block.content.length())
-        std::cout << " source: '" << block.content << "'\n";
-    else
-        std::cout << std::endl;
+    for (MarkdownBlock::Stack::const_iterator block = markdown.begin(); block != markdown.end(); ++block) {
     
-    for (MarkdownBlock::Stack::const_iterator it = block.blocks.begin(); it != block.blocks.end(); ++it) {
-        printMarkdownBlock(*it, level + 1);
+        std::cout << indent << "block: " << (int)block->type;
+        if (block->content.length())
+            std::cout << " source: '" << block->content << "'\n";
+        else
+            std::cout << std::endl;
+        
     }
     
     if (level == 0)
-        std::cout << std::endl;
+        std::cout << std::endl;    
 }
+
 #endif

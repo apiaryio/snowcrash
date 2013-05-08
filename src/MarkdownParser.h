@@ -26,7 +26,7 @@ namespace snowcrash {
         static const int ParserExtensions;// = MKDEXT_FENCED_CODE | MKDEXT_NO_INTRA_EMPHASIS /*| MKDEXT_TABLES */;
         
         // Parse source Markdown into Markdown AST
-        void parse(const SourceData& source, Result& result, MarkdownBlock& markdown);
+        void parse(const SourceData& source, Result& result, MarkdownBlock::Stack& markdown);
     
     private:
         typedef sd_callbacks RenderCallbacks;
@@ -35,11 +35,7 @@ namespace snowcrash {
         RenderCallbacks renderCallbacks();
         RenderCallbackData renderCallbackData();
         
-        typedef std::vector<MarkdownBlock::Stack> RenderStack;
-        RenderStack m_renderContext;
-        
-        void pushRenderContext();
-        void popRenderContext();
+        MarkdownBlock::Stack m_renderStack;
         
         // Header
         static void renderHeader(struct buf *ob, const struct buf *text, int level, void *opaque);

@@ -19,26 +19,26 @@ static const std::string ResponseRegex("^[Rr]esponse([[:space:]]+([0-9_])*)?([[:
 
 PayloadSignature snowcrash::HasPayloadSignature(const MarkdownBlock& block)
 {
-    if (block.type != ListBlockType ||
-        block.blocks.empty() ||
-        block.blocks.front().type != ListItemBlockType)
-        return NoPayloadSignature;
-    
-    MarkdownBlock::Stack::const_iterator item = block.blocks.begin();
-    
-    // In-place list (without child blocks)
-    if (!item->content.empty() || item->blocks.empty())
-        return NoPayloadSignature;
-    
-    // Sanity check, this should not happen
-    if (item->blocks.front().type != ParagraphBlockType)
-        return NoPayloadSignature;
-    
-    if (RegexMatch(item->blocks.front().content, RequestRegex))
-        return RequestPayloadSignature;
-
-    if (RegexMatch(item->blocks.front().content, ResponseRegex))
-        return ResponsePayloadSignature;
+//    if (block.type != ListBlockType ||
+//        block.blocks.empty() ||
+//        block.blocks.front().type != ListItemBlockType)
+//        return NoPayloadSignature;
+//    
+//    MarkdownBlock::Stack::const_iterator item = block.blocks.begin();
+//    
+//    // In-place list (without child blocks)
+//    if (!item->content.empty() || item->blocks.empty())
+//        return NoPayloadSignature;
+//    
+//    // Sanity check, this should not happen
+//    if (item->blocks.front().type != ParagraphBlockType)
+//        return NoPayloadSignature;
+//    
+//    if (RegexMatch(item->blocks.front().content, RequestRegex))
+//        return RequestPayloadSignature;
+//
+//    if (RegexMatch(item->blocks.front().content, ResponseRegex))
+//        return ResponsePayloadSignature;
     
     return NoPayloadSignature;
 }

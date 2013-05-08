@@ -43,25 +43,25 @@ static Section ClassifyBlock(const MarkdownBlock& block, Section previousContext
     // Exclusive terminator: Parameters List, Headers List,
     // Method Header, Resource Header, any other block after previous headers
     
-    if (block.type != HeaderBlockType &&
-        block.type != ListBlockType)
-        return (previousContext != ResourceSection) ? UndefinedSection : ResourceSection;
-    
-    if (block.type == HeaderBlockType) {
-        if (HasResourceSignature(block)) {
-            return (previousContext != ResourceSection) ? ResourceSection : UndefinedSection;
-        }
-        else if (HasMethodSignature(block)) {
-            return MethodSection;
-        }
-        
-        return (previousContext != ResourceSection) ? UndefinedSection : ResourceSection;
-    }
-    
-    if (block.type == ListBlockType) {
-        /// TODO:
-        return ResourceSection;
-    }
+//    if (block.type != HeaderBlockType &&
+//        block.type != ListBlockType)
+//        return (previousContext != ResourceSection) ? UndefinedSection : ResourceSection;
+//    
+//    if (block.type == HeaderBlockType) {
+//        if (HasResourceSignature(block)) {
+//            return (previousContext != ResourceSection) ? ResourceSection : UndefinedSection;
+//        }
+//        else if (HasMethodSignature(block)) {
+//            return MethodSection;
+//        }
+//        
+//        return (previousContext != ResourceSection) ? UndefinedSection : ResourceSection;
+//    }
+//    
+//    if (block.type == ListBlockType) {
+//        /// TODO:
+//        return ResourceSection;
+//    }
     
     return UndefinedSection;
 }

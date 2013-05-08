@@ -19,7 +19,6 @@ TEST_CASE("mdblock/init", "MD block construction")
     REQUIRE(block->type == UndefinedBlockType);
     REQUIRE(block->content.length() == 0);
     REQUIRE(block->data == static_cast<MarkdownBlock::Data>(0));
-    REQUIRE(block->blocks.size() == 0);
     REQUIRE(block->sourceMap.size() == 0);
     
     REQUIRE_NOTHROW(::delete block);
@@ -33,7 +32,6 @@ TEST_CASE("mdblock/init-param", "MD block construction with parameters")
     REQUIRE(block.type == CodeBlockType);
     REQUIRE(block.content == source);
     REQUIRE(block.data == static_cast<MarkdownBlock::Data>(0));
-    REQUIRE(block.blocks.size() == 0);
     REQUIRE(block.sourceMap.size() == 0);
 }
 
