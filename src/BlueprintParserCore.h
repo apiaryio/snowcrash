@@ -24,6 +24,8 @@ namespace snowcrash {
         ResourceGroupSection,
         ResourceSection,
         MethodSection,
+        RequestSection,
+        ResponseSection,
         TerminatorSection
     };
     

@@ -42,22 +42,18 @@ static ParseSectionResult ParseResourceGroupOverview(const BlockIterator& begin,
     
     while (currentBlock != end &&
            (currentSection = ClassifyBlock(*currentBlock, currentSection)) == ResourceGroupSection) {
-
-        // Name
-        if (currentBlock == begin) {
-            if (currentBlock->type == HeaderBlockType) {
-                group.name = currentBlock->content;
-            }
-            else {
-                // WARN: No group name specified
-                result.warnings.push_back(Warning("expected resources group name", 0, currentBlock->sourceMap));
-                
-                // Add as description
-                group.description += MapSourceData(sourceData, currentBlock->sourceMap);
-            }
+        
+        if (currentBlock == begin &&
+            currentBlock->type == HeaderBlockType) {
+            
+            group.name = currentBlock->content;
         }
         else {
-            // Description
+            if (currentBlock == begin) {
+                // WARN: No group name specified
+                result.warnings.push_back(Warning("expected resources group name", 0, currentBlock->sourceMap));
+            }
+            
             group.description += MapSourceData(sourceData, currentBlock->sourceMap);
         }
         
