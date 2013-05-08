@@ -28,8 +28,10 @@ TEST_CASE("parser/parse-empty", "Parse empty blueprint.")
     
     parser.parse(bluerpintSource, result, blueprint);
     REQUIRE(result.error.code == Error::OK);
+    REQUIRE(blueprint.metadata.empty());
     REQUIRE(blueprint.name.empty());
     REQUIRE(blueprint.description.empty());
+    REQUIRE(blueprint.resourceGroups.empty());
 }
 
 TEST_CASE("parser/parse-simple", "Parse simple blueprint.")

@@ -21,7 +21,8 @@ namespace snowcrash {
     class BlueprintParser {
     public:
         // Parse Markdown AST into API Blueprint AST
-        // TODO make result return value
+        // TODO: make result return value
+        // TODO: rename parse to Parse
         void parse(const SourceData& sourceData, const MarkdownBlock::Stack& source, Result& result, Blueprint& blueprint);
     };
 }

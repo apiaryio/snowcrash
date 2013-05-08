@@ -22,7 +22,6 @@ Collection<ResourceGroup>::iterator snowcrash::FindResourceGroup(Blueprint& blue
 
 static Section ClassifyBlock(const MarkdownBlock& block, Section previousContext)
 {
-    // We are in Resource Group section
     // exclusive terminator: Other Resource Group, Resource Header
     
     if (HasResourceSignature(block))
@@ -95,7 +94,6 @@ ParseSectionResult snowcrash::ParseResourceGroup(const BlockIterator& begin,
                                                  const SourceData& sourceData,
                                                  const Blueprint& blueprint,
                                                  ResourceGroup& group)
-
 {
     Result result;
     Section currentSection = UndefinedSection;
@@ -117,7 +115,6 @@ ParseSectionResult snowcrash::ParseResourceGroup(const BlockIterator& begin,
         }
         else {
 
-            // Sanity check
             result.error = Error("unexpected block", 1, currentBlock->sourceMap);
             break;
         }

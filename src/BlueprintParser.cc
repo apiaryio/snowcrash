@@ -20,14 +20,32 @@ static Section ClassifyBlock(const MarkdownBlock& block, Section previousContext
     if (HasResourceSignature(block))
         return ResourceGroupSection; // Treat Resource as anonymous resource group
     
-    if (previousContext == BlueprintSection)
-        return BlueprintSection;
-    
     if (previousContext == ResourceGroupSection ||
         previousContext == TerminatorSection)
         return ResourceGroupSection;
     
     return BlueprintSection;
+}
+
+static BlockIterator SkipToSectionEnd(const BlockIterator& begin, const BlockIterator& end, MarkdownBlockType sectionBegin, MarkdownBlockType sectionEnd)
+{
+    BlockIterator currentBlock = begin;
+    if (currentBlock->type == sectionBegin) {
+        int quoteLevel = 1;
+        ++currentBlock;
+        while (currentBlock != end && quoteLevel) {
+            if (currentBlock->type == sectionBegin)
+                ++quoteLevel;
+            
+            if (currentBlock->type == sectionEnd)
+                --quoteLevel;
+            
+            if (quoteLevel)
+                ++currentBlock;
+        }
+    }
+    
+    return currentBlock;
 }
 
 // Parse overview
@@ -51,6 +69,16 @@ static ParseSectionResult ParseBlueprintOverview(const BlockIterator& begin, con
                 // WARN: No API name specified
                 result.warnings.push_back(Warning("expected API name", 0, currentBlock->sourceMap));
             }
+            
+            // Fast forward over quote block
+            if (currentBlock->type == QuoteBlockBeginType) {
+                currentBlock = SkipToSectionEnd(currentBlock, end, QuoteBlockBeginType, QuoteBlockEndType);
+            }
+            
+            // Fast forward over list block
+            if (currentBlock->type == ListBlockBeginType) {
+                currentBlock = SkipToSectionEnd(currentBlock, end, ListBlockBeginType, ListBlockEndType);
+            }
 
             // Arbitrary markdown content, add to description
             blueprint.description += MapSourceData(sourceData, currentBlock->sourceMap);
@@ -63,7 +91,7 @@ static ParseSectionResult ParseBlueprintOverview(const BlockIterator& begin, con
 }
 
 // Parse & append resource group
-static ParseSectionResult ProcessResourceGroup(const BlockIterator& begin, const BlockIterator& end, const SourceData& sourceData, Blueprint& blueprint)
+static ParseSectionResult HandleResourceGroup(const BlockIterator& begin, const BlockIterator& end, const SourceData& sourceData, Blueprint& blueprint)
 {
     ResourceGroup resourceGroup;
     ParseSectionResult result;
@@ -91,46 +119,42 @@ static ParseSectionResult ProcessResourceGroup(const BlockIterator& begin, const
 // Top-level parse, start here
 void BlueprintParser::parse(const SourceData& sourceData, const MarkdownBlock::Stack& source, Result& result, Blueprint& blueprint)
 {
-//    Section currentSection = UndefinedSection;
-//    
-//    // Iterate over top-level blocks & parse any sections recognized
-//    MarkdownBlock::Stack::const_iterator currentBlock = source.blocks.begin();
-//    while (currentBlock != source.blocks.end()) {
-//
-//        currentSection = ClassifyBlock(*currentBlock, currentSection);
-//        if (currentSection == TerminatorSection) {
-//            ++currentBlock;
-//            continue;
-//        }
-//            
-//        ParseSectionResult sectionResult;
-//        sectionResult.second = currentBlock;
-//        if (currentSection == BlueprintSection) {
-//            
-//            sectionResult = ParseBlueprintOverview(currentBlock, source.blocks.end(), sourceData, blueprint);
-//        }
-//        else if (currentSection == ResourceGroupSection) {
-//            
-//            // Parse resource group and its resources
-//            // Top-level resource is treated as anonymous group
-//            sectionResult = ProcessResourceGroup(currentBlock, source.blocks.end(), sourceData, blueprint);
-//        }
-//        else {
-//            
-//            // Sanity check
-//            result.error = Error("unexpected block", 1, currentBlock->sourceMap);
-//            break;
-//        }
-//        
-//        // Append result error & warning data
-//        result += sectionResult.first;
-//        if (result.error.code != Error::OK)
-//            break;
-//        
-//        // Proceed to the next block
-//        if (sectionResult.second != currentBlock)
-//            currentBlock = sectionResult.second;
-//        else
-//            ++currentBlock;
-//    }
+    Section currentSection = UndefinedSection;
+    
+    // Iterate over top-level blocks & parse any sections recognized
+    MarkdownBlock::Stack::const_iterator currentBlock = source.begin();
+    while (currentBlock != source.end()) {
+
+        currentSection = ClassifyBlock(*currentBlock, currentSection);
+        if (currentSection == TerminatorSection) {
+            ++currentBlock;
+            continue;
+        }
+        
+        ParseSectionResult sectionResult = std::make_pair(Result(), currentBlock);
+        if (currentSection == BlueprintSection) {
+            
+            sectionResult = ParseBlueprintOverview(currentBlock, source.end(), sourceData, blueprint);
+        }
+        else if (currentSection == ResourceGroupSection) {
+            
+            sectionResult = HandleResourceGroup(currentBlock, source.end(), sourceData, blueprint);
+        }
+        else {
+            
+            result.error = Error("unexpected block", 1, currentBlock->sourceMap);
+            break;
+        }
+        
+        // Append result error & warning data
+        result += sectionResult.first;
+        if (result.error.code != Error::OK)
+            break;
+        
+        // Proceed to the next block
+        if (sectionResult.second != currentBlock)
+            currentBlock = sectionResult.second;
+        else
+            ++currentBlock;
+    }
 }
