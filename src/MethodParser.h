@@ -21,7 +21,10 @@ namespace snowcrash {
     Collection<Method>::iterator FindMethod(Resource& resource, const Method& method);
 
     // Parse method
-    ParseSectionResult ParseMethod(const BlockIterator& begin, const BlockIterator& end, const SourceData& sourceData, Method& method);
+    ParseSectionResult ParseMethod(const BlockIterator& begin,
+                                   const BlockIterator& end,
+                                   const SourceData& sourceData,
+                                   Method& method);
 }
 
 #endif

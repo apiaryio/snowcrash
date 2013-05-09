@@ -12,7 +12,7 @@
 
 using namespace snowcrash;
 
-TEST_CASE("resourcepparser/parse", "Parse resource")
+TEST_CASE("rparser/parse", "Parse resource")
 {
     SourceData source = "0123";
     MarkdownBlock::Stack markdown;
@@ -36,7 +36,7 @@ TEST_CASE("resourcepparser/parse", "Parse resource")
     REQUIRE(resource.methods.front().description.empty());
 }
 
-TEST_CASE("resourcepparser/parse-multi", "Parse mutliple methods")
+TEST_CASE("rparser/parse-multi-method", "Parse mutliple methods")
 {
     SourceData source = "0123";
     MarkdownBlock::Stack markdown;

@@ -35,6 +35,12 @@ namespace snowcrash {
     // Parsing sub routine result
     typedef std::pair<Result, BlockIterator> ParseSectionResult;
     
+    // Advances iterator from sectionBegin to the same leve sectionEnd
+    BlockIterator SkipToSectionEnd(const BlockIterator& begin,
+                                   const BlockIterator& end,
+                                   MarkdownBlockType sectionBegin,
+                                   MarkdownBlockType sectionEnd);
+    
     // Name matching predicate
     template <class T>
     struct MatchName : std::binary_function<T, T, bool> {

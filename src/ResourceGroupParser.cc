@@ -53,6 +53,16 @@ static ParseSectionResult ParseResourceGroupOverview(const BlockIterator& begin,
                 result.warnings.push_back(Warning("expected resources group name", 0, currentBlock->sourceMap));
             }
             
+            // Fast forward over quote block
+            if (currentBlock->type == QuoteBlockBeginType) {
+                currentBlock = SkipToSectionEnd(currentBlock, end, QuoteBlockBeginType, QuoteBlockEndType);
+            }
+            
+            // Fast forward over list block
+            if (currentBlock->type == ListBlockBeginType) {
+                currentBlock = SkipToSectionEnd(currentBlock, end, ListBlockBeginType, ListBlockEndType);
+            }
+            
             group.description += MapSourceData(sourceData, currentBlock->sourceMap);
         }
         
@@ -63,7 +73,7 @@ static ParseSectionResult ParseResourceGroupOverview(const BlockIterator& begin,
 }
 
 // Parse & append resource
-static ParseSectionResult ProcessResource(const BlockIterator& begin,
+static ParseSectionResult HandleResource(const BlockIterator& begin,
                                           const BlockIterator& end,
                                           const SourceData& sourceData,
                                           const Blueprint& blueprint,
@@ -83,9 +93,7 @@ static ParseSectionResult ProcessResource(const BlockIterator& begin,
         result.first.warnings.push_back(Warning("resource '" + resource.uri + "' already exists", 0, begin->sourceMap));
     }
     
-    // Insert resource
-    group.resources.push_back(resource);
-    
+    group.resources.push_back(resource); // FIXME: C++11 move
     return result;
 }
 
@@ -102,16 +110,14 @@ ParseSectionResult snowcrash::ParseResourceGroup(const BlockIterator& begin,
     while (currentBlock != end) {
         
         currentSection = ClassifyBlock(*currentBlock, currentSection);
-        
-        ParseSectionResult sectionResult;
-        sectionResult.second = currentBlock;
+        ParseSectionResult sectionResult = std::make_pair(Result(), currentBlock);
         if (currentSection == ResourceGroupSection) {
 
             sectionResult = ParseResourceGroupOverview(currentBlock, end, sourceData, group);
         }
         else if (currentSection == ResourceSection) {
 
-            sectionResult = ProcessResource(currentBlock, end, sourceData, blueprint, group);
+            sectionResult = HandleResource(currentBlock, end, sourceData, blueprint, group);
         }
         else {
 

@@ -29,7 +29,6 @@ Collection<Method>::iterator snowcrash::FindMethod(Resource& resource, const Met
     Collection<Method>::iterator match = std::find_if(resource.methods.begin(),
                                                       resource.methods.end(),
                                                       std::bind2nd(MatchMethod<Method>(), method));
-    
     return match;
 }
 
@@ -38,22 +37,19 @@ static Section ClassifyBlock(const MarkdownBlock& block, Section previousContext
     // Exclusive terminator: Other Method Header, Parameters List, Headers List,
     // Request List, Response List and any other block after previous headers
     
-//    if (block.type != HeaderBlockType &&
-//        block.type != ListBlockType)
-//        return (previousContext != MethodSection) ? UndefinedSection : MethodSection;
-//
-//    if (block.type == HeaderBlockType && HasMethodSignature(block)) {
-//        return (previousContext != MethodSection) ? MethodSection : UndefinedSection;
-//    }
-//
+    if (block.type != HeaderBlockType)
+        return (previousContext != MethodSection) ? UndefinedSection : MethodSection;
+
+    if (block.type == HeaderBlockType && HasMethodSignature(block)) {
+        return (previousContext != MethodSection) ? MethodSection : UndefinedSection;
+    }
+
 //    if (block.type == ListBlockType) {
 //        /// TODO:
 //        return MethodSection;
 //    }
-//    
-//    return (previousContext != MethodSection) ? UndefinedSection : MethodSection;
     
-    return UndefinedSection;
+    return (previousContext != MethodSection) ? UndefinedSection : MethodSection;
 }
 
 // Parse method and description
@@ -67,8 +63,10 @@ static ParseSectionResult ParseMethodOverview(const BlockIterator& begin, const 
            (currentSection = ClassifyBlock(*currentBlock, currentSection)) == MethodSection) {
         
         // Method
-        if (currentBlock == begin) {
-            method.method= currentBlock->content;
+        if (currentBlock == begin &&
+            currentBlock->type == HeaderBlockType) {
+            
+            method.method = currentBlock->content;
         }
         else {
             // Description
@@ -92,16 +90,14 @@ ParseSectionResult snowcrash::ParseMethod(const BlockIterator& begin, const Bloc
     while (currentBlock != end) {
         
         currentSection = ClassifyBlock(*currentBlock, currentSection);
-        
-        ParseSectionResult sectionResult;
-        sectionResult.second = currentBlock;
+        ParseSectionResult sectionResult = std::make_pair(Result(), currentBlock);
         if (currentSection == MethodSection) {
             
             sectionResult = ParseMethodOverview(currentBlock, end, sourceData, method);
         }
         else if (currentSection == UndefinedSection) {
             
-            break; // Pass control to caller
+            break;
         }
         else {
             

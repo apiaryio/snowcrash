@@ -12,7 +12,7 @@
 
 using namespace snowcrash;
 
-TEST_CASE("methodparser/parse", "Parse method")
+TEST_CASE("mparser/parse", "Parse method")
 {
     SourceData source = "01";
     MarkdownBlock::Stack markdown;

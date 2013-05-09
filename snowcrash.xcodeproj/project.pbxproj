@@ -45,6 +45,7 @@
 		BBB0F4291731CE0D00C92465 /* RegexMatch.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB0F4271731CE0D00C92465 /* RegexMatch.cc */; };
 		BBB0F42A1731CE0D00C92465 /* RegexMatch.h in Headers */ = {isa = PBXBuildFile; fileRef = BBB0F4281731CE0D00C92465 /* RegexMatch.h */; };
 		BBB0F42C1731D04900C92465 /* test-RegexMatch.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB0F42B1731D04900C92465 /* test-RegexMatch.cc */; };
+		BBB1C46D173BEF7500589284 /* BlueprintParserCore.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB1C46C173BEF7500589284 /* BlueprintParserCore.cc */; };
 		BBC3AC091737DF9A0001F63A /* test-MethodParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBC3AC081737DF9A0001F63A /* test-MethodParser.cc */; };
 		BBD5F9C917353C310049BBEE /* ResourceGroupParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD5F9C717353C300049BBEE /* ResourceGroupParser.h */; };
 		BBD5F9CA17353C310049BBEE /* ResourceGroupParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD5F9C817353C310049BBEE /* ResourceGroupParser.cc */; };
@@ -138,6 +139,7 @@
 		BBB0F4271731CE0D00C92465 /* RegexMatch.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RegexMatch.cc; path = src/RegexMatch.cc; sourceTree = "<group>"; };
 		BBB0F4281731CE0D00C92465 /* RegexMatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RegexMatch.h; path = src/RegexMatch.h; sourceTree = "<group>"; };
 		BBB0F42B1731D04900C92465 /* test-RegexMatch.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-RegexMatch.cc"; path = "test/test-RegexMatch.cc"; sourceTree = "<group>"; };
+		BBB1C46C173BEF7500589284 /* BlueprintParserCore.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BlueprintParserCore.cc; path = src/BlueprintParserCore.cc; sourceTree = "<group>"; };
 		BBC3AC081737DF9A0001F63A /* test-MethodParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-MethodParser.cc"; path = "test/test-MethodParser.cc"; sourceTree = "<group>"; };
 		BBD5F9C717353C300049BBEE /* ResourceGroupParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ResourceGroupParser.h; path = src/ResourceGroupParser.h; sourceTree = "<group>"; };
 		BBD5F9C817353C310049BBEE /* ResourceGroupParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ResourceGroupParser.cc; path = src/ResourceGroupParser.cc; sourceTree = "<group>"; };
@@ -238,19 +240,20 @@
 		BBE57062173929B90086CE22 /* blueprint */ = {
 			isa = PBXGroup;
 			children = (
-				BBB0F4271731CE0D00C92465 /* RegexMatch.cc */,
-				BBB0F4281731CE0D00C92465 /* RegexMatch.h */,
 				BBA91DBF171D402600649B05 /* BlueprintParser.cc */,
 				BBA91DC0171D402600649B05 /* BlueprintParser.h */,
+				BBB1C46C173BEF7500589284 /* BlueprintParserCore.cc */,
 				BBD5F9CF1735413A0049BBEE /* BlueprintParserCore.h */,
 				BBD5F9D517354B450049BBEE /* MethodParser.cc */,
 				BBD5F9D617354B450049BBEE /* MethodParser.h */,
+				BBE5705E173927870086CE22 /* PayloadParser.cc */,
+				BBE5705F173927870086CE22 /* PayloadParser.h */,
+				BBB0F4271731CE0D00C92465 /* RegexMatch.cc */,
+				BBB0F4281731CE0D00C92465 /* RegexMatch.h */,
 				BBD5F9C817353C310049BBEE /* ResourceGroupParser.cc */,
 				BBD5F9C717353C300049BBEE /* ResourceGroupParser.h */,
 				BBD5F9CB17353CE00049BBEE /* ResourceParser.cc */,
 				BBD5F9CC17353CE00049BBEE /* ResourceParser.h */,
-				BBE5705E173927870086CE22 /* PayloadParser.cc */,
-				BBE5705F173927870086CE22 /* PayloadParser.h */,
 			);
 			name = blueprint;
 			sourceTree = "<group>";
@@ -470,6 +473,7 @@
 				BBD5F9D21735439B0049BBEE /* ParserCore.cc in Sources */,
 				BBD5F9D717354B460049BBEE /* MethodParser.cc in Sources */,
 				BBE57060173927870086CE22 /* PayloadParser.cc in Sources */,
+				BBB1C46D173BEF7500589284 /* BlueprintParserCore.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

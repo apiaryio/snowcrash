@@ -22,7 +22,10 @@ namespace snowcrash {
     ResourceMatch FindResource(const Blueprint& blueprint, const Resource& resource);
 
     // Parse Resource
-    ParseSectionResult ParseResource(const BlockIterator& begin, const BlockIterator& end, const SourceData& sourceData, Resource &resource);
+    ParseSectionResult ParseResource(const BlockIterator& begin,
+                                     const BlockIterator& end,
+                                     const SourceData& sourceData,
+                                     Resource &resource);
 }
 
 #endif

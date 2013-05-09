@@ -12,7 +12,7 @@
 
 using namespace snowcrash;
 
-TEST_CASE("resourcegroupparser/parse-resource", "Parse resource group section terminated by a resource")
+TEST_CASE("rgparser/parse", "Parse resource group with empty resource")
 {
     SourceData source = "012";
     MarkdownBlock::Stack markdown;
@@ -34,7 +34,7 @@ TEST_CASE("resourcegroupparser/parse-resource", "Parse resource group section te
     REQUIRE(resourceGroup.resources.front().uri == "/resource");
 }
 
-TEST_CASE("resourcegroupparser/parse-multi", "Parse multiple resource")
+TEST_CASE("rgparser/parse-multi-resource", "Parse multiple resource in anonymous group")
 {
     SourceData source = "0123";
     MarkdownBlock::Stack markdown;

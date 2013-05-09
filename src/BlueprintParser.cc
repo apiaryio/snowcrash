@@ -27,27 +27,6 @@ static Section ClassifyBlock(const MarkdownBlock& block, Section previousContext
     return BlueprintSection;
 }
 
-static BlockIterator SkipToSectionEnd(const BlockIterator& begin, const BlockIterator& end, MarkdownBlockType sectionBegin, MarkdownBlockType sectionEnd)
-{
-    BlockIterator currentBlock = begin;
-    if (currentBlock->type == sectionBegin) {
-        int quoteLevel = 1;
-        ++currentBlock;
-        while (currentBlock != end && quoteLevel) {
-            if (currentBlock->type == sectionBegin)
-                ++quoteLevel;
-            
-            if (currentBlock->type == sectionEnd)
-                --quoteLevel;
-            
-            if (quoteLevel)
-                ++currentBlock;
-        }
-    }
-    
-    return currentBlock;
-}
-
 // Parse overview
 static ParseSectionResult ParseBlueprintOverview(const BlockIterator& begin, const BlockIterator& end, const SourceData& sourceData, Blueprint& blueprint)
 {
@@ -94,10 +73,8 @@ static ParseSectionResult ParseBlueprintOverview(const BlockIterator& begin, con
 static ParseSectionResult HandleResourceGroup(const BlockIterator& begin, const BlockIterator& end, const SourceData& sourceData, Blueprint& blueprint)
 {
     ResourceGroup resourceGroup;
-    ParseSectionResult result;
-    result = ParseResourceGroup(begin, end, sourceData, blueprint, resourceGroup);
+    ParseSectionResult result = ParseResourceGroup(begin, end, sourceData, blueprint, resourceGroup);
     
-    // Check for duplicate & emplace group into blueprint
     if (result.first.error.code != Error::OK)
         return result;
         
@@ -106,13 +83,9 @@ static ParseSectionResult HandleResourceGroup(const BlockIterator& begin, const 
         
         // WARN: duplicate group
         result.first.warnings.push_back(Warning("group '" + resourceGroup.name + "' already exists", 0, begin->sourceMap));
-        duplicate->description += resourceGroup.description;
     }
-    else {
-        
-        blueprint.resourceGroups.push_back(resourceGroup); // FIXME: C++11 move
-    }
-    
+
+    blueprint.resourceGroups.push_back(resourceGroup); // FIXME: C++11 move
     return result;
 }
 

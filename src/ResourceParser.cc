@@ -43,21 +43,20 @@ static Section ClassifyBlock(const MarkdownBlock& block, Section previousContext
     // Exclusive terminator: Parameters List, Headers List,
     // Method Header, Resource Header, any other block after previous headers
     
-//    if (block.type != HeaderBlockType &&
-//        block.type != ListBlockType)
-//        return (previousContext != ResourceSection) ? UndefinedSection : ResourceSection;
-//    
-//    if (block.type == HeaderBlockType) {
-//        if (HasResourceSignature(block)) {
-//            return (previousContext != ResourceSection) ? ResourceSection : UndefinedSection;
-//        }
-//        else if (HasMethodSignature(block)) {
-//            return MethodSection;
-//        }
-//        
-//        return (previousContext != ResourceSection) ? UndefinedSection : ResourceSection;
-//    }
-//    
+    if (block.type != HeaderBlockType)
+        return (previousContext != ResourceSection) ? UndefinedSection : ResourceSection;
+    
+    if (block.type == HeaderBlockType) {
+        if (HasResourceSignature(block)) {
+            return (previousContext != ResourceSection) ? ResourceSection : UndefinedSection;
+        }
+        else if (HasMethodSignature(block)) {
+            return MethodSection;
+        }
+        
+        return (previousContext != ResourceSection) ? UndefinedSection : ResourceSection;
+    }
+    
 //    if (block.type == ListBlockType) {
 //        /// TODO:
 //        return ResourceSection;
@@ -67,7 +66,10 @@ static Section ClassifyBlock(const MarkdownBlock& block, Section previousContext
 }
 
 // Parse resource name and description
-static ParseSectionResult ParseResourceOverview(const BlockIterator& begin, const BlockIterator& end, const SourceData& sourceData, Resource& resource)
+static ParseSectionResult ParseResourceOverview(const BlockIterator& begin,
+                                                const BlockIterator& end,
+                                                const SourceData& sourceData,
+                                                Resource& resource)
 {
     Result result;
     Section currentSection = UndefinedSection;
@@ -94,7 +96,10 @@ static ParseSectionResult ParseResourceOverview(const BlockIterator& begin, cons
 }
 
 // Parse & append method
-static ParseSectionResult ProcessMethod(const BlockIterator& begin, const BlockIterator& end, const SourceData& sourceData, Resource& resource)
+static ParseSectionResult HandleMethod(const BlockIterator& begin,
+                                       const BlockIterator& end,
+                                       const SourceData& sourceData,
+                                       Resource& resource)
 {
     Method method;
     ParseSectionResult result = ParseMethod(begin, end, sourceData, method);
@@ -117,7 +122,10 @@ static ParseSectionResult ProcessMethod(const BlockIterator& begin, const BlockI
     return result;
 }
 
-ParseSectionResult snowcrash::ParseResource(const BlockIterator& begin, const BlockIterator& end, const SourceData& sourceData, Resource &resource)
+ParseSectionResult snowcrash::ParseResource(const BlockIterator& begin,
+                                            const BlockIterator& end,
+                                            const SourceData& sourceData,
+                                            Resource &resource)
 {
     Result result;
     Section currentSection = UndefinedSection;
@@ -126,20 +134,18 @@ ParseSectionResult snowcrash::ParseResource(const BlockIterator& begin, const Bl
     while (currentBlock != end) {
         
         currentSection = ClassifyBlock(*currentBlock, currentSection);
-        
-        ParseSectionResult sectionResult;
-        sectionResult.second = currentBlock;
+        ParseSectionResult sectionResult = std::make_pair(Result(), currentBlock);
         if (currentSection == ResourceSection) {
             
             sectionResult = ParseResourceOverview(currentBlock, end, sourceData, resource);
         }
         else if (currentSection == MethodSection) {
 
-            sectionResult = ProcessMethod(currentBlock, end, sourceData, resource);
+            sectionResult = HandleMethod(currentBlock, end, sourceData, resource);
         }
         else if (currentSection == UndefinedSection) {
             
-            break; // Pass control to caller
+            break;
         }
         else {
             
