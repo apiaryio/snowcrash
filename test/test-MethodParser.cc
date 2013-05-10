@@ -20,7 +20,7 @@ TEST_CASE("mparser/parse", "Parse method")
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "p1", 0, MakeSourceDataBlock(1, 1)));
     
     Method method;
-    ParseSectionResult result = ParseMethod(markdown.begin(), markdown.end(), source, method);
+    ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), method);
     
     REQUIRE(result.first.error.code == Error::OK);
 

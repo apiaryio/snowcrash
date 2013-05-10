@@ -21,7 +21,7 @@ TEST_CASE("rgparser/parse", "Parse resource group with empty resource")
     markdown.push_back(MarkdownBlock(HeaderBlockType, "/resource", 1, MakeSourceDataBlock(2, 1)));
     
     ResourceGroup resourceGroup;
-    ParseSectionResult result = ParseResourceGroup(markdown.begin(), markdown.end(), source, Blueprint(), resourceGroup);
+    ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), resourceGroup);
     
     REQUIRE(result.first.error.code == Error::OK);
     
@@ -44,7 +44,7 @@ TEST_CASE("rgparser/parse-multi-resource", "Parse multiple resource in anonymous
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "p2", 0, MakeSourceDataBlock(3, 1)));
     
     ResourceGroup resourceGroup;
-    ParseSectionResult result = ParseResourceGroup(markdown.begin(), markdown.end(), source, Blueprint(), resourceGroup);
+    ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), resourceGroup);
     
     REQUIRE(result.first.error.code == Error::OK);
     

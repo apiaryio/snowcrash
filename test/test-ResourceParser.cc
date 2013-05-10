@@ -21,7 +21,7 @@ TEST_CASE("rparser/parse", "Parse resource")
     markdown.push_back(MarkdownBlock(HeaderBlockType, "GET", 1, MakeSourceDataBlock(2, 1)));
     
     Resource resource;
-    ParseSectionResult result = ParseResource(markdown.begin(), markdown.end(), source, resource);
+    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), resource);
     
     REQUIRE(result.first.error.code == Error::OK);
     
@@ -47,7 +47,7 @@ TEST_CASE("rparser/parse-multi-method", "Parse mutliple methods")
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "p2", 0, MakeSourceDataBlock(3, 1)));
     
     Resource resource;
-    ParseSectionResult result = ParseResource(markdown.begin(), markdown.end(), source, resource);
+    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), resource);
     
     REQUIRE(result.first.error.code == Error::OK);
     

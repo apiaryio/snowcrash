@@ -25,6 +25,5 @@ void Parser::parse(const SourceData& source, Result& result, Blueprint& blueprin
         return;
     
     // Parse Blueprint
-    BlueprintParser blueprintParser;
-    blueprintParser.parse(source, markdown, result, blueprint);
+    BlueprintParser::Parse(source, markdown, result, blueprint);
 }
