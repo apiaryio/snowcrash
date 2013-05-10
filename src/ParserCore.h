@@ -45,19 +45,32 @@ namespace snowcrash {
         
         static const int OK = 0;
         
-        SourceAnnotation()
-        : code(OK) {}
+        SourceAnnotation() : code(OK) {}
         
-        SourceAnnotation(const SourceAnnotation& rhs)
-        { this->message = rhs.message; this->code = rhs.code; this->location = rhs.location; }
+        SourceAnnotation(const SourceAnnotation& rhs) {
+
+            this->message = rhs.message;
+            this->code = rhs.code;
+            this->location = rhs.location;
+        }
         
-        SourceAnnotation(const std::string& message, int code = OK, const SourceDataBlock& location = SourceDataBlock())
-        { this->message = message; this->code = code; this->location = location; }
+        SourceAnnotation(const std::string& message,
+                         int code = OK,
+                         const SourceDataBlock& location = SourceDataBlock()) {
+
+            this->message = message;
+            this->code = code; 
+            this->location =
+            location; }
         
         ~SourceAnnotation() {}
         
-        SourceAnnotation& operator=(const SourceAnnotation& rhs)
-        { this->message = rhs.message; this->code = rhs.code; this->location = rhs.location; return *this; }
+        SourceAnnotation& operator=(const SourceAnnotation& rhs) {
+            this->message = rhs.message;
+            this->code = rhs.code;
+            this->location = rhs.location;
+            return *this;
+        }
         
         // Location of this annotation
         SourceDataBlock location;
