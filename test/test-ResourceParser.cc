@@ -14,11 +14,22 @@ using namespace snowcrash;
 
 TEST_CASE("rparser/parse", "Parse resource")
 {
-    SourceData source = "0123";
+    SourceData source = "0123456789";
     MarkdownBlock::Stack markdown;
     markdown.push_back(MarkdownBlock(HeaderBlockType, "/resource", 1, MakeSourceDataBlock(0, 1)));
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "p1", 0, MakeSourceDataBlock(1, 1)));
     markdown.push_back(MarkdownBlock(HeaderBlockType, "GET", 1, MakeSourceDataBlock(2, 1)));
+    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Response 200", 0, MakeSourceDataBlock(3, 1)));
+    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Body", 0, MakeSourceDataBlock(4, 1)));
+    markdown.push_back(MarkdownBlock(CodeBlockType, "Code", 0, MakeSourceDataBlock(5, 1)));
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(6, 1)));
+    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(7, 1)));
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(8, 1)));
+    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(9, 1)));    
     
     Resource resource;
     ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), resource);
@@ -26,7 +37,7 @@ TEST_CASE("rparser/parse", "Parse resource")
     REQUIRE(result.first.error.code == Error::OK);
     
     const MarkdownBlock::Stack &blocks = markdown;
-    REQUIRE(std::distance(blocks.begin(), result.second) == 3);
+    REQUIRE(std::distance(blocks.begin(), result.second) == 14);
     
     REQUIRE(resource.uri == "/resource");
     REQUIRE(resource.description == "1");
@@ -34,6 +45,8 @@ TEST_CASE("rparser/parse", "Parse resource")
     
     REQUIRE(resource.methods.front().method == "GET");
     REQUIRE(resource.methods.front().description.empty());
+    REQUIRE(resource.methods.front().responses.size() == 1);
+    REQUIRE(resource.methods.front().responses.front().body == "Code");
 }
 
 TEST_CASE("rparser/parse-multi-method", "Parse mutliple methods")

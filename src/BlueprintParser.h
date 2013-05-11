@@ -21,12 +21,14 @@ namespace snowcrash {
     // Block Classifier, Resource Context
     //
     template <>
-    inline Section TClassifyBlock<Blueprint>(const MarkdownBlock& block, const Section& context) {
+    inline Section TClassifyBlock<Blueprint>(const BlockIterator& begin,
+                                             const BlockIterator& end,
+                                             const Section& context) {
         
-        if (block.type == HRuleBlockType)
+        if (begin->type == HRuleBlockType)
             return TerminatorSection;
         
-        if (HasResourceSignature(block))
+        if (HasResourceSignature(*begin))
             return ResourceGroupSection; // Treat Resource as anonymous resource group
         
         if (context == ResourceGroupSection ||
@@ -43,42 +45,41 @@ namespace snowcrash {
     struct SectionOverviewParser<Blueprint>  {
         
         static ParseSectionResult ParseSection(const Section& section,
-                                               const BlockIterator& begin,
-                                               const BlockIterator& end,
+                                               const BlockIterator& cur,
+                                               const SectionBounds& bounds,
                                                const SourceData& sourceData,
                                                const Blueprint& blueprint,
                                                Blueprint& output) {
             if (section != BlueprintSection)
-                return std::make_pair(Result(), begin);
+                return std::make_pair(Result(), cur);
             
             Result result;
-            BlockIterator cur(begin);
-            if (begin->type == HeaderBlockType &&
-                output.description.empty()) {
-                output.name = begin->content;
+            BlockIterator sectionCur(cur);
+            if (sectionCur->type == HeaderBlockType &&
+                sectionCur == bounds.first) {
+                output.name = cur->content;
             }
             else {
-                if (output.name.empty() &&
-                    output.description.empty()) {
+                if (sectionCur == bounds.first) {
                     
                     // WARN: No API name specified
                     result.warnings.push_back(Warning("expected API name",
                                                       0,
-                                                      begin->sourceMap));
+                                                      cur->sourceMap));
                 }
                 
 
-                if (begin->type == QuoteBlockBeginType) {
-                    cur = SkipToSectionEnd(begin, end, QuoteBlockBeginType, QuoteBlockEndType);
+                if (sectionCur->type == QuoteBlockBeginType) {
+                    sectionCur = SkipToSectionEnd(cur, bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
                 }
-                else if (begin->type == ListBlockBeginType) {
-                    cur = SkipToSectionEnd(begin, end, ListBlockBeginType, ListBlockEndType);
+                else if (sectionCur->type == ListBlockBeginType) {
+                    sectionCur = SkipToSectionEnd(cur, bounds.second, ListBlockBeginType, ListBlockEndType);
                 }
                 
-                output.description += MapSourceData(sourceData, cur->sourceMap);
+                output.description += MapSourceData(sourceData, sectionCur->sourceMap);
             }
             
-            return std::make_pair(result, ++cur);
+            return std::make_pair(result, ++sectionCur);
         }
     };
     
@@ -91,30 +92,30 @@ namespace snowcrash {
     struct SectionParser<Blueprint> {
         
         static ParseSectionResult ParseSection(const Section& section,
-                                               const BlockIterator& begin,
-                                               const BlockIterator& end,
+                                               const BlockIterator& cur,
+                                               const SectionBounds& bounds,
                                                const SourceData& sourceData,
                                                const Blueprint& blueprint,
                                                Blueprint& output) {
             
-            ParseSectionResult result = std::make_pair(Result(), begin);
+            ParseSectionResult result = std::make_pair(Result(), cur);
             
             switch (section) {
                 case TerminatorSection:
-                    result.second = ++BlockIterator(begin);
+                    result.second = ++BlockIterator(cur);
                     break;
                     
                 case BlueprintSection:
                     
-                    result = BlueprintOverviewParser::Parse(begin, end, sourceData, blueprint, output);
+                    result = BlueprintOverviewParser::Parse(cur, bounds.second, sourceData, blueprint, output);
                     break;
                     
                 case ResourceGroupSection:
-                    result = HandleResourceGroup(begin, end, sourceData, blueprint, output);
+                    result = HandleResourceGroup(cur, bounds.second, sourceData, blueprint, output);
                     break;
                     
                 default:
-                    result.first.error = Error("unexpected block", 1, begin->sourceMap);
+                    result.first.error = Error("unexpected block", 1, cur->sourceMap);
                     break;
             }
             

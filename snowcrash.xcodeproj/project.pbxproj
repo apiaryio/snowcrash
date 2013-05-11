@@ -132,6 +132,7 @@
 		BBB0F4271731CE0D00C92465 /* RegexMatch.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RegexMatch.cc; path = src/RegexMatch.cc; sourceTree = "<group>"; };
 		BBB0F4281731CE0D00C92465 /* RegexMatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RegexMatch.h; path = src/RegexMatch.h; sourceTree = "<group>"; };
 		BBB0F42B1731D04900C92465 /* test-RegexMatch.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-RegexMatch.cc"; path = "test/test-RegexMatch.cc"; sourceTree = "<group>"; };
+		BBB2A226173EA77A0020C1CE /* TrimString.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = TrimString.h; path = src/TrimString.h; sourceTree = "<group>"; };
 		BBC3AC081737DF9A0001F63A /* test-MethodParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-MethodParser.cc"; path = "test/test-MethodParser.cc"; sourceTree = "<group>"; };
 		BBD5F9C717353C300049BBEE /* ResourceGroupParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ResourceGroupParser.h; path = src/ResourceGroupParser.h; sourceTree = "<group>"; };
 		BBD5F9CC17353CE00049BBEE /* ResourceParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ResourceParser.h; path = src/ResourceParser.h; sourceTree = "<group>"; };
@@ -302,6 +303,7 @@
 				BBB0F4281731CE0D00C92465 /* RegexMatch.h */,
 				BBFF48CC170B3EDE001E5FB2 /* snowcrash.cc */,
 				BBFF48D1170B4224001E5FB2 /* snowcrash.h */,
+				BBB2A226173EA77A0020C1CE /* TrimString.h */,
 			);
 			name = src;
 			sourceTree = "<group>";

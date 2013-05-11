@@ -42,3 +42,32 @@ bool snowcrash::RegexMatch(const std::string& target, const std::string& express
     
     return false;
 }
+
+std::string snowcrash::RegexCaptureFirst(const std::string& target, const std::string& expression)
+{
+    if (target.empty() || expression.empty())
+        return false;
+    
+    regex_t regex;
+    int reti = ::regcomp(&regex, expression.c_str(), REG_EXTENDED);
+    if (reti)
+        return std::string();
+    
+    regmatch_t pmatch[2];
+    ::memset(pmatch, 0, sizeof(pmatch));
+    reti = ::regexec(&regex, target.c_str(), 2, pmatch, 0);
+    if (!reti) {
+        ::regfree(&regex);
+        
+        if (pmatch[1].rm_so == -1 || pmatch[1].rm_eo == -1)
+            return std::string(); // no group
+        
+        return std::string(target, pmatch[1].rm_so, pmatch[1].rm_eo - pmatch[1].rm_so);
+    }
+    else {
+        ::regfree(&regex);
+        return std::string();
+    }
+    
+    return false;
+}

@@ -12,6 +12,7 @@
 #include "BlueprintParserCore.h"
 #include "Blueprint.h"
 #include "RegexMatch.h"
+#include "PayloadParser.h"
 
 static const std::string MethodHeaderRegex("^(" HTTP_METHODS ")[[:space:]]*$");
 
@@ -37,13 +38,21 @@ namespace snowcrash {
     // Block Classifier, Method Context
     //
     template <>
-    inline Section TClassifyBlock<Method>(const MarkdownBlock& block, const Section& context) {
+    inline Section TClassifyBlock<Method>(const BlockIterator& begin,
+                                          const BlockIterator& end,
+                                          const Section& context) {
 
-        if (block.type != HeaderBlockType)
-            return (context != MethodSection) ? UndefinedSection : MethodSection;
-        
-        if (block.type == HeaderBlockType && HasMethodSignature(block))
+        if (begin->type == HeaderBlockType && HasMethodSignature(*begin))
             return (context != MethodSection) ? MethodSection : UndefinedSection;
+        
+        if (begin->type == ListBlockBeginType || begin->type == ListItemBlockBeginType) {
+
+            PayloadSignature payload = HasPayloadSignature(begin, end);
+            if (payload == RequestPayloadSignature)
+                return RequestSection;
+            else if (payload == ResponsePayloadSignature)
+                return ResponseSection;
+        }
         
         return (context != MethodSection) ? UndefinedSection : MethodSection;
     }
@@ -55,23 +64,25 @@ namespace snowcrash {
     struct SectionOverviewParser<Method>  {
         
         static ParseSectionResult ParseSection(const Section& section,
-                                               const BlockIterator& begin,
-                                               const BlockIterator& end,
+                                               const BlockIterator& cur,
+                                               const SectionBounds& bounds,
                                                const SourceData& sourceData,
                                                const Blueprint& blueprint,
                                                Method& method) {
             if (section != MethodSection)
-                return std::make_pair(Result(), begin);
+                return std::make_pair(Result(), cur);
             
-            if (begin->type == HeaderBlockType &&
-                method.description.empty()) {
-                method.method = begin->content;
+            if (cur->type == HeaderBlockType &&
+                cur == bounds.first) {
+                method.method = cur->content;
             }
             else {
-                method.description += MapSourceData(sourceData, begin->sourceMap);
+                
+                // TODO: handle list / quotes
+                method.description += MapSourceData(sourceData, cur->sourceMap);
             }
             
-            return std::make_pair(Result(), ++BlockIterator(begin));
+            return std::make_pair(Result(), ++BlockIterator(cur));
         }
     };
     
@@ -84,29 +95,87 @@ namespace snowcrash {
     struct SectionParser<Method> {
         
         static ParseSectionResult ParseSection(const Section& section,
-                                               const BlockIterator& begin,
-                                               const BlockIterator& end,
+                                               const BlockIterator& cur,
+                                               const SectionBounds& bounds,
                                                const SourceData& sourceData,
                                                const Blueprint& blueprint,
                                                Method& method) {
             
-            ParseSectionResult result = std::make_pair(Result(), begin);
+            ParseSectionResult result = std::make_pair(Result(), cur);
             switch (section) {
                 case MethodSection:
+                    result = MethodOverviewParser::Parse(cur, bounds.second, sourceData, blueprint, method);
+                    break;
                     
-                    result = MethodOverviewParser::Parse(begin, end, sourceData, blueprint, method);
+                case RequestSection:
+                    result = HandleRequest(cur, bounds.second, sourceData, blueprint, method);
+                    break;
+                
+                case ResponseSection:
+                    result = HandleResponse(cur, bounds.second, sourceData, blueprint, method);
                     break;
                     
                 case UndefinedSection:
                     break;
                     
                 default:
-                    result.first.error = Error("unexpected block", 1, begin->sourceMap);
+                    result.first.error = Error("unexpected block", 1, cur->sourceMap);
                     break;
             }
             
             return result;
         }
+        
+        static ParseSectionResult HandleRequest(const BlockIterator& begin,
+                                                const BlockIterator& end,
+                                                const SourceData& sourceData,
+                                                const Blueprint& blueprint,
+                                                Method& method)
+        {
+            Request request;
+            ParseSectionResult result = PayloadParser::Parse(begin, end, sourceData, blueprint, request);
+            Collection<Response>::const_iterator duplicate = FindResponse(method, request);
+            if (duplicate != method.responses.end()) {
+                
+                // WARN: duplicate request
+                result.first.warnings.push_back(Warning("request '" +
+                                                        request.name +
+                                                        "' already defined for '" +
+                                                        method.method +
+                                                        "' method",
+                                                        0,
+                                                        begin->sourceMap));
+            }
+            
+            method.requests.push_back(request);
+            return result;
+        }
+        
+        static ParseSectionResult HandleResponse(const BlockIterator& begin,
+                                                 const BlockIterator& end,
+                                                 const SourceData& sourceData,
+                                                 const Blueprint& blueprint,
+                                                 Method& method)
+        {
+            Response response;
+            ParseSectionResult result = PayloadParser::Parse(begin, end, sourceData, blueprint, response);            
+            Collection<Response>::const_iterator duplicate = FindResponse(method, response);
+            if (duplicate != method.responses.end()) {
+
+                // WARN: duplicate response
+                result.first.warnings.push_back(Warning("response '" +
+                                                        response.name +
+                                                        "' already defined for '" +
+                                                        method.method +
+                                                        "' method",
+                                                        0,
+                                                        begin->sourceMap));
+            }
+            
+            method.responses.push_back(response);
+            return result;
+        }
+        
     };
     
     typedef BlockParser<Method, SectionParser<Method> > MethodParser;

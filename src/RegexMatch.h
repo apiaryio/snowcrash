@@ -16,6 +16,9 @@ namespace snowcrash {
     // Perform snowcrash-specific regex evaluation
     // returns true if target string matches given expression, false otherwise
     bool RegexMatch(const std::string& target, const std::string& expression);
+    
+    // Performs posix-regex and returns first captured group (excluding whole target)
+    std::string RegexCaptureFirst(const std::string& target, const std::string& expression);
 }
 
 #endif

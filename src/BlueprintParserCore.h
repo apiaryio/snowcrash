@@ -28,6 +28,7 @@ namespace snowcrash {
         MethodSection,
         RequestSection,
         ResponseSection,
+        BodySection,
         TerminatorSection
     };
     
@@ -36,6 +37,9 @@ namespace snowcrash {
     
     // Parsing sub routine result
     typedef std::pair<Result, BlockIterator> ParseSectionResult;
+    
+    // Section boundaries (begin : end)
+    typedef std::pair<BlockIterator, BlockIterator> SectionBounds;
     
     // Advances iterator from sectionBegin to the same leve sectionEnd
     inline BlockIterator SkipToSectionEnd(const BlockIterator& begin,
@@ -95,8 +99,8 @@ namespace snowcrash {
         
         // Parse classified blocks
         static ParseSectionResult ParseSection(const Section& section,
-                                               const BlockIterator& begin,
-                                               const BlockIterator& end,
+                                               const BlockIterator& cur,
+                                               const SectionBounds& bounds,
                                                const SourceData& sourceData,
                                                const Blueprint& blueprint,
                                                T& output);
@@ -110,18 +114,20 @@ namespace snowcrash {
         
         // Parse section overview blocks
         static ParseSectionResult ParseSection(const Section& section,
-                                               const BlockIterator& begin,
-                                               const BlockIterator& end,
+                                               const BlockIterator& cur,
+                                               const SectionBounds& bounds,
                                                const SourceData& sourceData,
                                                const Blueprint& blueprint,
                                                T& output);
     };
     
     //
-    // Block Classifier prototype
+    // Block Classifier prototype, Look Ahead
     //
     template <class T>
-    Section TClassifyBlock(const MarkdownBlock& block, const Section& context);
+    Section TClassifyBlock(const BlockIterator& begin,
+                           const BlockIterator& end,
+                           const Section& context);
     
     //
     // Block Parser, iterates over block and call section parser P<T>
@@ -140,10 +146,10 @@ namespace snowcrash {
             BlockIterator currentBlock = begin;
             while (currentBlock != end) {
                 
-                currentSection = TClassifyBlock<T>(*currentBlock, currentSection);
+                currentSection = TClassifyBlock<T>(currentBlock, end, currentSection);
                 ParseSectionResult sectionResult = P::ParseSection(currentSection,
                                                                    currentBlock,
-                                                                   end,
+                                                                   std::make_pair(begin, end),
                                                                    sourceData,
                                                                    blueprint,
                                                                    output);
@@ -156,6 +162,9 @@ namespace snowcrash {
                     break;
 
                 currentBlock = sectionResult.second;
+
+                if (currentSection == UndefinedSection)
+                    break;
             }
             
             return std::make_pair(result, currentBlock);

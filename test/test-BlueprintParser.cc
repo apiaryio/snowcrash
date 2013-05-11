@@ -169,25 +169,33 @@ TEST_CASE("bpparser/parse-list-only", "Parse nameless blueprint with a list desc
 
 //TEST_CASE("bpparser/parse-resource", "Parse simple resource.")
 //{
-//    BlueprintParser parser;
+//    // Blueprint in question:
+//    //R"(
+//    //# GET /resource
+//    //p1
+//    //+ Response 200
+//    //
+//    //        body
+//    //");
+//    
 //    Result result;
 //    Blueprint blueprint;
 //    
-//    SourceData source = "0";
+//    SourceData source = "012345";
 //
-//    MarkdownBlock listItem(ListItemBlockType);
-//    listItem.push_back(MarkdownBlock(ParagraphBlockType, "Response 200"));
-//    listItem.push_back(MarkdownBlock(CodeBlockType, "body"));
-//    
-//    MarkdownBlock list(ListBlockType);
-//    list.push_back(listItem);
-//    
 //    MarkdownBlock::Stack markdown;
-//    markdown.push_back(MarkdownBlock(HeaderBlockType, "GET /resource", 1));
-//    markdown.push_back(MarkdownBlock(ParagraphBlockType, "p1", 0, MakeSourceDataBlock(1, 1)));
-//    markdown.push_back(list);
+//    markdown.push_back(MarkdownBlock(HeaderBlockType, "GET /resource", 1, MakeSourceDataBlock(0, 1)));
+//    markdown.push_back(MarkdownBlock(ParagraphBlockType, "p1", 1, MakeSourceDataBlock(1, 1)));
+//    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 1, SourceDataBlock()));
+//    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 1, SourceDataBlock()));
 //    
-//    parser.parse(source, markdown, result, blueprint);
+//    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Response 200", 1, MakeSourceDataBlock(2, 1)));
+//    markdown.push_back(MarkdownBlock(CodeBlockType, "body", 1, MakeSourceDataBlock(3, 1)));
+//    
+//    markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 1, MakeSourceDataBlock(4, 1)));
+//    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 1, MakeSourceDataBlock(5, 1)));
+//    
+//    BlueprintParser::Parse(source, markdown, result, blueprint);
 //
 //    REQUIRE(result.error.code == Error::OK);
 //    REQUIRE(blueprint.name.empty());
@@ -223,5 +231,3 @@ TEST_CASE("bpparser/parse-list-only", "Parse nameless blueprint with a list desc
 //    REQUIRE(response.body == "body");
 //    REQUIRE(response.schema.empty());
 //}
-
-

@@ -46,9 +46,9 @@ void snowcrash::printMarkdown(const MarkdownBlock::Stack& markdown, unsigned int
 
     for (MarkdownBlock::Stack::const_iterator block = markdown.begin(); block != markdown.end(); ++block) {
     
-        std::cout << indent << "block: " << (int)block->type;
+        std::cout << indent << "block " << static_cast<int>(block->type);
         if (block->content.length())
-            std::cout << " source: '" << block->content << "'\n";
+            std::cout << ", content: '" << block->content << "'\n";
         else
             std::cout << std::endl;
         

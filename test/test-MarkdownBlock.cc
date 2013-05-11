@@ -34,24 +34,3 @@ TEST_CASE("mdblock/init-param", "MD block construction with parameters")
     REQUIRE(block.data == static_cast<MarkdownBlock::Data>(0));
     REQUIRE(block.sourceMap.size() == 0);
 }
-
-// FIXME: C++11 move
-//TEST_CASE("mdblock/move", "MD block move semantics")
-//{
-//    MarkdownBlock::Stack stack = {  MarkdownBlock(ParagraphBlockType, "1"),
-//                                    MarkdownBlock(ParagraphBlockType, "2") };
-//    
-//    REQUIRE(stack.front().content == "1");
-//    REQUIRE(stack.back().content == "2");
-//    
-//    MarkdownBlock block(ListItemBlockType);
-//    REQUIRE(block.blocks.size() == 0);    
-//    
-//    block.blocks = std::move(stack);
-//    
-//    REQUIRE(block.blocks.size() == 2);
-//    REQUIRE(block.blocks.front().content == "1");
-//    REQUIRE(block.blocks.back().content == "2");
-//    
-//}
-

@@ -51,22 +51,24 @@ namespace snowcrash {
     // Block Classifier, Resource Context
     //
     template <>
-    inline Section TClassifyBlock<Resource>(const MarkdownBlock& block, const Section& context) {
+    inline Section TClassifyBlock<Resource>(const BlockIterator& begin,
+                                            const BlockIterator& end,
+                                            const Section& context) {
         
-        if (block.type != HeaderBlockType)
+        if (begin->type != HeaderBlockType)
             return (context != ResourceSection) ? UndefinedSection : ResourceSection;
         
-        if (block.type == HeaderBlockType) {
-            if (HasResourceSignature(block)) {
+        if (begin->type == HeaderBlockType) {
+            if (HasResourceSignature(*begin)) {
                 return (context != ResourceSection) ? ResourceSection : UndefinedSection;
             }
-            else if (HasMethodSignature(block)) {
+            else if (HasMethodSignature(*begin)) {
                 return MethodSection;
             }
             
             return (context != ResourceSection) ? UndefinedSection : ResourceSection;
         }
-        
+    
         //    if (block.type == ListBlockType) {
         //        /// TODO:
         //        return ResourceSection;
@@ -82,23 +84,25 @@ namespace snowcrash {
     struct SectionOverviewParser<Resource>  {
         
         static ParseSectionResult ParseSection(const Section& section,
-                                               const BlockIterator& begin,
-                                               const BlockIterator& end,
+                                               const BlockIterator& cur,
+                                               const SectionBounds& bounds,
                                                const SourceData& sourceData,
                                                const Blueprint& blueprint,
                                                Resource& resource) {
             if (section != ResourceSection)
-                return std::make_pair(Result(), begin);
+                return std::make_pair(Result(), cur);
             
-            if (begin->type == HeaderBlockType &&
-                resource.description.empty()) {
-                resource.uri = begin->content;
+            if (cur->type == HeaderBlockType &&
+                cur == bounds.first) {
+                resource.uri = cur->content;
             }
             else {
-                resource.description += MapSourceData(sourceData, begin->sourceMap);
+                
+                // TODO: handle list / quotes
+                resource.description += MapSourceData(sourceData, cur->sourceMap);
             }
             
-            return std::make_pair(Result(), ++BlockIterator(begin));
+            return std::make_pair(Result(), ++BlockIterator(cur));
         }
     };
     
@@ -111,28 +115,28 @@ namespace snowcrash {
     struct SectionParser<Resource> {
         
         static ParseSectionResult ParseSection(const Section& section,
-                                               const BlockIterator& begin,
-                                               const BlockIterator& end,
+                                               const BlockIterator& cur,
+                                               const SectionBounds& bounds,
                                                const SourceData& sourceData,
                                                const Blueprint& blueprint,
                                                Resource& resource) {
 
-            ParseSectionResult result = std::make_pair(Result(), begin);
+            ParseSectionResult result = std::make_pair(Result(), cur);
             switch (section) {
                 case ResourceSection:
                     
-                    result = ResourceOverviewParser::Parse(begin, end, sourceData, blueprint, resource);
+                    result = ResourceOverviewParser::Parse(cur, bounds.second, sourceData, blueprint, resource);
                     break;
                     
                 case MethodSection:
-                    result = HandleMethod(begin, end, sourceData, blueprint, resource);
+                    result = HandleMethod(cur, bounds.second, sourceData, blueprint, resource);
                     break;
                     
                 case UndefinedSection:
                     break;
                     
                 default:
-                    result.first.error = Error("unexpected block", 1, begin->sourceMap);
+                    result.first.error = Error("unexpected block", 1, cur->sourceMap);
                     break;
             }
             
