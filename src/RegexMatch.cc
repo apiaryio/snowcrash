@@ -17,7 +17,7 @@ bool snowcrash::RegexMatch(const std::string& target, const std::string& express
         return false;
 
     regex_t regex;
-    int reti = ::regcomp(&regex, expression.c_str(), REG_EXTENDED);
+    int reti = ::regcomp(&regex, expression.c_str(), REG_EXTENDED | REG_NOSUB);
     if (reti) {
         // Unable to compile regex
         return false;

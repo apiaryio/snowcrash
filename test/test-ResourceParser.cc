@@ -118,3 +118,45 @@ TEST_CASE("rparser/parse-multi-method", "Parse mutliple methods")
     REQUIRE(resource.methods[1].method == "POST");
     REQUIRE(resource.methods[1].description == "3");
 }
+
+TEST_CASE("rparser/parse-list-description", "Parse description with list")
+{
+    
+    // Blueprint in question:
+    //R"(
+    //# /1
+    //+ A
+    //+ B
+    //
+    //p1
+    //");
+    
+    SourceData source = "01234";
+    MarkdownBlock::Stack markdown;
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "/1", 1, MakeSourceDataBlock(0, 1)));
+    
+    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
+
+    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "A", 0, MakeSourceDataBlock(1, 1)));
+    
+    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "B", 0, MakeSourceDataBlock(2, 1)));
+    
+    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(3, 1)));
+    
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "p1", 0, MakeSourceDataBlock(4, 1)));
+    
+    Resource resource;
+    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), resource);
+    
+    REQUIRE(result.first.error.code == Error::OK);
+    REQUIRE(result.first.warnings.empty());
+    
+    const MarkdownBlock::Stack &blocks = markdown;
+    REQUIRE(std::distance(blocks.begin(), result.second) == 8);
+    
+    REQUIRE(resource.uri == "/1");
+    REQUIRE(resource.description == "34");
+    REQUIRE(resource.methods.empty());
+}

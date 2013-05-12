@@ -22,7 +22,6 @@ namespace snowcrash {
     public:
         
         // Parse source data into Blueprint AST
-        // TODO: make result return value
         void parse(const SourceData& source, Result& result, Blueprint& blueprint);
     };
 }

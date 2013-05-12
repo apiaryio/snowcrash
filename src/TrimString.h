@@ -35,7 +35,15 @@ namespace snowcrash {
     static inline std::string& TrimString(std::string &s) {
         return TrimStringStart(TrimStringEnd(s));
     }
-
+    
+    // Retrieve first line of given string
+    static inline std::string GetFirstLine(const std::string& source) {
+        std::string::size_type pos = source.find("\n");
+        if (pos == std::string::npos)
+            return source;
+        else
+            return source.substr(0, pos);
+    }
 }
 
 #endif

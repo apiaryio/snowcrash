@@ -62,10 +62,11 @@ namespace snowcrash {
                 cur->type != ListItemBlockEndType)
                 return NoPayloadSignature;
             
-            if (RegexMatch(cur->content, RequestRegex))
+            std::string content = GetFirstLine(cur->content);
+            if (RegexMatch(content, RequestRegex))
                 return RequestPayloadSignature;
             
-            if (RegexMatch(cur->content, ResponseRegex))
+            if (RegexMatch(content, ResponseRegex))
                 return ResponsePayloadSignature;
         }
 
@@ -82,7 +83,7 @@ namespace snowcrash {
             if (cur == end)
                 return false;
             
-            if (cur->type != ParagraphBlockType)
+            if (cur->type != ParagraphBlockType && cur->type != ListItemBlockEndType)
                 return false;
             
             return RegexMatch(cur->content, BodyRegex);
@@ -153,7 +154,6 @@ namespace snowcrash {
                     return std::make_pair(Result(), sectionCur);
                 
                 ContentParts content = ExtractFirstLine(*sectionCur);
-                
                 if (section == RequestSection) {
                     payload.name = RegexCaptureFirst(content[0], RequestRegex);
                 }
@@ -165,13 +165,19 @@ namespace snowcrash {
                     TrimString(payload.name);
                 
                 if (content.size() == 2) {
-                    payload.description += content[1]; // MapSourceData(sourceData, content[1].sourceMap);
+                    payload.description += content[1];
                     TrimString(payload.description);
                 }
             }
             else {
                 
-                // TODO: handle list / quotes
+                if (sectionCur->type == QuoteBlockBeginType) {
+                    sectionCur = SkipToSectionEnd(sectionCur, bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
+                }
+                else if (sectionCur->type == ListBlockBeginType) {
+                    sectionCur = SkipToListBlockEndChecking(sectionCur, bounds.second, result);
+                }
+                
                 payload.description += MapSourceData(sourceData, sectionCur->sourceMap);
             }
             
@@ -181,6 +187,34 @@ namespace snowcrash {
             }
             
             return std::make_pair(result, ++sectionCur);
+        }
+        
+        static BlockIterator SkipToListBlockEndChecking(const BlockIterator& begin,
+                                                        const BlockIterator& end,
+                                                        Result& result) {
+            BlockIterator cur(begin);
+            if (++cur == end)
+                return cur;
+            
+            while (cur != end &&
+                   cur->type == ListItemBlockBeginType) {
+                
+                // Check body signature
+                bool body = HasBodySignature(cur, end);
+                cur = SkipToSectionEnd(cur, end, ListItemBlockBeginType, ListItemBlockEndType);
+                if (cur == end)
+                    break;
+                
+                if (body) {
+                    result.warnings.push_back(Warning("ignoring body in payload description", 0, cur->sourceMap));
+                }
+                
+                // TODO: Headers & Parameters check
+                
+                ++cur;
+            }
+            
+            return cur;
         }
     };
     

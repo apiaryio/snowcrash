@@ -18,7 +18,7 @@ namespace snowcrash {
     
     // Pair of content parts
     typedef std::vector<MarkdownBlock::Content> ContentParts;
-    
+        
     // Extract first line from block content
     // ContentParts[0] contains first line of block content
     // ContentParts[1] contains the rest of block content

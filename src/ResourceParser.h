@@ -69,11 +69,6 @@ namespace snowcrash {
             return (context != ResourceSection) ? UndefinedSection : ResourceSection;
         }
     
-        //    if (block.type == ListBlockType) {
-        //        /// TODO:
-        //        return ResourceSection;
-        //    }
-        
         return UndefinedSection;
     }
     
@@ -92,17 +87,25 @@ namespace snowcrash {
             if (section != ResourceSection)
                 return std::make_pair(Result(), cur);
             
+            Result result;
+            BlockIterator sectionCur(cur);
             if (cur->type == HeaderBlockType &&
                 cur == bounds.first) {
                 resource.uri = cur->content;
             }
             else {
                 
-                // TODO: handle list / quotes
-                resource.description += MapSourceData(sourceData, cur->sourceMap);
+                if (cur->type == QuoteBlockBeginType) {
+                    sectionCur = SkipToSectionEnd(sectionCur, bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
+                }
+                else if (cur->type == ListBlockBeginType) {
+                    sectionCur = SkipToSectionEnd(sectionCur, bounds.second, ListBlockBeginType, ListBlockEndType);
+                }
+                
+                resource.description += MapSourceData(sourceData, sectionCur->sourceMap);
             }
             
-            return std::make_pair(Result(), ++BlockIterator(cur));
+            return std::make_pair(Result(), ++sectionCur);
         }
     };
     

@@ -8,6 +8,8 @@
 
 #include "SerializeJSON.h"
 
+// TODO: JSON serialization is outdated
+
 using namespace snowcrash;
 
 // Serialize string
@@ -29,8 +31,6 @@ static void serialize(const Collection<Metadata>::type& metadata, std::ostream &
 {
     if (metadata.empty())
         return;
-    
-    // TODO:
 }
 
 // Serialize Resource Groups
@@ -42,8 +42,6 @@ static void serialize(const ResourceGroup& group, std::ostream &os)
     os << ", ";
     
     serialize("description", group.description, os);
-    
-    // TODO: resources
     
     os << " }";
 }
