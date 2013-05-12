@@ -7,6 +7,7 @@
 //
 
 #include <regex.h>
+#include <cstring>
 #include "RegexMatch.h"
 
 // FIXME: Migrate to C++11.
@@ -46,7 +47,7 @@ bool snowcrash::RegexMatch(const std::string& target, const std::string& express
 std::string snowcrash::RegexCaptureFirst(const std::string& target, const std::string& expression)
 {
     if (target.empty() || expression.empty())
-        return false;
+        return std::string();
     
     regex_t regex;
     int reti = ::regcomp(&regex, expression.c_str(), REG_EXTENDED);
@@ -68,6 +69,4 @@ std::string snowcrash::RegexCaptureFirst(const std::string& target, const std::s
         ::regfree(&regex);
         return std::string();
     }
-    
-    return false;
 }
