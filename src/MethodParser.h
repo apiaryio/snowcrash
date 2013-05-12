@@ -102,6 +102,13 @@ namespace snowcrash {
                                                Method& method) {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
+            
+//            if (cur->type == ListItemBlockEndType) {
+//                result.second = SkipToListBlockEnd(cur, bounds.second, result.first);
+//                ++result.second;
+//                return result;
+//            }
+            
             switch (section) {
                 case MethodSection:
                     result = MethodOverviewParser::Parse(cur, bounds.second, sourceData, blueprint, method);

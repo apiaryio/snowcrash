@@ -26,6 +26,7 @@ TEST_CASE("bpparser/parse-params", "parse() method parameters.")
     BlueprintParser::Parse("", MarkdownBlock::Stack(), result, blueprint);
     
     REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.empty());
 }
 
 TEST_CASE("bpparser/parse-bp-name", "Parse blueprint name.")
@@ -39,6 +40,7 @@ TEST_CASE("bpparser/parse-bp-name", "Parse blueprint name.")
     BlueprintParser::Parse("", markdown, result, blueprint);
     
     REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.empty());
     REQUIRE(blueprint.name == "API Name");
     REQUIRE(blueprint.description.length() == 0);
 }
@@ -58,6 +60,7 @@ TEST_CASE("bpparser/parse-bp-overview", "Parse blueprint overview section.")
     BlueprintParser::Parse(source, markdown, result, blueprint);
     
     REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.empty());
     REQUIRE(blueprint.name == "API Name");
     REQUIRE(blueprint.description == "123");
     REQUIRE(blueprint.resourceGroups.empty());
@@ -81,6 +84,9 @@ TEST_CASE("bpparser/parse-group", "Parse resource group.")
     BlueprintParser::Parse(source, markdown, result, blueprint);
 
     REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.empty());
+    REQUIRE(result.warnings.empty());
+    
     REQUIRE(blueprint.resourceGroups.size() == 1);
 
     ResourceGroup group = blueprint.resourceGroups.front();
@@ -110,6 +116,7 @@ TEST_CASE("bpparser/parse-name-resource", "Parse API with Name and resouce")
     BlueprintParser::Parse(source, markdown, result, blueprint);
     
     REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.empty());
     REQUIRE(blueprint.resourceGroups.size() == 1);
     
     ResourceGroup group = blueprint.resourceGroups.front();
@@ -140,6 +147,10 @@ TEST_CASE("bpparser/parse-nameless-description", "Parse nameless blueprint descr
     BlueprintParser::Parse(source, markdown, result, blueprint);
     
     REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.size() == 1); // expected API name
+    REQUIRE(result.warnings.front().location.size() == 1);
+    REQUIRE(result.warnings.front().location.front().location == 0);
+    REQUIRE(result.warnings.front().location.front().length == 1);
     REQUIRE(blueprint.resourceGroups.size() == 0);
     REQUIRE(blueprint.description == "01");
 }
@@ -163,6 +174,7 @@ TEST_CASE("bpparser/parse-list-only", "Parse nameless blueprint with a list desc
     BlueprintParser::Parse(source, markdown, result, blueprint);
     
     REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.size() == 1); // expected API name
     REQUIRE(blueprint.resourceGroups.size() == 0);
     REQUIRE(blueprint.description == "0");
 }
@@ -198,6 +210,7 @@ TEST_CASE("bpparser/parse-list-only", "Parse nameless blueprint with a list desc
 //    BlueprintParser::Parse(source, markdown, result, blueprint);
 //
 //    REQUIRE(result.error.code == Error::OK);
+//    REQUIRE(result.warnings.empty());
 //    REQUIRE(blueprint.name.empty());
 //    REQUIRE(blueprint.description.empty());
 //    

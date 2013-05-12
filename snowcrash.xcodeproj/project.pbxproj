@@ -93,6 +93,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		BB1EC203173FD06600CFB84A /* ListUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ListUtility.h; path = src/ListUtility.h; sourceTree = "<group>"; };
 		BB740991171C05B20023105F /* MarkdownParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = MarkdownParser.cc; path = src/MarkdownParser.cc; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		BB740992171C05B20023105F /* MarkdownParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = MarkdownParser.h; path = src/MarkdownParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BB740995171C065C0023105F /* MarkdownBlock.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MarkdownBlock.cc; path = src/MarkdownBlock.cc; sourceTree = "<group>"; };
@@ -231,6 +232,7 @@
 			children = (
 				BBA91DC0171D402600649B05 /* BlueprintParser.h */,
 				BBD5F9CF1735413A0049BBEE /* BlueprintParserCore.h */,
+				BB1EC203173FD06600CFB84A /* ListUtility.h */,
 				BBD5F9D617354B450049BBEE /* MethodParser.h */,
 				BBE5705F173927870086CE22 /* PayloadParser.h */,
 				BBD5F9C717353C300049BBEE /* ResourceGroupParser.h */,

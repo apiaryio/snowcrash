@@ -14,8 +14,6 @@ using namespace snowcrash;
 
 TEST_CASE("pldparser/parse-request", "Parse request payload")
 {
-    SourceData source = "0123456789";
-    
     // Blueprint in question:
     //R"(
     //+ Request Hello World (text/plain)
@@ -26,7 +24,8 @@ TEST_CASE("pldparser/parse-request", "Parse request payload")
     //            Code
     //
     //)";
-        
+
+    SourceData source = "0123456789";
     MarkdownBlock::Stack markdown;
     markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
     markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
@@ -45,14 +44,48 @@ TEST_CASE("pldparser/parse-request", "Parse request payload")
     ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), payload);
     
     REQUIRE(result.first.error.code == Error::OK);
+    REQUIRE(result.first.warnings.empty());
     
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 12);
 
     REQUIRE(payload.name == "Hello World");
     REQUIRE(payload.description == "1");
-    REQUIRE(payload.parameters.size() == 0);
-    REQUIRE(payload.headers.size() == 0);
+    REQUIRE(payload.parameters.empty());
+    REQUIRE(payload.headers.empty());
     REQUIRE(payload.body == "Code");
+    REQUIRE(payload.schema.empty());
+}
+
+TEST_CASE("pldparser/parse-incomplete", "Parse incomplete payload")
+{
+    // Blueprint in question:
+    //R"(
+    //+ Request A
+    //
+    //  Description
+    //)";
+    
+    SourceData source = "01";
+    MarkdownBlock::Stack markdown;
+    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "Request A\n  B\n", 0, MakeSourceDataBlock(0, 1)));
+    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(1, 1)));
+    
+    Payload payload;
+    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), payload);
+    
+    REQUIRE(result.first.error.code == Error::OK);
+    REQUIRE(result.first.warnings.empty());
+
+    const MarkdownBlock::Stack &blocks = markdown;
+    REQUIRE(std::distance(blocks.begin(), result.second) == 4);
+    
+    REQUIRE(payload.name == "A");
+    REQUIRE(payload.description == "B");
+    REQUIRE(payload.parameters.empty());
+    REQUIRE(payload.headers.empty());
+    REQUIRE(payload.body.empty());
     REQUIRE(payload.schema.empty());
 }

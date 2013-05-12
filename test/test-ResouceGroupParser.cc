@@ -24,6 +24,7 @@ TEST_CASE("rgparser/parse", "Parse resource group with empty resource")
     ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), resourceGroup);
     
     REQUIRE(result.first.error.code == Error::OK);
+    REQUIRE(result.first.warnings.empty());
     
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 3);
@@ -47,6 +48,7 @@ TEST_CASE("rgparser/parse-multi-resource", "Parse multiple resource in anonymous
     ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), resourceGroup);
     
     REQUIRE(result.first.error.code == Error::OK);
+    REQUIRE(result.first.warnings.empty());
     
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 4);

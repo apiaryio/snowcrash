@@ -52,7 +52,7 @@ static void serialize(const Payload& payload, std::ostream &os)
     os << "        - ";   // indent 5
     serialize(SerializeKey::Name, payload.name, 0, os);
     serialize(SerializeKey::Description, payload.description, 5, os);
-    serialize(SerializeKey::Body, payload.description, 5, os);
+    serialize(SerializeKey::Body, payload.body, 5, os);
     
     // TODO: params, headers, schema
 }

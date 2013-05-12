@@ -14,6 +14,7 @@
 #include "Blueprint.h"
 #include "RegexMatch.h"
 #include "TrimString.h"
+#include "ListUtility.h"
 
 // Request matching regex
 static const std::string RequestRegex("^[Rr]equest([[:space:]]+([A-Za-z0-9_]|[[:space:]])*)?([[:space:]]\\([^\\)]*\\))?[[:space:]]*$");
@@ -34,58 +35,6 @@ namespace snowcrash {
         ResponsePayloadSignature,
         GenericPayloadSignature
     };
-    
-    // Skips list / list item blocks to first content block (paragraph)
-    inline BlockIterator FirstContentBlock(const BlockIterator& begin,
-                                           const BlockIterator& end) {
-        
-        BlockIterator cur = begin;
-        if (cur->type == ListBlockBeginType)
-            if (++cur == end)
-                return end;
-        
-        if (cur->type == ListItemBlockBeginType)
-            if (++cur == end)
-                return end;
-        
-        return cur;
-    }
-    
-    // Skips to first closing list item block or list block if there is no additional list item
-    // Appends result warnings if skipping other blocks
-    inline BlockIterator SkipToListBlockEnd(const BlockIterator& begin,
-                                            const BlockIterator& end,
-                                            Result& result) {
-        
-        if (begin->type == ListBlockBeginType)
-            return begin;
-        
-        BlockIterator cur = begin;
-        int level = 0;
-        while (cur != end) {
-            
-            if (cur->type != ListItemBlockEndType && level == 0)
-                break;
-            
-            if (cur->type == ListBlockBeginType)
-                ++level;
-            else if (cur->type == ListBlockEndType)
-                --level;
-
-            if (cur->type != ListBlockBeginType &&
-                cur->type != ListItemBlockBeginType &&
-                cur->type != QuoteBlockBeginType)
-                result.warnings.push_back(Warning("ignoring extraneous content", 0, cur->sourceMap));
-            ++cur;
-        }
-        
-        BlockIterator next(cur);
-        ++next;
-        if (next != end && next->type == ListBlockEndType)
-            ++cur;  // eat closing list block
-        
-        return cur;
-    }
     
     inline Collection<Request>::const_iterator FindRequest(const Method& method, const Request& request) {
         return std::find_if(method.requests.begin(),
@@ -109,7 +58,8 @@ namespace snowcrash {
             if (cur == end)
                 return NoPayloadSignature;
             
-            if (cur->type != ParagraphBlockType)
+            if (cur->type != ParagraphBlockType &&
+                cur->type != ListItemBlockEndType)
                 return NoPayloadSignature;
             
             if (RegexMatch(cur->content, RequestRegex))
@@ -189,21 +139,35 @@ namespace snowcrash {
             
             Result result;
             BlockIterator sectionCur(cur);
+
+            // Cleanup previous list item
+            if (cur->type == ListBlockEndType ||
+                cur->type == ListItemBlockEndType)
+                return SkipAfterListBlockEnd(cur, bounds.second);
+            
+            // Signature
             if (sectionCur == bounds.first) {
                 
                 sectionCur = FirstContentBlock(sectionCur, bounds.second);
                 if (sectionCur == bounds.second)
                     return std::make_pair(Result(), sectionCur);
                 
+                ContentParts content = ExtractFirstLine(*sectionCur);
+                
                 if (section == RequestSection) {
-                    payload.name = RegexCaptureFirst(sectionCur->content, RequestRegex);
+                    payload.name = RegexCaptureFirst(content[0], RequestRegex);
                 }
                 else if (section == ResponseSection) {
-                    payload.name = RegexCaptureFirst(sectionCur->content, ResponseRegex);
+                    payload.name = RegexCaptureFirst(content[0], ResponseRegex);
                 }
                 
                 if (!payload.name.empty())
                     TrimString(payload.name);
+                
+                if (content.size() == 2) {
+                    payload.description += content[1]; // MapSourceData(sourceData, content[1].sourceMap);
+                    TrimString(payload.description);
+                }
             }
             else {
                 
@@ -236,6 +200,12 @@ namespace snowcrash {
                                                Payload& payload) {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
+
+            // Cleanup previous list item
+            if (cur->type == ListBlockEndType ||
+                cur->type == ListItemBlockEndType)
+                return SkipAfterListBlockEnd(cur, bounds.second);
+            
             switch (section) {
                 case RequestSection:
                 case ResponseSection:
@@ -248,9 +218,6 @@ namespace snowcrash {
                     break;
                     
                 case UndefinedSection:
-                    result.second = SkipToListBlockEnd(cur, bounds.second, result.first);
-                    if (result.second != cur)
-                        ++result.second; // eat list end
                     break;
                     
                 default:
@@ -271,7 +238,7 @@ namespace snowcrash {
             ParseSectionResult result = std::make_pair(Result(), begin);
             BlockIterator sectionCur = FirstContentBlock(begin, end);
             
-            // Skip 'body' signature
+            // Skip body signature
             if (++sectionCur == end) {
                 result.second = end;
                 return result;
@@ -285,8 +252,7 @@ namespace snowcrash {
             
             // Forward to end of this section
             result.second = SkipToListBlockEnd(++sectionCur, end, result.first);
-            if (result.second != sectionCur)
-                ++result.second;
+            ++result.second;
             return result;
         }
         

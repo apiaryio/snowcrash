@@ -20,20 +20,20 @@ namespace snowcrash {
     //
     enum MarkdownBlockType {
         UndefinedBlockType = 0,
-        CodeBlockType,
-        QuoteBlockBeginType,
-        QuoteBlockEndType,
-        HTMLBlockType,
-        HeaderBlockType,
-        HRuleBlockType,
-        ListBlockBeginType,
-        ListBlockEndType,
-        ListItemBlockBeginType,
-        ListItemBlockEndType,
-        ParagraphBlockType,
-        TableBlockType,
-        TableRowBlockType,
-        TableCellBlockType
+        CodeBlockType = 1,
+        QuoteBlockBeginType = 2,
+        QuoteBlockEndType = 3,
+        HTMLBlockType = 4,
+        HeaderBlockType = 5,
+        HRuleBlockType = 6,
+        ListBlockBeginType = 7,
+        ListBlockEndType = 8,
+        ListItemBlockBeginType = 9,
+        ListItemBlockEndType = 10,
+        ParagraphBlockType = 11,
+        TableBlockType = 12,
+        TableRowBlockType = 13,
+        TableCellBlockType = 14
     };
 
     //

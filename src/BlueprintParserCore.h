@@ -41,31 +41,6 @@ namespace snowcrash {
     // Section boundaries (begin : end)
     typedef std::pair<BlockIterator, BlockIterator> SectionBounds;
     
-    // Advances iterator from sectionBegin to the same leve sectionEnd
-    inline BlockIterator SkipToSectionEnd(const BlockIterator& begin,
-                                          const BlockIterator& end,
-                                          MarkdownBlockType sectionBegin,
-                                          MarkdownBlockType sectionEnd) {
-
-        BlockIterator currentBlock = begin;
-        if (currentBlock->type == sectionBegin) {
-            int level = 1;
-            ++currentBlock;
-            while (currentBlock != end && level) {
-                if (currentBlock->type == sectionBegin)
-                    ++level;
-                
-                if (currentBlock->type == sectionEnd)
-                    --level;
-                
-                if (level)
-                    ++currentBlock;
-            }
-        }
-        
-        return currentBlock;
-    }
-    
     // Name matching predicate
     template <class T>
     struct MatchName : std::binary_function<T, T, bool> {
@@ -170,6 +145,31 @@ namespace snowcrash {
             return std::make_pair(result, currentBlock);
         }        
     };
+    
+    // Advances iterator from sectionBegin to the same level' sectionEnd
+    inline BlockIterator SkipToSectionEnd(const BlockIterator& begin,
+                                          const BlockIterator& end,
+                                          MarkdownBlockType sectionBegin,
+                                          MarkdownBlockType sectionEnd) {
+        
+        BlockIterator currentBlock = begin;
+        if (currentBlock->type == sectionBegin) {
+            int level = 1;
+            ++currentBlock;
+            while (currentBlock != end && level) {
+                if (currentBlock->type == sectionBegin)
+                    ++level;
+                
+                if (currentBlock->type == sectionEnd)
+                    --level;
+                
+                if (level)
+                    ++currentBlock;
+            }
+        }
+        
+        return currentBlock;
+    }
 }
 
 #endif

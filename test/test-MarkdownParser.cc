@@ -26,6 +26,7 @@ TEST_CASE("mdparser/parse-params", "parse() method parameters.")
     
     parser.parse("", result, markdown);
     REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.empty());
 }
 
 TEST_CASE("mdparser/parse-flat", "parsing flat Markdown into AST")
@@ -44,6 +45,7 @@ paragraph\n\
 
     parser.parse(source, result, markdown);
     REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.empty());
     
     REQUIRE(markdown.size() == 3);
     
@@ -86,6 +88,7 @@ TEST_CASE("mdparser/parse-html", "parsing Markdown with HTML into AST")
     parser.parse(source, result, markdown);
     
     REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.empty());
     REQUIRE(markdown.size() == 2);
     
     // Header block
@@ -116,6 +119,7 @@ TEST_CASE("mdparser/parse-hr", "parsing Markdown with horizontal rule into AST")
     parser.parse(source, result, markdown);
     
     REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.empty());
     REQUIRE(markdown.size() == 2);
     
     // Header block
@@ -154,6 +158,7 @@ paragraph-1\n\
     parser.parse(source, result, markdown);
         
     REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.empty());
     REQUIRE(markdown.size() == 9);
     
     // First quote
@@ -246,6 +251,7 @@ TEST_CASE("mdparser/parse-src-map", "parsing simple nested Markdown into AST and
     parser.parse(source, result, markdown);
     
     REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.empty());
     REQUIRE(markdown.size() == 10);
     
     REQUIRE(markdown[0].type == ListBlockBeginType);
@@ -333,6 +339,7 @@ paragraph-2\n\
     parser.parse(source, result, markdown);
     
     REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.empty());
     REQUIRE(markdown.size() == 25);
 
     // paragraph-1
@@ -457,6 +464,7 @@ code\n\
     parser.parse(source, result, markdown);
     
     REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.empty());
     REQUIRE(markdown.size() == 1);
     
     REQUIRE(markdown[0].type == CodeBlockType);
@@ -478,6 +486,7 @@ TEST_CASE("mdparser/parse-inline-list", "parsing inplace-list")
     parser.parse(source, result, markdown);
     
     REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.empty());
     REQUIRE(markdown.size() == 4);
     
     REQUIRE(markdown[0].type == ListBlockBeginType);
@@ -508,6 +517,7 @@ TEST_CASE("mdparser/parse-header-only", "parsing asserting header one liner")
     parser.parse(source, result, markdown);
     
     REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.empty());
     REQUIRE(markdown.size() == 1);
     
     REQUIRE(markdown[0].type == HeaderBlockType);

@@ -28,6 +28,7 @@ TEST_CASE("parser/parse-empty", "Parse empty blueprint.")
     
     parser.parse(bluerpintSource, result, blueprint);
     REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.empty());
     REQUIRE(blueprint.metadata.empty());
     REQUIRE(blueprint.name.empty());
     REQUIRE(blueprint.description.empty());
@@ -56,6 +57,7 @@ Resource **description**\n\
         
     parser.parse(bluerpintSource, result, blueprint);
     REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.empty());
     REQUIRE(blueprint.name == "Snowcrash API");
     REQUIRE(blueprint.description.empty());
     REQUIRE(blueprint.resourceGroups.size() == 1);

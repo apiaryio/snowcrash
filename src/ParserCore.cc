@@ -36,3 +36,40 @@ void snowcrash::AppendSourceDataBlock(SourceDataBlock& destination, const Source
         }
     }
 }
+
+SourceDataBlockPair snowcrash::SplitSourceDataBlock(const SourceDataBlock& block, size_t len)
+{
+    if (block.empty())
+        return std::make_pair(SourceDataBlock(), SourceDataBlock());
+
+    SourceDataBlock first;
+    SourceDataBlock second;
+    
+    size_t remain = len;
+    for (SourceDataBlock::const_iterator it = block.begin(); it != block.end(); ++it) {
+        
+        if (remain == 0) {
+            second.push_back(*it);
+            continue;
+        }
+        
+        if (remain >= it->length) {
+            first.push_back(*it);
+            remain -= it->length;
+            continue;
+        }
+        
+        if (remain < it->length) {
+            SourceDataRange left = *it;
+            left.length = remain;
+            first.push_back(left);
+            
+            SourceDataRange right = *it;
+            right.location += remain;
+            right.length -= remain;
+            second.push_back(right);
+        }
+    }
+    
+    return std::make_pair(first, second);
+}

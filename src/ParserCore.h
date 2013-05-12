@@ -35,8 +35,12 @@ namespace snowcrash {
     // Create SourceDataBlock 
     SourceDataBlock MakeSourceDataBlock(size_t loc, size_t len);
     
-    // Append SourceDataBlock to existign blog, mergin continuous blocks
+    // Append SourceDataBlock to existign blog, merging continuous blocks
     void AppendSourceDataBlock(SourceDataBlock& destination, const SourceDataBlock& append);
+    
+    // Split source data block at len
+    typedef std::pair<SourceDataBlock, SourceDataBlock> SourceDataBlockPair;
+    SourceDataBlockPair SplitSourceDataBlock(const SourceDataBlock& block, size_t len);
     
     //
     // Source module line anotation
