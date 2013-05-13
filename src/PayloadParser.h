@@ -115,6 +115,10 @@ namespace snowcrash {
         if ((context == RequestSection || context == ResponseSection) &&
             (begin->type == ListBlockBeginType || begin->type == ListItemBlockBeginType)) {
             
+            PayloadSignature payload = HasPayloadSignature(begin, end);
+            if (payload != NoPayloadSignature)
+                return UndefinedSection; // Adjacent payload, bail out
+            
             if (HasBodySignature(begin, end))
                 return BodySection;
         }
