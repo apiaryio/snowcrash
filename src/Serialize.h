@@ -10,8 +10,6 @@
 #define SNOWCRASH_SERIALIZE_H
 
 #include <string>
-#include "SerializeJSON.h"
-#include "SerializeYAML.h"
 
 namespace snowcrash {
     

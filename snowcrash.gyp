@@ -36,6 +36,7 @@
         'src/Blueprint.h',
         'src/BlueprintParser.h',
         'src/BlueprintParserCore.h',
+        'src/ListUtility.h',
         'src/MarkdownBlock.cc',
         'src/MarkdownBlock.h',
         'src/MarkdownParser.cc',
@@ -50,7 +51,13 @@
         'src/RegexMatch.h',
         'src/ResourceGroupParser.h',
         'src/ResourceParser.h',
-        'src/snowcrash',
+        'src/Serialize.cc',
+        'src/Serialize.h',
+        'src/SerializeJSON.cc',
+        'src/SerializeJSON.h',
+        'src/SerializeYAML.cc',
+        'src/SerializeYAML.h',
+        'src/TrimString.h',
         'src/snowcrash.cc',
         'src/snowcrash.h'
       ],
@@ -100,10 +107,7 @@
         'src/snowcrash'
       ],
       'sources': [
-        'src/snowcrash/snowcrash.cc',
-        'src/snowcrash/SerializeJSON.cc',
-        'src/snowcrash/SerializeYAML.cc',
-        'src/snowcrash/Serialize.cc'
+        'src/snowcrash/snowcrash.cc'
       ],
       'dependencies': [
         'libsnowcrash',
