@@ -173,6 +173,11 @@ namespace snowcrash {
                     TrimString(payload.description);
                 }
             }
+            else if (sectionCur->type == ListItemBlockBeginType) {
+                // Alien list item warn & eat
+                sectionCur = SkipToSectionEnd(sectionCur, bounds.second, ListItemBlockBeginType, ListItemBlockEndType);
+                result.warnings.push_back(Warning("ignoring unexpected list item", 0, sectionCur->sourceMap));
+            }
             else {
                 
                 if (sectionCur->type == QuoteBlockBeginType) {
