@@ -88,7 +88,7 @@ namespace snowcrash {
     
     typedef SourceAnnotation Error;
     typedef SourceAnnotation Warning;
-    typedef std::vector<Warning> Warnigns;
+    typedef std::vector<Warning> Warnings;
     
     //
     // Module parsing report
@@ -103,7 +103,7 @@ namespace snowcrash {
         }
         
         Error error;
-        Warnigns warnings;
+        Warnings warnings;
     };
 }
 

@@ -48,7 +48,7 @@ void PrintResult(const snowcrash::Result& result)
         PrintAnnotation("error:", result.error);
     }
     
-    for (snowcrash::Warnigns::const_iterator it = result.warnings.begin(); it != result.warnings.end(); ++it) {
+    for (snowcrash::Warnings::const_iterator it = result.warnings.begin(); it != result.warnings.end(); ++it) {
         PrintAnnotation("warning:", *it);
     }
 }
