@@ -42,19 +42,16 @@ namespace snowcrash {
                                           const BlockIterator& end,
                                           const Section& context) {
 
-        if (begin->type == HeaderBlockType && HasMethodSignature(*begin))
-            return (context != MethodSection) ? MethodSection : UndefinedSection;
+        if (HasMethodSignature(*begin))
+            return (context == UndefinedSection) ? MethodSection : UndefinedSection;
         
-        if (begin->type == ListBlockBeginType || begin->type == ListItemBlockBeginType) {
-
-            PayloadSignature payload = HasPayloadSignature(begin, end);
-            if (payload == RequestPayloadSignature)
-                return RequestSection;
-            else if (payload == ResponsePayloadSignature)
-                return ResponseSection;
-        }
+        PayloadSignature payload = HasPayloadSignature(begin, end);
+        if (payload == RequestPayloadSignature)
+            return RequestSection;
+        else if (payload == ResponsePayloadSignature)
+            return ResponseSection;
         
-        return (context != MethodSection) ? UndefinedSection : MethodSection;
+        return (context == MethodSection) ? MethodSection : UndefinedSection;
     }
     
     //
@@ -176,8 +173,8 @@ namespace snowcrash {
         {
             Request request;
             ParseSectionResult result = PayloadParser::Parse(begin, end, sourceData, blueprint, request);
-            Collection<Response>::const_iterator duplicate = FindResponse(method, request);
-            if (duplicate != method.responses.end()) {
+            Collection<Response>::const_iterator duplicate = FindRequest(method, request);
+            if (duplicate != method.requests.end()) {
                 
                 // WARN: duplicate request
                 result.first.warnings.push_back(Warning("request '" +

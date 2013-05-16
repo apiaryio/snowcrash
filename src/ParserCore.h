@@ -64,8 +64,8 @@ namespace snowcrash {
 
             this->message = message;
             this->code = code; 
-            this->location =
-            location; }
+            this->location = location;
+        }
         
         ~SourceAnnotation() {}
         

@@ -179,6 +179,54 @@ TEST_CASE("bpparser/parse-list-only", "Parse nameless blueprint with a list desc
     REQUIRE(blueprint.description == "0");
 }
 
+TEST_CASE("bpparser/parse-multi-groups", "Parse nameless group after defined resource")
+{
+    // Blueprint in question:
+    //# /1
+    //# GET
+    //+ request
+    //	+ body
+    //
+    //			{ ... }
+    //
+    //A
+    
+    Result result;
+    Blueprint blueprint;
+    SourceData source = "0123456789";
+    
+    MarkdownBlock::Stack markdown;
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "/1", 1, MakeSourceDataBlock(0, 1)));
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "GET", 2, MakeSourceDataBlock(1, 1)));
+    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "request", 0, MakeSourceDataBlock(2, 1)));
+    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "body", 0, MakeSourceDataBlock(2, 1)));
+    markdown.push_back(MarkdownBlock(CodeBlockType, "{ ... }", 0, MakeSourceDataBlock(4, 1)));
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(5, 1)));
+    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(6, 1)));
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(7, 1)));
+    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(8, 1)));
+    
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "A", 0, MakeSourceDataBlock(9, 1)));
+    
+    BlueprintParser::Parse(source, markdown, result, blueprint);
+    
+    REQUIRE(result.error.code == Error::OK);
+    CHECK(result.warnings.size() == 2); // groups with same name & expected group name
+
+    REQUIRE(blueprint.resourceGroups.size() == 2);
+    
+    REQUIRE(blueprint.resourceGroups[0].name.empty());
+    REQUIRE(blueprint.resourceGroups[0].description.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    
+    REQUIRE(blueprint.resourceGroups[1].name.empty());
+    REQUIRE(blueprint.resourceGroups[1].description == "9");
+}
+
 //TEST_CASE("bpparser/parse-resource", "Parse simple resource.")
 //{
 //    // Blueprint in question:

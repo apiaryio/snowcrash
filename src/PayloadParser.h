@@ -92,6 +92,11 @@ namespace snowcrash {
         return false;
     }
     
+    
+    // Classify Block tools
+    extern bool HasMethodSignature(const MarkdownBlock& block);
+    extern bool HasResourceSignature(const MarkdownBlock& block);
+    
     //
     // Block Classifier, Payload Context
     //
@@ -101,8 +106,7 @@ namespace snowcrash {
                                            const Section& context) {
         
         // Leading list
-        if (context == UndefinedSection &&
-            (begin->type == ListBlockBeginType || begin->type == ListItemBlockBeginType)) {
+        if (context == UndefinedSection) {
             
             PayloadSignature payload = HasPayloadSignature(begin, end);
             if (payload == RequestPayloadSignature)
@@ -110,15 +114,17 @@ namespace snowcrash {
             else if (payload == ResponsePayloadSignature)
                 return ResponseSection;
         }
-
-        // Internal lists (params, headers, body, schema)
-        if ((context == RequestSection || context == ResponseSection) &&
-            (begin->type == ListBlockBeginType || begin->type == ListItemBlockBeginType)) {
+        else if ((context == RequestSection || context == ResponseSection)) {
+            
+            // Adjacent method or resource
+            if (HasMethodSignature(*begin) || HasResourceSignature(*begin))
+                return UndefinedSection;
             
             PayloadSignature payload = HasPayloadSignature(begin, end);
             if (payload != NoPayloadSignature)
                 return UndefinedSection; // Adjacent payload, bail out
             
+            // Internal lists (params, headers, body, schema)
             if (HasBodySignature(begin, end))
                 return BodySection;
         }
@@ -191,8 +197,9 @@ namespace snowcrash {
             }
             
             if (payload.name.empty() && section == ResponseSection) {
-                // ERR: missing status code
-                result.error = Error("missing response status code", 1, sectionCur->sourceMap);
+                // WARN: missing status code
+                result.warnings.push_back(Warning("missing response status code, assuming 200", 0, sectionCur->sourceMap));
+                payload.name = "200";
             }
             
             return std::make_pair(result, ++sectionCur);

@@ -66,14 +66,18 @@ static void serialize(const Method& method, std::ostream &os)
     
     // TODO: parameters, headers
     
-    serialize(SerializeKey::Requests, std::string(), 4, os);
-    for (Collection<Request>::const_iterator it = method.requests.begin(); it != method.requests.end(); ++it) {
-        serialize(*it, os);
+    if (!method.requests.empty()) {
+        serialize(SerializeKey::Requests, std::string(), 4, os);
+        for (Collection<Request>::const_iterator it = method.requests.begin(); it != method.requests.end(); ++it) {
+            serialize(*it, os);
+        }
     }
-    
-    serialize(SerializeKey::Responses, std::string(), 4, os);
-    for (Collection<Response>::const_iterator it = method.responses.begin(); it != method.responses.end(); ++it) {
-        serialize(*it, os);
+
+    if (!method.responses.empty()) {
+        serialize(SerializeKey::Responses, std::string(), 4, os);
+        for (Collection<Response>::const_iterator it = method.responses.begin(); it != method.responses.end(); ++it) {
+            serialize(*it, os);
+        }
     }
 }
 
@@ -85,6 +89,9 @@ static void serialize(const Resource& resource, std::ostream &os)
     serialize(SerializeKey::Description, resource.description, 3, os);
     
     //TODO: params, headers
+
+    if (resource.methods.empty())
+        return;
     
     serialize(SerializeKey::Methods, std::string(), 3, os);
     for (Collection<Method>::const_iterator it = resource.methods.begin(); it != resource.methods.end(); ++it) {

@@ -55,21 +55,14 @@ namespace snowcrash {
                                             const BlockIterator& end,
                                             const Section& context) {
         
-        if (begin->type != HeaderBlockType)
-            return (context != ResourceSection) ? UndefinedSection : ResourceSection;
-        
-        if (begin->type == HeaderBlockType) {
-            if (HasResourceSignature(*begin)) {
-                return (context != ResourceSection) ? ResourceSection : UndefinedSection;
-            }
-            else if (HasMethodSignature(*begin)) {
-                return MethodSection;
-            }
-            
-            return (context != ResourceSection) ? UndefinedSection : ResourceSection;
+        if (HasResourceSignature(*begin)) {
+            return (context == UndefinedSection) ? ResourceSection : UndefinedSection;
         }
-    
-        return UndefinedSection;
+        else if (HasMethodSignature(*begin)) {
+            return MethodSection;
+        }
+        
+        return (context != ResourceSection) ? UndefinedSection : ResourceSection;
     }
     
     //

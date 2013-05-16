@@ -112,6 +112,9 @@ namespace snowcrash {
                     result = HandleResource(cur, bounds.second, sourceData, blueprint, group);
                     break;
                     
+                case UndefinedSection:
+                    break;
+                    
                 default:
                     result.first.error = Error("unexpected block", 1, cur->sourceMap);
                     break;
