@@ -301,7 +301,7 @@ namespace snowcrash {
                 payload.body = sectionCur->content;
             
             // Forward to end of this section
-            result.second = SkipToListBlockEnd(++sectionCur, end, result.first);
+            result.second = SkipToListBlockEnd(sectionCur, end, result.first);
             ++result.second;
             return result;
         }

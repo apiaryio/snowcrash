@@ -154,7 +154,7 @@ TEST_CASE("rgparser/parse-resource-desc-list", "Parse resource with list")
     ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), resourceGroup);
     
     REQUIRE(result.first.error.code == Error::OK);
-    REQUIRE(result.first.warnings.empty());
+    CHECK(result.first.warnings.size() == 1);
     
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 8);
