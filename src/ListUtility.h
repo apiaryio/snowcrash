@@ -61,9 +61,7 @@ namespace snowcrash {
                                             const BlockIterator& end,
                                             Result& result) {
         
-        if (begin->type == ListBlockBeginType ||
-            begin->type == ListItemBlockEndType ||
-            begin->type == ListBlockEndType)
+        if (begin->type == ListBlockBeginType)
             return begin;
         
         BlockIterator cur = begin;

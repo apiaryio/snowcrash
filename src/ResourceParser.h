@@ -120,7 +120,6 @@ namespace snowcrash {
             ParseSectionResult result = std::make_pair(Result(), cur);
             switch (section) {
                 case ResourceSection:
-                    
                     result = ResourceOverviewParser::Parse(cur, bounds.second, sourceData, blueprint, resource);
                     break;
                     

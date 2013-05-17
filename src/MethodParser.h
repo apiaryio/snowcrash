@@ -45,7 +45,7 @@ namespace snowcrash {
         if (HasMethodSignature(*begin))
             return (context == UndefinedSection) ? MethodSection : UndefinedSection;
         
-        PayloadSignature payload = HasPayloadSignature(begin, end);
+        PayloadSignature payload = GetPayloadSignature(begin, end);
         if (payload == RequestPayloadSignature)
             return RequestSection;
         else if (payload == ResponsePayloadSignature)
@@ -103,7 +103,7 @@ namespace snowcrash {
                    cur->type == ListItemBlockBeginType) {
                 
                 // Check payload signature
-                PayloadSignature payload = HasPayloadSignature(cur, end);
+                PayloadSignature payload = GetPayloadSignature(cur, end);
                 cur = SkipToSectionEnd(cur, end, ListItemBlockBeginType, ListItemBlockEndType);
                 if (cur == end)
                     break;

@@ -15,6 +15,7 @@
 #include "RegexMatch.h"
 #include "TrimString.h"
 #include "ListUtility.h"
+#include "AssetParser.h"
 
 // Request matching regex
 static const std::string RequestRegex("^[Rr]equest([[:space:]]+([A-Za-z0-9_]|[[:space:]])*)?([[:space:]]\\([^\\)]*\\))?[[:space:]]*$");
@@ -22,19 +23,7 @@ static const std::string RequestRegex("^[Rr]equest([[:space:]]+([A-Za-z0-9_]|[[:
 // Response matching regex
 static const std::string ResponseRegex("^[Rr]esponse([[:space:]]+([0-9_])*)?([[:space:]]\\([^\\)]*\\))?[[:space:]]*$");
 
-// Body matching regex
-static const std::string BodyRegex("^[Bb]ody[[:space:]]*$");
-
 namespace snowcrash {
-    
-    // Payload signature
-    enum PayloadSignature {
-        UndefinedPayloadSignature,
-        NoPayloadSignature,
-        RequestPayloadSignature,
-        ResponsePayloadSignature,
-        GenericPayloadSignature
-    };
     
     inline Collection<Request>::const_iterator FindRequest(const Method& method, const Request& request) {
         return std::find_if(method.requests.begin(),
@@ -48,8 +37,17 @@ namespace snowcrash {
                             std::bind2nd(MatchName<Response>(), response));
     }
     
+    // Payload signature
+    enum PayloadSignature {
+        UndefinedPayloadSignature,
+        NoPayloadSignature,
+        RequestPayloadSignature,
+        ResponsePayloadSignature,
+        GenericPayloadSignature
+    };
+    
     // Query payload signature a of given block
-    inline PayloadSignature HasPayloadSignature(const BlockIterator& begin,
+    inline PayloadSignature GetPayloadSignature(const BlockIterator& begin,
                                                 const BlockIterator& end) {
         
         if (begin->type == ListBlockBeginType || begin->type == ListItemBlockBeginType) {
@@ -73,29 +71,11 @@ namespace snowcrash {
         return NoPayloadSignature;
     }
     
-    // Query payload's body signature
-    inline bool HasBodySignature(const BlockIterator& begin,
-                                 const BlockIterator& end) {
-        
-        if (begin->type == ListBlockBeginType || begin->type == ListItemBlockBeginType) {
-            
-            BlockIterator cur = FirstContentBlock(begin, end);
-            if (cur == end)
-                return false;
-            
-            if (cur->type != ParagraphBlockType && cur->type != ListItemBlockEndType)
-                return false;
-            
-            return RegexMatch(cur->content, BodyRegex);
-        }
-
-        return false;
+    inline bool HasPayloadSignature(const BlockIterator& begin,
+                                    const BlockIterator& end) {
+        PayloadSignature signature = GetPayloadSignature(begin, end);
+        return (signature == RequestPayloadSignature || signature == ResponsePayloadSignature);
     }
-    
-    
-    // Classify Block tools
-    extern bool HasMethodSignature(const MarkdownBlock& block);
-    extern bool HasResourceSignature(const MarkdownBlock& block);
     
     //
     // Block Classifier, Payload Context
@@ -105,10 +85,9 @@ namespace snowcrash {
                                            const BlockIterator& end,
                                            const Section& context) {
         
-        // Leading list
         if (context == UndefinedSection) {
             
-            PayloadSignature payload = HasPayloadSignature(begin, end);
+            PayloadSignature payload = GetPayloadSignature(begin, end);
             if (payload == RequestPayloadSignature)
                 return RequestSection;
             else if (payload == ResponsePayloadSignature)
@@ -116,16 +95,14 @@ namespace snowcrash {
         }
         else if ((context == RequestSection || context == ResponseSection)) {
             
-            // Adjacent method or resource
-            if (HasMethodSignature(*begin) || HasResourceSignature(*begin))
+            // Adjacent sections
+            if (HasMethodSignature(*begin) ||
+                HasResourceSignature(*begin) ||
+                HasPayloadSignature(begin, end))
                 return UndefinedSection;
             
-            PayloadSignature payload = HasPayloadSignature(begin, end);
-            if (payload != NoPayloadSignature)
-                return UndefinedSection; // Adjacent payload, bail out
-            
             // Internal lists (params, headers, body, schema)
-            if (HasBodySignature(begin, end))
+            if (GetAssetSignature(begin, end) == BodyAssetSignature)
                 return BodySection;
         }
         
@@ -178,14 +155,24 @@ namespace snowcrash {
                     payload.description += content[1];
                     TrimString(payload.description);
                 }
+                
+                // WARN: missing status code
+                if (payload.name.empty() && section == ResponseSection) {
+                    result.warnings.push_back(Warning("missing response status code, assuming 200",
+                                                      0,
+                                                      sectionCur->sourceMap));
+                    payload.name = "200";
+                }
             }
-            else if (sectionCur->type == ListItemBlockBeginType) {
-                // Alien list item warn & eat
-                sectionCur = SkipToSectionEnd(sectionCur, bounds.second, ListItemBlockBeginType, ListItemBlockEndType);
-                result.warnings.push_back(Warning("ignoring unexpected list item", 0, sectionCur->sourceMap));
-            }
+//            else if (sectionCur->type == ListItemBlockBeginType) {
+//                // Alien list item warn & eat
+//                // TODO: remove from here, this check should be in Asset parser
+//                sectionCur = SkipToSectionEnd(sectionCur, bounds.second, ListItemBlockBeginType, ListItemBlockEndType);
+//                result.warnings.push_back(Warning("ignoring unexpected list item", 0, sectionCur->sourceMap));
+//            }
             else {
                 
+                // Description
                 if (sectionCur->type == QuoteBlockBeginType) {
                     sectionCur = SkipToSectionEnd(sectionCur, bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
                 }
@@ -196,18 +183,13 @@ namespace snowcrash {
                 payload.description += MapSourceData(sourceData, sectionCur->sourceMap);
             }
             
-            if (payload.name.empty() && section == ResponseSection) {
-                // WARN: missing status code
-                result.warnings.push_back(Warning("missing response status code, assuming 200", 0, sectionCur->sourceMap));
-                payload.name = "200";
-            }
-            
             return std::make_pair(result, ++sectionCur);
         }
         
         static BlockIterator SkipToListBlockEndChecking(const BlockIterator& begin,
                                                         const BlockIterator& end,
                                                         Result& result) {
+
             BlockIterator cur(begin);
             if (++cur == end)
                 return cur;
@@ -216,7 +198,7 @@ namespace snowcrash {
                    cur->type == ListItemBlockBeginType) {
                 
                 // Check body signature
-                bool body = HasBodySignature(cur, end);
+                bool body = GetAssetSignature(cur, end) == BodyAssetSignature;
                 cur = SkipToSectionEnd(cur, end, ListItemBlockBeginType, ListItemBlockEndType);
                 if (cur == end)
                     break;
@@ -225,8 +207,7 @@ namespace snowcrash {
                     result.warnings.push_back(Warning("ignoring body in payload description", 0, cur->sourceMap));
                 }
                 
-                // TODO: Headers & Parameters check
-                
+                // TODO: Headers & Parameters check                
                 ++cur;
             }
             
@@ -264,7 +245,7 @@ namespace snowcrash {
                     break;
                     
                 case BodySection:
-                    result = ParseBody(cur, bounds.second, sourceData, blueprint, payload);
+                    result = HandleBody(cur, bounds.second, sourceData, blueprint, payload);
                     break;
                     
                 case UndefinedSection:
@@ -278,33 +259,30 @@ namespace snowcrash {
             return result;
         }
         
-        // Parse body asset
-        static ParseSectionResult ParseBody(const BlockIterator& begin,
-                                            const BlockIterator& end,
-                                            const SourceData& sourceData,
-                                            const Blueprint& blueprint,
-                                            Payload& payload)
+        static ParseSectionResult HandleBody(const BlockIterator& begin,
+                                               const BlockIterator& end,
+                                               const SourceData& sourceData,
+                                               const Blueprint& blueprint,
+                                               Payload& payload)
         {
-            ParseSectionResult result = std::make_pair(Result(), begin);
-            BlockIterator sectionCur = FirstContentBlock(begin, end);
-            
-            // Skip body signature
-            if (++sectionCur == end) {
-                result.second = end;
+            Asset body;
+            ParseSectionResult result = AssetParser::Parse(begin, end, sourceData, blueprint, body);
+            if (result.first.error.code != Error::OK)
                 return result;
+
+            if (!payload.body.empty()) {
+                
+                // WARN: body already exists
+                result.first.warnings.push_back(Warning("ignored body asset, payload body already defined,",
+                                                        0,
+                                                        begin->sourceMap));
             }
-            
-            // Retrieve asset
-            if (sectionCur->type != CodeBlockType || sectionCur->content.empty())
-                result.first.warnings.push_back(Warning("expected payload's body asset", 0, sectionCur->sourceMap));
             else
-                payload.body = sectionCur->content;
+                payload.body = body;
             
-            // Forward to end of this section
-            result.second = SkipToListBlockEnd(sectionCur, end, result.first);
-            ++result.second;
             return result;
         }
+
         
     };
     

@@ -65,7 +65,6 @@ namespace snowcrash {
         }
     };
     
-    
     //
     // Section Parser prototype
     //
@@ -103,6 +102,14 @@ namespace snowcrash {
     Section TClassifyBlock(const BlockIterator& begin,
                            const BlockIterator& end,
                            const Section& context);
+    
+    // Forward declaration of classifier helpers
+    extern bool HasMethodSignature(const MarkdownBlock& block);
+    extern bool HasResourceSignature(const MarkdownBlock& block);
+    extern bool HasPayloadSignature(const BlockIterator& begin,
+                                    const BlockIterator& end);
+    extern bool HasAssetSignature(const BlockIterator& begin,
+                                  const BlockIterator& end);
     
     //
     // Block Parser, iterates over block and call section parser P<T>

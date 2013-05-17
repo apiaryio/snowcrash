@@ -106,7 +106,6 @@ namespace snowcrash {
                     break;
                     
                 case BlueprintSection:
-                    
                     result = BlueprintOverviewParser::Parse(cur, bounds.second, sourceData, blueprint, output);
                     break;
                     
