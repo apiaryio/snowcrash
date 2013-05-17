@@ -95,7 +95,7 @@ TEST_CASE("aparser/classifier", "Asset block classifier")
     
     ++cur; // ListItemBlockBeginType
     REQUIRE(TClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == BodySection);
-    REQUIRE(TClassifyBlock<Asset>(cur, markdown.end(), BodySection) == BodySection);
+    REQUIRE(TClassifyBlock<Asset>(cur, markdown.end(), BodySection) == UndefinedSection); // treat new list items as aliens
     
     ++cur; // ParagraphBlockType
     REQUIRE(TClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
@@ -173,4 +173,30 @@ TEST_CASE("aparser/parse-alien", "Parse body asset with alien block inside")
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 7);
     REQUIRE(asset == "Lorem Ipsum4");
+}
+
+TEST_CASE("aparser/parse-alien-listitem", "Parse body asset with alien list item inside")
+{
+    SourceData source = CanonicalBodyAssetSourceDataFixture;
+    MarkdownBlock::Stack markdown = CanonicalBodyAssetFixture();
+    
+    MarkdownBlock::Stack alien;
+    alien.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    alien.push_back(MarkdownBlock(ListItemBlockEndType, "Alien", 0, MakeSourceDataBlock(5, 1)));
+    
+    MarkdownBlock::Stack::iterator pos = markdown.begin();
+    std::advance(pos, 5);
+    markdown.insert(pos, alien.begin(), alien.end());
+    
+    CHECK(markdown.size() == 8);
+    
+    Asset asset;
+    ParseSectionResult result = AssetParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), asset);
+    
+    REQUIRE(result.first.error.code == Error::OK);
+    CHECK(result.first.warnings.empty());
+    
+    const MarkdownBlock::Stack &blocks = markdown;
+    REQUIRE(std::distance(blocks.begin(), result.second) == 5);
+    REQUIRE(asset == "Lorem Ipsum");
 }

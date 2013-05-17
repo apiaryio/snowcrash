@@ -12,6 +12,39 @@
 
 using namespace snowcrash;
 
+//TEST_CASE("pldparser/classifier", "Asset block classifier")
+//{
+//    SourceData source = CanonicalBodyAssetSourceDataFixture;
+//    MarkdownBlock::Stack markdown = CanonicalBodyAssetFixture();
+//    
+//    CHECK(markdown.size() == 6);
+//    
+//    BlockIterator cur = markdown.begin();
+//    // ListBlockBeginType
+//    REQUIRE(TClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == BodySection);
+//    REQUIRE(TClassifyBlock<Asset>(cur, markdown.end(), BodySection) == BodySection);
+//    
+//    ++cur; // ListItemBlockBeginType
+//    REQUIRE(TClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == BodySection);
+//    REQUIRE(TClassifyBlock<Asset>(cur, markdown.end(), BodySection) == BodySection);
+//    
+//    ++cur; // ParagraphBlockType
+//    REQUIRE(TClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
+//    REQUIRE(TClassifyBlock<Asset>(cur, markdown.end(), BodySection) == BodySection);
+//    
+//    ++cur; // CodeBlockType
+//    REQUIRE(TClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
+//    REQUIRE(TClassifyBlock<Asset>(cur, markdown.end(), BodySection) == BodySection);
+//    
+//    ++cur; // ListItemBlockEndType
+//    REQUIRE(TClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
+//    REQUIRE(TClassifyBlock<Asset>(cur, markdown.end(), BodySection) == UndefinedSection);
+//    
+//    ++cur; // ListBlockEndType
+//    REQUIRE(TClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
+//    REQUIRE(TClassifyBlock<Asset>(cur, markdown.end(), BodySection) == UndefinedSection);
+//}
+
 TEST_CASE("pldparser/parse-request", "Parse request payload")
 {
     // Blueprint in question:
@@ -156,10 +189,10 @@ TEST_CASE("pldparser/parse-alien-listitem", "Parse alien list item after recogni
     ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), payload);
     
     REQUIRE(result.first.error.code == Error::OK);
-    CHECK(result.first.warnings.size() == 1); // warn unexpected list item
+    CHECK(result.first.warnings.empty());
     
     const MarkdownBlock::Stack &blocks = markdown;
-    REQUIRE(std::distance(blocks.begin(), result.second) == 6);
+    REQUIRE(std::distance(blocks.begin(), result.second) == 3);
     
     REQUIRE(payload.name == "A");
     REQUIRE(payload.description.empty());

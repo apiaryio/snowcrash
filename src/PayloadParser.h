@@ -95,128 +95,22 @@ namespace snowcrash {
         }
         else if ((context == RequestSection || context == ResponseSection)) {
             
-            // Adjacent sections
-            if (HasMethodSignature(*begin) ||
-                HasResourceSignature(*begin) ||
-                HasPayloadSignature(begin, end))
-                return UndefinedSection;
-            
+            if (begin->type == ListItemBlockEndType ||
+                begin->type == ListBlockEndType)
+                return UndefinedSection;    // closing
+
             // Internal lists (params, headers, body, schema)
             if (GetAssetSignature(begin, end) == BodyAssetSignature)
                 return BodySection;
+            
+            // Alien list item
+            if (begin->type == ListItemBlockBeginType)
+                return UndefinedSection;
         }
         
         return (context == RequestSection || context == ResponseSection) ? context : UndefinedSection;
     }
-    
-    //
-    // Payload Overview Parser
-    //
-    template<>
-    struct SectionOverviewParser<Payload>  {
-        
-        static ParseSectionResult ParseSection(const Section& section,
-                                               const BlockIterator& cur,
-                                               const SectionBounds& bounds,
-                                               const SourceData& sourceData,
-                                               const Blueprint& blueprint,
-                                               Payload& payload) {
-
-            if (section != RequestSection && section != ResponseSection)
-                return std::make_pair(Result(), cur);
-            
-            Result result;
-            BlockIterator sectionCur(cur);
-
-            // Cleanup previous list item
-            if (cur->type == ListBlockEndType ||
-                cur->type == ListItemBlockEndType)
-                return SkipAfterListBlockEnd(cur, bounds.second);
-            
-            // Signature
-            if (sectionCur == bounds.first) {
-                
-                sectionCur = FirstContentBlock(sectionCur, bounds.second);
-                if (sectionCur == bounds.second)
-                    return std::make_pair(Result(), sectionCur);
-                
-                ContentParts content = ExtractFirstLine(*sectionCur);
-                if (section == RequestSection) {
-                    payload.name = RegexCaptureFirst(content[0], RequestRegex);
-                }
-                else if (section == ResponseSection) {
-                    payload.name = RegexCaptureFirst(content[0], ResponseRegex);
-                }
-                
-                if (!payload.name.empty())
-                    TrimString(payload.name);
-                
-                if (content.size() == 2) {
-                    payload.description += content[1];
-                    TrimString(payload.description);
-                }
-                
-                // WARN: missing status code
-                if (payload.name.empty() && section == ResponseSection) {
-                    result.warnings.push_back(Warning("missing response status code, assuming 200",
-                                                      0,
-                                                      sectionCur->sourceMap));
-                    payload.name = "200";
-                }
-            }
-//            else if (sectionCur->type == ListItemBlockBeginType) {
-//                // Alien list item warn & eat
-//                // TODO: remove from here, this check should be in Asset parser
-//                sectionCur = SkipToSectionEnd(sectionCur, bounds.second, ListItemBlockBeginType, ListItemBlockEndType);
-//                result.warnings.push_back(Warning("ignoring unexpected list item", 0, sectionCur->sourceMap));
-//            }
-            else {
-                
-                // Description
-                if (sectionCur->type == QuoteBlockBeginType) {
-                    sectionCur = SkipToSectionEnd(sectionCur, bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
-                }
-                else if (sectionCur->type == ListBlockBeginType) {
-                    sectionCur = SkipToListBlockEndChecking(sectionCur, bounds.second, result);
-                }
-                
-                payload.description += MapSourceData(sourceData, sectionCur->sourceMap);
-            }
-            
-            return std::make_pair(result, ++sectionCur);
-        }
-        
-        static BlockIterator SkipToListBlockEndChecking(const BlockIterator& begin,
-                                                        const BlockIterator& end,
-                                                        Result& result) {
-
-            BlockIterator cur(begin);
-            if (++cur == end)
-                return cur;
-            
-            while (cur != end &&
-                   cur->type == ListItemBlockBeginType) {
-                
-                // Check body signature
-                bool body = GetAssetSignature(cur, end) == BodyAssetSignature;
-                cur = SkipToSectionEnd(cur, end, ListItemBlockBeginType, ListItemBlockEndType);
-                if (cur == end)
-                    break;
-                
-                if (body) {
-                    result.warnings.push_back(Warning("ignoring body in payload description", 0, cur->sourceMap));
-                }
-                
-                // TODO: Headers & Parameters check                
-                ++cur;
-            }
-            
-            return cur;
-        }
-    };
-    
-    typedef BlockParser<Payload, SectionOverviewParser<Payload> > PayloadOverviewParser;    
-    
+       
     //
     // Payload Section Parser
     //
@@ -241,7 +135,8 @@ namespace snowcrash {
                 case RequestSection:
                 case ResponseSection:
                     
-                    result = PayloadOverviewParser::Parse(cur, bounds.second, sourceData, blueprint, payload);
+                    //result = PayloadOverviewParser::Parse(cur, bounds.second, sourceData, blueprint, payload);
+                    result = HandleOverviewSectionBlock(section, cur, bounds, sourceData, blueprint, payload);
                     break;
                     
                 case BodySection:
@@ -282,7 +177,97 @@ namespace snowcrash {
             
             return result;
         }
-
+        
+        static ParseSectionResult HandleOverviewSectionBlock(const Section& section,
+                                                             const BlockIterator& cur,
+                                                             const SectionBounds& bounds,
+                                                             const SourceData& sourceData,
+                                                             const Blueprint& blueprint,
+                                                             Payload& payload) {
+            
+            ParseSectionResult result = std::make_pair(Result(), cur);
+            BlockIterator sectionCur = cur;
+            
+            // Eat leading list (item) harness
+            if (sectionCur == bounds.first) {
+                
+                sectionCur = FirstContentBlock(sectionCur, bounds.second);
+                if (sectionCur == bounds.second)
+                    return std::make_pair(Result(), sectionCur);
+                
+                ContentParts content = ExtractFirstLine(*sectionCur);
+                if (section == RequestSection) {
+                    payload.name = RegexCaptureFirst(content[0], RequestRegex);
+                }
+                else if (section == ResponseSection) {
+                    payload.name = RegexCaptureFirst(content[0], ResponseRegex);
+                }
+                
+                if (!payload.name.empty())
+                    TrimString(payload.name);
+                
+                if (content.size() == 2) {
+                    payload.description += content[1];
+                    TrimString(payload.description);
+                }
+                
+                // WARN: missing status code
+                if (payload.name.empty() && section == ResponseSection) {
+                    result.first.warnings.push_back(Warning("missing response status code, assuming 200",
+                                                            0,
+                                                            sectionCur->sourceMap));
+                    payload.name = "200";
+                }
+                
+                if (sectionCur != bounds.second)
+                    ++sectionCur; // skip signature
+                
+                result.second = sectionCur;
+                return result;
+            }
+            else {
+                // Description
+                if (sectionCur->type == QuoteBlockBeginType) {
+                    sectionCur = SkipToSectionEnd(sectionCur, bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
+                }
+                else if (sectionCur->type == ListBlockBeginType) {
+                    sectionCur = SkipToListBlockEndChecking(sectionCur, bounds.second, result.first);
+                }
+                
+                payload.description += MapSourceData(sourceData, sectionCur->sourceMap);
+            }
+            
+            result.second = ++sectionCur;
+            return result;
+        }
+        
+        static BlockIterator SkipToListBlockEndChecking(const BlockIterator& begin,
+                                                        const BlockIterator& end,
+                                                        Result& result) {
+            
+            BlockIterator cur(begin);
+            if (++cur == end)
+                return cur;
+            
+            while (cur != end &&
+                   cur->type == ListItemBlockBeginType) {
+                
+                // Check body signature
+                bool body = GetAssetSignature(cur, end) == BodyAssetSignature;
+                cur = SkipToSectionEnd(cur, end, ListItemBlockBeginType, ListItemBlockEndType);
+                if (cur == end)
+                    break;
+                
+                if (body) {
+                    result.warnings.push_back(Warning("ignoring body in payload description", 0, cur->sourceMap));
+                }
+                
+                // TODO: Headers & Parameters check
+                ++cur;
+            }
+            
+            return cur;
+        }
         
     };
     

@@ -74,12 +74,14 @@
         'sundown/src/html'
       ],
       'sources': [
+        'test/test-AssetParser.cc',
         'test/test-Blueprint.cc',
         'test/test-BlueprintParser.cc',
         'test/test-MarkdownBlock.cc',
         'test/test-MarkdownParser.cc',
         'test/test-MethodParser.cc',
         'test/test-Parser.cc',
+        'test/test-PayloadParser.cc',
         'test/test-RegexMatch.cc',
         'test/test-ResouceGroupParser.cc',
         'test/test-ResourceParser.cc',

@@ -77,7 +77,9 @@ namespace snowcrash {
                 begin->type == ListBlockEndType)
                 return UndefinedSection;    // closing
             
-            // TODO: Adjacent sections
+            // Alien list item
+            if (begin->type == ListItemBlockBeginType)
+                return UndefinedSection;
         }
         
         return (context == BodySection) ? context : UndefinedSection;
@@ -97,7 +99,6 @@ namespace snowcrash {
                                                Asset& asset) {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
-            
             switch (section) {
                 case BodySection:
                     result = HandleBodySectionBlock(cur, bounds, sourceData, blueprint, asset);
@@ -112,7 +113,7 @@ namespace snowcrash {
                     if (asset.empty())
                         result.first.warnings.push_back(Warning("empty asset",
                                                                 0,
-                                                                result.second->sourceMap));
+                                                                cur->sourceMap));
                     break;
                     
                 default:
