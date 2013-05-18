@@ -99,9 +99,9 @@ namespace snowcrash {
     // Block Classifier prototype, Look Ahead
     //
     template <class T>
-    Section TClassifyBlock(const BlockIterator& begin,
-                           const BlockIterator& end,
-                           const Section& context);
+    Section ClassifyBlock(const BlockIterator& begin,
+                          const BlockIterator& end,
+                          const Section& context);
     
     // Forward declaration of classifier helpers
     extern bool HasMethodSignature(const MarkdownBlock& block);
@@ -128,7 +128,7 @@ namespace snowcrash {
             BlockIterator currentBlock = begin;
             while (currentBlock != end) {
                 
-                currentSection = TClassifyBlock<T>(currentBlock, end, currentSection);
+                currentSection = ClassifyBlock<T>(currentBlock, end, currentSection);
                 ParseSectionResult sectionResult = P::ParseSection(currentSection,
                                                                    currentBlock,
                                                                    std::make_pair(begin, end),

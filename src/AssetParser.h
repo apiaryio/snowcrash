@@ -62,9 +62,9 @@ namespace snowcrash {
     // Block Classifier, Asset Context
     //
     template <>
-    inline Section TClassifyBlock<Asset>(const BlockIterator& begin,
-                                         const BlockIterator& end,
-                                         const Section& context) {
+    inline Section ClassifyBlock<Asset>(const BlockIterator& begin,
+                                        const BlockIterator& end,
+                                        const Section& context) {
         if (context == UndefinedSection) {
             
             AssetSignature asset = GetAssetSignature(begin, end);

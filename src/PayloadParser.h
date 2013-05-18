@@ -81,9 +81,9 @@ namespace snowcrash {
     // Block Classifier, Payload Context
     //
     template <>
-    inline Section TClassifyBlock<Payload>(const BlockIterator& begin,
-                                           const BlockIterator& end,
-                                           const Section& context) {
+    inline Section ClassifyBlock<Payload>(const BlockIterator& begin,
+                                          const BlockIterator& end,
+                                          const Section& context) {
         
         if (context == UndefinedSection) {
             
@@ -134,8 +134,6 @@ namespace snowcrash {
             switch (section) {
                 case RequestSection:
                 case ResponseSection:
-                    
-                    //result = PayloadOverviewParser::Parse(cur, bounds.second, sourceData, blueprint, payload);
                     result = HandleOverviewSectionBlock(section, cur, bounds, sourceData, blueprint, payload);
                     break;
                     

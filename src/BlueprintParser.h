@@ -21,9 +21,9 @@ namespace snowcrash {
     // Block Classifier, Resource Context
     //
     template <>
-    inline Section TClassifyBlock<Blueprint>(const BlockIterator& begin,
-                                             const BlockIterator& end,
-                                             const Section& context) {
+    inline Section ClassifyBlock<Blueprint>(const BlockIterator& begin,
+                                            const BlockIterator& end,
+                                            const Section& context) {
         
         if (begin->type == HRuleBlockType)
             return TerminatorSection;

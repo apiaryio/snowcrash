@@ -38,9 +38,9 @@ namespace snowcrash {
     // Block Classifier, Method Context
     //
     template <>
-    inline Section TClassifyBlock<Method>(const BlockIterator& begin,
-                                          const BlockIterator& end,
-                                          const Section& context) {
+    inline Section ClassifyBlock<Method>(const BlockIterator& begin,
+                                         const BlockIterator& end,
+                                         const Section& context) {
 
         if (HasMethodSignature(*begin))
             return (context == UndefinedSection) ? MethodSection : UndefinedSection;

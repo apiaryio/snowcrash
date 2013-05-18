@@ -51,9 +51,9 @@ namespace snowcrash {
     // Block Classifier, Resource Context
     //
     template <>
-    inline Section TClassifyBlock<Resource>(const BlockIterator& begin,
-                                            const BlockIterator& end,
-                                            const Section& context) {
+    inline Section ClassifyBlock<Resource>(const BlockIterator& begin,
+                                           const BlockIterator& end,
+                                           const Section& context) {
         
         if (HasResourceSignature(*begin)) {
             return (context == UndefinedSection) ? ResourceSection : UndefinedSection;

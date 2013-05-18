@@ -21,28 +21,28 @@ using namespace snowcrash;
 //    
 //    BlockIterator cur = markdown.begin();
 //    // ListBlockBeginType
-//    REQUIRE(TClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == BodySection);
-//    REQUIRE(TClassifyBlock<Asset>(cur, markdown.end(), BodySection) == BodySection);
+//    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == BodySection);
+//    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), BodySection) == BodySection);
 //    
 //    ++cur; // ListItemBlockBeginType
-//    REQUIRE(TClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == BodySection);
-//    REQUIRE(TClassifyBlock<Asset>(cur, markdown.end(), BodySection) == BodySection);
+//    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == BodySection);
+//    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), BodySection) == BodySection);
 //    
 //    ++cur; // ParagraphBlockType
-//    REQUIRE(TClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
-//    REQUIRE(TClassifyBlock<Asset>(cur, markdown.end(), BodySection) == BodySection);
+//    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
+//    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), BodySection) == BodySection);
 //    
 //    ++cur; // CodeBlockType
-//    REQUIRE(TClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
-//    REQUIRE(TClassifyBlock<Asset>(cur, markdown.end(), BodySection) == BodySection);
+//    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
+//    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), BodySection) == BodySection);
 //    
 //    ++cur; // ListItemBlockEndType
-//    REQUIRE(TClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
-//    REQUIRE(TClassifyBlock<Asset>(cur, markdown.end(), BodySection) == UndefinedSection);
+//    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
+//    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), BodySection) == UndefinedSection);
 //    
 //    ++cur; // ListBlockEndType
-//    REQUIRE(TClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
-//    REQUIRE(TClassifyBlock<Asset>(cur, markdown.end(), BodySection) == UndefinedSection);
+//    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
+//    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), BodySection) == UndefinedSection);
 //}
 
 TEST_CASE("pldparser/parse-request", "Parse request payload")
