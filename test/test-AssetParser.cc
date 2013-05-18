@@ -95,7 +95,7 @@ TEST_CASE("aparser/classifier", "Asset block classifier")
     
     ++cur; // ListItemBlockBeginType
     REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == BodySection);
-    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), BodySection) == UndefinedSection); // treat new list items as aliens
+    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), BodySection) == UndefinedSection); // treat new list item as foreign
     
     ++cur; // ParagraphBlockType
     REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
@@ -152,15 +152,15 @@ TEST_CASE("aparser/parse-ajdacent", "Parse body asset followed by other blocks")
     REQUIRE(asset == "Lorem Ipsum");
 }
 
-TEST_CASE("aparser/parse-alien", "Parse body asset with alien block inside")
+TEST_CASE("aparser/parse-foreign", "Parse body asset with foreign block inside")
 {
     SourceData source = CanonicalBodyAssetSourceDataFixture;
     MarkdownBlock::Stack markdown = CanonicalBodyAssetFixture();
     
-    MarkdownBlock alien(ParagraphBlockType, "Hello World", 0, MakeSourceDataBlock(4, 1));
+    MarkdownBlock foreign(ParagraphBlockType, "Hello World", 0, MakeSourceDataBlock(4, 1));
     MarkdownBlock::Stack::iterator pos = markdown.begin();
     std::advance(pos, 4);
-    markdown.insert(pos, 1, alien);
+    markdown.insert(pos, 1, foreign);
     
     CHECK(markdown.size() == 7);
     
@@ -175,18 +175,18 @@ TEST_CASE("aparser/parse-alien", "Parse body asset with alien block inside")
     REQUIRE(asset == "Lorem Ipsum4");
 }
 
-TEST_CASE("aparser/parse-alien-listitem", "Parse body asset with alien list item inside")
+TEST_CASE("aparser/parse-foreign-listitem", "Parse body asset with foreign list item inside")
 {
     SourceData source = CanonicalBodyAssetSourceDataFixture;
     MarkdownBlock::Stack markdown = CanonicalBodyAssetFixture();
     
-    MarkdownBlock::Stack alien;
-    alien.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-    alien.push_back(MarkdownBlock(ListItemBlockEndType, "Alien", 0, MakeSourceDataBlock(5, 1)));
+    MarkdownBlock::Stack foreign;
+    foreign.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    foreign.push_back(MarkdownBlock(ListItemBlockEndType, "Foreign", 0, MakeSourceDataBlock(5, 1)));
     
     MarkdownBlock::Stack::iterator pos = markdown.begin();
     std::advance(pos, 5);
-    markdown.insert(pos, alien.begin(), alien.end());
+    markdown.insert(pos, foreign.begin(), foreign.end());
     
     CHECK(markdown.size() == 8);
     

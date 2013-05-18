@@ -236,7 +236,7 @@ TEST_CASE("pldparser/parse-one-foreign", "Parse just one payload in a list with 
     REQUIRE(payload.schema.empty());
 }
 
-TEST_CASE("pldparser/parse-payload-alien", "Parse method with alien item in its payload")
+TEST_CASE("pldparser/parse-payload-foreign", "Parse method with foreign item in its payload")
 {
     // Blueprint in question:
     //R"(
