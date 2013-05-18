@@ -41,53 +41,6 @@ namespace snowcrash {
     }
     
     //
-    // Resource Group Section Overview Parser
-    //
-    template<>
-    struct SectionOverviewParser<ResourceGroup>  {
-        
-        static ParseSectionResult ParseSection(const Section& section,
-                                               const BlockIterator& cur,
-                                               const SectionBounds& bounds,
-                                               const SourceData& sourceData,
-                                               const Blueprint& blueprint,
-                                               ResourceGroup& group) {
-            if (section != ResourceGroupSection)
-                return std::make_pair(Result(), cur);
-            
-            Result result;
-            BlockIterator sectionCur(cur);
-            if (sectionCur->type == HeaderBlockType &&
-                sectionCur == bounds.first) {
-                group.name = sectionCur->content;
-            }
-            else {
-                if (sectionCur == bounds.first) {
-                    
-                    // WARN: No API name specified
-                    result.warnings.push_back(Warning("expected resources group name",
-                                                      0,
-                                                      sectionCur->sourceMap));
-                }
-                
-                
-                if (cur->type == QuoteBlockBeginType) {
-                    sectionCur = SkipToSectionEnd(sectionCur, bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
-                }
-                else if (cur->type == ListBlockBeginType) {
-                    sectionCur = SkipToSectionEnd(sectionCur, bounds.second, ListBlockBeginType, ListBlockEndType);
-                }
-                
-                group.description += MapSourceData(sourceData, sectionCur->sourceMap);
-            }
-            
-            return std::make_pair(result, ++sectionCur);
-        }
-    };
-    
-    typedef BlockParser<ResourceGroup, SectionOverviewParser<ResourceGroup> > ResourceGroupOverviewParser;    
-    
-    //
     // Resource Group Section Parser
     //
     template<>
@@ -103,7 +56,7 @@ namespace snowcrash {
             ParseSectionResult result = std::make_pair(Result(), cur);
             switch (section) {
                 case ResourceGroupSection:
-                    result = ResourceGroupOverviewParser::Parse(cur, bounds.second, sourceData, blueprint, group);
+                    result = HandleResourceGroupOverviewBlock(cur, bounds, sourceData, blueprint, group);
                     break;
                     
                 case ResourceSection:
@@ -118,6 +71,42 @@ namespace snowcrash {
                     break;
             }
             
+            return result;
+        }
+        
+        static ParseSectionResult HandleResourceGroupOverviewBlock(const BlockIterator& cur,
+                                                                   const SectionBounds& bounds,
+                                                                   const SourceData& sourceData,
+                                                                   const Blueprint& blueprint,
+                                                                   ResourceGroup& group) {
+            
+            ParseSectionResult result = std::make_pair(Result(), cur);
+            BlockIterator sectionCur(cur);
+            if (sectionCur->type == HeaderBlockType &&
+                sectionCur == bounds.first) {
+                group.name = cur->content;
+            }
+            else {
+                if (sectionCur == bounds.first) {
+                    
+                    // WARN: No Group name specified
+                    result.first.warnings.push_back(Warning("expected resource group name",
+                                                            0,
+                                                            cur->sourceMap));
+                }
+                
+                
+                if (sectionCur->type == QuoteBlockBeginType) {
+                    sectionCur = SkipToSectionEnd(cur, bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
+                }
+                else if (sectionCur->type == ListBlockBeginType) {
+                    sectionCur = SkipToSectionEnd(cur, bounds.second, ListBlockBeginType, ListBlockEndType);
+                }
+                
+                group.description += MapSourceData(sourceData, sectionCur->sourceMap);
+            }
+            
+            result.second = ++sectionCur;
             return result;
         }
         

@@ -54,76 +54,6 @@ namespace snowcrash {
         return (context == MethodSection) ? MethodSection : UndefinedSection;
     }
     
-    //
-    // Resource Section Overview Parser
-    //
-    template<>
-    struct SectionOverviewParser<Method>  {
-        
-        static ParseSectionResult ParseSection(const Section& section,
-                                               const BlockIterator& cur,
-                                               const SectionBounds& bounds,
-                                               const SourceData& sourceData,
-                                               const Blueprint& blueprint,
-                                               Method& method) {
-            if (section != MethodSection)
-                return std::make_pair(Result(), cur);
-            
-            Result result;
-            BlockIterator sectionCur(cur);
-            if (cur->type == HeaderBlockType &&
-                cur == bounds.first) {
-                method.method = cur->content;
-            }
-            else {
-                
-                if (sectionCur->type == QuoteBlockBeginType) {
-                    sectionCur = SkipToSectionEnd(sectionCur, bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
-                }
-                else if (sectionCur->type == ListBlockBeginType) {
-                    sectionCur = SkipToListBlockEndChecking(sectionCur, bounds.second, result);
-                }
-                
-                method.description += MapSourceData(sourceData, sectionCur->sourceMap);
-            }
-            
-            return std::make_pair(result, ++sectionCur);
-        }
-        
-        // Skips to block list' end as SkipToSectionEnd with ListBlockBeginType
-        // Checks for recognized sections & warns, begin should be of ListBlockBeginType type
-        static BlockIterator SkipToListBlockEndChecking(const BlockIterator& begin,
-                                                        const BlockIterator& end,
-                                                        Result& result) {
-            BlockIterator cur(begin);
-            if (++cur == end)
-                return cur;
-            
-            while (cur != end &&
-                   cur->type == ListItemBlockBeginType) {
-                
-                // Check payload signature
-                PayloadSignature payload = GetPayloadSignature(cur, end);
-                cur = SkipToSectionEnd(cur, end, ListItemBlockBeginType, ListItemBlockEndType);
-                if (cur == end)
-                    break;
-                
-                if (payload == RequestPayloadSignature) {
-                    result.warnings.push_back(Warning("ignoring request in method description", 0, cur->sourceMap));
-                }
-                else if (payload == ResponsePayloadSignature) {
-                    result.warnings.push_back(Warning("ignoring response in method description", 0, cur->sourceMap));
-                }
-                
-                // TODO: Headers & Parameters check
-                
-                ++cur;
-            }
-            
-            return cur;
-        }
-    };
-    
     typedef BlockParser<Method, SectionOverviewParser<Method> > MethodOverviewParser;
     
     //
@@ -143,7 +73,7 @@ namespace snowcrash {
             
             switch (section) {
                 case MethodSection:
-                    result = MethodOverviewParser::Parse(cur, bounds.second, sourceData, blueprint, method);
+                    result = HandleMethodOverviewBlock(cur, bounds, sourceData, blueprint, method);
                     break;
                     
                 case RequestSection:
@@ -163,6 +93,71 @@ namespace snowcrash {
             }
             
             return result;
+        }
+        
+        static ParseSectionResult HandleMethodOverviewBlock(const BlockIterator& cur,
+                                                            const SectionBounds& bounds,
+                                                            const SourceData& sourceData,
+                                                            const Blueprint& blueprint,
+                                                            Method& method) {
+            
+            ParseSectionResult result = std::make_pair(Result(), cur);
+            BlockIterator sectionCur(cur);
+            if (cur->type == HeaderBlockType &&
+                cur == bounds.first) {
+                method.method = cur->content;
+            }
+            else {
+                
+                if (sectionCur->type == QuoteBlockBeginType) {
+                    sectionCur = SkipToSectionEnd(sectionCur, bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
+                }
+                else if (sectionCur->type == ListBlockBeginType) {
+                    sectionCur = SkipToListBlockEndChecking(sectionCur, bounds.second, result.first);
+                }
+                
+                method.description += MapSourceData(sourceData, sectionCur->sourceMap);
+            }
+            
+            result.second = ++sectionCur;
+            return result;
+        }
+        
+        // Skips to block list end as in SkipToSectionEnd() with ListBlockBeginType.
+        // Checks for recognized sections & warns, begin should be of ListBlockBeginType type
+        static BlockIterator SkipToListBlockEndChecking(const BlockIterator& begin,
+                                                        const BlockIterator& end,
+                                                        Result& result) {
+            BlockIterator cur(begin);
+            if (++cur == end)
+                return cur;
+            
+            while (cur != end &&
+                   cur->type == ListItemBlockBeginType) {
+                
+                // Check payload signature
+                PayloadSignature payload = GetPayloadSignature(cur, end);
+                cur = SkipToSectionEnd(cur, end, ListItemBlockBeginType, ListItemBlockEndType);
+                if (cur == end)
+                    break;
+                
+                if (payload == RequestPayloadSignature) {
+                    result.warnings.push_back(Warning("ignoring request in method description",
+                                                      0,
+                                                      cur->sourceMap));
+                }
+                else if (payload == ResponsePayloadSignature) {
+                    result.warnings.push_back(Warning("ignoring response in method description",
+                                                      0,
+                                                      cur->sourceMap));
+                }
+                
+                // TODO: Headers & Parameters check
+                
+                ++cur;
+            }
+            
+            return cur;
         }
         
         static ParseSectionResult HandleRequest(const BlockIterator& begin,

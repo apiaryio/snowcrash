@@ -64,12 +64,12 @@ namespace snowcrash {
         
         return (context != ResourceSection) ? UndefinedSection : ResourceSection;
     }
-    
+        
     //
-    // Resource Section Overview Parser
+    // Resource Section Parser
     //
     template<>
-    struct SectionOverviewParser<Resource>  {
+    struct SectionParser<Resource> {
         
         static ParseSectionResult ParseSection(const Section& section,
                                                const BlockIterator& cur,
@@ -77,10 +77,35 @@ namespace snowcrash {
                                                const SourceData& sourceData,
                                                const Blueprint& blueprint,
                                                Resource& resource) {
-            if (section != ResourceSection)
-                return std::make_pair(Result(), cur);
+
+            ParseSectionResult result = std::make_pair(Result(), cur);
+            switch (section) {
+                case ResourceSection:
+                    result = HandleResourceOverviewBlock(cur, bounds, sourceData, blueprint, resource);
+                    break;
+                    
+                case MethodSection:
+                    result = HandleMethod(cur, bounds.second, sourceData, blueprint, resource);
+                    break;
+                    
+                case UndefinedSection:
+                    break;
+                    
+                default:
+                    result.first.error = Error("unexpected block", 1, cur->sourceMap);
+                    break;
+            }
             
-            Result result;
+            return result;
+        }
+        
+        static ParseSectionResult HandleResourceOverviewBlock(const BlockIterator& cur,
+                                                              const SectionBounds& bounds,
+                                                              const SourceData& sourceData,
+                                                              const Blueprint& blueprint,
+                                                              Resource& resource) {
+            
+            ParseSectionResult result = std::make_pair(Result(), cur);
             BlockIterator sectionCur(cur);
             if (cur->type == HeaderBlockType &&
                 cur == bounds.first) {
@@ -98,43 +123,7 @@ namespace snowcrash {
                 resource.description += MapSourceData(sourceData, sectionCur->sourceMap);
             }
             
-            return std::make_pair(Result(), ++sectionCur);
-        }
-    };
-    
-    typedef BlockParser<Resource, SectionOverviewParser<Resource> > ResourceOverviewParser;
-    
-    //
-    // Resource Section Parser
-    //
-    template<>
-    struct SectionParser<Resource> {
-        
-        static ParseSectionResult ParseSection(const Section& section,
-                                               const BlockIterator& cur,
-                                               const SectionBounds& bounds,
-                                               const SourceData& sourceData,
-                                               const Blueprint& blueprint,
-                                               Resource& resource) {
-
-            ParseSectionResult result = std::make_pair(Result(), cur);
-            switch (section) {
-                case ResourceSection:
-                    result = ResourceOverviewParser::Parse(cur, bounds.second, sourceData, blueprint, resource);
-                    break;
-                    
-                case MethodSection:
-                    result = HandleMethod(cur, bounds.second, sourceData, blueprint, resource);
-                    break;
-                    
-                case UndefinedSection:
-                    break;
-                    
-                default:
-                    result.first.error = Error("unexpected block", 1, cur->sourceMap);
-                    break;
-            }
-            
+            result.second = ++sectionCur;
             return result;
         }
         

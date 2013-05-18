@@ -39,53 +39,6 @@ namespace snowcrash {
     }
     
     //
-    // Blueprint Section Overview Parser
-    //
-    template<>
-    struct SectionOverviewParser<Blueprint>  {
-        
-        static ParseSectionResult ParseSection(const Section& section,
-                                               const BlockIterator& cur,
-                                               const SectionBounds& bounds,
-                                               const SourceData& sourceData,
-                                               const Blueprint& blueprint,
-                                               Blueprint& output) {
-            if (section != BlueprintSection)
-                return std::make_pair(Result(), cur);
-            
-            Result result;
-            BlockIterator sectionCur(cur);
-            if (sectionCur->type == HeaderBlockType &&
-                sectionCur == bounds.first) {
-                output.name = cur->content;
-            }
-            else {
-                if (sectionCur == bounds.first) {
-                    
-                    // WARN: No API name specified
-                    result.warnings.push_back(Warning("expected API name",
-                                                      0,
-                                                      cur->sourceMap));
-                }
-                
-
-                if (sectionCur->type == QuoteBlockBeginType) {
-                    sectionCur = SkipToSectionEnd(cur, bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
-                }
-                else if (sectionCur->type == ListBlockBeginType) {
-                    sectionCur = SkipToSectionEnd(cur, bounds.second, ListBlockBeginType, ListBlockEndType);
-                }
-                
-                output.description += MapSourceData(sourceData, sectionCur->sourceMap);
-            }
-            
-            return std::make_pair(result, ++sectionCur);
-        }
-    };
-    
-    typedef BlockParser<Blueprint, SectionOverviewParser<Blueprint> > BlueprintOverviewParser;
-    
-    //
     // Blueprint Section Parser
     //
     template<>
@@ -106,7 +59,7 @@ namespace snowcrash {
                     break;
                     
                 case BlueprintSection:
-                    result = BlueprintOverviewParser::Parse(cur, bounds.second, sourceData, blueprint, output);
+                    result = HandleBlueprintOverviewBlock(cur, bounds, sourceData, blueprint, output);
                     break;
                     
                 case ResourceGroupSection:
@@ -118,6 +71,42 @@ namespace snowcrash {
                     break;
             }
             
+            return result;
+        }
+
+        static ParseSectionResult HandleBlueprintOverviewBlock(const BlockIterator& cur,
+                                                               const SectionBounds& bounds,
+                                                               const SourceData& sourceData,
+                                                               const Blueprint& blueprint,
+                                                               Blueprint& output) {
+            
+            ParseSectionResult result = std::make_pair(Result(), cur);
+            BlockIterator sectionCur(cur);
+            if (sectionCur->type == HeaderBlockType &&
+                sectionCur == bounds.first) {
+                output.name = cur->content;
+            }
+            else {
+                if (sectionCur == bounds.first) {
+                    
+                    // WARN: No API name specified
+                    result.first.warnings.push_back(Warning("expected API name",
+                                                            0,
+                                                            cur->sourceMap));
+                }
+                
+
+                if (sectionCur->type == QuoteBlockBeginType) {
+                    sectionCur = SkipToSectionEnd(cur, bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
+                }
+                else if (sectionCur->type == ListBlockBeginType) {
+                    sectionCur = SkipToSectionEnd(cur, bounds.second, ListBlockBeginType, ListBlockEndType);
+                }
+                
+                output.description += MapSourceData(sourceData, sectionCur->sourceMap);
+            }
+            
+            result.second = ++sectionCur;
             return result;
         }
         
@@ -145,8 +134,7 @@ namespace snowcrash {
             
             output.resourceGroups.push_back(resourceGroup); // FIXME: C++11 move
             return result;
-        }
-        
+        }  
     };
     
     typedef BlockParser<Blueprint, SectionParser<Blueprint> > BlueprintParserInner;

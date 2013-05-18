@@ -124,7 +124,6 @@ namespace snowcrash {
             return result;
         }
         
-        
         static ParseSectionResult HandleBodySectionBlock(const BlockIterator& cur,
                                                          const SectionBounds& bounds,
                                                          const SourceData& sourceData,
