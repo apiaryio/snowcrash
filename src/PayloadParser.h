@@ -238,7 +238,7 @@ namespace snowcrash {
                     break;
                 
                 if (body) {
-                    result.warnings.push_back(Warning("ignoring body in payload description", 0, cur->sourceMap));
+                    result.warnings.push_back(Warning("ignoring body in description, description should not end with list", 0, cur->sourceMap));
                 }
                 
                 // TODO: Headers & Parameters check
