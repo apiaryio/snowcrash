@@ -377,5 +377,3 @@ TEST_CASE("mparser/parse-multi-request-incomplete", "Parse method with multiple 
     REQUIRE(method.requests[1].parameters.empty());
     REQUIRE(method.requests[1].headers.empty());
 }
-
-

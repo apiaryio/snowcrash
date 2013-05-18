@@ -55,57 +55,21 @@ namespace snowcrash {
         return cur;
     }
     
-    // Skips to first closing list item block or list block if there is no additional list item
-    // Appends result warnings if skipping other blocks
-    inline BlockIterator SkipToListBlockEnd(const BlockIterator& begin,
-                                            const BlockIterator& end,
-                                            Result& result) {
-        
-        if (begin->type == ListBlockBeginType)
-            return begin;
+    inline BlockIterator CloseListItemBlock(const BlockIterator& begin,
+                                            const BlockIterator& end) {
         
         BlockIterator cur = begin;
-        int level = 0;
-        while (cur != end) {
-            
-            if (cur->type == ListItemBlockEndType && level == 0)
-                break;
-            
-            if (cur->type == ListBlockBeginType)
-                ++level;
-            else if (cur->type == ListBlockEndType)
-                --level;
-            
-            if (cur->type != ListBlockBeginType &&
-                cur->type != ListItemBlockBeginType &&
-                cur->type != QuoteBlockBeginType)
-                result.warnings.push_back(Warning("ignoring extraneous content", 0, cur->sourceMap));
-            ++cur;
+        if (cur != end &&
+            cur->type == ListItemBlockEndType) {
+            ++cur; // eat list item end
         }
         
-        BlockIterator next(cur);
-        ++next;
-        if (next != end && next->type == ListBlockEndType)
-            ++cur;  // eat closing list block
+        if (cur != end &&
+            cur->type == ListBlockEndType) {
+            ++cur; // eat list end
+        }
         
         return cur;
-    }
-    
-    // Skips to AFTER current level's closing list block
-    inline ParseSectionResult SkipAfterListBlockEnd(const BlockIterator& begin,
-                                                    const BlockIterator& end) {
-        Result result;
-        BlockIterator cur(begin);
-        if (cur->type == ListBlockEndType) {
-            return std::make_pair(result, ++cur);
-        }
-        
-        if (cur->type == ListItemBlockEndType) {
-            cur = SkipToListBlockEnd(cur, end, result);
-            return std::make_pair(result, ++cur);
-        }
-        
-        return std::make_pair(result, begin);
     }
 }
 

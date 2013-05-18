@@ -105,10 +105,8 @@ namespace snowcrash {
                     break;
                     
                 case UndefinedSection:
-                    // Cleanup previous list item
-                    if (cur->type == ListBlockEndType ||
-                        cur->type == ListItemBlockEndType)
-                        result = SkipAfterListBlockEnd(cur, bounds.second);
+
+                    result.second = CloseListItemBlock(cur, bounds.second);
                     
                     if (asset.empty())
                         result.first.warnings.push_back(Warning("empty asset",

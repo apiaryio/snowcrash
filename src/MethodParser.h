@@ -142,12 +142,12 @@ namespace snowcrash {
                     break;
                 
                 if (payload == RequestPayloadSignature) {
-                    result.warnings.push_back(Warning("ignoring request in method description",
+                    result.warnings.push_back(Warning("ignoring request in description, description must not end with list",
                                                       0,
                                                       cur->sourceMap));
                 }
                 else if (payload == ResponsePayloadSignature) {
-                    result.warnings.push_back(Warning("ignoring response in method description",
+                    result.warnings.push_back(Warning("ignoring response in description, description must not end with list",
                                                       0,
                                                       cur->sourceMap));
                 }

@@ -107,6 +107,11 @@ namespace snowcrash {
             if (begin->type == ListItemBlockBeginType)
                 return UndefinedSection;
         }
+        else if (context == BodySection || context == ForeignSection) {
+
+            if (begin->type == ListItemBlockBeginType)
+                return ForeignSection;
+        }
         
         return (context == RequestSection || context == ResponseSection) ? context : UndefinedSection;
     }
@@ -126,11 +131,6 @@ namespace snowcrash {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
 
-            // Cleanup previous list item
-            if (cur->type == ListBlockEndType ||
-                cur->type == ListItemBlockEndType)
-                return SkipAfterListBlockEnd(cur, bounds.second);
-            
             switch (section) {
                 case RequestSection:
                 case ResponseSection:
@@ -141,37 +141,18 @@ namespace snowcrash {
                     result = HandleBody(cur, bounds.second, sourceData, blueprint, payload);
                     break;
                     
+                case ForeignSection:
+                    result = HandleForeignSection(cur, bounds, sourceData, blueprint, payload);
+                    break;
+                    
                 case UndefinedSection:
+                    result.second = CloseListItemBlock(cur, bounds.second);
                     break;
                     
                 default:
                     result.first.error = Error("unexpected block", 1, cur->sourceMap);
                     break;
             }
-            
-            return result;
-        }
-        
-        static ParseSectionResult HandleBody(const BlockIterator& begin,
-                                               const BlockIterator& end,
-                                               const SourceData& sourceData,
-                                               const Blueprint& blueprint,
-                                               Payload& payload)
-        {
-            Asset body;
-            ParseSectionResult result = AssetParser::Parse(begin, end, sourceData, blueprint, body);
-            if (result.first.error.code != Error::OK)
-                return result;
-
-            if (!payload.body.empty()) {
-                
-                // WARN: body already exists
-                result.first.warnings.push_back(Warning("ignored body asset, payload body already defined,",
-                                                        0,
-                                                        begin->sourceMap));
-            }
-            else
-                payload.body = body;
             
             return result;
         }
@@ -267,6 +248,49 @@ namespace snowcrash {
             return cur;
         }
         
+        // Foreign list item, warn & eat
+        static ParseSectionResult HandleForeignSection(const BlockIterator& cur,
+                                                       const SectionBounds& bounds,
+                                                       const SourceData& sourceData,
+                                                       const Blueprint& blueprint,
+                                                       Payload& payload) {
+            if (cur->type != ListItemBlockBeginType)
+                return std::make_pair(Result(), cur);
+            
+            ParseSectionResult result;
+            result.second = SkipToSectionEnd(cur, bounds.second, ListItemBlockBeginType, ListItemBlockEndType);
+            result.first.warnings.push_back(Warning("ignoring unrecognized list item",
+                                                    0,
+                                                    result.second->sourceMap));
+            
+            result.second = CloseListItemBlock(result.second, bounds.second);
+            return result;
+        
+        }
+        
+        static ParseSectionResult HandleBody(const BlockIterator& begin,
+                                               const BlockIterator& end,
+                                               const SourceData& sourceData,
+                                               const Blueprint& blueprint,
+                                               Payload& payload)
+        {
+            Asset body;
+            ParseSectionResult result = AssetParser::Parse(begin, end, sourceData, blueprint, body);
+            if (result.first.error.code != Error::OK)
+                return result;
+
+            if (!payload.body.empty()) {
+                
+                // WARN: body already exists
+                result.first.warnings.push_back(Warning("ignoring body asset, payload body already defined,",
+                                                        0,
+                                                        begin->sourceMap));
+            }
+            else
+                payload.body = body;
+            
+            return result;
+        }
     };
     
     typedef BlockParser<Payload, SectionParser<Payload> > PayloadParser;    
