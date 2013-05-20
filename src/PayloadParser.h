@@ -110,8 +110,12 @@ namespace snowcrash {
         }
         else if (context == BodySection || context == ForeignSection) {
 
-            if (begin->type == ListItemBlockBeginType)
-                return ForeignSection;
+            // Section closure
+            if (begin->type == ListItemBlockEndType ||
+                begin->type == ListBlockEndType)
+                return UndefinedSection;
+            
+            return ForeignSection;
         }
         
         return (context == RequestSection || context == ResponseSection) ? context : UndefinedSection;
@@ -271,11 +275,6 @@ namespace snowcrash {
             if (result.first.error.code != Error::OK)
                 return result;
             
-//            if (asset.empty())
-//                result.first.warnings.push_back(Warning("empty asset",
-//                                                        0,
-//                                                        cur->sourceMap));
-
             if (!payload.body.empty()) {
                 
                 // WARN: body already exists

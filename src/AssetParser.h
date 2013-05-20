@@ -18,6 +18,8 @@
 // Body matching regex
 static const std::string BodyRegex("^[Bb]ody[[:space:]]*$");
 
+static const std::string AssetFormattingWarning = "asset is expected to be preformatted code block";
+
 namespace snowcrash {
     
     // Asset signature
@@ -127,26 +129,42 @@ namespace snowcrash {
                                                          const SourceData& sourceData,
                                                          const Blueprint& blueprint,
                                                          Asset& asset) {
-            
-            ParseSectionResult result = std::make_pair(Result(), cur);
 
-            // Eat leading list (item) harness
-            if (cur == bounds.first) {
-                result.second = FirstContentBlock(cur, bounds.second);
-                
-                if (result.second != bounds.second)
-                    ++result.second; // skip payload signature
-                
-                return result;
-            }
-            
-            // Retrieve asset
+            ParseSectionResult result = std::make_pair(Result(), cur);
             BlockIterator sectionCur = cur;
-            if (sectionCur->type == CodeBlockType) {
+            
+            if (sectionCur == bounds.first) {
+
+                sectionCur = ListItemNameBlock(cur, bounds.second);
+                if (sectionCur == bounds.second)
+                    return std::make_pair(Result(), sectionCur);
+                
+                ContentParts content = ExtractFirstLine(*sectionCur);
+                if (content.empty() ||
+                    content.front().empty()) {
+                    result.first.error = Error("unable to parse asset signature",
+                                               1,
+                                               sectionCur->sourceMap);
+                    result.second = sectionCur;
+                    return result;
+                }
+                
+                // Add any extra lines after signature to asset body
+                if (content.size() == 2 && !content[1].empty()) {
+                    asset += content[1];
+                    result.first.warnings.push_back(Warning(AssetFormattingWarning,
+                                                            0,
+                                                            sectionCur->sourceMap));
+                }
+                                
+                sectionCur = FirstContentBlock(cur, bounds.second);
+            }
+            else if (sectionCur->type == CodeBlockType) {
+                // Well-formed asset body
                 asset += sectionCur->content;
             }
             else {
-                
+                // Other blocks
                 if (sectionCur->type == QuoteBlockBeginType) {
                     sectionCur = SkipToSectionEnd(sectionCur, bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
                 }
@@ -154,15 +172,18 @@ namespace snowcrash {
                     sectionCur = SkipToSectionEnd(sectionCur, bounds.second, ListBlockBeginType, ListBlockEndType);
                 }
                 
-                result.first.warnings.push_back(Warning("asset is expected to be preformatted code block",
+                asset += MapSourceData(sourceData, sectionCur->sourceMap);
+
+                result.first.warnings.push_back(Warning(AssetFormattingWarning,
                                                         0,
                                                         sectionCur->sourceMap));
-                asset += MapSourceData(sourceData, sectionCur->sourceMap);
             }
             
-            result.second = ++sectionCur; // advance to next block
+            if (sectionCur != bounds.second)
+                result.second = ++sectionCur;
+            
             return result;
-        }
+        }        
     };
     
     typedef BlockParser<Asset, SectionParser<Asset> > AssetParser;

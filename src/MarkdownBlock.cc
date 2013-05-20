@@ -35,7 +35,61 @@ std::string snowcrash::MapSourceData(const SourceData& source, const SourceDataB
 
 #ifdef DEBUG
 
+#include "Serialize.h"
+
 using namespace snowcrash;
+
+static std::string BlockTypeToString(MarkdownBlockType type) {
+    switch (type) {
+        case UndefinedBlockType:
+            return "UndefinedBlockType";
+            
+        case CodeBlockType:
+            return "CodeBlockType";
+            
+        case QuoteBlockBeginType:
+            return "QuoteBlockBeginType";
+            
+        case QuoteBlockEndType:
+            return "QuoteBlockEndType";
+            
+        case HTMLBlockType:
+            return "HTMLBlockType";
+            
+        case HeaderBlockType:
+            return "HeaderBlockType";
+            
+        case HRuleBlockType:
+            return "HRuleBlockType";
+            
+        case ListBlockBeginType:
+            return "ListBlockBeginType";
+            
+        case ListBlockEndType:
+            return "ListBlockEndType";
+            
+        case ListItemBlockBeginType:
+            return "ListItemBlockBeginType";
+            
+        case ListItemBlockEndType:
+            return "ListItemBlockEndType";
+            
+        case ParagraphBlockType:
+            return "ParagraphBlockType";
+            
+        case TableBlockType:
+            return "TableBlockType";
+            
+        case TableRowBlockType:
+            return "TableRowBlockType";
+            
+        case TableCellBlockType:
+            return "TableCellBlockType";
+            
+        default:
+            return "n/a";
+    }
+}
 
 void snowcrash::printMarkdown(const MarkdownBlock::Stack& markdown, unsigned int level)
 {
@@ -46,9 +100,9 @@ void snowcrash::printMarkdown(const MarkdownBlock::Stack& markdown, unsigned int
 
     for (MarkdownBlock::Stack::const_iterator block = markdown.begin(); block != markdown.end(); ++block) {
     
-        std::cout << indent << "block " << static_cast<int>(block->type);
+        std::cout << indent << BlockTypeToString(block->type);
         if (block->content.length())
-            std::cout << ", content: '" << block->content << "'\n";
+            std::cout << ", content: '" << EscapeNewlines(block->content) << "'\n";
         else
             std::cout << std::endl;
         

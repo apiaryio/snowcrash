@@ -95,8 +95,7 @@ TEST_CASE("pldparser/parse-incomplete", "Parse incomplete payload")
     // Blueprint in question:
     //R"(
     //+ Request A
-    //
-    //  Description
+    //  B
     //)";
     
     SourceData source = "01";
@@ -236,7 +235,7 @@ TEST_CASE("pldparser/parse-one-foreign", "Parse just one payload in a list with 
     REQUIRE(payload.schema.empty());
 }
 
-TEST_CASE("pldparser/parse-payload-foreign", "Parse payload with foreign item")
+TEST_CASE("pldparser/parse-payload-foreign-listitem", "Parse payload with foreign list item")
 {
     // Blueprint in question:
     //R"(
@@ -286,5 +285,55 @@ TEST_CASE("pldparser/parse-payload-foreign", "Parse payload with foreign item")
     REQUIRE(payload.body == "Foo");
     REQUIRE(payload.schema.empty());
 }
+
+TEST_CASE("pldparser/parse-payload-foreign-block", "Parse payload with foreign block")
+{
+    // Blueprint in question:
+    //R"(
+    //# /1
+    //## MKCOL
+    //+ Request
+    //  + Body
+    //
+    //              Foo
+    //
+    //  Bar
+    //");
+    
+    SourceData source = "0123456789ABCDEFGHIJKLMNOPQRST";
+    MarkdownBlock::Stack markdown;
+    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Request", 0, MakeSourceDataBlock(0, 1)));
+    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    
+    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Body", 0, MakeSourceDataBlock(1, 1)));
+    markdown.push_back(MarkdownBlock(CodeBlockType, "Foo", 0, MakeSourceDataBlock(2, 1)));
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(3, 1)));
+    
+    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(4, 1)));
+    
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Bar", 0, MakeSourceDataBlock(5, 1)));
+    
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(6, 1)));
+    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(7, 1)));
+    
+    Payload payload;
+    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), payload);
+    
+    REQUIRE(result.first.error.code == Error::OK);
+    CHECK(result.first.warnings.size() == 1); // ignoring unrecognized item
+    
+    const MarkdownBlock::Stack &blocks = markdown;
+    REQUIRE(std::distance(blocks.begin(), result.second) == 12);
+    REQUIRE(payload.name.empty());
+    REQUIRE(payload.description.empty());
+    REQUIRE(payload.parameters.empty());
+    REQUIRE(payload.headers.empty());
+    REQUIRE(payload.body == "Foo");
+    REQUIRE(payload.schema.empty());
+}
+
 
 

@@ -14,6 +14,14 @@ using namespace snowcrash;
 
 MarkdownBlock::Stack CanonicalBodyAssetFixture()
 {
+    // Blueprint in:
+    //R"(
+    //+ Body
+    //
+    //          Lorem Ipsum
+    //)";
+    
+    
     MarkdownBlock::Stack markdown;
     markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
     markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
@@ -200,3 +208,85 @@ TEST_CASE("aparser/parse-foreign-listitem", "Parse body asset with foreign list 
     REQUIRE(std::distance(blocks.begin(), result.second) == 5);
     REQUIRE(asset == "Lorem Ipsum");
 }
+
+TEST_CASE("aparser/parse-multiline-signature", "Parse body asset with multiple lines in its signagure")
+{
+    // Blueprint in question:
+    //R"(
+    //+ Body
+    //  A
+    //
+    //          Lorem Ipsum
+    //)";
+    
+    SourceData source = CanonicalBodyAssetSourceDataFixture;
+    MarkdownBlock::Stack markdown = CanonicalBodyAssetFixture();
+    
+    REQUIRE(markdown.size() == 6);
+    
+    markdown[2].content = "Body\n  A\n";
+    
+    Asset asset;
+    ParseSectionResult result = AssetParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), asset);
+    
+    REQUIRE(result.first.error.code == Error::OK);
+    CHECK(result.first.warnings.size() == 1); // expected code block
+    
+    const MarkdownBlock::Stack &blocks = markdown;
+    REQUIRE(std::distance(blocks.begin(), result.second) == 6);
+    REQUIRE(asset == "  A\nLorem Ipsum");
+}
+
+TEST_CASE("aparser/parse-multipart", "Parse body asset composed from multiple blocks")
+{
+    // Blueprint in question:
+    //R"(
+    //+ Body
+    //  A
+    //
+    //  B
+    //
+    //          Lorem Ipsum
+    //)";
+    
+    SourceData source = CanonicalBodyAssetSourceDataFixture;
+    MarkdownBlock::Stack markdown = CanonicalBodyAssetFixture();
+    
+    REQUIRE(markdown.size() == 6);
+    
+    markdown[2].content = "Body\n  A\n";
+    
+    MarkdownBlock foreign(ParagraphBlockType, "B", 0, MakeSourceDataBlock(4, 1));
+    MarkdownBlock::Stack::iterator pos = markdown.begin();
+    std::advance(pos, 3);
+    markdown.insert(pos, 1, foreign);
+    
+    
+    Asset asset;
+    ParseSectionResult result = AssetParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), asset);
+    
+    REQUIRE(result.first.error.code == Error::OK);
+    CHECK(result.first.warnings.size() == 2); // expected code block
+    
+    const MarkdownBlock::Stack &blocks = markdown;
+    REQUIRE(std::distance(blocks.begin(), result.second) == 7);
+    REQUIRE(asset == "  A\n4Lorem Ipsum");
+}
+
+//block 5, content: '/1'
+//block 5, content: 'GET'
+//block 7
+//block 9
+//block 11, content: 'Request'
+//block 7
+//block 9
+//block 10, content: 'Body
+//A
+//'
+//block 8
+//block 11, content: 'B'
+//block 1, content: '    Lorem Ipsum
+//'
+//block 10
+//block 8
+
