@@ -52,7 +52,7 @@ namespace snowcrash {
         
         if (begin->type == ListBlockBeginType || begin->type == ListItemBlockBeginType) {
             
-            BlockIterator cur = FirstContentBlock(begin, end);
+            BlockIterator cur = ListItemNameBlock(begin, end);
             if (cur == end)
                 return NoPayloadSignature;
             
@@ -167,25 +167,35 @@ namespace snowcrash {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
             BlockIterator sectionCur = cur;
-            
-            // Eat leading list (item) harness
+
             if (sectionCur == bounds.first) {
-                
-                sectionCur = FirstContentBlock(sectionCur, bounds.second);
+                // Parse payload signature
+                sectionCur = ListItemNameBlock(cur, bounds.second);
                 if (sectionCur == bounds.second)
                     return std::make_pair(Result(), sectionCur);
                 
+                // Extract signagure
                 ContentParts content = ExtractFirstLine(*sectionCur);
-                if (section == RequestSection) {
-                    payload.name = RegexCaptureFirst(content[0], RequestRegex);
-                }
-                else if (section == ResponseSection) {
-                    payload.name = RegexCaptureFirst(content[0], ResponseRegex);
+                if (content.empty() ||
+                    content.front().empty()) {
+                    result.first.error = Error("unable to parse payload signature",
+                                               1,
+                                               sectionCur->sourceMap);
+                    result.second = sectionCur;
+                    return result;
                 }
                 
+                // Capture name
+                if (section == RequestSection)
+                    payload.name = RegexCaptureFirst(content[0], RequestRegex);
+                else if (section == ResponseSection)
+                    payload.name = RegexCaptureFirst(content[0], ResponseRegex);
+                
+                // Clean & trim
                 if (!payload.name.empty())
                     TrimString(payload.name);
                 
+                // Add any extra lines to description
                 if (content.size() == 2) {
                     payload.description += content[1];
                     TrimString(payload.description);
@@ -199,11 +209,7 @@ namespace snowcrash {
                     payload.name = "200";
                 }
                 
-                if (sectionCur != bounds.second)
-                    ++sectionCur; // skip signature
-                
-                result.second = sectionCur;
-                return result;
+                sectionCur = FirstContentBlock(cur, bounds.second);
             }
             else {
                 // Description
@@ -217,7 +223,9 @@ namespace snowcrash {
                 payload.description += MapSourceData(sourceData, sectionCur->sourceMap);
             }
             
-            result.second = ++sectionCur;
+            if (sectionCur != bounds.second)
+                result.second = ++sectionCur;
+            
             return result;
         }
         
@@ -253,15 +261,20 @@ namespace snowcrash {
         }
         
         static ParseSectionResult HandleBody(const BlockIterator& begin,
-                                               const BlockIterator& end,
-                                               const SourceData& sourceData,
-                                               const Blueprint& blueprint,
-                                               Payload& payload)
+                                             const BlockIterator& end,
+                                             const SourceData& sourceData,
+                                             const Blueprint& blueprint,
+                                             Payload& payload)
         {
             Asset body;
             ParseSectionResult result = AssetParser::Parse(begin, end, sourceData, blueprint, body);
             if (result.first.error.code != Error::OK)
                 return result;
+            
+//            if (asset.empty())
+//                result.first.warnings.push_back(Warning("empty asset",
+//                                                        0,
+//                                                        cur->sourceMap));
 
             if (!payload.body.empty()) {
                 

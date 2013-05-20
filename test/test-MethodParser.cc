@@ -492,3 +492,46 @@ TEST_CASE("mparser/parse-foreign", "Parse method with foreign item")
     REQUIRE(method.requests[0].headers.empty());    
 }
 
+TEST_CASE("mparser/parse-inline-method-payload", "Parse method with inline payload")
+{
+    // Blueprint in question:
+    //R"(
+    //# POST
+    //+ request
+    //  + body
+    //");
+    
+    SourceData source = "01234";
+    MarkdownBlock::Stack markdown;
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "POST", 1, MakeSourceDataBlock(0, 1)));
+    
+    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    
+    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "body", 0, MakeSourceDataBlock(1, 1)));
+    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(2, 1)));
+    
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "request", 0, MakeSourceDataBlock(3, 1)));
+    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(4, 1)));
+    
+    Method method;
+    ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), method);
+    
+    REQUIRE(result.first.error.code == Error::OK);
+    CHECK(result.first.warnings.size() == 1); // empty asset
+    
+    const MarkdownBlock::Stack &blocks = markdown;
+    REQUIRE(std::distance(blocks.begin(), result.second) == 9);
+        
+    REQUIRE(method.method == "POST");
+    REQUIRE(method.description.empty());
+    REQUIRE(method.responses.empty());
+    REQUIRE(method.requests.size() == 1);
+    REQUIRE(method.requests[0].name.empty());
+    REQUIRE(method.requests[0].description.empty());
+    REQUIRE(method.requests[0].body.empty());
+}
+
+

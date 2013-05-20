@@ -39,7 +39,8 @@ namespace snowcrash {
         return result;
     }
     
-    // Skips list / list item blocks to first content block (paragraph)
+    // Return first list / list item content block block (paragraph)
+    // This is the first block inside the list / list item or the list item's closing block 
     inline BlockIterator FirstContentBlock(const BlockIterator& begin,
                                            const BlockIterator& end) {
         
@@ -51,6 +52,24 @@ namespace snowcrash {
         if (cur->type == ListItemBlockBeginType)
             if (++cur == end)
                 return end;
+        
+        return cur;
+    }
+
+    // Return name block of list item; that is either FirstContentBlock() or
+    // matching closing items block for inline items
+    inline BlockIterator ListItemNameBlock(const BlockIterator& begin,
+                                           const BlockIterator& end) {
+        
+        BlockIterator cur = FirstContentBlock(begin, end);
+        if (cur == end ||
+            cur->type != ListBlockBeginType)
+            return cur;
+        
+        // Inline list block
+        cur = SkipToSectionEnd(cur, end, ListBlockBeginType, ListBlockEndType);
+        if (cur != end)
+            return ++cur;
         
         return cur;
     }

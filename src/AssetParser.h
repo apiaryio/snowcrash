@@ -35,7 +35,7 @@ namespace snowcrash {
         
         if (begin->type == ListBlockBeginType || begin->type == ListItemBlockBeginType) {
             
-            BlockIterator cur = FirstContentBlock(begin, end);
+            BlockIterator cur = ListItemNameBlock(begin, end);
             if (cur == end)
                 return NoAssetSignature;
             
