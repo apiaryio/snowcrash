@@ -10,6 +10,7 @@
 #define SNOWCRASH_BLUEPRINTPARSER_H
 
 #include <functional>
+#include <sstream>
 #include "BlueprintParserCore.h"
 #include "Blueprint.h"
 #include "ResourceParser.h"
@@ -90,7 +91,7 @@ namespace snowcrash {
                 if (sectionCur == bounds.first) {
                     
                     // WARN: No API name specified
-                    result.first.warnings.push_back(Warning("expected API name",
+                    result.first.warnings.push_back(Warning("expected API name, e.g. `# <API Name>`",
                                                             0,
                                                             cur->sourceMap));
                 }
@@ -125,11 +126,16 @@ namespace snowcrash {
             if (duplicate != blueprint.resourceGroups.end()) {
                 
                 // WARN: duplicate group
-                result.first.warnings.push_back(Warning("group '" +
-                                                        resourceGroup.name +
-                                                        "' already exists",
-                                                        0,
-                                                        begin->sourceMap));
+                std::stringstream ss;
+                if (resourceGroup.name.empty()) {
+                    ss << "anonymous group";
+                }
+                else {
+                    ss << "group `" << resourceGroup.name << "`";
+                }
+                ss << " already exists";
+                
+                result.first.warnings.push_back(Warning(ss.str(), 0, begin->sourceMap));
             }
             
             output.resourceGroups.push_back(resourceGroup); // FIXME: C++11 move

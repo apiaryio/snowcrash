@@ -160,12 +160,12 @@ namespace snowcrash {
                 cur = SkipToSectionEnd(cur, end, ListItemBlockBeginType, ListItemBlockEndType);
                 
                 if (payload == RequestPayloadSignature) {
-                    result.warnings.push_back(Warning("ignoring request in description, description should not end with list",
+                    result.warnings.push_back(Warning("ignoring request in description, method description should not end with list",
                                                       0,
                                                       (cur != end) ? cur->sourceMap : MakeSourceDataBlock(0, 0)));
                 }
                 else if (payload == ResponsePayloadSignature) {
-                    result.warnings.push_back(Warning("ignoring response in description, description should not end with list",
+                    result.warnings.push_back(Warning("ignoring response in description, method description should not end with list",
                                                       0,
                                                       (cur != end) ? cur->sourceMap : MakeSourceDataBlock(0, 0)));
                 }
@@ -192,11 +192,11 @@ namespace snowcrash {
             if (duplicate != method.requests.end()) {
                 
                 // WARN: duplicate request
-                result.first.warnings.push_back(Warning("request '" +
+                result.first.warnings.push_back(Warning("request `" +
                                                         request.name +
-                                                        "' already defined for '" +
+                                                        "` already defined for `" +
                                                         method.method +
-                                                        "' method",
+                                                        "` method",
                                                         0,
                                                         begin->sourceMap));
             }
@@ -217,11 +217,11 @@ namespace snowcrash {
             if (duplicate != method.responses.end()) {
 
                 // WARN: duplicate response
-                result.first.warnings.push_back(Warning("response '" +
+                result.first.warnings.push_back(Warning("response `" +
                                                         response.name +
-                                                        "' already defined for '" +
+                                                        "` already defined for `" +
                                                         method.method +
-                                                        "' method",
+                                                        "` method",
                                                         0,
                                                         begin->sourceMap));
             }

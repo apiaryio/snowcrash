@@ -207,7 +207,7 @@ namespace snowcrash {
                 
                 // WARN: missing status code
                 if (payload.name.empty() && section == ResponseSection) {
-                    result.first.warnings.push_back(Warning("missing response status code, assuming 200",
+                    result.first.warnings.push_back(Warning("missing response status code, assuming `200`",
                                                             0,
                                                             sectionCur->sourceMap));
                     payload.name = "200";
@@ -278,7 +278,7 @@ namespace snowcrash {
             if (!payload.body.empty()) {
                 
                 // WARN: body already exists
-                result.first.warnings.push_back(Warning("ignoring body asset, payload body already defined,",
+                result.first.warnings.push_back(Warning("ignoring body asset, payload body already defined",
                                                         0,
                                                         begin->sourceMap));
             }

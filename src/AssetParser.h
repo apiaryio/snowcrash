@@ -18,7 +18,7 @@
 // Body matching regex
 static const std::string BodyRegex("^[Bb]ody[[:space:]]*$");
 
-static const std::string AssetFormattingWarning = "asset is expected to be preformatted code block";
+static const std::string AssetFormattingWarning = "body asset is expected to be preformatted code block";
 
 namespace snowcrash {
     
@@ -142,7 +142,7 @@ namespace snowcrash {
                 ContentParts content = ExtractFirstLine(*sectionCur);
                 if (content.empty() ||
                     content.front().empty()) {
-                    result.first.error = Error("unable to parse asset signature",
+                    result.first.error = Error("unable to parse body signature",
                                                1,
                                                sectionCur->sourceMap);
                     result.second = sectionCur;

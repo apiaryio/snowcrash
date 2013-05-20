@@ -100,7 +100,7 @@ namespace snowcrash {
                 if (sectionCur == bounds.first) {
                     
                     // WARN: No Group name specified
-                    result.first.warnings.push_back(Warning("expected resource group name",
+                    result.first.warnings.push_back(Warning("expected resource group name, e.g. `# <Group Name>`",
                                                             0,
                                                             cur->sourceMap));
                 }
@@ -135,9 +135,9 @@ namespace snowcrash {
             if (duplicate.first != blueprint.resourceGroups.end()) {
                 
                 // WARN: duplicate resource
-                result.first.warnings.push_back(Warning("resource '" +
+                result.first.warnings.push_back(Warning("resource `" +
                                                         resource.uri +
-                                                        "' already exists",
+                                                        "` already exists",
                                                         0,
                                                         begin->sourceMap));
             }

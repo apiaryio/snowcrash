@@ -119,7 +119,7 @@ namespace snowcrash {
             else {
                 ++result.second;
             }
-            result.first.warnings.push_back(Warning("ignoring unrecognized block, check its indentation",
+            result.first.warnings.push_back(Warning("ignoring unrecognized block, check indentation",
                                                     0,
                                                     result.second->sourceMap));
         }

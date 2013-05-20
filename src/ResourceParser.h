@@ -153,11 +153,11 @@ namespace snowcrash {
             if (duplicate != resource.methods.end()) {
                 
                 // WARN: duplicate method
-                result.first.warnings.push_back(Warning("method '" +
+                result.first.warnings.push_back(Warning("method `" +
                                                         method.method +
-                                                        "' already defined for resource '" +
+                                                        "` already defined for resource `" +
                                                         resource.uri +
-                                                        "'",
+                                                        "`",
                                                         0,
                                                         begin->sourceMap));
             }
