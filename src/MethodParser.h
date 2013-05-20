@@ -44,12 +44,16 @@ namespace snowcrash {
 
         if (HasMethodSignature(*begin))
             return (context == UndefinedSection) ? MethodSection : UndefinedSection;
-        
+
         PayloadSignature payload = GetPayloadSignature(begin, end);
         if (payload == RequestPayloadSignature)
             return RequestSection;
         else if (payload == ResponsePayloadSignature)
             return ResponseSection;
+        
+        // Unrecognized list item at this level
+        if (begin->type == ListItemBlockBeginType)
+            return ForeignSection;
         
         return (context == MethodSection) ? MethodSection : UndefinedSection;
     }
@@ -84,7 +88,12 @@ namespace snowcrash {
                     result = HandleResponse(cur, bounds.second, sourceData, blueprint, method);
                     break;
                     
+                case ForeignSection:
+                    result = HandleForeignSection(cur, bounds);
+                    break;
+                    
                 case UndefinedSection:
+                    result.second = CloseListItemBlock(cur, bounds.second);
                     break;
                     
                 default:
@@ -138,23 +147,23 @@ namespace snowcrash {
                 // Check payload signature
                 PayloadSignature payload = GetPayloadSignature(cur, end);
                 cur = SkipToSectionEnd(cur, end, ListItemBlockBeginType, ListItemBlockEndType);
-                if (cur == end)
-                    break;
                 
                 if (payload == RequestPayloadSignature) {
                     result.warnings.push_back(Warning("ignoring request in description, description should not end with list",
                                                       0,
-                                                      cur->sourceMap));
+                                                      (cur != end) ? cur->sourceMap : MakeSourceDataBlock(0, 0)));
                 }
                 else if (payload == ResponsePayloadSignature) {
                     result.warnings.push_back(Warning("ignoring response in description, description should not end with list",
                                                       0,
-                                                      cur->sourceMap));
+                                                      (cur != end) ? cur->sourceMap : MakeSourceDataBlock(0, 0)));
                 }
                 
                 // TODO: Headers & Parameters check
                 
-                ++cur;
+                
+                if (cur != end)
+                    ++cur;
             }
             
             return cur;

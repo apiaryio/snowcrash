@@ -12,6 +12,64 @@
 
 using namespace snowcrash;
 
+TEST_CASE("mparser/classifier", "Method block classifier")
+{
+    MarkdownBlock::Stack markdown;
+
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "PUT", 1, MakeSourceDataBlock(0, 1)));
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "A", 0, MakeSourceDataBlock(1, 1)));
+    
+    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    
+    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Request B", 0, MakeSourceDataBlock(2, 1)));
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "C", 0, MakeSourceDataBlock(3, 1)));
+    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Body", 0, MakeSourceDataBlock(4, 1)));
+    markdown.push_back(MarkdownBlock(CodeBlockType, "D", 0, MakeSourceDataBlock(5, 1)));
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(6, 1)));
+    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(7, 1)));
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(8, 1)));
+    
+    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Request E", 0, MakeSourceDataBlock(9, 1)));
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "F", 0, MakeSourceDataBlock(10, 1)));
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(11, 1)));
+    
+    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "Foreign", 0, MakeSourceDataBlock(12, 1)));    
+    
+    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(13, 1)));
+    
+    BlockIterator cur = markdown.begin();
+    // HeaderBlockType - "PUT"
+    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), UndefinedSection) == MethodSection);
+    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), MethodSection) == UndefinedSection);
+    
+    ++cur; // ParagraphBlockType - "A"
+    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), MethodSection) == MethodSection);
+    
+    ++cur; // ListBlockBeginType - "Request B"
+    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), UndefinedSection) == RequestSection);
+    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), MethodSection) == RequestSection);
+    
+    ++cur; // ParagraphBlockType - "Request E"
+    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), UndefinedSection) == RequestSection);
+    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), MethodSection) == RequestSection);
+    
+    cur = markdown.begin();
+    std::advance(cur, 13);  // ListItemBlockBeginType - "Request E"
+    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), UndefinedSection) == RequestSection);
+    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), MethodSection) == RequestSection);
+    
+    std::advance(cur, 4);  // ListItemBlockBeginType - "Foreign"
+    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), UndefinedSection) == ForeignSection);
+    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), MethodSection) == ForeignSection);
+
+}
+
 TEST_CASE("mparser/parse", "Parse method")
 {
     SourceData source = "012345678";
@@ -377,3 +435,60 @@ TEST_CASE("mparser/parse-multi-request-incomplete", "Parse method with multiple 
     REQUIRE(method.requests[1].parameters.empty());
     REQUIRE(method.requests[1].headers.empty());
 }
+
+TEST_CASE("mparser/parse-foreign", "Parse method with foreign item")
+{
+    // Blueprint in question:
+    //R"(
+    //# MKCOL
+    //+ Request
+    //  + Body
+    //
+    //              Foo
+    //
+    //+ Bar
+    //");
+    
+    SourceData source = "0123456789ABCDEFGHIJKLMNOPQRST";
+    MarkdownBlock::Stack markdown;
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "MKCOL", 1, MakeSourceDataBlock(0, 1)));
+    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Request", 0, MakeSourceDataBlock(1, 1)));
+    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    
+    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Body", 0, MakeSourceDataBlock(2, 1)));
+    markdown.push_back(MarkdownBlock(CodeBlockType, "Foo", 0, MakeSourceDataBlock(3, 1)));
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(4, 1)));
+    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(5, 1)));
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(6, 1)));
+    
+    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Bar", 0, MakeSourceDataBlock(7, 1)));
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(8, 1)));
+
+    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(9, 1)));
+    
+    Method method;
+    ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), method);
+    
+    REQUIRE(result.first.error.code == Error::OK);
+    CHECK(result.first.warnings.size() == 1); // ignoring unrecognized item
+    
+    const MarkdownBlock::Stack &blocks = markdown;
+    REQUIRE(std::distance(blocks.begin(), result.second) == 15);
+    
+    REQUIRE(method.method == "MKCOL");
+    REQUIRE(method.description.empty());
+    REQUIRE(method.headers.empty());
+    REQUIRE(method.parameters.empty());
+    
+    REQUIRE(method.requests.size() == 1);
+    REQUIRE(method.requests[0].name.empty());
+    REQUIRE(method.requests[0].body == "Foo");
+    REQUIRE(method.requests[0].schema.empty());
+    REQUIRE(method.requests[0].parameters.empty());
+    REQUIRE(method.requests[0].headers.empty());    
+}
+

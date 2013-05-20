@@ -216,7 +216,7 @@ TEST_CASE("pldparser/parse-one-foreign", "Parse just one payload in a list with 
     markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
     markdown.push_back(MarkdownBlock(ListItemBlockEndType, "Request A", 0, MakeSourceDataBlock(0, 1)));
     markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock())); 
-    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "Alien", 0, MakeSourceDataBlock(1, 1)));
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "Foo", 0, MakeSourceDataBlock(1, 1)));
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(2, 1)));
     
     Payload payload;
@@ -236,7 +236,7 @@ TEST_CASE("pldparser/parse-one-foreign", "Parse just one payload in a list with 
     REQUIRE(payload.schema.empty());
 }
 
-TEST_CASE("pldparser/parse-payload-foreign", "Parse method with foreign item in its payload")
+TEST_CASE("pldparser/parse-payload-foreign", "Parse payload with foreign item")
 {
     // Blueprint in question:
     //R"(

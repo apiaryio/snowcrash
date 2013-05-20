@@ -71,6 +71,23 @@ namespace snowcrash {
         
         return cur;
     }
+    
+    // Generic parser handler to warn & skip foreign list item sections 
+    static ParseSectionResult HandleForeignSection(const BlockIterator& cur,
+                                                   const SectionBounds& bounds) {
+        
+        if (cur->type != ListItemBlockBeginType)
+            return std::make_pair(Result(), cur);
+        
+        ParseSectionResult result;
+        result.second = SkipToSectionEnd(cur, bounds.second, ListItemBlockBeginType, ListItemBlockEndType);
+        result.first.warnings.push_back(Warning("ignoring unrecognized list item",
+                                                0,
+                                                result.second->sourceMap));
+        
+        result.second = CloseListItemBlock(result.second, bounds.second);
+        return result;
+    }
 }
 
 #endif

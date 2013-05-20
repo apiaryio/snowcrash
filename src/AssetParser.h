@@ -73,11 +73,12 @@ namespace snowcrash {
         }
         else if (context == BodySection) {
             
+            // Section closure
             if (begin->type == ListItemBlockEndType ||
                 begin->type == ListBlockEndType)
-                return UndefinedSection;    // closing
+                return UndefinedSection;
             
-            // Alien list item
+            // Adjacent list item
             if (begin->type == ListItemBlockBeginType)
                 return UndefinedSection;
         }
@@ -105,7 +106,6 @@ namespace snowcrash {
                     break;
                     
                 case UndefinedSection:
-
                     result.second = CloseListItemBlock(cur, bounds.second);
                     
                     if (asset.empty())
