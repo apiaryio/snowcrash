@@ -16,9 +16,33 @@ using namespace snowcrash;
 
 const int SourceAnnotation::OK;
 
+// Check source for unsupported character \t & \r
+// Returns true if passed (not found), false otherwise
+static bool CheckSource(const SourceData& source, Result& result)
+{
+    std::string::size_type pos = source.find("\t");
+    if (pos != std::string::npos) {
+        result.error = Error("the use of tab(s) `\\t` in source data isn't currently supported, please contact makers", 2);
+        return false;
+    }
+
+    pos = source.find("\r");
+    if (pos != std::string::npos) {
+        result.error = Error("the use of carriage return(s) `\\r` in source data isn't currently supported, please contact makers", 2);
+        return false;
+    }
+    
+    return true;
+}
+
 void Parser::parse(const SourceData& source, Result& result, Blueprint& blueprint)
 {
     try {
+        
+        // Sanity Check
+        if (!CheckSource(source, result))
+            return;
+        
         // Parse Markdown
         MarkdownBlock::Stack markdown;
         MarkdownParser markdownParser;
