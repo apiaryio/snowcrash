@@ -169,3 +169,32 @@ TEST_CASE("rgparser/parse-resource-desc-list", "Parse resource with list")
     REQUIRE(resourceGroup.resources[0].methods[0].description == "");
 }
 
+TEST_CASE("rgparser/parse-terminator", "Parse resource groups finalized by terminator")
+{
+    
+    // Blueprint in question:
+    //R"(
+    //# 1
+    //---
+    //A
+    
+    SourceData source = "01234";
+    MarkdownBlock::Stack markdown;
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "1", 1, MakeSourceDataBlock(0, 1)));
+    markdown.push_back(MarkdownBlock(HRuleBlockType, SourceData(), 0, MakeSourceDataBlock(1, 1)));
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "A", 0, MakeSourceDataBlock(2, 1)));
+    
+    ResourceGroup resourceGroup;
+    ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), resourceGroup);
+    
+    REQUIRE(result.first.error.code == Error::OK);
+    CHECK(result.first.warnings.empty());
+    
+    const MarkdownBlock::Stack &blocks = markdown;
+    REQUIRE(std::distance(blocks.begin(), result.second) == 2);
+    
+    REQUIRE(resourceGroup.name == "1");
+    REQUIRE(resourceGroup.description.empty());
+    REQUIRE(resourceGroup.resources.empty());
+}
+

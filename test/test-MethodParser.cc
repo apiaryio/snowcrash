@@ -534,4 +534,34 @@ TEST_CASE("mparser/parse-inline-method-payload", "Parse method with inline paylo
     REQUIRE(method.requests[0].body.empty());
 }
 
+TEST_CASE("mparser/parse-terminator", "Parse method finalized by terminator")
+{
+    
+    // Blueprint in question:
+    //R"(
+    //# /1
+    //# PATCH
+    //---
+    //A
+    
+    SourceData source = "01234";
+    MarkdownBlock::Stack markdown;
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "PATCH", 1, MakeSourceDataBlock(0, 1)));
+    markdown.push_back(MarkdownBlock(HRuleBlockType, SourceData(), 0, MakeSourceDataBlock(1, 1)));
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "A", 0, MakeSourceDataBlock(2, 1)));
+    
+    Method method;
+    ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), method);
+    
+    REQUIRE(result.first.error.code == Error::OK);
+    CHECK(result.first.warnings.empty());
+    
+    const MarkdownBlock::Stack &blocks = markdown;
+    REQUIRE(std::distance(blocks.begin(), result.second) == 2);
+    
+    REQUIRE(method.method == "PATCH");
+    REQUIRE(method.description.empty());
+    REQUIRE(method.requests.empty());
+    REQUIRE(method.responses.empty());
+}
 

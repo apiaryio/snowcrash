@@ -41,6 +41,12 @@ namespace snowcrash {
     inline Section ClassifyBlock<Method>(const BlockIterator& begin,
                                          const BlockIterator& end,
                                          const Section& context) {
+        
+        if (begin->type == HRuleBlockType)
+            return TerminatorSection;
+        
+        if (context == TerminatorSection)
+            return UndefinedSection;
 
         if (HasMethodSignature(*begin))
             return (context == UndefinedSection) ? MethodSection : UndefinedSection;
@@ -76,6 +82,11 @@ namespace snowcrash {
             ParseSectionResult result = std::make_pair(Result(), cur);
             
             switch (section) {
+                case TerminatorSection:
+                    if (result.second != bounds.second)
+                        ++result.second;
+                    break;
+                    
                 case MethodSection:
                     result = HandleMethodOverviewBlock(cur, bounds, sourceData, blueprint, method);
                     break;

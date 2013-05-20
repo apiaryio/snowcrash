@@ -31,6 +31,11 @@ namespace snowcrash {
     inline Section ClassifyBlock<ResourceGroup>(const BlockIterator& begin,
                                                 const BlockIterator& end,
                                                 const Section& context) {
+        if (begin->type == HRuleBlockType)
+            return TerminatorSection;
+        
+        if (context == TerminatorSection)
+            return UndefinedSection;
         
         if (HasResourceSignature(*begin))
             return ResourceSection;
@@ -55,6 +60,11 @@ namespace snowcrash {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
             switch (section) {
+                case TerminatorSection:
+                    if (result.second != bounds.second)
+                        ++result.second;
+                    break;
+                    
                 case ResourceGroupSection:
                     result = HandleResourceGroupOverviewBlock(cur, bounds, sourceData, blueprint, group);
                     break;

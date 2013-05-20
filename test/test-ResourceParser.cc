@@ -262,62 +262,31 @@ TEST_CASE("rparser/parse-list-description", "Parse description with list")
     REQUIRE(resource.methods.empty());
 }
 
-//TEST_CASE("rparser/parse-inline-method-payload", "Parse resource with multiple methods, one with incomplete payload")
-//{
-//    // Blueprint in question:
-//    //R"(
-//    //# /1
-//    //## POST
-//    //+ request
-//    //  + body
-//    //
-//    //## GET
-//    //");
-//    
-//    SourceData source = "01234";
-//    MarkdownBlock::Stack markdown;
-//    markdown.push_back(MarkdownBlock(HeaderBlockType, "/1", 1, MakeSourceDataBlock(0, 1)));
-//    markdown.push_back(MarkdownBlock(HeaderBlockType, "POST", 1, MakeSourceDataBlock(1, 1)));
-//    
-//    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
-//    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-//    
-//    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
-//    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-//    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "body", 0, MakeSourceDataBlock(2, 1)));
-//    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(3, 1)));
-//    
-//    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "request", 0, MakeSourceDataBlock(4, 1)));
-//    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(5, 1)));
-//    
-//    markdown.push_back(MarkdownBlock(HeaderBlockType, "GET", 1, MakeSourceDataBlock(6, 1)));
-//    
-//    Resource resource;
-//    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), resource);
-//    
-//    REQUIRE(result.first.error.code == Error::OK);
-//    REQUIRE(result.first.warnings.empty());
-//    
-//    const MarkdownBlock::Stack &blocks = markdown;
-//    REQUIRE(std::distance(blocks.begin(), result.second) == 11);
-//    
-//    REQUIRE(resource.uri == "/1");
-//    REQUIRE(resource.description.empty());
-//    REQUIRE(resource.methods.size() == 2);
-//    
-//    REQUIRE(resource.methods[0].method == "POST");
-//    REQUIRE(resource.methods[0].description.empty());
-//    REQUIRE(resource.methods[0].responses.empty());
-//    REQUIRE(resource.methods[0].requests.size() == 1);
-//    REQUIRE(resource.methods[0].requests[0].name.empty());
-//    REQUIRE(resource.methods[0].requests[0].description.empty());
-//    REQUIRE(resource.methods[0].requests[0].body.empty());
-//
-//    REQUIRE(resource.methods[1].method == "GET");
-//    REQUIRE(resource.methods[1].description.empty());
-//    REQUIRE(resource.methods[1].responses.empty());
-//    REQUIRE(resource.methods[1].requests.empty());
-//}
-
-
-
+TEST_CASE("rparser/parse-terminator", "Parse resource finalized by terminator")
+{
+    
+    // Blueprint in question:
+    //R"(
+    //# /1
+    //---
+    //A
+    
+    SourceData source = "01234";
+    MarkdownBlock::Stack markdown;
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "/1", 1, MakeSourceDataBlock(0, 1)));
+    markdown.push_back(MarkdownBlock(HRuleBlockType, SourceData(), 0, MakeSourceDataBlock(1, 1)));
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "A", 0, MakeSourceDataBlock(2, 1)));
+    
+    Resource resource;
+    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), resource);
+    
+    REQUIRE(result.first.error.code == Error::OK);
+    CHECK(result.first.warnings.empty());
+    
+    const MarkdownBlock::Stack &blocks = markdown;
+    REQUIRE(std::distance(blocks.begin(), result.second) == 2);
+    
+    REQUIRE(resource.uri == "/1");
+    REQUIRE(resource.description.empty());
+    REQUIRE(resource.methods.empty());
+}

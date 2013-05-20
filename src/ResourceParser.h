@@ -55,6 +55,12 @@ namespace snowcrash {
                                            const BlockIterator& end,
                                            const Section& context) {
         
+        if (begin->type == HRuleBlockType)
+            return TerminatorSection;
+        
+        if (context == TerminatorSection)
+            return UndefinedSection;
+        
         if (HasResourceSignature(*begin)) {
             return (context == UndefinedSection) ? ResourceSection : UndefinedSection;
         }
@@ -80,6 +86,11 @@ namespace snowcrash {
 
             ParseSectionResult result = std::make_pair(Result(), cur);
             switch (section) {
+                case TerminatorSection:
+                    if (result.second != bounds.second)
+                        ++result.second;
+                    break;
+                    
                 case ResourceSection:
                     result = HandleResourceOverviewBlock(cur, bounds, sourceData, blueprint, resource);
                     break;

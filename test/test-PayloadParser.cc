@@ -334,6 +334,3 @@ TEST_CASE("pldparser/parse-payload-foreign-block", "Parse payload with foreign b
     REQUIRE(payload.body == "Foo");
     REQUIRE(payload.schema.empty());
 }
-
-
-
