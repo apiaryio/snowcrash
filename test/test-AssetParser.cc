@@ -14,13 +14,12 @@ using namespace snowcrash;
 
 MarkdownBlock::Stack CanonicalBodyAssetFixture()
 {
-    // Blueprint in:
+    // Blueprint in question:
     //R"(
     //+ Body
     //
     //          Lorem Ipsum
     //)";
-    
     
     MarkdownBlock::Stack markdown;
     markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
@@ -35,7 +34,29 @@ MarkdownBlock::Stack CanonicalBodyAssetFixture()
     return markdown;
 }
 
-SourceData CanonicalBodyAssetSourceDataFixture = "0123456789ABCDEFGHIJKLMNOPQRST";
+MarkdownBlock::Stack CanonicalSchemaAssetFixture()
+{
+    // Blueprint in question:
+    //R"(
+    //+ Sechema
+    //
+    //          Lorem Ipsum
+    //)";
+    
+    MarkdownBlock::Stack markdown;
+    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Schema", 0, MakeSourceDataBlock(0, 1)));
+    markdown.push_back(MarkdownBlock(CodeBlockType, "Dolor Sit Amet", 0, MakeSourceDataBlock(1, 1)));
+    
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(2, 1)));
+    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(3, 1)));
+    
+    return markdown;
+}
+
+static SourceData SourceDataFixture = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 TEST_CASE("aparser/signature-inline", "Verify asset signature, inline")
 {
@@ -52,11 +73,18 @@ TEST_CASE("aparser/signature-inline", "Verify asset signature, inline")
 
 TEST_CASE("aparser/signature", "Verify asset signature")
 {
-    SourceData source = CanonicalBodyAssetSourceDataFixture;
+    
     MarkdownBlock::Stack markdown = CanonicalBodyAssetFixture();
     
     REQUIRE(GetAssetSignature(markdown.begin(), markdown.end()) == BodyAssetSignature);
     REQUIRE(GetAssetSignature(++BlockIterator(markdown.begin()), markdown.end()) == BodyAssetSignature);
+    REQUIRE(HasAssetSignature(markdown.begin(), markdown.end()) == true);
+    
+    markdown = CanonicalSchemaAssetFixture();
+    
+    REQUIRE(GetAssetSignature(markdown.begin(), markdown.end()) == SchemaAssetSignature);
+    REQUIRE(GetAssetSignature(++BlockIterator(markdown.begin()), markdown.end()) == SchemaAssetSignature);
+    REQUIRE(HasAssetSignature(markdown.begin(), markdown.end()) == true);
 }
 
 TEST_CASE("aparser/no-signature-inline", "List without asset signature, inline")
@@ -89,9 +117,9 @@ TEST_CASE("aparser/no-signature", "List without asset signature")
     REQUIRE(GetAssetSignature(++BlockIterator(markdown.begin()), markdown.end()) == NoAssetSignature);
 }
 
-TEST_CASE("aparser/classifier", "Asset block classifier")
+TEST_CASE("aparser/classifier-body", "Body asset block classifier")
 {
-    SourceData source = CanonicalBodyAssetSourceDataFixture;
+    
     MarkdownBlock::Stack markdown = CanonicalBodyAssetFixture();
     
     CHECK(markdown.size() == 6);
@@ -122,15 +150,47 @@ TEST_CASE("aparser/classifier", "Asset block classifier")
     REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), BodySection) == UndefinedSection);
 }
 
-TEST_CASE("aparser/parse", "Parse body asset")
+TEST_CASE("aparser/classifier-schema", "Schema asset block classifier")
 {
-    SourceData source = CanonicalBodyAssetSourceDataFixture;
+    
+    MarkdownBlock::Stack markdown = CanonicalSchemaAssetFixture();
+    
+    CHECK(markdown.size() == 6);
+    
+    BlockIterator cur = markdown.begin();
+    // ListBlockBeginType
+    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == SchemaSection);
+    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), SchemaSection) == SchemaSection);
+    
+    ++cur; // ListItemBlockBeginType
+    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == SchemaSection);
+    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), SchemaSection) == UndefinedSection);
+    
+    ++cur; // ParagraphBlockType
+    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), SchemaSection) == SchemaSection);
+    
+    ++cur; // CodeBlockType
+    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), SchemaSection) == SchemaSection);
+    
+    ++cur; // ListItemBlockEndType
+    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), SchemaSection) == UndefinedSection);
+    
+    ++cur; // ListBlockEndType
+    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), SchemaSection) == UndefinedSection);
+}
+
+TEST_CASE("aparser/parse-body", "Parse body asset")
+{
     MarkdownBlock::Stack markdown = CanonicalBodyAssetFixture();
     
     CHECK(markdown.size() == 6);
     
     Asset asset;
-    ParseSectionResult result = AssetParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), asset);
+    ParseSectionResult result = AssetParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), asset);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.empty());
@@ -140,9 +200,25 @@ TEST_CASE("aparser/parse", "Parse body asset")
     REQUIRE(asset == "Lorem Ipsum");
 }
 
+TEST_CASE("aparser/parse-schema", "Parse schema asset")
+{
+    MarkdownBlock::Stack markdown = CanonicalSchemaAssetFixture();
+    
+    CHECK(markdown.size() == 6);
+    
+    Asset asset;
+    ParseSectionResult result = AssetParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), asset);
+    
+    REQUIRE(result.first.error.code == Error::OK);
+    CHECK(result.first.warnings.empty());
+    
+    const MarkdownBlock::Stack &blocks = markdown;
+    REQUIRE(std::distance(blocks.begin(), result.second) == 6);
+    REQUIRE(asset == "Dolor Sit Amet");
+}
+
 TEST_CASE("aparser/parse-ajdacent", "Parse body asset followed by other blocks")
 {
-    SourceData source = CanonicalBodyAssetSourceDataFixture;
     MarkdownBlock::Stack markdown = CanonicalBodyAssetFixture();
     
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "Hello World", 0, MakeSourceDataBlock(4, 1)));
@@ -150,7 +226,7 @@ TEST_CASE("aparser/parse-ajdacent", "Parse body asset followed by other blocks")
     CHECK(markdown.size() == 7);
     
     Asset asset;
-    ParseSectionResult result = AssetParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), asset);
+    ParseSectionResult result = AssetParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), asset);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.empty());
@@ -162,7 +238,6 @@ TEST_CASE("aparser/parse-ajdacent", "Parse body asset followed by other blocks")
 
 TEST_CASE("aparser/parse-foreign", "Parse body asset with foreign block inside")
 {
-    SourceData source = CanonicalBodyAssetSourceDataFixture;
     MarkdownBlock::Stack markdown = CanonicalBodyAssetFixture();
     
     MarkdownBlock foreign(ParagraphBlockType, "Hello World", 0, MakeSourceDataBlock(4, 1));
@@ -173,7 +248,7 @@ TEST_CASE("aparser/parse-foreign", "Parse body asset with foreign block inside")
     CHECK(markdown.size() == 7);
     
     Asset asset;
-    ParseSectionResult result = AssetParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), asset);
+    ParseSectionResult result = AssetParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), asset);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.size() == 1);
@@ -185,7 +260,6 @@ TEST_CASE("aparser/parse-foreign", "Parse body asset with foreign block inside")
 
 TEST_CASE("aparser/parse-foreign-listitem", "Parse body asset with foreign list item inside")
 {
-    SourceData source = CanonicalBodyAssetSourceDataFixture;
     MarkdownBlock::Stack markdown = CanonicalBodyAssetFixture();
     
     MarkdownBlock::Stack foreign;
@@ -199,7 +273,7 @@ TEST_CASE("aparser/parse-foreign-listitem", "Parse body asset with foreign list 
     CHECK(markdown.size() == 8);
     
     Asset asset;
-    ParseSectionResult result = AssetParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), asset);
+    ParseSectionResult result = AssetParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), asset);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.empty());
@@ -219,7 +293,6 @@ TEST_CASE("aparser/parse-multiline-signature", "Parse body asset with multiple l
     //          Lorem Ipsum
     //)";
     
-    SourceData source = CanonicalBodyAssetSourceDataFixture;
     MarkdownBlock::Stack markdown = CanonicalBodyAssetFixture();
     
     REQUIRE(markdown.size() == 6);
@@ -227,7 +300,7 @@ TEST_CASE("aparser/parse-multiline-signature", "Parse body asset with multiple l
     markdown[2].content = "Body\n  A\n";
     
     Asset asset;
-    ParseSectionResult result = AssetParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), asset);
+    ParseSectionResult result = AssetParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), asset);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.size() == 1); // expected code block
@@ -249,7 +322,6 @@ TEST_CASE("aparser/parse-multipart", "Parse body asset composed from multiple bl
     //          Lorem Ipsum
     //)";
     
-    SourceData source = CanonicalBodyAssetSourceDataFixture;
     MarkdownBlock::Stack markdown = CanonicalBodyAssetFixture();
     
     REQUIRE(markdown.size() == 6);
@@ -261,9 +333,8 @@ TEST_CASE("aparser/parse-multipart", "Parse body asset composed from multiple bl
     std::advance(pos, 3);
     markdown.insert(pos, 1, foreign);
     
-    
     Asset asset;
-    ParseSectionResult result = AssetParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), asset);
+    ParseSectionResult result = AssetParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), asset);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.size() == 2); // expected code block
@@ -272,21 +343,4 @@ TEST_CASE("aparser/parse-multipart", "Parse body asset composed from multiple bl
     REQUIRE(std::distance(blocks.begin(), result.second) == 7);
     REQUIRE(asset == "  A\n4Lorem Ipsum");
 }
-
-//block 5, content: '/1'
-//block 5, content: 'GET'
-//block 7
-//block 9
-//block 11, content: 'Request'
-//block 7
-//block 9
-//block 10, content: 'Body
-//A
-//'
-//block 8
-//block 11, content: 'B'
-//block 1, content: '    Lorem Ipsum
-//'
-//block 10
-//block 8
 

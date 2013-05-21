@@ -12,82 +12,107 @@
 
 using namespace snowcrash;
 
-//TEST_CASE("pldparser/classifier", "Asset block classifier")
-//{
-//    SourceData source = CanonicalBodyAssetSourceDataFixture;
-//    MarkdownBlock::Stack markdown = CanonicalBodyAssetFixture();
-//    
-//    CHECK(markdown.size() == 6);
-//    
-//    BlockIterator cur = markdown.begin();
-//    // ListBlockBeginType
-//    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == BodySection);
-//    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), BodySection) == BodySection);
-//    
-//    ++cur; // ListItemBlockBeginType
-//    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == BodySection);
-//    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), BodySection) == BodySection);
-//    
-//    ++cur; // ParagraphBlockType
-//    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
-//    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), BodySection) == BodySection);
-//    
-//    ++cur; // CodeBlockType
-//    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
-//    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), BodySection) == BodySection);
-//    
-//    ++cur; // ListItemBlockEndType
-//    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
-//    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), BodySection) == UndefinedSection);
-//    
-//    ++cur; // ListBlockEndType
-//    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
-//    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), BodySection) == UndefinedSection);
-//}
-
-TEST_CASE("pldparser/parse-request", "Parse request payload")
+MarkdownBlock::Stack CanonicalPayloadFixture()
 {
     // Blueprint in question:
     //R"(
     //+ Request Hello World (text/plain)
     //
     //  Description
+    //
     //    + Body
     //
     //            Code
     //
+    //    + Schema
+    //
+    //            Code 2
+    //
     //)";
-
-    SourceData source = "0123456789";
+    
     MarkdownBlock::Stack markdown;
     markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
     markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "Request Hello World (text/plain)", 0, MakeSourceDataBlock(0, 1)));
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "Description", 0, MakeSourceDataBlock(1, 1)));
-    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, MakeSourceDataBlock(2, 1)));
-    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, MakeSourceDataBlock(3, 1)));
-    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Body", 0, MakeSourceDataBlock(4, 1)));
-    markdown.push_back(MarkdownBlock(CodeBlockType, "Code", 0, MakeSourceDataBlock(5, 1)));
-    markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(6, 1)));
+    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    
+    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Body", 0, MakeSourceDataBlock(2, 1)));
+    markdown.push_back(MarkdownBlock(CodeBlockType, "Code", 0, MakeSourceDataBlock(3, 1)));
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(4, 1)));
+    
+    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Schema", 0, MakeSourceDataBlock(5, 1)));
+    markdown.push_back(MarkdownBlock(CodeBlockType, "Code 2", 0, MakeSourceDataBlock(6, 1)));
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(7, 1)));
+    
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(7, 1)));
     markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(8, 1)));
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(9, 1)));
     
+    return markdown;
+}
+
+static SourceData SourceDataFixture = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+TEST_CASE("pldparser/classifier", "Payload block classifier")
+{
+    MarkdownBlock::Stack markdown = CanonicalPayloadFixture();
+    
+    CHECK(markdown.size() == 16);
+    
+    BlockIterator cur = markdown.begin();
+
+    // ListBlockBeginType
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), UndefinedSection) == RequestSection);
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), RequestSection) == RequestSection);
+
+    ++cur; // ListItemBlockBeginType
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), UndefinedSection) == RequestSection);
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), RequestSection) == UndefinedSection); 
+
+    ++cur; // ParagraphBlockType
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), RequestSection) == RequestSection);
+    
+    std::advance(cur, 2); // ListBlockBeginType
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), RequestSection) == BodySection);
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), BodySection) == BodySection);
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), SchemaSection) == BodySection);
+    
+    ++cur; // ListItemBlockBeginType
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), RequestSection) == BodySection);
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), BodySection) == BodySection);
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), SchemaSection) == BodySection);
+    
+    std::advance(cur, 4); // ListItemBlockBeginType
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), RequestSection) == SchemaSection);
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), SchemaSection) == SchemaSection);
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), BodySection) == SchemaSection);
+}
+
+TEST_CASE("pldparser/parse", "Parse canonical payload")
+{
+    MarkdownBlock::Stack markdown = CanonicalPayloadFixture();    
     Payload payload;
-    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), payload);
+    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), payload);
     
     REQUIRE(result.first.error.code == Error::OK);
-    REQUIRE(result.first.warnings.empty());
+    CHECK(result.first.warnings.empty());
     
     const MarkdownBlock::Stack &blocks = markdown;
-    REQUIRE(std::distance(blocks.begin(), result.second) == 12);
+    REQUIRE(std::distance(blocks.begin(), result.second) == 16);
 
     REQUIRE(payload.name == "Hello World");
     REQUIRE(payload.description == "1");
     REQUIRE(payload.parameters.empty());
     REQUIRE(payload.headers.empty());
     REQUIRE(payload.body == "Code");
-    REQUIRE(payload.schema.empty());
+    REQUIRE(payload.schema == "Code 2");
 }
 
 TEST_CASE("pldparser/parse-incomplete", "Parse incomplete payload")
@@ -115,7 +140,7 @@ TEST_CASE("pldparser/parse-incomplete", "Parse incomplete payload")
     REQUIRE(std::distance(blocks.begin(), result.second) == 4);
     
     REQUIRE(payload.name == "A");
-    REQUIRE(payload.description == "B");
+    REQUIRE(payload.description == "  B\n");
     REQUIRE(payload.parameters.empty());
     REQUIRE(payload.headers.empty());
     REQUIRE(payload.body.empty());

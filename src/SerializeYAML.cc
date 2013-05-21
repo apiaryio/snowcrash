@@ -53,8 +53,9 @@ static void serialize(const Payload& payload, std::ostream &os)
     serialize(SerializeKey::Name, payload.name, 0, os);
     serialize(SerializeKey::Description, payload.description, 5, os);
     serialize(SerializeKey::Body, payload.body, 5, os);
+    serialize(SerializeKey::Schema, payload.schema, 5, os);
     
-    // TODO: params, headers, schema
+    // TODO: params, headers
 }
 
 // Serialize Method

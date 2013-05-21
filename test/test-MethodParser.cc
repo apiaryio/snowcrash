@@ -238,7 +238,7 @@ TEST_CASE("mparser/response-regex-problem", "Parse method with response not matc
     REQUIRE(method.requests.empty());
     REQUIRE(method.responses.size() == 1);
     REQUIRE(method.responses.front().name == "200");
-    REQUIRE(method.responses.front().description == "B");
+    REQUIRE(method.responses.front().description == "  B\n");
     REQUIRE(method.responses.front().body.empty());
 }
 

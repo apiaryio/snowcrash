@@ -9,6 +9,7 @@
 #ifndef SNOWCRASH_ASSETPARSER_H
 #define SNOWCRASH_ASSETPARSER_H
 
+#include <sstream>
 #include "BlueprintParserCore.h"
 #include "Blueprint.h"
 #include "ListUtility.h"
@@ -18,7 +19,10 @@
 // Body matching regex
 static const std::string BodyRegex("^[Bb]ody[[:space:]]*$");
 
-static const std::string AssetFormattingWarning = "body asset is expected to be preformatted code block";
+// Schema matching regex
+static const std::string SchemaRegex("^[Ss]chema[[:space:]]*$");
+
+static const std::string AssetFormattingWarning = " asset is expected to be preformatted code block";
 
 namespace snowcrash {
     
@@ -49,6 +53,8 @@ namespace snowcrash {
             if (RegexMatch(content, BodyRegex))
                 return BodyAssetSignature;
 
+            if (RegexMatch(content, SchemaRegex))
+                return SchemaAssetSignature;
         }
         
         return NoAssetSignature;
@@ -57,7 +63,7 @@ namespace snowcrash {
     inline bool HasAssetSignature(const BlockIterator& begin,
                                   const BlockIterator& end) {
         AssetSignature signature = GetAssetSignature(begin, end);
-        return (signature == BodyAssetSignature);
+        return (signature == BodyAssetSignature || signature == SchemaAssetSignature);
     }
     
     //
@@ -72,8 +78,10 @@ namespace snowcrash {
             AssetSignature asset = GetAssetSignature(begin, end);
             if (asset == BodyAssetSignature)
                 return BodySection;
+            if (asset == SchemaAssetSignature)
+                return SchemaSection;
         }
-        else if (context == BodySection) {
+        else if (context == BodySection || context == SchemaSection) {
             
             // Section closure
             if (begin->type == ListItemBlockEndType ||
@@ -85,7 +93,7 @@ namespace snowcrash {
                 return UndefinedSection;
         }
         
-        return (context == BodySection) ? context : UndefinedSection;
+        return (context == BodySection || context == SchemaSection) ? context : UndefinedSection;
     }
     
     //
@@ -104,16 +112,12 @@ namespace snowcrash {
             ParseSectionResult result = std::make_pair(Result(), cur);
             switch (section) {
                 case BodySection:
-                    result = HandleBodySectionBlock(cur, bounds, sourceData, blueprint, asset);
+                case SchemaSection: 
+                    result = HandleAssetSectionBlock(section, cur, bounds, sourceData, blueprint, asset);
                     break;
                     
                 case UndefinedSection:
                     result.second = CloseListItemBlock(cur, bounds.second);
-                    
-                    if (asset.empty())
-                        result.first.warnings.push_back(Warning("empty asset",
-                                                                0,
-                                                                cur->sourceMap));
                     break;
                     
                 default:
@@ -124,11 +128,12 @@ namespace snowcrash {
             return result;
         }
         
-        static ParseSectionResult HandleBodySectionBlock(const BlockIterator& cur,
-                                                         const SectionBounds& bounds,
-                                                         const SourceData& sourceData,
-                                                         const Blueprint& blueprint,
-                                                         Asset& asset) {
+        static ParseSectionResult HandleAssetSectionBlock(const Section& section,
+                                                          const BlockIterator& cur,
+                                                          const SectionBounds& bounds,
+                                                          const SourceData& sourceData,
+                                                          const Blueprint& blueprint,
+                                                          Asset& asset) {
 
             ParseSectionResult result = std::make_pair(Result(), cur);
             BlockIterator sectionCur = cur;
@@ -142,7 +147,10 @@ namespace snowcrash {
                 ContentParts content = ExtractFirstLine(*sectionCur);
                 if (content.empty() ||
                     content.front().empty()) {
-                    result.first.error = Error("unable to parse body signature",
+                    
+                    std::stringstream ss;
+                    ss << "unable to parse " << SectionName(section) << " signature";
+                    result.first.error = Error(ss.str(),
                                                1,
                                                sectionCur->sourceMap);
                     result.second = sectionCur;
@@ -152,7 +160,9 @@ namespace snowcrash {
                 // Add any extra lines after signature to asset body
                 if (content.size() == 2 && !content[1].empty()) {
                     asset += content[1];
-                    result.first.warnings.push_back(Warning(AssetFormattingWarning,
+                    std::stringstream ss;
+                    ss << SectionName(section) << AssetFormattingWarning;
+                    result.first.warnings.push_back(Warning(ss.str(),
                                                             0,
                                                             sectionCur->sourceMap));
                 }
@@ -174,7 +184,9 @@ namespace snowcrash {
                 
                 asset += MapSourceData(sourceData, sectionCur->sourceMap);
 
-                result.first.warnings.push_back(Warning(AssetFormattingWarning,
+                std::stringstream ss;
+                ss << SectionName(section) << AssetFormattingWarning;
+                result.first.warnings.push_back(Warning(ss.str(),
                                                         0,
                                                         sectionCur->sourceMap));
             }
@@ -183,7 +195,20 @@ namespace snowcrash {
                 result.second = ++sectionCur;
             
             return result;
-        }        
+        }
+        
+        static std::string SectionName(const Section& section) {
+            switch (section) {
+                case BodySection:
+                    return "body";
+                    
+                case SchemaSection:
+                    return "schema";
+                    
+                default:
+                    return "section";
+            }
+        }
     };
     
     typedef BlockParser<Asset, SectionParser<Asset> > AssetParser;

@@ -24,6 +24,7 @@ const std::string SerializeKey::Method = "method";
 const std::string SerializeKey::Requests = "requests";
 const std::string SerializeKey::Responses = "responses";
 const std::string SerializeKey::Body = "body";
+const std::string SerializeKey::Schema = "schema";
 
 std::string snowcrash::EscapeNewlines(const std::string& input)
 {

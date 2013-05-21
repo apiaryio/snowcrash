@@ -29,6 +29,7 @@ namespace snowcrash {
         RequestSection,
         ResponseSection,
         BodySection,
+        SchemaSection,
         ForeignSection, 
         TerminatorSection
     };

@@ -10,6 +10,7 @@
 #define SNOWCRASH_PARSEPAYLOAD_H
 
 #include <algorithm>
+#include <sstream>
 #include "BlueprintParserCore.h"
 #include "Blueprint.h"
 #include "RegexMatch.h"
@@ -78,6 +79,21 @@ namespace snowcrash {
     }
     
     //
+    // Classifier of internal list items (params, headers, body, schema)
+    //
+    inline static Section ClassifyInternaListBlock(const BlockIterator& begin,
+                                                   const BlockIterator& end) {
+        
+        AssetSignature asset = GetAssetSignature(begin, end);
+        if (asset == BodyAssetSignature)
+            return BodySection;
+        else if (asset == SchemaAssetSignature)
+            return SchemaSection;
+        
+        return UndefinedSection;
+    }
+    
+    //
     // Block Classifier, Payload Context
     //
     template <>
@@ -100,27 +116,33 @@ namespace snowcrash {
                 begin->type == ListBlockEndType)
                 return UndefinedSection;
 
-            // Internal lists (params, headers, body, schema)
-            if (GetAssetSignature(begin, end) == BodyAssetSignature)
-                return BodySection;
+            Section listSection = ClassifyInternaListBlock(begin, end);
+            if (listSection != UndefinedSection)
+                return listSection;
             
             // Adjacent list item
             if (begin->type == ListItemBlockBeginType)
                 return UndefinedSection;
         }
-        else if (context == BodySection || context == ForeignSection) {
+        else if (context == BodySection ||
+                 context == SchemaSection ||
+                 context == ForeignSection) {
 
             // Section closure
             if (begin->type == ListItemBlockEndType ||
                 begin->type == ListBlockEndType)
                 return UndefinedSection;
             
+            Section listSection = ClassifyInternaListBlock(begin, end);
+            if (listSection != UndefinedSection)
+                return listSection;
+            
             return ForeignSection;
         }
         
         return (context == RequestSection || context == ResponseSection) ? context : UndefinedSection;
     }
-       
+    
     //
     // Payload Section Parser
     //
@@ -144,6 +166,10 @@ namespace snowcrash {
                     
                 case BodySection:
                     result = HandleBody(cur, bounds.second, sourceData, blueprint, payload);
+                    break;
+                    
+                case SchemaSection:
+                    result = HandleSchema(cur, bounds.second, sourceData, blueprint, payload);
                     break;
                     
                 case ForeignSection:
@@ -202,7 +228,6 @@ namespace snowcrash {
                 // Add any extra lines to description
                 if (content.size() == 2) {
                     payload.description += content[1];
-                    TrimString(payload.description);
                 }
                 
                 // WARN: missing status code
@@ -244,18 +269,22 @@ namespace snowcrash {
             while (cur != end &&
                    cur->type == ListItemBlockBeginType) {
                 
-                // Check asset signatures
-                AssetSignature assetSignature = GetAssetSignature(cur, end);
-                
+                // Check for internal lists
+                Section listSection = ClassifyInternaListBlock(cur, end);
                 cur = SkipToSectionEnd(cur, end, ListItemBlockBeginType, ListItemBlockEndType);
                 
-                if (assetSignature  == BodyAssetSignature) {
-                    result.warnings.push_back(Warning("ignoring body in description, description should not end with list",
+                if (listSection == BodySection ||
+                    listSection == SchemaSection) {
+                    // WARN: skipping asset section in description
+                    std::stringstream ss;
+                    ss << "ignoring " << AssetParser::SectionName(listSection);
+                    ss << "in description, description should not end with list";
+                    result.warnings.push_back(Warning(ss.str(),
                                                       0,
                                                       (cur != end) ? cur->sourceMap : MakeSourceDataBlock(0,0)));
                 }
                 
-                // TODO: Headers & Parameters check
+                // TODO: Check headers & parameters
 
                 if (cur != end)
                     ++cur;
@@ -275,15 +304,53 @@ namespace snowcrash {
             if (result.first.error.code != Error::OK)
                 return result;
             
+            if (body.empty()) {
+                BlockIterator nameBlock = ListItemNameBlock(begin, end);
+                result.first.warnings.push_back(Warning("empty body asset",
+                                                        0,
+                                                        nameBlock->sourceMap));
+            }
+            
             if (!payload.body.empty()) {
-                
-                // WARN: body already exists
+                BlockIterator nameBlock = ListItemNameBlock(begin, end);
                 result.first.warnings.push_back(Warning("ignoring body asset, payload body already defined",
                                                         0,
-                                                        begin->sourceMap));
+                                                        nameBlock->sourceMap));
             }
-            else
+            else {
                 payload.body = body;
+            }
+
+            return result;
+        }
+        
+        static ParseSectionResult HandleSchema(const BlockIterator& begin,
+                                               const BlockIterator& end,
+                                               const SourceData& sourceData,
+                                               const Blueprint& blueprint,
+                                               Payload& payload)
+        {
+            Asset schema;
+            ParseSectionResult result = AssetParser::Parse(begin, end, sourceData, blueprint, schema);
+            if (result.first.error.code != Error::OK)
+                return result;
+            
+            if (schema.empty()) {
+                BlockIterator nameBlock = ListItemNameBlock(begin, end);
+                result.first.warnings.push_back(Warning("empty schema asset",
+                                                        0,
+                                                        nameBlock->sourceMap));
+            }
+            
+            if (!payload.schema.empty()) {
+                BlockIterator nameBlock = ListItemNameBlock(begin, end);
+                result.first.warnings.push_back(Warning("ignoring schema asset, payload schema already defined",
+                                                        0,
+                                                        nameBlock->sourceMap));
+            }
+            else {
+                payload.schema = schema;
+            }
             
             return result;
         }
