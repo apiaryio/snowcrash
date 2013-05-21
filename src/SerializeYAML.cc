@@ -49,11 +49,11 @@ static void serialize(const Collection<Metadata>::type& metadata, std::ostream &
 
 static void serialize(const Payload& payload, std::ostream &os)
 {
-    os << "        - ";   // indent 5
+    os << "      - ";   // indent 4
     serialize(SerializeKey::Name, payload.name, 0, os);
-    serialize(SerializeKey::Description, payload.description, 5, os);
-    serialize(SerializeKey::Body, payload.body, 5, os);
-    serialize(SerializeKey::Schema, payload.schema, 5, os);
+    serialize(SerializeKey::Description, payload.description, 4, os);
+    serialize(SerializeKey::Body, payload.body, 4, os);
+    serialize(SerializeKey::Schema, payload.schema, 4, os);
     
     // TODO: params, headers
 }
@@ -61,21 +61,21 @@ static void serialize(const Payload& payload, std::ostream &os)
 // Serialize Method
 static void serialize(const Method& method, std::ostream &os)
 {
-    os << "      - ";   // indent 4
+    os << "    - ";   // indent 3
     serialize(SerializeKey::Method, method.method, 0, os);
-    serialize(SerializeKey::Description, method.description, 4, os);
+    serialize(SerializeKey::Description, method.description, 3, os);
     
     // TODO: parameters, headers
     
     if (!method.requests.empty()) {
-        serialize(SerializeKey::Requests, std::string(), 4, os);
+        serialize(SerializeKey::Requests, std::string(), 3, os);
         for (Collection<Request>::const_iterator it = method.requests.begin(); it != method.requests.end(); ++it) {
             serialize(*it, os);
         }
     }
 
     if (!method.responses.empty()) {
-        serialize(SerializeKey::Responses, std::string(), 4, os);
+        serialize(SerializeKey::Responses, std::string(), 3, os);
         for (Collection<Response>::const_iterator it = method.responses.begin(); it != method.responses.end(); ++it) {
             serialize(*it, os);
         }
@@ -85,16 +85,16 @@ static void serialize(const Method& method, std::ostream &os)
 // Serialize Resource
 static void serialize(const Resource& resource, std::ostream &os)
 {
-    os << "    - ";   // indent 3
+    os << "  - ";   // indent 2
     serialize(SerializeKey::URI, resource.uri, 0, os);
-    serialize(SerializeKey::Description, resource.description, 3, os);
+    serialize(SerializeKey::Description, resource.description, 2, os);
     
     //TODO: params, headers
 
     if (resource.methods.empty())
         return;
     
-    serialize(SerializeKey::Methods, std::string(), 3, os);
+    serialize(SerializeKey::Methods, std::string(), 2, os);
     for (Collection<Method>::const_iterator it = resource.methods.begin(); it != resource.methods.end(); ++it) {
         serialize(*it, os);
     }
@@ -110,7 +110,7 @@ static void serialize(const ResourceGroup& group, std::ostream &os)
     if (group.resources.empty())
         return;
     
-    serialize(SerializeKey::Resources, std::string(), 2, os);
+    serialize(SerializeKey::Resources, std::string(), 1, os);
     for (Collection<Resource>::const_iterator it = group.resources.begin(); it != group.resources.end(); ++it) {
         serialize(*it, os);
     }
