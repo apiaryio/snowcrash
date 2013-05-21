@@ -280,10 +280,10 @@ TEST_CASE("mdparser/parse-src-map", "parsing simple nested Markdown into AST and
     
     REQUIRE(markdown[6].type == ListItemBlockEndType);
     REQUIRE(markdown[6].sourceMap.size() == 2);
-    REQUIRE(markdown[6].sourceMap[0].location == 46);
-    REQUIRE(markdown[6].sourceMap[0].length == 8);
-    REQUIRE(markdown[6].sourceMap[1].location == 58);
-    REQUIRE(markdown[6].sourceMap[1].length == 12);
+    REQUIRE(markdown[6].sourceMap[0].location == 48);
+    REQUIRE(markdown[6].sourceMap[0].length == 6);
+    REQUIRE(markdown[6].sourceMap[1].location == 62);
+    REQUIRE(markdown[6].sourceMap[1].length == 8);
     
     REQUIRE(markdown[7].type == ListBlockEndType);
     REQUIRE(markdown[7].sourceMap.size() == 2);
@@ -293,15 +293,102 @@ TEST_CASE("mdparser/parse-src-map", "parsing simple nested Markdown into AST and
     REQUIRE(markdown[7].sourceMap[1].length == 12);
 
     REQUIRE(markdown[8].type == ListItemBlockEndType);
-    REQUIRE(markdown[8].sourceMap.size() == 1);
-    REQUIRE(markdown[8].sourceMap.back().location == 1);
-    REQUIRE(markdown[8].sourceMap.back().length == 69);
+    REQUIRE(markdown[8].sourceMap.size() == 5);
+    REQUIRE(markdown[8].sourceMap[0].location == 3);
+    REQUIRE(markdown[8].sourceMap[0].length == 6);
+    REQUIRE(markdown[8].sourceMap[1].location == 13);
+    REQUIRE(markdown[8].sourceMap[1].length == 10);
+    REQUIRE(markdown[8].sourceMap[2].location == 27);
+    REQUIRE(markdown[8].sourceMap[2].length == 10);
+    REQUIRE(markdown[8].sourceMap[3].location == 46);
+    REQUIRE(markdown[8].sourceMap[3].length == 8);
+    REQUIRE(markdown[8].sourceMap[4].location == 58);
+    REQUIRE(markdown[8].sourceMap[4].length == 12);
     
     REQUIRE(markdown[9].type == ListBlockEndType);
     REQUIRE(markdown[9].sourceMap.size() == 1);
     REQUIRE(markdown[9].sourceMap.back().location == 1);
     REQUIRE(markdown[9].sourceMap.back().length == 69);
     
+}
+
+TEST_CASE("mdparser/parse-src-map-inline-nested", "parse nested inline list testing source maps")
+{
+    MarkdownParser parser;
+    Result result;
+    MarkdownBlock::Stack markdown;
+    
+    const std::string source = \
+"# /1\n\
+## GET\n\
++ Request\n\
+    + Schema\n\
+    + Body\n\
+\n";
+    
+    parser.parse(source, result, markdown);
+    
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.empty());
+    REQUIRE(markdown.size() == 12);
+    
+    REQUIRE(markdown[0].type == HeaderBlockType);
+    REQUIRE(markdown[0].sourceMap.size() == 1);
+    REQUIRE(markdown[0].sourceMap[0].location == 0);
+    REQUIRE(markdown[0].sourceMap[0].length == 5);
+
+    REQUIRE(markdown[1].type == HeaderBlockType);
+    REQUIRE(markdown[1].sourceMap.size() == 1);
+    REQUIRE(markdown[1].sourceMap[0].location == 5);
+    REQUIRE(markdown[1].sourceMap[0].length == 7);
+    
+    REQUIRE(markdown[2].type == ListBlockBeginType);
+    REQUIRE(markdown[2].sourceMap.empty());
+    
+    REQUIRE(markdown[3].type == ListItemBlockBeginType);
+    REQUIRE(markdown[3].sourceMap.empty());
+
+    REQUIRE(markdown[4].type == ListBlockBeginType);
+    REQUIRE(markdown[4].sourceMap.empty());
+    
+    REQUIRE(markdown[5].type == ListItemBlockBeginType);
+    REQUIRE(markdown[5].sourceMap.empty());
+    
+    // "+ Schema"
+    REQUIRE(markdown[6].type == ListItemBlockEndType);
+    REQUIRE(markdown[6].sourceMap.size() == 1);
+    REQUIRE(markdown[6].sourceMap[0].location == 28);
+    REQUIRE(markdown[6].sourceMap[0].length == 7);
+    
+    REQUIRE(markdown[7].type == ListItemBlockBeginType);
+    REQUIRE(markdown[7].sourceMap.empty());
+
+    // "+ Body"
+    REQUIRE(markdown[8].type == ListItemBlockEndType);
+    REQUIRE(markdown[8].sourceMap.size() == 1);
+    REQUIRE(markdown[8].sourceMap[0].location == 41);
+    REQUIRE(markdown[8].sourceMap[0].length == 5);
+    
+    REQUIRE(markdown[9].type == ListBlockEndType);
+    REQUIRE(markdown[9].sourceMap.size() == 2);
+    REQUIRE(markdown[9].sourceMap[0].location == 26);
+    REQUIRE(markdown[9].sourceMap[0].length == 9);
+    REQUIRE(markdown[9].sourceMap[1].location == 39);
+    REQUIRE(markdown[9].sourceMap[1].length == 7);
+    
+    REQUIRE(markdown[10].type == ListItemBlockEndType);
+    REQUIRE(markdown[10].sourceMap.size() == 3);
+    REQUIRE(markdown[10].sourceMap[0].location == 14);
+    REQUIRE(markdown[10].sourceMap[0].length == 8);
+    REQUIRE(markdown[10].sourceMap[1].location == 26);
+    REQUIRE(markdown[10].sourceMap[1].length == 9);
+    REQUIRE(markdown[10].sourceMap[2].location == 39);
+    REQUIRE(markdown[10].sourceMap[2].length == 7);
+    
+    REQUIRE(markdown[11].type == ListBlockEndType);
+    REQUIRE(markdown[11].sourceMap.size() == 1);
+    REQUIRE(markdown[11].sourceMap[0].location == 12);
+    REQUIRE(markdown[11].sourceMap[0].length == 35);
 }
 
 TEST_CASE("mdparser/parse-nested", "parsing complex nested Markdown into AST")

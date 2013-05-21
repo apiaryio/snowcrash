@@ -103,21 +103,19 @@ void snowcrash::printMarkdown(const MarkdownBlock::Stack& markdown, unsigned int
         std::cout << indent << BlockTypeToString(block->type);
         if (block->content.length()) {
             std::cout << ", content: '" << EscapeNewlines(block->content) << "'";
-            if (!block->sourceMap.empty()) {
-                for (SourceDataBlock::const_iterator sourceMap = block->sourceMap.begin();
-                     sourceMap != block->sourceMap.end();
-                     ++sourceMap) {
-                    
-                    std::cout << ((sourceMap == block->sourceMap.begin()) ? " :" : ";");
-                    std::cout << sourceMap->location << ":" << sourceMap->length;
-                }
-            }
-            
-            std::cout << std::endl;
         }
-        else
-            std::cout << std::endl;
         
+        if (!block->sourceMap.empty()) {
+            for (SourceDataBlock::const_iterator sourceMap = block->sourceMap.begin();
+                 sourceMap != block->sourceMap.end();
+                 ++sourceMap) {
+                
+                std::cout << ((sourceMap == block->sourceMap.begin()) ? ", :" : ";");
+                std::cout << sourceMap->location << ":" << sourceMap->length;
+            }
+        }
+        
+        std::cout << std::endl;
     }
     
     if (level == 0)
