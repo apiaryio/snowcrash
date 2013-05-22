@@ -67,7 +67,20 @@ TEST_CASE("mparser/classifier", "Method block classifier")
     std::advance(cur, 4);  // ListItemBlockBeginType - "Foreign"
     REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), UndefinedSection) == ForeignSection);
     REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), MethodSection) == ForeignSection);
+}
 
+TEST_CASE("mparser/classifier-implicit-termination", "Method block classifier implicit termination")
+{
+    MarkdownBlock::Stack markdown;
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "PUT", 1, MakeSourceDataBlock(0, 1)));
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "A", 0, MakeSourceDataBlock(1, 1)));
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "/1", 1, MakeSourceDataBlock(2, 1)));
+    
+    BlockIterator cur = markdown.begin();
+    std::advance(cur, 2);
+    
+    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), MethodSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), UndefinedSection) == UndefinedSection);    
 }
 
 TEST_CASE("mparser/parse", "Parse method")
@@ -563,5 +576,31 @@ TEST_CASE("mparser/parse-terminator", "Parse method finalized by terminator")
     REQUIRE(method.description.empty());
     REQUIRE(method.requests.empty());
     REQUIRE(method.responses.empty());
+}
+
+TEST_CASE("mparser/parse-implicit-termination", "Parse incomplete method followed by another resource")
+{
+    // Blueprint in question:
+    //R"(
+    //# /1
+    //## GET
+    //# /2
+    
+    SourceData source = "01234";
+    MarkdownBlock::Stack markdown;
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "GET", 2, MakeSourceDataBlock(0, 1)));
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "/2", 1, MakeSourceDataBlock(1, 1)));
+    
+    Method method;
+    ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), method);
+    
+    REQUIRE(result.first.error.code == Error::OK);
+    CHECK(result.first.warnings.empty());
+    
+    const MarkdownBlock::Stack &blocks = markdown;
+    REQUIRE(std::distance(blocks.begin(), result.second) == 1);
+    
+    REQUIRE(method.method == "GET");
+    REQUIRE(method.description.empty());
 }
 

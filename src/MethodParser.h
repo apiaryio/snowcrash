@@ -47,6 +47,9 @@ namespace snowcrash {
         
         if (context == TerminatorSection)
             return UndefinedSection;
+        
+        if (HasResourceSignature(*begin))
+            return UndefinedSection;
 
         if (HasMethodSignature(*begin))
             return (context == UndefinedSection) ? MethodSection : UndefinedSection;

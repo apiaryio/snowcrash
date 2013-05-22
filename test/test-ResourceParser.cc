@@ -222,7 +222,6 @@ TEST_CASE("rparser/parse-multi-method", "Parse multiple method")
 
 TEST_CASE("rparser/parse-list-description", "Parse description with list")
 {
-    
     // Blueprint in question:
     //R"(
     //# /1
