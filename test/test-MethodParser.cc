@@ -9,6 +9,7 @@
 #include <iterator>
 #include "catch.hpp"
 #include "MethodParser.h"
+#include "ResourceParser.h"
 
 using namespace snowcrash;
 

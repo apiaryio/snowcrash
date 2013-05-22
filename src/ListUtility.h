@@ -11,6 +11,7 @@
 
 #include <vector>
 #include <string>
+#include <sstream>
 #include "MarkdownBlock.h"
 #include "BlueprintParserCore.h"
 
@@ -74,6 +75,7 @@ namespace snowcrash {
         return cur;
     }
     
+    // Eats closing elements of a list / list item block
     inline BlockIterator CloseListItemBlock(const BlockIterator& begin,
                                             const BlockIterator& end) {
         
@@ -124,6 +126,85 @@ namespace snowcrash {
                                                     result.second->sourceMap));
         }
 
+        return result;
+    }
+    
+    // Parse preformatted source data from block(s) of a list item block
+    static inline ParseSectionResult ParseListPreformattedBlock(const Section& section,
+                                                                const BlockIterator& cur,
+                                                                const SectionBounds& bounds,
+                                                                const SourceData& sourceData,
+                                                                SourceData& data,
+                                                                SourceDataBlock& sourceMap) {
+        
+        static const std::string FormattingWarning = "content is expected to be preformatted code block";
+        
+        ParseSectionResult result = std::make_pair(Result(), cur);
+        BlockIterator sectionCur = cur;
+        std::stringstream dataStream;
+        
+        if (sectionCur == bounds.first) {
+            // Process first block of list, throw away first line - signature
+            sectionCur = ListItemNameBlock(cur, bounds.second);
+            if (sectionCur == bounds.second)
+                return std::make_pair(Result(), sectionCur);
+            
+            ContentParts content = ExtractFirstLine(*sectionCur);
+            if (content.empty() ||
+                content.front().empty()) {
+                
+                std::stringstream ss;
+                ss << "unable to parse " << SectionName(section) << " signature";
+                result.first.error = Error(ss.str(),
+                                           1,
+                                           sectionCur->sourceMap);
+                result.second = sectionCur;
+                return result;
+            }
+            
+            // Retrieve any extra lines after signature
+            if (content.size() == 2 && !content[1].empty()) {
+                dataStream << content[1];
+                
+                // WARN: Not a preformatted code block
+                std::stringstream ss;
+                ss << SectionName(section) << " " << FormattingWarning;
+                result.first.warnings.push_back(Warning(ss.str(),
+                                                        0,
+                                                        sectionCur->sourceMap));
+            }
+            
+            sectionCur = FirstContentBlock(cur, bounds.second);
+        }
+        else if (sectionCur->type == CodeBlockType) {
+
+            dataStream << sectionCur->content; // well formatted content, stream it up
+        }
+        else {
+            // Other blocks, process them but warn
+            if (sectionCur->type == QuoteBlockBeginType) {
+                sectionCur = SkipToSectionEnd(sectionCur, bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
+            }
+            else if (sectionCur->type == ListBlockBeginType) {
+                sectionCur = SkipToSectionEnd(sectionCur, bounds.second, ListBlockBeginType, ListBlockEndType);
+            }
+            
+            dataStream << MapSourceData(sourceData, sectionCur->sourceMap);
+            
+            // WARN: Not a preformatted code block
+            std::stringstream ss;
+            ss << SectionName(section) << " " << FormattingWarning;
+            result.first.warnings.push_back(Warning(ss.str(),
+                                                    0,
+                                                    sectionCur->sourceMap));
+        }
+        
+        data = dataStream.str();
+        sourceMap = sectionCur->sourceMap;
+        
+        if (sectionCur != bounds.second)
+            result.second = ++sectionCur;
+        
         return result;
     }
 }

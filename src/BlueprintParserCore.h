@@ -30,9 +30,27 @@ namespace snowcrash {
         ResponseSection,
         BodySection,
         SchemaSection,
-        ForeignSection, 
+        HeadersSection,
+        ForeignSection,
         TerminatorSection
     };
+    
+    // Returns human readable name of given <Section>
+    inline std::string SectionName(const Section& section) {
+        switch (section) {
+            case BodySection:
+                return "body section";
+                
+            case SchemaSection:
+                return "schema section";
+                
+            case HeadersSection:
+                return "headers section";
+                
+            default:
+                return "section";
+        }
+    }
     
     // Parser iterator
     typedef MarkdownBlock::Stack::const_iterator BlockIterator;
@@ -83,21 +101,6 @@ namespace snowcrash {
     };
     
     //
-    // Section Overview Parser prototype
-    //
-    template<class T>
-    struct SectionOverviewParser {
-        
-        // Parse section overview blocks
-        static ParseSectionResult ParseSection(const Section& section,
-                                               const BlockIterator& cur,
-                                               const SectionBounds& bounds,
-                                               const SourceData& sourceData,
-                                               const Blueprint& blueprint,
-                                               T& output);
-    };
-    
-    //
     // Block Classifier prototype, Look Ahead
     //
     template <class T>
@@ -108,10 +111,9 @@ namespace snowcrash {
     // Forward declaration of classifier helpers
     extern bool HasMethodSignature(const MarkdownBlock& block);
     extern bool HasResourceSignature(const MarkdownBlock& block);
-    extern bool HasPayloadSignature(const BlockIterator& begin,
-                                    const BlockIterator& end);
-    extern bool HasAssetSignature(const BlockIterator& begin,
-                                  const BlockIterator& end);
+    extern bool HasPayloadSignature(const BlockIterator& begin, const BlockIterator& end);
+    extern bool HasAssetSignature(const BlockIterator& begin, const BlockIterator& end);
+    extern bool HasHeaderSignature(const BlockIterator& begin, const BlockIterator& end);
     
     //
     // Block Parser, iterates over block and call section parser P<T>

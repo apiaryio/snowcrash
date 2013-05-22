@@ -67,8 +67,6 @@ namespace snowcrash {
         return (context == MethodSection) ? MethodSection : UndefinedSection;
     }
     
-    typedef BlockParser<Method, SectionOverviewParser<Method> > MethodOverviewParser;
-    
     //
     // Method Section Parser
     //

@@ -37,12 +37,43 @@ namespace snowcrash {
     }
     
     // Retrieve first line of given string
-    static inline std::string GetFirstLine(const std::string& source) {
-        std::string::size_type pos = source.find("\n");
+    static inline std::string GetFirstLine(const std::string& s) {
+        std::string::size_type pos = s.find("\n");
         if (pos == std::string::npos)
-            return source;
+            return s;
         else
-            return source.substr(0, pos);
+            return s.substr(0, pos);
+    }
+    
+    // Split string by delim
+    static inline std::vector<std::string>& Split(const std::string& s, char delim, std::vector<std::string>& elems) {
+        std::stringstream ss(s);
+        std::string item;
+        while (std::getline(ss, item, delim)) {
+            elems.push_back(item);
+        }
+        return elems;
+    }
+    
+    // Split string by delim    
+    static inline std::vector<std::string> Split(const std::string& s, char delim) {
+        std::vector<std::string> elems;
+        Split(s, delim, elems);
+        return elems;
+    }
+    
+    // Split string on the first occurence of delim
+    static inline std::vector<std::string> SplitOnFirst(const std::string& s, char delim) {
+        std::string::size_type pos = s.find(delim);
+        std::vector<std::string> elems;
+        if (pos == std::string::npos) {
+            elems.push_back(s);
+        }
+        else {
+            elems.push_back(s.substr(0, pos));
+            elems.push_back(s.substr(pos + 1, std::string::npos));
+        }
+        return elems;
     }
 }
 
