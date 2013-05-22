@@ -277,7 +277,7 @@ namespace snowcrash {
                     listSection == SchemaSection) {
                     // WARN: skipping asset section in description
                     std::stringstream ss;
-                    ss << "ignoring " << AssetParser::SectionName(listSection);
+                    ss << "ignoring " << SectionName(listSection);
                     ss << "in description, description should not end with list";
                     result.warnings.push_back(Warning(ss.str(),
                                                       0,

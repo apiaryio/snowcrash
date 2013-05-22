@@ -135,80 +135,22 @@ namespace snowcrash {
                                                           const Blueprint& blueprint,
                                                           Asset& asset) {
 
-            ParseSectionResult result = std::make_pair(Result(), cur);
-            BlockIterator sectionCur = cur;
+            SourceData data;
+            SourceDataBlock sourceMap;
+            ParseSectionResult result = ParseListPreformattedBlock(section,
+                                                                   cur,
+                                                                   bounds,
+                                                                   sourceData,
+                                                                   data,
+                                                                   sourceMap);
+            if (result.first.error.code != Error::OK ||
+                sourceData.empty())
+                return result;
             
-            if (sectionCur == bounds.first) {
-
-                sectionCur = ListItemNameBlock(cur, bounds.second);
-                if (sectionCur == bounds.second)
-                    return std::make_pair(Result(), sectionCur);
-                
-                ContentParts content = ExtractFirstLine(*sectionCur);
-                if (content.empty() ||
-                    content.front().empty()) {
-                    
-                    std::stringstream ss;
-                    ss << "unable to parse " << SectionName(section) << " signature";
-                    result.first.error = Error(ss.str(),
-                                               1,
-                                               sectionCur->sourceMap);
-                    result.second = sectionCur;
-                    return result;
-                }
-                
-                // Add any extra lines after signature to asset body
-                if (content.size() == 2 && !content[1].empty()) {
-                    asset += content[1];
-                    std::stringstream ss;
-                    ss << SectionName(section) << AssetFormattingWarning;
-                    result.first.warnings.push_back(Warning(ss.str(),
-                                                            0,
-                                                            sectionCur->sourceMap));
-                }
-                                
-                sectionCur = FirstContentBlock(cur, bounds.second);
-            }
-            else if (sectionCur->type == CodeBlockType) {
-                // Well-formed asset body
-                asset += sectionCur->content;
-            }
-            else {
-                // Other blocks
-                if (sectionCur->type == QuoteBlockBeginType) {
-                    sectionCur = SkipToSectionEnd(sectionCur, bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
-                }
-                else if (sectionCur->type == ListBlockBeginType) {
-                    sectionCur = SkipToSectionEnd(sectionCur, bounds.second, ListBlockBeginType, ListBlockEndType);
-                }
-                
-                asset += MapSourceData(sourceData, sectionCur->sourceMap);
-
-                std::stringstream ss;
-                ss << SectionName(section) << AssetFormattingWarning;
-                result.first.warnings.push_back(Warning(ss.str(),
-                                                        0,
-                                                        sectionCur->sourceMap));
-            }
-            
-            if (sectionCur != bounds.second)
-                result.second = ++sectionCur;
-            
+            asset += data;
             return result;
         }
-        
-        static std::string SectionName(const Section& section) {
-            switch (section) {
-                case BodySection:
-                    return "body";
-                    
-                case SchemaSection:
-                    return "schema";
-                    
-                default:
-                    return "section";
-            }
-        }
+
     };
     
     typedef BlockParser<Asset, SectionParser<Asset> > AssetParser;
