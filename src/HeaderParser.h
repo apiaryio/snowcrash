@@ -13,7 +13,7 @@
 #include "Blueprint.h"
 #include "ListUtility.h"
 #include "RegexMatch.h"
-#include "TrimString.h"
+#include "StringUtility.h"
 
 // Headers matching regex
 static const std::string HeadersRegex("^[Hh]eaders?[[:space:]]*$");

@@ -14,7 +14,7 @@
 #include "Blueprint.h"
 #include "ListUtility.h"
 #include "RegexMatch.h"
-#include "TrimString.h"
+#include "StringUtility.h"
 
 // Body matching regex
 static const std::string BodyRegex("^[Bb]ody[[:space:]]*$");

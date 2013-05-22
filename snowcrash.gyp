@@ -58,7 +58,7 @@
         'src/SerializeJSON.h',
         'src/SerializeYAML.cc',
         'src/SerializeYAML.h',
-        'src/TrimString.h',
+        'src/StringUtility.h',
         'src/snowcrash.cc',
         'src/snowcrash.h'
       ],

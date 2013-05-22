@@ -14,7 +14,7 @@
 #include "BlueprintParserCore.h"
 #include "Blueprint.h"
 #include "RegexMatch.h"
-#include "TrimString.h"
+#include "StringUtility.h"
 #include "ListUtility.h"
 #include "AssetParser.h"
 
