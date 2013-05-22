@@ -27,19 +27,29 @@ namespace snowcrash {
         return RegexMatch(block.content, ResourceHeaderRegex);
     }
 
-    // Resource match iterators
-    typedef std::pair<Collection<ResourceGroup>::const_iterator, Collection<Resource>::const_iterator> ResourceMatch;
+    // Resource iterator in its containment group
+    typedef Collection<Resource>::const_iterator ResourceIterator;
+    
+    // Finds a resource in resource group by its URI template
+    inline ResourceIterator FindResource(const ResourceGroup& group,
+                                         const Resource& resource) {
+        
+        return std::find_if(group.resources.begin(),
+                            group.resources.end(),
+                            std::bind2nd(MatchURI<Resource>(), resource));
+    }
 
+    // Resource iterator pair: its containment group and resource iterator itself
+    typedef std::pair<Collection<ResourceGroup>::const_iterator, ResourceIterator> ResourceIteratorPair;
+    
     // Finds a resource in blueprint by its URI template
-    inline ResourceMatch FindResource(const Blueprint& blueprint, const Resource& resource) {
+    inline ResourceIteratorPair FindResource(const Blueprint& blueprint, const Resource& resource) {
         
         for (Collection<ResourceGroup>::const_iterator it = blueprint.resourceGroups.begin();
              it != blueprint.resourceGroups.end();
              ++it) {
             
-            Collection<Resource>::const_iterator match = std::find_if(it->resources.begin(),
-                                                                      it->resources.end(),
-                                                                      std::bind2nd(MatchURI<Resource>(), resource));
+            Collection<Resource>::const_iterator match = FindResource(*it, resource);
             if (match != it->resources.end())
                 return std::make_pair(it, match);
         }

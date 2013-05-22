@@ -35,7 +35,7 @@ TEST_CASE("rgparser/parse", "Parse resource group with empty resource")
     REQUIRE(resourceGroup.resources.front().uri == "/resource");
 }
 
-TEST_CASE("rgparser/parse-multi-resource-desc-only", "Parse multiple resource in anonymous group")
+TEST_CASE("rgparser/parse-multiple-resource-description", "Parse multiple resource in anonymous group")
 {
     SourceData source = "0123";
     MarkdownBlock::Stack markdown;
@@ -62,7 +62,7 @@ TEST_CASE("rgparser/parse-multi-resource-desc-only", "Parse multiple resource in
     REQUIRE(resourceGroup.resources[1].description == "3");
 }
 
-TEST_CASE("rgparser/parse-multi-resource", "Parse multiple resources with payloads")
+TEST_CASE("rgparser/parse-multiple-resource", "Parse multiple resources with payloads")
 {
     // Blueprint in question:
     //R"(
@@ -128,7 +128,24 @@ TEST_CASE("rgparser/parse-multi-resource", "Parse multiple resources with payloa
     REQUIRE(resource2.methods[0].responses.empty());
 }
 
-TEST_CASE("rgparser/parse-resource-desc-list", "Parse resource with list")
+TEST_CASE("rgparser/parse-multiple-same", "Parse multiple same resources")
+{
+    SourceData source = "01";
+    MarkdownBlock::Stack markdown;
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "/r1", 1, MakeSourceDataBlock(0, 1)));
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "/r1", 1, MakeSourceDataBlock(1, 1)));
+    
+    ResourceGroup resourceGroup;
+    ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), resourceGroup);
+    
+    REQUIRE(result.first.error.code == Error::OK);
+    REQUIRE(result.first.warnings.size());
+    
+    const MarkdownBlock::Stack &blocks = markdown;
+    REQUIRE(std::distance(blocks.begin(), result.second) == 2);
+}
+
+TEST_CASE("rgparser/parse-resource-description-list", "Parse resource with list in its description")
 {
     
     // Blueprint in question:

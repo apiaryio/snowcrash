@@ -131,8 +131,13 @@ namespace snowcrash {
             if (result.first.error.code != Error::OK)
                 return result;
             
-            ResourceMatch duplicate = FindResource(blueprint, resource);
-            if (duplicate.first != blueprint.resourceGroups.end()) {
+            ResourceIterator duplicate = FindResource(group, resource);
+            ResourceIteratorPair globalDuplicate;
+            if (duplicate != group.resources.end())
+                globalDuplicate = FindResource(blueprint, resource);
+            
+            if (duplicate != group.resources.end() ||
+                globalDuplicate.first != blueprint.resourceGroups.end()) {
                 
                 // WARN: duplicate resource
                 result.first.warnings.push_back(Warning("resource `" +
