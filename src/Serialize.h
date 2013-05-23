@@ -27,6 +27,7 @@ namespace snowcrash {
         static const std::string Responses;
         static const std::string Body;
         static const std::string Schema;
+        static const std::string Headers;
     };
 }
 

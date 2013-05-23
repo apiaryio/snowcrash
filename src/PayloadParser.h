@@ -17,6 +17,7 @@
 #include "StringUtility.h"
 #include "ListUtility.h"
 #include "AssetParser.h"
+#include "HeaderParser.h"
 
 // Request matching regex
 static const std::string RequestRegex("^[Rr]equest([[:space:]]+([A-Za-z0-9_]|[[:space:]])*)?([[:space:]]\\([^\\)]*\\))?[[:space:]]*$");
@@ -90,6 +91,9 @@ namespace snowcrash {
         else if (asset == SchemaAssetSignature)
             return SchemaSection;
         
+        if (HasHeaderSignature(begin, end))
+            return HeadersSection;
+        
         return UndefinedSection;
     }
     
@@ -124,7 +128,8 @@ namespace snowcrash {
             if (begin->type == ListItemBlockBeginType)
                 return UndefinedSection;
         }
-        else if (context == BodySection ||
+        else if (context == HeadersSection ||
+                 context == BodySection ||
                  context == SchemaSection ||
                  context == ForeignSection) {
 
@@ -162,6 +167,10 @@ namespace snowcrash {
                 case RequestSection:
                 case ResponseSection:
                     result = HandleOverviewSectionBlock(section, cur, bounds, sourceData, blueprint, payload);
+                    break;
+                    
+                case HeadersSection:
+                    result = HandleHeaders(cur, bounds.second, sourceData, blueprint, payload);
                     break;
                     
                 case BodySection:
@@ -273,8 +282,10 @@ namespace snowcrash {
                 Section listSection = ClassifyInternaListBlock(cur, end);
                 cur = SkipToSectionEnd(cur, end, ListItemBlockBeginType, ListItemBlockEndType);
                 
-                if (listSection == BodySection ||
+                if (listSection == HeadersSection ||
+                    listSection == BodySection ||
                     listSection == SchemaSection) {
+                    
                     // WARN: skipping asset section in description
                     std::stringstream ss;
                     ss << "ignoring " << SectionName(listSection);
@@ -284,13 +295,38 @@ namespace snowcrash {
                                                       (cur != end) ? cur->sourceMap : MakeSourceDataBlock(0,0)));
                 }
                 
-                // TODO: Check headers & parameters
+                // TODO: Check parameters
 
                 if (cur != end)
                     ++cur;
             }
             
             return cur;
+        }
+        
+        static ParseSectionResult HandleHeaders(const BlockIterator& begin,
+                                                const BlockIterator& end,
+                                                const SourceData& sourceData,
+                                                const Blueprint& blueprint,
+                                                Payload& payload)
+        {
+            HeaderCollection headers;
+            ParseSectionResult result = HeadersParser::Parse(begin, end, sourceData, blueprint, headers);
+            if (result.first.error.code != Error::OK)
+                return result;
+            
+            if (headers.empty()) {
+                BlockIterator nameBlock = ListItemNameBlock(begin, end);
+                result.first.warnings.push_back(Warning("no headers specified",
+                                                        0,
+                                                        nameBlock->sourceMap));
+            }
+            else {
+                // TODO: Check duplicates
+                payload.headers.insert(payload.headers.end(), headers.begin(), headers.end());
+                
+            }
+            return result;
         }
         
         static ParseSectionResult HandleBody(const BlockIterator& begin,

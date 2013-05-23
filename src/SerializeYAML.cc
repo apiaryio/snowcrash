@@ -47,6 +47,25 @@ static void serialize(const Collection<Metadata>::type& metadata, std::ostream &
     }
 }
 
+static void serialize(const Collection<Header>::type& headers, size_t level, std::ostream &os)
+{
+    serialize(SerializeKey::Headers, std::string(), 4, os);
+    for (Collection<Header>::const_iterator it = headers.begin(); it != headers.end(); ++it) {
+        
+        if (it == headers.begin()) {
+            
+            for (size_t i = 0; i < level; ++i)
+                os << "  ";
+            os << "- ";   // indent 5
+            
+            serialize(it->first, it->second, 0, os);
+        }
+        else {
+            serialize(it->first, it->second, level + 1, os);
+        }
+    }
+}
+
 static void serialize(const Payload& payload, std::ostream &os)
 {
     os << "      - ";   // indent 4
@@ -55,7 +74,13 @@ static void serialize(const Payload& payload, std::ostream &os)
     serialize(SerializeKey::Body, payload.body, 4, os);
     serialize(SerializeKey::Schema, payload.schema, 4, os);
     
-    // TODO: params, headers
+    // Headers
+    if (!payload.headers.empty()) {
+        //serialize(SerializeKey::Headers, std::string(), 4, os);
+        serialize(payload.headers, 4, os);
+    }
+    
+    // TODO: params
 }
 
 // Serialize Method
