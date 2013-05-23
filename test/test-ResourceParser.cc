@@ -9,56 +9,93 @@
 #include <iterator>
 #include "catch.hpp"
 #include "ResourceParser.h"
+#include "Fixture.h"
 
 using namespace snowcrash;
+using namespace snowcrashtest;
+
+MarkdownBlock::Stack snowcrashtest::CanonicalResourceFixture()
+{
+    // Blueprint in question:
+    //R"(
+    //# /resource
+    //Resource Description
+    //
+    //+ Headers
+    //
+    //        X-Resource-Header: Swordfighter XXII
+    //
+    // <see CanonicalMethodFixture()>
+    //
+    //)";
+    
+    MarkdownBlock::Stack markdown;
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "/resource", 1, MakeSourceDataBlock(0, 1)));
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Resource Description", 0, MakeSourceDataBlock(1, 1)));    
+
+    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Headers", 0, MakeSourceDataBlock(2, 1)));
+    markdown.push_back(MarkdownBlock(CodeBlockType, "X-Resource-Header: Swordfighter XXII", 0, MakeSourceDataBlock(3, 1)));
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(4, 1)));
+    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(5, 1)));
+    
+    MarkdownBlock::Stack methodBlocks = CanonicalMethodFixture();
+    markdown.insert(markdown.end(), methodBlocks.begin(), methodBlocks.end());
+    
+    return markdown;
+}
+
+TEST_CASE("rparser/classifier", "Resource block classifier")
+{
+    MarkdownBlock::Stack markdown = CanonicalResourceFixture();
+    
+    BlockIterator cur = markdown.begin();
+    // "/resource"
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSection) == ResourceSection);
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSection) == UndefinedSection);
+    
+    ++cur; // "Resource Description"
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSection) == ResourceSection);
+    
+    ++cur; // ListBlockBeginType - "Headers"
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSection) == HeadersSection);
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSection) == HeadersSection);
+    
+    ++cur; // ListItemBlockBeginType - "Headers"
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSection) == HeadersSection);
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSection) == HeadersSection);
+    
+    std::advance(cur, 5); // Method
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSection) == MethodSection);
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSection) == MethodSection);
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), HeadersSection) == MethodSection);
+}
 
 TEST_CASE("rparser/parse", "Parse resource")
 {
-    SourceData source = "0123456789";
-    MarkdownBlock::Stack markdown;
-    markdown.push_back(MarkdownBlock(HeaderBlockType, "/resource", 1, MakeSourceDataBlock(0, 1)));
-    markdown.push_back(MarkdownBlock(ParagraphBlockType, "p1", 0, MakeSourceDataBlock(1, 1)));
-    markdown.push_back(MarkdownBlock(HeaderBlockType, "GET", 1, MakeSourceDataBlock(2, 1)));
-    
-    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
-    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-    
-    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Response 200", 0, MakeSourceDataBlock(3, 1)));
-    
-    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
-    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-    
-    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Body", 0, MakeSourceDataBlock(4, 1)));
-    markdown.push_back(MarkdownBlock(CodeBlockType, "Code", 0, MakeSourceDataBlock(5, 1)));
-   
-    markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(6, 1)));
-    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(7, 1)));
-    
-    markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(8, 1)));
-    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(9, 1)));    
-    
+    MarkdownBlock::Stack markdown = CanonicalResourceFixture();
     Resource resource;
-    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), resource);
+    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), resource);
     
     REQUIRE(result.first.error.code == Error::OK);
-    REQUIRE(result.first.warnings.empty());
+    CHECK(result.first.warnings.empty());
     
     const MarkdownBlock::Stack &blocks = markdown;
-    REQUIRE(std::distance(blocks.begin(), result.second) == 14);
+    REQUIRE(std::distance(blocks.begin(), result.second) == 34);
     
     REQUIRE(resource.uri == "/resource");
     REQUIRE(resource.description == "1");
+    REQUIRE(resource.headers.size() == 1);
+    REQUIRE(resource.headers[0].first == "X-Resource-Header");
+    REQUIRE(resource.headers[0].second == "Swordfighter XXII");
     REQUIRE(resource.methods.size() == 1);
-    
     REQUIRE(resource.methods.front().method == "GET");
-    REQUIRE(resource.methods.front().description.empty());
-    REQUIRE(resource.methods.front().responses.size() == 1);
-    REQUIRE(resource.methods.front().responses.front().body == "Code");
 }
 
 TEST_CASE("rparser/parse-partial", "Parse partially defined resource")
 {
-    SourceData source = "012345";
     MarkdownBlock::Stack markdown;
     markdown.push_back(MarkdownBlock(HeaderBlockType, "/1", 1, MakeSourceDataBlock(0, 1)));
     markdown.push_back(MarkdownBlock(HeaderBlockType, "GET", 1, MakeSourceDataBlock(1, 1)));
@@ -73,7 +110,7 @@ TEST_CASE("rparser/parse-partial", "Parse partially defined resource")
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(5, 1)));
     
     Resource resource;
-    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), resource);
+    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), resource);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.empty());
@@ -93,7 +130,6 @@ TEST_CASE("rparser/parse-partial", "Parse partially defined resource")
 
 TEST_CASE("rparser/parse-multi-method-desc", "Parse multiple method descriptions")
 {
-    SourceData source = "0123";
     MarkdownBlock::Stack markdown;
     markdown.push_back(MarkdownBlock(HeaderBlockType, "/1", 1, MakeSourceDataBlock(0, 1)));    
     markdown.push_back(MarkdownBlock(HeaderBlockType, "GET", 1, MakeSourceDataBlock(0, 1)));
@@ -102,7 +138,7 @@ TEST_CASE("rparser/parse-multi-method-desc", "Parse multiple method descriptions
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "p2", 0, MakeSourceDataBlock(3, 1)));
     
     Resource resource;
-    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), resource);
+    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), resource);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.empty());
@@ -146,7 +182,6 @@ TEST_CASE("rparser/parse-multi-method", "Parse multiple method")
     //E
     //");
     
-    SourceData source = "0123456789ABCDEFGHIJKLMNOPQ";
     MarkdownBlock::Stack markdown;
     markdown.push_back(MarkdownBlock(HeaderBlockType, "/1", 1, MakeSourceDataBlock(0, 1)));
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "A", 0, MakeSourceDataBlock(1, 1)));
@@ -183,7 +218,7 @@ TEST_CASE("rparser/parse-multi-method", "Parse multiple method")
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "E", 0, MakeSourceDataBlock(20, 1)));
     
     Resource resource;
-    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), resource);
+    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), resource);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.size() == 1); // Expected HEAD's body asset
@@ -231,7 +266,6 @@ TEST_CASE("rparser/parse-list-description", "Parse description with list")
     //p1
     //");
     
-    SourceData source = "01234";
     MarkdownBlock::Stack markdown;
     markdown.push_back(MarkdownBlock(HeaderBlockType, "/1", 1, MakeSourceDataBlock(0, 1)));
     
@@ -248,7 +282,7 @@ TEST_CASE("rparser/parse-list-description", "Parse description with list")
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "p1", 0, MakeSourceDataBlock(4, 1)));
     
     Resource resource;
-    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), resource);
+    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), resource);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.empty());
@@ -270,14 +304,13 @@ TEST_CASE("rparser/parse-terminator", "Parse resource finalized by terminator")
     //---
     //A
     
-    SourceData source = "01234";
     MarkdownBlock::Stack markdown;
     markdown.push_back(MarkdownBlock(HeaderBlockType, "/1", 1, MakeSourceDataBlock(0, 1)));
     markdown.push_back(MarkdownBlock(HRuleBlockType, SourceData(), 0, MakeSourceDataBlock(1, 1)));
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "A", 0, MakeSourceDataBlock(2, 1)));
     
     Resource resource;
-    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), resource);
+    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), resource);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.empty());

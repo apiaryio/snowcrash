@@ -57,6 +57,19 @@ namespace snowcrash {
         return std::make_pair(blueprint.resourceGroups.end(), Collection<Resource>::iterator());
     }
     
+    
+    //
+    // Classifier of internal list items, Resource context
+    //
+    template <>
+    inline Section ClassifyInternaListBlock<Resource>(const BlockIterator& begin,
+                                                      const BlockIterator& end) {
+        if (HasHeaderSignature(begin, end))
+            return HeadersSection;
+
+        return UndefinedSection;
+    }
+    
     //
     // Block Classifier, Resource Context
     //
@@ -64,21 +77,28 @@ namespace snowcrash {
     inline Section ClassifyBlock<Resource>(const BlockIterator& begin,
                                            const BlockIterator& end,
                                            const Section& context) {
-        
+
         if (begin->type == HRuleBlockType)
             return TerminatorSection;
         
         if (context == TerminatorSection)
             return UndefinedSection;
         
-        if (HasResourceSignature(*begin)) {
-            return (context == UndefinedSection) ? ResourceSection : UndefinedSection;
-        }
-        else if (HasMethodSignature(*begin)) {
-            return MethodSection;
-        }
+        if (HasResourceSignature(*begin))
+            return (context == UndefinedSection) ? ResourceSection : UndefinedSection;;
         
-        return (context != ResourceSection) ? UndefinedSection : ResourceSection;
+        if (HasMethodSignature(*begin))
+            return MethodSection;
+        
+        Section listSection = ClassifyInternaListBlock<Resource>(begin, end);
+        if (listSection != UndefinedSection)
+            return listSection;
+        
+        // Unrecognized list item at this level
+        if (begin->type == ListItemBlockBeginType)
+            return ForeignSection;
+        
+        return (context == ResourceSection) ? context : UndefinedSection;
     }
         
     //
@@ -105,11 +125,20 @@ namespace snowcrash {
                     result = HandleResourceOverviewBlock(cur, bounds, sourceData, blueprint, resource);
                     break;
                     
+                case HeadersSection:
+                    result = HandleHeaders(cur, bounds.second, sourceData, blueprint, resource);
+                    break;
+                    
                 case MethodSection:
                     result = HandleMethod(cur, bounds.second, sourceData, blueprint, resource);
                     break;
                     
                 case UndefinedSection:
+                    result.second = CloseListItemBlock(cur, bounds.second);
+                    break;
+                    
+                case ForeignSection:
+                    result = HandleForeignSection(cur, bounds);
                     break;
                     
                 default:
@@ -138,7 +167,7 @@ namespace snowcrash {
                     sectionCur = SkipToSectionEnd(sectionCur, bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
                 }
                 else if (cur->type == ListBlockBeginType) {
-                    sectionCur = SkipToSectionEnd(sectionCur, bounds.second, ListBlockBeginType, ListBlockEndType);
+                    sectionCur = SkipToDescriptionListEnd<Resource>(sectionCur, bounds.second, result.first);
                 }
                 
                 resource.description += MapSourceData(sourceData, sectionCur->sourceMap);

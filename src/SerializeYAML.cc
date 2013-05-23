@@ -115,8 +115,12 @@ static void serialize(const Resource& resource, std::ostream &os)
     os << "  - ";   // indent 2
     serialize(SerializeKey::URI, resource.uri, 0, os);
     serialize(SerializeKey::Description, resource.description, 2, os);
+
+    // TODO: parameters
     
-    //TODO: params, headers
+    if (!resource.headers.empty()) {
+        serialize(resource.headers, 2, os);
+    }
 
     if (resource.methods.empty())
         return;

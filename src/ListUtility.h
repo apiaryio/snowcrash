@@ -148,7 +148,7 @@ namespace snowcrash {
                 // WARN: skipping section in description
                 std::stringstream ss;
                 ss << "ignoring " << SectionName(listSection);
-                ss << "in description, description should not end with list";
+                ss << " in description, description should not end with list";
                 result.warnings.push_back(Warning(ss.str(),
                                                   0,
                                                   (cur != end) ? cur->sourceMap : MakeSourceDataBlock(0,0)));
