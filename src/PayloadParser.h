@@ -101,6 +101,7 @@ namespace snowcrash {
     //
     // Block Classifier, Payload Context
     //
+    // TODO: refactor
     template <>
     inline Section ClassifyBlock<Payload>(const BlockIterator& begin,
                                           const BlockIterator& end,
@@ -175,21 +176,18 @@ namespace snowcrash {
                     break;
                     
                 case BodySection:
-                    result = HandleBody(cur, bounds.second, sourceData, blueprint, payload);
-                    break;
-                    
                 case SchemaSection:
-                    result = HandleSchema(cur, bounds.second, sourceData, blueprint, payload);
-                    break;
-                    
-                case ForeignSection:
-                    result = HandleForeignSection(cur, bounds);
+                    result = HandleAsset(section, cur, bounds.second, sourceData, blueprint, payload);
                     break;
                     
                 case UndefinedSection:
                     result.second = CloseListItemBlock(cur, bounds.second);
                     break;
                     
+                case ForeignSection:
+                    result = HandleForeignSection(cur, bounds);
+                    break;
+                                        
                 default:
                     result.first.error = Error("unexpected block", 1, cur->sourceMap);
                     break;
@@ -268,66 +266,58 @@ namespace snowcrash {
             return result;
         }
         
-        static ParseSectionResult HandleBody(const BlockIterator& begin,
-                                             const BlockIterator& end,
-                                             const SourceData& sourceData,
-                                             const Blueprint& blueprint,
-                                             Payload& payload)
-        {
-            Asset body;
-            ParseSectionResult result = AssetParser::Parse(begin, end, sourceData, blueprint, body);
+        static ParseSectionResult HandleAsset(const Section& section,
+                                              const BlockIterator& begin,
+                                              const BlockIterator& end,
+                                              const SourceData& sourceData,
+                                              const Blueprint& blueprint,
+                                              Payload& payload) {
+            Asset asset;
+            ParseSectionResult result = AssetParser::Parse(begin, end, sourceData, blueprint, asset);
             if (result.first.error.code != Error::OK)
                 return result;
             
-            if (body.empty()) {
+            if (asset.empty()) {
+                // WARN: empty asset
                 BlockIterator nameBlock = ListItemNameBlock(begin, end);
-                result.first.warnings.push_back(Warning("empty body asset",
+                std::stringstream ss;
+                ss << "empty " << SectionName(section) << " asset";
+                result.first.warnings.push_back(Warning(ss.str(),
                                                         0,
                                                         nameBlock->sourceMap));
             }
             
-            if (!payload.body.empty()) {
+            
+            if (!SetAsset(section, asset, payload)) {
+                // WARN: asset already set
                 BlockIterator nameBlock = ListItemNameBlock(begin, end);
-                result.first.warnings.push_back(Warning("ignoring body asset, payload body already defined",
+                std::stringstream ss;
+                ss << "ignoring " << SectionName(section) << " asset, asset already defined";
+                result.first.warnings.push_back(Warning(ss.str(),
                                                         0,
                                                         nameBlock->sourceMap));
             }
-            else {
-                payload.body = body;
-            }
-
+            
             return result;
         }
         
-        static ParseSectionResult HandleSchema(const BlockIterator& begin,
-                                               const BlockIterator& end,
-                                               const SourceData& sourceData,
-                                               const Blueprint& blueprint,
-                                               Payload& payload)
-        {
-            Asset schema;
-            ParseSectionResult result = AssetParser::Parse(begin, end, sourceData, blueprint, schema);
-            if (result.first.error.code != Error::OK)
-                return result;
+        // Sets payload section asset. Returns true on success, false when asset is already set.
+        static bool SetAsset(const Section& section, const Asset& asset, Payload& payload) {
             
-            if (schema.empty()) {
-                BlockIterator nameBlock = ListItemNameBlock(begin, end);
-                result.first.warnings.push_back(Warning("empty schema asset",
-                                                        0,
-                                                        nameBlock->sourceMap));
+            if (section == BodySection) {
+                if (!payload.body.empty())
+                    return false;
+
+                payload.body = asset;
+            }
+            else if (section == SchemaSection) {
+                if (!payload.schema.empty())
+                    return false;
+                
+                payload.schema = asset;
             }
             
-            if (!payload.schema.empty()) {
-                BlockIterator nameBlock = ListItemNameBlock(begin, end);
-                result.first.warnings.push_back(Warning("ignoring schema asset, payload schema already defined",
-                                                        0,
-                                                        nameBlock->sourceMap));
-            }
-            else {
-                payload.schema = schema;
-            }
-            
-            return result;
+            return true;
         }
     };
     

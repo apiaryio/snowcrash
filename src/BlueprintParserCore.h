@@ -39,13 +39,13 @@ namespace snowcrash {
     inline std::string SectionName(const Section& section) {
         switch (section) {
             case BodySection:
-                return "body section";
+                return "body";
                 
             case SchemaSection:
-                return "schema section";
+                return "schema";
                 
             case HeadersSection:
-                return "headers section";
+                return "headers";
                 
             default:
                 return "section";
