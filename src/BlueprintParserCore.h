@@ -38,6 +38,12 @@ namespace snowcrash {
     // Returns human readable name of given <Section>
     inline std::string SectionName(const Section& section) {
         switch (section) {
+            case RequestSection:
+                return "request";
+                
+            case ResponseSection:
+                return "response";
+                
             case BodySection:
                 return "body";
                 

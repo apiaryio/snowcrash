@@ -115,11 +115,8 @@ namespace snowcrash {
                     break;
                     
                 case RequestSection:
-                    result = HandleRequest(cur, bounds.second, sourceData, blueprint, method);
-                    break;
-                
                 case ResponseSection:
-                    result = HandleResponse(cur, bounds.second, sourceData, blueprint, method);
+                    result = HandlePayload(section, cur, bounds.second, sourceData, blueprint, method);
                     break;
                     
                 case ForeignSection:
@@ -166,56 +163,53 @@ namespace snowcrash {
             return result;
         }
         
-        static ParseSectionResult HandleRequest(const BlockIterator& begin,
+        static ParseSectionResult HandlePayload(const Section &section,
+                                                const BlockIterator& begin,
                                                 const BlockIterator& end,
                                                 const SourceData& sourceData,
                                                 const Blueprint& blueprint,
                                                 Method& method)
         {
-            Request request;
-            ParseSectionResult result = PayloadParser::Parse(begin, end, sourceData, blueprint, request);
-            Collection<Response>::const_iterator duplicate = FindRequest(method, request);
-            if (duplicate != method.requests.end()) {
+            Payload payload;
+            ParseSectionResult result = PayloadParser::Parse(begin, end, sourceData, blueprint, payload);
+            if (result.first.error.code != Error::OK)
+                return result;
+            
+            if (IsPayloadDuplicate(section, payload, method)) {
+                // WARN: duplicate payload
+                std::stringstream ss;
+                ss << SectionName(section) << " payload `" << payload.name << "`";
+                ss << " already defined for `" << method.method << "` method";
                 
-                // WARN: duplicate request
-                result.first.warnings.push_back(Warning("request `" +
-                                                        request.name +
-                                                        "` already defined for `" +
-                                                        method.method +
-                                                        "` method",
+                result.first.warnings.push_back(Warning(ss.str(),
                                                         0,
                                                         begin->sourceMap));
+                
             }
             
-            method.requests.push_back(request);
+            if (section == RequestSection)
+                method.requests.push_back(payload);
+            else if (section == ResponseSection)
+                method.responses.push_back(payload);
+            
             return result;
         }
         
-        static ParseSectionResult HandleResponse(const BlockIterator& begin,
-                                                 const BlockIterator& end,
-                                                 const SourceData& sourceData,
-                                                 const Blueprint& blueprint,
-                                                 Method& method)
-        {
-            Response response;
-            ParseSectionResult result = PayloadParser::Parse(begin, end, sourceData, blueprint, response);            
-            Collection<Response>::const_iterator duplicate = FindResponse(method, response);
-            if (duplicate != method.responses.end()) {
+        // Checks whether given section payload has duplicate.
+        // Returns true when a duplicate is found, false otherwise.
+        static bool IsPayloadDuplicate(const Section& section, const Payload& payload, Method& method) {
+            
+            if (section == RequestSection) {
+                Collection<Request>::const_iterator duplicate = FindRequest(method, payload);
+                return duplicate != method.requests.end();
+            }
+            else if (section == ResponseSection) {
+                Collection<Response>::const_iterator duplicate = FindResponse(method, payload);
+                return duplicate != method.responses.end();
+            }
 
-                // WARN: duplicate response
-                result.first.warnings.push_back(Warning("response `" +
-                                                        response.name +
-                                                        "` already defined for `" +
-                                                        method.method +
-                                                        "` method",
-                                                        0,
-                                                        begin->sourceMap));
-            }
-            
-            method.responses.push_back(response);
-            return result;
+            return false;
         }
-        
     };
     
     typedef BlockParser<Method, SectionParser<Method> > MethodParser;
