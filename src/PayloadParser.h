@@ -80,10 +80,11 @@ namespace snowcrash {
     }
     
     //
-    // Classifier of internal list items (params, headers, body, schema)
+    // Classifier of internal list items, Payload context
     //
-    inline static Section ClassifyInternaListBlock(const BlockIterator& begin,
-                                                   const BlockIterator& end) {
+    template <>
+    inline Section ClassifyInternaListBlock<Payload>(const BlockIterator& begin,
+                                                     const BlockIterator& end) {
         
         AssetSignature asset = GetAssetSignature(begin, end);
         if (asset == BodyAssetSignature)
@@ -120,7 +121,7 @@ namespace snowcrash {
                 begin->type == ListBlockEndType)
                 return UndefinedSection;
 
-            Section listSection = ClassifyInternaListBlock(begin, end);
+            Section listSection = ClassifyInternaListBlock<Payload>(begin, end);
             if (listSection != UndefinedSection)
                 return listSection;
             
@@ -138,7 +139,7 @@ namespace snowcrash {
                 begin->type == ListBlockEndType)
                 return UndefinedSection;
             
-            Section listSection = ClassifyInternaListBlock(begin, end);
+            Section listSection = ClassifyInternaListBlock<Payload>(begin, end);
             if (listSection != UndefinedSection)
                 return listSection;
             
@@ -255,7 +256,7 @@ namespace snowcrash {
                     sectionCur = SkipToSectionEnd(sectionCur, bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
                 }
                 else if (sectionCur->type == ListBlockBeginType) {
-                    sectionCur = SkipToListBlockEndChecking(sectionCur, bounds.second, result.first);
+                    sectionCur = SkipToDescriptionListEnd<Payload>(sectionCur, bounds.second, result.first);
                 }
                 
                 payload.description += MapSourceData(sourceData, sectionCur->sourceMap);
@@ -264,68 +265,6 @@ namespace snowcrash {
             if (sectionCur != bounds.second)
                 result.second = ++sectionCur;
             
-            return result;
-        }
-        
-        static BlockIterator SkipToListBlockEndChecking(const BlockIterator& begin,
-                                                        const BlockIterator& end,
-                                                        Result& result) {
-            
-            BlockIterator cur(begin);
-            if (++cur == end)
-                return cur;
-            
-            while (cur != end &&
-                   cur->type == ListItemBlockBeginType) {
-                
-                // Check for internal lists
-                Section listSection = ClassifyInternaListBlock(cur, end);
-                cur = SkipToSectionEnd(cur, end, ListItemBlockBeginType, ListItemBlockEndType);
-                
-                if (listSection == HeadersSection ||
-                    listSection == BodySection ||
-                    listSection == SchemaSection) {
-                    
-                    // WARN: skipping asset section in description
-                    std::stringstream ss;
-                    ss << "ignoring " << SectionName(listSection);
-                    ss << "in description, description should not end with list";
-                    result.warnings.push_back(Warning(ss.str(),
-                                                      0,
-                                                      (cur != end) ? cur->sourceMap : MakeSourceDataBlock(0,0)));
-                }
-                
-                // TODO: Check parameters
-
-                if (cur != end)
-                    ++cur;
-            }
-            
-            return cur;
-        }
-        
-        static ParseSectionResult HandleHeaders(const BlockIterator& begin,
-                                                const BlockIterator& end,
-                                                const SourceData& sourceData,
-                                                const Blueprint& blueprint,
-                                                Payload& payload)
-        {
-            HeaderCollection headers;
-            ParseSectionResult result = HeadersParser::Parse(begin, end, sourceData, blueprint, headers);
-            if (result.first.error.code != Error::OK)
-                return result;
-            
-            if (headers.empty()) {
-                BlockIterator nameBlock = ListItemNameBlock(begin, end);
-                result.first.warnings.push_back(Warning("no headers specified",
-                                                        0,
-                                                        nameBlock->sourceMap));
-            }
-            else {
-                // TODO: Check duplicates
-                payload.headers.insert(payload.headers.end(), headers.begin(), headers.end());
-                
-            }
             return result;
         }
         

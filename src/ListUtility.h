@@ -94,7 +94,7 @@ namespace snowcrash {
     }
     
     // Generic parser handler to warn & skip foreign blocks
-    static ParseSectionResult HandleForeignSection(const BlockIterator& cur,
+    inline ParseSectionResult HandleForeignSection(const BlockIterator& cur,
                                                    const SectionBounds& bounds) {
 
         ParseSectionResult result = std::make_pair(Result(), cur);
@@ -129,13 +129,45 @@ namespace snowcrash {
         return result;
     }
     
+    // Skips to the end of a list in description, checks
+    template <class T>
+    static BlockIterator SkipToDescriptionListEnd(const BlockIterator& begin,
+                                                  const BlockIterator& end,
+                                                  Result& result) {
+        BlockIterator cur(begin);
+        if (++cur == end)
+            return cur;
+        
+        while (cur != end &&
+               cur->type == ListItemBlockBeginType) {
+            
+            Section listSection = ClassifyInternaListBlock<T>(cur, end);
+            cur = SkipToSectionEnd(cur, end, ListItemBlockBeginType, ListItemBlockEndType);
+            
+            if (listSection != UndefinedSection) {
+                // WARN: skipping section in description
+                std::stringstream ss;
+                ss << "ignoring " << SectionName(listSection);
+                ss << "in description, description should not end with list";
+                result.warnings.push_back(Warning(ss.str(),
+                                                  0,
+                                                  (cur != end) ? cur->sourceMap : MakeSourceDataBlock(0,0)));
+            }
+            if (cur != end)
+                ++cur;
+        }
+        
+        return cur;
+    }
+    
     // Parse preformatted source data from block(s) of a list item block
-    static inline ParseSectionResult ParseListPreformattedBlock(const Section& section,
-                                                                const BlockIterator& cur,
-                                                                const SectionBounds& bounds,
-                                                                const SourceData& sourceData,
-                                                                SourceData& data,
-                                                                SourceDataBlock& sourceMap) {
+    // TODO: refactor
+    inline ParseSectionResult ParseListPreformattedBlock(const Section& section,
+                                                         const BlockIterator& cur,
+                                                         const SectionBounds& bounds,
+                                                         const SourceData& sourceData,
+                                                         SourceData& data,
+                                                         SourceDataBlock& sourceMap) {
         
         static const std::string FormattingWarning = "content is expected to be preformatted code block";
         

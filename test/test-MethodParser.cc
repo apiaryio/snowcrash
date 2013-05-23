@@ -22,6 +22,10 @@ MarkdownBlock::Stack snowcrashtest::CanonicalMethodFixture()
     //# GET
     //Method Description
     //
+    //+ Headers
+    //
+    //        X-Method-Header: 0xdeadbeef
+    //
     // <see CanonicalPayloadFixture()>
     //
     //)";
@@ -30,67 +34,73 @@ MarkdownBlock::Stack snowcrashtest::CanonicalMethodFixture()
     markdown.push_back(MarkdownBlock(HeaderBlockType, "GET", 1, MakeSourceDataBlock(0, 1)));
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "Method Description", 0, MakeSourceDataBlock(1, 1)));
     
-    MarkdownBlock::Stack payload = CanonicalPayloadFixture();
-    markdown.insert(markdown.end(), payload.begin(), payload.end());
+    MarkdownBlock::Stack headerList;
+    headerList.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    headerList.push_back(MarkdownBlock(ParagraphBlockType, "Headers", 0, MakeSourceDataBlock(1, 1)));
+    headerList.push_back(MarkdownBlock(CodeBlockType, "X-Method-Header: 0xdeadbeef", 0, MakeSourceDataBlock(2, 1)));
+    headerList.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(3, 1)));
+    
+    MarkdownBlock::Stack listBlock = CanonicalPayloadFixture();
+    
+    // inject header into list
+    MarkdownBlock::Stack::iterator cur = listBlock.begin();
+    ++cur;
+    listBlock.insert(cur, headerList.begin(), headerList.end());
+    
+    // inject complete list into final markdown
+    markdown.insert(markdown.end(), listBlock.begin(), listBlock.end());
 
     return markdown;
 }
 
 TEST_CASE("mparser/classifier", "Method block classifier")
 {
-    MarkdownBlock::Stack markdown;
-
-    markdown.push_back(MarkdownBlock(HeaderBlockType, "PUT", 1, MakeSourceDataBlock(0, 1)));
-    markdown.push_back(MarkdownBlock(ParagraphBlockType, "A", 0, MakeSourceDataBlock(1, 1)));
+    MarkdownBlock::Stack markdown = CanonicalMethodFixture();
     
-    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    MarkdownBlock::Stack additionalListItems;
+    additionalListItems.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    additionalListItems.push_back(MarkdownBlock(ParagraphBlockType, "Response 200", 0, MakeSourceDataBlock(0, 1)));
+    additionalListItems.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(1, 1)));
+    additionalListItems.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    additionalListItems.push_back(MarkdownBlock(ListItemBlockEndType, "Foreign", 0, MakeSourceDataBlock(2, 1)));
     
-    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Request B", 0, MakeSourceDataBlock(2, 1)));
-    markdown.push_back(MarkdownBlock(ParagraphBlockType, "C", 0, MakeSourceDataBlock(3, 1)));
-    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
-    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Body", 0, MakeSourceDataBlock(4, 1)));
-    markdown.push_back(MarkdownBlock(CodeBlockType, "D", 0, MakeSourceDataBlock(5, 1)));
-    markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(6, 1)));
-    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(7, 1)));
-    markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(8, 1)));
+    MarkdownBlock::Stack::iterator cur = markdown.end();
+    --cur;
+    markdown.insert(cur, additionalListItems.begin(), additionalListItems.end());
     
-    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Request E", 0, MakeSourceDataBlock(9, 1)));
-    markdown.push_back(MarkdownBlock(ParagraphBlockType, "F", 0, MakeSourceDataBlock(10, 1)));
-    markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(11, 1)));
-    
-    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "Foreign", 0, MakeSourceDataBlock(12, 1)));    
-    
-    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(13, 1)));
-    
-    BlockIterator cur = markdown.begin();
-    // HeaderBlockType - "PUT"
+    cur = markdown.begin();
+    // HeaderBlockType - "GET"
     REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), UndefinedSection) == MethodSection);
     REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), MethodSection) == UndefinedSection);
     
-    ++cur; // ParagraphBlockType - "A"
+    ++cur; // ParagraphBlockType - "MethodSection"
     REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
     REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), MethodSection) == MethodSection);
     
-    ++cur; // ListBlockBeginType - "Request B"
+    ++cur; // ListBlockBeginType - "Headers"
+    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), UndefinedSection) == HeadersSection);
+    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), MethodSection) == HeadersSection);
+    
+    ++cur; // ListItemBlockBeginType - "Headers"
+    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), UndefinedSection) == HeadersSection);
+    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), MethodSection) == HeadersSection);
+    
+    std::advance(cur, 4); // Request
     REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), UndefinedSection) == RequestSection);
     REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), MethodSection) == RequestSection);
+    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), HeadersSection) == RequestSection);
     
-    ++cur; // ParagraphBlockType - "Request E"
-    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), UndefinedSection) == RequestSection);
-    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), MethodSection) == RequestSection);
+    std::advance(cur, 18); // Response
+    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), UndefinedSection) == ResponseSection);
+    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), MethodSection) == ResponseSection);
+    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), ResponseSection) == ResponseSection);
     
-    cur = markdown.begin();
-    std::advance(cur, 13);  // ListItemBlockBeginType - "Request E"
-    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), UndefinedSection) == RequestSection);
-    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), MethodSection) == RequestSection);
-    
-    std::advance(cur, 4);  // ListItemBlockBeginType - "Foreign"
+    std::advance(cur, 3); // Foreign
     REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), UndefinedSection) == ForeignSection);
     REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), MethodSection) == ForeignSection);
+    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), HeadersSection) == ForeignSection);
+    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), ResponseSection) == ForeignSection);
+    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), RequestSection) == ForeignSection);
 }
 
 TEST_CASE("mparser/classifier-implicit-termination", "Method block classifier implicit termination")
@@ -111,18 +121,24 @@ TEST_CASE("mparser/parse", "Parse method")
 {
     MarkdownBlock::Stack markdown = CanonicalMethodFixture();   
     Method method;
-    ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), method);
+    ParseSectionResult result = MethodParser::Parse(markdown.begin(),
+                                                    markdown.end(),
+                                                    SourceDataFixture,
+                                                    Blueprint(),
+                                                    method);
     
     REQUIRE(result.first.error.code == Error::OK);
-    REQUIRE(result.first.warnings.empty());
+    CHECK(result.first.warnings.empty());
 
     const MarkdownBlock::Stack &blocks = markdown;
-    REQUIRE(std::distance(blocks.begin(), result.second) == 22);
+    REQUIRE(std::distance(blocks.begin(), result.second) == 26);
     
     REQUIRE(method.method == "GET");
     REQUIRE(method.description == "1");
     REQUIRE(method.responses.empty());
-    REQUIRE(method.headers.empty());
+    REQUIRE(method.headers.size() == 1);
+    REQUIRE(method.headers[0].first == "X-Method-Header");
+    REQUIRE(method.headers[0].second == "0xdeadbeef");
     REQUIRE(method.parameters.empty());
     REQUIRE(method.requests.size() == 1);
 }

@@ -13,6 +13,7 @@
 #include "Blueprint.h"
 #include "RegexMatch.h"
 #include "PayloadParser.h"
+#include "HeaderParser.h"
 
 static const std::string MethodHeaderRegex("^(" HTTP_METHODS ")[[:space:]]*$");
 
@@ -32,6 +33,25 @@ namespace snowcrash {
         return std::find_if(resource.methods.begin(),
                             resource.methods.end(),
                             std::bind2nd(MatchMethod<Method>(), method));
+    }
+    
+    //
+    // Classifier of internal list items, Payload context
+    //
+    template <>
+    inline Section ClassifyInternaListBlock<Method>(const BlockIterator& begin,
+                                                    const BlockIterator& end) {
+        
+        if (HasHeaderSignature(begin, end))
+            return HeadersSection;
+        
+        PayloadSignature payload = GetPayloadSignature(begin, end);
+        if (payload == RequestPayloadSignature)
+            return RequestSection;
+        else if (payload == ResponsePayloadSignature)
+            return ResponseSection;
+        
+        return UndefinedSection;
     }
         
     //
@@ -53,12 +73,10 @@ namespace snowcrash {
 
         if (HasMethodSignature(*begin))
             return (context == UndefinedSection) ? MethodSection : UndefinedSection;
-
-        PayloadSignature payload = GetPayloadSignature(begin, end);
-        if (payload == RequestPayloadSignature)
-            return RequestSection;
-        else if (payload == ResponsePayloadSignature)
-            return ResponseSection;
+        
+        Section listSection = ClassifyInternaListBlock<Method>(begin, end);
+        if (listSection != UndefinedSection)
+            return listSection;
         
         // Unrecognized list item at this level
         if (begin->type == ListItemBlockBeginType)
@@ -90,6 +108,10 @@ namespace snowcrash {
                     
                 case MethodSection:
                     result = HandleMethodOverviewBlock(cur, bounds, sourceData, blueprint, method);
+                    break;
+                    
+                case HeadersSection:
+                    result = HandleHeaders(cur, bounds.second, sourceData, blueprint, method);
                     break;
                     
                 case RequestSection:
@@ -134,7 +156,7 @@ namespace snowcrash {
                     sectionCur = SkipToSectionEnd(sectionCur, bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
                 }
                 else if (sectionCur->type == ListBlockBeginType) {
-                    sectionCur = SkipToListBlockEndChecking(sectionCur, bounds.second, result.first);
+                    sectionCur = SkipToDescriptionListEnd<Method>(sectionCur, bounds.second, result.first);
                 }
                 
                 method.description += MapSourceData(sourceData, sectionCur->sourceMap);
@@ -142,43 +164,6 @@ namespace snowcrash {
             
             result.second = ++sectionCur;
             return result;
-        }
-        
-        // Skips to block list end as in SkipToSectionEnd() with ListBlockBeginType.
-        // Checks for recognized sections & warns, begin should be of ListBlockBeginType type
-        static BlockIterator SkipToListBlockEndChecking(const BlockIterator& begin,
-                                                        const BlockIterator& end,
-                                                        Result& result) {
-            BlockIterator cur(begin);
-            if (++cur == end)
-                return cur;
-            
-            while (cur != end &&
-                   cur->type == ListItemBlockBeginType) {
-                
-                // Check payload signature
-                PayloadSignature payload = GetPayloadSignature(cur, end);
-                cur = SkipToSectionEnd(cur, end, ListItemBlockBeginType, ListItemBlockEndType);
-                
-                if (payload == RequestPayloadSignature) {
-                    result.warnings.push_back(Warning("ignoring request in description, method description should not end with list",
-                                                      0,
-                                                      (cur != end) ? cur->sourceMap : MakeSourceDataBlock(0, 0)));
-                }
-                else if (payload == ResponsePayloadSignature) {
-                    result.warnings.push_back(Warning("ignoring response in description, method description should not end with list",
-                                                      0,
-                                                      (cur != end) ? cur->sourceMap : MakeSourceDataBlock(0, 0)));
-                }
-                
-                // TODO: Headers & Parameters check
-                
-                
-                if (cur != end)
-                    ++cur;
-            }
-            
-            return cur;
         }
         
         static ParseSectionResult HandleRequest(const BlockIterator& begin,

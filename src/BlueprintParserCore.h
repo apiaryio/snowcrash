@@ -100,6 +100,14 @@ namespace snowcrash {
                                                T& output);
     };
     
+    
+    //
+    // Classifier of internal list items prototype
+    //
+    template <class T>
+    Section ClassifyInternaListBlock(const BlockIterator& begin,
+                                     const BlockIterator& end);
+        
     //
     // Block Classifier prototype, Look Ahead
     //

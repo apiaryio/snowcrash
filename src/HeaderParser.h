@@ -160,6 +160,35 @@ namespace snowcrash {
     };
 
     typedef BlockParser<HeaderCollection, SectionParser<HeaderCollection> > HeadersParser;
+    
+    //
+    // Generic HeaderSection parser handler
+    //
+    template <class T>
+    inline ParseSectionResult HandleHeaders(const BlockIterator& begin,
+                                            const BlockIterator& end,
+                                            const SourceData& sourceData,
+                                            const Blueprint& blueprint,
+                                            T& t)
+    {
+        HeaderCollection headers;
+        ParseSectionResult result = HeadersParser::Parse(begin, end, sourceData, blueprint, headers);
+        if (result.first.error.code != Error::OK)
+            return result;
+        
+        if (headers.empty()) {
+            BlockIterator nameBlock = ListItemNameBlock(begin, end);
+            result.first.warnings.push_back(Warning("no headers specified",
+                                                    0,
+                                                    nameBlock->sourceMap));
+        }
+        else {
+            // TODO: Check duplicates
+            t.headers.insert(t.headers.end(), headers.begin(), headers.end());
+            
+        }
+        return result;
+    }
 }
 
 #endif
