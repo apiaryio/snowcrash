@@ -9,8 +9,10 @@
 #include <iterator>
 #include "catch.hpp"
 #include "HeaderParser.h"
+#include "Fixture.h"
 
 using namespace snowcrash;
+using namespace snowcrashtest;
 
 MarkdownBlock::Stack CanonicalHeaderFixture()
 {
@@ -34,8 +36,6 @@ MarkdownBlock::Stack CanonicalHeaderFixture()
     
     return markdown;
 }
-
-static SourceData SourceDataFixture = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 TEST_CASE("hparser/signature-inline", "Verify headers signature, inline")
 {

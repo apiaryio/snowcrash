@@ -9,10 +9,12 @@
 #include <iterator>
 #include "catch.hpp"
 #include "AssetParser.h"
+#include "Fixture.h"
 
 using namespace snowcrash;
+using namespace snowcrashtest;
 
-MarkdownBlock::Stack CanonicalBodyAssetFixture()
+MarkdownBlock::Stack snowcrashtest::CanonicalBodyAssetFixture()
 {
     // Blueprint in question:
     //R"(
@@ -34,7 +36,7 @@ MarkdownBlock::Stack CanonicalBodyAssetFixture()
     return markdown;
 }
 
-MarkdownBlock::Stack CanonicalSchemaAssetFixture()
+MarkdownBlock::Stack snowcrashtest::CanonicalSchemaAssetFixture()
 {
     // Blueprint in question:
     //R"(
@@ -55,8 +57,6 @@ MarkdownBlock::Stack CanonicalSchemaAssetFixture()
     
     return markdown;
 }
-
-static SourceData SourceDataFixture = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 TEST_CASE("aparser/signature-inline", "Verify asset signature, inline")
 {

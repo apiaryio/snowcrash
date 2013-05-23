@@ -9,10 +9,12 @@
 #include <iterator>
 #include "catch.hpp"
 #include "PayloadParser.h"
+#include "Fixture.h"
 
 using namespace snowcrash;
+using namespace snowcrashtest;
 
-MarkdownBlock::Stack CanonicalPayloadFixture()
+MarkdownBlock::Stack snowcrashtest::CanonicalPayloadFixture()
 {
     // Blueprint in question:
     //R"(
@@ -62,8 +64,6 @@ MarkdownBlock::Stack CanonicalPayloadFixture()
     
     return markdown;
 }
-
-static SourceData SourceDataFixture = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 TEST_CASE("pldparser/classifier", "Payload block classifier")
 {

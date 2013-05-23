@@ -10,8 +10,31 @@
 #include "catch.hpp"
 #include "MethodParser.h"
 #include "ResourceParser.h"
+#include "Fixture.h"
 
 using namespace snowcrash;
+using namespace snowcrashtest;
+
+MarkdownBlock::Stack snowcrashtest::CanonicalMethodFixture()
+{
+    // Blueprint in question:
+    //R"(
+    //# GET
+    //Method Description
+    //
+    // <see CanonicalPayloadFixture()>
+    //
+    //)";
+    
+    MarkdownBlock::Stack markdown;
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "GET", 1, MakeSourceDataBlock(0, 1)));
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Method Description", 0, MakeSourceDataBlock(1, 1)));
+    
+    MarkdownBlock::Stack payload = CanonicalPayloadFixture();
+    markdown.insert(markdown.end(), payload.begin(), payload.end());
+
+    return markdown;
+}
 
 TEST_CASE("mparser/classifier", "Method block classifier")
 {
@@ -86,43 +109,22 @@ TEST_CASE("mparser/classifier-implicit-termination", "Method block classifier im
 
 TEST_CASE("mparser/parse", "Parse method")
 {
-    SourceData source = "012345678";
-    MarkdownBlock::Stack markdown;
-    markdown.push_back(MarkdownBlock(HeaderBlockType, "GET", 1, MakeSourceDataBlock(0, 1)));
-    markdown.push_back(MarkdownBlock(ParagraphBlockType, "p1", 0, MakeSourceDataBlock(1, 1)));
-    
-    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
-    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Response 200", 0, MakeSourceDataBlock(2, 1)));
-    
-    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
-    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Body", 0, MakeSourceDataBlock(3, 1)));
-    markdown.push_back(MarkdownBlock(CodeBlockType, "Code", 0, MakeSourceDataBlock(4, 1)));
-    
-    markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(5, 1)));
-    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(6, 1)));
-    markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(7, 1)));
-    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(8, 1)));
-    
+    MarkdownBlock::Stack markdown = CanonicalMethodFixture();   
     Method method;
-    ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), method);
+    ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), method);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.empty());
 
     const MarkdownBlock::Stack &blocks = markdown;
-    REQUIRE(std::distance(blocks.begin(), result.second) == 13);
+    REQUIRE(std::distance(blocks.begin(), result.second) == 22);
     
     REQUIRE(method.method == "GET");
     REQUIRE(method.description == "1");
-    REQUIRE(method.requests.empty());
+    REQUIRE(method.responses.empty());
     REQUIRE(method.headers.empty());
     REQUIRE(method.parameters.empty());
-    REQUIRE(method.responses.size() == 1);
-    REQUIRE(method.responses.front().name == "200");
-    REQUIRE(method.responses.front().description.empty());
-    REQUIRE(method.responses.front().body == "Code");
+    REQUIRE(method.requests.size() == 1);
 }
 
 TEST_CASE("mparser/parse-list-description", "Parse description with list")
@@ -135,7 +137,6 @@ TEST_CASE("mparser/parse-list-description", "Parse description with list")
     //+ Request
     //");
     
-    SourceData source = "01234";
     MarkdownBlock::Stack markdown;
     markdown.push_back(MarkdownBlock(HeaderBlockType, "GET", 1, MakeSourceDataBlock(0, 1)));
     
@@ -153,7 +154,7 @@ TEST_CASE("mparser/parse-list-description", "Parse description with list")
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(4, 1)));
     
     Method method;
-    ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), method);
+    ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), method);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.size() == 1); // warn skipping Request list
@@ -180,7 +181,6 @@ TEST_CASE("mparser/parse-list-description-request", "Parse description with list
     //+ Request
     //");
     
-    SourceData source = "012345";
     MarkdownBlock::Stack markdown;
     markdown.push_back(MarkdownBlock(HeaderBlockType, "GET", 1, MakeSourceDataBlock(0, 1)));
     
@@ -198,7 +198,7 @@ TEST_CASE("mparser/parse-list-description-request", "Parse description with list
     
     
     Method method;
-    ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), method);
+    ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), method);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.empty());
@@ -227,7 +227,6 @@ TEST_CASE("mparser/response-regex-problem", "Parse method with response not matc
     //  X
     //");
     
-    SourceData source = "012";
     MarkdownBlock::Stack markdown;
     markdown.push_back(MarkdownBlock(HeaderBlockType, "GET", 1, MakeSourceDataBlock(0, 1)));
     
@@ -237,7 +236,7 @@ TEST_CASE("mparser/response-regex-problem", "Parse method with response not matc
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(2, 1)));
 
     Method method;
-    ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), method);
+    ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), method);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.empty());
@@ -287,8 +286,7 @@ TEST_CASE("mparser/parse-multi-request-response", "Parse method with multiple re
     //            J
     //");
     
-    
-    SourceData source = "0123456789ABCDEFGHIJKLMNOPQRST"; 
+
     MarkdownBlock::Stack markdown;
     markdown.push_back(MarkdownBlock(HeaderBlockType, "PUT", 1, MakeSourceDataBlock(0, 1)));
     
@@ -345,7 +343,7 @@ TEST_CASE("mparser/parse-multi-request-response", "Parse method with multiple re
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(29, 1)));
     
     Method method;
-    ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), method);
+    ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), method);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.size() == 1); // warn responses with the same name
@@ -402,8 +400,7 @@ TEST_CASE("mparser/parse-multi-request-incomplete", "Parse method with multiple 
     //+ Request B
     //  C
     //");
-    
-    SourceData source = "012345";
+
     MarkdownBlock::Stack markdown;
     markdown.push_back(MarkdownBlock(HeaderBlockType, "HEAD", 1, MakeSourceDataBlock(0, 1)));
     
@@ -422,7 +419,7 @@ TEST_CASE("mparser/parse-multi-request-incomplete", "Parse method with multiple 
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(5, 1)));
 
     Method method;
-    ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), method);
+    ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), method);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.empty());
@@ -463,7 +460,6 @@ TEST_CASE("mparser/parse-foreign", "Parse method with foreign item")
     //+ Bar
     //");
     
-    SourceData source = "0123456789ABCDEFGHIJKLMNOPQRST";
     MarkdownBlock::Stack markdown;
     markdown.push_back(MarkdownBlock(HeaderBlockType, "MKCOL", 1, MakeSourceDataBlock(0, 1)));
     markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
@@ -485,7 +481,7 @@ TEST_CASE("mparser/parse-foreign", "Parse method with foreign item")
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(9, 1)));
     
     Method method;
-    ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), method);
+    ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), method);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.size() == 1); // ignoring unrecognized item
@@ -515,7 +511,6 @@ TEST_CASE("mparser/parse-inline-method-payload", "Parse method with inline paylo
     //  + body
     //");
     
-    SourceData source = "01234";
     MarkdownBlock::Stack markdown;
     markdown.push_back(MarkdownBlock(HeaderBlockType, "POST", 1, MakeSourceDataBlock(0, 1)));
     
@@ -531,7 +526,7 @@ TEST_CASE("mparser/parse-inline-method-payload", "Parse method with inline paylo
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(4, 1)));
     
     Method method;
-    ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), method);
+    ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), method);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.size() == 1); // empty asset
@@ -557,15 +552,14 @@ TEST_CASE("mparser/parse-terminator", "Parse method finalized by terminator")
     //# PATCH
     //---
     //A
-    
-    SourceData source = "01234";
+
     MarkdownBlock::Stack markdown;
     markdown.push_back(MarkdownBlock(HeaderBlockType, "PATCH", 1, MakeSourceDataBlock(0, 1)));
     markdown.push_back(MarkdownBlock(HRuleBlockType, SourceData(), 0, MakeSourceDataBlock(1, 1)));
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "A", 0, MakeSourceDataBlock(2, 1)));
     
     Method method;
-    ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), method);
+    ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), method);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.empty());
@@ -587,13 +581,12 @@ TEST_CASE("mparser/parse-implicit-termination", "Parse incomplete method followe
     //## GET
     //# /2
     
-    SourceData source = "01234";
     MarkdownBlock::Stack markdown;
     markdown.push_back(MarkdownBlock(HeaderBlockType, "GET", 2, MakeSourceDataBlock(0, 1)));
     markdown.push_back(MarkdownBlock(HeaderBlockType, "/2", 1, MakeSourceDataBlock(1, 1)));
     
     Method method;
-    ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), method);
+    ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), method);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.empty());
