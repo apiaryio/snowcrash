@@ -91,6 +91,14 @@ namespace snowcrash {
         }
     };
     
+    // Pair first matching predicate
+    template <class T>
+    struct MatchFirst : std::binary_function<T, T, bool> {
+        bool operator()(const T& left, const T& right) const {
+            return left.first == right.first;
+        }
+    };
+    
     //
     // Section Parser prototype
     //

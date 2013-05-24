@@ -216,3 +216,37 @@ TEST_CASE("hparser/parse-multiple-blocks", "Parse header section composed of mul
     REQUIRE(headers[1].second == "42");
     
 }
+
+TEST_CASE("hparser/warnings", "Check warnings during parsing")
+{
+    MarkdownBlock::Stack markdown = CanonicalHeaderFixture();
+    
+    CHECK(markdown.size() == 6);
+    
+    HeaderCollection headers;
+    ParseSectionResult result = HeadersParser::Parse(markdown.begin(),
+                                                     markdown.end(),
+                                                     SourceDataFixture,
+                                                     Blueprint(),
+                                                     headers);
+    
+    REQUIRE(result.first.error.code == Error::OK);
+    REQUIRE(result.first.warnings.empty());
+    
+    const MarkdownBlock::Stack &blocks = markdown;
+    REQUIRE(std::distance(blocks.begin(), result.second) == 6);
+    REQUIRE(headers.size() == 2);
+    
+    // Parse again with headers, check parser warnings
+    result = HeadersParser::Parse(markdown.begin(),
+                                  markdown.end(),
+                                  SourceDataFixture,
+                                  Blueprint(),
+                                  headers);
+    
+    REQUIRE(result.first.error.code == Error::OK);
+    REQUIRE(result.first.warnings.size() == 2);
+
+    REQUIRE(std::distance(blocks.begin(), result.second) == 6);
+    REQUIRE(headers.size() == 4);
+}

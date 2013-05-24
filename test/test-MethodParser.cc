@@ -614,3 +614,21 @@ TEST_CASE("mparser/parse-implicit-termination", "Parse incomplete method followe
     REQUIRE(method.description.empty());
 }
 
+TEST_CASE("mparser/header-warnings", "Check warnings on overshadowing a header")
+{
+    MarkdownBlock::Stack markdown = CanonicalMethodFixture();
+    Method method;
+    method.headers.push_back(std::make_pair("X-Header", "24"));
+    ParseSectionResult result = MethodParser::Parse(markdown.begin(),
+                                                    markdown.end(),
+                                                    SourceDataFixture,
+                                                    Blueprint(),
+                                                    method);
+    
+    REQUIRE(result.first.error.code == Error::OK);
+    REQUIRE(result.first.warnings.size() == 1);
+    
+    const MarkdownBlock::Stack &blocks = markdown;
+    REQUIRE(std::distance(blocks.begin(), result.second) == 26);
+}
+

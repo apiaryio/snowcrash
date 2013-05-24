@@ -322,3 +322,21 @@ TEST_CASE("rparser/parse-terminator", "Parse resource finalized by terminator")
     REQUIRE(resource.description.empty());
     REQUIRE(resource.methods.empty());
 }
+
+TEST_CASE("rparser/header-warnings", "Check warnings on overshadowing a header")
+{
+    MarkdownBlock::Stack markdown = CanonicalResourceFixture();
+    Resource resource;
+    resource.headers.push_back(std::make_pair("X-Header", "24"));
+    ParseSectionResult result = ResourceParser::Parse(markdown.begin(),
+                                                      markdown.end(),
+                                                      SourceDataFixture,
+                                                      Blueprint(),
+                                                      resource);
+    
+    REQUIRE(result.first.error.code == Error::OK);
+    REQUIRE(result.first.warnings.size() == 1);
+    
+    const MarkdownBlock::Stack &blocks = markdown;
+    REQUIRE(std::distance(blocks.begin(), result.second) == 34);
+}

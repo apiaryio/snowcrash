@@ -9,6 +9,7 @@
 #ifndef SNOWCRASH_HEADERPARSER_H
 #define SNOWCRASH_HEADERPARSER_H
 
+#include <sstream>
 #include "BlueprintParserCore.h"
 #include "Blueprint.h"
 #include "ListUtility.h"
@@ -43,6 +44,19 @@ namespace snowcrash {
         
         return false;
     }
+    
+    // Header iterator in its containment group
+    typedef Collection<Header>::const_iterator HeaderIterator;
+    
+    // Finds a header in its containment group by its key (first)
+    inline HeaderIterator FindHeader(const HeaderCollection& headers,
+                                     const Header& header) {
+        
+        return std::find_if(headers.begin(),
+                            headers.end(),
+                            std::bind2nd(MatchFirst<Header>(), header));
+    }
+    
     
     //
     // Block Classifier, Headers Context
@@ -129,7 +143,16 @@ namespace snowcrash {
                 Header header;
                 if (HeaderFromLine(*line, header)) {
                     
-                    // TODO: check duplicates
+                    if (FindHeader(headers, header) != headers.end()) {
+                        // WARN: duplicate header on this level
+                        std::stringstream ss;
+                        ss << "duplicate definitions of `" << header.first << "` header";
+                        result.first.warnings.push_back(Warning(ss.str(),
+                                                                0   ,
+                                                                sourceMap));
+                        
+                    }
+                        
                     headers.push_back(header);
                 }
                 else {
@@ -183,11 +206,28 @@ namespace snowcrash {
                                                     nameBlock->sourceMap));
         }
         else {
-            // TODO: Check duplicates
             t.headers.insert(t.headers.end(), headers.begin(), headers.end());
-            
         }
         return result;
+    }
+    
+    // Checks T's headers for occurence of R's headers, warns if a match is found.
+    template <class T, class R>
+    inline void CheckHeaderDuplicates(const T& left,
+                                      const R& right,
+                                      const SourceDataBlock& rightSourceMap,
+                                      Result& result) {
+        
+        for (HeaderIterator it = right.headers.begin(); it != right.headers.end(); ++it) {
+            if (FindHeader(left.headers, *it) != left.headers.end()) {
+                // WARN: overshadowing header definition
+                std::stringstream ss;
+                ss << "overshadowing `" << it->first << "` header definition";
+                result.warnings.push_back(Warning(ss.str(),
+                                                  0,
+                                                  rightSourceMap));
+            }
+        }
     }
 }
 

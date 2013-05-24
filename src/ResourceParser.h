@@ -201,8 +201,29 @@ namespace snowcrash {
                                                         begin->sourceMap));
             }
             
+            DeepCheckHeaderDuplicates(resource, method, begin->sourceMap, result.first);
             resource.methods.push_back(method);
             return result;
+        }
+        
+        static void DeepCheckHeaderDuplicates(const Resource& resource,
+                                              const Method& method,
+                                              const SourceDataBlock& sourceMap,
+                                              Result& result) {
+            
+            CheckHeaderDuplicates(resource, method, sourceMap, result);
+            for (Collection<Request>::const_iterator it = method.requests.begin();
+                 it != method.requests.end();
+                 ++it) {
+                
+                CheckHeaderDuplicates(resource, *it, sourceMap, result);
+            }
+            for (Collection<Response>::const_iterator it = method.responses.begin();
+                 it != method.responses.end();
+                 ++it) {
+                
+                CheckHeaderDuplicates(resource, *it, sourceMap, result);
+            }
         }
     };
     

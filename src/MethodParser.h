@@ -180,10 +180,10 @@ namespace snowcrash {
                 std::stringstream ss;
                 ss << SectionName(section) << " payload `" << payload.name << "`";
                 ss << " already defined for `" << method.method << "` method";
-                
+                BlockIterator nameBlock = ListItemNameBlock(begin, end);
                 result.first.warnings.push_back(Warning(ss.str(),
                                                         0,
-                                                        begin->sourceMap));
+                                                        nameBlock->sourceMap));
                 
             }
             
@@ -191,6 +191,9 @@ namespace snowcrash {
                 method.requests.push_back(payload);
             else if (section == ResponseSection)
                 method.responses.push_back(payload);
+            
+            BlockIterator nameBlock = ListItemNameBlock(begin, end);
+            CheckHeaderDuplicates(method, payload, nameBlock->sourceMap, result.first);
             
             return result;
         }
