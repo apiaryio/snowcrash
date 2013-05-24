@@ -80,7 +80,7 @@ TEST_CASE("rparser/parse", "Parse resource")
     ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), resource);
     
     REQUIRE(result.first.error.code == Error::OK);
-    CHECK(result.first.warnings.empty());
+    CHECK(result.first.warnings.size() == 1); // no response
     
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 34);
@@ -113,7 +113,7 @@ TEST_CASE("rparser/parse-partial", "Parse partially defined resource")
     ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), resource);
     
     REQUIRE(result.first.error.code == Error::OK);
-    REQUIRE(result.first.warnings.empty());
+    REQUIRE(result.first.warnings.size() == 1); // no response
     
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 8);
@@ -141,7 +141,7 @@ TEST_CASE("rparser/parse-multi-method-desc", "Parse multiple method descriptions
     ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), resource);
     
     REQUIRE(result.first.error.code == Error::OK);
-    REQUIRE(result.first.warnings.empty());
+    REQUIRE(result.first.warnings.size() == 2); // 2x no response
     
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 5);
@@ -221,7 +221,7 @@ TEST_CASE("rparser/parse-multi-method", "Parse multiple method")
     ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), resource);
     
     REQUIRE(result.first.error.code == Error::OK);
-    CHECK(result.first.warnings.size() == 1); // Expected HEAD's body asset
+    CHECK(result.first.warnings.size() == 2); // Expected HEAD's body asset & no response
     
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 30);
@@ -335,7 +335,7 @@ TEST_CASE("rparser/header-warnings", "Check warnings on overshadowing a header")
                                                       resource);
     
     REQUIRE(result.first.error.code == Error::OK);
-    REQUIRE(result.first.warnings.size() == 1);
+    REQUIRE(result.first.warnings.size() == 2); // overshadowing header & no response
     
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 34);

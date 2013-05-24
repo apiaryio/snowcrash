@@ -95,7 +95,7 @@ TEST_CASE("rgparser/parse-multiple-resource", "Parse multiple resources with pay
     ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), resourceGroup);
     
     REQUIRE(result.first.error.code == Error::OK);
-    CHECK(result.first.warnings.empty());
+    CHECK(result.first.warnings.size() == 2); // 2x no response specified
     
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 12);
@@ -171,7 +171,7 @@ TEST_CASE("rgparser/parse-resource-description-list", "Parse resource with list 
     ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), resourceGroup);
     
     REQUIRE(result.first.error.code == Error::OK);
-    CHECK(result.first.warnings.size() == 1);
+    CHECK(result.first.warnings.size() == 2);   // empty asset & no response
     
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 8);

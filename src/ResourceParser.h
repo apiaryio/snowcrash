@@ -202,6 +202,18 @@ namespace snowcrash {
             }
             
             DeepCheckHeaderDuplicates(resource, method, begin->sourceMap, result.first);
+            
+            if (method.responses.empty()) {
+                // WARN: method has no response
+                result.first.warnings.push_back(Warning("no response defined for `" +
+                                                        method.method +
+                                                        " " +
+                                                        resource.uri +
+                                                        "`",
+                                                        0,
+                                                        begin->sourceMap));
+            }
+            
             resource.methods.push_back(method);
             return result;
         }

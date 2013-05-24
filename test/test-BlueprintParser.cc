@@ -215,7 +215,7 @@ TEST_CASE("bpparser/parse-multi-groups", "Parse nameless group after defined res
     BlueprintParser::Parse(source, markdown, result, blueprint);
     
     REQUIRE(result.error.code == Error::OK);
-    CHECK(result.warnings.size() == 2); // groups with same name & expected group name
+    CHECK(result.warnings.size() == 3); // groups with same name & expected group name & no response
 
     REQUIRE(blueprint.resourceGroups.size() == 2);
     
