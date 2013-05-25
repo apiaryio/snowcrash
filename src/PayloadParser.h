@@ -101,7 +101,7 @@ namespace snowcrash {
     //
     // Block Classifier, Payload Context
     //
-    // TODO: refactor
+    // REFACTOR: If need to modify, refactor to MethodParser Classifier standards
     template <>
     inline Section ClassifyBlock<Payload>(const BlockIterator& begin,
                                           const BlockIterator& end,
@@ -203,6 +203,7 @@ namespace snowcrash {
                                                              const Blueprint& blueprint,
                                                              Payload& payload) {
             
+            // REFACTOR: If need to modify refactor reusing ParseListPreformattedBlock
             ParseSectionResult result = std::make_pair(Result(), cur);
             BlockIterator sectionCur = cur;
 
