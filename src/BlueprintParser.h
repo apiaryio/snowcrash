@@ -133,7 +133,7 @@ namespace snowcrash {
                 else {
                     ss << "group `" << resourceGroup.name << "`";
                 }
-                ss << " already defined";
+                ss << " is already defined";
                 
                 result.first.warnings.push_back(Warning(ss.str(), 0, begin->sourceMap));
             }
