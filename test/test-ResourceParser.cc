@@ -73,6 +73,22 @@ TEST_CASE("rparser/classifier", "Resource block classifier")
     REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), HeadersSection) == MethodSection);
 }
 
+TEST_CASE("rparser/classifier-abbrev", "Abbreviated Resource Method block classifier")
+{
+    MarkdownBlock::Stack markdown;
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "GET /resource", 1, MakeSourceDataBlock(0, 1)));
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "POST", 1, MakeSourceDataBlock(1, 1)));
+    
+    BlockIterator cur = markdown.begin();
+    // "GET /resource"
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSection) == ResourceMethodSection);
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceMethodSection) == UndefinedSection);
+    
+    ++cur; // "POST"
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSection) == MethodSection);
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceMethodSection) == UndefinedSection);
+}
+
 TEST_CASE("rparser/parse", "Parse resource")
 {
     MarkdownBlock::Stack markdown = CanonicalResourceFixture();
@@ -340,3 +356,76 @@ TEST_CASE("rparser/header-warnings", "Check warnings on overshadowing a header")
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 34);
 }
+
+TEST_CASE("rparser/parse-abbrev", "Parse resource method abbreviation")
+{
+    // Blueprint in question:
+    //R"(
+    //# GET /resource
+    //Description
+    //
+    //+ Response 200
+    //    + Body
+    //
+    //            { ... }
+    //");
+    
+    MarkdownBlock::Stack markdown;
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "GET /resource", 1, MakeSourceDataBlock(0, 1)));
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Description", 1, MakeSourceDataBlock(1, 1)));
+
+    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Response 200", 0, MakeSourceDataBlock(2, 1)));
+
+    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Body", 0, MakeSourceDataBlock(3, 1)));
+    markdown.push_back(MarkdownBlock(CodeBlockType, "{ ... }", 0, MakeSourceDataBlock(4, 1)));
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(5, 1)));
+    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(6, 1)));
+    
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(7, 1)));
+    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(8, 1)));
+    
+    Resource resource;
+    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), resource);
+    
+    REQUIRE(result.first.error.code == Error::OK);
+    REQUIRE(result.first.warnings.empty());
+    
+    const MarkdownBlock::Stack &blocks = markdown;
+    REQUIRE(std::distance(blocks.begin(), result.second) == 13);
+    
+    REQUIRE(resource.methods.size() == 1);
+    REQUIRE(resource.methods[0].method == "GET");
+    REQUIRE(resource.methods[0].description == "1");
+    REQUIRE(resource.methods[0].responses.size() == 1);
+}
+
+TEST_CASE("rparser/parse-abbrev-ambiguous", "Parse resource method abbreviation followed by a foreign method")
+{
+    // Blueprint in question:
+    //R"(
+    //# GET /resource
+    //# POST
+    //");
+    
+    MarkdownBlock::Stack markdown;
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "GET /resource", 1, MakeSourceDataBlock(0, 1)));
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "POST", 1, MakeSourceDataBlock(1, 1)));
+    
+    Resource resource;
+    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), resource);
+    
+    REQUIRE(result.first.error.code == Error::OK);
+    REQUIRE(result.first.warnings.size() == 2); // no response & ignoring possible resource method
+    
+    const MarkdownBlock::Stack &blocks = markdown;
+    REQUIRE(std::distance(blocks.begin(), result.second) == 1);
+    
+    REQUIRE(resource.methods.size() == 1);
+    REQUIRE(resource.methods[0].method == "GET");
+}
+

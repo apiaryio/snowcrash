@@ -50,7 +50,7 @@ Resource **description**\n\
 + Response 200\n\
     + Body\n\
 \n\
-        Text\n\
+            Text\n\
 \n\
             { ... }\n\
 ";
@@ -67,7 +67,17 @@ Resource **description**\n\
     REQUIRE(resourceGroup.description.empty());
     REQUIRE(resourceGroup.resources.size() == 1);
     
-    // TODO:
-    //Resource& resource = resourceGroup.resources.front();
-    //REQUIRE(resource.uri == "/resource");
+    Resource& resource = resourceGroup.resources.front();
+    REQUIRE(resource.uri == "/resource");
+    REQUIRE(resource.methods.size() == 1);
+    
+    Method& method = resource.methods[0];
+    REQUIRE(method.method == "GET");
+    REQUIRE(method.description == "Resource **description**\n\n");
+    REQUIRE(method.requests.empty());
+    REQUIRE(method.responses.size() == 1);
+    
+    Response& response = method.responses[0];
+    REQUIRE(response.name == "200");
+    REQUIRE(response.body == "Text\n\n{ ... }\n");
 }

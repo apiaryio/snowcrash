@@ -10,6 +10,7 @@
 #define SNOWCRASH_REGEXMATCH_H
 
 #include <string>
+#include <vector>
 
 namespace snowcrash {
 
@@ -19,6 +20,13 @@ namespace snowcrash {
     
     // Performs posix-regex and returns first captured group (excluding whole target)
     std::string RegexCaptureFirst(const std::string& target, const std::string& expression);
+    
+    // Array of capture groups
+    typedef std::vector<std::string> CaptureGroups;
+    
+    // Performs posix-regex
+    // returns true if target string matches given expression, false otherwise
+    bool RegexCapture(const std::string& target, const std::string& expression, CaptureGroups& captureGroups);
 }
 
 #endif

@@ -15,17 +15,18 @@
 #include "PayloadParser.h"
 #include "HeaderParser.h"
 
-static const std::string MethodHeaderRegex("^(" HTTP_METHODS ")[[:space:]]*$");
+static const std::string CanonicalMethodHeaderRegex("^(" HTTP_METHODS ")[[:space:]]*$");
+static const std::string LooseMethodHeaderRegex("^(" HTTP_METHODS ")[[:space:]]*");
 
 namespace snowcrash {
     
     // Returns true if block has HTTP Method signature, false otherwise
-    inline bool HasMethodSignature(const MarkdownBlock& block) {
+    inline bool HasMethodSignature(const MarkdownBlock& block, bool strict = false) {
         if (block.type != HeaderBlockType ||
             block.content.empty())
             return false;
         
-        return RegexMatch(block.content, MethodHeaderRegex);
+        return RegexMatch(block.content, (strict) ? CanonicalMethodHeaderRegex : LooseMethodHeaderRegex);
     }
     
     // Finds a method inside resource
@@ -67,12 +68,12 @@ namespace snowcrash {
         
         if (context == TerminatorSection)
             return UndefinedSection;
-        
-        if (HasResourceSignature(*begin))
-            return UndefinedSection;
 
         if (HasMethodSignature(*begin))
             return (context == UndefinedSection) ? MethodSection : UndefinedSection;
+        
+        if (HasResourceSignature(*begin))
+            return UndefinedSection;
         
         Section listSection = ClassifyInternaListBlock<Method>(begin, end);
         if (listSection != UndefinedSection)
@@ -145,7 +146,13 @@ namespace snowcrash {
             BlockIterator sectionCur(cur);
             if (cur->type == HeaderBlockType &&
                 cur == bounds.first) {
-                method.method = cur->content;
+                
+                CaptureGroups captureGroups;
+                RegexCapture(cur->content, LooseMethodHeaderRegex, captureGroups);
+                if (captureGroups.size() == 2)
+                    method.method = captureGroups[1];
+                else
+                    method.method = cur->content;
             }
             else {
                 

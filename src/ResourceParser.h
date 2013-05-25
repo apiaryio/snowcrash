@@ -9,22 +9,55 @@
 #ifndef SNOWCRASH_RESOURCEPARSER_H
 #define SNOWCRASH_RESOURCEPARSER_H
 
+#include <sstream>
 #include "BlueprintParserCore.h"
 #include "Blueprint.h"
 #include "MethodParser.h"
 #include "RegexMatch.h"
+#include "StringUtility.h"
 
-static const std::string ResourceHeaderRegex("^((" HTTP_METHODS ")[[:space:]]+)?/.*$");
+static const std::string ResourceHeaderRegex("^((" HTTP_METHODS ")[[:space:]]+)?(/.*)$");
 
 namespace snowcrash {
+    
+    // Resource signature
+    enum ResourceSignature {
+        UndefinedResourceSignature,
+        NoResourceSignature,
+        URIResourceSignature,
+        MethodURIResourceSignature
+    };
+    
+    // Query resource signature
+    inline ResourceSignature GetResourceSignature(const MarkdownBlock& block, HTTPMethod& method, URITemplate& uri) {
+        if (block.type != HeaderBlockType ||
+            block.content.empty())
+            return NoResourceSignature;
+        
+        CaptureGroups captureGroups;
+        if (!RegexCapture(block.content, ResourceHeaderRegex, captureGroups))
+            return NoResourceSignature;
+        
+        if (captureGroups.size() == 4) {
+            method = captureGroups[2];
+            uri = captureGroups[3];
+            return MethodURIResourceSignature;
+        }
+        else if (captureGroups.size() == 1){
+            method = HTTPMethod();
+            uri = captureGroups[0];
+            return URIResourceSignature;
+        }
+        
+        return NoResourceSignature;
+    }
     
     // Returns true if block has resource header signature, false otherwise
     inline bool HasResourceSignature(const MarkdownBlock& block) {
 
-        if (block.type != HeaderBlockType || block.content.empty())
-            return false;
-        
-        return RegexMatch(block.content, ResourceHeaderRegex);
+        HTTPMethod method;
+        URITemplate uri;
+        return GetResourceSignature(block, method, uri) != NoResourceSignature;
     }
 
     // Resource iterator in its containment group
@@ -84,11 +117,17 @@ namespace snowcrash {
         if (context == TerminatorSection)
             return UndefinedSection;
         
-        if (HasResourceSignature(*begin))
-            return (context == UndefinedSection) ? ResourceSection : UndefinedSection;;
+        HTTPMethod method;
+        URITemplate uri;
+        ResourceSignature resourceSignature = GetResourceSignature(*begin, method, uri);
+        if (resourceSignature != NoResourceSignature) {
+            return (context == UndefinedSection) ?
+                    ((resourceSignature == MethodURIResourceSignature) ? ResourceMethodSection : ResourceSection) :
+                    UndefinedSection;
+        }
         
         if (HasMethodSignature(*begin))
-            return MethodSection;
+            return (context != ResourceMethodSection) ? MethodSection : UndefinedSection;
         
         Section listSection = ClassifyInternaListBlock<Resource>(begin, end);
         if (listSection != UndefinedSection)
@@ -125,6 +164,10 @@ namespace snowcrash {
                     result = HandleResourceOverviewBlock(cur, bounds, sourceData, blueprint, resource);
                     break;
                     
+                case ResourceMethodSection:
+                    result = HandleResourceMethod(cur, bounds, sourceData, blueprint, resource);
+                    break;
+                    
                 case HeadersSection:
                     result = HandleHeaders(cur, bounds.second, sourceData, blueprint, resource);
                     break;
@@ -134,6 +177,7 @@ namespace snowcrash {
                     break;
                     
                 case UndefinedSection:
+                    CheckAmbiguousMethod(cur, bounds.second, result.first);
                     result.second = CloseListItemBlock(cur, bounds.second);
                     break;
                     
@@ -159,7 +203,10 @@ namespace snowcrash {
             BlockIterator sectionCur(cur);
             if (cur->type == HeaderBlockType &&
                 cur == bounds.first) {
-                resource.uri = cur->content;
+                
+                // Retrieve URI
+                HTTPMethod method;
+                GetResourceSignature(*cur, method, resource.uri);
             }
             else {
                 
@@ -177,16 +224,40 @@ namespace snowcrash {
             return result;
         }
         
+        static ParseSectionResult HandleResourceMethod(const BlockIterator& cur,
+                                                       const SectionBounds& bounds,
+                                                       const SourceData& sourceData,
+                                                       const Blueprint& blueprint,
+                                                       Resource& resource) {
+            
+            // Retrieve URI template
+            HTTPMethod method;
+            GetResourceSignature(*cur, method, resource.uri);
+            
+            // Parse as a resource method abbreviation
+            return HandleMethod(cur, bounds.second, sourceData, blueprint, resource, true);
+        }
+        
         static ParseSectionResult HandleMethod(const BlockIterator& begin,
                                                const BlockIterator& end,
                                                const SourceData& sourceData,
                                                const Blueprint& blueprint,
-                                               Resource& resource)
+                                               Resource& resource,
+                                               bool abbrev = false)
         {
             Method method;
             ParseSectionResult result = MethodParser::Parse(begin, end, sourceData, blueprint, method);
             if (result.first.error.code != Error::OK)
                 return result;
+
+            if (!abbrev &&
+                !HasMethodSignature(*begin, true)) {
+                // WARN: ignoring extraneous content in method header
+                std::stringstream ss;
+                ss << "ignoring extraneous content in method header `" << begin->content << "`";
+                ss << ", expected method-only e.g. `# " << method.method << "`";
+                result.first.warnings.push_back(Warning(ss.str(), 0, begin->sourceMap));
+            }
             
             Collection<Method>::iterator duplicate = FindMethod(resource, method);
             if (duplicate != resource.methods.end()) {
@@ -235,6 +306,24 @@ namespace snowcrash {
                  ++it) {
                 
                 CheckHeaderDuplicates(resource, *it, sourceMap, result);
+            }
+        }
+        
+        // Check whether abbreviated resource method isn't followed by a
+        // method header -> implies possible additional method intended
+        static void CheckAmbiguousMethod(const BlockIterator& begin,
+                                         const BlockIterator& end,
+                                         Result& result) {
+            
+            if (begin == end ||
+                begin->type != HeaderBlockType)
+                return;
+            
+            if (HasMethodSignature(*begin, true)) {
+                // WARN: ignoring possible method header
+                std::stringstream ss;
+                ss << "ambiguous method `" << begin->content << "`, check previous resource definition";
+                result.warnings.push_back(Warning(ss.str(), 0, begin->sourceMap));
             }
         }
     };

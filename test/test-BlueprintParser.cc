@@ -227,68 +227,68 @@ TEST_CASE("bpparser/parse-multi-groups", "Parse nameless group after defined res
     REQUIRE(blueprint.resourceGroups[1].description == "9");
 }
 
-//TEST_CASE("bpparser/parse-resource", "Parse simple resource.")
-//{
-//    // Blueprint in question:
-//    //R"(
-//    //# GET /resource
-//    //p1
-//    //+ Response 200
-//    //
-//    //        body
-//    //");
-//    
-//    Result result;
-//    Blueprint blueprint;
-//    
-//    SourceData source = "012345";
-//
-//    MarkdownBlock::Stack markdown;
-//    markdown.push_back(MarkdownBlock(HeaderBlockType, "GET /resource", 1, MakeSourceDataBlock(0, 1)));
-//    markdown.push_back(MarkdownBlock(ParagraphBlockType, "p1", 1, MakeSourceDataBlock(1, 1)));
-//    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 1, SourceDataBlock()));
-//    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 1, SourceDataBlock()));
-//    
-//    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Response 200", 1, MakeSourceDataBlock(2, 1)));
-//    markdown.push_back(MarkdownBlock(CodeBlockType, "body", 1, MakeSourceDataBlock(3, 1)));
-//    
-//    markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 1, MakeSourceDataBlock(4, 1)));
-//    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 1, MakeSourceDataBlock(5, 1)));
-//    
-//    BlueprintParser::Parse(source, markdown, result, blueprint);
-//
-//    REQUIRE(result.error.code == Error::OK);
-//    REQUIRE(result.warnings.empty());
-//    REQUIRE(blueprint.name.empty());
-//    REQUIRE(blueprint.description.empty());
-//    
-//    REQUIRE(blueprint.resourceGroups.size() == 1);
-//
-//    ResourceGroup group = blueprint.resourceGroups.front();
-//    REQUIRE(group.name.empty());
-//    REQUIRE(group.description.empty());
-//    REQUIRE(group.resources.size() == 1);
-//    
-//    Resource resource = group.resources.front();
-//    REQUIRE(resource.uri == "/resource");
-//    REQUIRE(resource.description == "0");
-//    REQUIRE(resource.headers.empty());
-//    REQUIRE(resource.parameters.empty());
-//    REQUIRE(resource.methods.size() == 1);
-//    
-//    Method method = resource.methods.front();
-//    REQUIRE(method.method == "GET");
-//    REQUIRE(method.description.empty());
-//    REQUIRE(method.parameters.empty());
-//    REQUIRE(method.headers.empty());
-//    REQUIRE(method.requests.empty());
-//    REQUIRE(method.responses.size() == 1);
-//    
-//    Response response = method.responses.front();
-//    REQUIRE(response.name == "200");
+TEST_CASE("bpparser/parse-resource", "Parse simple resource.")
+{
+    // Blueprint in question:
+    //R"(
+    //# GET /resource
+    //p1
+    //+ Response 200
+    //
+    //        body
+    //");
+    
+    Result result;
+    Blueprint blueprint;
+    
+    SourceData source = "012345";
+
+    MarkdownBlock::Stack markdown;
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "GET /resource", 1, MakeSourceDataBlock(0, 1)));
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "p1", 1, MakeSourceDataBlock(1, 1)));
+    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 1, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 1, SourceDataBlock()));
+    
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Response 200", 1, MakeSourceDataBlock(2, 1)));
+    markdown.push_back(MarkdownBlock(CodeBlockType, "body", 1, MakeSourceDataBlock(3, 1)));
+    
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 1, MakeSourceDataBlock(4, 1)));
+    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 1, MakeSourceDataBlock(5, 1)));
+    
+    BlueprintParser::Parse(source, markdown, result, blueprint);
+
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.empty());
+    REQUIRE(blueprint.name.empty());
+    REQUIRE(blueprint.description.empty());
+    
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+
+    ResourceGroup group = blueprint.resourceGroups.front();
+    REQUIRE(group.name.empty());
+    REQUIRE(group.description.empty());
+    REQUIRE(group.resources.size() == 1);
+    
+    Resource resource = group.resources.front();
+    REQUIRE(resource.uri == "/resource");
+    REQUIRE(resource.description.empty());
+    REQUIRE(resource.headers.empty());
+    REQUIRE(resource.parameters.empty());
+    REQUIRE(resource.methods.size() == 1);
+    
+    Method method = resource.methods.front();
+    REQUIRE(method.method == "GET");
+    REQUIRE(method.description == "1");
+    REQUIRE(method.parameters.empty());
+    REQUIRE(method.headers.empty());
+    REQUIRE(method.requests.empty());
+    REQUIRE(method.responses.size() == 1);
+    
+    Response response = method.responses.front();
+    REQUIRE(response.name == "200");
 //    REQUIRE(response.description.empty());
 //    REQUIRE(response.parameters.empty());
 //    REQUIRE(response.headers.empty());
 //    REQUIRE(response.body == "body");
 //    REQUIRE(response.schema.empty());
-//}
+}

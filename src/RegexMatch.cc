@@ -46,27 +46,46 @@ bool snowcrash::RegexMatch(const std::string& target, const std::string& express
 
 std::string snowcrash::RegexCaptureFirst(const std::string& target, const std::string& expression)
 {
-    if (target.empty() || expression.empty())
+    CaptureGroups groups;
+    if (!RegexCapture(target, expression, groups) ||
+        groups.size() < 2)
         return std::string();
+    
+    return groups[1];
+}
+
+bool snowcrash::RegexCapture(const std::string& target, const std::string& expression, CaptureGroups& captureGroups)
+{
+    static const size_t MaxCaptureGroup = 8;
+    if (target.empty() || expression.empty())
+        return false;
+    
+    captureGroups.clear();
     
     regex_t regex;
     int reti = ::regcomp(&regex, expression.c_str(), REG_EXTENDED);
     if (reti)
-        return std::string();
+        return false;
     
-    regmatch_t pmatch[2];
+    regmatch_t pmatch[MaxCaptureGroup];
     ::memset(pmatch, 0, sizeof(pmatch));
-    reti = ::regexec(&regex, target.c_str(), 2, pmatch, 0);
+    reti = ::regexec(&regex, target.c_str(), MaxCaptureGroup, pmatch, 0);
     if (!reti) {
         ::regfree(&regex);
         
-        if (pmatch[1].rm_so == -1 || pmatch[1].rm_eo == -1)
-            return std::string(); // no group
+        for (size_t i = 0; i < MaxCaptureGroup; ++i) {
+            if (pmatch[i].rm_so == -1 || pmatch[i].rm_eo == -1)
+                break;
+
+            captureGroups.push_back(std::string(target, pmatch[i].rm_so, pmatch[i].rm_eo - pmatch[i].rm_so));
+        }
         
-        return std::string(target, pmatch[1].rm_so, pmatch[1].rm_eo - pmatch[1].rm_so);
+        return true;
     }
     else {
         ::regfree(&regex);
-        return std::string();
+        return false;
     }
 }
+
+

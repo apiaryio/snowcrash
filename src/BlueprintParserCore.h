@@ -25,6 +25,7 @@ namespace snowcrash {
         BlueprintSection,
         ResourceGroupSection,
         ResourceSection,
+        ResourceMethodSection,
         MethodSection,
         RequestSection,
         ResponseSection,
@@ -131,7 +132,7 @@ namespace snowcrash {
                           const Section& context);
     
     // Forward declaration of classifier helpers
-    extern bool HasMethodSignature(const MarkdownBlock& block);
+    extern bool HasMethodSignature(const MarkdownBlock& block, bool strict);
     extern bool HasResourceSignature(const MarkdownBlock& block);
     extern bool HasPayloadSignature(const BlockIterator& begin, const BlockIterator& end);
     extern bool HasAssetSignature(const BlockIterator& begin, const BlockIterator& end);
