@@ -129,9 +129,11 @@ TEST_CASE("pldparser/parse", "Parse canonical payload")
     REQUIRE(payload.name == "Hello World");
     REQUIRE(payload.description == "1");
     REQUIRE(payload.parameters.empty());
-    REQUIRE(payload.headers.size() == 1);
-    REQUIRE(payload.headers[0].first == "X-Header");
-    REQUIRE(payload.headers[0].second == "42");
+    REQUIRE(payload.headers.size() == 2);
+    REQUIRE(payload.headers[0].first == "Content-Type");
+    REQUIRE(payload.headers[0].second == "text/plain");
+    REQUIRE(payload.headers[1].first == "X-Header");
+    REQUIRE(payload.headers[1].second == "42");
     REQUIRE(payload.body == "Code");
     REQUIRE(payload.schema == "Code 2");
 }
@@ -380,7 +382,7 @@ TEST_CASE("pldparser/parse-abbrev-body", "Parse abbreviated payload body")
     REQUIRE(payload.name == "200");
     REQUIRE(payload.description.empty());
     REQUIRE(payload.parameters.empty());
-    REQUIRE(payload.headers.empty());
+    REQUIRE(payload.headers.size() == 1);
     REQUIRE(payload.body == "Hello World");
     REQUIRE(payload.schema.empty());
 }

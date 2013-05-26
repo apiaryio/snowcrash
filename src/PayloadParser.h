@@ -20,10 +20,10 @@
 #include "HeaderParser.h"
 
 // Request matching regex
-static const std::string RequestRegex("^[Rr]equest([[:space:]]+([A-Za-z0-9_]|[[:space:]])*)?([[:space:]]\\([^\\)]*\\))?[[:space:]]*$");
+static const std::string RequestRegex("^[Rr]equest([[:space:]]+([A-Za-z0-9_]|[[:space:]])*)?([[:space:]]\\(([^\\)]*)\\))?[[:space:]]*$");
 
 // Response matching regex
-static const std::string ResponseRegex("^[Rr]esponse([[:space:]]+([0-9_])*)?([[:space:]]\\([^\\)]*\\))?[[:space:]]*$");
+static const std::string ResponseRegex("^[Rr]esponse([[:space:]]+([0-9_])*)?([[:space:]]\\(([^\\)]*)\\))?[[:space:]]*$");
 
 namespace snowcrash {
     
@@ -308,10 +308,13 @@ namespace snowcrash {
             SourceData signature = GetListItemSignature(begin, end, remainingContent);
 
             // Capture name
+            CaptureGroups groups;
             if (section == RequestSection || section == RequestBodySection)
-                payload.name = RegexCaptureFirst(signature, RequestRegex);
+                RegexCapture(signature, RequestRegex, groups, 5);
             else if (section == ResponseSection || section == ResponseBodySection)
-                payload.name = RegexCaptureFirst(signature, ResponseRegex);
+                RegexCapture(signature, ResponseRegex, groups, 5);
+            
+            payload.name = groups[1];
             
             // Clean & trim
             if (!payload.name.empty())
@@ -332,7 +335,13 @@ namespace snowcrash {
                                                   0,
                                                   nameBlock->sourceMap));
                 payload.name = "200";
-            }            
+            }
+            
+            if (!groups[4].empty()) {
+                Header header = std::make_pair("Content-Type", groups[4]);
+                TrimString(header.second);
+                payload.headers.push_back(header);
+            }
         }
         
         // Sets payload section asset. Returns true on success, false when asset is already set.

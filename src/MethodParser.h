@@ -148,11 +148,8 @@ namespace snowcrash {
                 cur == bounds.first) {
                 
                 CaptureGroups captureGroups;
-                RegexCapture(cur->content, LooseMethodHeaderRegex, captureGroups);
-                if (captureGroups.size() == 2)
-                    method.method = captureGroups[1];
-                else
-                    method.method = cur->content;
+                RegexCapture(cur->content, LooseMethodHeaderRegex, captureGroups, 2);
+                method.method = captureGroups[1];
             }
             else {
                 

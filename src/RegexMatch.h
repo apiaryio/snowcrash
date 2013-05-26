@@ -26,7 +26,7 @@ namespace snowcrash {
     
     // Performs posix-regex
     // returns true if target string matches given expression, false otherwise
-    bool RegexCapture(const std::string& target, const std::string& expression, CaptureGroups& captureGroups);
+    bool RegexCapture(const std::string& target, const std::string& expression, CaptureGroups& captureGroups, size_t groupSize = 8);
 }
 
 #endif

@@ -35,21 +35,12 @@ namespace snowcrash {
             return NoResourceSignature;
         
         CaptureGroups captureGroups;
-        if (!RegexCapture(block.content, ResourceHeaderRegex, captureGroups))
+        if (!RegexCapture(block.content, ResourceHeaderRegex, captureGroups, 4))
             return NoResourceSignature;
-        
-        if (captureGroups.size() == 4) {
-            method = captureGroups[2];
-            uri = captureGroups[3];
-            return MethodURIResourceSignature;
-        }
-        else if (captureGroups.size() == 1){
-            method = HTTPMethod();
-            uri = captureGroups[0];
-            return URIResourceSignature;
-        }
-        
-        return NoResourceSignature;
+
+        method = captureGroups[2];
+        uri = captureGroups[3];
+        return (method.empty()) ? URIResourceSignature : MethodURIResourceSignature;
     }
     
     // Returns true if block has resource header signature, false otherwise

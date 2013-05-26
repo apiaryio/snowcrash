@@ -54,36 +54,44 @@ std::string snowcrash::RegexCaptureFirst(const std::string& target, const std::s
     return groups[1];
 }
 
-bool snowcrash::RegexCapture(const std::string& target, const std::string& expression, CaptureGroups& captureGroups)
+bool snowcrash::RegexCapture(const std::string& target, const std::string& expression, CaptureGroups& captureGroups, size_t groupSize)
 {
-    static const size_t MaxCaptureGroup = 8;
     if (target.empty() || expression.empty())
         return false;
     
     captureGroups.clear();
     
-    regex_t regex;
-    int reti = ::regcomp(&regex, expression.c_str(), REG_EXTENDED);
-    if (reti)
-        return false;
-    
-    regmatch_t pmatch[MaxCaptureGroup];
-    ::memset(pmatch, 0, sizeof(pmatch));
-    reti = ::regexec(&regex, target.c_str(), MaxCaptureGroup, pmatch, 0);
-    if (!reti) {
-        ::regfree(&regex);
+    try {
+        regex_t regex;
+        int reti = ::regcomp(&regex, expression.c_str(), REG_EXTENDED);
+        if (reti)
+            return false;
         
-        for (size_t i = 0; i < MaxCaptureGroup; ++i) {
-            if (pmatch[i].rm_so == -1 || pmatch[i].rm_eo == -1)
-                break;
-
-            captureGroups.push_back(std::string(target, pmatch[i].rm_so, pmatch[i].rm_eo - pmatch[i].rm_so));
+        regmatch_t *pmatch = ::new regmatch_t[groupSize];
+        ::memset(pmatch, 0, sizeof(regmatch_t) * groupSize);
+        
+        reti = ::regexec(&regex, target.c_str(), groupSize, pmatch, 0);
+        if (!reti) {
+            ::regfree(&regex);
+            
+            for (size_t i = 0; i < groupSize; ++i) {
+                if (pmatch[i].rm_so == -1 || pmatch[i].rm_eo == -1)
+                    captureGroups.push_back(std::string());
+                else
+                    captureGroups.push_back(std::string(target, pmatch[i].rm_so, pmatch[i].rm_eo - pmatch[i].rm_so));
+            }
+            
+            delete [] pmatch;
+            return true;
         }
-        
-        return true;
+        else {
+            ::regfree(&regex);
+            delete [] pmatch;        
+            return false;
+        }
     }
-    else {
-        ::regfree(&regex);
+    catch (...)
+    {
         return false;
     }
 }
