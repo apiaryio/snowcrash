@@ -31,6 +31,7 @@ namespace snowcrash {
         UndefinedAssetSignature,
         NoAssetSignature,
         BodyAssetSignature,
+        PayloadBodyAssetSignature,
         SchemaAssetSignature,
         GenericAssetSignature
     };
@@ -55,6 +56,9 @@ namespace snowcrash {
 
             if (RegexMatch(content, SchemaRegex))
                 return SchemaAssetSignature;
+            
+            if (HasPayloadAssetSignature(begin, end))
+                return PayloadBodyAssetSignature;
         }
         
         return NoAssetSignature;
@@ -63,7 +67,7 @@ namespace snowcrash {
     inline bool HasAssetSignature(const BlockIterator& begin,
                                   const BlockIterator& end) {
         AssetSignature signature = GetAssetSignature(begin, end);
-        return (signature == BodyAssetSignature || signature == SchemaAssetSignature);
+        return (signature != NoAssetSignature);
     }
     
     //
@@ -74,15 +78,13 @@ namespace snowcrash {
                                         const BlockIterator& end,
                                         const Section& context) {
         if (context == UndefinedSection) {
-            
             AssetSignature asset = GetAssetSignature(begin, end);
-            if (asset == BodyAssetSignature)
+            if (asset == BodyAssetSignature || asset == PayloadBodyAssetSignature)
                 return BodySection;
             if (asset == SchemaAssetSignature)
                 return SchemaSection;
         }
         else if (context == BodySection || context == SchemaSection) {
-            
             // Section closure
             if (begin->type == ListItemBlockEndType ||
                 begin->type == ListBlockEndType)

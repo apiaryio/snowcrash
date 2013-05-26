@@ -79,6 +79,13 @@ namespace snowcrash {
         return (signature == RequestPayloadSignature || signature == ResponsePayloadSignature);
     }
     
+    inline bool HasPayloadAssetSignature(const BlockIterator& begin, const BlockIterator& end) {
+        if (!HasPayloadSignature(begin, end))
+            return false;
+        
+        return !HasNestedListBlock(begin, end);
+    }
+    
     //
     // Classifier of internal list items, Payload context
     //
@@ -101,7 +108,6 @@ namespace snowcrash {
     //
     // Block Classifier, Payload Context
     //
-    // REFACTOR: If need to modify, refactor to MethodParser Classifier standards
     template <>
     inline Section ClassifyBlock<Payload>(const BlockIterator& begin,
                                           const BlockIterator& end,
@@ -110,10 +116,14 @@ namespace snowcrash {
         if (context == UndefinedSection) {
             
             PayloadSignature payload = GetPayloadSignature(begin, end);
-            if (payload == RequestPayloadSignature)
-                return RequestSection;
-            else if (payload == ResponsePayloadSignature)
-                return ResponseSection;
+            if (payload == RequestPayloadSignature) {
+
+                return (HasNestedListBlock(begin, end)) ? RequestSection : RequestBodySection;
+            }
+            else if (payload == ResponsePayloadSignature) {
+                
+                return (HasNestedListBlock(begin, end)) ? ResponseSection : ResponseBodySection;
+            }
         }
         else if ((context == RequestSection || context == ResponseSection)) {
             
@@ -171,6 +181,11 @@ namespace snowcrash {
                     result = HandleOverviewSectionBlock(section, cur, bounds, sourceData, blueprint, payload);
                     break;
                     
+                case RequestBodySection:
+                case ResponseBodySection:
+                    result = HandlePayloadAsset(section, cur, bounds.second, sourceData, blueprint, payload);
+                    break;
+                    
                 case HeadersSection:
                     result = HandleHeaders(cur, bounds.second, sourceData, blueprint, payload);
                     break;
@@ -203,50 +218,12 @@ namespace snowcrash {
                                                              const Blueprint& blueprint,
                                                              Payload& payload) {
             
-            // REFACTOR: If need to modify refactor reusing ParseListPreformattedBlock
             ParseSectionResult result = std::make_pair(Result(), cur);
             BlockIterator sectionCur = cur;
 
             if (sectionCur == bounds.first) {
-                // Parse payload signature
-                sectionCur = ListItemNameBlock(cur, bounds.second);
-                if (sectionCur == bounds.second)
-                    return std::make_pair(Result(), sectionCur);
-                
-                // Extract signagure
-                ContentParts content = ExtractFirstLine(*sectionCur);
-                if (content.empty() ||
-                    content.front().empty()) {
-                    result.first.error = Error("unable to parse payload signature",
-                                               1,
-                                               sectionCur->sourceMap);
-                    result.second = sectionCur;
-                    return result;
-                }
-                
-                // Capture name
-                if (section == RequestSection)
-                    payload.name = RegexCaptureFirst(content[0], RequestRegex);
-                else if (section == ResponseSection)
-                    payload.name = RegexCaptureFirst(content[0], ResponseRegex);
-                
-                // Clean & trim
-                if (!payload.name.empty())
-                    TrimString(payload.name);
-                
-                // Add any extra lines to description
-                if (content.size() == 2) {
-                    payload.description += content[1];
-                }
-                
-                // WARN: missing status code
-                if (payload.name.empty() && section == ResponseSection) {
-                    result.first.warnings.push_back(Warning("missing response HTTP status code, assuming `Response 200`",
-                                                            0,
-                                                            sectionCur->sourceMap));
-                    payload.name = "200";
-                }
-                
+                // Signature
+                ProcessSignature(section, sectionCur, bounds.first, sourceData, result.first, payload);
                 sectionCur = FirstContentBlock(cur, bounds.second);
             }
             else {
@@ -300,6 +277,62 @@ namespace snowcrash {
             }
             
             return result;
+        }
+        
+        // Handle payload + body asset abbreviation
+        static ParseSectionResult HandlePayloadAsset(const Section& section,
+                                                     const BlockIterator& begin,
+                                                     const BlockIterator& end,
+                                                     const SourceData& sourceData,
+                                                     const Blueprint& blueprint,
+                                                     Payload& payload) {
+        
+            // Parse as an asset
+            ParseSectionResult result = HandleAsset(BodySection, begin, end, sourceData, blueprint, payload);
+            
+            // Retrieve signature
+            ProcessSignature(section, begin, end, sourceData, result.first, payload);
+            
+            return result;
+        }
+        
+        // Retrieves & process payload name - signature
+        static void ProcessSignature(const Section& section,
+                                     const BlockIterator& begin,
+                                     const BlockIterator& end,
+                                     const SourceData& sourceData,
+                                     Result& result,
+                                     Payload& payload) {
+            
+            SourceData remainingContent;
+            SourceData signature = GetListItemSignature(begin, end, remainingContent);
+
+            // Capture name
+            if (section == RequestSection || section == RequestBodySection)
+                payload.name = RegexCaptureFirst(signature, RequestRegex);
+            else if (section == ResponseSection || section == ResponseBodySection)
+                payload.name = RegexCaptureFirst(signature, ResponseRegex);
+            
+            // Clean & trim
+            if (!payload.name.empty())
+                TrimString(payload.name);
+            
+            // Add any extra lines to description unless abbreviated body
+            if (!remainingContent.empty() &&
+                section != RequestBodySection &&
+                section != ResponseBodySection) {
+                payload.description += remainingContent;
+            }
+            
+            // WARN: missing status code
+            if (payload.name.empty() &&
+                (section == ResponseSection || section == ResponseBodySection)) {
+                BlockIterator nameBlock = ListItemNameBlock(begin, end);
+                result.warnings.push_back(Warning("missing response HTTP status code, assuming `Response 200`",
+                                                  0,
+                                                  nameBlock->sourceMap));
+                payload.name = "200";
+            }            
         }
         
         // Sets payload section asset. Returns true on success, false when asset is already set.

@@ -217,7 +217,7 @@ TEST_CASE("mparser/parse-list-description-request", "Parse description with list
     ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), method);
     
     REQUIRE(result.first.error.code == Error::OK);
-    REQUIRE(result.first.warnings.empty());
+    REQUIRE(result.first.warnings.size() == 1); // empty body asset
     
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 10);
@@ -255,7 +255,7 @@ TEST_CASE("mparser/response-regex-problem", "Parse method with response not matc
     ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), method);
     
     REQUIRE(result.first.error.code == Error::OK);
-    REQUIRE(result.first.warnings.empty());
+    REQUIRE(result.first.warnings.size() == 1); // preformatted asset
     
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 5);
@@ -267,8 +267,8 @@ TEST_CASE("mparser/response-regex-problem", "Parse method with response not matc
     REQUIRE(method.requests.empty());
     REQUIRE(method.responses.size() == 1);
     REQUIRE(method.responses.front().name == "200");
-    REQUIRE(method.responses.front().description == "  B\n");
-    REQUIRE(method.responses.front().body.empty());
+    REQUIRE(method.responses.front().description.empty());
+    REQUIRE(method.responses.front().body == "  B\n");
 }
 
 TEST_CASE("mparser/parse-multi-request-response", "Parse method with multiple requests and responses")
@@ -438,7 +438,7 @@ TEST_CASE("mparser/parse-multi-request-incomplete", "Parse method with multiple 
     ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), method);
     
     REQUIRE(result.first.error.code == Error::OK);
-    CHECK(result.first.warnings.empty());
+    CHECK(result.first.warnings.size() == 2); // empty asset & preformatted asset
     
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 9);
@@ -456,8 +456,8 @@ TEST_CASE("mparser/parse-multi-request-incomplete", "Parse method with multiple 
     REQUIRE(method.requests[0].headers.empty());
     
     REQUIRE(method.requests[1].name == "B");
-    REQUIRE(method.requests[1].description == "3");
-    REQUIRE(method.requests[1].body.empty());
+    REQUIRE(method.requests[1].description.empty());
+    REQUIRE(method.requests[1].body == "3");
     REQUIRE(method.requests[1].schema.empty());
     REQUIRE(method.requests[1].parameters.empty());
     REQUIRE(method.requests[1].headers.empty());

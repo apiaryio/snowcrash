@@ -58,7 +58,7 @@ namespace snowcrash {
     }
 
     // Return name block of list item; that is either FirstContentBlock() or
-    // matching closing items block for inline items
+    // matching closing item block for inline items
     inline BlockIterator ListItemNameBlock(const BlockIterator& begin,
                                            const BlockIterator& end) {
         
@@ -160,6 +160,28 @@ namespace snowcrash {
         return cur;
     }
     
+    // Extracts first line of a list item content - signature
+    inline SourceData GetListItemSignature(const BlockIterator& cur,
+                                           const BlockIterator& end,
+                                           SourceData& remainingContent) {
+
+        BlockIterator sectionCur = ListItemNameBlock(cur, end);
+        if (sectionCur == end)
+            return SourceData();
+        
+        ContentParts content = ExtractFirstLine(*sectionCur);
+        if (content.empty() ||
+            content.front().empty())
+            return SourceData();
+        
+        if (content.size() == 2)
+            remainingContent = content[1];
+        
+        return content[0];
+    }
+    
+    
+    
     // Parse preformatted source data from block(s) of a list item block
     // TODO: refactor
     inline ParseSectionResult ParseListPreformattedBlock(const Section& section,
@@ -238,6 +260,33 @@ namespace snowcrash {
             result.second = ++sectionCur;
         
         return result;
+    }
+    
+    // Returns true if list item (begin) contains nested list block false otherwise
+    // Look ahead. 
+    inline bool HasNestedListBlock(const BlockIterator& begin, const BlockIterator& end) {
+
+        BlockIterator sectionBegin = begin;
+        if (sectionBegin == end)
+            return false;
+        
+        if (sectionBegin->type == ListBlockBeginType &&
+            ++sectionBegin == end)
+            return false;
+
+        if (sectionBegin->type != ListItemBlockBeginType)
+            return false;
+        
+        BlockIterator sectionEnd = SkipToSectionEnd(sectionBegin,
+                                                    end,
+                                                    ListItemBlockBeginType,
+                                                    ListItemBlockEndType);
+        for (BlockIterator it = sectionBegin; it != sectionEnd; ++it) {
+            if (it->type == ListBlockBeginType)
+                return true;
+        }
+        
+        return false;
     }
 }
 

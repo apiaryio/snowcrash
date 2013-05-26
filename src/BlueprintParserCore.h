@@ -28,7 +28,9 @@ namespace snowcrash {
         ResourceMethodSection,
         MethodSection,
         RequestSection,
+        RequestBodySection,
         ResponseSection,
+        ResponseBodySection,
         BodySection,
         SchemaSection,
         HeadersSection,
@@ -135,6 +137,7 @@ namespace snowcrash {
     extern bool HasMethodSignature(const MarkdownBlock& block, bool strict);
     extern bool HasResourceSignature(const MarkdownBlock& block);
     extern bool HasPayloadSignature(const BlockIterator& begin, const BlockIterator& end);
+    extern bool HasPayloadAssetSignature(const BlockIterator& begin, const BlockIterator& end);
     extern bool HasAssetSignature(const BlockIterator& begin, const BlockIterator& end);
     extern bool HasHeaderSignature(const BlockIterator& begin, const BlockIterator& end);
     

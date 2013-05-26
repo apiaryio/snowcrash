@@ -136,38 +136,6 @@ TEST_CASE("pldparser/parse", "Parse canonical payload")
     REQUIRE(payload.schema == "Code 2");
 }
 
-TEST_CASE("pldparser/parse-incomplete", "Parse incomplete payload")
-{
-    // Blueprint in question:
-    //R"(
-    //+ Request A
-    //  B
-    //)";
-    
-    SourceData source = "01";
-    MarkdownBlock::Stack markdown;
-    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
-    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "Request A\n  B\n", 0, MakeSourceDataBlock(0, 1)));
-    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(1, 1)));
-    
-    Payload payload;
-    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), payload);
-    
-    REQUIRE(result.first.error.code == Error::OK);
-    REQUIRE(result.first.warnings.empty());
-
-    const MarkdownBlock::Stack &blocks = markdown;
-    REQUIRE(std::distance(blocks.begin(), result.second) == 4);
-    
-    REQUIRE(payload.name == "A");
-    REQUIRE(payload.description == "  B\n");
-    REQUIRE(payload.parameters.empty());
-    REQUIRE(payload.headers.empty());
-    REQUIRE(payload.body.empty());
-    REQUIRE(payload.schema.empty());
-}
-
 TEST_CASE("pldparser/parse-list-description", "Parse description with list")
 {
     // Blueprint in question:
@@ -234,7 +202,7 @@ TEST_CASE("pldparser/parse-one", "Parse just one payload in a list with multiple
     ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), payload);
     
     REQUIRE(result.first.error.code == Error::OK);
-    CHECK(result.first.warnings.empty());
+    CHECK(result.first.warnings.size() == 1); // empty body asset
     
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 3);
@@ -268,7 +236,7 @@ TEST_CASE("pldparser/parse-one-foreign", "Parse just one payload in a list with 
     ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), payload);
     
     REQUIRE(result.first.error.code == Error::OK);
-    CHECK(result.first.warnings.empty());
+    CHECK(result.first.warnings.size() == 1); // empty body asset
     
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 3);
@@ -378,5 +346,73 @@ TEST_CASE("pldparser/parse-payload-foreign-block", "Parse payload with foreign b
     REQUIRE(payload.parameters.empty());
     REQUIRE(payload.headers.empty());
     REQUIRE(payload.body == "Foo");
+    REQUIRE(payload.schema.empty());
+}
+
+
+TEST_CASE("pldparser/parse-abbrev-body", "Parse abbreviated payload body")
+{
+    // Blueprint in question:
+    //R"(
+    //+ Response 200 (text/plain)
+    //
+    //          Hello World!
+    //)";
+    
+    MarkdownBlock::Stack markdown;
+    
+    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Response 200 (text/plain)", 0, MakeSourceDataBlock(0, 1)));
+    markdown.push_back(MarkdownBlock(CodeBlockType, "Hello World", 0, MakeSourceDataBlock(1, 1)));
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(2, 1)));
+    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(3, 1)));
+    
+    Payload payload;
+    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), payload);
+    
+    REQUIRE(result.first.error.code == Error::OK);
+    CHECK(result.first.warnings.empty());
+    
+    const MarkdownBlock::Stack &blocks = markdown;
+    REQUIRE(std::distance(blocks.begin(), result.second) == 6);
+    
+    REQUIRE(payload.name == "200");
+    REQUIRE(payload.description.empty());
+    REQUIRE(payload.parameters.empty());
+    REQUIRE(payload.headers.empty());
+    REQUIRE(payload.body == "Hello World");
+    REQUIRE(payload.schema.empty());
+}
+
+TEST_CASE("pldparser/parse-abbrev-inline", "Parse abbreviated inline payload body")
+{
+    // Blueprint in question:
+    //R"(
+    //+ Request A
+    //  B
+    //)";
+    
+    SourceData source = "01";
+    MarkdownBlock::Stack markdown;
+    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "Request A\n  B\n", 0, MakeSourceDataBlock(0, 1)));
+    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(1, 1)));
+    
+    Payload payload;
+    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), payload);
+    
+    REQUIRE(result.first.error.code == Error::OK);
+    CHECK(result.first.warnings.size() == 1); // preformatted code block
+    
+    const MarkdownBlock::Stack &blocks = markdown;
+    REQUIRE(std::distance(blocks.begin(), result.second) == 4);
+    
+    REQUIRE(payload.name == "A");
+    REQUIRE(payload.description.empty());
+    REQUIRE(payload.parameters.empty());
+    REQUIRE(payload.headers.empty());
+    REQUIRE(payload.body == "  B\n");
     REQUIRE(payload.schema.empty());
 }

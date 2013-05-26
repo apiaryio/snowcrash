@@ -129,7 +129,7 @@ TEST_CASE("rparser/parse-partial", "Parse partially defined resource")
     ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), resource);
     
     REQUIRE(result.first.error.code == Error::OK);
-    REQUIRE(result.first.warnings.size() == 1); // no response
+    REQUIRE(result.first.warnings.size() == 2); // no response & preformatted asset
     
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 8);
@@ -141,7 +141,8 @@ TEST_CASE("rparser/parse-partial", "Parse partially defined resource")
     REQUIRE(resource.methods.front().description.empty());
     REQUIRE(resource.methods.front().requests.size() == 1);
     REQUIRE(resource.methods.front().requests.front().name.empty());
-    REQUIRE(resource.methods.front().requests.front().description == "3");
+    REQUIRE(resource.methods.front().requests.front().description.empty());
+    REQUIRE(resource.methods.front().requests.front().body == "3");
 }
 
 TEST_CASE("rparser/parse-multi-method-desc", "Parse multiple method descriptions")
@@ -237,7 +238,7 @@ TEST_CASE("rparser/parse-multi-method", "Parse multiple method")
     ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), resource);
     
     REQUIRE(result.first.error.code == Error::OK);
-    CHECK(result.first.warnings.size() == 2); // Expected HEAD's body asset & no response
+    CHECK(result.first.warnings.size() == 3); // 2x empty body asset & no response
     
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 30);
