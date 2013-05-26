@@ -146,7 +146,7 @@ namespace snowcrash {
                     if (FindHeader(headers, header) != headers.end()) {
                         // WARN: duplicate header on this level
                         std::stringstream ss;
-                        ss << "duplicate definitions of `" << header.first << "` header";
+                        ss << "duplicate definition of `" << header.first << "` header";
                         result.first.warnings.push_back(Warning(ss.str(),
                                                                 0   ,
                                                                 sourceMap));
@@ -194,19 +194,16 @@ namespace snowcrash {
                                             const Blueprint& blueprint,
                                             T& t)
     {
-        HeaderCollection headers;
-        ParseSectionResult result = HeadersParser::Parse(begin, end, sourceData, blueprint, headers);
+        size_t headerCount = t.headers.size();
+        ParseSectionResult result = HeadersParser::Parse(begin, end, sourceData, blueprint, t.headers);
         if (result.first.error.code != Error::OK)
             return result;
         
-        if (headers.empty()) {
+        if (t.headers.size() == headerCount) {
             BlockIterator nameBlock = ListItemNameBlock(begin, end);
             result.first.warnings.push_back(Warning("no headers specified",
                                                     0,
                                                     nameBlock->sourceMap));
-        }
-        else {
-            t.headers.insert(t.headers.end(), headers.begin(), headers.end());
         }
         return result;
     }
