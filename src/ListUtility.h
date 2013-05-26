@@ -183,7 +183,6 @@ namespace snowcrash {
     
     
     // Parse preformatted source data from block(s) of a list item block
-    // TODO: refactor
     inline ParseSectionResult ParseListPreformattedBlock(const Section& section,
                                                          const BlockIterator& cur,
                                                          const SectionBounds& bounds,
@@ -199,26 +198,12 @@ namespace snowcrash {
         
         if (sectionCur == bounds.first) {
             // Process first block of list, throw away first line - signature
-            sectionCur = ListItemNameBlock(cur, bounds.second);
-            if (sectionCur == bounds.second)
-                return std::make_pair(Result(), sectionCur);
-            
-            ContentParts content = ExtractFirstLine(*sectionCur);
-            if (content.empty() ||
-                content.front().empty()) {
-                
-                std::stringstream ss;
-                ss << "unable to parse " << SectionName(section) << " signature";
-                result.first.error = Error(ss.str(),
-                                           1,
-                                           sectionCur->sourceMap);
-                result.second = sectionCur;
-                return result;
-            }
+            SourceData content;
+            SourceData signature = GetListItemSignature(cur, bounds.second, content);
             
             // Retrieve any extra lines after signature
-            if (content.size() == 2 && !content[1].empty()) {
-                dataStream << content[1];
+            if (!content.empty()) {
+                dataStream << content;
                 
                 // WARN: Not a preformatted code block
                 std::stringstream ss;
