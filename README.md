@@ -51,4 +51,4 @@ To build & run Snow Crash command line tool use:
 	$ ./bin/snowcrash
 
 ## License
-See [LICENSE](https://github.com/apiaryio/snowcrash/blob/master/LICENSE) file.
+MIT License. See [LICENSE](https://github.com/apiaryio/snowcrash/blob/master/LICENSE) file.
