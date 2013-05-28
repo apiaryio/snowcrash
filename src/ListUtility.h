@@ -205,7 +205,7 @@ namespace snowcrash {
             if (!content.empty()) {
                 dataStream << content;
                 
-                // WARN: Not a preformatted code block
+                // WARN: not a preformatted code block
                 std::stringstream ss;
                 ss << SectionName(section) << " " << FormattingWarning;
                 result.first.warnings.push_back(Warning(ss.str(),
@@ -230,7 +230,7 @@ namespace snowcrash {
             
             dataStream << MapSourceData(sourceData, sectionCur->sourceMap);
             
-            // WARN: Not a preformatted code block
+            // WARN: not a preformatted code block
             std::stringstream ss;
             ss << SectionName(section) << " " << FormattingWarning;
             result.first.warnings.push_back(Warning(ss.str(),

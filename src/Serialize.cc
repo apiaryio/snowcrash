@@ -14,6 +14,7 @@
 
 using namespace snowcrash;
 
+const std::string SerializeKey::Metadata = "metadata";
 const std::string SerializeKey::Name = "name";
 const std::string SerializeKey::Description = "description";
 const std::string SerializeKey::ResourceGroups = "resourceGroups";

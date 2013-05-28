@@ -16,6 +16,7 @@ namespace snowcrash {
     std::string EscapeNewlines(const std::string& input);
     
     struct SerializeKey {
+        static const std::string Metadata;
         static const std::string Name;
         static const std::string Description;
         static const std::string ResourceGroups;

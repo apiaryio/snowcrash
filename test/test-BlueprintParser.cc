@@ -286,9 +286,41 @@ TEST_CASE("bpparser/parse-resource", "Parse simple resource.")
     
     Response response = method.responses.front();
     REQUIRE(response.name == "200");
-//    REQUIRE(response.description.empty());
-//    REQUIRE(response.parameters.empty());
-//    REQUIRE(response.headers.empty());
-//    REQUIRE(response.body == "body");
-//    REQUIRE(response.schema.empty());
+    REQUIRE(response.description.empty());
+    REQUIRE(response.parameters.empty());
+    REQUIRE(response.headers.empty());
+    REQUIRE(response.body == "body");
+    REQUIRE(response.schema.empty());
+}
+
+TEST_CASE("bpparser/parse-metadata", "Parse blueprint that starts with metadata")
+{
+    // Blueprint in question:
+    //R"(
+    //meta: data
+    //foo: bar
+    //
+    //# API
+    //");
+    
+    Result result;
+    Blueprint blueprint;
+    SourceData source = "meta: data\nfoo:bar\n";
+    
+    MarkdownBlock::Stack markdown;
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "meta: data\nfoo:bar\n", 1, MakeSourceDataBlock(0, 19)));
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "API", 0, MakeSourceDataBlock(1, 1)));
+    
+    BlueprintParser::Parse(source, markdown, result, blueprint);
+    
+    REQUIRE(result.error.code == Error::OK);
+    CHECK(result.warnings.empty());
+    REQUIRE(blueprint.name == "API");
+    REQUIRE(blueprint.description.empty());
+    REQUIRE(blueprint.resourceGroups.size() == 0);
+    REQUIRE(blueprint.metadata.size() == 2);
+    REQUIRE(blueprint.metadata[0].first == "meta");
+    REQUIRE(blueprint.metadata[0].second == "data");
+    REQUIRE(blueprint.metadata[1].first == "foo");
+    REQUIRE(blueprint.metadata[1].second == "bar");
 }

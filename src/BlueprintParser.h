@@ -11,6 +11,7 @@
 
 #include <functional>
 #include <sstream>
+#include <iterator>
 #include "BlueprintParserCore.h"
 #include "Blueprint.h"
 #include "ResourceParser.h"
@@ -74,6 +75,20 @@ namespace snowcrash {
             
             return result;
         }
+        
+        // Returns true if header is first block in document
+        // after metadata block, false otherwise.
+        static bool IsFirstHeader(const BlockIterator& cur,
+                                  const SectionBounds& bounds,
+                                  const Blueprint& blueprint) {
+            if (cur->type != HeaderBlockType)
+                return false;
+            
+            if (blueprint.metadata.empty())
+                return cur == bounds.first;
+            
+            return std::distance(bounds.first, cur) == 1;
+        }
 
         static ParseSectionResult HandleBlueprintOverviewBlock(const BlockIterator& cur,
                                                                const SectionBounds& bounds,
@@ -83,12 +98,18 @@ namespace snowcrash {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
             BlockIterator sectionCur(cur);
-            if (sectionCur->type == HeaderBlockType &&
-                sectionCur == bounds.first) {
+            if (IsFirstHeader(cur, bounds, blueprint)) {
                 output.name = cur->content;
             }
             else {
                 if (sectionCur == bounds.first) {
+                    
+                    // Try to parse first paragraph as metadata
+                    if (sectionCur->type == ParagraphBlockType) {
+                        result = ParseMetadataBlock(sectionCur, bounds, sourceData, blueprint, output);
+                        if (result.second != sectionCur)
+                            return result;
+                    }
                     
                     // WARN: No API name specified
                     result.first.warnings.push_back(Warning("expected API name, e.g. `# <API Name>`",
@@ -140,7 +161,50 @@ namespace snowcrash {
             
             output.resourceGroups.push_back(resourceGroup); // FIXME: C++11 move
             return result;
-        }  
+        }
+        
+
+        static ParseSectionResult ParseMetadataBlock(const BlockIterator& cur,
+                                                     const SectionBounds& bounds,
+                                                     const SourceData& sourceData,
+                                                     const Blueprint& blueprint,
+                                                     Blueprint& output) {
+            
+            typedef Collection<Metadata>::type MetadataCollection;
+            MetadataCollection metadataCollection;
+            
+            ParseSectionResult result = std::make_pair(Result(), cur);
+            SourceData content = cur->content;
+            TrimStringEnd(content);
+            std::vector<std::string> lines = Split(content, '\n');
+            for (std::vector<std::string>::iterator line = lines.begin();
+                 line != lines.end();
+                 ++line) {
+                
+                Metadata metadata;
+                if (KeyValueFromLine(*line, metadata))
+                    metadataCollection.push_back(metadata);
+            }
+            
+            if (lines.size() == metadataCollection.size()) {
+                output.metadata.insert(output.metadata.end(),
+                                       metadataCollection.begin(),
+                                       metadataCollection.end());
+                
+                // TODO: check duplicates
+                
+                ++result.second;
+            }
+            else if (!metadataCollection.empty()) {
+                // WARN: malformed metadata block
+                result.first.warnings.push_back(Warning("ignoring possible metadata, expected"
+                                                        " `<key> : <value>`, one one per line",
+                                                        0,
+                                                        cur->sourceMap));
+            }
+            
+            return result;
+        }
     };
     
     typedef BlockParser<Blueprint, SectionParser<Blueprint> > BlueprintParserInner;

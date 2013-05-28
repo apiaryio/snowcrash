@@ -35,24 +35,11 @@ static void serialize(const std::string& key, const std::string& value, size_t l
         os << key << ":\n";
 }
 
-// Serialize Metadata
-static void serialize(const Collection<Metadata>::type& metadata, std::ostream &os)
+static void serializeKeyValueCollection(const Collection<KeyValuePair>::type& collection, size_t level, std::ostream &os)
 {
-    if (metadata.empty())
-        return;
-    
-    serialize(SerializeKey::Name, std::string(), 0, os);
-    for (Collection<Metadata>::type::const_iterator it = metadata.begin(); it != metadata.end(); ++it) {
-        serialize(it->first, it->second, 1, os);
-    }
-}
-
-static void serialize(const Collection<Header>::type& headers, size_t level, std::ostream &os)
-{
-    serialize(SerializeKey::Headers, std::string(), level, os);
-    for (Collection<Header>::const_iterator it = headers.begin(); it != headers.end(); ++it) {
+    for (Collection<KeyValuePair>::const_iterator it = collection.begin(); it != collection.end(); ++it) {
         
-        if (it == headers.begin()) {
+        if (it == collection.begin()) {
             
             for (size_t i = 0; i < level; ++i)
                 os << "  ";
@@ -64,6 +51,21 @@ static void serialize(const Collection<Header>::type& headers, size_t level, std
             serialize(it->first, it->second, level + 1, os);
         }
     }
+}
+
+static void serialize(const Collection<Metadata>::type& metadata, std::ostream &os)
+{
+    if (metadata.empty())
+        return;
+    
+    serialize(SerializeKey::Metadata, std::string(), 0, os);
+    serializeKeyValueCollection(metadata, 0, os);
+}
+
+static void serialize(const Collection<Header>::type& headers, size_t level, std::ostream &os)
+{
+    serialize(SerializeKey::Headers, std::string(), level, os);
+    serializeKeyValueCollection(headers, level, os);
 }
 
 static void serialize(const Payload& payload, std::ostream &os)

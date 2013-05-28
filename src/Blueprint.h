@@ -34,6 +34,9 @@ namespace snowcrash {
     // HTTP Method
     typedef std::string HTTPMethod;
     
+    // Key:Value pair
+    typedef std::pair<std::string, std::string> KeyValuePair;
+    
     // Default Container for collections
     // FIXME: C++11 template aliases
     template<typename T>
@@ -51,10 +54,10 @@ namespace snowcrash {
     typedef std::string Asset;
 
     // Metadata key-value pair, e.g. "HOST: http://acme.com"
-    typedef std::pair<std::string, std::string> Metadata;
+    typedef KeyValuePair Metadata;
 
     // Header key-value pair, e.g. "Content-Type: application/json"
-    typedef std::pair<std::string, std::string> Header;
+    typedef KeyValuePair Header;
     
     // Parameter
     struct Parameter {

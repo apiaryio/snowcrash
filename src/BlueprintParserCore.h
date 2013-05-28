@@ -10,6 +10,7 @@
 #define SNOWCRASH_BLUEPRINTPARSERCORE_H
 
 #include <algorithm>
+#include "StringUtility.h"
 #include "ParserCore.h"
 #include "MarkdownBlock.h"
 #include "Blueprint.h"
@@ -206,6 +207,21 @@ namespace snowcrash {
         }
         
         return currentBlock;
+    }
+    
+    // Parse one line of raw `key:value` data.
+    // Returns true on success, false otherwise.
+    static inline bool KeyValueFromLine(const std::string& line, KeyValuePair& keyValuePair) {
+        
+        std::vector<std::string> rawMetadata = SplitOnFirst(line, ':');
+        if (rawMetadata.size() != 2)
+            return false;
+        
+        keyValuePair = std::make_pair(rawMetadata[0], rawMetadata[1]);
+        TrimString(keyValuePair.first);
+        TrimString(keyValuePair.second);
+        
+        return (!keyValuePair.first.empty() && !keyValuePair.second.empty());
     }
 }
 

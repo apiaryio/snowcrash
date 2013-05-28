@@ -74,7 +74,7 @@ namespace snowcrash {
             elems.push_back(s.substr(pos + 1, std::string::npos));
         }
         return elems;
-    }
+    }    
 }
 
 #endif

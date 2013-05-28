@@ -141,7 +141,7 @@ namespace snowcrash {
                  ++line) {
                 
                 Header header;
-                if (HeaderFromLine(*line, header)) {
+                if (KeyValueFromLine(*line, header)) {
                     
                     if (FindHeader(headers, header) != headers.end()) {
                         // WARN: duplicate header on this level
@@ -165,20 +165,6 @@ namespace snowcrash {
             }
             
             return result;
-        }
-        
-        // Parse one line of raw header data
-        static inline bool HeaderFromLine(const std::string& line, Header& header) {
-            
-            std::vector<std::string> rawHeader = SplitOnFirst(line, ':');
-            if (rawHeader.size() != 2)
-                return false;
-            
-            header = std::make_pair(rawHeader[0], rawHeader[1]);
-            TrimString(header.first);
-            TrimString(header.second);
-            
-            return (!header.first.empty() && !header.second.empty());
         }
     };
 
