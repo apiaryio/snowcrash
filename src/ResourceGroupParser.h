@@ -54,8 +54,7 @@ namespace snowcrash {
         static ParseSectionResult ParseSection(const Section& section,
                                                const BlockIterator& cur,
                                                const SectionBounds& bounds,
-                                               const SourceData& sourceData,
-                                               const Blueprint& blueprint,
+                                               const ParserCore& parser,
                                                ResourceGroup& group) {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
@@ -66,11 +65,11 @@ namespace snowcrash {
                     break;
                     
                 case ResourceGroupSection:
-                    result = HandleResourceGroupOverviewBlock(cur, bounds, sourceData, blueprint, group);
+                    result = HandleResourceGroupOverviewBlock(cur, bounds, parser, group);
                     break;
                     
                 case ResourceSection:
-                    result = HandleResource(cur, bounds.second, sourceData, blueprint, group);
+                    result = HandleResource(cur, bounds.second, parser, group);
                     break;
                     
                 case UndefinedSection:
@@ -86,8 +85,7 @@ namespace snowcrash {
         
         static ParseSectionResult HandleResourceGroupOverviewBlock(const BlockIterator& cur,
                                                                    const SectionBounds& bounds,
-                                                                   const SourceData& sourceData,
-                                                                   const Blueprint& blueprint,
+                                                                   const ParserCore& parser,
                                                                    ResourceGroup& group) {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
@@ -113,7 +111,7 @@ namespace snowcrash {
                     sectionCur = SkipToSectionEnd(cur, bounds.second, ListBlockBeginType, ListBlockEndType);
                 }
                 
-                group.description += MapSourceData(sourceData, sectionCur->sourceMap);
+                group.description += MapSourceData(parser.sourceData, sectionCur->sourceMap);
             }
             
             result.second = ++sectionCur;
@@ -122,22 +120,21 @@ namespace snowcrash {
         
         static ParseSectionResult HandleResource(const BlockIterator& begin,
                                                  const BlockIterator& end,
-                                                 const SourceData& sourceData,
-                                                 const Blueprint& blueprint,
+                                                 const ParserCore& parser,
                                                  ResourceGroup& group)
         {
             Resource resource;
-            ParseSectionResult result = ResourceParser::Parse(begin, end, sourceData, blueprint, resource);
+            ParseSectionResult result = ResourceParser::Parse(begin, end, parser, resource);
             if (result.first.error.code != Error::OK)
                 return result;
             
             ResourceIterator duplicate = FindResource(group, resource);
             ResourceIteratorPair globalDuplicate;
             if (duplicate != group.resources.end())
-                globalDuplicate = FindResource(blueprint, resource);
+                globalDuplicate = FindResource(parser.blueprint, resource);
             
             if (duplicate != group.resources.end() ||
-                globalDuplicate.first != blueprint.resourceGroups.end()) {
+                globalDuplicate.first != parser.blueprint.resourceGroups.end()) {
                 
                 // WARN: duplicate resource
                 result.first.warnings.push_back(Warning("resource `" +

@@ -118,7 +118,8 @@ TEST_CASE("pldparser/parse", "Parse canonical payload")
 {
     MarkdownBlock::Stack markdown = CanonicalPayloadFixture();    
     Payload payload;
-    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), payload);
+    ParserCore parser(0, SourceDataFixture, Blueprint());
+    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), parser, payload);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.empty());
@@ -167,7 +168,8 @@ TEST_CASE("pldparser/parse-list-description", "Parse description with list")
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(4, 1)));
     
     Payload payload;
-    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), payload);
+    ParserCore parser(0, SourceDataFixture, Blueprint());
+    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), parser, payload);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.size() == 1); // warn skipping body list
@@ -201,7 +203,8 @@ TEST_CASE("pldparser/parse-one", "Parse just one payload in a list with multiple
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(2, 1)));
     
     Payload payload;
-    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), payload);
+    ParserCore parser(0, SourceDataFixture, Blueprint());
+    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), parser, payload);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.size() == 1); // empty body asset
@@ -235,7 +238,8 @@ TEST_CASE("pldparser/parse-one-foreign", "Parse just one payload in a list with 
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(2, 1)));
     
     Payload payload;
-    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), payload);
+    ParserCore parser(0, SourceDataFixture, Blueprint());
+    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), parser, payload);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.size() == 1); // empty body asset
@@ -287,7 +291,8 @@ TEST_CASE("pldparser/parse-payload-foreign-listitem", "Parse payload with foreig
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(8, 1)));
     
     Payload payload;
-    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), payload);
+    ParserCore parser(0, SourceDataFixture, Blueprint());
+    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), parser, payload);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.size() == 1); // ignoring unrecognized item
@@ -336,7 +341,8 @@ TEST_CASE("pldparser/parse-payload-foreign-block", "Parse payload with foreign b
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(7, 1)));
     
     Payload payload;
-    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), payload);
+    ParserCore parser(0, SourceDataFixture, Blueprint());
+    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), parser, payload);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.size() == 1); // ignoring unrecognized item
@@ -371,7 +377,8 @@ TEST_CASE("pldparser/parse-abbrev-body", "Parse abbreviated payload body")
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(3, 1)));
     
     Payload payload;
-    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), payload);
+    ParserCore parser(0, SourceDataFixture, Blueprint());
+    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), parser, payload);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.empty());
@@ -403,7 +410,8 @@ TEST_CASE("pldparser/parse-abbrev-inline", "Parse abbreviated inline payload bod
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(1, 1)));
     
     Payload payload;
-    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), payload);
+    ParserCore parser(0, SourceDataFixture, Blueprint());
+    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), parser, payload);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.size() == 1); // preformatted code block

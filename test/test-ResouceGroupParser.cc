@@ -7,10 +7,12 @@
 //
 
 #include <iterator>
+#include "Fixture.h"
 #include "catch.hpp"
 #include "ResourceGroupParser.h"
 
 using namespace snowcrash;
+using namespace snowcrashtest;
 
 TEST_CASE("rgparser/parse", "Parse resource group with empty resource")
 {
@@ -21,7 +23,8 @@ TEST_CASE("rgparser/parse", "Parse resource group with empty resource")
     markdown.push_back(MarkdownBlock(HeaderBlockType, "/resource", 1, MakeSourceDataBlock(2, 1)));
     
     ResourceGroup resourceGroup;
-    ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), resourceGroup);
+    ParserCore parser(0, SourceDataFixture, Blueprint());
+    ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), parser, resourceGroup);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.empty());
@@ -45,7 +48,8 @@ TEST_CASE("rgparser/parse-multiple-resource-description", "Parse multiple resour
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "p2", 0, MakeSourceDataBlock(3, 1)));
     
     ResourceGroup resourceGroup;
-    ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), resourceGroup);
+    ParserCore parser(0, SourceDataFixture, Blueprint());
+    ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), parser, resourceGroup);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.empty());
@@ -92,7 +96,8 @@ TEST_CASE("rgparser/parse-multiple-resource", "Parse multiple resources with pay
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(7, 1)));
     
     ResourceGroup resourceGroup;
-    ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), resourceGroup);
+    ParserCore parser(0, SourceDataFixture, Blueprint());
+    ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), parser, resourceGroup);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.size() == 4); // 2x no response specified + 2x empty body asset
@@ -136,7 +141,8 @@ TEST_CASE("rgparser/parse-multiple-same", "Parse multiple same resources")
     markdown.push_back(MarkdownBlock(HeaderBlockType, "/r1", 1, MakeSourceDataBlock(1, 1)));
     
     ResourceGroup resourceGroup;
-    ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), resourceGroup);
+    ParserCore parser(0, SourceDataFixture, Blueprint());
+    ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), parser, resourceGroup);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.size());
@@ -168,7 +174,8 @@ TEST_CASE("rgparser/parse-resource-description-list", "Parse resource with list 
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(4, 1)));
     
     ResourceGroup resourceGroup;
-    ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), resourceGroup);
+    ParserCore parser(0, SourceDataFixture, Blueprint());
+    ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), parser, resourceGroup);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.size() == 3);   // preformatted asset & ignoring unrecognized body & no response
@@ -202,7 +209,8 @@ TEST_CASE("rgparser/parse-terminator", "Parse resource groups finalized by termi
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "A", 0, MakeSourceDataBlock(2, 1)));
     
     ResourceGroup resourceGroup;
-    ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), source, Blueprint(), resourceGroup);
+    ParserCore parser(0, SourceDataFixture, Blueprint());   
+    ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), parser, resourceGroup);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.empty());

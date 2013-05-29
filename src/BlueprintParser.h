@@ -49,8 +49,7 @@ namespace snowcrash {
         static ParseSectionResult ParseSection(const Section& section,
                                                const BlockIterator& cur,
                                                const SectionBounds& bounds,
-                                               const SourceData& sourceData,
-                                               const Blueprint& blueprint,
+                                               const ParserCore& parser,
                                                Blueprint& output) {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
@@ -61,11 +60,11 @@ namespace snowcrash {
                     break;
                     
                 case BlueprintSection:
-                    result = HandleBlueprintOverviewBlock(cur, bounds, sourceData, blueprint, output);
+                    result = HandleBlueprintOverviewBlock(cur, bounds, parser, output);
                     break;
                     
                 case ResourceGroupSection:
-                    result = HandleResourceGroup(cur, bounds.second, sourceData, blueprint, output);
+                    result = HandleResourceGroup(cur, bounds.second, parser, output);
                     break;
                     
                 default:
@@ -92,13 +91,12 @@ namespace snowcrash {
 
         static ParseSectionResult HandleBlueprintOverviewBlock(const BlockIterator& cur,
                                                                const SectionBounds& bounds,
-                                                               const SourceData& sourceData,
-                                                               const Blueprint& blueprint,
+                                                               const ParserCore& parser,
                                                                Blueprint& output) {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
             BlockIterator sectionCur(cur);
-            if (IsFirstHeader(cur, bounds, blueprint)) {
+            if (IsFirstHeader(cur, bounds, parser.blueprint)) {
                 output.name = cur->content;
             }
             else {
@@ -106,7 +104,7 @@ namespace snowcrash {
                     
                     // Try to parse first paragraph as metadata
                     if (sectionCur->type == ParagraphBlockType) {
-                        result = ParseMetadataBlock(sectionCur, bounds, sourceData, blueprint, output);
+                        result = ParseMetadataBlock(sectionCur, bounds, parser, output);
                         if (result.second != sectionCur)
                             return result;
                     }
@@ -125,7 +123,7 @@ namespace snowcrash {
                     sectionCur = SkipToSectionEnd(cur, bounds.second, ListBlockBeginType, ListBlockEndType);
                 }
                 
-                output.description += MapSourceData(sourceData, sectionCur->sourceMap);
+                output.description += MapSourceData(parser.sourceData, sectionCur->sourceMap);
             }
             
             result.second = ++sectionCur;
@@ -134,17 +132,16 @@ namespace snowcrash {
         
         static ParseSectionResult HandleResourceGroup(const BlockIterator& begin,
                                                       const BlockIterator& end,
-                                                      const SourceData& sourceData,
-                                                      const Blueprint& blueprint,
+                                                      const ParserCore& parser,
                                                       Blueprint& output)
         {
             ResourceGroup resourceGroup;
-            ParseSectionResult result = ResourceGroupParser::Parse(begin, end, sourceData, blueprint, resourceGroup);
+            ParseSectionResult result = ResourceGroupParser::Parse(begin, end, parser, resourceGroup);
             if (result.first.error.code != Error::OK)
                 return result;
             
-            Collection<ResourceGroup>::const_iterator duplicate = FindResourceGroup(blueprint, resourceGroup);
-            if (duplicate != blueprint.resourceGroups.end()) {
+            Collection<ResourceGroup>::const_iterator duplicate = FindResourceGroup(parser.blueprint, resourceGroup);
+            if (duplicate != parser.blueprint.resourceGroups.end()) {
                 
                 // WARN: duplicate group
                 std::stringstream ss;
@@ -166,8 +163,7 @@ namespace snowcrash {
 
         static ParseSectionResult ParseMetadataBlock(const BlockIterator& cur,
                                                      const SectionBounds& bounds,
-                                                     const SourceData& sourceData,
-                                                     const Blueprint& blueprint,
+                                                     const ParserCore& parser,
                                                      Blueprint& output) {
             
             typedef Collection<Metadata>::type MetadataCollection;
@@ -250,10 +246,10 @@ namespace snowcrash {
                           Result& result,
                           Blueprint& blueprint) {
             
+            ParserCore parser(0, sourceData, blueprint);
             ParseSectionResult sectionResult = BlueprintParserInner::Parse(source.begin(),
                                                                            source.end(),
-                                                                           sourceData,
-                                                                           blueprint,
+                                                                           parser,
                                                                            blueprint);
             result += sectionResult.first;
         }

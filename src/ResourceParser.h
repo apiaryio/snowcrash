@@ -140,8 +140,7 @@ namespace snowcrash {
         static ParseSectionResult ParseSection(const Section& section,
                                                const BlockIterator& cur,
                                                const SectionBounds& bounds,
-                                               const SourceData& sourceData,
-                                               const Blueprint& blueprint,
+                                               const ParserCore& parser,
                                                Resource& resource) {
 
             ParseSectionResult result = std::make_pair(Result(), cur);
@@ -152,19 +151,19 @@ namespace snowcrash {
                     break;
                     
                 case ResourceSection:
-                    result = HandleResourceOverviewBlock(cur, bounds, sourceData, blueprint, resource);
+                    result = HandleResourceOverviewBlock(cur, bounds, parser, resource);
                     break;
                     
                 case ResourceMethodSection:
-                    result = HandleResourceMethod(cur, bounds, sourceData, blueprint, resource);
+                    result = HandleResourceMethod(cur, bounds, parser, resource);
                     break;
                     
                 case HeadersSection:
-                    result = HandleHeaders(cur, bounds.second, sourceData, blueprint, resource);
+                    result = HandleHeaders(cur, bounds.second, parser, resource);
                     break;
                     
                 case MethodSection:
-                    result = HandleMethod(cur, bounds.second, sourceData, blueprint, resource);
+                    result = HandleMethod(cur, bounds.second, parser, resource);
                     break;
                     
                 case UndefinedSection:
@@ -186,8 +185,7 @@ namespace snowcrash {
         
         static ParseSectionResult HandleResourceOverviewBlock(const BlockIterator& cur,
                                                               const SectionBounds& bounds,
-                                                              const SourceData& sourceData,
-                                                              const Blueprint& blueprint,
+                                                              const ParserCore& parser,
                                                               Resource& resource) {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
@@ -208,7 +206,7 @@ namespace snowcrash {
                     sectionCur = SkipToDescriptionListEnd<Resource>(sectionCur, bounds.second, result.first);
                 }
                 
-                resource.description += MapSourceData(sourceData, sectionCur->sourceMap);
+                resource.description += MapSourceData(parser.sourceData, sectionCur->sourceMap);
             }
             
             result.second = ++sectionCur;
@@ -217,8 +215,7 @@ namespace snowcrash {
         
         static ParseSectionResult HandleResourceMethod(const BlockIterator& cur,
                                                        const SectionBounds& bounds,
-                                                       const SourceData& sourceData,
-                                                       const Blueprint& blueprint,
+                                                       const ParserCore& parser,
                                                        Resource& resource) {
             
             // Retrieve URI template
@@ -226,18 +223,17 @@ namespace snowcrash {
             GetResourceSignature(*cur, method, resource.uri);
             
             // Parse as a resource method abbreviation
-            return HandleMethod(cur, bounds.second, sourceData, blueprint, resource, true);
+            return HandleMethod(cur, bounds.second, parser, resource, true);
         }
         
         static ParseSectionResult HandleMethod(const BlockIterator& begin,
                                                const BlockIterator& end,
-                                               const SourceData& sourceData,
-                                               const Blueprint& blueprint,
+                                               const ParserCore& parser,
                                                Resource& resource,
                                                bool abbrev = false)
         {
             Method method;
-            ParseSectionResult result = MethodParser::Parse(begin, end, sourceData, blueprint, method);
+            ParseSectionResult result = MethodParser::Parse(begin, end, parser, method);
             if (result.first.error.code != Error::OK)
                 return result;
 

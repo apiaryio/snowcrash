@@ -169,8 +169,7 @@ namespace snowcrash {
         static ParseSectionResult ParseSection(const Section& section,
                                                const BlockIterator& cur,
                                                const SectionBounds& bounds,
-                                               const SourceData& sourceData,
-                                               const Blueprint& blueprint,
+                                               const ParserCore& parser,
                                                Payload& payload) {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
@@ -178,21 +177,21 @@ namespace snowcrash {
             switch (section) {
                 case RequestSection:
                 case ResponseSection:
-                    result = HandleOverviewSectionBlock(section, cur, bounds, sourceData, blueprint, payload);
+                    result = HandleOverviewSectionBlock(section, cur, bounds, parser, payload);
                     break;
                     
                 case RequestBodySection:
                 case ResponseBodySection:
-                    result = HandlePayloadAsset(section, cur, bounds.second, sourceData, blueprint, payload);
+                    result = HandlePayloadAsset(section, cur, bounds.second, parser, payload);
                     break;
                     
                 case HeadersSection:
-                    result = HandleHeaders(cur, bounds.second, sourceData, blueprint, payload);
+                    result = HandleHeaders(cur, bounds.second, parser, payload);
                     break;
                     
                 case BodySection:
                 case SchemaSection:
-                    result = HandleAsset(section, cur, bounds.second, sourceData, blueprint, payload);
+                    result = HandleAsset(section, cur, bounds.second, parser, payload);
                     break;
                     
                 case UndefinedSection:
@@ -214,8 +213,7 @@ namespace snowcrash {
         static ParseSectionResult HandleOverviewSectionBlock(const Section& section,
                                                              const BlockIterator& cur,
                                                              const SectionBounds& bounds,
-                                                             const SourceData& sourceData,
-                                                             const Blueprint& blueprint,
+                                                             const ParserCore& parser,
                                                              Payload& payload) {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
@@ -223,7 +221,7 @@ namespace snowcrash {
 
             if (sectionCur == bounds.first) {
                 // Signature
-                ProcessSignature(section, sectionCur, bounds.first, sourceData, result.first, payload);
+                ProcessSignature(section, sectionCur, bounds.first, parser.sourceData, result.first, payload);
                 sectionCur = FirstContentBlock(cur, bounds.second);
             }
             else {
@@ -235,7 +233,7 @@ namespace snowcrash {
                     sectionCur = SkipToDescriptionListEnd<Payload>(sectionCur, bounds.second, result.first);
                 }
                 
-                payload.description += MapSourceData(sourceData, sectionCur->sourceMap);
+                payload.description += MapSourceData(parser.sourceData, sectionCur->sourceMap);
             }
             
             if (sectionCur != bounds.second)
@@ -247,11 +245,10 @@ namespace snowcrash {
         static ParseSectionResult HandleAsset(const Section& section,
                                               const BlockIterator& begin,
                                               const BlockIterator& end,
-                                              const SourceData& sourceData,
-                                              const Blueprint& blueprint,
+                                              const ParserCore& parser,
                                               Payload& payload) {
             Asset asset;
-            ParseSectionResult result = AssetParser::Parse(begin, end, sourceData, blueprint, asset);
+            ParseSectionResult result = AssetParser::Parse(begin, end, parser, asset);
             if (result.first.error.code != Error::OK)
                 return result;
             
@@ -283,15 +280,14 @@ namespace snowcrash {
         static ParseSectionResult HandlePayloadAsset(const Section& section,
                                                      const BlockIterator& begin,
                                                      const BlockIterator& end,
-                                                     const SourceData& sourceData,
-                                                     const Blueprint& blueprint,
+                                                     const ParserCore& parser,
                                                      Payload& payload) {
         
             // Parse as an asset
-            ParseSectionResult result = HandleAsset(BodySection, begin, end, sourceData, blueprint, payload);
+            ParseSectionResult result = HandleAsset(BodySection, begin, end, parser, payload);
             
             // Retrieve signature
-            ProcessSignature(section, begin, end, sourceData, result.first, payload);
+            ProcessSignature(section, begin, end, parser.sourceData, result.first, payload);
             
             return result;
         }

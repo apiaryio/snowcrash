@@ -104,6 +104,34 @@ namespace snowcrash {
     };
     
     //
+    // Blueprint Parser Options
+    //
+    enum BlueprintParserOption {
+        RenderDescriptionsOption = (1 << 0),    // Render Markdown in description
+        RequireBlueprintNameOption = (1 << 1)   // Treat missing blueprint name as error
+    };
+    typedef unsigned int BlueprintParserOptions;
+    
+    //
+    // Parser Core Data
+    //
+    struct ParserCore {
+        ParserCore(BlueprintParserOptions opts,
+                   const SourceData& src,
+                   const Blueprint& bp)
+        : options(opts), sourceData(src), blueprint(bp) {}
+        
+        BlueprintParserOptions options;
+        const SourceData& sourceData;
+        const Blueprint& blueprint;
+        
+    private:
+        ParserCore();
+        ParserCore(const ParserCore&);
+        ParserCore& operator=(const ParserCore&);
+    };
+    
+    //
     // Section Parser prototype
     //
     template<class T>
@@ -113,8 +141,7 @@ namespace snowcrash {
         static ParseSectionResult ParseSection(const Section& section,
                                                const BlockIterator& cur,
                                                const SectionBounds& bounds,
-                                               const SourceData& sourceData,
-                                               const Blueprint& blueprint,
+                                               const ParserCore& parser,
                                                T& output);
     };
     
@@ -151,8 +178,7 @@ namespace snowcrash {
         // Iterate blocks, classify & parse
         static ParseSectionResult Parse(const BlockIterator& begin,
                                         const BlockIterator& end,
-                                        const SourceData& sourceData,
-                                        const Blueprint& blueprint,
+                                        const ParserCore& parser,
                                         T& output) {
             Result result;
             Section currentSection = UndefinedSection;
@@ -163,8 +189,7 @@ namespace snowcrash {
                 ParseSectionResult sectionResult = P::ParseSection(currentSection,
                                                                    currentBlock,
                                                                    std::make_pair(begin, end),
-                                                                   sourceData,
-                                                                   blueprint,
+                                                                   parser,
                                                                    output);
                 
                 result += sectionResult.first;

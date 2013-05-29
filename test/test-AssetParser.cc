@@ -190,7 +190,8 @@ TEST_CASE("aparser/parse-body", "Parse body asset")
     CHECK(markdown.size() == 6);
     
     Asset asset;
-    ParseSectionResult result = AssetParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), asset);
+    ParserCore parser(0, SourceDataFixture, Blueprint());
+    ParseSectionResult result = AssetParser::Parse(markdown.begin(), markdown.end(), parser, asset);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.empty());
@@ -207,7 +208,8 @@ TEST_CASE("aparser/parse-schema", "Parse schema asset")
     CHECK(markdown.size() == 6);
     
     Asset asset;
-    ParseSectionResult result = AssetParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), asset);
+    ParserCore parser(0, SourceDataFixture, Blueprint());
+    ParseSectionResult result = AssetParser::Parse(markdown.begin(), markdown.end(), parser, asset);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.empty());
@@ -226,7 +228,8 @@ TEST_CASE("aparser/parse-ajdacent", "Parse body asset followed by other blocks")
     CHECK(markdown.size() == 7);
     
     Asset asset;
-    ParseSectionResult result = AssetParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), asset);
+    ParserCore parser(0, SourceDataFixture, Blueprint());
+    ParseSectionResult result = AssetParser::Parse(markdown.begin(), markdown.end(), parser, asset);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.empty());
@@ -248,7 +251,8 @@ TEST_CASE("aparser/parse-foreign", "Parse body asset with foreign block inside")
     CHECK(markdown.size() == 7);
     
     Asset asset;
-    ParseSectionResult result = AssetParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), asset);
+    ParserCore parser(0, SourceDataFixture, Blueprint());
+    ParseSectionResult result = AssetParser::Parse(markdown.begin(), markdown.end(), parser, asset);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.size() == 1);
@@ -273,7 +277,8 @@ TEST_CASE("aparser/parse-foreign-listitem", "Parse body asset with foreign list 
     CHECK(markdown.size() == 8);
     
     Asset asset;
-    ParseSectionResult result = AssetParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), asset);
+    ParserCore parser(0, SourceDataFixture, Blueprint());
+    ParseSectionResult result = AssetParser::Parse(markdown.begin(), markdown.end(), parser, asset);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.empty());
@@ -300,7 +305,8 @@ TEST_CASE("aparser/parse-multiline-signature", "Parse body asset with multiple l
     markdown[2].content = "Body\n  A\n";
     
     Asset asset;
-    ParseSectionResult result = AssetParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), asset);
+    ParserCore parser(0, SourceDataFixture, Blueprint());
+    ParseSectionResult result = AssetParser::Parse(markdown.begin(), markdown.end(), parser, asset);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.size() == 1); // expected code block
@@ -334,7 +340,8 @@ TEST_CASE("aparser/parse-multipart", "Parse body asset composed from multiple bl
     markdown.insert(pos, 1, foreign);
     
     Asset asset;
-    ParseSectionResult result = AssetParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), asset);
+    ParserCore parser(0, SourceDataFixture, Blueprint());
+    ParseSectionResult result = AssetParser::Parse(markdown.begin(), markdown.end(), parser, asset);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.size() == 2); // expected code block

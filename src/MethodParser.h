@@ -95,8 +95,7 @@ namespace snowcrash {
         static ParseSectionResult ParseSection(const Section& section,
                                                const BlockIterator& cur,
                                                const SectionBounds& bounds,
-                                               const SourceData& sourceData,
-                                               const Blueprint& blueprint,
+                                               const ParserCore& parser,
                                                Method& method) {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
@@ -108,16 +107,16 @@ namespace snowcrash {
                     break;
                     
                 case MethodSection:
-                    result = HandleMethodOverviewBlock(cur, bounds, sourceData, blueprint, method);
+                    result = HandleMethodOverviewBlock(cur, bounds, parser, method);
                     break;
                     
                 case HeadersSection:
-                    result = HandleHeaders(cur, bounds.second, sourceData, blueprint, method);
+                    result = HandleHeaders(cur, bounds.second, parser, method);
                     break;
                     
                 case RequestSection:
                 case ResponseSection:
-                    result = HandlePayload(section, cur, bounds.second, sourceData, blueprint, method);
+                    result = HandlePayload(section, cur, bounds.second, parser, method);
                     break;
                     
                 case ForeignSection:
@@ -138,8 +137,7 @@ namespace snowcrash {
         
         static ParseSectionResult HandleMethodOverviewBlock(const BlockIterator& cur,
                                                             const SectionBounds& bounds,
-                                                            const SourceData& sourceData,
-                                                            const Blueprint& blueprint,
+                                                            const ParserCore& parser,
                                                             Method& method) {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
@@ -160,7 +158,7 @@ namespace snowcrash {
                     sectionCur = SkipToDescriptionListEnd<Method>(sectionCur, bounds.second, result.first);
                 }
                 
-                method.description += MapSourceData(sourceData, sectionCur->sourceMap);
+                method.description += MapSourceData(parser.sourceData, sectionCur->sourceMap);
             }
             
             result.second = ++sectionCur;
@@ -170,12 +168,11 @@ namespace snowcrash {
         static ParseSectionResult HandlePayload(const Section &section,
                                                 const BlockIterator& begin,
                                                 const BlockIterator& end,
-                                                const SourceData& sourceData,
-                                                const Blueprint& blueprint,
+                                                const ParserCore& parser,
                                                 Method& method)
         {
             Payload payload;
-            ParseSectionResult result = PayloadParser::Parse(begin, end, sourceData, blueprint, payload);
+            ParseSectionResult result = PayloadParser::Parse(begin, end, parser, payload);
             if (result.first.error.code != Error::OK)
                 return result;
             

@@ -186,7 +186,7 @@ namespace snowcrash {
     inline ParseSectionResult ParseListPreformattedBlock(const Section& section,
                                                          const BlockIterator& cur,
                                                          const SectionBounds& bounds,
-                                                         const SourceData& sourceData,
+                                                         const ParserCore& parser,
                                                          SourceData& data,
                                                          SourceDataBlock& sourceMap) {
         
@@ -228,7 +228,7 @@ namespace snowcrash {
                 sectionCur = SkipToSectionEnd(sectionCur, bounds.second, ListBlockBeginType, ListBlockEndType);
             }
             
-            dataStream << MapSourceData(sourceData, sectionCur->sourceMap);
+            dataStream << MapSourceData(parser.sourceData, sectionCur->sourceMap);
             
             // WARN: not a preformatted code block
             std::stringstream ss;

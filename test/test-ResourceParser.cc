@@ -93,7 +93,8 @@ TEST_CASE("rparser/parse", "Parse resource")
 {
     MarkdownBlock::Stack markdown = CanonicalResourceFixture();
     Resource resource;
-    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), resource);
+    ParserCore parser(0, SourceDataFixture, Blueprint());
+    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), parser, resource);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.size() == 1); // no response
@@ -126,7 +127,8 @@ TEST_CASE("rparser/parse-partial", "Parse partially defined resource")
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(5, 1)));
     
     Resource resource;
-    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), resource);
+    ParserCore parser(0, SourceDataFixture, Blueprint());
+    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), parser, resource);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.size() == 2); // no response & preformatted asset
@@ -155,7 +157,8 @@ TEST_CASE("rparser/parse-multi-method-desc", "Parse multiple method descriptions
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "p2", 0, MakeSourceDataBlock(3, 1)));
     
     Resource resource;
-    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), resource);
+    ParserCore parser(0, SourceDataFixture, Blueprint());
+    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), parser, resource);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.size() == 2); // 2x no response
@@ -235,7 +238,8 @@ TEST_CASE("rparser/parse-multi-method", "Parse multiple method")
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "E", 0, MakeSourceDataBlock(20, 1)));
     
     Resource resource;
-    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), resource);
+    ParserCore parser(0, SourceDataFixture, Blueprint());
+    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), parser, resource);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.size() == 3); // 2x empty body asset & no response
@@ -299,7 +303,8 @@ TEST_CASE("rparser/parse-list-description", "Parse description with list")
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "p1", 0, MakeSourceDataBlock(4, 1)));
     
     Resource resource;
-    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), resource);
+    ParserCore parser(0, SourceDataFixture, Blueprint());
+    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), parser, resource);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.empty());
@@ -327,7 +332,8 @@ TEST_CASE("rparser/parse-terminator", "Parse resource finalized by terminator")
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "A", 0, MakeSourceDataBlock(2, 1)));
     
     Resource resource;
-    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), resource);
+    ParserCore parser(0, SourceDataFixture, Blueprint());
+    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), parser, resource);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.empty());
@@ -345,10 +351,11 @@ TEST_CASE("rparser/header-warnings", "Check warnings on overshadowing a header")
     MarkdownBlock::Stack markdown = CanonicalResourceFixture();
     Resource resource;
     resource.headers.push_back(std::make_pair("X-Header", "24"));
+    
+    ParserCore parser(0, SourceDataFixture, Blueprint());
     ParseSectionResult result = ResourceParser::Parse(markdown.begin(),
                                                       markdown.end(),
-                                                      SourceDataFixture,
-                                                      Blueprint(),
+                                                      parser,
                                                       resource);
     
     REQUIRE(result.first.error.code == Error::OK);
@@ -391,7 +398,8 @@ TEST_CASE("rparser/parse-abbrev", "Parse resource method abbreviation")
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(8, 1)));
     
     Resource resource;
-    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), resource);
+    ParserCore parser(0, SourceDataFixture, Blueprint());    
+    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), parser, resource);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.empty());
@@ -418,7 +426,8 @@ TEST_CASE("rparser/parse-abbrev-ambiguous", "Parse resource method abbreviation 
     markdown.push_back(MarkdownBlock(HeaderBlockType, "POST", 1, MakeSourceDataBlock(1, 1)));
     
     Resource resource;
-    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), SourceDataFixture, Blueprint(), resource);
+    ParserCore parser(0, SourceDataFixture, Blueprint());
+    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), parser, resource);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.size() == 2); // no response & ignoring possible resource method

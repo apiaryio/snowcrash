@@ -94,14 +94,13 @@ namespace snowcrash {
         static ParseSectionResult ParseSection(const Section& section,
                                                const BlockIterator& cur,
                                                const SectionBounds& bounds,
-                                               const SourceData& sourceData,
-                                               const Blueprint& blueprint,
+                                               const ParserCore& parser,
                                                HeaderCollection& headers) {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
             switch (section) {
                 case HeadersSection:
-                    result = HandleHeadersSectionBlock(cur, bounds, sourceData, blueprint, headers);
+                    result = HandleHeadersSectionBlock(cur, bounds, parser, headers);
                     break;
                     
                 case UndefinedSection:
@@ -118,8 +117,7 @@ namespace snowcrash {
         
         static ParseSectionResult HandleHeadersSectionBlock(const BlockIterator& cur,
                                                             const SectionBounds& bounds,
-                                                            const SourceData& sourceData,
-                                                            const Blueprint& blueprint,
+                                                            const ParserCore& parser,
                                                             HeaderCollection& headers) {
 
             SourceData data;
@@ -127,11 +125,11 @@ namespace snowcrash {
             ParseSectionResult result = ParseListPreformattedBlock(HeadersSection,
                                                                    cur,
                                                                    bounds,
-                                                                   sourceData,
+                                                                   parser,
                                                                    data,
                                                                    sourceMap);
             if (result.first.error.code != Error::OK ||
-                sourceData.empty())
+                parser.sourceData.empty())
                 return result;
             
             // Proces raw data
@@ -176,12 +174,11 @@ namespace snowcrash {
     template <class T>
     inline ParseSectionResult HandleHeaders(const BlockIterator& begin,
                                             const BlockIterator& end,
-                                            const SourceData& sourceData,
-                                            const Blueprint& blueprint,
+                                            const ParserCore& parser,
                                             T& t)
     {
         size_t headerCount = t.headers.size();
-        ParseSectionResult result = HeadersParser::Parse(begin, end, sourceData, blueprint, t.headers);
+        ParseSectionResult result = HeadersParser::Parse(begin, end, parser, t.headers);
         if (result.first.error.code != Error::OK)
             return result;
         

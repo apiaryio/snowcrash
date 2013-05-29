@@ -107,15 +107,14 @@ namespace snowcrash {
         static ParseSectionResult ParseSection(const Section& section,
                                                const BlockIterator& cur,
                                                const SectionBounds& bounds,
-                                               const SourceData& sourceData,
-                                               const Blueprint& blueprint,
+                                               const ParserCore& parser,
                                                Asset& asset) {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
             switch (section) {
                 case BodySection:
                 case SchemaSection: 
-                    result = HandleAssetSectionBlock(section, cur, bounds, sourceData, blueprint, asset);
+                    result = HandleAssetSectionBlock(section, cur, bounds, parser, asset);
                     break;
                     
                 case UndefinedSection:
@@ -133,8 +132,7 @@ namespace snowcrash {
         static ParseSectionResult HandleAssetSectionBlock(const Section& section,
                                                           const BlockIterator& cur,
                                                           const SectionBounds& bounds,
-                                                          const SourceData& sourceData,
-                                                          const Blueprint& blueprint,
+                                                          const ParserCore& parser,
                                                           Asset& asset) {
 
             SourceData data;
@@ -142,11 +140,11 @@ namespace snowcrash {
             ParseSectionResult result = ParseListPreformattedBlock(section,
                                                                    cur,
                                                                    bounds,
-                                                                   sourceData,
+                                                                   parser,
                                                                    data,
                                                                    sourceMap);
             if (result.first.error.code != Error::OK ||
-                sourceData.empty())
+                parser.sourceData.empty())
                 return result;
             
             asset += data;
