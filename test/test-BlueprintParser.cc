@@ -325,3 +325,25 @@ TEST_CASE("bpparser/parse-metadata", "Parse blueprint that starts with metadata"
     REQUIRE(blueprint.metadata[1].first == "foo");
     REQUIRE(blueprint.metadata[1].second == "bar");
 }
+
+TEST_CASE("bpparser/parser-options-name", "Test parser options - required blueprint name")
+{
+    // Blueprint in question:
+    //R"(
+    //# GET /resource
+    //");
+    
+    Result result;
+    Blueprint blueprint;
+    SourceData source = "01";
+    
+    MarkdownBlock::Stack markdown;
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "GET /resource", 0, MakeSourceDataBlock(0, 1)));
+    
+    BlueprintParser::Parse(source, markdown, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.size() == 1); // no response
+    
+    BlueprintParser::Parse(source, markdown, RequireBlueprintNameOption, result, blueprint);
+    REQUIRE(result.error.code != Error::OK);
+}

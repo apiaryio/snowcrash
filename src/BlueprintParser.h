@@ -17,6 +17,8 @@
 #include "ResourceParser.h"
 #include "ResourceGroupParser.h"
 
+static const std::string ExpectedAPINameMessage = "expected API name, e.g. `# <API Name>`";
+
 namespace snowcrash {
     
     //
@@ -54,6 +56,10 @@ namespace snowcrash {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
             
+            if ((section == TerminatorSection || section == ResourceGroupSection) &&
+                !CheckBlueprintName(cur, parser, result.first))
+                return result;
+            
             switch (section) {
                 case TerminatorSection:
                     result.second = ++BlockIterator(cur);
@@ -75,13 +81,26 @@ namespace snowcrash {
             return result;
         }
         
-        // Returns true if header is first block in document
+        // Checks blueprint name. Returns true on success, false otherwise
+        static bool CheckBlueprintName(const BlockIterator& cur, const ParserCore& parser, Result& result) {
+            if (!(parser.options & RequireBlueprintNameOption))
+                return true;
+            
+            if (!parser.blueprint.name.empty())
+                return true;
+            
+            // ERR: No API name specified
+            result.error = Error(ExpectedAPINameMessage,
+                                 2,
+                                 cur->sourceMap);
+            return false;
+        }
+        
+        // Returns true if given block is first block in document
         // after metadata block, false otherwise.
-        static bool IsFirstHeader(const BlockIterator& cur,
-                                  const SectionBounds& bounds,
-                                  const Blueprint& blueprint) {
-            if (cur->type != HeaderBlockType)
-                return false;
+        static bool IsFirstBlock(const BlockIterator& cur,
+                                 const SectionBounds& bounds,
+                                 const Blueprint& blueprint) {
             
             if (blueprint.metadata.empty())
                 return cur == bounds.first;
@@ -96,31 +115,38 @@ namespace snowcrash {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
             BlockIterator sectionCur(cur);
-            if (IsFirstHeader(cur, bounds, parser.blueprint)) {
+            if (cur->type == HeaderBlockType &&
+                IsFirstBlock(cur, bounds, parser.blueprint)) {
                 output.name = cur->content;
             }
             else {
-                if (sectionCur == bounds.first) {
+                if (sectionCur == bounds.first &&
+                    sectionCur->type == ParagraphBlockType) {
                     
                     // Try to parse first paragraph as metadata
-                    if (sectionCur->type == ParagraphBlockType) {
-                        result = ParseMetadataBlock(sectionCur, bounds, parser, output);
-                        if (result.second != sectionCur)
-                            return result;
-                    }
-                    
-                    // WARN: No API name specified
-                    result.first.warnings.push_back(Warning("expected API name, e.g. `# <API Name>`",
-                                                            0,
-                                                            cur->sourceMap));
+                    result = ParseMetadataBlock(sectionCur, bounds, parser, output);
+                    if (result.second != sectionCur)
+                        return result;
                 }
                 
-
                 if (sectionCur->type == QuoteBlockBeginType) {
                     sectionCur = SkipToSectionEnd(cur, bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
                 }
                 else if (sectionCur->type == ListBlockBeginType) {
                     sectionCur = SkipToSectionEnd(cur, bounds.second, ListBlockBeginType, ListBlockEndType);
+                }
+                
+                if (IsFirstBlock(cur, bounds, parser.blueprint)) {
+                    if (parser.options & RequireBlueprintNameOption) {
+                        if (!CheckBlueprintName(sectionCur, parser, result.first))
+                            return result;
+                    }
+                    else {
+                        // WARN: No API name specified
+                        result.first.warnings.push_back(Warning(ExpectedAPINameMessage,
+                                                                0,
+                                                                sectionCur->sourceMap));
+                    }
                 }
                 
                 output.description += MapSourceData(parser.sourceData, sectionCur->sourceMap);
