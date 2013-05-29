@@ -171,6 +171,7 @@ namespace snowcrash {
                                                      Blueprint& output) {
             
             typedef Collection<Metadata>::type MetadataCollection;
+            typedef Collection<Metadata>::iterator MetadataCollectionIterator;
             MetadataCollection metadataCollection;
             
             ParseSectionResult result = std::make_pair(Result(), cur);
@@ -187,11 +188,39 @@ namespace snowcrash {
             }
             
             if (lines.size() == metadataCollection.size()) {
+                
+                // Check duplicates
+                std::vector<std::string> duplicateKeys;
+                for (MetadataCollectionIterator it = metadataCollection.begin();
+                     it != metadataCollection.end();
+                     ++it) {
+                    
+                    MetadataCollectionIterator from = it;
+                    if (++from == metadataCollection.end())
+                        break;
+                    
+                    MetadataCollectionIterator duplicate = std::find_if(from,
+                                                                        metadataCollection.end(),
+                                                                        std::bind2nd(MatchFirst<Metadata>(), *it));
+                    
+                    if (duplicate != metadataCollection.end() &&
+                        std::find(duplicateKeys.begin(), duplicateKeys.end(), it->first) == duplicateKeys.end()) {
+                        
+                        duplicateKeys.push_back(it->first);
+                        
+                        // WARN: duplicate metada definition
+                        std::stringstream ss;
+                        ss << "duplicate definition of `" << it->first << "`";
+                        result.first.warnings.push_back(Warning(ss.str(),
+                                                                0,
+                                                                cur->sourceMap));
+                    }
+                }
+                
+                // Insert parsed metadata into output
                 output.metadata.insert(output.metadata.end(),
                                        metadataCollection.begin(),
                                        metadataCollection.end());
-                
-                // TODO: check duplicates
                 
                 ++result.second;
             }

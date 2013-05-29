@@ -80,7 +80,7 @@ static void serialize(const Payload& payload, std::ostream &os)
         serialize(payload.headers, 4, os);
     }
     
-    // TODO: params
+    // TODO: parameters
 }
 
 // Serialize Method
