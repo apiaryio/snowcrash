@@ -35,7 +35,7 @@ static bool CheckSource(const SourceData& source, Result& result)
     return true;
 }
 
-void Parser::parse(const SourceData& source, Result& result, Blueprint& blueprint)
+void Parser::parse(const SourceData& source, BlueprintParserOptions options, Result& result, Blueprint& blueprint)
 {
     try {
         
@@ -52,7 +52,7 @@ void Parser::parse(const SourceData& source, Result& result, Blueprint& blueprin
             return;
         
         // Parse Blueprint
-        BlueprintParser::Parse(source, markdown, result, blueprint);
+        BlueprintParser::Parse(source, markdown, options, result, blueprint);
     }
     catch (const std::exception& e) {
 

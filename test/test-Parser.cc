@@ -26,7 +26,7 @@ TEST_CASE("parser/parse-empty", "Parse empty blueprint.")
     
     const std::string bluerpintSource = "";
     
-    parser.parse(bluerpintSource, result, blueprint);
+    parser.parse(bluerpintSource, 0, result, blueprint);
     REQUIRE(result.error.code == Error::OK);
     REQUIRE(result.warnings.empty());
     REQUIRE(blueprint.metadata.empty());
@@ -55,7 +55,7 @@ Resource **description**\n\
             { ... }\n\
 ";
         
-    parser.parse(bluerpintSource, result, blueprint);
+    parser.parse(bluerpintSource, 0, result, blueprint);
     REQUIRE(result.error.code == Error::OK);
     REQUIRE(result.warnings.empty());
     REQUIRE(blueprint.name == "Snowcrash API");

@@ -243,10 +243,11 @@ namespace snowcrash {
         // Parse Markdown AST into API Blueprint AST
         static void Parse(const SourceData& sourceData,
                           const MarkdownBlock::Stack& source,
+                          BlueprintParserOptions options,
                           Result& result,
                           Blueprint& blueprint) {
             
-            ParserCore parser(0, sourceData, blueprint);
+            ParserCore parser(options, sourceData, blueprint);
             ParseSectionResult sectionResult = BlueprintParserInner::Parse(source.begin(),
                                                                            source.end(),
                                                                            parser,

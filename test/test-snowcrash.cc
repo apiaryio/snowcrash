@@ -17,9 +17,10 @@ using namespace snowcrash;
 
 const SourceData snowcrashtest::SourceDataFixture = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-TEST_CASE( "snowcrash/parse", "snowcrash parse test" )
+TEST_CASE("snowcrash/parse", "snowcrash parse test")
 {
+    // TODO: :)
     Result result;
     Blueprint blueprint;
-    snowcrash::parse("", result, blueprint);
+    snowcrash::parse("", 0, result, blueprint);
 }

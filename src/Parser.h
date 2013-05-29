@@ -11,7 +11,7 @@
 
 #include <functional>
 #include "Blueprint.h"
-#include "ParserCore.h"
+#include "BlueprintParserCore.h"
 
 namespace snowcrash {
     
@@ -22,7 +22,7 @@ namespace snowcrash {
     public:
         
         // Parse source data into Blueprint AST
-        void parse(const SourceData& source, Result& result, Blueprint& blueprint);
+        void parse(const SourceData& source, BlueprintParserOptions options, Result& result, Blueprint& blueprint);
     };
 }
 

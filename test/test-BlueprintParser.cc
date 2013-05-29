@@ -23,7 +23,7 @@ TEST_CASE("bpparser/parse-params", "parse() method parameters.")
     Result result;
     Blueprint blueprint;
     
-    BlueprintParser::Parse("", MarkdownBlock::Stack(), result, blueprint);
+    BlueprintParser::Parse("", MarkdownBlock::Stack(), 0, result, blueprint);
     
     REQUIRE(result.error.code == Error::OK);
     REQUIRE(result.warnings.empty());
@@ -37,7 +37,7 @@ TEST_CASE("bpparser/parse-bp-name", "Parse blueprint name.")
     MarkdownBlock::Stack markdown;
     markdown.push_back(MarkdownBlock(HeaderBlockType, "API Name", 1));
     
-    BlueprintParser::Parse("", markdown, result, blueprint);
+    BlueprintParser::Parse("", markdown, 0, result, blueprint);
     
     REQUIRE(result.error.code == Error::OK);
     REQUIRE(result.warnings.empty());
@@ -57,7 +57,7 @@ TEST_CASE("bpparser/parse-bp-overview", "Parse blueprint overview section.")
     markdown.push_back(MarkdownBlock(HeaderBlockType, "Overview Header", 2, MakeSourceDataBlock(2, 1)));
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "p2", 0, MakeSourceDataBlock(3, 1)));
     
-    BlueprintParser::Parse(source, markdown, result, blueprint);
+    BlueprintParser::Parse(source, markdown, 0, result, blueprint);
     
     REQUIRE(result.error.code == Error::OK);
     REQUIRE(result.warnings.empty());
@@ -81,7 +81,7 @@ TEST_CASE("bpparser/parse-group", "Parse resource group.")
     markdown.push_back(MarkdownBlock(HeaderBlockType, "Group Description Header", 2, MakeSourceDataBlock(5, 1)));
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "p3", 1, MakeSourceDataBlock(6, 1)));
     
-    BlueprintParser::Parse(source, markdown, result, blueprint);
+    BlueprintParser::Parse(source, markdown, 0, result, blueprint);
 
     REQUIRE(result.error.code == Error::OK);
     REQUIRE(result.warnings.empty());
@@ -113,7 +113,7 @@ TEST_CASE("bpparser/parse-name-resource", "Parse API with Name and resouce")
     markdown.push_back(MarkdownBlock(HeaderBlockType, "/resource", 1, MakeSourceDataBlock(2, 1)));
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "p2", 0, MakeSourceDataBlock(3, 1)));
     
-    BlueprintParser::Parse(source, markdown, result, blueprint);
+    BlueprintParser::Parse(source, markdown, 0, result, blueprint);
     
     REQUIRE(result.error.code == Error::OK);
     REQUIRE(result.warnings.empty());
@@ -144,7 +144,7 @@ TEST_CASE("bpparser/parse-nameless-description", "Parse nameless blueprint descr
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "A", 1, MakeSourceDataBlock(0, 1)));
     markdown.push_back(MarkdownBlock(HeaderBlockType, "B", 0, MakeSourceDataBlock(1, 1)));
     
-    BlueprintParser::Parse(source, markdown, result, blueprint);
+    BlueprintParser::Parse(source, markdown, 0, result, blueprint);
     
     REQUIRE(result.error.code == Error::OK);
     REQUIRE(result.warnings.size() == 1); // expected API name
@@ -153,6 +153,7 @@ TEST_CASE("bpparser/parse-nameless-description", "Parse nameless blueprint descr
     REQUIRE(result.warnings.front().location.front().length == 1);
     REQUIRE(blueprint.resourceGroups.size() == 0);
     REQUIRE(blueprint.description == "01");
+    
 }
 
 TEST_CASE("bpparser/parse-list-only", "Parse nameless blueprint with a list description")
@@ -171,7 +172,7 @@ TEST_CASE("bpparser/parse-list-only", "Parse nameless blueprint with a list desc
     markdown.push_back(MarkdownBlock(ListItemBlockEndType, "list", 0, MakeSourceDataBlock(1, 1)));
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(0, 1)));
     
-    BlueprintParser::Parse(source, markdown, result, blueprint);
+    BlueprintParser::Parse(source, markdown, 0, result, blueprint);
     
     REQUIRE(result.error.code == Error::OK);
     REQUIRE(result.warnings.size() == 1); // expected API name
@@ -212,7 +213,7 @@ TEST_CASE("bpparser/parse-multi-groups", "Parse nameless group after defined res
     
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "A", 0, MakeSourceDataBlock(9, 1)));
     
-    BlueprintParser::Parse(source, markdown, result, blueprint);
+    BlueprintParser::Parse(source, markdown, 0, result, blueprint);
     
     REQUIRE(result.error.code == Error::OK);
     CHECK(result.warnings.size() == 3); // groups with same name & expected group name & no response
@@ -255,7 +256,7 @@ TEST_CASE("bpparser/parse-resource", "Parse simple resource.")
     markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 1, MakeSourceDataBlock(4, 1)));
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 1, MakeSourceDataBlock(5, 1)));
     
-    BlueprintParser::Parse(source, markdown, result, blueprint);
+    BlueprintParser::Parse(source, markdown, 0, result, blueprint);
 
     REQUIRE(result.error.code == Error::OK);
     REQUIRE(result.warnings.empty());
@@ -311,7 +312,7 @@ TEST_CASE("bpparser/parse-metadata", "Parse blueprint that starts with metadata"
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "meta: data\nfoo:bar\n", 1, MakeSourceDataBlock(0, 19)));
     markdown.push_back(MarkdownBlock(HeaderBlockType, "API", 0, MakeSourceDataBlock(1, 1)));
     
-    BlueprintParser::Parse(source, markdown, result, blueprint);
+    BlueprintParser::Parse(source, markdown, 0, result, blueprint);
     
     REQUIRE(result.error.code == Error::OK);
     CHECK(result.warnings.empty());

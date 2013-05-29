@@ -16,6 +16,7 @@
 #include <cctype>
 #include <locale>
 #include <string>
+#include <sstream>
 
 namespace snowcrash {
 
