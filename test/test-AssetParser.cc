@@ -9,6 +9,7 @@
 #include <iterator>
 #include "catch.hpp"
 #include "AssetParser.h"
+#include "PayloadParser.h"
 #include "Fixture.h"
 
 using namespace snowcrash;
