@@ -7,9 +7,11 @@
 //
 
 #include "catch.hpp"
+#include "Fixture.h"
 #include "BlueprintParser.h"
 
 using namespace snowcrash;
+using namespace snowcrashtest;
 
 TEST_CASE("bpparser/init", "Blueprint parser construction")
 {
@@ -346,4 +348,37 @@ TEST_CASE("bpparser/parser-options-name", "Test parser options - required bluepr
     
     BlueprintParser::Parse(source, markdown, RequireBlueprintNameOption, result, blueprint);
     REQUIRE(result.error.code != Error::OK);
+}
+
+TEST_CASE("bpparser/empty-blueprint-required-name", "Test required blueprint name on empty blueprint")
+{
+    Result result;
+    Blueprint blueprint;
+    SourceData source = "01";
+    
+    MarkdownBlock::Stack markdown;
+    
+    BlueprintParser::Parse(SourceDataFixture, markdown, RequireBlueprintNameOption, result, blueprint);
+    REQUIRE(result.error.code != Error::OK);
+}
+
+TEST_CASE("bpparser/metadatarequired-name", "Test required blueprint name on blueprint that starts with metadata")
+{
+    // Blueprint in question:
+    //R"(
+    //meta: data
+    //foo: bar
+    //");
+    
+    Result result;
+    Blueprint blueprint;
+    SourceData source = "meta: data\nfoo:bar\n";
+    
+    MarkdownBlock::Stack markdown;
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "meta: data\nfoo:bar\n", 1, MakeSourceDataBlock(0, 19)));
+    
+    BlueprintParser::Parse(source, markdown, RequireBlueprintNameOption, result, blueprint);
+    
+    REQUIRE(result.error.code != Error::OK);
+    CHECK(result.warnings.empty());
 }

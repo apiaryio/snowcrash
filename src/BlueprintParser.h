@@ -56,8 +56,8 @@ namespace snowcrash {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
             
-            if ((section == TerminatorSection || section == ResourceGroupSection) &&
-                !CheckBlueprintName(cur, parser, result.first))
+            if ((section != BlueprintSection) &&
+                !CheckBlueprintName(*cur, parser, result.first))
                 return result;
             
             switch (section) {
@@ -82,7 +82,7 @@ namespace snowcrash {
         }
         
         // Checks blueprint name. Returns true on success, false otherwise
-        static bool CheckBlueprintName(const BlockIterator& cur, const ParserCore& parser, Result& result) {
+        static bool CheckBlueprintName(const MarkdownBlock& block, const ParserCore& parser, Result& result) {
             if (!(parser.options & RequireBlueprintNameOption))
                 return true;
             
@@ -92,7 +92,7 @@ namespace snowcrash {
             // ERR: No API name specified
             result.error = Error(ExpectedAPINameMessage,
                                  2,
-                                 cur->sourceMap);
+                                 block.sourceMap);
             return false;
         }
         
@@ -138,7 +138,7 @@ namespace snowcrash {
                 
                 if (IsFirstBlock(cur, bounds, parser.blueprint)) {
                     if (parser.options & RequireBlueprintNameOption) {
-                        if (!CheckBlueprintName(sectionCur, parser, result.first))
+                        if (!CheckBlueprintName(*sectionCur, parser, result.first))
                             return result;
                     }
                     else {
@@ -279,6 +279,23 @@ namespace snowcrash {
                                                                            parser,
                                                                            blueprint);
             result += sectionResult.first;
+            if (result.error.code != Error::OK)
+                return;
+            
+            PostParseCheck(sourceData, source, parser, result);
+        }
+        
+        // Perform additional post-parsing result checks
+        static void PostParseCheck(const SourceData& sourceData,
+                                   const MarkdownBlock::Stack& source,
+                                   const ParserCore& parser,
+                                   Result& result) {
+            
+            if (parser.options & RequireBlueprintNameOption) {
+                MarkdownBlock b;
+                b.sourceMap = MakeSourceDataBlock(0, 0);
+                BlueprintParserInner::CheckBlueprintName(b, parser, result);
+            }
         }
     };
 }
