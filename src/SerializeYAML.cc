@@ -88,6 +88,7 @@ static void serialize(const Method& method, std::ostream &os)
 {
     os << "    - ";   // indent 3
     serialize(SerializeKey::Method, method.method, 0, os);
+    serialize(SerializeKey::Name, method.name, 3, os);
     serialize(SerializeKey::Description, method.description, 3, os);
     
     // TODO: parameters
