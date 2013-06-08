@@ -60,7 +60,7 @@ int main(int argc, const char *argv[])
 
     snowcrash::Result result;
     snowcrash::Blueprint blueprint;
-    snowcrash::parse(ss.str(), snowcrash::RequireBlueprintNameOption, result, blueprint);
+    snowcrash::parse(ss.str(), 0 /* snowcrash::RequireBlueprintNameOption */, result, blueprint);
         
     PrintResult(result);
     SerializeYAML(blueprint, std::cout);

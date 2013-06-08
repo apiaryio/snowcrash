@@ -127,6 +127,9 @@ namespace snowcrash {
         // URI template
         URITemplate uri;
         
+        // Name
+        Name name;
+        
         // Description
         Description description;
         

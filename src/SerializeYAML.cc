@@ -116,6 +116,7 @@ static void serialize(const Resource& resource, std::ostream &os)
 {
     os << "  - ";   // indent 2
     serialize(SerializeKey::URI, resource.uri, 0, os);
+    serialize(SerializeKey::Name, resource.name, 2, os);
     serialize(SerializeKey::Description, resource.description, 2, os);
 
     // TODO: parameters

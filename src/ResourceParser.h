@@ -18,6 +18,8 @@
 
 static const std::string ResourceHeaderRegex("^((" HTTP_METHODS ")[[:space:]]+)?(/.*)$");
 
+static const std::string NamedResourceHeaderRegex("^([^\\[]*)\\[(/.+)\\]$");
+
 namespace snowcrash {
     
     // Resource signature
@@ -25,30 +27,44 @@ namespace snowcrash {
         UndefinedResourceSignature,
         NoResourceSignature,
         URIResourceSignature,
-        MethodURIResourceSignature
+        MethodURIResourceSignature,
+        NamedResourceSignature
     };
     
     // Query resource signature
-    inline ResourceSignature GetResourceSignature(const MarkdownBlock& block, HTTPMethod& method, URITemplate& uri) {
+    inline ResourceSignature GetResourceSignature(const MarkdownBlock& block,
+                                                  Name& name,
+                                                  URITemplate& uri,
+                                                  HTTPMethod& method) {
         if (block.type != HeaderBlockType ||
             block.content.empty())
             return NoResourceSignature;
         
         CaptureGroups captureGroups;
-        if (!RegexCapture(block.content, ResourceHeaderRegex, captureGroups, 4))
-            return NoResourceSignature;
+        // Nameless resource
+        if (RegexCapture(block.content, ResourceHeaderRegex, captureGroups, 4)) {
+            method = captureGroups[2];
+            uri = captureGroups[3];
+            return (method.empty()) ? URIResourceSignature : MethodURIResourceSignature;
+        }
+        else if (RegexCapture(block.content, NamedResourceHeaderRegex, captureGroups, 3)) {
+            method.clear();
+            name = captureGroups[1];
+            TrimString(name);
+            uri = captureGroups[2];
+            return NamedResourceSignature;
+        }
 
-        method = captureGroups[2];
-        uri = captureGroups[3];
-        return (method.empty()) ? URIResourceSignature : MethodURIResourceSignature;
+        return NoResourceSignature;
     }
     
     // Returns true if block has resource header signature, false otherwise
     inline bool HasResourceSignature(const MarkdownBlock& block) {
 
-        HTTPMethod method;
+        Name name;
         URITemplate uri;
-        return GetResourceSignature(block, method, uri) != NoResourceSignature;
+        HTTPMethod method;
+        return GetResourceSignature(block, name, uri, method) != NoResourceSignature;
     }
 
     // Resource iterator in its containment group
@@ -108,9 +124,11 @@ namespace snowcrash {
         if (context == TerminatorSection)
             return UndefinedSection;
         
-        HTTPMethod method;
+        
+        Name name;
         URITemplate uri;
-        ResourceSignature resourceSignature = GetResourceSignature(*begin, method, uri);
+        HTTPMethod method;
+        ResourceSignature resourceSignature = GetResourceSignature(*begin, name, uri, method);
         if (resourceSignature != NoResourceSignature) {
             return (context == UndefinedSection) ?
                     ((resourceSignature == MethodURIResourceSignature) ? ResourceMethodSection : ResourceSection) :
@@ -195,7 +213,7 @@ namespace snowcrash {
                 
                 // Retrieve URI
                 HTTPMethod method;
-                GetResourceSignature(*cur, method, resource.uri);
+                GetResourceSignature(*cur, resource.name, resource.uri, method);
             }
             else {
                 
@@ -220,7 +238,7 @@ namespace snowcrash {
             
             // Retrieve URI template
             HTTPMethod method;
-            GetResourceSignature(*cur, method, resource.uri);
+            GetResourceSignature(*cur, resource.name, resource.uri, method);
             
             // Parse as a resource method abbreviation
             return HandleMethod(cur, bounds.second, parser, resource, true);

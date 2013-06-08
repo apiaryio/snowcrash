@@ -18,7 +18,7 @@ MarkdownBlock::Stack snowcrashtest::CanonicalResourceFixture()
 {
     // Blueprint in question:
     //R"(
-    //# /resource
+    //# My Resource [/resource]
     //Resource Description
     //
     //+ Headers
@@ -30,7 +30,7 @@ MarkdownBlock::Stack snowcrashtest::CanonicalResourceFixture()
     //)";
     
     MarkdownBlock::Stack markdown;
-    markdown.push_back(MarkdownBlock(HeaderBlockType, "/resource", 1, MakeSourceDataBlock(0, 1)));
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "My Resource [/resource]", 1, MakeSourceDataBlock(0, 1)));
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "Resource Description", 0, MakeSourceDataBlock(1, 1)));    
 
     markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
@@ -51,7 +51,7 @@ TEST_CASE("rparser/classifier", "Resource block classifier")
     MarkdownBlock::Stack markdown = CanonicalResourceFixture();
     
     BlockIterator cur = markdown.begin();
-    // "/resource"
+    // Named resource: "My Resource [/resource]"
     REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSection) == ResourceSection);
     REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSection) == UndefinedSection);
     
@@ -71,6 +71,13 @@ TEST_CASE("rparser/classifier", "Resource block classifier")
     REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSection) == MethodSection);
     REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSection) == MethodSection);
     REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), HeadersSection) == MethodSection);
+    
+    // Nameless resource: "/resource"
+    markdown[0].content = "/resource";
+    cur = markdown.begin();
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSection) == ResourceSection);
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSection) == UndefinedSection);
+    
 }
 
 TEST_CASE("rparser/classifier-abbrev", "Abbreviated Resource Method block classifier")
@@ -102,6 +109,7 @@ TEST_CASE("rparser/parse", "Parse resource")
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 34);
     
+    REQUIRE(resource.name == "My Resource");
     REQUIRE(resource.uri == "/resource");
     REQUIRE(resource.description == "1");
     REQUIRE(resource.headers.size() == 1);
@@ -135,7 +143,8 @@ TEST_CASE("rparser/parse-partial", "Parse partially defined resource")
     
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 8);
-    
+
+    REQUIRE(resource.name.empty());
     REQUIRE(resource.uri == "/1");
     REQUIRE(resource.description.empty());
     REQUIRE(resource.methods.size() == 1);
@@ -407,6 +416,7 @@ TEST_CASE("rparser/parse-abbrev", "Parse resource method abbreviation")
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 13);
     
+    REQUIRE(resource.name.empty());    
     REQUIRE(resource.methods.size() == 1);
     REQUIRE(resource.methods[0].method == "GET");
     REQUIRE(resource.methods[0].description == "1");
@@ -435,7 +445,33 @@ TEST_CASE("rparser/parse-abbrev-ambiguous", "Parse resource method abbreviation 
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 1);
     
+    REQUIRE(resource.name.empty());    
     REQUIRE(resource.methods.size() == 1);
     REQUIRE(resource.methods[0].method == "GET");
+}
+
+TEST_CASE("rparser/parse-nameless-resource", "Parse resource without name")
+{
+    // Blueprint in question:
+    //R"(
+    //# /resource
+    //");
+    
+    MarkdownBlock::Stack markdown;
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "/resource", 1, MakeSourceDataBlock(0, 1)));
+    
+    Resource resource;
+    ParserCore parser(0, SourceDataFixture, Blueprint());
+    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), parser, resource);
+    
+    REQUIRE(result.first.error.code == Error::OK);
+    CHECK(result.first.warnings.size() == 0);
+    
+    const MarkdownBlock::Stack &blocks = markdown;
+    REQUIRE(std::distance(blocks.begin(), result.second) == 1);
+
+    REQUIRE(resource.uri == "/resource");
+    REQUIRE(resource.name.empty());
+    REQUIRE(resource.methods.size() == 0);
 }
 
