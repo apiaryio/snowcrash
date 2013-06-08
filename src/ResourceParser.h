@@ -16,8 +16,8 @@
 #include "RegexMatch.h"
 #include "StringUtility.h"
 
-static const std::string ResourceHeaderRegex("^((" HTTP_METHODS ")[[:space:]]+)?(/.*)$");
-static const std::string NamedResourceHeaderRegex("^([^\\[]*)\\[(/.+)\\]$");
+static const std::string ResourceHeaderRegex("^((" HTTP_METHODS ")[[:space:]]+)?(" URI_TEMPLATE ")$");
+static const std::string NamedResourceHeaderRegex("^([^\\[]*)\\[(" URI_TEMPLATE ")\\]$");
 
 namespace snowcrash {
     

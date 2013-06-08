@@ -18,9 +18,6 @@
 static const std::string MethodHeaderRegex("^(" HTTP_METHODS ")[[:space:]]*(" URI_TEMPLATE ")?$");
 static const std::string NamedMethodHeaderRegex("^([^\\[]*)\\[(" HTTP_METHODS ")\\]$");
 
-// TODO: Remove
-//static const std::string LooseMethodHeaderRegex("^(" HTTP_METHODS ")[[:space:]]*");
-
 namespace snowcrash {
     
     // Method signature
