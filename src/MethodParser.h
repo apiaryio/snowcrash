@@ -15,18 +15,58 @@
 #include "PayloadParser.h"
 #include "HeaderParser.h"
 
-static const std::string CanonicalMethodHeaderRegex("^(" HTTP_METHODS ")[[:space:]]*$");
-static const std::string LooseMethodHeaderRegex("^(" HTTP_METHODS ")[[:space:]]*");
+static const std::string MethodHeaderRegex("^(" HTTP_METHODS ")[[:space:]]*(" URI_TEMPLATE ")?$");
+static const std::string NamedMethodHeaderRegex("^([^\\[]*)\\[(" HTTP_METHODS ")\\]$");
+
+// TODO: Remove
+//static const std::string LooseMethodHeaderRegex("^(" HTTP_METHODS ")[[:space:]]*");
 
 namespace snowcrash {
     
+    // Method signature
+    enum MethodSignature {
+        UndefinedMethodSignature,
+        NoMethodSignature,
+        MethodMethodSignature,      // # GET
+        MethodURIMethodSignature,   // # GET /uri
+        NamedMethodSignature        // # My Method [GET]
+    };
+    
+    // Query method signature
+    inline MethodSignature GetMethodSignature(const MarkdownBlock& block,
+                                              Name& name,
+                                              HTTPMethod& method) {
+        if (block.type != HeaderBlockType ||
+            block.content.empty())
+            return NoMethodSignature;
+        
+        CaptureGroups captureGroups;
+        if (RegexCapture(block.content, MethodHeaderRegex, captureGroups, 3)) {
+            // Nameless method
+            method = captureGroups[1];
+            URITemplate uri = captureGroups[2];
+            return (uri.empty()) ? MethodMethodSignature : MethodURIMethodSignature;
+        }
+        else if (RegexCapture(block.content, NamedMethodHeaderRegex, captureGroups, 3)) {
+            // Named method
+            name = captureGroups[1];
+            TrimString(name);
+            method = captureGroups[2];
+            return NamedMethodSignature;
+        }
+        
+        return NoMethodSignature;
+    }
+
     // Returns true if block has HTTP Method signature, false otherwise
-    inline bool HasMethodSignature(const MarkdownBlock& block, bool strict = false) {
+    inline bool HasMethodSignature(const MarkdownBlock& block) {
         if (block.type != HeaderBlockType ||
             block.content.empty())
             return false;
         
-        return RegexMatch(block.content, (strict) ? CanonicalMethodHeaderRegex : LooseMethodHeaderRegex);
+        Name name;
+        HTTPMethod method;
+        return GetMethodSignature(block, name, method) != NoMethodSignature;
     }
     
     // Finds a method inside resource
@@ -145,9 +185,7 @@ namespace snowcrash {
             if (cur->type == HeaderBlockType &&
                 cur == bounds.first) {
                 
-                CaptureGroups captureGroups;
-                RegexCapture(cur->content, LooseMethodHeaderRegex, captureGroups, 2);
-                method.method = captureGroups[1];
+                GetMethodSignature(*cur, method.name, method.method);
             }
             else {
                 

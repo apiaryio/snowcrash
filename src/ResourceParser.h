@@ -17,7 +17,6 @@
 #include "StringUtility.h"
 
 static const std::string ResourceHeaderRegex("^((" HTTP_METHODS ")[[:space:]]+)?(/.*)$");
-
 static const std::string NamedResourceHeaderRegex("^([^\\[]*)\\[(/.+)\\]$");
 
 namespace snowcrash {
@@ -255,13 +254,17 @@ namespace snowcrash {
             if (result.first.error.code != Error::OK)
                 return result;
 
-            if (!abbrev &&
-                !HasMethodSignature(*begin, true)) {
-                // WARN: ignoring extraneous content in method header
-                std::stringstream ss;
-                ss << "ignoring extraneous content in method header `" << begin->content << "`";
-                ss << ", expected method-only e.g. `# " << method.method << "`";
-                result.first.warnings.push_back(Warning(ss.str(), 0, begin->sourceMap));
+            if (!abbrev) {
+                Name name;
+                HTTPMethod httpMethod;
+                MethodSignature methodSignature = GetMethodSignature(*begin, name, httpMethod);
+                if (methodSignature == MethodURIMethodSignature) {
+                    // WARN: ignoring extraneous content in method header
+                    std::stringstream ss;
+                    ss << "ignoring extraneous content in method header `" << begin->content << "`";
+                    ss << ", expected method-only e.g. `# " << method.method << "`";
+                    result.first.warnings.push_back(Warning(ss.str(), 0, begin->sourceMap));
+                }
             }
             
             Collection<Method>::iterator duplicate = FindMethod(resource, method);
@@ -324,7 +327,11 @@ namespace snowcrash {
                 begin->type != HeaderBlockType)
                 return;
             
-            if (HasMethodSignature(*begin, true)) {
+            Name name;
+            HTTPMethod method;
+            MethodSignature methodSignature = GetMethodSignature(*begin, name, method);
+            if (methodSignature == MethodMethodSignature ||
+                methodSignature == NamedMethodSignature) {
                 // WARN: ignoring possible method header
                 std::stringstream ss;
                 ss << "ambiguous method `" << begin->content << "`, check previous resource definition";

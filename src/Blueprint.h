@@ -62,10 +62,10 @@ namespace snowcrash {
     // Parameter
     struct Parameter {
         
-        // Group Name
+        // Parameter Name
         Name name;
         
-        // Group Description
+        // Parameter Description
         Description description;
         
         // TODO: type, optional, default value
@@ -74,10 +74,10 @@ namespace snowcrash {
     // Payload
     struct Payload {
         
-        // Group Name
+        // Payload Name
         Name name;
         
-        // Group Description
+        // Payload Description
         Description description;
         
         // Parameters
@@ -105,6 +105,9 @@ namespace snowcrash {
         // HTTP method
         HTTPMethod method;
         
+        // Method name
+        Name name;
+        
         // Description
         Description description;
         
@@ -127,7 +130,7 @@ namespace snowcrash {
         // URI template
         URITemplate uri;
         
-        // Name
+        // Resource Name
         Name name;
         
         // Description

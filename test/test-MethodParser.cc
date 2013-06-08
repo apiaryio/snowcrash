@@ -19,7 +19,7 @@ MarkdownBlock::Stack snowcrashtest::CanonicalMethodFixture()
 {
     // Blueprint in question:
     //R"(
-    //# GET
+    //# My Method [GET]
     //Method Description
     //
     //+ Headers
@@ -31,7 +31,7 @@ MarkdownBlock::Stack snowcrashtest::CanonicalMethodFixture()
     //)";
     
     MarkdownBlock::Stack markdown;
-    markdown.push_back(MarkdownBlock(HeaderBlockType, "GET", 1, MakeSourceDataBlock(0, 1)));
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "My Method [GET]", 1, MakeSourceDataBlock(0, 1)));
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "Method Description", 0, MakeSourceDataBlock(1, 1)));
     
     MarkdownBlock::Stack headerList;
@@ -101,6 +101,13 @@ TEST_CASE("mparser/classifier", "Method block classifier")
     REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), HeadersSection) == ForeignSection);
     REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), ResponseSection) == ForeignSection);
     REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), RequestSection) == ForeignSection);
+    
+    // Nameless method
+    markdown[0].content = "GET";
+    cur = markdown.begin();
+    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), UndefinedSection) == MethodSection);
+    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), MethodSection) == UndefinedSection);
+    
 }
 
 TEST_CASE("mparser/classifier-implicit-termination", "Method block classifier implicit termination")
@@ -133,6 +140,7 @@ TEST_CASE("mparser/parse", "Parse method")
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 26);
     
+    REQUIRE(method.name == "My Method");
     REQUIRE(method.method == "GET");
     REQUIRE(method.description == "1");
     REQUIRE(method.responses.empty());
@@ -179,6 +187,7 @@ TEST_CASE("mparser/parse-list-description", "Parse description with list")
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 9);
     
+    REQUIRE(method.name.empty());
     REQUIRE(method.method == "GET");
     REQUIRE(method.description == "4");
     REQUIRE(method.requests.empty());
@@ -223,6 +232,7 @@ TEST_CASE("mparser/parse-list-description-request", "Parse description with list
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 10);
     
+    REQUIRE(method.name.empty());    
     REQUIRE(method.method == "GET");
     REQUIRE(method.description == "23");
     REQUIRE(method.headers.empty());
@@ -262,6 +272,7 @@ TEST_CASE("mparser/response-regex-problem", "Parse method with response not matc
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 5);
     
+    REQUIRE(method.name.empty());    
     REQUIRE(method.method == "GET");
     REQUIRE(method.description.empty());
     REQUIRE(method.headers.empty());
@@ -370,6 +381,7 @@ TEST_CASE("mparser/parse-multi-request-response", "Parse method with multiple re
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 43);
     
+    REQUIRE(method.name.empty());    
     REQUIRE(method.method == "PUT");
     REQUIRE(method.description.empty());
     REQUIRE(method.headers.empty());
@@ -447,6 +459,7 @@ TEST_CASE("mparser/parse-multi-request-incomplete", "Parse method with multiple 
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 9);
     
+    REQUIRE(method.name.empty());    
     REQUIRE(method.method == "HEAD");
     REQUIRE(method.description.empty());
     REQUIRE(method.headers.empty());
@@ -510,6 +523,7 @@ TEST_CASE("mparser/parse-foreign", "Parse method with foreign item")
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 15);
     
+    REQUIRE(method.name.empty());    
     REQUIRE(method.method == "MKCOL");
     REQUIRE(method.description.empty());
     REQUIRE(method.headers.empty());
@@ -555,7 +569,8 @@ TEST_CASE("mparser/parse-inline-method-payload", "Parse method with inline paylo
     
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 9);
-        
+    
+    REQUIRE(method.name.empty());
     REQUIRE(method.method == "POST");
     REQUIRE(method.description.empty());
     REQUIRE(method.responses.empty());
@@ -590,6 +605,7 @@ TEST_CASE("mparser/parse-terminator", "Parse method finalized by terminator")
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 2);
     
+    REQUIRE(method.name.empty());    
     REQUIRE(method.method == "PATCH");
     REQUIRE(method.description.empty());
     REQUIRE(method.requests.empty());
@@ -618,6 +634,7 @@ TEST_CASE("mparser/parse-implicit-termination", "Parse incomplete method followe
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 1);
     
+    REQUIRE(method.name.empty());    
     REQUIRE(method.method == "GET");
     REQUIRE(method.description.empty());
 }
@@ -638,4 +655,28 @@ TEST_CASE("mparser/header-warnings", "Check warnings on overshadowing a header")
     
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 26);
+}
+
+TEST_CASE("mparser/parse-nameless-method", "Parse method without name")
+{
+    // Blueprint in question:
+    //R"(
+    //# GET
+    
+    MarkdownBlock::Stack markdown;
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "GET", 2, MakeSourceDataBlock(0, 1)));
+    
+    Method method;
+    ParserCore parser(0, SourceDataFixture, Blueprint());
+    ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), parser, method);
+    
+    REQUIRE(result.first.error.code == Error::OK);
+    CHECK(result.first.warnings.empty());
+    
+    const MarkdownBlock::Stack &blocks = markdown;
+    REQUIRE(std::distance(blocks.begin(), result.second) == 1);
+    
+    REQUIRE(method.name.empty());
+    REQUIRE(method.method == "GET");
+    REQUIRE(method.description.empty());
 }
