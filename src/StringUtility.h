@@ -3,7 +3,7 @@
 //  snowcrash
 //
 //  Created by Zdenek Nemec on 5/11/13.
-//  Copyright (c) 2013 Apiary.io. All rights reserved.
+//  Copyright (c) 2013 Apiary Inc. All rights reserved.
 //
 //  Credits:
 //  http://stackoverflow.com/questions/216823/whats-the-best-way-to-trim-stdstring

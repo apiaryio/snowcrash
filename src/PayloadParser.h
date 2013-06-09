@@ -3,7 +3,7 @@
 //  snowcrash
 //
 //  Created by Zdenek Nemec on 5/7/13.
-//  Copyright (c) 2013 Apiary.io. All rights reserved.
+//  Copyright (c) 2013 Apiary Inc. All rights reserved.
 //
 
 #ifndef SNOWCRASH_PARSEPAYLOAD_H

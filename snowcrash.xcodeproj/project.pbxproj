@@ -423,7 +423,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0460;
-				ORGANIZATIONNAME = Apiary.io;
+				ORGANIZATIONNAME = "Apiary Inc.";
 			};
 			buildConfigurationList = BBFF4893170B34E6001E5FB2 /* Build configuration list for PBXProject "snowcrash" */;
 			compatibilityVersion = "Xcode 3.2";
