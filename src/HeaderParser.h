@@ -94,7 +94,7 @@ namespace snowcrash {
         static ParseSectionResult ParseSection(const Section& section,
                                                const BlockIterator& cur,
                                                const SectionBounds& bounds,
-                                               const BlueprinParserCore& parser,
+                                               BlueprintParserCore& parser,
                                                HeaderCollection& headers) {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
@@ -117,7 +117,7 @@ namespace snowcrash {
         
         static ParseSectionResult HandleHeadersSectionBlock(const BlockIterator& cur,
                                                             const SectionBounds& bounds,
-                                                            const BlueprinParserCore& parser,
+                                                            BlueprintParserCore& parser,
                                                             HeaderCollection& headers) {
 
             SourceData data;
@@ -174,7 +174,7 @@ namespace snowcrash {
     template <class T>
     inline ParseSectionResult HandleHeaders(const BlockIterator& begin,
                                             const BlockIterator& end,
-                                            const BlueprinParserCore& parser,
+                                            BlueprintParserCore& parser,
                                             T& t)
     {
         size_t headerCount = t.headers.size();

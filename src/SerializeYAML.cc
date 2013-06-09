@@ -132,11 +132,11 @@ static void serialize(const Resource& resource, std::ostream &os)
     // TODO: parameters
 
     serialize(SerializeKey::Object, std::string(), 2, os);
-    serialize(resource.object, 3, false, os);
+    if (!resource.object.name.empty())
+        serialize(resource.object, 3, false, os);
     
-    if (!resource.headers.empty()) {
+    if (!resource.headers.empty())
         serialize(resource.headers, 2, os);
-    }
 
     if (resource.methods.empty())
         return;

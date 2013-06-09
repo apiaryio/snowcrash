@@ -163,7 +163,7 @@ namespace snowcrash {
         static ParseSectionResult ParseSection(const Section& section,
                                                const BlockIterator& cur,
                                                const SectionBounds& bounds,
-                                               const BlueprinParserCore& parser,
+                                               BlueprintParserCore& parser,
                                                Resource& resource) {
 
             ParseSectionResult result = std::make_pair(Result(), cur);
@@ -212,7 +212,7 @@ namespace snowcrash {
         
         static ParseSectionResult HandleResourceOverviewBlock(const BlockIterator& cur,
                                                               const SectionBounds& bounds,
-                                                              const BlueprinParserCore& parser,
+                                                              BlueprintParserCore& parser,
                                                               Resource& resource) {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
@@ -242,7 +242,7 @@ namespace snowcrash {
         
         static ParseSectionResult HandleObject(const BlockIterator& begin,
                                                const BlockIterator& end,
-                                               const BlueprinParserCore& parser,
+                                               BlueprintParserCore& parser,
                                                Resource& resource)
         {
             Payload payload;
@@ -269,16 +269,28 @@ namespace snowcrash {
             }
             else {
                 resource.object = payload;
+                
+                ResourceObjectSymbolTable::const_iterator it = parser.symbolTable.resourceObjects.find(payload.name);
+                if (it != parser.symbolTable.resourceObjects.end()) {
+                    // ERR: symbol already defined
+                    std::stringstream ss;
+                    ss << "symbol `" << payload.name << "` already defined";
+                    BlockIterator nameBlock = ListItemNameBlock(begin, end);
+                    result.first.error = Error(ss.str(),
+                                               1,
+                                               nameBlock->sourceMap);
+                }
+                else {
+                    parser.symbolTable.resourceObjects[payload.name] = payload;
+                }
             }
-            
-            // TODO: check & add symbol table
             
             return result;
         }
         
         static ParseSectionResult HandleResourceMethod(const BlockIterator& cur,
                                                        const SectionBounds& bounds,
-                                                       const BlueprinParserCore& parser,
+                                                       BlueprintParserCore& parser,
                                                        Resource& resource) {
             
             // Retrieve URI template
@@ -291,7 +303,7 @@ namespace snowcrash {
         
         static ParseSectionResult HandleMethod(const BlockIterator& begin,
                                                const BlockIterator& end,
-                                               const BlueprinParserCore& parser,
+                                               BlueprintParserCore& parser,
                                                Resource& resource,
                                                bool abbrev = false)
         {

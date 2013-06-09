@@ -23,7 +23,7 @@ TEST_CASE("rgparser/parse", "Parse resource group with empty resource")
     markdown.push_back(MarkdownBlock(HeaderBlockType, "/resource", 1, MakeSourceDataBlock(2, 1)));
     
     ResourceGroup resourceGroup;
-    BlueprinParserCore parser(0, SourceDataFixture, Blueprint());
+    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
     ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), parser, resourceGroup);
     
     REQUIRE(result.first.error.code == Error::OK);
@@ -48,7 +48,7 @@ TEST_CASE("rgparser/parse-multiple-resource-description", "Parse multiple resour
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "p2", 0, MakeSourceDataBlock(3, 1)));
     
     ResourceGroup resourceGroup;
-    BlueprinParserCore parser(0, SourceDataFixture, Blueprint());
+    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
     ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), parser, resourceGroup);
     
     REQUIRE(result.first.error.code == Error::OK);
@@ -96,7 +96,7 @@ TEST_CASE("rgparser/parse-multiple-resource", "Parse multiple resources with pay
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(7, 1)));
     
     ResourceGroup resourceGroup;
-    BlueprinParserCore parser(0, SourceDataFixture, Blueprint());
+    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
     ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), parser, resourceGroup);
     
     REQUIRE(result.first.error.code == Error::OK);
@@ -141,7 +141,7 @@ TEST_CASE("rgparser/parse-multiple-same", "Parse multiple same resources")
     markdown.push_back(MarkdownBlock(HeaderBlockType, "/r1", 1, MakeSourceDataBlock(1, 1)));
     
     ResourceGroup resourceGroup;
-    BlueprinParserCore parser(0, SourceDataFixture, Blueprint());
+    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
     ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), parser, resourceGroup);
     
     REQUIRE(result.first.error.code == Error::OK);
@@ -174,7 +174,7 @@ TEST_CASE("rgparser/parse-resource-description-list", "Parse resource with list 
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(4, 1)));
     
     ResourceGroup resourceGroup;
-    BlueprinParserCore parser(0, SourceDataFixture, Blueprint());
+    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
     ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), parser, resourceGroup);
     
     REQUIRE(result.first.error.code == Error::OK);
@@ -209,7 +209,7 @@ TEST_CASE("rgparser/parse-terminator", "Parse resource groups finalized by termi
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "A", 0, MakeSourceDataBlock(2, 1)));
     
     ResourceGroup resourceGroup;
-    BlueprinParserCore parser(0, SourceDataFixture, Blueprint());   
+    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());   
     ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), parser, resourceGroup);
     
     REQUIRE(result.first.error.code == Error::OK);

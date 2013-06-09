@@ -202,7 +202,7 @@ namespace snowcrash {
         static ParseSectionResult ParseSection(const Section& section,
                                                const BlockIterator& cur,
                                                const SectionBounds& bounds,
-                                               const BlueprinParserCore& parser,
+                                               BlueprintParserCore& parser,
                                                Payload& payload) {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
@@ -248,7 +248,7 @@ namespace snowcrash {
         static ParseSectionResult HandleOverviewSectionBlock(const Section& section,
                                                              const BlockIterator& cur,
                                                              const SectionBounds& bounds,
-                                                             const BlueprinParserCore& parser,
+                                                             BlueprintParserCore& parser,
                                                              Payload& payload) {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
@@ -280,7 +280,7 @@ namespace snowcrash {
         static ParseSectionResult HandleAsset(const Section& section,
                                               const BlockIterator& begin,
                                               const BlockIterator& end,
-                                              const BlueprinParserCore& parser,
+                                              BlueprintParserCore& parser,
                                               Payload& payload) {
             Asset asset;
             ParseSectionResult result = AssetParser::Parse(begin, end, parser, asset);
@@ -315,7 +315,7 @@ namespace snowcrash {
         static ParseSectionResult HandlePayloadAsset(const Section& section,
                                                      const BlockIterator& begin,
                                                      const BlockIterator& end,
-                                                     const BlueprinParserCore& parser,
+                                                     BlueprintParserCore& parser,
                                                      Payload& payload) {
         
             // Parse as an asset

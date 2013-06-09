@@ -125,10 +125,10 @@ namespace snowcrash {
     //
     // Parser Core Data
     //
-    struct BlueprinParserCore {
-        BlueprinParserCore(BlueprintParserOptions opts,
-                           const SourceData& src,
-                           const Blueprint& bp)
+    struct BlueprintParserCore {
+        BlueprintParserCore(BlueprintParserOptions opts,
+                            const SourceData& src,
+                            const Blueprint& bp)
         : options(opts), sourceData(src), blueprint(bp) {}
         
         BlueprintParserOptions options;
@@ -137,9 +137,9 @@ namespace snowcrash {
         const Blueprint& blueprint;
         
     private:
-        BlueprinParserCore();
-        BlueprinParserCore(const BlueprinParserCore&);
-        BlueprinParserCore& operator=(const BlueprinParserCore&);
+        BlueprintParserCore();
+        BlueprintParserCore(const BlueprintParserCore&);
+        BlueprintParserCore& operator=(const BlueprintParserCore&);
     };
     
     //
@@ -152,7 +152,7 @@ namespace snowcrash {
         static ParseSectionResult ParseSection(const Section& section,
                                                const BlockIterator& cur,
                                                const SectionBounds& bounds,
-                                               const BlueprinParserCore& parser,
+                                               BlueprintParserCore& parser,
                                                T& output);
     };
     
@@ -189,7 +189,7 @@ namespace snowcrash {
         // Iterate blocks, classify & parse
         static ParseSectionResult Parse(const BlockIterator& begin,
                                         const BlockIterator& end,
-                                        const BlueprinParserCore& parser,
+                                        BlueprintParserCore& parser,
                                         T& output) {
             Result result;
             Section currentSection = UndefinedSection;

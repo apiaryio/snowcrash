@@ -54,7 +54,7 @@ namespace snowcrash {
         static ParseSectionResult ParseSection(const Section& section,
                                                const BlockIterator& cur,
                                                const SectionBounds& bounds,
-                                               const BlueprinParserCore& parser,
+                                               BlueprintParserCore& parser,
                                                ResourceGroup& group) {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
@@ -85,7 +85,7 @@ namespace snowcrash {
         
         static ParseSectionResult HandleResourceGroupOverviewBlock(const BlockIterator& cur,
                                                                    const SectionBounds& bounds,
-                                                                   const BlueprinParserCore& parser,
+                                                                   BlueprintParserCore& parser,
                                                                    ResourceGroup& group) {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
@@ -120,7 +120,7 @@ namespace snowcrash {
         
         static ParseSectionResult HandleResource(const BlockIterator& begin,
                                                  const BlockIterator& end,
-                                                 const BlueprinParserCore& parser,
+                                                 BlueprintParserCore& parser,
                                                  ResourceGroup& group)
         {
             Resource resource;

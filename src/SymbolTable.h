@@ -11,6 +11,12 @@
 
 #include <string>
 #include <map>
+
+#ifdef DEBUG
+#include <iostream>
+#include "Serialize.h"
+#endif
+
 #include "Blueprint.h"
 
 namespace snowcrash {
@@ -18,17 +24,34 @@ namespace snowcrash {
     // Name of a symbol
     typedef SourceData SymbolName;
     
-    // Object Symbol
-    typedef std::pair<SymbolName, ResourceObject> ObjectSymbol;
+    // Resource Object Symbol
+    typedef std::pair<SymbolName, ResourceObject> ResourceObjectSymbol;
     
-    // Object Symbol Table
-    typedef std::map<SymbolName, ResourceObject> ObjectSymbolTable;
+    // Resource Object Symbol Table
+    typedef std::map<SymbolName, ResourceObject> ResourceObjectSymbolTable;
     
     struct SymbolTable {
         
         // Resource Object Symbol Table
-        ObjectSymbolTable objects;
+        ResourceObjectSymbolTable resourceObjects;
     };
+    
+#ifdef DEBUG
+    // Prints markdown block recursively to stdout
+    inline void PrintSymbolTable(const SymbolTable& symbolTable) {
+
+        std::cout << "Resource Object Symbols:\n";
+        for (ResourceObjectSymbolTable::const_iterator it = symbolTable.resourceObjects.begin();
+             it != symbolTable.resourceObjects.end();
+             ++it) {
+            
+            std::cout << "- " << it->first << " - body: `" << EscapeNewlines(it->second.body) << "`\n";
+        }
+        
+        std::cout << std::endl;
+    }
+#endif
+    
 }
 
 #endif

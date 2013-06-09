@@ -60,7 +60,8 @@
         'src/SerializeYAML.h',
         'src/StringUtility.h',
         'src/snowcrash.cc',
-        'src/snowcrash.h'
+        'src/snowcrash.h',
+        'src/SymbolTable.h'
       ],
     },
 
@@ -87,7 +88,8 @@
         'test/test-RegexMatch.cc',
         'test/test-ResouceGroupParser.cc',
         'test/test-ResourceParser.cc',
-        'test/test-snowcrash.cc'
+        'test/test-snowcrash.cc',
+        'test/test-SymbolTable.h'
       ],
       'dependencies': [
         'libsnowcrash',

@@ -51,7 +51,7 @@ namespace snowcrash {
         static ParseSectionResult ParseSection(const Section& section,
                                                const BlockIterator& cur,
                                                const SectionBounds& bounds,
-                                               const BlueprinParserCore& parser,
+                                               BlueprintParserCore& parser,
                                                Blueprint& output) {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
@@ -82,7 +82,7 @@ namespace snowcrash {
         }
         
         // Checks blueprint name. Returns true on success, false otherwise
-        static bool CheckBlueprintName(const MarkdownBlock& block, const BlueprinParserCore& parser, Result& result) {
+        static bool CheckBlueprintName(const MarkdownBlock& block, BlueprintParserCore& parser, Result& result) {
             if (!(parser.options & RequireBlueprintNameOption))
                 return true;
             
@@ -110,7 +110,7 @@ namespace snowcrash {
 
         static ParseSectionResult HandleBlueprintOverviewBlock(const BlockIterator& cur,
                                                                const SectionBounds& bounds,
-                                                               const BlueprinParserCore& parser,
+                                                               BlueprintParserCore& parser,
                                                                Blueprint& output) {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
@@ -158,7 +158,7 @@ namespace snowcrash {
         
         static ParseSectionResult HandleResourceGroup(const BlockIterator& begin,
                                                       const BlockIterator& end,
-                                                      const BlueprinParserCore& parser,
+                                                      BlueprintParserCore& parser,
                                                       Blueprint& output)
         {
             ResourceGroup resourceGroup;
@@ -189,7 +189,7 @@ namespace snowcrash {
 
         static ParseSectionResult ParseMetadataBlock(const BlockIterator& cur,
                                                      const SectionBounds& bounds,
-                                                     const BlueprinParserCore& parser,
+                                                     BlueprintParserCore& parser,
                                                      Blueprint& output) {
             
             typedef Collection<Metadata>::type MetadataCollection;
@@ -273,12 +273,16 @@ namespace snowcrash {
                           Result& result,
                           Blueprint& blueprint) {
             
-            BlueprinParserCore parser(options, sourceData, blueprint);
+            BlueprintParserCore parser(options, sourceData, blueprint);
             ParseSectionResult sectionResult = BlueprintParserInner::Parse(source.begin(),
                                                                            source.end(),
                                                                            parser,
                                                                            blueprint);
             result += sectionResult.first;
+            
+#ifdef DEBUG
+            PrintSymbolTable(parser.symbolTable);
+#endif
             if (result.error.code != Error::OK)
                 return;
             
@@ -288,7 +292,7 @@ namespace snowcrash {
         // Perform additional post-parsing result checks
         static void PostParseCheck(const SourceData& sourceData,
                                    const MarkdownBlock::Stack& source,
-                                   const BlueprinParserCore& parser,
+                                   BlueprintParserCore& parser,
                                    Result& result) {
             
             if (parser.options & RequireBlueprintNameOption) {
