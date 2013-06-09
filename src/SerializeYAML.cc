@@ -68,16 +68,25 @@ static void serialize(const Collection<Header>::type& headers, size_t level, std
     serializeKeyValueCollection(headers, level, os);
 }
 
-static void serialize(const Payload& payload, std::ostream &os)
+static void serialize(const Payload& payload, size_t level, bool array, std::ostream &os)
 {
-    os << "      - ";   // indent 4
+    for (size_t i = 0; i < level - 1; i++) {
+        os << "  ";
+    }
+    
+    if (array)
+        os << "- ";
+    else
+        os << "  ";
+    
     serialize(SerializeKey::Name, payload.name, 0, os);
-    serialize(SerializeKey::Description, payload.description, 4, os);
-    serialize(SerializeKey::Body, payload.body, 4, os);
-    serialize(SerializeKey::Schema, payload.schema, 4, os);
+    
+    serialize(SerializeKey::Description, payload.description, level, os);
+    serialize(SerializeKey::Body, payload.body, level, os);
+    serialize(SerializeKey::Schema, payload.schema, level, os);
     
     if (!payload.headers.empty()) {
-        serialize(payload.headers, 4, os);
+        serialize(payload.headers, level, os);
     }
     
     // TODO: parameters
@@ -100,14 +109,14 @@ static void serialize(const Method& method, std::ostream &os)
     if (!method.requests.empty()) {
         serialize(SerializeKey::Requests, std::string(), 3, os);
         for (Collection<Request>::const_iterator it = method.requests.begin(); it != method.requests.end(); ++it) {
-            serialize(*it, os);
+            serialize(*it, 4, true, os);
         }
     }
 
     if (!method.responses.empty()) {
         serialize(SerializeKey::Responses, std::string(), 3, os);
         for (Collection<Response>::const_iterator it = method.responses.begin(); it != method.responses.end(); ++it) {
-            serialize(*it, os);
+            serialize(*it, 4, true, os);
         }
     }
 }
@@ -121,6 +130,9 @@ static void serialize(const Resource& resource, std::ostream &os)
     serialize(SerializeKey::Description, resource.description, 2, os);
 
     // TODO: parameters
+
+    serialize(SerializeKey::Object, std::string(), 2, os);
+    serialize(resource.object, 3, false, os);
     
     if (!resource.headers.empty()) {
         serialize(resource.headers, 2, os);

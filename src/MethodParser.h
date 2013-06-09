@@ -170,7 +170,7 @@ namespace snowcrash {
                     
                 case ObjectSection:
                     // ERR: Unexpected object definition
-                    result.first.error = Error("unexpected object definiton at method level, object can be defined at resource level only", 1, cur->sourceMap);
+                    result.first.error = Error("unexpected object definiton, object can be only defined in a resource section", 1, cur->sourceMap);
                     break;
                     
                 default:

@@ -93,6 +93,9 @@ namespace snowcrash {
         Asset schema;
     };
     
+    // Resource Object
+    typedef Payload ResourceObject;
+    
     // Request
     typedef Payload Request;
     
@@ -128,6 +131,7 @@ namespace snowcrash {
     struct Resource {
         
         // URI template
+        // TODO: remane uri -> uriTemplate
         URITemplate uri;
         
         // Resource Name
@@ -135,6 +139,9 @@ namespace snowcrash {
         
         // Description
         Description description;
+        
+        // Object represented by this resource
+        ResourceObject object;
         
         // Parameters
         Collection<Parameter>::type parameters;

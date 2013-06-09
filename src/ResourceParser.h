@@ -105,6 +105,12 @@ namespace snowcrash {
                                                       const BlockIterator& end) {
         if (HasHeaderSignature(begin, end))
             return HeadersSection;
+        
+        Name name;
+        SourceData mediaType;
+        PayloadSignature payloadSignature = GetPayloadSignature(begin, end, name, mediaType);
+        if (payloadSignature == ObjectPayloadSignature)
+            return ObjectSection;
 
         return UndefinedSection;
     }
@@ -175,6 +181,10 @@ namespace snowcrash {
                     result = HandleResourceMethod(cur, bounds, parser, resource);
                     break;
                     
+                case ObjectSection:
+                    result = HandleObject(cur, bounds.second, parser, resource);
+                    break;
+                    
                 case HeadersSection:
                     result = HandleHeaders(cur, bounds.second, parser, resource);
                     break;
@@ -227,6 +237,42 @@ namespace snowcrash {
             }
             
             result.second = ++sectionCur;
+            return result;
+        }
+        
+        static ParseSectionResult HandleObject(const BlockIterator& begin,
+                                               const BlockIterator& end,
+                                               const ParserCore& parser,
+                                               Resource& resource)
+        {
+            Payload payload;
+            ParseSectionResult result = PayloadParser::Parse(begin, end, parser, payload);
+            if (result.first.error.code != Error::OK)
+                return result;
+            
+            if (!resource.object.name.empty()) {
+                // WARN: object already defined
+                std::stringstream ss;
+                ss << "ignoring additional object definiton for `";
+                if (!resource.name.empty()) {
+                    ss << resource.name << "(" << resource.uri << ")";
+                }
+                else {
+                    ss << resource.uri;
+                }
+                ss << "` resource, a resource can be represented single (1) object only";
+                
+                BlockIterator nameBlock = ListItemNameBlock(begin, end);
+                result.first.warnings.push_back(Warning(ss.str(),
+                                                        0,
+                                                        nameBlock->sourceMap));
+            }
+            else {
+                resource.object = payload;
+            }
+            
+            // TODO: check & add symbol table
+            
             return result;
         }
         
