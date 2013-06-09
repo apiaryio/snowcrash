@@ -439,3 +439,89 @@ TEST_CASE("pldparser/parse-abbrev-inline", "Parse abbreviated inline payload bod
     REQUIRE(payload.body == "  B\n");
     REQUIRE(payload.schema.empty());
 }
+
+TEST_CASE("pldparser/parse-symbol-inline-reference", "Parse inline payload with symbol reference")
+{
+    // Blueprint in question:
+    //R"(
+    //+ Request
+    //     [Symbol][]
+    //");
+    
+    MarkdownBlock::Stack markdown;
+    
+    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "Request\n  [Symbol][]", 0, MakeSourceDataBlock(0, 1)));
+    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(1, 1)));
+    
+    Payload payload;
+    
+    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
+    ResourceObject object;
+    object.name = "Symbol";
+    object.description = "Foo";
+    object.body = "Bar";
+    parser.symbolTable.resourceObjects[object.name] = object;
+    
+    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), parser, payload);
+    
+    REQUIRE(result.first.error.code == Error::OK);
+    REQUIRE(result.first.warnings.empty());
+    
+    const MarkdownBlock::Stack &blocks = markdown;
+    REQUIRE(std::distance(blocks.begin(), result.second) == 4);
+    
+    REQUIRE(payload.name.empty());
+    REQUIRE(payload.description == "Foo");
+    REQUIRE(payload.parameters.empty());
+    REQUIRE(payload.headers.empty());
+    REQUIRE(payload.body == "Bar");
+    REQUIRE(payload.schema.empty());
+}
+
+TEST_CASE("pldparser/parse-symbol-reference", "Parse payload with symbol reference")
+{
+    // Blueprint in question:
+    //R"(
+    //+ Request
+    //
+    //     [Symbol][]
+    //
+    //     Foreign
+    //");
+    
+    MarkdownBlock::Stack markdown;
+    
+    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Request A", 0, MakeSourceDataBlock(0, 1)));
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "  [Symbol][]  ", 0, MakeSourceDataBlock(1, 1)));
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "  Foreign ", 0, MakeSourceDataBlock(4, 1))); // will be silently ignored TODO:
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(2, 1)));
+    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(3, 1)));
+    
+    Payload payload;
+    
+    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
+    ResourceObject object;
+    object.name = "Symbol";
+    object.description = "Foo";
+    object.body = "Bar";
+    parser.symbolTable.resourceObjects[object.name] = object;
+    
+    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), parser, payload);
+    
+    REQUIRE(result.first.error.code == Error::OK);
+    REQUIRE(result.first.warnings.empty());
+    
+    const MarkdownBlock::Stack &blocks = markdown;
+    REQUIRE(std::distance(blocks.begin(), result.second) == 7);
+    
+    REQUIRE(payload.name == "A");
+    REQUIRE(payload.description == "Foo");
+    REQUIRE(payload.parameters.empty());
+    REQUIRE(payload.headers.empty());
+    REQUIRE(payload.body == "Bar");
+    REQUIRE(payload.schema.empty());
+}

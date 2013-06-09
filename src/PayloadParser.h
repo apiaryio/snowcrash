@@ -317,12 +317,82 @@ namespace snowcrash {
                                                      const BlockIterator& end,
                                                      BlueprintParserCore& parser,
                                                      Payload& payload) {
-        
-            // Parse as an asset
-            ParseSectionResult result = HandleAsset(BodySection, begin, end, parser, payload);
+            // Try to parse as a Symbol reference
+            SymbolName symbol;
+            SourceDataBlock symbolSourceMap;
+            ParseSectionResult result = ParseSymbolReference(begin, end, parser, symbol, symbolSourceMap);
+            if (result.first.error.code != Error::OK)
+                return result;
+            
+            if (result.second != begin) {
+                // Process a symbol reference
+                ResourceObjectSymbolTable::const_iterator symbolEntry = parser.symbolTable.resourceObjects.find(symbol);
+                if (symbolEntry == parser.symbolTable.resourceObjects.end()) {
+                    
+                    // ERR: Undefined symbol
+                    std::stringstream ss;
+                    ss << "undefined symbol `" << symbol << "`";
+                    result.first.error = Error(ss.str(), 3, symbolSourceMap);
+                    return result;
+                }
+                
+                // Retrieve payload from symbol table
+                payload = symbolEntry->second;
+            }
+            else {
+                // Parse as an asset
+                result = HandleAsset(BodySection, begin, end, parser, payload);
+            }
             
             // Retrieve signature
             ProcessSignature(section, begin, end, parser.sourceData, result.first, payload);
+            
+            return result;
+        }
+        
+        // Try to parse a symbol reference
+        static ParseSectionResult ParseSymbolReference(const BlockIterator& begin,
+                                                       const BlockIterator& end,
+                                                       BlueprintParserCore& parser,
+                                                       SymbolName& symbolName,
+                                                       SourceDataBlock& symbolSourceMap) {
+            
+            ParseSectionResult result = std::make_pair(Result(), begin);
+            BlockIterator cur = begin;
+            SourceData content;
+            SourceData signature = GetListItemSignature(cur, end, content);
+            if (!content.empty()) {
+                cur = ListItemNameBlock(cur, end);
+            }
+            else {
+                cur = FirstContentBlock(begin, end);
+                if (cur == end ||
+                    cur->type != ParagraphBlockType)
+                    return result;
+
+                // Try the next block
+                if (++cur == end ||
+                    cur->type != ParagraphBlockType)
+                    return result;
+                
+                content = cur->content;
+            }
+            
+            TrimString(content);
+            SymbolName symbol;
+            if (!GetSymbolReference(content, symbol))
+                return result;
+            
+            symbolName = symbol;
+            symbolSourceMap = cur->sourceMap;
+            
+            // Close list item
+            cur = begin;
+            if (cur->type == ListBlockBeginType)
+                ++cur;
+            cur = SkipToSectionEnd(cur, end, ListItemBlockBeginType, ListItemBlockEndType);
+            cur = CloseListItemBlock(cur, end);
+            result.second = cur;
             
             return result;
         }

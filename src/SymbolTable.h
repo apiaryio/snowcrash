@@ -11,6 +11,7 @@
 
 #include <string>
 #include <map>
+#include "RegexMatch.h"
 
 #ifdef DEBUG
 #include <iostream>
@@ -18,6 +19,8 @@
 #endif
 
 #include "Blueprint.h"
+
+static const std::string SymbolReferenceRegex("\\[(([A-Za-z0-9_\\-]|[[:space:]])*)\\]\\[\\]");
 
 namespace snowcrash {
 
@@ -35,6 +38,20 @@ namespace snowcrash {
         // Resource Object Symbol Table
         ResourceObjectSymbolTable resourceObjects;
     };
+    
+    
+    // Checks wheter given source data represents reference to a symbol returning true if so,
+    // false otherwise. If source data is represent reference referred symbol name is filled in.
+    inline bool GetSymbolReference(const SourceData& sourceData, SymbolName& referredSymbol) {
+        
+        CaptureGroups captureGroups;
+        if (RegexCapture(sourceData, SymbolReferenceRegex, captureGroups, 3)) {
+            referredSymbol = captureGroups[1];
+            TrimString(referredSymbol);
+            return true;
+        }
+        return false;
+    }
     
 #ifdef DEBUG
     // Prints markdown block recursively to stdout
