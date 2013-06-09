@@ -112,6 +112,19 @@ TEST_CASE("pldparser/classifier", "Payload block classifier")
     REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), SchemaSection) == SchemaSection);
     REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), BodySection) == SchemaSection);
     REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), HeadersSection) == SchemaSection);
+    
+    // Test object payload
+    markdown[2].content = "My Resource Object (application/json)";
+    cur = markdown.begin();
+    
+    // ListBlockBeginType
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), UndefinedSection) == ObjectSection);
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), ObjectSection) == ObjectSection);
+    
+    ++cur; // ListItemBlockBeginType
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), UndefinedSection) == ObjectSection);
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), ObjectSection) == UndefinedSection);
+    
 }
 
 TEST_CASE("pldparser/parse", "Parse canonical payload")

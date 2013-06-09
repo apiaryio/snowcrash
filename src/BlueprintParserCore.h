@@ -35,6 +35,8 @@ namespace snowcrash {
         RequestBodySection,
         ResponseSection,
         ResponseBodySection,
+        ObjectSection,
+        ObjectBodySection,
         BodySection,
         SchemaSection,
         HeadersSection,
@@ -45,6 +47,10 @@ namespace snowcrash {
     // Returns human readable name of given <Section>
     inline std::string SectionName(const Section& section) {
         switch (section) {
+                
+            case ObjectSection:
+                return "object";
+                
             case RequestSection:
                 return "request";
                 

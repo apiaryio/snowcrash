@@ -83,11 +83,15 @@ namespace snowcrash {
         if (HasHeaderSignature(begin, end))
             return HeadersSection;
         
-        PayloadSignature payload = GetPayloadSignature(begin, end);
+        Name name;
+        SourceData mediaType;
+        PayloadSignature payload = GetPayloadSignature(begin, end, name, mediaType);
         if (payload == RequestPayloadSignature)
             return RequestSection;
         else if (payload == ResponsePayloadSignature)
             return ResponseSection;
+        else if (payload == ObjectPayloadSignature)
+            return ObjectSection;
         
         return UndefinedSection;
     }
@@ -162,6 +166,11 @@ namespace snowcrash {
                     
                 case UndefinedSection:
                     result.second = CloseListItemBlock(cur, bounds.second);
+                    break;
+                    
+                case ObjectSection:
+                    // ERR: Unexpected object definition
+                    result.first.error = Error("unexpected object definiton at method level, object can be defined at resource level only", 1, cur->sourceMap);
                     break;
                     
                 default:

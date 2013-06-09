@@ -25,6 +25,9 @@ static const std::string RequestRegex("^[Rr]equest([[:space:]]+([A-Za-z0-9_]|[[:
 // Response matching regex
 static const std::string ResponseRegex("^[Rr]esponse([[:space:]]+([0-9_])*)?([[:space:]]\\(([^\\)]*)\\))?[[:space:]]*$");
 
+// Object matching regex
+static const std::string ObjectRegex("([[:print:]]+)[[:space:]][Oo]bject([[:space:]]\\(([^\\)]*)\\))?[[:space:]]*$");
+
 namespace snowcrash {
     
     inline Collection<Request>::const_iterator FindRequest(const Method& method, const Request& request) {
@@ -45,12 +48,14 @@ namespace snowcrash {
         NoPayloadSignature,
         RequestPayloadSignature,
         ResponsePayloadSignature,
-        GenericPayloadSignature
+        ObjectPayloadSignature
     };
     
     // Query payload signature a of given block
     inline PayloadSignature GetPayloadSignature(const BlockIterator& begin,
-                                                const BlockIterator& end) {
+                                                const BlockIterator& end,
+                                                Name& name,
+                                                SourceData& mediaType) {
         
         if (begin->type == ListBlockBeginType || begin->type == ListItemBlockBeginType) {
             
@@ -63,11 +68,26 @@ namespace snowcrash {
                 return NoPayloadSignature;
             
             std::string content = GetFirstLine(cur->content);
-            if (RegexMatch(content, RequestRegex))
-                return RequestPayloadSignature;
             
-            if (RegexMatch(content, ResponseRegex))
+            CaptureGroups captureGroups;
+            if (RegexCapture(content, RequestRegex, captureGroups, 5)) {
+                name = captureGroups[1];
+                TrimString(name);
+                mediaType = captureGroups[4];
+                return RequestPayloadSignature;
+            }
+            else if (RegexCapture(content, ResponseRegex, captureGroups, 5)) {
+                name = captureGroups[1];
+                TrimString(name);
+                mediaType = captureGroups[4];
                 return ResponsePayloadSignature;
+            }
+            else if (RegexCapture(content, ObjectRegex, captureGroups, 4)) {
+                name = captureGroups[1];
+                TrimString(name);
+                mediaType = captureGroups[3];
+                return ObjectPayloadSignature;
+            }
         }
 
         return NoPayloadSignature;
@@ -75,8 +95,10 @@ namespace snowcrash {
     
     inline bool HasPayloadSignature(const BlockIterator& begin,
                                     const BlockIterator& end) {
-        PayloadSignature signature = GetPayloadSignature(begin, end);
-        return (signature == RequestPayloadSignature || signature == ResponsePayloadSignature);
+        Name name;
+        SourceData mediaType;
+        PayloadSignature signature = GetPayloadSignature(begin, end, name, mediaType);
+        return signature != NoPayloadSignature;
     }
     
     inline bool HasPayloadAssetSignature(const BlockIterator& begin, const BlockIterator& end) {
@@ -115,7 +137,9 @@ namespace snowcrash {
         
         if (context == UndefinedSection) {
             
-            PayloadSignature payload = GetPayloadSignature(begin, end);
+            Name name;
+            SourceData mediaType;
+            PayloadSignature payload = GetPayloadSignature(begin, end, name, mediaType);
             if (payload == RequestPayloadSignature) {
 
                 return (HasNestedListBlock(begin, end)) ? RequestSection : RequestBodySection;
@@ -124,8 +148,15 @@ namespace snowcrash {
                 
                 return (HasNestedListBlock(begin, end)) ? ResponseSection : ResponseBodySection;
             }
+            else if (payload == ObjectPayloadSignature) {
+                
+                return (HasNestedListBlock(begin, end)) ? ObjectSection : ObjectBodySection;
+            }
+
         }
-        else if ((context == RequestSection || context == ResponseSection)) {
+        else if (context == RequestSection ||
+                 context == ResponseSection ||
+                 context == ObjectSection) {
             
             // Section closure
             if (begin->type == ListItemBlockEndType ||
@@ -157,7 +188,9 @@ namespace snowcrash {
             return ForeignSection;
         }
         
-        return (context == RequestSection || context == ResponseSection) ? context : UndefinedSection;
+        return (context == RequestSection ||
+                context == ResponseSection ||
+                context == ObjectSection) ? context : UndefinedSection;
     }
     
     //
@@ -177,11 +210,13 @@ namespace snowcrash {
             switch (section) {
                 case RequestSection:
                 case ResponseSection:
+                case ObjectSection:
                     result = HandleOverviewSectionBlock(section, cur, bounds, parser, payload);
                     break;
                     
                 case RequestBodySection:
                 case ResponseBodySection:
+                case ObjectBodySection:
                     result = HandlePayloadAsset(section, cur, bounds.second, parser, payload);
                     break;
                     
@@ -303,18 +338,9 @@ namespace snowcrash {
             SourceData remainingContent;
             SourceData signature = GetListItemSignature(begin, end, remainingContent);
 
-            // Capture name
-            CaptureGroups groups;
-            if (section == RequestSection || section == RequestBodySection)
-                RegexCapture(signature, RequestRegex, groups, 5);
-            else if (section == ResponseSection || section == ResponseBodySection)
-                RegexCapture(signature, ResponseRegex, groups, 5);
-            
-            payload.name = groups[1];
-            
-            // Clean & trim
-            if (!payload.name.empty())
-                TrimString(payload.name);
+            // Capture name & payload type
+            SourceData mediaType;
+            GetPayloadSignature(begin, end, payload.name, mediaType);
             
             // Add any extra lines to description unless abbreviated body
             if (!remainingContent.empty() &&
@@ -333,8 +359,8 @@ namespace snowcrash {
                 payload.name = "200";
             }
             
-            if (!groups[4].empty()) {
-                Header header = std::make_pair("Content-Type", groups[4]);
+            if (!mediaType.empty()) {
+                Header header = std::make_pair("Content-Type", mediaType);
                 TrimString(header.second);
                 payload.headers.push_back(header);
             }

@@ -42,7 +42,7 @@ MarkdownBlock::Stack snowcrashtest::CanonicalMethodFixture()
     
     MarkdownBlock::Stack listBlock = CanonicalPayloadFixture();
     
-    // inject header into list
+    // inject payload into list
     MarkdownBlock::Stack::iterator cur = listBlock.begin();
     ++cur;
     listBlock.insert(cur, headerList.begin(), headerList.end());
@@ -679,4 +679,29 @@ TEST_CASE("mparser/parse-nameless-method", "Parse method without name")
     REQUIRE(method.name.empty());
     REQUIRE(method.method == "GET");
     REQUIRE(method.description.empty());
+}
+
+TEST_CASE("mparser/not-parse-object", "Make sure method with object payload is not parsed")
+{
+    // Blueprint in question:
+    //R"(
+    //# GET
+    //+ My Object
+    //");
+    
+    MarkdownBlock::Stack markdown;
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "GET", 1, MakeSourceDataBlock(0, 1)));
+    
+    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    
+    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "My Object", 0, MakeSourceDataBlock(1, 1)));
+    
+    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(2, 1)));
+    
+    Method method;
+    ParserCore parser(0, SourceDataFixture, Blueprint());
+    ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), parser, method);
+    
+    REQUIRE(result.first.error.code != Error::OK);
 }
