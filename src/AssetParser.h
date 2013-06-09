@@ -107,7 +107,7 @@ namespace snowcrash {
         static ParseSectionResult ParseSection(const Section& section,
                                                const BlockIterator& cur,
                                                const SectionBounds& bounds,
-                                               const ParserCore& parser,
+                                               const BlueprinParserCore& parser,
                                                Asset& asset) {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
@@ -132,7 +132,7 @@ namespace snowcrash {
         static ParseSectionResult HandleAssetSectionBlock(const Section& section,
                                                           const BlockIterator& cur,
                                                           const SectionBounds& bounds,
-                                                          const ParserCore& parser,
+                                                          const BlueprinParserCore& parser,
                                                           Asset& asset) {
 
             SourceData data;

@@ -97,6 +97,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		BB1865C71764D67B00756B18 /* SymbolTable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SymbolTable.h; path = src/SymbolTable.h; sourceTree = "<group>"; };
 		BB1D4D07174D0828009BCB1C /* HeaderParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = HeaderParser.h; path = src/HeaderParser.h; sourceTree = "<group>"; };
 		BB1D4D08174D08C3009BCB1C /* test-HeaderParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-HeaderParser.cc"; path = "test/test-HeaderParser.cc"; sourceTree = "<group>"; };
 		BB1EC203173FD06600CFB84A /* ListUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ListUtility.h; path = src/ListUtility.h; sourceTree = "<group>"; };
@@ -242,6 +243,7 @@
 				BBE5705F173927870086CE22 /* PayloadParser.h */,
 				BBD5F9C717353C300049BBEE /* ResourceGroupParser.h */,
 				BBD5F9CC17353CE00049BBEE /* ResourceParser.h */,
+				BB1865C71764D67B00756B18 /* SymbolTable.h */,
 			);
 			name = blueprint;
 			sourceTree = "<group>";

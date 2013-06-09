@@ -128,7 +128,7 @@ TEST_CASE("hparser/parse", "Parse canonical header section")
     CHECK(markdown.size() == 6);
     
     HeaderCollection headers;
-    ParserCore parser(0, SourceDataFixture, Blueprint());    
+    BlueprinParserCore parser(0, SourceDataFixture, Blueprint());    
     ParseSectionResult result = HeadersParser::Parse(markdown.begin(),
                                                      markdown.end(),
                                                      parser,
@@ -156,7 +156,7 @@ TEST_CASE("hparser/parse-malformed", "Parse malformed header section")
     markdown[3].content = "Content-Type: application/json\nX-My-Header:\n";
     
     HeaderCollection headers;
-    ParserCore parser(0, SourceDataFixture, Blueprint());
+    BlueprinParserCore parser(0, SourceDataFixture, Blueprint());
     ParseSectionResult result = HeadersParser::Parse(markdown.begin(),
                                                      markdown.end(),
                                                      parser,
@@ -197,7 +197,7 @@ TEST_CASE("hparser/parse-multiple-blocks", "Parse header section composed of mul
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(4, 1)));
     
     HeaderCollection headers;
-    ParserCore parser(0, SourceDataFixture, Blueprint());
+    BlueprinParserCore parser(0, SourceDataFixture, Blueprint());
     ParseSectionResult result = HeadersParser::Parse(markdown.begin(),
                                                      markdown.end(),
                                                      parser,
@@ -224,7 +224,7 @@ TEST_CASE("hparser/warnings", "Check warnings during parsing")
     CHECK(markdown.size() == 6);
     
     HeaderCollection headers;
-    ParserCore parser(0, SourceDataFixture, Blueprint());
+    BlueprinParserCore parser(0, SourceDataFixture, Blueprint());
     ParseSectionResult result = HeadersParser::Parse(markdown.begin(),
                                                      markdown.end(),
                                                      parser,

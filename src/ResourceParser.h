@@ -163,7 +163,7 @@ namespace snowcrash {
         static ParseSectionResult ParseSection(const Section& section,
                                                const BlockIterator& cur,
                                                const SectionBounds& bounds,
-                                               const ParserCore& parser,
+                                               const BlueprinParserCore& parser,
                                                Resource& resource) {
 
             ParseSectionResult result = std::make_pair(Result(), cur);
@@ -212,7 +212,7 @@ namespace snowcrash {
         
         static ParseSectionResult HandleResourceOverviewBlock(const BlockIterator& cur,
                                                               const SectionBounds& bounds,
-                                                              const ParserCore& parser,
+                                                              const BlueprinParserCore& parser,
                                                               Resource& resource) {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
@@ -242,7 +242,7 @@ namespace snowcrash {
         
         static ParseSectionResult HandleObject(const BlockIterator& begin,
                                                const BlockIterator& end,
-                                               const ParserCore& parser,
+                                               const BlueprinParserCore& parser,
                                                Resource& resource)
         {
             Payload payload;
@@ -278,7 +278,7 @@ namespace snowcrash {
         
         static ParseSectionResult HandleResourceMethod(const BlockIterator& cur,
                                                        const SectionBounds& bounds,
-                                                       const ParserCore& parser,
+                                                       const BlueprinParserCore& parser,
                                                        Resource& resource) {
             
             // Retrieve URI template
@@ -291,7 +291,7 @@ namespace snowcrash {
         
         static ParseSectionResult HandleMethod(const BlockIterator& begin,
                                                const BlockIterator& end,
-                                               const ParserCore& parser,
+                                               const BlueprinParserCore& parser,
                                                Resource& resource,
                                                bool abbrev = false)
         {

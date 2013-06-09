@@ -128,7 +128,7 @@ TEST_CASE("mparser/parse", "Parse method")
 {
     MarkdownBlock::Stack markdown = CanonicalMethodFixture();   
     Method method;
-    ParserCore parser(0, SourceDataFixture, Blueprint());
+    BlueprinParserCore parser(0, SourceDataFixture, Blueprint());
     ParseSectionResult result = MethodParser::Parse(markdown.begin(),
                                                     markdown.end(),
                                                     parser,
@@ -178,7 +178,7 @@ TEST_CASE("mparser/parse-list-description", "Parse description with list")
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(4, 1)));
     
     Method method;
-    ParserCore parser(0, SourceDataFixture, Blueprint());
+    BlueprinParserCore parser(0, SourceDataFixture, Blueprint());
     ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), parser, method);
     
     REQUIRE(result.first.error.code == Error::OK);
@@ -223,7 +223,7 @@ TEST_CASE("mparser/parse-list-description-request", "Parse description with list
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(5, 1)));
     
     Method method;
-    ParserCore parser(0, SourceDataFixture, Blueprint());    
+    BlueprinParserCore parser(0, SourceDataFixture, Blueprint());    
     ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), parser, method);
     
     REQUIRE(result.first.error.code == Error::OK);
@@ -263,7 +263,7 @@ TEST_CASE("mparser/response-regex-problem", "Parse method with response not matc
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(2, 1)));
 
     Method method;
-    ParserCore parser(0, SourceDataFixture, Blueprint());
+    BlueprinParserCore parser(0, SourceDataFixture, Blueprint());
     ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), parser, method);
     
     REQUIRE(result.first.error.code == Error::OK);
@@ -372,7 +372,7 @@ TEST_CASE("mparser/parse-multi-request-response", "Parse method with multiple re
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(29, 1)));
     
     Method method;
-    ParserCore parser(0, SourceDataFixture, Blueprint());
+    BlueprinParserCore parser(0, SourceDataFixture, Blueprint());
     ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), parser, method);
     
     REQUIRE(result.first.error.code == Error::OK);
@@ -450,7 +450,7 @@ TEST_CASE("mparser/parse-multi-request-incomplete", "Parse method with multiple 
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(5, 1)));
 
     Method method;
-    ParserCore parser(0, SourceDataFixture, Blueprint());
+    BlueprinParserCore parser(0, SourceDataFixture, Blueprint());
     ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), parser, method);
     
     REQUIRE(result.first.error.code == Error::OK);
@@ -514,7 +514,7 @@ TEST_CASE("mparser/parse-foreign", "Parse method with foreign item")
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(9, 1)));
     
     Method method;
-    ParserCore parser(0, SourceDataFixture, Blueprint());
+    BlueprinParserCore parser(0, SourceDataFixture, Blueprint());
     ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), parser, method);
     
     REQUIRE(result.first.error.code == Error::OK);
@@ -561,7 +561,7 @@ TEST_CASE("mparser/parse-inline-method-payload", "Parse method with inline paylo
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(4, 1)));
     
     Method method;
-    ParserCore parser(0, SourceDataFixture, Blueprint());
+    BlueprinParserCore parser(0, SourceDataFixture, Blueprint());
     ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), parser, method);
     
     REQUIRE(result.first.error.code == Error::OK);
@@ -596,7 +596,7 @@ TEST_CASE("mparser/parse-terminator", "Parse method finalized by terminator")
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "A", 0, MakeSourceDataBlock(2, 1)));
     
     Method method;
-    ParserCore parser(0, SourceDataFixture, Blueprint());
+    BlueprinParserCore parser(0, SourceDataFixture, Blueprint());
     ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), parser, method);
     
     REQUIRE(result.first.error.code == Error::OK);
@@ -625,7 +625,7 @@ TEST_CASE("mparser/parse-implicit-termination", "Parse incomplete method followe
     markdown.push_back(MarkdownBlock(HeaderBlockType, "/2", 1, MakeSourceDataBlock(1, 1)));
     
     Method method;
-    ParserCore parser(0, SourceDataFixture, Blueprint());
+    BlueprinParserCore parser(0, SourceDataFixture, Blueprint());
     ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), parser, method);
     
     REQUIRE(result.first.error.code == Error::OK);
@@ -643,7 +643,7 @@ TEST_CASE("mparser/header-warnings", "Check warnings on overshadowing a header")
 {
     MarkdownBlock::Stack markdown = CanonicalMethodFixture();
     Method method;
-    ParserCore parser(0, SourceDataFixture, Blueprint());
+    BlueprinParserCore parser(0, SourceDataFixture, Blueprint());
     method.headers.push_back(std::make_pair("X-Header", "24"));
     ParseSectionResult result = MethodParser::Parse(markdown.begin(),
                                                     markdown.end(),
@@ -667,7 +667,7 @@ TEST_CASE("mparser/parse-nameless-method", "Parse method without name")
     markdown.push_back(MarkdownBlock(HeaderBlockType, "GET", 2, MakeSourceDataBlock(0, 1)));
     
     Method method;
-    ParserCore parser(0, SourceDataFixture, Blueprint());
+    BlueprinParserCore parser(0, SourceDataFixture, Blueprint());
     ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), parser, method);
     
     REQUIRE(result.first.error.code == Error::OK);
@@ -700,7 +700,7 @@ TEST_CASE("mparser/not-parse-object", "Make sure method with object payload is n
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(2, 1)));
     
     Method method;
-    ParserCore parser(0, SourceDataFixture, Blueprint());
+    BlueprinParserCore parser(0, SourceDataFixture, Blueprint());
     ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), parser, method);
     
     REQUIRE(result.first.error.code != Error::OK);

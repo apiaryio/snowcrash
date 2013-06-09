@@ -186,7 +186,7 @@ namespace snowcrash {
     inline ParseSectionResult ParseListPreformattedBlock(const Section& section,
                                                          const BlockIterator& cur,
                                                          const SectionBounds& bounds,
-                                                         const ParserCore& parser,
+                                                         const BlueprinParserCore& parser,
                                                          SourceData& data,
                                                          SourceDataBlock& sourceMap) {
         

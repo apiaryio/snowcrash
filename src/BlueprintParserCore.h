@@ -14,6 +14,7 @@
 #include "ParserCore.h"
 #include "MarkdownBlock.h"
 #include "Blueprint.h"
+#include "SymbolTable.h"
 
 // Recognized HTTP headers, regex string
 #define HTTP_METHODS "GET|POST|PUT|DELETE|OPTIONS|PATCH|PROPPATCH|LOCK|UNLOCK|COPY|MOVE|MKCOL|HEAD"
@@ -124,20 +125,21 @@ namespace snowcrash {
     //
     // Parser Core Data
     //
-    struct ParserCore {
-        ParserCore(BlueprintParserOptions opts,
-                   const SourceData& src,
-                   const Blueprint& bp)
+    struct BlueprinParserCore {
+        BlueprinParserCore(BlueprintParserOptions opts,
+                           const SourceData& src,
+                           const Blueprint& bp)
         : options(opts), sourceData(src), blueprint(bp) {}
         
         BlueprintParserOptions options;
+        SymbolTable symbolTable;
         const SourceData& sourceData;
         const Blueprint& blueprint;
         
     private:
-        ParserCore();
-        ParserCore(const ParserCore&);
-        ParserCore& operator=(const ParserCore&);
+        BlueprinParserCore();
+        BlueprinParserCore(const BlueprinParserCore&);
+        BlueprinParserCore& operator=(const BlueprinParserCore&);
     };
     
     //
@@ -150,7 +152,7 @@ namespace snowcrash {
         static ParseSectionResult ParseSection(const Section& section,
                                                const BlockIterator& cur,
                                                const SectionBounds& bounds,
-                                               const ParserCore& parser,
+                                               const BlueprinParserCore& parser,
                                                T& output);
     };
     
@@ -187,7 +189,7 @@ namespace snowcrash {
         // Iterate blocks, classify & parse
         static ParseSectionResult Parse(const BlockIterator& begin,
                                         const BlockIterator& end,
-                                        const ParserCore& parser,
+                                        const BlueprinParserCore& parser,
                                         T& output) {
             Result result;
             Section currentSection = UndefinedSection;
