@@ -17,7 +17,7 @@
 #include "StringUtility.h"
 
 static const std::string ResourceHeaderRegex("^((" HTTP_METHODS ")[[:space:]]+)?(" URI_TEMPLATE ")$");
-static const std::string NamedResourceHeaderRegex("^([^\\[]*)\\[(" URI_TEMPLATE ")\\]$");
+static const std::string NamedResourceHeaderRegex("^[[:space:]]*(" SYMBOL_IDENTIFIER ")[[:space:]]+\\[(" URI_TEMPLATE ")\\]$");
 
 namespace snowcrash {
     
@@ -46,11 +46,11 @@ namespace snowcrash {
             uri = captureGroups[3];
             return (method.empty()) ? URIResourceSignature : MethodURIResourceSignature;
         }
-        else if (RegexCapture(block.content, NamedResourceHeaderRegex, captureGroups, 3)) {
+        else if (RegexCapture(block.content, NamedResourceHeaderRegex, captureGroups, 4)) {
             method.clear();
             name = captureGroups[1];
             TrimString(name);
-            uri = captureGroups[2];
+            uri = captureGroups[3];
             return NamedResourceSignature;
         }
 

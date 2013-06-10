@@ -20,7 +20,11 @@
 
 #include "Blueprint.h"
 
-static const std::string SymbolReferenceRegex("\\[(([A-Za-z0-9_\\-]|[[:space:]])*)\\]\\[\\]");
+// Symbol identifier regex
+#define SYMBOL_IDENTIFIER "([A-Za-z0-9_\\-]|[[:space:]])*"
+
+// Symbol reference regex
+static const std::string SymbolReferenceRegex("^[[:space:]]*\\[(" SYMBOL_IDENTIFIER ")\\]\\[\\][[:space:]]*$");
 
 namespace snowcrash {
 
