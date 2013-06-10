@@ -82,10 +82,10 @@ namespace snowcrash {
                 mediaType = captureGroups[4];
                 return ResponsePayloadSignature;
             }
-            else if (RegexCapture(content, ObjectRegex, captureGroups, 4)) {
+            else if (RegexCapture(content, ObjectRegex, captureGroups, 5)) {
                 name = captureGroups[1];
                 TrimString(name);
-                mediaType = captureGroups[3];
+                mediaType = captureGroups[4];
                 return ObjectPayloadSignature;
             }
         }

@@ -128,6 +128,9 @@ TEST_CASE("rparser/parse", "Parse resource")
     REQUIRE(resource.uriTemplate == "/resource");
     REQUIRE(resource.object.name == "My Resource");
     REQUIRE(resource.object.body == "X.O.");
+    REQUIRE(resource.object.headers.size() == 1);
+    REQUIRE(resource.object.headers[0].first == "Content-Type");
+    REQUIRE(resource.object.headers[0].second == "text/plain");
     REQUIRE(resource.description == "1");
     REQUIRE(resource.headers.size() == 1);
     REQUIRE(resource.headers[0].first == "X-Resource-Header");
