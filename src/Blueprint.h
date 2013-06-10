@@ -131,8 +131,7 @@ namespace snowcrash {
     struct Resource {
         
         // URI template
-        // TODO: remane uri -> uriTemplate
-        URITemplate uri;
+        URITemplate uriTemplate;
         
         // Resource Name
         Name name;

@@ -127,7 +127,7 @@ TEST_CASE("bpparser/parse-name-resource", "Parse API with Name and resouce")
     REQUIRE(group.resources.size() == 1);
     
     Resource resource = group.resources.front();
-    REQUIRE(resource.uri == "/resource");
+    REQUIRE(resource.uriTemplate == "/resource");
     REQUIRE(resource.description == "3");
 }
 
@@ -273,7 +273,7 @@ TEST_CASE("bpparser/parse-resource", "Parse simple resource.")
     REQUIRE(group.resources.size() == 1);
     
     Resource resource = group.resources.front();
-    REQUIRE(resource.uri == "/resource");
+    REQUIRE(resource.uriTemplate == "/resource");
     REQUIRE(resource.description.empty());
     REQUIRE(resource.headers.empty());
     REQUIRE(resource.parameters.empty());

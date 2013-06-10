@@ -125,7 +125,7 @@ TEST_CASE("rparser/parse", "Parse resource")
     REQUIRE(std::distance(blocks.begin(), result.second) == 38);
     
     REQUIRE(resource.name == "My Resource");
-    REQUIRE(resource.uri == "/resource");
+    REQUIRE(resource.uriTemplate == "/resource");
     REQUIRE(resource.object.name == "My Resource");
     REQUIRE(resource.object.body == "X.O.");
     REQUIRE(resource.description == "1");
@@ -162,7 +162,7 @@ TEST_CASE("rparser/parse-partial", "Parse partially defined resource")
     REQUIRE(std::distance(blocks.begin(), result.second) == 8);
 
     REQUIRE(resource.name.empty());
-    REQUIRE(resource.uri == "/1");
+    REQUIRE(resource.uriTemplate == "/1");
     REQUIRE(resource.description.empty());
     REQUIRE(resource.object.name.empty());
     REQUIRE(resource.object.body.empty());
@@ -194,7 +194,7 @@ TEST_CASE("rparser/parse-multi-method-desc", "Parse multiple method descriptions
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 5);
     
-    REQUIRE(resource.uri == "/1");
+    REQUIRE(resource.uriTemplate == "/1");
     REQUIRE(resource.description.empty());
     REQUIRE(resource.object.name.empty());
     REQUIRE(resource.object.body.empty());
@@ -277,7 +277,7 @@ TEST_CASE("rparser/parse-multi-method", "Parse multiple method")
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 30);
     
-    REQUIRE(resource.uri == "/1");
+    REQUIRE(resource.uriTemplate == "/1");
     REQUIRE(resource.description == "1");
     REQUIRE(resource.object.name.empty());
     REQUIRE(resource.object.body.empty());
@@ -344,7 +344,7 @@ TEST_CASE("rparser/parse-list-description", "Parse description with list")
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 8);
     
-    REQUIRE(resource.uri == "/1");
+    REQUIRE(resource.uriTemplate == "/1");
     REQUIRE(resource.description == "34");
     REQUIRE(resource.object.name.empty());
     REQUIRE(resource.object.body.empty());
@@ -375,7 +375,7 @@ TEST_CASE("rparser/parse-terminator", "Parse resource finalized by terminator")
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 2);
     
-    REQUIRE(resource.uri == "/1");
+    REQUIRE(resource.uriTemplate == "/1");
     REQUIRE(resource.description.empty());
     REQUIRE(resource.object.name.empty());
     REQUIRE(resource.object.body.empty());
@@ -501,7 +501,7 @@ TEST_CASE("rparser/parse-nameless-resource", "Parse resource without name")
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 1);
 
-    REQUIRE(resource.uri == "/resource");
+    REQUIRE(resource.uriTemplate == "/resource");
     REQUIRE(resource.name.empty());
     REQUIRE(resource.object.name.empty());
     REQUIRE(resource.object.body.empty());

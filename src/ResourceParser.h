@@ -222,7 +222,7 @@ namespace snowcrash {
                 
                 // Retrieve URI
                 HTTPMethod method;
-                GetResourceSignature(*cur, resource.name, resource.uri, method);
+                GetResourceSignature(*cur, resource.name, resource.uriTemplate, method);
             }
             else {
                 
@@ -255,10 +255,10 @@ namespace snowcrash {
                 std::stringstream ss;
                 ss << "ignoring additional object definiton for `";
                 if (!resource.name.empty()) {
-                    ss << resource.name << "(" << resource.uri << ")";
+                    ss << resource.name << "(" << resource.uriTemplate << ")";
                 }
                 else {
-                    ss << resource.uri;
+                    ss << resource.uriTemplate;
                 }
                 ss << "` resource, a resource can be represented single (1) object only";
                 
@@ -295,7 +295,7 @@ namespace snowcrash {
             
             // Retrieve URI template
             HTTPMethod method;
-            GetResourceSignature(*cur, resource.name, resource.uri, method);
+            GetResourceSignature(*cur, resource.name, resource.uriTemplate, method);
             
             // Parse as a resource method abbreviation
             return HandleMethod(cur, bounds.second, parser, resource, true);
@@ -332,7 +332,7 @@ namespace snowcrash {
                 result.first.warnings.push_back(Warning("method `" +
                                                         method.method +
                                                         "` already defined for resource `" +
-                                                        resource.uri +
+                                                        resource.uriTemplate +
                                                         "`",
                                                         0,
                                                         begin->sourceMap));
@@ -345,7 +345,7 @@ namespace snowcrash {
                 result.first.warnings.push_back(Warning("no response defined for `" +
                                                         method.method +
                                                         " " +
-                                                        resource.uri +
+                                                        resource.uriTemplate +
                                                         "`",
                                                         0,
                                                         begin->sourceMap));

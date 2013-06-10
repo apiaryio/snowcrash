@@ -35,7 +35,7 @@ TEST_CASE("rgparser/parse", "Parse resource group with empty resource")
     REQUIRE(resourceGroup.name == "Group Name");
     REQUIRE(resourceGroup.description == "1");
     REQUIRE(resourceGroup.resources.size() == 1);
-    REQUIRE(resourceGroup.resources.front().uri == "/resource");
+    REQUIRE(resourceGroup.resources.front().uriTemplate == "/resource");
 }
 
 TEST_CASE("rgparser/parse-multiple-resource-description", "Parse multiple resource in anonymous group")
@@ -60,9 +60,9 @@ TEST_CASE("rgparser/parse-multiple-resource-description", "Parse multiple resour
     REQUIRE(resourceGroup.name.empty());
     REQUIRE(resourceGroup.description.empty());
     REQUIRE(resourceGroup.resources.size() == 2);
-    REQUIRE(resourceGroup.resources[0].uri == "/r1");
+    REQUIRE(resourceGroup.resources[0].uriTemplate == "/r1");
     REQUIRE(resourceGroup.resources[0].description == "1");
-    REQUIRE(resourceGroup.resources[1].uri == "/r2");
+    REQUIRE(resourceGroup.resources[1].uriTemplate == "/r2");
     REQUIRE(resourceGroup.resources[1].description == "3");
 }
 
@@ -110,7 +110,7 @@ TEST_CASE("rgparser/parse-multiple-resource", "Parse multiple resources with pay
     REQUIRE(resourceGroup.resources.size() == 2);
     
     Resource resource1 = resourceGroup.resources[0];
-    REQUIRE(resource1.uri == "/1");
+    REQUIRE(resource1.uriTemplate == "/1");
     REQUIRE(resource1.description.empty());
     REQUIRE(resource1.methods.size() == 1);
     REQUIRE(resource1.methods[0].method == "GET");
@@ -122,7 +122,7 @@ TEST_CASE("rgparser/parse-multiple-resource", "Parse multiple resources with pay
     REQUIRE(resource1.methods[0].responses.empty());
 
     Resource resource2 = resourceGroup.resources[1];
-    REQUIRE(resource2.uri == "/2");
+    REQUIRE(resource2.uriTemplate == "/2");
     REQUIRE(resource2.description.empty());
     REQUIRE(resource2.methods.size() == 1);
     REQUIRE(resource2.methods[0].method == "GET");
@@ -186,7 +186,7 @@ TEST_CASE("rgparser/parse-resource-description-list", "Parse resource with list 
     REQUIRE(resourceGroup.name.empty());
     REQUIRE(resourceGroup.description.empty());
     REQUIRE(resourceGroup.resources.size() == 1);
-    REQUIRE(resourceGroup.resources[0].uri == "/1");
+    REQUIRE(resourceGroup.resources[0].uriTemplate == "/1");
     REQUIRE(resourceGroup.resources[0].description.empty());
     REQUIRE(resourceGroup.resources[0].methods.size() == 1);
     REQUIRE(resourceGroup.resources[0].methods[0].method == "GET");

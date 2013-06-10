@@ -93,7 +93,7 @@ namespace snowcrash {
     template <class T>
     struct MatchURI : std::binary_function<T, T, bool> {
         bool operator()(const T& first, const T& second) const {
-            return first.uri == second.uri;
+            return first.uriTemplate == second.uriTemplate;
         }
     };
     

@@ -68,7 +68,7 @@ Resource **description**\n\
     REQUIRE(resourceGroup.resources.size() == 1);
     
     Resource& resource = resourceGroup.resources.front();
-    REQUIRE(resource.uri == "/resource");
+    REQUIRE(resource.uriTemplate == "/resource");
     REQUIRE(resource.methods.size() == 1);
     
     Method& method = resource.methods[0];

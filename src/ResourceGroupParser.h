@@ -138,7 +138,7 @@ namespace snowcrash {
                 
                 // WARN: duplicate resource
                 result.first.warnings.push_back(Warning("resource `" +
-                                                        resource.uri +
+                                                        resource.uriTemplate +
                                                         "` is already defined",
                                                         0,
                                                         begin->sourceMap));
