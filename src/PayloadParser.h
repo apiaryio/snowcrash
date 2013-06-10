@@ -387,12 +387,32 @@ namespace snowcrash {
             symbolSourceMap = cur->sourceMap;
             
             // Close list item
-            cur = begin;
-            if (cur->type == ListBlockBeginType)
+            BlockIterator endCur = begin;
+            if (endCur->type == ListBlockBeginType)
+                ++endCur;
+            endCur = SkipToSectionEnd(endCur, end, ListItemBlockBeginType, ListItemBlockEndType);
+            
+            // Check extraneous content
+            if (cur != endCur) {
                 ++cur;
-            cur = SkipToSectionEnd(cur, end, ListItemBlockBeginType, ListItemBlockEndType);
-            cur = CloseListItemBlock(cur, end);
-            result.second = cur;
+                for (; cur != endCur; ++cur) {
+
+                    if (cur->type == QuoteBlockBeginType)
+                        cur = SkipToSectionEnd(cur, endCur, QuoteBlockBeginType, QuoteBlockEndType);
+                    
+                    if (cur->type == ListBlockBeginType)
+                        cur = SkipToSectionEnd(cur, endCur, ListBlockBeginType, ListBlockEndType);
+                    
+                    // WARN: ignoring extraneous content after symbol reference
+                    std::stringstream ss;
+                    ss << "ignoring extraneous content after symbol reference";
+                    ss << ", expected symbol reference only e.g. `[" << symbolName << "][]`";
+                    result.first.warnings.push_back(Warning(ss.str(), 0, cur->sourceMap));
+                }
+            }
+            
+            endCur = CloseListItemBlock(cur, end);
+            result.second = endCur;
             
             return result;
         }

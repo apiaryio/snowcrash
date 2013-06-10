@@ -497,7 +497,7 @@ TEST_CASE("pldparser/parse-symbol-reference", "Parse payload with symbol referen
     markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "Request A", 0, MakeSourceDataBlock(0, 1)));
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "  [Symbol][]  ", 0, MakeSourceDataBlock(1, 1)));
-    markdown.push_back(MarkdownBlock(ParagraphBlockType, "  Foreign ", 0, MakeSourceDataBlock(4, 1))); // will be silently ignored TODO:
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "  Foreign ", 0, MakeSourceDataBlock(4, 1)));
     markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(2, 1)));
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(3, 1)));
     
@@ -513,7 +513,7 @@ TEST_CASE("pldparser/parse-symbol-reference", "Parse payload with symbol referen
     ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), parser, payload);
     
     REQUIRE(result.first.error.code == Error::OK);
-    REQUIRE(result.first.warnings.empty());
+    REQUIRE(result.first.warnings.size() == 1); // ignoring foreign entry
     
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 7);
