@@ -2,7 +2,7 @@
 
 ### API Blueprint Parser
 
-Snow Crash is reference [API Blueprint](http://apiblueprint.org) parser built on top of [Sundown](https://github.com/vmg/sundown) Markdown parser.
+Snow Crash is the reference [API Blueprint](http://apiblueprint.org) parser built on top of the [Sundown](https://github.com/vmg/sundown) Markdown parser.
 
 API Blueprint is Web API documentation language. You can find API Blueprint documentation on the [API Blueprint site](http://apiblueprint.org).
 
@@ -49,4 +49,4 @@ To build & run Snow Crash command line tool use:
 	$ ./bin/snowcrash
 
 ## License
-MIT License. See [LICENSE](https://github.com/apiaryio/snowcrash/blob/master/LICENSE) file.
+MIT License. See the [LICENSE](https://github.com/apiaryio/snowcrash/blob/master/LICENSE) file.
