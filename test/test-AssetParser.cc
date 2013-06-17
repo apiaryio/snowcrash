@@ -352,3 +352,30 @@ TEST_CASE("aparser/parse-multipart", "Parse body asset composed from multiple bl
     REQUIRE(asset == "  A\n4Lorem Ipsum");
 }
 
+TEST_CASE("aparser/fix-body-not-parsed", "Issue: Object payload body isn't parsed")
+{
+    // http://github.com/apiaryio/snowcrash/issues/6
+    // NOTE: caused by extra spaces before the body
+    //
+    // Blueprint in question:
+    //R"(
+    //+    Body
+    //
+    //          Lorem Ipsum
+    //");
+    
+    MarkdownBlock::Stack markdown = CanonicalBodyAssetFixture();
+    markdown[2].content = "   Body";
+    
+    Asset asset;
+    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
+    ParseSectionResult result = AssetParser::Parse(markdown.begin(), markdown.end(), parser, asset);
+    
+    REQUIRE(result.first.error.code == Error::OK);
+    CHECK(result.first.warnings.empty());
+    
+    const MarkdownBlock::Stack &blocks = markdown;
+    REQUIRE(std::distance(blocks.begin(), result.second) == 6);
+    REQUIRE(asset == "Lorem Ipsum");
+}
+

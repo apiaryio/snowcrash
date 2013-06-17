@@ -526,16 +526,6 @@ TEST_CASE("pldparser/parse-symbol-reference", "Parse payload with symbol referen
     REQUIRE(payload.schema.empty());
 }
 
-//HeaderBlockType, content: 'GET /res\n', :0:12
-//ListBlockBeginType
-//ListItemBlockBeginType
-//ListBlockBeginType
-//ListItemBlockBeginType
-//ListItemBlockEndType, content: 'Body        \n    something\n', :46:13;67:14
-//ListBlockEndType, :44:15;63:18
-//ListItemBlockEndType, content: 'Response 200 (text/plain)\n', :14:26;44:15;63:18
-//ListBlockEndType, :12:70
-
 TEST_CASE("pldparser/fix-missing-source-map", "Issue: Fix missing source map")
 {
     // https://github.com/apiaryio/snowcrash/issues/2
@@ -573,6 +563,4 @@ TEST_CASE("pldparser/fix-missing-source-map", "Issue: Fix missing source map")
     
     REQUIRE(result.first.warnings[0].location.size() == 1);
 }
-
-
 

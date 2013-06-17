@@ -17,7 +17,7 @@
 #include "StringUtility.h"
 
 // Headers matching regex
-static const std::string HeadersRegex("^[Hh]eaders?[[:space:]]*$");
+static const std::string HeadersRegex("^[ \t]*[Hh]eaders?[ \t]*$");
 
 namespace snowcrash {
 
