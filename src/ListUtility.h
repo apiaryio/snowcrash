@@ -206,11 +206,12 @@ namespace snowcrash {
                 dataStream << content;
                 
                 // WARN: not a preformatted code block
+                BlockIterator nameBlock = ListItemNameBlock(sectionCur, bounds.second);
                 std::stringstream ss;
                 ss << SectionName(section) << " " << FormattingWarning;
                 result.first.warnings.push_back(Warning(ss.str(),
                                                         0,
-                                                        sectionCur->sourceMap));
+                                                        nameBlock->sourceMap));
             }
             
             sectionCur = FirstContentBlock(cur, bounds.second);

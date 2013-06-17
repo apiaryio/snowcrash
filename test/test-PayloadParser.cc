@@ -525,3 +525,54 @@ TEST_CASE("pldparser/parse-symbol-reference", "Parse payload with symbol referen
     REQUIRE(payload.body == "Bar");
     REQUIRE(payload.schema.empty());
 }
+
+//HeaderBlockType, content: 'GET /res\n', :0:12
+//ListBlockBeginType
+//ListItemBlockBeginType
+//ListBlockBeginType
+//ListItemBlockBeginType
+//ListItemBlockEndType, content: 'Body        \n    something\n', :46:13;67:14
+//ListBlockEndType, :44:15;63:18
+//ListItemBlockEndType, content: 'Response 200 (text/plain)\n', :14:26;44:15;63:18
+//ListBlockEndType, :12:70
+
+TEST_CASE("pldparser/fix-missing-source-map", "Issue: Fix missing source map")
+{
+    // https://github.com/apiaryio/snowcrash/issues/2
+    //
+    // Blueprint in question:
+    //R"(
+    //# GET /res
+    //
+    //+ Response 200 (text/plain)
+    //    + Body        
+    //            something
+    //");
+    
+    MarkdownBlock::Stack markdown;
+    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+
+    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "Body        \n    something\n", 0, MakeSourceDataBlock(0, 1)));
+    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(1, 1)));
+
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "Response 200 (text/plain)\n", 0, MakeSourceDataBlock(2, 1)));
+    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(3, 1)));
+    
+    Payload payload;
+    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
+    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), parser, payload);
+    
+    REQUIRE(result.first.error.code == Error::OK);
+    REQUIRE(result.first.warnings.size() == 1); // ignoring unrecognized item
+    
+    const MarkdownBlock::Stack &blocks = markdown;
+    REQUIRE(std::distance(blocks.begin(), result.second) == 8);
+    
+    REQUIRE(result.first.warnings[0].location.size() == 1);
+}
+
+
+
