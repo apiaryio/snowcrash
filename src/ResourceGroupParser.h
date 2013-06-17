@@ -130,7 +130,7 @@ namespace snowcrash {
             
             ResourceIterator duplicate = FindResource(group, resource);
             ResourceIteratorPair globalDuplicate;
-            if (duplicate != group.resources.end())
+            if (duplicate == group.resources.end())
                 globalDuplicate = FindResource(parser.blueprint, resource);
             
             if (duplicate != group.resources.end() ||

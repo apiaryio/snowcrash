@@ -382,3 +382,50 @@ TEST_CASE("bpparser/metadatarequired-name", "Test required blueprint name on blu
     REQUIRE(result.error.code != Error::OK);
     CHECK(result.warnings.empty());
 }
+
+TEST_CASE("bparser/incorrect-duplicity-warn", "Issue: fix incorrect warning about duplicity")
+{
+    //https://github.com/apiaryio/snowcrash/issues/3
+    
+    // Blueprint in question:
+    //R"(
+    //FORMAT: X-1A
+    //
+    //# API Name
+    //
+    //# Resource 1 [/1]
+    //## Retrieve Resource 1 [GET]
+    //+ Response 200
+    //
+    //        ...
+    //
+    //# Section Header
+    //## Resource 2 [/2]
+    //");
+    
+    MarkdownBlock::Stack markdown;
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "API Name", 1, MakeSourceDataBlock(0, 1)));
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "Resource 1 [/1]", 1, MakeSourceDataBlock(1, 1)));
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "Retrieve Resource 1 [GET]", 1, MakeSourceDataBlock(2, 1)));
+    
+    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Response 200\n", 0, MakeSourceDataBlock(3, 1)));
+    markdown.push_back(MarkdownBlock(CodeBlockType, "...\n", 0, MakeSourceDataBlock(4, 1)));
+    
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(5, 1)));
+    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(6, 1)));
+    
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "Section Header", 1, MakeSourceDataBlock(7, 1)));
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "Resource 2 [/2]", 1, MakeSourceDataBlock(8, 1)));
+    
+    Result result;
+    Blueprint blueprint;
+    BlueprintParser::Parse(SourceDataFixture, markdown, RequireBlueprintNameOption, result, blueprint);
+    
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.empty());
+
+    REQUIRE(blueprint.resourceGroups.size() == 2);
+}
