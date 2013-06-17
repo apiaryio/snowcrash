@@ -111,6 +111,8 @@ namespace snowcrash {
                     sectionCur = SkipToSectionEnd(cur, bounds.second, ListBlockBeginType, ListBlockEndType);
                 }
                 
+                if (!CheckCursor(sectionCur, bounds, cur, result.first))
+                    return result;
                 group.description += MapSourceData(parser.sourceData, sectionCur->sourceMap);
             }
             

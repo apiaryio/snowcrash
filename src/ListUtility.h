@@ -228,6 +228,8 @@ namespace snowcrash {
                 sectionCur = SkipToSectionEnd(sectionCur, bounds.second, ListBlockBeginType, ListBlockEndType);
             }
             
+            if (!CheckCursor(sectionCur, bounds, cur, result.first))
+                return result;
             dataStream << MapSourceData(parser.sourceData, sectionCur->sourceMap);
             
             // WARN: not a preformatted code block

@@ -149,6 +149,8 @@ namespace snowcrash {
                     }
                 }
                 
+                if (!CheckCursor(sectionCur, bounds, cur, result.first))
+                    return result;
                 output.description += MapSourceData(parser.sourceData, sectionCur->sourceMap);
             }
             

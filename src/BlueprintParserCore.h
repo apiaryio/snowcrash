@@ -259,6 +259,25 @@ namespace snowcrash {
         
         return (!keyValuePair.first.empty() && !keyValuePair.second.empty());
     }
+    
+    ///! \brief Checks cursor validity within its container.
+    ///! \param cur an iterator to be checked
+    ///! \param bounds boundaries to check against
+    ///! \param parent cursor's parent block to be used in case of error reporting
+    ///! \param result error result output, an error object is added in case of failed check
+    ///! \returns true if cursor appears to be valid false otherwise
+    inline bool CheckCursor(const BlockIterator& cur,
+                            const SectionBounds& bounds,
+                            const BlockIterator& parent,
+                            Result& result) {
+        if (cur != bounds.second)
+            return true;
+        
+        result.error = Error("unexpected markdown closure", 1, parent->sourceMap);
+        return false;
+    }
+    
+    
 }
 
 #endif

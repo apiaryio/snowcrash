@@ -233,6 +233,8 @@ namespace snowcrash {
                     sectionCur = SkipToDescriptionListEnd<Resource>(sectionCur, bounds.second, result.first);
                 }
                 
+                if (!CheckCursor(sectionCur, bounds, cur, result.first))
+                    return result;
                 resource.description += MapSourceData(parser.sourceData, sectionCur->sourceMap);
             }
             
