@@ -568,7 +568,7 @@ TEST_CASE("mparser/parse-inline-method-payload", "Parse method with inline paylo
     REQUIRE(method.requests[0].body.empty());
 }
 
-TEST_CASE("mparser/parse-terminator", "Parse method finalized by terminator")
+TEST_CASE("mparser/parse-hr", "Parse method with a HR")
 {
     
     // Blueprint in question:
@@ -591,11 +591,11 @@ TEST_CASE("mparser/parse-terminator", "Parse method finalized by terminator")
     CHECK(result.first.warnings.empty());
     
     const MarkdownBlock::Stack &blocks = markdown;
-    REQUIRE(std::distance(blocks.begin(), result.second) == 2);
+    REQUIRE(std::distance(blocks.begin(), result.second) == 3);
     
     REQUIRE(method.name.empty());    
     REQUIRE(method.method == "PATCH");
-    REQUIRE(method.description.empty());
+    REQUIRE(method.description == "12");
     REQUIRE(method.requests.empty());
     REQUIRE(method.responses.empty());
 }

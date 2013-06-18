@@ -14,9 +14,82 @@
 using namespace snowcrash;
 using namespace snowcrashtest;
 
-TEST_CASE("rgparser/parse", "Parse resource group with empty resource")
+snowcrash::MarkdownBlock::Stack snowcrashtest::CanonicalResourceGroupFixture()
 {
-    SourceData source = "012";
+    // Blueprint in question:
+    //R"(
+    //# Group First
+    //
+    //Fiber optics
+    //
+    //<see CanonicalResourceFixture()>
+    //
+    //
+    //# Group Second
+    //
+    //Assembly language
+    //)";
+    
+    MarkdownBlock::Stack markdown;
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "Group First", 1, MakeSourceDataBlock(0, 1)));
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Fiber optics", 0, MakeSourceDataBlock(1, 1)));
+
+    MarkdownBlock::Stack methodBlocks = CanonicalResourceFixture();
+    markdown.insert(markdown.end(), methodBlocks.begin(), methodBlocks.end());
+    
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "Group Second", 1, MakeSourceDataBlock(0, 1)));
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Assembly language", 0, MakeSourceDataBlock(2, 1)));
+    
+    return markdown;
+}
+
+TEST_CASE("rgparser/classifier", "Resource Group block classifier")
+{
+    MarkdownBlock::Stack markdown = CanonicalResourceGroupFixture();
+
+    BlockIterator cur = markdown.begin();
+
+    // # Group First
+    REQUIRE(ClassifyBlock<ResourceGroup>(cur, markdown.end(), UndefinedSection) == ResourceGroupSection);
+    REQUIRE(ClassifyBlock<ResourceGroup>(cur, markdown.end(), ResourceGroupSection) == UndefinedSection);
+    
+    ++cur; // Fiber optics
+    REQUIRE(ClassifyBlock<ResourceGroup>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<ResourceGroup>(cur, markdown.end(), ResourceGroupSection) == ResourceGroupSection);
+
+    ++cur; // # My Resource [/resource]
+    REQUIRE(ClassifyBlock<ResourceGroup>(cur, markdown.end(), UndefinedSection) == ResourceSection);
+    REQUIRE(ClassifyBlock<ResourceGroup>(cur, markdown.end(), ResourceGroupSection) == ResourceSection);
+
+    std::advance(cur, 38); // # Group Second
+    REQUIRE(ClassifyBlock<ResourceGroup>(cur, markdown.end(), UndefinedSection) == ResourceGroupSection);
+    REQUIRE(ClassifyBlock<ResourceGroup>(cur, markdown.end(), ResourceGroupSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<ResourceGroup>(cur, markdown.end(), ResourceSection) == UndefinedSection);    
+}
+
+TEST_CASE("rgparser/parse", "Parse canonical resource group")
+{
+    MarkdownBlock::Stack markdown = CanonicalResourceGroupFixture();
+    
+    ResourceGroup resourceGroup;
+    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
+    ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), parser, resourceGroup);
+    
+    REQUIRE(result.first.error.code == Error::OK);
+    REQUIRE(result.first.warnings.size() == 1); // TODO: Fix canonical resource 
+    
+    const MarkdownBlock::Stack &blocks = markdown;
+    REQUIRE(std::distance(blocks.begin(), result.second) == 40);
+    
+    REQUIRE(resourceGroup.name == "First");
+    REQUIRE(resourceGroup.description == "1");
+    REQUIRE(resourceGroup.resources.size() == 1);
+    REQUIRE(resourceGroup.resources.front().uriTemplate == "/resource");
+    REQUIRE(resourceGroup.resources.front().name == "My Resource");
+}
+
+TEST_CASE("rgparser/parse-empty-resource", "Parse resource group with empty resource")
+{
     MarkdownBlock::Stack markdown;
     markdown.push_back(MarkdownBlock(HeaderBlockType, "Group Name", 1, MakeSourceDataBlock(0, 1)));
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "p1", 0, MakeSourceDataBlock(1, 1)));
@@ -32,7 +105,7 @@ TEST_CASE("rgparser/parse", "Parse resource group with empty resource")
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 3);
     
-    REQUIRE(resourceGroup.name == "Group Name");
+    REQUIRE(resourceGroup.name == "Name");
     REQUIRE(resourceGroup.description == "1");
     REQUIRE(resourceGroup.resources.size() == 1);
     REQUIRE(resourceGroup.resources.front().uriTemplate == "/resource");
@@ -133,9 +206,8 @@ TEST_CASE("rgparser/parse-multiple-resource", "Parse multiple resources with pay
     REQUIRE(resource2.methods[0].responses.empty());
 }
 
-TEST_CASE("rgparser/parse-multiple-same", "Parse multiple same resources")
+TEST_CASE("rgparser/parse-multiple-same", "Parse multiple resources with the same name")
 {
-    SourceData source = "01";
     MarkdownBlock::Stack markdown;
     markdown.push_back(MarkdownBlock(HeaderBlockType, "/r1", 1, MakeSourceDataBlock(0, 1)));
     markdown.push_back(MarkdownBlock(HeaderBlockType, "/r1", 1, MakeSourceDataBlock(1, 1)));
@@ -159,10 +231,9 @@ TEST_CASE("rgparser/parse-resource-description-list", "Parse resource with list 
     //# /1
     //# GET
     //+ Request
-    //Hello
+    //   Hello
     //+ Body
     
-    SourceData source = "01234";
     MarkdownBlock::Stack markdown;
     markdown.push_back(MarkdownBlock(HeaderBlockType, "/1", 1, MakeSourceDataBlock(0, 1)));
     markdown.push_back(MarkdownBlock(HeaderBlockType, "GET", 1, MakeSourceDataBlock(1, 1)));
@@ -193,18 +264,17 @@ TEST_CASE("rgparser/parse-resource-description-list", "Parse resource with list 
     REQUIRE(resourceGroup.resources[0].methods[0].description == "");
 }
 
-TEST_CASE("rgparser/parse-terminator", "Parse resource groups finalized by terminator")
+TEST_CASE("rgparser/parse-hr", "Parse resource groups with hr in description")
 {
     
     // Blueprint in question:
     //R"(
-    //# 1
+    //# Group 1
     //---
     //A
     
-    SourceData source = "01234";
     MarkdownBlock::Stack markdown;
-    markdown.push_back(MarkdownBlock(HeaderBlockType, "1", 1, MakeSourceDataBlock(0, 1)));
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "Group 1", 1, MakeSourceDataBlock(0, 1)));
     markdown.push_back(MarkdownBlock(HRuleBlockType, SourceData(), 0, MakeSourceDataBlock(1, 1)));
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "A", 0, MakeSourceDataBlock(2, 1)));
     
@@ -216,10 +286,10 @@ TEST_CASE("rgparser/parse-terminator", "Parse resource groups finalized by termi
     CHECK(result.first.warnings.empty());
     
     const MarkdownBlock::Stack &blocks = markdown;
-    REQUIRE(std::distance(blocks.begin(), result.second) == 2);
+    REQUIRE(std::distance(blocks.begin(), result.second) == 3);
     
     REQUIRE(resourceGroup.name == "1");
-    REQUIRE(resourceGroup.description.empty());
+    REQUIRE(resourceGroup.description == "12");
     REQUIRE(resourceGroup.resources.empty());
 }
 

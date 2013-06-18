@@ -123,13 +123,6 @@ namespace snowcrash {
                                            const BlockIterator& end,
                                            const Section& context) {
 
-        if (begin->type == HRuleBlockType)
-            return TerminatorSection;
-        
-        if (context == TerminatorSection)
-            return UndefinedSection;
-        
-        
         Name name;
         URITemplate uri;
         HTTPMethod method;
@@ -167,12 +160,7 @@ namespace snowcrash {
                                                Resource& resource) {
 
             ParseSectionResult result = std::make_pair(Result(), cur);
-            switch (section) {
-                case TerminatorSection:
-                    if (result.second != bounds.second)
-                        ++result.second;
-                    break;
-                    
+            switch (section) {                    
                 case ResourceSection:
                     result = HandleResourceOverviewBlock(cur, bounds, parser, resource);
                     break;

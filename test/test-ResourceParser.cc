@@ -354,7 +354,7 @@ TEST_CASE("rparser/parse-list-description", "Parse description with list")
     REQUIRE(resource.methods.empty());
 }
 
-TEST_CASE("rparser/parse-terminator", "Parse resource finalized by terminator")
+TEST_CASE("rparser/parse-hr", "Parse resource with a HR")
 {
     
     // Blueprint in question:
@@ -376,10 +376,10 @@ TEST_CASE("rparser/parse-terminator", "Parse resource finalized by terminator")
     CHECK(result.first.warnings.empty());
     
     const MarkdownBlock::Stack &blocks = markdown;
-    REQUIRE(std::distance(blocks.begin(), result.second) == 2);
+    REQUIRE(std::distance(blocks.begin(), result.second) == 3);
     
     REQUIRE(resource.uriTemplate == "/1");
-    REQUIRE(resource.description.empty());
+    REQUIRE(resource.description == "12");
     REQUIRE(resource.object.name.empty());
     REQUIRE(resource.object.body.empty());
     REQUIRE(resource.methods.empty());

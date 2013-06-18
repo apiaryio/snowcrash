@@ -41,8 +41,7 @@ namespace snowcrash {
         BodySection,
         SchemaSection,
         HeadersSection,
-        ForeignSection,
-        TerminatorSection
+        ForeignSection
     };
     
     // Returns human readable name of given <Section>
@@ -173,6 +172,7 @@ namespace snowcrash {
                           const Section& context);
     
     // Forward declaration of classifier helpers
+    extern bool HasResourceGroupSignature(const MarkdownBlock& block);
     extern bool HasMethodSignature(const MarkdownBlock& block);
     extern bool HasResourceSignature(const MarkdownBlock& block);
     extern bool HasPayloadSignature(const BlockIterator& begin, const BlockIterator& end);

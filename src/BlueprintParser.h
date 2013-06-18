@@ -29,17 +29,11 @@ namespace snowcrash {
                                             const BlockIterator& end,
                                             const Section& context) {
         
-        if (begin->type == HRuleBlockType)
-            return TerminatorSection;
-        
-        if (HasResourceSignature(*begin))
+        if (HasResourceGroupSignature(*begin) ||
+            HasResourceSignature(*begin))
             return ResourceGroupSection; // Treat Resource as anonymous resource group
         
-        if (context == ResourceGroupSection ||
-            context == TerminatorSection)
-            return ResourceGroupSection;
-        
-        return BlueprintSection;
+        return (context == ResourceGroupSection) ? UndefinedSection : BlueprintSection;
     }
     
     //
@@ -61,9 +55,6 @@ namespace snowcrash {
                 return result;
             
             switch (section) {
-                case TerminatorSection:
-                    result.second = ++BlockIterator(cur);
-                    break;
                     
                 case BlueprintSection:
                     result = HandleBlueprintOverviewBlock(cur, bounds, parser, output);
@@ -116,7 +107,7 @@ namespace snowcrash {
             ParseSectionResult result = std::make_pair(Result(), cur);
             BlockIterator sectionCur(cur);
             if (cur->type == HeaderBlockType &&
-                IsFirstBlock(cur, bounds, parser.blueprint)) {
+                IsFirstBlock(cur, bounds, output)) {
                 output.name = cur->content;
             }
             else {
@@ -136,7 +127,7 @@ namespace snowcrash {
                     sectionCur = SkipToSectionEnd(cur, bounds.second, ListBlockBeginType, ListBlockEndType);
                 }
                 
-                if (IsFirstBlock(cur, bounds, parser.blueprint)) {
+                if (IsFirstBlock(cur, bounds, output)) {
                     if (parser.options & RequireBlueprintNameOption) {
                         if (!CheckBlueprintName(*sectionCur, parser, result.first))
                             return result;

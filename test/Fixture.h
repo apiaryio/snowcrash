@@ -15,6 +15,8 @@ namespace snowcrashtest {
 
     extern const snowcrash::SourceData SourceDataFixture;
 
+    extern snowcrash::MarkdownBlock::Stack CanonicalBlueprintFixture();
+    extern snowcrash::MarkdownBlock::Stack CanonicalResourceGroupFixture();
     extern snowcrash::MarkdownBlock::Stack CanonicalResourceFixture();
     extern snowcrash::MarkdownBlock::Stack CanonicalMethodFixture();
     extern snowcrash::MarkdownBlock::Stack CanonicalPayloadFixture();

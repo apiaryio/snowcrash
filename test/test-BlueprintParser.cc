@@ -13,11 +13,94 @@
 using namespace snowcrash;
 using namespace snowcrashtest;
 
+snowcrash::MarkdownBlock::Stack snowcrashtest::CanonicalBlueprintFixture()
+{
+    // Blueprint in question:
+    //R"(
+    //meta: verse
+    //
+    //# Snowcrash API
+    //
+    //## Character
+    //Uncle Enzo
+    //
+    //<see CanonicalResourceGroupFixture()>
+    //
+    //)";
+    
+    MarkdownBlock::Stack markdown;
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "meta: verse", 0, MakeSourceDataBlock(0, 1)));
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "Snowcrash API", 1, MakeSourceDataBlock(1, 1)));
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "Character", 2, MakeSourceDataBlock(2, 1)));
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Uncle Enzo", 0, MakeSourceDataBlock(3, 1)));
+    
+    MarkdownBlock::Stack methodBlocks = CanonicalResourceGroupFixture();
+    markdown.insert(markdown.end(), methodBlocks.begin(), methodBlocks.end());
+    
+    return markdown;
+}
+
+TEST_CASE("bparser/classifier", "Blueprint block classifier")
+{
+    MarkdownBlock::Stack markdown = CanonicalBlueprintFixture();
+    
+    BlockIterator cur = markdown.begin();
+
+    // meta: verse
+    REQUIRE(ClassifyBlock<Blueprint>(cur, markdown.end(), UndefinedSection) == BlueprintSection);
+    
+    ++cur; // # Snowcrash API
+    REQUIRE(ClassifyBlock<Blueprint>(cur, markdown.end(), UndefinedSection) == BlueprintSection);
+    REQUIRE(ClassifyBlock<Blueprint>(cur, markdown.end(), BlueprintSection) == BlueprintSection);
+    
+    ++cur; // ## Character
+    REQUIRE(ClassifyBlock<Blueprint>(cur, markdown.end(), UndefinedSection) == BlueprintSection);
+    REQUIRE(ClassifyBlock<Blueprint>(cur, markdown.end(), BlueprintSection) == BlueprintSection);
+    
+    ++cur; // Uncle Enzo
+    REQUIRE(ClassifyBlock<Blueprint>(cur, markdown.end(), UndefinedSection) == BlueprintSection);    
+    REQUIRE(ClassifyBlock<Blueprint>(cur, markdown.end(), BlueprintSection) == BlueprintSection);
+    
+    ++cur; // # Group First
+    REQUIRE(ClassifyBlock<Blueprint>(cur, markdown.end(), UndefinedSection) == ResourceGroupSection);
+    REQUIRE(ClassifyBlock<Blueprint>(cur, markdown.end(), BlueprintSection) == ResourceGroupSection);
+}
+
 TEST_CASE("bpparser/init", "Blueprint parser construction")
 {
     BlueprintParser* parser;
     REQUIRE_NOTHROW(parser = ::new BlueprintParser);
     REQUIRE_NOTHROW(::delete parser);
+}
+
+TEST_CASE("bpparser/parse", "Parse canonical blueprint")
+{
+    MarkdownBlock::Stack markdown = CanonicalBlueprintFixture();
+    
+    Blueprint blueprint;
+    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
+    ParseSectionResult result = BlueprintParserInner::Parse(markdown.begin(), markdown.end(), parser, blueprint);
+    
+    REQUIRE(result.first.error.code == Error::OK);
+    CHECK(result.first.warnings.size() == 1); // TODO: fix resource canonical asset
+    
+    const MarkdownBlock::Stack &blocks = markdown;
+    REQUIRE(std::distance(blocks.begin(), result.second) == 46);
+
+    REQUIRE(blueprint.metadata.size() == 1);
+    REQUIRE(blueprint.metadata[0].first == "meta");
+    REQUIRE(blueprint.metadata[0].second == "verse");
+    REQUIRE(blueprint.name == "Snowcrash API");
+    REQUIRE(blueprint.description == "23");
+    REQUIRE(blueprint.resourceGroups.size() == 2);
+    
+    REQUIRE(blueprint.resourceGroups[0].name == "First");
+    REQUIRE(blueprint.resourceGroups[0].description == "1");
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    
+    REQUIRE(blueprint.resourceGroups[1].name == "Second");
+    REQUIRE(blueprint.resourceGroups[1].description == "2");
+    REQUIRE(blueprint.resourceGroups[1].resources.empty());
 }
 
 TEST_CASE("bpparser/parse-params", "parse() method parameters.")
@@ -72,7 +155,6 @@ TEST_CASE("bpparser/parse-group", "Parse resource group.")
 {
     Result result;
     Blueprint blueprint;
-    SourceData source = "0123456";
     
     MarkdownBlock::Stack markdown;
     markdown.push_back(MarkdownBlock(HeaderBlockType, "API Name", 1, MakeSourceDataBlock(0, 1)));
@@ -80,10 +162,10 @@ TEST_CASE("bpparser/parse-group", "Parse resource group.")
     markdown.push_back(MarkdownBlock(HRuleBlockType, MarkdownBlock::Content(), 0, MakeSourceDataBlock(2, 1)));
     markdown.push_back(MarkdownBlock(HeaderBlockType, "Group Name", 1, MakeSourceDataBlock(3, 1)));
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "p2", 0, MakeSourceDataBlock(4, 1)));
-    markdown.push_back(MarkdownBlock(HeaderBlockType, "Group Description Header", 2, MakeSourceDataBlock(5, 1)));
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "Description Header", 2, MakeSourceDataBlock(5, 1)));
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "p3", 1, MakeSourceDataBlock(6, 1)));
     
-    BlueprintParser::Parse(source, markdown, 0, result, blueprint);
+    BlueprintParser::Parse(SourceDataFixture, markdown, 0, result, blueprint);
 
     REQUIRE(result.error.code == Error::OK);
     REQUIRE(result.warnings.empty());
@@ -92,7 +174,7 @@ TEST_CASE("bpparser/parse-group", "Parse resource group.")
     REQUIRE(blueprint.resourceGroups.size() == 1);
 
     ResourceGroup group = blueprint.resourceGroups.front();
-    REQUIRE(group.name == "Group Name");
+    REQUIRE(group.name == "Name");
     REQUIRE(group.description == "456");
 }
 
@@ -192,11 +274,8 @@ TEST_CASE("bpparser/parse-multi-groups", "Parse nameless group after defined res
     //
     //			{ ... }
     //
-    //A
-    
-    Result result;
-    Blueprint blueprint;
-    SourceData source = "0123456789";
+    //# Group Name
+    //
     
     MarkdownBlock::Stack markdown;
     markdown.push_back(MarkdownBlock(HeaderBlockType, "/1", 1, MakeSourceDataBlock(0, 1)));
@@ -213,12 +292,17 @@ TEST_CASE("bpparser/parse-multi-groups", "Parse nameless group after defined res
     markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(7, 1)));
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(8, 1)));
     
-    markdown.push_back(MarkdownBlock(ParagraphBlockType, "A", 0, MakeSourceDataBlock(9, 1)));
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "Group Name", 0, MakeSourceDataBlock(9, 1)));
     
-    BlueprintParser::Parse(source, markdown, 0, result, blueprint);
+    Blueprint blueprint;
+    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
+    ParseSectionResult result = BlueprintParserInner::Parse(markdown.begin(), markdown.end(), parser, blueprint);
     
-    REQUIRE(result.error.code == Error::OK);
-    CHECK(result.warnings.size() == 3); // groups with same name & expected group name & no response
+    REQUIRE(result.first.error.code == Error::OK);
+    CHECK(result.first.warnings.size() == 1); // groups with same name & expected group name & no response
+    
+    const MarkdownBlock::Stack &blocks = markdown;
+    REQUIRE(std::distance(blocks.begin(), result.second) == 14);
 
     REQUIRE(blueprint.resourceGroups.size() == 2);
     
@@ -226,8 +310,8 @@ TEST_CASE("bpparser/parse-multi-groups", "Parse nameless group after defined res
     REQUIRE(blueprint.resourceGroups[0].description.empty());
     REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
     
-    REQUIRE(blueprint.resourceGroups[1].name.empty());
-    REQUIRE(blueprint.resourceGroups[1].description == "9");
+    REQUIRE(blueprint.resourceGroups[1].name == "Name");
+    REQUIRE(blueprint.resourceGroups[1].description.empty());
 }
 
 TEST_CASE("bpparser/parse-resource", "Parse simple resource.")
@@ -399,7 +483,7 @@ TEST_CASE("bparser/incorrect-duplicity-warn", "Issue: fix incorrect warning abou
     //
     //        ...
     //
-    //# Section Header
+    //# Group Section Header
     //## Resource 2 [/2]
     //");
     
@@ -417,7 +501,7 @@ TEST_CASE("bparser/incorrect-duplicity-warn", "Issue: fix incorrect warning abou
     markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(5, 1)));
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(6, 1)));
     
-    markdown.push_back(MarkdownBlock(HeaderBlockType, "Section Header", 1, MakeSourceDataBlock(7, 1)));
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "Group Section Header", 1, MakeSourceDataBlock(7, 1)));
     markdown.push_back(MarkdownBlock(HeaderBlockType, "Resource 2 [/2]", 1, MakeSourceDataBlock(8, 1)));
     
     Result result;
