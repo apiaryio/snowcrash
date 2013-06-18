@@ -181,19 +181,7 @@ TEST_CASE("mparser/parse-list-description", "Parse description with list")
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
     ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), parser, method);
     
-    REQUIRE(result.first.error.code == Error::OK);
-    REQUIRE(result.first.warnings.size() == 1); // warn skipping Request list
-    
-    const MarkdownBlock::Stack &blocks = markdown;
-    REQUIRE(std::distance(blocks.begin(), result.second) == 9);
-    
-    REQUIRE(method.name.empty());
-    REQUIRE(method.method == "GET");
-    REQUIRE(method.description == "4");
-    REQUIRE(method.requests.empty());
-    REQUIRE(method.headers.empty());
-    REQUIRE(method.parameters.empty());
-    REQUIRE(method.responses.empty());
+    REQUIRE(result.first.error.code != Error::OK);
 }
 
 TEST_CASE("mparser/parse-list-description-request", "Parse description with list followed by a request")

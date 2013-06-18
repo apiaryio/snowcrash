@@ -184,18 +184,7 @@ TEST_CASE("pldparser/parse-list-description", "Parse description with list")
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
     ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), parser, payload);
     
-    REQUIRE(result.first.error.code == Error::OK);
-    CHECK(result.first.warnings.size() == 1); // warn skipping body list
-    
-    const MarkdownBlock::Stack &blocks = markdown;
-    REQUIRE(std::distance(blocks.begin(), result.second) == 10);
-    
-    REQUIRE(payload.name.empty());
-    REQUIRE(payload.description == "3");
-    REQUIRE(payload.parameters.empty());
-    REQUIRE(payload.headers.empty());
-    REQUIRE(payload.body.empty());
-    REQUIRE(payload.schema.empty());
+    REQUIRE(result.first.error.code != Error::OK);
 }
 
 TEST_CASE("pldparser/parse-one", "Parse just one payload in a list with multiple payloads")
