@@ -22,13 +22,17 @@ static bool CheckSource(const SourceData& source, Result& result)
 {
     std::string::size_type pos = source.find("\t");
     if (pos != std::string::npos) {
-        result.error = Error("the use of tab(s) `\\t` in source data isn't currently supported, please contact makers", 2);
+        result.error = Error("the use of tab(s) `\\t` in source data isn't currently supported, please contact makers",
+                             2,
+                             MakeSourceDataBlock(pos, 1));
         return false;
     }
 
     pos = source.find("\r");
     if (pos != std::string::npos) {
-        result.error = Error("the use of carriage return(s) `\\r` in source data isn't currently supported, please contact makers", 2);
+        result.error = Error("the use of carriage return(s) `\\r` in source data isn't currently supported, please contact makers",
+                             2,
+                             MakeSourceDataBlock(pos, 1));
         return false;
     }
     

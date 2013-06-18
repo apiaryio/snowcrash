@@ -81,3 +81,23 @@ Resource **description**\n\
     REQUIRE(response.name == "200");
     REQUIRE(response.body == "Text\n\n{ ... }\n");
 }
+
+TEST_CASE("parser/parse-sanity-check-loc", "Attempt to parse bluprint with unsupported characters")
+{
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    
+    parser.parse("hello\t", 0, result, blueprint);
+    REQUIRE(result.error.code != Error::OK);
+    REQUIRE(result.error.location.size() == 1);
+    REQUIRE(result.error.location[0].location == 5);
+    REQUIRE(result.error.location[0].length == 1);
+
+    parser.parse("sun\n\rsalt\n\r", 0, result, blueprint);
+    REQUIRE(result.error.code != Error::OK);
+    REQUIRE(result.error.location.size() == 1);
+    REQUIRE(result.error.location[0].location == 4);
+    REQUIRE(result.error.location[0].length == 1);
+    
+}
