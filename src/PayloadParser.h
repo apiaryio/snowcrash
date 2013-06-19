@@ -20,13 +20,13 @@
 #include "HeaderParser.h"
 
 // Request matching regex
-static const std::string RequestRegex("^[ \t]*[Rr]equest([ \t]+" SYMBOL_IDENTIFIER ")?([ \t]\\(([^\\)]*)\\))?[ \t]*$");
+static const std::string RequestRegex("^[ \\t]*[Rr]equest([ \\t]+" SYMBOL_IDENTIFIER ")?([ \\t]\\(([^\\)]*)\\))?[ \\t]*$");
 
 // Response matching regex
-static const std::string ResponseRegex("^[ \t]*[Rr]esponse([ \t]+([0-9_])*)?([ \t]\\(([^\\)]*)\\))?[ \t]*$");
+static const std::string ResponseRegex("^[ \\t]*[Rr]esponse([ \\t]+([0-9_])*)?([ \\t]\\(([^\\)]*)\\))?[ \\t]*$");
 
 // Object matching regex
-static const std::string ObjectRegex("^[ \t]*(" SYMBOL_IDENTIFIER ")[ \t][Oo]bject([ \t]\\(([^\\)]*)\\))?[ \t]*$");
+static const std::string ObjectRegex("^[ \\t]*(" SYMBOL_IDENTIFIER ")[ \\t][Oo]bject([ \\t]\\(([^\\)]*)\\))?[ \\t]*$");
 
 namespace snowcrash {
     

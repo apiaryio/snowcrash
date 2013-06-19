@@ -15,7 +15,7 @@
 #include "PayloadParser.h"
 #include "HeaderParser.h"
 
-static const std::string MethodHeaderRegex("^(" HTTP_METHODS ")[ \t]*(" URI_TEMPLATE ")?$");
+static const std::string MethodHeaderRegex("^(" HTTP_METHODS ")[ \\t]*(" URI_TEMPLATE ")?$");
 static const std::string NamedMethodHeaderRegex("^([^\\[]*)\\[(" HTTP_METHODS ")\\]$");
 
 namespace snowcrash {

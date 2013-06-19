@@ -17,10 +17,10 @@
 #include "StringUtility.h"
 
 // Body matching regex
-static const std::string BodyRegex("^[ \t]*[Bb]ody[ \t]*$");
+static const std::string BodyRegex("^[ \\t]*[Bb]ody[ \\t]*$");
 
 // Schema matching regex
-static const std::string SchemaRegex("^[ \t]*[Ss]chema[ \t]*$");
+static const std::string SchemaRegex("^[ \\t]*[Ss]chema[ \\t]*$");
 
 static const std::string AssetFormattingWarning = " asset is expected to be preformatted code block";
 
