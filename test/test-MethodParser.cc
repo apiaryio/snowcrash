@@ -28,6 +28,10 @@ MarkdownBlock::Stack snowcrashtest::CanonicalMethodFixture()
     //
     // <see CanonicalPayloadFixture()>
     //
+    //+ Response 200 (text/plain)
+    //
+    //       OK.
+    //
     //)";
     
     MarkdownBlock::Stack markdown;
@@ -42,10 +46,19 @@ MarkdownBlock::Stack snowcrashtest::CanonicalMethodFixture()
     
     MarkdownBlock::Stack listBlock = CanonicalPayloadFixture();
     
-    // inject payload into list
+    // inject headers into payload list
     MarkdownBlock::Stack::iterator cur = listBlock.begin();
     ++cur;
     listBlock.insert(cur, headerList.begin(), headerList.end());
+    
+    // inject response into payload list
+    MarkdownBlock::Stack responseList;
+    responseList.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    responseList.push_back(MarkdownBlock(ParagraphBlockType, "Response 200 (text/plain)", 0, MakeSourceDataBlock(4, 1)));
+    responseList.push_back(MarkdownBlock(CodeBlockType, "OK.", 0, MakeSourceDataBlock(5, 1)));
+    responseList.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(6, 1)));
+    
+    listBlock.insert(cur, responseList.begin(), responseList.end());
     
     // inject complete list into final markdown
     markdown.insert(markdown.end(), listBlock.begin(), listBlock.end());
@@ -76,12 +89,16 @@ TEST_CASE("mparser/classifier", "Method block classifier")
     ++cur; // ParagraphBlockType - "MethodSection"
     REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
     REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), MethodSection) == MethodSection);
+
+    ++cur; // ListBlockBeginType - "Response"
+    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), UndefinedSection) == ResponseSection);
+    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), MethodSection) == ResponseSection);
     
-    ++cur; // ListBlockBeginType - "Headers"
-    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), UndefinedSection) == HeadersSection);
-    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), MethodSection) == HeadersSection);
+    ++cur; // ListItemBlockBeginType - "Response"
+    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), UndefinedSection) == ResponseSection);
+    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), MethodSection) == ResponseSection);
     
-    ++cur; // ListItemBlockBeginType - "Headers"
+    std::advance(cur, 4); // ListItemBlockBeginType - "Headers"
     REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), UndefinedSection) == HeadersSection);
     REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), MethodSection) == HeadersSection);
     
@@ -138,17 +155,24 @@ TEST_CASE("mparser/parse", "Parse method")
     CHECK(result.first.warnings.empty());
 
     const MarkdownBlock::Stack &blocks = markdown;
-    REQUIRE(std::distance(blocks.begin(), result.second) == 26);
+    REQUIRE(std::distance(blocks.begin(), result.second) == 30);
     
     REQUIRE(method.name == "My Method");
     REQUIRE(method.method == "GET");
     REQUIRE(method.description == "1");
-    REQUIRE(method.responses.empty());
+
     REQUIRE(method.headers.size() == 1);
     REQUIRE(method.headers[0].first == "X-Method-Header");
     REQUIRE(method.headers[0].second == "0xdeadbeef");
     REQUIRE(method.parameters.empty());
     REQUIRE(method.requests.size() == 1);
+    REQUIRE(method.responses.size() == 1);
+    
+    REQUIRE(method.responses[0].name == "200");
+    REQUIRE(method.responses[0].body == "OK.");
+    REQUIRE(method.responses[0].headers.size() == 1);
+    REQUIRE(method.responses[0].headers[0].first == "Content-Type");
+    REQUIRE(method.responses[0].headers[0].second == "text/plain");
 }
 
 TEST_CASE("mparser/parse-list-description", "Parse description with list")
@@ -642,7 +666,7 @@ TEST_CASE("mparser/header-warnings", "Check warnings on overshadowing a header")
     REQUIRE(result.first.warnings.size() == 1);
     
     const MarkdownBlock::Stack &blocks = markdown;
-    REQUIRE(std::distance(blocks.begin(), result.second) == 26);
+    REQUIRE(std::distance(blocks.begin(), result.second) == 30);
 }
 
 TEST_CASE("mparser/parse-nameless-method", "Parse method without name")

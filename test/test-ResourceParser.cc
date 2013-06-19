@@ -119,10 +119,10 @@ TEST_CASE("rparser/parse", "Parse resource")
     ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), parser, resource);
     
     REQUIRE(result.first.error.code == Error::OK);
-    CHECK(result.first.warnings.size() == 1); // no response
+    CHECK(result.first.warnings.empty());
     
     const MarkdownBlock::Stack &blocks = markdown;
-    REQUIRE(std::distance(blocks.begin(), result.second) == 38);
+    REQUIRE(std::distance(blocks.begin(), result.second) == 42);
     
     REQUIRE(resource.name == "My Resource");
     REQUIRE(resource.uriTemplate == "/resource");
@@ -398,10 +398,10 @@ TEST_CASE("rparser/header-warnings", "Check warnings on overshadowing a header")
                                                       resource);
     
     REQUIRE(result.first.error.code == Error::OK);
-    REQUIRE(result.first.warnings.size() == 2); // overshadowing header & no response
+    REQUIRE(result.first.warnings.size() == 1); // overshadowing header
     
     const MarkdownBlock::Stack &blocks = markdown;
-    REQUIRE(std::distance(blocks.begin(), result.second) == 38);
+    REQUIRE(std::distance(blocks.begin(), result.second) == 42);
 }
 
 TEST_CASE("rparser/parse-abbrev", "Parse resource method abbreviation")

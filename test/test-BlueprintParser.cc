@@ -82,10 +82,10 @@ TEST_CASE("bpparser/parse", "Parse canonical blueprint")
     ParseSectionResult result = BlueprintParserInner::Parse(markdown.begin(), markdown.end(), parser, blueprint);
     
     REQUIRE(result.first.error.code == Error::OK);
-    CHECK(result.first.warnings.size() == 1); // TODO: fix resource canonical asset
+    CHECK(result.first.warnings.empty());
     
     const MarkdownBlock::Stack &blocks = markdown;
-    REQUIRE(std::distance(blocks.begin(), result.second) == 46);
+    REQUIRE(std::distance(blocks.begin(), result.second) == 50);
 
     REQUIRE(blueprint.metadata.size() == 1);
     REQUIRE(blueprint.metadata[0].first == "meta");
