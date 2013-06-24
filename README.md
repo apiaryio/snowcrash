@@ -14,25 +14,7 @@ Snow Crash bindings in other languages:
 * [Protagonist](https://github.com/apiaryio/protagonist) (Node.js)
 
 ## Build
-Snow Crash uses [Gyp](http://code.google.com/p/gyp/) build automation tool to generates its Makefiles.
-
-1. If needed, install Gyp. Either from its package:
-	
-	```sh
-	$ sudo apt-get install gyp
-	```
-
-	or from source:
-
-	```sh
-	$ svn checkout http://gyp.googlecode.com/svn/trunk/ gyp
-	$ cd ./gyp
-	$ sudo python setup.py install	
-	```
-		
-	See [Gyp Hello World](https://github.com/springmeyer/hello-gyp) for a primer on installing and using Gyp.
-	
-2. Clone the repo + fetch the submodules:
+1. Clone the repo + fetch the submodules:
 
 	```sh
 	$ git clone git://github.com/apiaryio/snowcrash.git
@@ -40,7 +22,7 @@ Snow Crash uses [Gyp](http://code.google.com/p/gyp/) build automation tool to ge
 	$ git submodule update --init --recursive
 	```
 
-3. Build & test Snow Crash:
+2. Build & test Snow Crash:
 
 	```sh
 	$ ./configure

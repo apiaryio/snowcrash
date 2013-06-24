@@ -3,7 +3,7 @@
 BUILDTYPE ?= Release
 BUILD_DIR ?= ./build
 PYTHON ?= python
-GYP ?= gyp
+GYP ?= ./tools/gyp/gyp
 
 # Default to verbose builds
 V ?= 1

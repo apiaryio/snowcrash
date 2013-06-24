@@ -7,7 +7,8 @@ import shlex
 import subprocess
 import sys
 
-# NOTE: we borrow from Node.js configure
+# NOTE: We borrow from Node.js configure,
+# refer to https://github.com/joyent/node
 
 root_dir = os.path.dirname(__file__)
 build_dir = './build'
@@ -42,7 +43,7 @@ write('config.mk',
 # Gyp call
 print "creating makefiles"
 gyp_args = ['-f', 'make', '--generator-output', build_dir, '--depth', '.']
-subprocess.call(['gyp'] + gyp_args)
+subprocess.call([sys.executable, 'tools/gyp/gyp'] + gyp_args)
 
 # All done
 print "All OK."
