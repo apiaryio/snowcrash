@@ -4,7 +4,7 @@
 Snow Crash uses (bundled) [Gyp](http://code.google.com/p/gyp/) build automation tool to generates its Makefiles. 
 
 ### Actual Bundled Version
-**r1653**
+**r1652**
 
 ### Update
 1. Get the latest version from Gyp's repository:
