@@ -110,7 +110,8 @@
       'type': 'executable',
       'include_dirs': [
         'src',
-        'src/snowcrash'
+        'src/snowcrash',
+        'cmdline'
       ],
       'sources': [
         'src/snowcrash/snowcrash.cc'

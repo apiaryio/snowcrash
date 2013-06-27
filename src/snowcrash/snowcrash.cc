@@ -8,13 +8,29 @@
 
 #include <iostream>
 #include <sstream>
+#include <fstream>
 #include "snowcrash.h"
 #include "SerializeJSON.h"
 #include "SerializeYAML.h"
+#include "cmdline.h"
 
 using snowcrash::SourceAnnotation;
 using snowcrash::Error;
 
+static const std::string OutputArgument = "output";
+static const std::string FormatArgument = "format";
+static const std::string RenderArgument = "render";
+static const std::string ValidateArgument = "validate";
+
+/// \enum Snow Crash AST output format.
+enum SerializationFormat {
+    YAMLSerializationFormat,
+    JSONSerializationFormat
+};
+
+/// \brief Print Markdown source annotation.
+/// \param prefix A string prefix for the annotation
+/// \param annotation An annotation to print
 void PrintAnnotation(const std::string& prefix, const snowcrash::SourceAnnotation& annotation)
 {
     std::cerr << prefix;
@@ -37,6 +53,8 @@ void PrintAnnotation(const std::string& prefix, const snowcrash::SourceAnnotatio
     std::cerr << std::endl;
 }
 
+/// \brief Print parser result to stderr.
+/// \param result A parser result to print
 void PrintResult(const snowcrash::Result& result)
 {
     std::cerr << std::endl;
@@ -55,16 +73,85 @@ void PrintResult(const snowcrash::Result& result)
 
 int main(int argc, const char *argv[])
 {
-    std::stringstream ss;
-    ss << std::cin.rdbuf();
+    cmdline::parser argumentParser;
 
+    argumentParser.set_program_name("snowcrash");
+    std::stringstream ss;
+    ss << "<input file>\n\n";
+    ss << "API Blueprint Parser\n";
+    ss << "If called without <input file>, `snowcrash` will listen on stdin.\n";
+    argumentParser.footer(ss.str());
+
+    argumentParser.add<std::string>(OutputArgument, 'o', "save output AST into file", false);
+    argumentParser.add<std::string>(FormatArgument, 'f', "output AST format", false, "yaml", cmdline::oneof<std::string>("yaml", "json"));
+    // TODO: argumentParser.add("render", 'r', "render markdown descriptions");
+    argumentParser.add("help", 'h', "display this help message");
+    argumentParser.add(ValidateArgument, 'v', "validate input only, do not print AST");
+    
+    argumentParser.parse_check(argc, argv);
+    if (argumentParser.rest().size() > 1) {
+        std::cerr << "one input file expected, got " << argumentParser.rest().size() << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    // Input
+    std::stringstream inputStream;
+    if (argumentParser.rest().empty()) {
+        // Read stdin
+        inputStream << std::cin.rdbuf();
+    }
+    else {
+        // Read from file
+        std::ifstream inputFileStream;
+        std::string inputFileName = argumentParser.rest().front();
+        inputFileStream.open(inputFileName.c_str());
+        if (!inputFileStream.is_open()) {
+            std::cerr << "fatal: unable to open input file `" << inputFileName << "`\n";
+            exit(EXIT_FAILURE);
+        }
+        
+        inputStream << inputFileStream.rdbuf();
+        inputFileStream.close();
+    }
+
+    // Parse
+    snowcrash::BlueprintParserOptions options = 0;  // Or snowcrash::RequireBlueprintNameOption
     snowcrash::Result result;
     snowcrash::Blueprint blueprint;
-    snowcrash::parse(ss.str(), 0 /* snowcrash::RequireBlueprintNameOption */, result, blueprint);
+    snowcrash::parse(inputStream.str(), options, result, blueprint);
+    
+    // Output
+    if (!argumentParser.exist(ValidateArgument)) {
         
+        std::stringstream outputStream;
+
+        if (argumentParser.get<std::string>(FormatArgument) == "json") {
+            SerializeJSON(blueprint, outputStream);
+        }
+        else if (argumentParser.get<std::string>(FormatArgument) == "yaml") {
+            SerializeYAML(blueprint, outputStream);
+        }
+        
+        std::string outputFileName = argumentParser.get<std::string>(OutputArgument);
+        if (!outputFileName.empty()) {
+            // Serialize to file
+            std::ofstream outputFileStream;
+            outputFileStream.open(outputFileName.c_str());
+            if (!outputFileStream.is_open()) {
+                std::cerr << "fatal: unable to write to file `" <<  outputFileName << "`\n";
+                exit(EXIT_FAILURE);
+            }
+            
+            outputFileStream << outputStream.rdbuf();
+            outputFileStream.close();
+        }
+        else {
+            // Serialize to stdout
+            std::cout << outputStream.rdbuf();
+        }
+    }
+    
+    // Result
     PrintResult(result);
-    SerializeYAML(blueprint, std::cout);
-
-    return 0;
+    return result.error.code;
 }
-

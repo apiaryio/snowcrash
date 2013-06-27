@@ -7,3 +7,6 @@
 [submodule "houdini"]
 	path = houdini
 	url = https://github.com/vmg/houdini
+[submodule "cmdline"]
+	path = cmdline
+	url = https://github.com/apiaryio/cmdline.git

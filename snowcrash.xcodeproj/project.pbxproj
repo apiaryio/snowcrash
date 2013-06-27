@@ -112,6 +112,7 @@
 		BB740996171C065C0023105F /* MarkdownBlock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MarkdownBlock.h; path = src/MarkdownBlock.h; sourceTree = "<group>"; };
 		BB740999171C08240023105F /* test-MarkdownBlock.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-MarkdownBlock.cc"; path = "test/test-MarkdownBlock.cc"; sourceTree = "<group>"; };
 		BB74099B171C08850023105F /* test-MarkdownParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-MarkdownParser.cc"; path = "test/test-MarkdownParser.cc"; sourceTree = "<group>"; };
+		BB810F771779AB2F00B89CD8 /* cmdline.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = cmdline.h; path = cmdline/cmdline.h; sourceTree = "<group>"; };
 		BB86DEC01723E3A700063644 /* src_map.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = src_map.c; path = sundown/src/src_map.c; sourceTree = "<group>"; };
 		BB86DEC21723E3C600063644 /* src_map.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = src_map.h; path = sundown/src/src_map.h; sourceTree = "<group>"; };
 		BBA01FF817292F9C0050B603 /* test-BlueprintParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-BlueprintParser.cc"; path = "test/test-BlueprintParser.cc"; sourceTree = "<group>"; };
@@ -193,6 +194,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		BB810F781779AB5400B89CD8 /* cmdline */ = {
+			isa = PBXGroup;
+			children = (
+				BB810F771779AB2F00B89CD8 /* cmdline.h */,
+			);
+			name = cmdline;
+			sourceTree = "<group>";
+		};
 		BBA25668172BFE4C00C1AD5E /* snowcrash */ = {
 			isa = PBXGroup;
 			children = (
@@ -264,8 +273,9 @@
 		BBFF488F170B34E6001E5FB2 = {
 			isa = PBXGroup;
 			children = (
-				BBA889AB17131AEB005A9570 /* sundown */,
+				BB810F781779AB5400B89CD8 /* cmdline */,
 				BBFF48CB170B3ECB001E5FB2 /* src */,
+				BBA889AB17131AEB005A9570 /* sundown */,
 				BBFF48B9170B3AF6001E5FB2 /* test */,
 				BBFF4899170B34E6001E5FB2 /* Products */,
 			);
