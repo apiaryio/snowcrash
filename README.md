@@ -29,7 +29,7 @@ Snow Crash bindings in other languages:
 	$ make test
 	```
 		
-### Build `snowcrash` command line tool
+### `snowcrash` command line tool
 To build the Snow Crash command line tool use:
 ```sh
 $ make snowcrash
