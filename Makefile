@@ -39,4 +39,7 @@ distclean:
 test: test-snowcrash
 	$(BUILD_DIR)/out/Default/test-snowcrash
 
+install: snowcrash
+	cp -f $(BUILD_DIR)/out/Default/snowcrash /usr/local/bin/snowcrash	
+
 .PHONY: libsnowcrash test-snowcrash snowcrash clean distclean test
