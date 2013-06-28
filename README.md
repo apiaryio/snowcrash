@@ -29,18 +29,20 @@ Snow Crash bindings in other languages:
 	$ make test
 	```
 		
-### `snowcrash` command line tool
-To build the Snow Crash command line tool use:
-```sh
-$ make snowcrash
-```
+### Snow Crash command line tool
 
-To install and use the Snow Crash command line tool globally use:
+1. Build `snowcrash`:
+	
+	```sh
+	$ make snowcrash
+	```
 
-```sh
-$ sudo make install
-$ snowcrash --help
-```
+2. Install & use `snowcrash`:
+
+	```sh
+	$ sudo make install
+	$ snowcrash --help
+	```
 
 ## Contribute
 Fork & Pull Request. 
