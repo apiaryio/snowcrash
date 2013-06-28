@@ -38,7 +38,7 @@ $ make snowcrash
 To install and use the Snow Crash command line tool globally use:
 
 ```sh
-$ make install
+$ sudo make install
 $ snowcrash --help
 usage: snowcrash [options] ... <input file>
 
