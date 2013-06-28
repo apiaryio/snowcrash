@@ -125,7 +125,7 @@ static void serialize(const Method& method, std::ostream &os)
 static void serialize(const Resource& resource, std::ostream &os)
 {
     os << "  - ";   // indent 2
-    serialize(SerializeKey::URI, resource.uriTemplate, 0, os);
+    serialize(SerializeKey::URITemplate, resource.uriTemplate, 0, os);
     serialize(SerializeKey::Name, resource.name, 2, os);
     serialize(SerializeKey::Description, resource.description, 2, os);
 
