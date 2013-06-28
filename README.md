@@ -30,11 +30,26 @@ Snow Crash bindings in other languages:
 	```
 		
 ### Build `snowcrash` command line tool
-To build & run Snow Crash command line tool use:
-
+To build the Snow Crash command line tool use:
 ```sh
 $ make snowcrash
-$ ./bin/snowcrash
+```
+
+To install and use the Snow Crash command line tool globally use:
+
+```sh
+$ make install
+$ snowcrash --help
+usage: snowcrash [options] ... <input file>
+
+API Blueprint Parser
+If called without <input file>, `snowcrash` will listen on stdin.
+
+options:
+  -o, --output      save output AST into file (string [=])
+  -f, --format      output AST format (string [=yaml])
+  -h, --help        display this help message
+  -v, --validate    validate input only, do not print AST
 ```
 
 ## Contribute
