@@ -88,8 +88,7 @@
         'test/test-RegexMatch.cc',
         'test/test-ResouceGroupParser.cc',
         'test/test-ResourceParser.cc',
-        'test/test-snowcrash.cc',
-        'test/test-SymbolTable.h'
+        'test/test-snowcrash.cc'
       ],
       'dependencies': [
         'libsnowcrash',

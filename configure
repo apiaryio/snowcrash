@@ -6,6 +6,7 @@ import re
 import shlex
 import subprocess
 import sys
+import platform
 
 # NOTE: We borrow from Node.js configure,
 # refer to https://github.com/joyent/node
@@ -42,7 +43,15 @@ write('config.mk',
 
 # Gyp call
 print "creating makefiles"
-gyp_args = ['-f', 'make', '--generator-output', build_dir, '--depth', '.']
+
+gyp_args = ['--generator-output', build_dir, '--depth', '.']
+if sys.platform == 'win32':
+  # Windows
+  gyp_args.extend(['-f', 'msvs', '-G', 'msvs_version=2012'])
+else:
+  # Posix systems
+  gyp_args.extend(['-f', 'make'])
+  
 subprocess.call([sys.executable, 'tools/gyp/gyp'] + gyp_args)
 
 # All done
