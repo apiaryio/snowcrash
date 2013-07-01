@@ -20,6 +20,7 @@
 		BB74099C171C08860023105F /* test-MarkdownParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB74099B171C08850023105F /* test-MarkdownParser.cc */; };
 		BB86DEC11723E3A700063644 /* src_map.c in Sources */ = {isa = PBXBuildFile; fileRef = BB86DEC01723E3A700063644 /* src_map.c */; };
 		BB86DEC31723E3C600063644 /* src_map.h in Headers */ = {isa = PBXBuildFile; fileRef = BB86DEC21723E3C600063644 /* src_map.h */; };
+		BB8945901781D33E0079084F /* RegexMatch.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB0F4271731CE0D00C92465 /* RegexMatch.cc */; };
 		BBA25671172BFEB800C1AD5E /* snowcrash.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA25670172BFEB800C1AD5E /* snowcrash.cc */; };
 		BBA889A71712FF37005A9570 /* Parser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA889A51712FF37005A9570 /* Parser.cc */; };
 		BBA889A81712FF37005A9570 /* Parser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA889A61712FF37005A9570 /* Parser.h */; };
@@ -40,7 +41,6 @@
 		BBA889C917131B19005A9570 /* html_smartypants.c in Sources */ = {isa = PBXBuildFile; fileRef = BBA889C317131B19005A9570 /* html_smartypants.c */; };
 		BBA889CA17131B19005A9570 /* html.c in Sources */ = {isa = PBXBuildFile; fileRef = BBA889C417131B19005A9570 /* html.c */; };
 		BBA91DC2171D402600649B05 /* BlueprintParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA91DC0171D402600649B05 /* BlueprintParser.h */; };
-		BBB0F4291731CE0D00C92465 /* RegexMatch.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB0F4271731CE0D00C92465 /* RegexMatch.cc */; };
 		BBB0F42A1731CE0D00C92465 /* RegexMatch.h in Headers */ = {isa = PBXBuildFile; fileRef = BBB0F4281731CE0D00C92465 /* RegexMatch.h */; };
 		BBB0F42C1731D04900C92465 /* test-RegexMatch.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB0F42B1731D04900C92465 /* test-RegexMatch.cc */; };
 		BBC3AC091737DF9A0001F63A /* test-MethodParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBC3AC081737DF9A0001F63A /* test-MethodParser.cc */; };
@@ -115,6 +115,7 @@
 		BB810F771779AB2F00B89CD8 /* cmdline.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = cmdline.h; path = cmdline/cmdline.h; sourceTree = "<group>"; };
 		BB86DEC01723E3A700063644 /* src_map.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = src_map.c; path = sundown/src/src_map.c; sourceTree = "<group>"; };
 		BB86DEC21723E3C600063644 /* src_map.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = src_map.h; path = sundown/src/src_map.h; sourceTree = "<group>"; };
+		BB89458C17817B5B0079084F /* RegexMatch.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RegexMatch.cc; path = src/win/RegexMatch.cc; sourceTree = "<group>"; };
 		BBA01FF817292F9C0050B603 /* test-BlueprintParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-BlueprintParser.cc"; path = "test/test-BlueprintParser.cc"; sourceTree = "<group>"; };
 		BBA25667172BFE4C00C1AD5E /* snowcrash */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = snowcrash; sourceTree = BUILT_PRODUCTS_DIR; };
 		BBA25670172BFEB800C1AD5E /* snowcrash.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = snowcrash.cc; path = src/snowcrash/snowcrash.cc; sourceTree = SOURCE_ROOT; };
@@ -137,7 +138,7 @@
 		BBA889C317131B19005A9570 /* html_smartypants.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = html_smartypants.c; path = sundown/html/html_smartypants.c; sourceTree = "<group>"; };
 		BBA889C417131B19005A9570 /* html.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = html.c; path = sundown/html/html.c; sourceTree = "<group>"; };
 		BBA91DC0171D402600649B05 /* BlueprintParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = BlueprintParser.h; path = src/BlueprintParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
-		BBB0F4271731CE0D00C92465 /* RegexMatch.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RegexMatch.cc; path = src/RegexMatch.cc; sourceTree = "<group>"; };
+		BBB0F4271731CE0D00C92465 /* RegexMatch.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RegexMatch.cc; path = src/posix/RegexMatch.cc; sourceTree = "<group>"; };
 		BBB0F4281731CE0D00C92465 /* RegexMatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RegexMatch.h; path = src/RegexMatch.h; sourceTree = "<group>"; };
 		BBB0F42B1731D04900C92465 /* test-RegexMatch.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-RegexMatch.cc"; path = "test/test-RegexMatch.cc"; sourceTree = "<group>"; };
 		BBB2A226173EA77A0020C1CE /* StringUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = StringUtility.h; path = src/StringUtility.h; sourceTree = "<group>"; };
@@ -200,6 +201,22 @@
 				BB810F771779AB2F00B89CD8 /* cmdline.h */,
 			);
 			name = cmdline;
+			sourceTree = "<group>";
+		};
+		BB89458B17817B240079084F /* posix */ = {
+			isa = PBXGroup;
+			children = (
+				BBB0F4271731CE0D00C92465 /* RegexMatch.cc */,
+			);
+			name = posix;
+			sourceTree = "<group>";
+		};
+		BB89458E17817B720079084F /* win */ = {
+			isa = PBXGroup;
+			children = (
+				BB89458C17817B5B0079084F /* RegexMatch.cc */,
+			);
+			name = win;
 			sourceTree = "<group>";
 		};
 		BBA25668172BFE4C00C1AD5E /* snowcrash */ = {
@@ -317,14 +334,13 @@
 			isa = PBXGroup;
 			children = (
 				BBE57062173929B90086CE22 /* blueprint */,
-				BBE57063173929FA0086CE22 /* markdown */,
-				BBA25668172BFE4C00C1AD5E /* snowcrash */,
 				BBFF48D4170C4F30001E5FB2 /* Blueprint.h */,
+				BBE57063173929FA0086CE22 /* markdown */,
 				BBA889A51712FF37005A9570 /* Parser.cc */,
 				BBA889A61712FF37005A9570 /* Parser.h */,
 				BBD5F9D11735439B0049BBEE /* ParserCore.cc */,
 				BBD5F9D0173542D60049BBEE /* ParserCore.h */,
-				BBB0F4271731CE0D00C92465 /* RegexMatch.cc */,
+				BB89458B17817B240079084F /* posix */,
 				BBB0F4281731CE0D00C92465 /* RegexMatch.h */,
 				BBE5355E174132B100BCA7AD /* Serialize.cc */,
 				BBE5355B174132B100BCA7AD /* Serialize.h */,
@@ -332,9 +348,11 @@
 				BBE5355C174132B100BCA7AD /* SerializeJSON.h */,
 				BBE53560174132B100BCA7AD /* SerializeYAML.cc */,
 				BBE5355D174132B100BCA7AD /* SerializeYAML.h */,
+				BBA25668172BFE4C00C1AD5E /* snowcrash */,
 				BBFF48CC170B3EDE001E5FB2 /* snowcrash.cc */,
 				BBFF48D1170B4224001E5FB2 /* snowcrash.h */,
 				BBB2A226173EA77A0020C1CE /* StringUtility.h */,
+				BB89458E17817B720079084F /* win */,
 			);
 			name = src;
 			sourceTree = "<group>";
@@ -470,6 +488,7 @@
 				BBFF48CD170B3EDE001E5FB2 /* snowcrash.cc in Sources */,
 				BBA889A71712FF37005A9570 /* Parser.cc in Sources */,
 				BBA889B517131AFF005A9570 /* autolink.c in Sources */,
+				BB8945901781D33E0079084F /* RegexMatch.cc in Sources */,
 				BBA889B717131AFF005A9570 /* buffer.c in Sources */,
 				BBA889BA17131AFF005A9570 /* markdown.c in Sources */,
 				BBA889BC17131AFF005A9570 /* stack.c in Sources */,
@@ -480,7 +499,6 @@
 				BB740993171C05B20023105F /* MarkdownParser.cc in Sources */,
 				BB740997171C065C0023105F /* MarkdownBlock.cc in Sources */,
 				BB86DEC11723E3A700063644 /* src_map.c in Sources */,
-				BBB0F4291731CE0D00C92465 /* RegexMatch.cc in Sources */,
 				BBD5F9D21735439B0049BBEE /* ParserCore.cc in Sources */,
 				BBE53564174132B100BCA7AD /* Serialize.cc in Sources */,
 				BBE53565174132B100BCA7AD /* SerializeJSON.cc in Sources */,
@@ -538,6 +556,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_CXX0X_EXTENSIONS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -565,6 +585,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_CXX0X_EXTENSIONS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;

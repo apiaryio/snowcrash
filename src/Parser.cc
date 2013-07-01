@@ -14,7 +14,7 @@
 
 using namespace snowcrash;
 
-const int SourceAnnotation::OK;
+const int SourceAnnotation::OK = 0;
 
 // Check source for unsupported character \t & \r
 // Returns true if passed (not found), false otherwise

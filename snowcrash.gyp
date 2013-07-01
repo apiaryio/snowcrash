@@ -48,7 +48,6 @@
         'src/ParserCore.cc',
         'src/ParserCore.h',
         'src/PayloadParser.h',
-        'src/RegexMatch.cc',
         'src/RegexMatch.h',
         'src/ResourceGroupParser.h',
         'src/ResourceParser.h',
@@ -62,6 +61,12 @@
         'src/snowcrash.cc',
         'src/snowcrash.h',
         'src/SymbolTable.h'
+      ],
+      'conditions': [
+        [ 'OS=="win"', 
+          { 'sources': [ 'src/win/RegexMatch.cc' ] }, 
+          { 'sources': [ 'src/posix/RegexMatch.cc' ] } # OS != Windows
+        ]
       ],
     },
 

@@ -17,28 +17,29 @@
 #include <locale>
 #include <string>
 #include <sstream>
+#include <vector>
 
 namespace snowcrash {
 
     // Trim string from start
-    static inline std::string& TrimStringStart(std::string &s) {
+    inline std::string& TrimStringStart(std::string &s) {
         s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
         return s;
     }
     
     // Trim string from end
-    static inline std::string& TrimStringEnd(std::string &s) {
+    inline std::string& TrimStringEnd(std::string &s) {
         s.erase(std::find_if(s.rbegin(), s.rend(), std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
         return s;
     }
     
     // Trim both ends of string
-    static inline std::string& TrimString(std::string &s) {
+    inline std::string& TrimString(std::string &s) {
         return TrimStringStart(TrimStringEnd(s));
     }
     
     // Retrieve first line of given string
-    static inline std::string GetFirstLine(const std::string& s) {
+    inline std::string GetFirstLine(const std::string& s) {
         std::string::size_type pos = s.find("\n");
         if (pos == std::string::npos)
             return s;
@@ -47,7 +48,7 @@ namespace snowcrash {
     }
     
     // Split string by delim
-    static inline std::vector<std::string>& Split(const std::string& s, char delim, std::vector<std::string>& elems) {
+    inline std::vector<std::string>& Split(const std::string& s, char delim, std::vector<std::string>& elems) {
         std::stringstream ss(s);
         std::string item;
         while (std::getline(ss, item, delim)) {
@@ -57,14 +58,14 @@ namespace snowcrash {
     }
     
     // Split string by delim    
-    static inline std::vector<std::string> Split(const std::string& s, char delim) {
+    inline std::vector<std::string> Split(const std::string& s, char delim) {
         std::vector<std::string> elems;
         Split(s, delim, elems);
         return elems;
     }
     
     // Split string on the first occurence of delim
-    static inline std::vector<std::string> SplitOnFirst(const std::string& s, char delim) {
+    inline std::vector<std::string> SplitOnFirst(const std::string& s, char delim) {
         std::string::size_type pos = s.find(delim);
         std::vector<std::string> elems;
         if (pos == std::string::npos) {

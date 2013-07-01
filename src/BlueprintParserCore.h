@@ -247,7 +247,7 @@ namespace snowcrash {
     
     // Parse one line of raw `key:value` data.
     // Returns true on success, false otherwise.
-    static inline bool KeyValueFromLine(const std::string& line, KeyValuePair& keyValuePair) {
+    inline bool KeyValueFromLine(const std::string& line, KeyValuePair& keyValuePair) {
         
         std::vector<std::string> rawMetadata = SplitOnFirst(line, ':');
         if (rawMetadata.size() != 2)

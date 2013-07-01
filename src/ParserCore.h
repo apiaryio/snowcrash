@@ -47,7 +47,7 @@ namespace snowcrash {
     //
     struct SourceAnnotation {
         
-        static const int OK = 0;
+        static const int OK;
         
         SourceAnnotation() : code(OK) {}
         
