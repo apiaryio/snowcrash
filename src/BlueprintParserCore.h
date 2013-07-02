@@ -20,7 +20,7 @@
 #define HTTP_METHODS "GET|POST|PUT|DELETE|OPTIONS|PATCH|PROPPATCH|LOCK|UNLOCK|COPY|MOVE|MKCOL|HEAD"
 
 // (Naive) URI Template, regex string
-#define URI_TEMPLATE "/.+"
+#define URI_TEMPLATE "/[^]]+"
 
 namespace snowcrash {
     

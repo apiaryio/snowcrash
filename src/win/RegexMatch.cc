@@ -10,13 +10,24 @@
 #include <cstring>
 #include "RegexMatch.h"
 
+//
 // A C++11 implementation
+//
+
 bool snowcrash::RegexMatch(const std::string& target, const std::string& expression)
 {
     if (target.empty() || expression.empty())
         return false;
     
-    // TODO:
+    try {
+        std::regex pattern(expression, std::regex_constants::extended);
+        return std::regex_search(target, pattern);
+    }
+    catch (const std::regex_error& e) {
+    }
+    catch (...) {
+    }
+    
     return false;
 }
 
@@ -37,6 +48,26 @@ bool snowcrash::RegexCapture(const std::string& target, const std::string& expre
     
     captureGroups.clear();
 
-    // TODO:
+    try {
+        
+        std::regex pattern(expression, std::regex_constants::extended);
+        std::match_results<std::string::const_iterator> result;
+        if (!std::regex_search(target, result, pattern))
+            return false;
+    
+        for (std::match_results<std::string::const_iterator>::const_iterator it = result.begin();
+             it != result.end();
+             ++it) {
+
+            captureGroups.push_back(*it);
+        }
+
+        return true;
+    }
+    catch (const std::regex_error& e) {
+    }
+    catch (...) {
+    }
+    
     return false;
 }

@@ -18,9 +18,10 @@
 		BB740998171C065C0023105F /* MarkdownBlock.h in Headers */ = {isa = PBXBuildFile; fileRef = BB740996171C065C0023105F /* MarkdownBlock.h */; };
 		BB74099A171C08240023105F /* test-MarkdownBlock.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB740999171C08240023105F /* test-MarkdownBlock.cc */; };
 		BB74099C171C08860023105F /* test-MarkdownParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB74099B171C08850023105F /* test-MarkdownParser.cc */; };
+		BB858A86178307440022EF68 /* RegexMatch.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB0F4271731CE0D00C92465 /* RegexMatch.cc */; };
+		BB858A871783074A0022EF68 /* snowcrash.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA25670172BFEB800C1AD5E /* snowcrash.cc */; };
 		BB86DEC11723E3A700063644 /* src_map.c in Sources */ = {isa = PBXBuildFile; fileRef = BB86DEC01723E3A700063644 /* src_map.c */; };
 		BB86DEC31723E3C600063644 /* src_map.h in Headers */ = {isa = PBXBuildFile; fileRef = BB86DEC21723E3C600063644 /* src_map.h */; };
-		BB8945901781D33E0079084F /* RegexMatch.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB0F4271731CE0D00C92465 /* RegexMatch.cc */; };
 		BBA25671172BFEB800C1AD5E /* snowcrash.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA25670172BFEB800C1AD5E /* snowcrash.cc */; };
 		BBA889A71712FF37005A9570 /* Parser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA889A51712FF37005A9570 /* Parser.cc */; };
 		BBA889A81712FF37005A9570 /* Parser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA889A61712FF37005A9570 /* Parser.h */; };
@@ -490,9 +491,10 @@
 				BBFF48CD170B3EDE001E5FB2 /* snowcrash.cc in Sources */,
 				BBA889A71712FF37005A9570 /* Parser.cc in Sources */,
 				BBA889B517131AFF005A9570 /* autolink.c in Sources */,
-				BB8945901781D33E0079084F /* RegexMatch.cc in Sources */,
+				BB858A86178307440022EF68 /* RegexMatch.cc in Sources */,
 				BBA889B717131AFF005A9570 /* buffer.c in Sources */,
 				BBA889BA17131AFF005A9570 /* markdown.c in Sources */,
+				BB858A871783074A0022EF68 /* snowcrash.cc in Sources */,
 				BBA889BC17131AFF005A9570 /* stack.c in Sources */,
 				BBA889C717131B19005A9570 /* houdini_href_e.c in Sources */,
 				BBA889C817131B19005A9570 /* houdini_html_e.c in Sources */,
