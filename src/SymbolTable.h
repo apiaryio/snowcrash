@@ -46,7 +46,8 @@ namespace snowcrash {
     
     // Checks wheter given source data represents reference to a symbol returning true if so,
     // false otherwise. If source data is represent reference referred symbol name is filled in.
-    inline bool GetSymbolReference(const SourceData& sourceData, SymbolName& referredSymbol) {
+    FORCEINLINE bool GetSymbolReference(const SourceData& sourceData,
+                                        SymbolName& referredSymbol) {
         
         CaptureGroups captureGroups;
         if (RegexCapture(sourceData, SymbolReferenceRegex, captureGroups, 3)) {
@@ -59,7 +60,7 @@ namespace snowcrash {
     
 #ifdef DEBUG
     // Prints markdown block recursively to stdout
-    inline void PrintSymbolTable(const SymbolTable& symbolTable) {
+    FORCEINLINE void PrintSymbolTable(const SymbolTable& symbolTable) {
 
         std::cout << "Resource Object Symbols:\n";
         for (ResourceObjectSymbolTable::const_iterator it = symbolTable.resourceObjects.begin();

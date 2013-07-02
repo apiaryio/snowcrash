@@ -23,7 +23,7 @@ namespace snowcrash {
     // Extract first line from block content
     // ContentParts[0] contains first line of block content
     // ContentParts[1] contains the rest of block content
-    inline ContentParts ExtractFirstLine(const MarkdownBlock& block) {
+    FORCEINLINE ContentParts ExtractFirstLine(const MarkdownBlock& block) {
         
         ContentParts result;
         if (block.content.empty())
@@ -42,8 +42,8 @@ namespace snowcrash {
     
     // Return first list / list item content block block (paragraph)
     // This is the first block inside the list / list item or the list item's closing block 
-    inline BlockIterator FirstContentBlock(const BlockIterator& begin,
-                                           const BlockIterator& end) {
+    FORCEINLINE BlockIterator FirstContentBlock(const BlockIterator& begin,
+                                                const BlockIterator& end) {
         
         BlockIterator cur = begin;
         if (cur->type == ListBlockBeginType)
@@ -59,8 +59,8 @@ namespace snowcrash {
 
     // Return name block of list item; that is either FirstContentBlock() or
     // matching closing item block for inline items
-    inline BlockIterator ListItemNameBlock(const BlockIterator& begin,
-                                           const BlockIterator& end) {
+    FORCEINLINE BlockIterator ListItemNameBlock(const BlockIterator& begin,
+                                                const BlockIterator& end) {
         
         BlockIterator cur = FirstContentBlock(begin, end);
         if (cur == end ||
@@ -76,8 +76,8 @@ namespace snowcrash {
     }
     
     // Eats closing elements of a list / list item block
-    inline BlockIterator CloseListItemBlock(const BlockIterator& begin,
-                                            const BlockIterator& end) {
+    FORCEINLINE BlockIterator CloseListItemBlock(const BlockIterator& begin,
+                                                 const BlockIterator& end) {
         
         BlockIterator cur = begin;
         if (cur != end &&
@@ -94,8 +94,8 @@ namespace snowcrash {
     }
     
     // Generic parser handler to warn & skip foreign blocks
-    inline ParseSectionResult HandleForeignSection(const BlockIterator& cur,
-                                                   const SectionBounds& bounds) {
+    FORCEINLINE ParseSectionResult HandleForeignSection(const BlockIterator& cur,
+                                                        const SectionBounds& bounds) {
 
         ParseSectionResult result = std::make_pair(Result(), cur);
         if (cur->type == ListItemBlockBeginType) {
@@ -161,9 +161,9 @@ namespace snowcrash {
     }
     
     // Extracts first line of a list item content - signature
-    inline SourceData GetListItemSignature(const BlockIterator& cur,
-                                           const BlockIterator& end,
-                                           SourceData& remainingContent) {
+    FORCEINLINE SourceData GetListItemSignature(const BlockIterator& cur,
+                                                const BlockIterator& end,
+                                                SourceData& remainingContent) {
 
         BlockIterator sectionCur = ListItemNameBlock(cur, end);
         if (sectionCur == end)
@@ -183,12 +183,12 @@ namespace snowcrash {
     
     
     // Parse preformatted source data from block(s) of a list item block
-    inline ParseSectionResult ParseListPreformattedBlock(const Section& section,
-                                                         const BlockIterator& cur,
-                                                         const SectionBounds& bounds,
-                                                         BlueprintParserCore& parser,
-                                                         SourceData& data,
-                                                         SourceDataBlock& sourceMap) {
+    FORCEINLINE ParseSectionResult ParseListPreformattedBlock(const Section& section,
+                                                              const BlockIterator& cur,
+                                                              const SectionBounds& bounds,
+                                                              BlueprintParserCore& parser,
+                                                              SourceData& data,
+                                                              SourceDataBlock& sourceMap) {
         
         static const std::string FormattingWarning = "content is expected to be preformatted code block";
         
@@ -252,7 +252,8 @@ namespace snowcrash {
     
     // Returns true if list item (begin) contains nested list block false otherwise
     // Look ahead. 
-    inline bool HasNestedListBlock(const BlockIterator& begin, const BlockIterator& end) {
+    FORCEINLINE bool HasNestedListBlock(const BlockIterator& begin,
+                                        const BlockIterator& end) {
 
         BlockIterator sectionBegin = begin;
         if (sectionBegin == end)

@@ -45,7 +45,7 @@ namespace snowcrash {
     };
     
     // Returns human readable name of given <Section>
-    inline std::string SectionName(const Section& section) {
+    FORCEINLINE std::string SectionName(const Section& section) {
         switch (section) {
                 
             case ObjectSection:
@@ -221,10 +221,10 @@ namespace snowcrash {
     };
     
     // Advances iterator from sectionBegin to the same level' sectionEnd
-    inline BlockIterator SkipToSectionEnd(const BlockIterator& begin,
-                                          const BlockIterator& end,
-                                          MarkdownBlockType sectionBegin,
-                                          MarkdownBlockType sectionEnd) {
+    FORCEINLINE BlockIterator SkipToSectionEnd(const BlockIterator& begin,
+                                               const BlockIterator& end,
+                                               MarkdownBlockType sectionBegin,
+                                               MarkdownBlockType sectionEnd) {
         
         BlockIterator currentBlock = begin;
         if (currentBlock->type == sectionBegin) {
@@ -247,7 +247,8 @@ namespace snowcrash {
     
     // Parse one line of raw `key:value` data.
     // Returns true on success, false otherwise.
-    inline bool KeyValueFromLine(const std::string& line, KeyValuePair& keyValuePair) {
+    FORCEINLINE bool KeyValueFromLine(const std::string& line,
+                                      KeyValuePair& keyValuePair) {
         
         std::vector<std::string> rawMetadata = SplitOnFirst(line, ':');
         if (rawMetadata.size() != 2)
@@ -266,10 +267,10 @@ namespace snowcrash {
     ///! \param parent cursor's parent block to be used in case of error reporting
     ///! \param result error result output, an error object is added in case of failed check
     ///! \returns true if cursor appears to be valid false otherwise
-    inline bool CheckCursor(const BlockIterator& cur,
-                            const SectionBounds& bounds,
-                            const BlockIterator& parent,
-                            Result& result) {
+    FORCEINLINE bool CheckCursor(const BlockIterator& cur,
+                                 const SectionBounds& bounds,
+                                 const BlockIterator& parent,
+                                 Result& result) {
         if (cur != bounds.second)
             return true;
         

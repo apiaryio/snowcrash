@@ -21,8 +21,8 @@ namespace snowcrash {
     /// \param blueprint A blueprint AST to be searched.
     /// \param group A resrouce group to look for.
     /// \returns An iterator at matching group within blueprint's resource groups collection.
-    inline Collection<ResourceGroup>::const_iterator FindResourceGroup(const Blueprint& blueprint,
-                                                                       const ResourceGroup& group) {
+    FORCEINLINE Collection<ResourceGroup>::const_iterator FindResourceGroup(const Blueprint& blueprint,
+                                                                            const ResourceGroup& group) {
 
         return std::find_if(blueprint.resourceGroups.begin(),
                             blueprint.resourceGroups.end(),
@@ -33,8 +33,8 @@ namespace snowcrash {
     /// \param block A markdown block to query for its signature and retrieve a group name from.
     /// \param name An output buffer to retrieve a Resource Group Name into.
     /// \returns True if the given markdown block has Resource group signature, false otherwise.
-    inline bool GetResourceGroupSignature(const MarkdownBlock& block,
-                                          Name& name) {
+    FORCEINLINE bool GetResourceGroupSignature(const MarkdownBlock& block,
+                                               Name& name) {
         if (block.type != HeaderBlockType ||
             block.content.empty())
             return false;
@@ -51,7 +51,7 @@ namespace snowcrash {
     /// \brief Query whether given block has resource group signature.
     /// \param block A markdown block to query its signature
     /// \returns True if the given markdown block has Resource group signature, false otherwise.
-    inline bool HasResourceGroupSignature(const MarkdownBlock& block)
+    FORCEINLINE bool HasResourceGroupSignature(const MarkdownBlock& block)
     {
         Name name;
         return GetResourceGroupSignature(block, name);
@@ -61,9 +61,9 @@ namespace snowcrash {
     /// \struct Block Classifier, Resource Group Context
     ///
     template <>
-    inline Section ClassifyBlock<ResourceGroup>(const BlockIterator& begin,
-                                                const BlockIterator& end,
-                                                const Section& context) {
+    FORCEINLINE Section ClassifyBlock<ResourceGroup>(const BlockIterator& begin,
+                                                     const BlockIterator& end,
+                                                     const Section& context) {
         
         if (HasResourceGroupSignature(*begin))
             return (context == UndefinedSection) ? ResourceGroupSection : UndefinedSection;

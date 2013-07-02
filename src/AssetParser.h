@@ -37,8 +37,8 @@ namespace snowcrash {
     };
     
     // Query asset signature a of given block
-    inline AssetSignature GetAssetSignature(const BlockIterator& begin,
-                                            const BlockIterator& end) {
+    FORCEINLINE AssetSignature GetAssetSignature(const BlockIterator& begin,
+                                                 const BlockIterator& end) {
         
         if (begin->type == ListBlockBeginType || begin->type == ListItemBlockBeginType) {
             
@@ -64,8 +64,8 @@ namespace snowcrash {
         return NoAssetSignature;
     }
     
-    inline bool HasAssetSignature(const BlockIterator& begin,
-                                  const BlockIterator& end) {
+    FORCEINLINE bool HasAssetSignature(const BlockIterator& begin,
+                                       const BlockIterator& end) {
         AssetSignature signature = GetAssetSignature(begin, end);
         return (signature != NoAssetSignature);
     }
@@ -74,9 +74,9 @@ namespace snowcrash {
     // Block Classifier, Asset Context
     //
     template <>
-    inline Section ClassifyBlock<Asset>(const BlockIterator& begin,
-                                        const BlockIterator& end,
-                                        const Section& context) {
+    FORCEINLINE Section ClassifyBlock<Asset>(const BlockIterator& begin,
+                                             const BlockIterator& end,
+                                             const Section& context) {
         if (context == UndefinedSection) {
             AssetSignature asset = GetAssetSignature(begin, end);
             if (asset == BodyAssetSignature || asset == PayloadBodyAssetSignature)

@@ -25,9 +25,9 @@ namespace snowcrash {
     // Block Classifier, Resource Context
     //
     template <>
-    inline Section ClassifyBlock<Blueprint>(const BlockIterator& begin,
-                                            const BlockIterator& end,
-                                            const Section& context) {
+    FORCEINLINE Section ClassifyBlock<Blueprint>(const BlockIterator& begin,
+                                                 const BlockIterator& end,
+                                                 const Section& context) {
         
         if (HasResourceGroupSignature(*begin) ||
             HasResourceSignature(*begin))

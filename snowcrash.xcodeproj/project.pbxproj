@@ -98,6 +98,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		BB0793BE1782C773005BB7CC /* Platform.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Platform.h; path = src/Platform.h; sourceTree = "<group>"; };
 		BB1865C71764D67B00756B18 /* SymbolTable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SymbolTable.h; path = src/SymbolTable.h; sourceTree = "<group>"; };
 		BB1865C81764DB8A00756B18 /* test-SymbolTable.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-SymbolTable.cc"; path = "test/test-SymbolTable.cc"; sourceTree = "<group>"; };
 		BB1D4D07174D0828009BCB1C /* HeaderParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = HeaderParser.h; path = src/HeaderParser.h; sourceTree = "<group>"; };
@@ -259,7 +260,7 @@
 			name = html;
 			sourceTree = "<group>";
 		};
-		BBE57062173929B90086CE22 /* blueprint */ = {
+		BBE57062173929B90086CE22 /* blueprint parser */ = {
 			isa = PBXGroup;
 			children = (
 				BB3DD973174654B8004C4077 /* AssetParser.h */,
@@ -273,10 +274,10 @@
 				BBD5F9CC17353CE00049BBEE /* ResourceParser.h */,
 				BB1865C71764D67B00756B18 /* SymbolTable.h */,
 			);
-			name = blueprint;
+			name = "blueprint parser";
 			sourceTree = "<group>";
 		};
-		BBE57063173929FA0086CE22 /* markdown */ = {
+		BBE57063173929FA0086CE22 /* markdown parser */ = {
 			isa = PBXGroup;
 			children = (
 				BB740995171C065C0023105F /* MarkdownBlock.cc */,
@@ -284,7 +285,7 @@
 				BB740991171C05B20023105F /* MarkdownParser.cc */,
 				BB740992171C05B20023105F /* MarkdownParser.h */,
 			);
-			name = markdown;
+			name = "markdown parser";
 			sourceTree = "<group>";
 		};
 		BBFF488F170B34E6001E5FB2 = {
@@ -333,14 +334,17 @@
 		BBFF48CB170B3ECB001E5FB2 /* src */ = {
 			isa = PBXGroup;
 			children = (
-				BBE57062173929B90086CE22 /* blueprint */,
+				BBE57062173929B90086CE22 /* blueprint parser */,
+				BBE57063173929FA0086CE22 /* markdown parser */,
+				BB89458B17817B240079084F /* posix */,
+				BBA25668172BFE4C00C1AD5E /* snowcrash */,
+				BB89458E17817B720079084F /* win */,
 				BBFF48D4170C4F30001E5FB2 /* Blueprint.h */,
-				BBE57063173929FA0086CE22 /* markdown */,
 				BBA889A51712FF37005A9570 /* Parser.cc */,
 				BBA889A61712FF37005A9570 /* Parser.h */,
 				BBD5F9D11735439B0049BBEE /* ParserCore.cc */,
 				BBD5F9D0173542D60049BBEE /* ParserCore.h */,
-				BB89458B17817B240079084F /* posix */,
+				BB0793BE1782C773005BB7CC /* Platform.h */,
 				BBB0F4281731CE0D00C92465 /* RegexMatch.h */,
 				BBE5355E174132B100BCA7AD /* Serialize.cc */,
 				BBE5355B174132B100BCA7AD /* Serialize.h */,
@@ -348,11 +352,9 @@
 				BBE5355C174132B100BCA7AD /* SerializeJSON.h */,
 				BBE53560174132B100BCA7AD /* SerializeYAML.cc */,
 				BBE5355D174132B100BCA7AD /* SerializeYAML.h */,
-				BBA25668172BFE4C00C1AD5E /* snowcrash */,
 				BBFF48CC170B3EDE001E5FB2 /* snowcrash.cc */,
 				BBFF48D1170B4224001E5FB2 /* snowcrash.h */,
 				BBB2A226173EA77A0020C1CE /* StringUtility.h */,
-				BB89458E17817B720079084F /* win */,
 			);
 			name = src;
 			sourceTree = "<group>";

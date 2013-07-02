@@ -11,6 +11,7 @@
 
 #include <string>
 #include <vector>
+#include "Platform.h"
 
 namespace snowcrash {
     

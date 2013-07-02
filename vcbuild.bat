@@ -12,7 +12,7 @@ SETLOCAL
 ENDLOCAL
 
 @rem Skip to the end for now
-@rem goto exit
+goto exit
 
 :msbuild
 @rem Look for Visual Studio 2012

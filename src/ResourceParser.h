@@ -31,10 +31,10 @@ namespace snowcrash {
     };
     
     // Query resource signature
-    inline ResourceSignature GetResourceSignature(const MarkdownBlock& block,
-                                                  Name& name,
-                                                  URITemplate& uri,
-                                                  HTTPMethod& method) {
+    FORCEINLINE ResourceSignature GetResourceSignature(const MarkdownBlock& block,
+                                                       Name& name,
+                                                       URITemplate& uri,
+                                                       HTTPMethod& method) {
         if (block.type != HeaderBlockType ||
             block.content.empty())
             return NoResourceSignature;
@@ -58,7 +58,7 @@ namespace snowcrash {
     }
     
     // Returns true if block has resource header signature, false otherwise
-    inline bool HasResourceSignature(const MarkdownBlock& block) {
+    FORCEINLINE bool HasResourceSignature(const MarkdownBlock& block) {
 
         Name name;
         URITemplate uri;
@@ -70,9 +70,8 @@ namespace snowcrash {
     typedef Collection<Resource>::const_iterator ResourceIterator;
     
     // Finds a resource in resource group by its URI template
-    inline ResourceIterator FindResource(const ResourceGroup& group,
-                                         const Resource& resource) {
-        
+    FORCEINLINE ResourceIterator FindResource(const ResourceGroup& group,
+                                              const Resource& resource) {
         return std::find_if(group.resources.begin(),
                             group.resources.end(),
                             std::bind2nd(MatchURI<Resource>(), resource));
@@ -82,7 +81,8 @@ namespace snowcrash {
     typedef std::pair<Collection<ResourceGroup>::const_iterator, ResourceIterator> ResourceIteratorPair;
     
     // Finds a resource in blueprint by its URI template
-    inline ResourceIteratorPair FindResource(const Blueprint& blueprint, const Resource& resource) {
+    FORCEINLINE ResourceIteratorPair FindResource(const Blueprint& blueprint,
+                                                  const Resource& resource) {
         
         for (Collection<ResourceGroup>::const_iterator it = blueprint.resourceGroups.begin();
              it != blueprint.resourceGroups.end();
@@ -101,8 +101,8 @@ namespace snowcrash {
     // Classifier of internal list items, Resource context
     //
     template <>
-    inline Section ClassifyInternaListBlock<Resource>(const BlockIterator& begin,
-                                                      const BlockIterator& end) {
+    FORCEINLINE Section ClassifyInternaListBlock<Resource>(const BlockIterator& begin,
+                                                           const BlockIterator& end) {
         if (HasHeaderSignature(begin, end))
             return HeadersSection;
         
@@ -119,9 +119,9 @@ namespace snowcrash {
     // Block Classifier, Resource Context
     //
     template <>
-    inline Section ClassifyBlock<Resource>(const BlockIterator& begin,
-                                           const BlockIterator& end,
-                                           const Section& context) {
+    FORCEINLINE Section ClassifyBlock<Resource>(const BlockIterator& begin,
+                                                const BlockIterator& end,
+                                                const Section& context) {
 
         Name name;
         URITemplate uri;

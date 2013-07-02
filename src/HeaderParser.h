@@ -25,8 +25,8 @@ namespace snowcrash {
     typedef Collection<Header>::type HeaderCollection;
     
     // Query header signature a of given block
-    inline bool HasHeaderSignature(const BlockIterator& begin,
-                                   const BlockIterator& end) {
+    FORCEINLINE bool HasHeaderSignature(const BlockIterator& begin,
+                                        const BlockIterator& end) {
         
         if (begin->type == ListBlockBeginType || begin->type == ListItemBlockBeginType) {
             
@@ -49,8 +49,8 @@ namespace snowcrash {
     typedef Collection<Header>::const_iterator HeaderIterator;
     
     // Finds a header in its containment group by its key (first)
-    inline HeaderIterator FindHeader(const HeaderCollection& headers,
-                                     const Header& header) {
+    FORCEINLINE HeaderIterator FindHeader(const HeaderCollection& headers,
+                                          const Header& header) {
         
         return std::find_if(headers.begin(),
                             headers.end(),
@@ -62,9 +62,9 @@ namespace snowcrash {
     // Block Classifier, Headers Context
     //
     template <>
-    inline Section ClassifyBlock<HeaderCollection>(const BlockIterator& begin,
-                                                   const BlockIterator& end,
-                                                   const Section& context) {
+    FORCEINLINE Section ClassifyBlock<HeaderCollection>(const BlockIterator& begin,
+                                                        const BlockIterator& end,
+                                                        const Section& context) {
         
         if (context == UndefinedSection &&
             HasHeaderSignature(begin, end)) {
@@ -172,10 +172,10 @@ namespace snowcrash {
     // Generic HeaderSection parser handler
     //
     template <class T>
-    inline ParseSectionResult HandleHeaders(const BlockIterator& begin,
-                                            const BlockIterator& end,
-                                            BlueprintParserCore& parser,
-                                            T& t)
+    ParseSectionResult HandleHeaders(const BlockIterator& begin,
+                                     const BlockIterator& end,
+                                     BlueprintParserCore& parser,
+                                     T& t)
     {
         size_t headerCount = t.headers.size();
         ParseSectionResult result = HeadersParser::Parse(begin, end, parser, t.headers);
@@ -193,10 +193,10 @@ namespace snowcrash {
     
     // Checks T's headers for occurence of R's headers, warns if a match is found.
     template <class T, class R>
-    inline void CheckHeaderDuplicates(const T& left,
-                                      const R& right,
-                                      const SourceDataBlock& rightSourceMap,
-                                      Result& result) {
+    void CheckHeaderDuplicates(const T& left,
+                               const R& right,
+                               const SourceDataBlock& rightSourceMap,
+                                Result& result) {
         
         for (HeaderIterator it = right.headers.begin(); it != right.headers.end(); ++it) {
             if (FindHeader(left.headers, *it) != left.headers.end()) {

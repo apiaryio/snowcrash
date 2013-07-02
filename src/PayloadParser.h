@@ -30,13 +30,13 @@ static const std::string ObjectRegex("^[ \\t]*(" SYMBOL_IDENTIFIER ")[ \\t][Oo]b
 
 namespace snowcrash {
     
-    inline Collection<Request>::const_iterator FindRequest(const Method& method, const Request& request) {
+    FORCEINLINE Collection<Request>::const_iterator FindRequest(const Method& method, const Request& request) {
         return std::find_if(method.requests.begin(),
                             method.requests.end(),
                             std::bind2nd(MatchName<Request>(), request));
     }
     
-    inline Collection<Request>::const_iterator FindResponse(const Method& method, const Response& response) {
+    FORCEINLINE Collection<Request>::const_iterator FindResponse(const Method& method, const Response& response) {
         return std::find_if(method.responses.begin(),
                             method.responses.end(),
                             std::bind2nd(MatchName<Response>(), response));
@@ -52,10 +52,10 @@ namespace snowcrash {
     };
     
     // Query payload signature a of given block
-    inline PayloadSignature GetPayloadSignature(const BlockIterator& begin,
-                                                const BlockIterator& end,
-                                                Name& name,
-                                                SourceData& mediaType) {
+    FORCEINLINE PayloadSignature GetPayloadSignature(const BlockIterator& begin,
+                                                     const BlockIterator& end,
+                                                     Name& name,
+                                                     SourceData& mediaType) {
         
         if (begin->type == ListBlockBeginType || begin->type == ListItemBlockBeginType) {
             
@@ -93,15 +93,16 @@ namespace snowcrash {
         return NoPayloadSignature;
     }
     
-    inline bool HasPayloadSignature(const BlockIterator& begin,
-                                    const BlockIterator& end) {
+    FORCEINLINE bool HasPayloadSignature(const BlockIterator& begin,
+                                         const BlockIterator& end) {
         Name name;
         SourceData mediaType;
         PayloadSignature signature = GetPayloadSignature(begin, end, name, mediaType);
         return signature != NoPayloadSignature;
     }
     
-    inline bool HasPayloadAssetSignature(const BlockIterator& begin, const BlockIterator& end) {
+    FORCEINLINE bool HasPayloadAssetSignature(const BlockIterator& begin,
+                                              const BlockIterator& end) {
         if (!HasPayloadSignature(begin, end))
             return false;
         
@@ -112,8 +113,8 @@ namespace snowcrash {
     // Classifier of internal list items, Payload context
     //
     template <>
-    inline Section ClassifyInternaListBlock<Payload>(const BlockIterator& begin,
-                                                     const BlockIterator& end) {
+    FORCEINLINE Section ClassifyInternaListBlock<Payload>(const BlockIterator& begin,
+                                                          const BlockIterator& end) {
         
         AssetSignature asset = GetAssetSignature(begin, end);
         if (asset == BodyAssetSignature)
@@ -131,9 +132,9 @@ namespace snowcrash {
     // Block Classifier, Payload Context
     //
     template <>
-    inline Section ClassifyBlock<Payload>(const BlockIterator& begin,
-                                          const BlockIterator& end,
-                                          const Section& context) {
+    FORCEINLINE Section ClassifyBlock<Payload>(const BlockIterator& begin,
+                                               const BlockIterator& end,
+                                               const Section& context) {
         
         if (context == UndefinedSection) {
             

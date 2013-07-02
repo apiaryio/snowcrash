@@ -30,9 +30,9 @@ namespace snowcrash {
     };
     
     // Query method signature
-    inline MethodSignature GetMethodSignature(const MarkdownBlock& block,
-                                              Name& name,
-                                              HTTPMethod& method) {
+    FORCEINLINE MethodSignature GetMethodSignature(const MarkdownBlock& block,
+                                                   Name& name,
+                                                   HTTPMethod& method) {
         if (block.type != HeaderBlockType ||
             block.content.empty())
             return NoMethodSignature;
@@ -56,7 +56,8 @@ namespace snowcrash {
     }
 
     // Returns true if block has HTTP Method signature, false otherwise
-    inline bool HasMethodSignature(const MarkdownBlock& block) {
+    FORCEINLINE bool HasMethodSignature(const MarkdownBlock& block) {
+        
         if (block.type != HeaderBlockType ||
             block.content.empty())
             return false;
@@ -67,7 +68,8 @@ namespace snowcrash {
     }
     
     // Finds a method inside resource
-    inline Collection<Method>::iterator FindMethod(Resource& resource, const Method& method) {
+    FORCEINLINE Collection<Method>::iterator FindMethod(Resource& resource,
+                                                        const Method& method) {
         return std::find_if(resource.methods.begin(),
                             resource.methods.end(),
                             std::bind2nd(MatchMethod<Method>(), method));
@@ -77,8 +79,8 @@ namespace snowcrash {
     // Classifier of internal list items, Payload context
     //
     template <>
-    inline Section ClassifyInternaListBlock<Method>(const BlockIterator& begin,
-                                                    const BlockIterator& end) {
+    FORCEINLINE Section ClassifyInternaListBlock<Method>(const BlockIterator& begin,
+                                                         const BlockIterator& end) {
         
         if (HasHeaderSignature(begin, end))
             return HeadersSection;
@@ -100,9 +102,9 @@ namespace snowcrash {
     // Block Classifier, Method Context
     //
     template <>
-    inline Section ClassifyBlock<Method>(const BlockIterator& begin,
-                                         const BlockIterator& end,
-                                         const Section& context) {
+    FORCEINLINE Section ClassifyBlock<Method>(const BlockIterator& begin,
+                                              const BlockIterator& end,
+                                              const Section& context) {
         
         if (HasMethodSignature(*begin))
             return (context == UndefinedSection) ? MethodSection : UndefinedSection;
