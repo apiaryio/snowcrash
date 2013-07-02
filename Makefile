@@ -22,7 +22,7 @@ test-snowcrash: $(BUILD_DIR)/Makefile
 snowcrash: $(BUILD_DIR)/Makefile
 	$(MAKE) -C $(BUILD_DIR) V=$(V) snowcrash
 	mkdir -p ./bin
-	cp -f $(BUILD_DIR)/out/Default/snowcrash ./bin/snowcrash
+	cp -f $(BUILD_DIR)/out/Release/snowcrash ./bin/snowcrash
 
 $(BUILD_DIR)/Makefile:
 	$(GYP) -f make --generator-output $(BUILD_DIR) --depth=.
@@ -37,9 +37,9 @@ distclean:
 	rm -rf ./bin	
 
 test: test-snowcrash
-	$(BUILD_DIR)/out/Default/test-snowcrash
+	$(BUILD_DIR)/out/Release/test-snowcrash
 
 install: snowcrash
-	cp -f $(BUILD_DIR)/out/Default/snowcrash /usr/local/bin/snowcrash	
+	cp -f $(BUILD_DIR)/out/Release/snowcrash /usr/local/bin/snowcrash	
 
 .PHONY: libsnowcrash test-snowcrash snowcrash clean distclean test
