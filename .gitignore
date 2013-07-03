@@ -33,5 +33,6 @@ DerivedData
 
 # Generated files
 config.mk
+config.gypi
 bin/
 vendor/

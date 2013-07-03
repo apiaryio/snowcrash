@@ -13,16 +13,19 @@ all: libsnowcrash test-snowcrash snowcrash
 
 .PHONY: libsnowcrash test-snowcrash snowcrash
 
-libsnowcrash: $(BUILD_DIR)/Makefile
+libsnowcrash: config.gypi $(BUILD_DIR)/Makefile
 	$(MAKE) -C $(BUILD_DIR) V=$(V) libsnowcrash
 
-test-snowcrash: $(BUILD_DIR)/Makefile
+test-snowcrash: config.gypi $(BUILD_DIR)/Makefile
 	$(MAKE) -C $(BUILD_DIR) V=$(V) test-snowcrash
 
-snowcrash: $(BUILD_DIR)/Makefile
+snowcrash: config.gypi $(BUILD_DIR)/Makefile
 	$(MAKE) -C $(BUILD_DIR) V=$(V) snowcrash
 	mkdir -p ./bin
 	cp -f $(BUILD_DIR)/out/Release/snowcrash ./bin/snowcrash
+
+config.gypi: configure
+	$(PYTHON) ./configure
 
 $(BUILD_DIR)/Makefile:
 	$(GYP) -f make --generator-output $(BUILD_DIR) --depth=.
@@ -34,6 +37,7 @@ clean:
 distclean:
 	rm -rf ./build
 	rm -f ./config.mk
+	rm -f ./config.gypi
 	rm -rf ./bin	
 
 test: test-snowcrash
