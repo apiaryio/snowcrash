@@ -112,10 +112,6 @@
           '_CRT_NONSTDC_NO_DEPRECATE'
         ],
       }],
-      [ 'OS in "linux freebsd openbsd solaris"', {
-        'cflags': [ '-pthread', ],
-        'ldflags': [ '-pthread' ],
-      }],
       [ 'OS in "linux freebsd openbsd solaris android"', {
         'cflags': [ '-Wall', '-Wextra', '-Wno-unused-parameter', ],
         'cflags_cc!': [ '-fno-rtti', '-fno-exceptions' ],
