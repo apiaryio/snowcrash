@@ -36,6 +36,7 @@ goto exit
 
 :msbuild-found
 @rem Build the sln with msbuild.
+echo Building Snow Crash...
 msbuild build/snowcrash.sln /m /clp:NoSummary;NoItemAndPropertyList;Verbosity=minimal /nologo
 if errorlevel 1 goto exit
 

@@ -23,7 +23,7 @@ bool snowcrash::RegexMatch(const std::string& target, const std::string& express
         std::regex pattern(expression, std::regex_constants::extended);
         return std::regex_search(target, pattern);
     }
-    catch (const std::regex_error& e) {
+    catch (const std::regex_error&) {
     }
     catch (...) {
     }
@@ -64,7 +64,7 @@ bool snowcrash::RegexCapture(const std::string& target, const std::string& expre
 
         return true;
     }
-    catch (const std::regex_error& e) {
+    catch (const std::regex_error&) {
     }
     catch (...) {
     }

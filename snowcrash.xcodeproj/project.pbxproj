@@ -12,14 +12,13 @@
 		BB1D4D0B174D0932009BCB1C /* test-HeaderParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB1D4D08174D08C3009BCB1C /* test-HeaderParser.cc */; };
 		BB3DD975174654FD004C4077 /* test-AssetParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB3DD974174654FD004C4077 /* test-AssetParser.cc */; };
 		BB4D8E57172D15CA0024EB04 /* libsnowcrash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBFF4898170B34E6001E5FB2 /* libsnowcrash.a */; };
+		BB65939117845C2D00321230 /* RegexMatch.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB0F4271731CE0D00C92465 /* RegexMatch.cc */; };
 		BB740993171C05B20023105F /* MarkdownParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB740991171C05B20023105F /* MarkdownParser.cc */; };
 		BB740994171C05B20023105F /* MarkdownParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BB740992171C05B20023105F /* MarkdownParser.h */; };
 		BB740997171C065C0023105F /* MarkdownBlock.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB740995171C065C0023105F /* MarkdownBlock.cc */; };
 		BB740998171C065C0023105F /* MarkdownBlock.h in Headers */ = {isa = PBXBuildFile; fileRef = BB740996171C065C0023105F /* MarkdownBlock.h */; };
 		BB74099A171C08240023105F /* test-MarkdownBlock.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB740999171C08240023105F /* test-MarkdownBlock.cc */; };
 		BB74099C171C08860023105F /* test-MarkdownParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB74099B171C08850023105F /* test-MarkdownParser.cc */; };
-		BB858A86178307440022EF68 /* RegexMatch.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB0F4271731CE0D00C92465 /* RegexMatch.cc */; };
-		BB858A871783074A0022EF68 /* snowcrash.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA25670172BFEB800C1AD5E /* snowcrash.cc */; };
 		BB86DEC11723E3A700063644 /* src_map.c in Sources */ = {isa = PBXBuildFile; fileRef = BB86DEC01723E3A700063644 /* src_map.c */; };
 		BB86DEC31723E3C600063644 /* src_map.h in Headers */ = {isa = PBXBuildFile; fileRef = BB86DEC21723E3C600063644 /* src_map.h */; };
 		BBA25671172BFEB800C1AD5E /* snowcrash.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA25670172BFEB800C1AD5E /* snowcrash.cc */; };
@@ -491,10 +490,8 @@
 				BBFF48CD170B3EDE001E5FB2 /* snowcrash.cc in Sources */,
 				BBA889A71712FF37005A9570 /* Parser.cc in Sources */,
 				BBA889B517131AFF005A9570 /* autolink.c in Sources */,
-				BB858A86178307440022EF68 /* RegexMatch.cc in Sources */,
 				BBA889B717131AFF005A9570 /* buffer.c in Sources */,
 				BBA889BA17131AFF005A9570 /* markdown.c in Sources */,
-				BB858A871783074A0022EF68 /* snowcrash.cc in Sources */,
 				BBA889BC17131AFF005A9570 /* stack.c in Sources */,
 				BBA889C717131B19005A9570 /* houdini_href_e.c in Sources */,
 				BBA889C817131B19005A9570 /* houdini_html_e.c in Sources */,
@@ -506,6 +503,7 @@
 				BBD5F9D21735439B0049BBEE /* ParserCore.cc in Sources */,
 				BBE53564174132B100BCA7AD /* Serialize.cc in Sources */,
 				BBE53565174132B100BCA7AD /* SerializeJSON.cc in Sources */,
+				BB65939117845C2D00321230 /* RegexMatch.cc in Sources */,
 				BBE53566174132B100BCA7AD /* SerializeYAML.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

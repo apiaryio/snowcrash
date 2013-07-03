@@ -58,6 +58,8 @@ MarkdownBlock::Stack snowcrashtest::CanonicalMethodFixture()
     responseList.push_back(MarkdownBlock(CodeBlockType, "OK.", 0, MakeSourceDataBlock(5, 1)));
     responseList.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(6, 1)));
     
+    cur = listBlock.begin();
+    ++cur;
     listBlock.insert(cur, responseList.begin(), responseList.end());
     
     // inject complete list into final markdown

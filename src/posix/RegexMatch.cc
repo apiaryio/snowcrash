@@ -90,10 +90,10 @@ bool snowcrash::RegexCapture(const std::string& target, const std::string& expre
             return false;
         }
     }
-    catch (...)
-    {
-        return false;
+    catch (...) {
     }
+    
+    return false;    
 }
 
 

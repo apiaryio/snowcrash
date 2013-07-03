@@ -18,6 +18,7 @@
         ],
         'msvs_settings': {
           'VCCLCompilerTool': {
+            'PreprocessorDefinitions': ['_SECURE_SCL=0', '_HAS_ITERATOR_DEBUGGING=0' ], # https://github.com/xbmc/xbmc/pull/1009
             'RuntimeLibrary': 1, # static debug
             'Optimization': 0, # /Od, no optimization
             'MinimalRebuild': 'false',

@@ -93,6 +93,7 @@
         'test/test-RegexMatch.cc',
         'test/test-ResouceGroupParser.cc',
         'test/test-ResourceParser.cc',
+        'test/test-SymbolTable.cc',
         'test/test-snowcrash.cc'
       ],
       'dependencies': [
