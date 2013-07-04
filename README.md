@@ -29,7 +29,7 @@ Snow Crash bindings in other languages:
 	$ make test
 	```
 	
-We love **Windows** too! **Please refer to [Building on Windows](https://github.com/apiaryio/snowcrash/wiki/Building-on-Windows).**
+We love **Windows** too! Please refer to [Building on Windows](https://github.com/apiaryio/snowcrash/wiki/Building-on-Windows).
 		
 ### Snow Crash command line tool
 
