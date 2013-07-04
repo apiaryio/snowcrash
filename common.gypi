@@ -1,6 +1,8 @@
 {
-  #
-  # Refer to Node.js common.gypi 
+  # Attribution Notice
+  # ------------------
+  # This file uses parts of Node.js `common.gypi`.
+  # Please refer to https://github.com/joyent/node.
   #
   'variables': {
     'target_arch%': 'ia32',

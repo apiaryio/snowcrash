@@ -1,5 +1,10 @@
 @echo off
 
+@rem Attribution Notice
+@rem ------------------
+@rem This file uses parts of Node.js `vcbuild.bat`.
+@rem Please refer to https://github.com/joyent/node.
+
 cd %~dp0
 
 @rem Generate the VS project.
