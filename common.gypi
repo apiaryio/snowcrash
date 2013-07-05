@@ -21,7 +21,7 @@
         'msvs_settings': {
           'VCCLCompilerTool': {
             'PreprocessorDefinitions': ['_SECURE_SCL=0', '_HAS_ITERATOR_DEBUGGING=0' ], # https://github.com/xbmc/xbmc/pull/1009
-            'RuntimeLibrary': 1, # static debug
+            'RuntimeLibrary': 3, # dll debug
             'Optimization': 0, # /Od, no optimization
             'MinimalRebuild': 'false',
             'OmitFramePointers': 'false',
@@ -43,7 +43,7 @@
         ],
         'msvs_settings': {
           'VCCLCompilerTool': {
-            'RuntimeLibrary': 0, # static release
+            'RuntimeLibrary': 2, # dll release
             'Optimization': 3, # /Ox, full optimization
             'FavorSizeOrSpeed': 1, # /Ot, favour speed over size
             'InlineFunctionExpansion': 2, # /Ob2, inline anything eligible
