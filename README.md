@@ -11,7 +11,8 @@ Snow Crash is Work in Progress. See its [Wiki status page](https://github.com/ap
 ## Bindings
 Snow Crash bindings in other languages:
 
-* [Protagonist](https://github.com/apiaryio/protagonist) (Node.js)
+- [Protagonist](https://github.com/apiaryio/protagonist) (Node.js)
+- [snowcrashCLR](https://github.com/SeriousM/snowcrashCLR) (.NET)
 
 ## Build
 1. Clone the repo + fetch the submodules:
