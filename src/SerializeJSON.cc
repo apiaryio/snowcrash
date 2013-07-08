@@ -319,32 +319,32 @@ static void serialize(const ResourceGroup& resourceGroup, std::ostream &os)
     serialize(SerializeKey::Description, resourceGroup.description, 3, false, os);
     
     // Resources
-    if (resourceGroup.resources.empty())
-        return;
-
-    os << NewLineItemBlock;
-    indent(3, os);
-    serialize(SerializeKey::Resources, os);
-    os << ": ";
-    os << "[\n";
-    
-    size_t i = 0;
-    for (Collection<Resource>::const_iterator it = resourceGroup.resources.begin();
-         it != resourceGroup.resources.end();
-         ++i, ++it) {
-        
-        if (i > 0 && i < resourceGroup.resources.size())
-            os << NewLineItemBlock;
-        
-        serialize(*it, os);
-    }
-    
     if (!resourceGroup.resources.empty()) {
-        os << "\n";
+
+        os << NewLineItemBlock;
         indent(3, os);
+        serialize(SerializeKey::Resources, os);
+        os << ": ";
+        os << "[\n";
+        
+        size_t i = 0;
+        for (Collection<Resource>::const_iterator it = resourceGroup.resources.begin();
+             it != resourceGroup.resources.end();
+             ++i, ++it) {
+            
+            if (i > 0 && i < resourceGroup.resources.size())
+                os << NewLineItemBlock;
+            
+            serialize(*it, os);
+        }
+        
+        if (!resourceGroup.resources.empty()) {
+            os << "\n";
+            indent(3, os);
+        }
+        
+        os << "]";
     }
-    
-    os << "]";
     
     // Close the group
     os << "\n";
