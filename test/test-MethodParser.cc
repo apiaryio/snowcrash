@@ -10,6 +10,7 @@
 #include "catch.hpp"
 #include "MethodParser.h"
 #include "ResourceParser.h"
+#include "ResourceGroupParser.h"
 #include "Fixture.h"
 
 using namespace snowcrash;
@@ -126,7 +127,12 @@ TEST_CASE("mparser/classifier", "Method block classifier")
     cur = markdown.begin();
     REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), UndefinedSection) == MethodSection);
     REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), MethodSection) == UndefinedSection);
-    
+
+    // Keyword "group"
+    markdown[0].content = "Group A";
+    cur = markdown.begin();
+    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), MethodSection) == UndefinedSection);
 }
 
 TEST_CASE("mparser/classifier-implicit-termination", "Method block classifier implicit termination")
@@ -718,4 +724,31 @@ TEST_CASE("mparser/not-parse-object", "Make sure method with object payload is n
     ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), parser, method);
     
     REQUIRE(result.first.error.code != Error::OK);
+}
+
+TEST_CASE("mparser/adjacent-group", "Make sure method followed by a group does not eat the group")
+{
+    // Blueprint in question:
+    //R"(
+    //## POST
+    //# Group Two
+    //");
+    
+    MarkdownBlock::Stack markdown;
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "POST", 2, MakeSourceDataBlock(0, 1)));
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "Group Two", 1, MakeSourceDataBlock(1, 1)));
+    
+    Method method;
+    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
+    ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), parser, method);
+    
+    REQUIRE(result.first.error.code == Error::OK);
+    CHECK(result.first.warnings.empty());
+    
+    const MarkdownBlock::Stack &blocks = markdown;
+    REQUIRE(std::distance(blocks.begin(), result.second) == 1);
+
+    REQUIRE(method.method == "POST");
+    REQUIRE(method.description.empty());
+
 }

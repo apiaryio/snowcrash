@@ -122,6 +122,8 @@ namespace snowcrash {
     FORCEINLINE Section ClassifyBlock<Resource>(const BlockIterator& begin,
                                                 const BlockIterator& end,
                                                 const Section& context) {
+        if (HasResourceGroupSignature(*begin))
+            return UndefinedSection;
 
         Name name;
         URITemplate uri;

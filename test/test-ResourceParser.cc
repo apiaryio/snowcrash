@@ -9,6 +9,7 @@
 #include <iterator>
 #include "catch.hpp"
 #include "ResourceParser.h"
+#include "ResourceGroupParser.h"
 #include "Fixture.h"
 
 using namespace snowcrash;
@@ -93,6 +94,11 @@ TEST_CASE("rparser/classifier", "Resource block classifier")
     REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSection) == ResourceSection);
     REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSection) == UndefinedSection);
     
+    // Keyword "group"
+    markdown[0].content = "Group A";
+    cur = markdown.begin();
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSection) == UndefinedSection);
 }
 
 TEST_CASE("rparser/classifier-abbrev", "Abbreviated Resource Method block classifier")

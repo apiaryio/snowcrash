@@ -80,8 +80,7 @@ namespace snowcrash {
     //
     template <>
     FORCEINLINE Section ClassifyInternaListBlock<Method>(const BlockIterator& begin,
-                                                         const BlockIterator& end) {
-        
+                                                         const BlockIterator& end) {        
         if (HasHeaderSignature(begin, end))
             return HeadersSection;
         
@@ -105,11 +104,12 @@ namespace snowcrash {
     FORCEINLINE Section ClassifyBlock<Method>(const BlockIterator& begin,
                                               const BlockIterator& end,
                                               const Section& context) {
-        
+
         if (HasMethodSignature(*begin))
             return (context == UndefinedSection) ? MethodSection : UndefinedSection;
         
-        if (HasResourceSignature(*begin))
+        if (HasResourceSignature(*begin) ||
+            HasResourceGroupSignature(*begin))
             return UndefinedSection;
         
         Section listSection = ClassifyInternaListBlock<Method>(begin, end);
