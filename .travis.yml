@@ -5,9 +5,6 @@ compiler:
 script: ./configure && make test
 before_install:
   - git submodule update --init --recursive
-branches:
-  only:
-    - master
 notifications:
   email:
     recipients:
