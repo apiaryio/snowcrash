@@ -26,6 +26,11 @@ parser.add_option("--debug",
     dest="debug",
     help="Also build debug build")
 
+parser.add_option("--dest-cpu",
+    action="store",
+    dest="dest_cpu",
+    help="CPU architecture to build for. Valid values are: ia32, x64")
+
 (options, args) = parser.parse_args()
 
 def write(filename, data):
