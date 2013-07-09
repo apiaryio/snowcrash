@@ -52,5 +52,7 @@ Fork & Pull Request.
 
 Make sure to follow the [API Blueprint Developers discussion group](https://groups.google.com/forum/#!forum/apiblueprint-dev). Also check the Snow Crash [issues page](https://github.com/apiaryio/snowcrash/issues?state=open).
 
+If you want to create a binding for Snow Crash please refer to the [Writing a binding](https://github.com/apiaryio/snowcrash/wiki/Writing-a-binding) Wiki article.
+
 ## License
 MIT License. See the [LICENSE](https://github.com/apiaryio/snowcrash/blob/master/LICENSE) file.
