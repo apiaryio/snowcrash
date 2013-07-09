@@ -13,32 +13,43 @@
 #include <string>
 #include <utility>
 
+/**
+ *  API Blueprint Abstract Syntaxt Tree
+ *  -----------------------------------
+ *
+ *  Data types in this documents define the API Blueprint AST.
+ */
+
 namespace snowcrash {
     
-    //
-    // Generic types
-    //
-    
-    // Name of section / element. Plain text
+    /** Name of a an API Blueprint entity. */
     typedef std::string Name;
 
-    // Section Description. Rendered HTML from Markdown
+    /** 
+     *  \brief An API Blueprint entity Description.
+     *
+     *  Depending on parser setting the description might be 
+     *  rendered HTML from Markdown or raw Markdown.
+     */
     typedef std::string Description;
     
-    // URI
+    /** URI */
     typedef std::string URI;
     
-    // URI template
+    /** URI template */
     typedef std::string URITemplate;
     
-    // HTTP Method
+    /** HTTP Method */
     typedef std::string HTTPMethod;
     
-    // Key:Value pair
+    /** A generic key - value pair */
     typedef std::pair<std::string, std::string> KeyValuePair;
     
-    // Default Container for collections
-    // FIXME: C++11 template aliases
+    /**
+     * Default Container for collections.
+     *
+     *  FIXME: Use C++11 template aliases when migrating to C++11.
+     */
     template<typename T>
     struct Collection {
         typedef std::vector<T> type;
@@ -46,138 +57,160 @@ namespace snowcrash {
         typedef typename std::vector<T>::const_iterator const_iterator;
     };
     
-    //
-    // API Blueprint sections
-    //
-    
-    // Asset data
+    /** An asset data */
     typedef std::string Asset;
 
-    // Metadata key-value pair, e.g. "HOST: http://acme.com"
+    /** 
+     *  \brief Metadata key-value pair,
+     *
+     *  E.g. "HOST: http://acme.com"
+     */
     typedef KeyValuePair Metadata;
 
-    // Header key-value pair, e.g. "Content-Type: application/json"
+    /** 
+     *  \brief  Header key-value pair.
+     *
+     *  E.g. "Content-Type: application/json"
+     */
     typedef KeyValuePair Header;
     
-    // Parameter
+    /** Parameter */
     struct Parameter {
         
-        // Parameter Name
+        /** Parameter Name */
         Name name;
         
-        // Parameter Description
+        /** Parameter Description */
         Description description;
         
         // TODO: type, optional, default value
     };
     
-    // Payload
+    /**
+     *  Payload
+     */
     struct Payload {
         
-        // Payload Name
+        /** A Payload Name */
         Name name;
         
-        // Payload Description
+        /** Payload Description */
         Description description;
         
-        // Parameters
+        /** Payload-specific Parameters */
         Collection<Parameter>::type parameters;
         
-        // Headers
+        /** Payload-specific Headers */
         Collection<Header>::type headers;
         
-        // Body
+        /** Body */
         Asset body;
         
-        // Schema
+        /** Schema */
         Asset schema;
     };
     
-    // Resource Object
+    /** Resource Object */
     typedef Payload ResourceObject;
     
-    // Request
+    /** Request */
     typedef Payload Request;
     
-    // Response, a payload where name is HTTP status code
+    /** 
+     *  \brief Response
+     *
+     *  A payload returned in a response to an action.
+     *  Payload's name represents the HTTP status code.
+     */
     typedef Payload Response;
     
-    // Method
+    /**
+     *  Method
+     */
     struct Method {
         
-        // HTTP method
+        /** HTTP method */
         HTTPMethod method;
         
-        // Method name
+        /** A Method name */
         Name name;
         
-        // Description
+        /** Description */
         Description description;
         
-        // Parameters
+        /** Method-specfic Parameters */
         Collection<Parameter>::type parameters;
         
-        // Headers
+        /** Method-specific HTTP headers */
         Collection<Header>::type headers;
 
-        // Requests
+        /** Requests */
         Collection<Request>::type requests;
         
-        // Responses
+        /** Responses */
         Collection<Response>::type responses;
     };
     
-    // Resource
+    /**
+     *  API Resource
+     */
     struct Resource {
         
-        // URI template
+        /** URI template */
         URITemplate uriTemplate;
         
-        // Resource Name
+        /** A Resource Name */
         Name name;
         
-        // Description
+        /** Description of the resource */
         Description description;
         
-        // Object represented by this resource
+        /** Object model representing this Resource */
         ResourceObject object;
         
-        // Parameters
+        /** Parameters */
         Collection<Parameter>::type parameters;
         
-        // Headers
+        /** Resource-specific HTTP Headers */
         Collection<Header>::type headers;
         
-        // Methods
+        /** A set of HTTP Methods specified for this Resource */
         Collection<Method>::type methods;
     };
     
-    // Group of resources
+    /**
+     *  Group of API Resources
+     */
     struct ResourceGroup {
         
-        // Group Name
+        /** A Group Name */
         Name name;
         
-        // Group Description
+        /** Group description */
         Description description;
         
-        // Resources
+        /** Resources */
         Collection<Resource>::type resources;
     };
     
-    // API Blueprint
+    /** 
+     *  \brief API Blueprint AST
+     *
+     *  This is top-level (or root if you prefer) of API Blueprint abstract syntax tree.
+     *  Start reading a parsed API here.
+     */
     struct Blueprint {
         
-        // Metadata
+        /** Metadata */
         Collection<Metadata>::type metadata;
         
-        // API Name
+        /** The API Name */
         Name name;
 
-        // API Overview
+        /** An API Overview description */
         Description description;
         
-        // Resource Groups
+        /** The set of API Resource Groups */
         Collection<ResourceGroup>::type resourceGroups;
     };
 }
