@@ -24,8 +24,15 @@ static void serialize(const std::string& key, const std::string& value, size_t l
         
         os << key << ": ";
 
+        std::string normalizedValue = value;
+        if (normalizedValue.find("\"") != std::string::npos)
+            normalizedValue = EscapeDoubleQuotes(normalizedValue);
+        
         if (value.find("\n") != std::string::npos)
-            os << "\"" << EscapeNewlines(value) << "\"";
+            normalizedValue = EscapeNewlines(normalizedValue);
+
+        if (normalizedValue != value)
+            os << "\"" << normalizedValue << "\"";
         else
             os << value;
         

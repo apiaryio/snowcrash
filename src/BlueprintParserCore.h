@@ -112,18 +112,20 @@ namespace snowcrash {
         }
     };
     
-    //
-    // Blueprint Parser Options
-    //
+    /**
+     *  \brief Blueprint Parser Options.
+     *
+     *  Controls blueprint parser behavi
+     */
     enum BlueprintParserOption {
-        RenderDescriptionsOption = (1 << 0),    // Render Markdown in description
-        RequireBlueprintNameOption = (1 << 1)   // Treat missing blueprint name as error
+        RenderDescriptionsOption = (1 << 0),    /// < Render Markdown in description.
+        RequireBlueprintNameOption = (1 << 1)   /// < Treat missing blueprint name as error
     };
     typedef unsigned int BlueprintParserOptions;
     
-    //
-    // Parser Core Data
-    //
+    /**
+     *  Parser Core Data
+     */
     struct BlueprintParserCore {
         BlueprintParserCore(BlueprintParserOptions opts,
                             const SourceData& src,
@@ -261,12 +263,14 @@ namespace snowcrash {
         return (!keyValuePair.first.empty() && !keyValuePair.second.empty());
     }
     
-    ///! \brief Checks cursor validity within its container.
-    ///! \param cur an iterator to be checked
-    ///! \param bounds boundaries to check against
-    ///! \param parent cursor's parent block to be used in case of error reporting
-    ///! \param result error result output, an error object is added in case of failed check
-    ///! \returns true if cursor appears to be valid false otherwise
+    /**
+     *  \brief Checks cursor validity within its container.
+     *  \param cur an iterator to be checked
+     *  \param bounds boundaries to check against
+     *  \param parent cursor's parent block to be used in case of error reporting
+     *  \param result error result output, an error object is added in case of failed check
+     *  \returns true if cursor appears to be valid false otherwise
+     */
     FORCEINLINE bool CheckCursor(const BlockIterator& cur,
                                  const SectionBounds& bounds,
                                  const BlockIterator& parent,

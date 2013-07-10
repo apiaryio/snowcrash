@@ -22,7 +22,7 @@ static std::string BufText(const struct buf *text)
 
 const size_t MarkdownParser::OutputUnitSize = 64;
 const size_t MarkdownParser::MaxNesting = 16;
-const int MarkdownParser::ParserExtensions = MKDEXT_FENCED_CODE | MKDEXT_NO_INTRA_EMPHASIS /*| MKDEXT_TABLES */;
+const int MarkdownParser::ParserExtensions = MKDEXT_FENCED_CODE | MKDEXT_NO_INTRA_EMPHASIS | MKDEXT_LAX_SPACING /*| MKDEXT_TABLES */;
 
 void MarkdownParser::parse(const SourceData& source, Result& result, MarkdownBlock::Stack& markdown)
 {
