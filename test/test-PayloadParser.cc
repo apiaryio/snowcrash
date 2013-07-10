@@ -65,7 +65,7 @@ MarkdownBlock::Stack snowcrashtest::CanonicalPayloadFixture()
     return markdown;
 }
 
-TEST_CASE("pldparser/classifier", "Payload block classifier")
+TEST_CASE("Payload block classifier", "[payload]")
 {
     MarkdownBlock::Stack markdown = CanonicalPayloadFixture();
     
@@ -127,7 +127,7 @@ TEST_CASE("pldparser/classifier", "Payload block classifier")
     
 }
 
-TEST_CASE("pldparser/parse", "Parse canonical payload")
+TEST_CASE("Parse canonical payload", "[payload]")
 {
     MarkdownBlock::Stack markdown = CanonicalPayloadFixture();    
     Payload payload;
@@ -152,7 +152,7 @@ TEST_CASE("pldparser/parse", "Parse canonical payload")
     REQUIRE(payload.schema == "Code 2");
 }
 
-TEST_CASE("pldparser/parse-list-description", "Parse description with list")
+TEST_CASE("Parse description with list", "[payload]")
 {
     // Blueprint in question:
     //R"(
@@ -187,7 +187,7 @@ TEST_CASE("pldparser/parse-list-description", "Parse description with list")
     REQUIRE(result.first.error.code != Error::OK);
 }
 
-TEST_CASE("pldparser/parse-one", "Parse just one payload in a list with multiple payloads")
+TEST_CASE("Parse just one payload in a list with multiple payloads", "[payload]")
 {
     // Blueprint in question:
     //R"(
@@ -222,7 +222,7 @@ TEST_CASE("pldparser/parse-one", "Parse just one payload in a list with multiple
     REQUIRE(payload.schema.empty());
 }
 
-TEST_CASE("pldparser/parse-one-foreign", "Parse just one payload in a list with multiple items")
+TEST_CASE("Parse just one payload in a list with multiple items", "[payload]")
 {
     // Blueprint in question:
     //R"(
@@ -257,7 +257,7 @@ TEST_CASE("pldparser/parse-one-foreign", "Parse just one payload in a list with 
     REQUIRE(payload.schema.empty());
 }
 
-TEST_CASE("pldparser/parse-payload-foreign-listitem", "Parse payload with foreign list item")
+TEST_CASE("Parse payload with foreign list item", "[payload]")
 {
     // Blueprint in question:
     //R"(
@@ -309,7 +309,7 @@ TEST_CASE("pldparser/parse-payload-foreign-listitem", "Parse payload with foreig
     REQUIRE(payload.schema.empty());
 }
 
-TEST_CASE("pldparser/parse-payload-foreign-block", "Parse payload with foreign block")
+TEST_CASE("Parse payload with foreign block", "[payload]")
 {
     // Blueprint in question:
     //R"(
@@ -360,7 +360,7 @@ TEST_CASE("pldparser/parse-payload-foreign-block", "Parse payload with foreign b
 }
 
 
-TEST_CASE("pldparser/parse-abbrev-body", "Parse abbreviated payload body")
+TEST_CASE("Parse abbreviated payload body", "[payload]")
 {
     // Blueprint in question:
     //R"(
@@ -396,7 +396,7 @@ TEST_CASE("pldparser/parse-abbrev-body", "Parse abbreviated payload body")
     REQUIRE(payload.schema.empty());
 }
 
-TEST_CASE("pldparser/parse-abbrev-inline", "Parse abbreviated inline payload body")
+TEST_CASE("Parse abbreviated inline payload body", "[payload]")
 {
     // Blueprint in question:
     //R"(
@@ -429,7 +429,7 @@ TEST_CASE("pldparser/parse-abbrev-inline", "Parse abbreviated inline payload bod
     REQUIRE(payload.schema.empty());
 }
 
-TEST_CASE("pldparser/parse-symbol-inline-reference", "Parse inline payload with symbol reference")
+TEST_CASE("Parse inline payload with symbol reference", "[payload]")
 {
     // Blueprint in question:
     //R"(
@@ -469,7 +469,7 @@ TEST_CASE("pldparser/parse-symbol-inline-reference", "Parse inline payload with 
     REQUIRE(payload.schema.empty());
 }
 
-TEST_CASE("pldparser/parse-symbol-reference", "Parse payload with symbol reference")
+TEST_CASE("Parse payload with symbol reference", "[payload]")
 {
     // Blueprint in question:
     //R"(
@@ -515,10 +515,8 @@ TEST_CASE("pldparser/parse-symbol-reference", "Parse payload with symbol referen
     REQUIRE(payload.schema.empty());
 }
 
-TEST_CASE("pldparser/fix-missing-source-map", "Issue: Fix missing source map")
+TEST_CASE("Missing 'expected pre-formatted code block' warning source map", "[payload][issue][#2]")
 {
-    // https://github.com/apiaryio/snowcrash/issues/2
-    //
     // Blueprint in question:
     //R"(
     //# GET /res
@@ -552,4 +550,3 @@ TEST_CASE("pldparser/fix-missing-source-map", "Issue: Fix missing source map")
     
     REQUIRE(result.first.warnings[0].location.size() == 1);
 }
-

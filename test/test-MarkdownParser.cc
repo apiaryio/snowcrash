@@ -612,3 +612,63 @@ TEST_CASE("mdparser/parse-header-only", "parsing asserting header one liner")
     REQUIRE(markdown[0].data == 1);
 }
 
+TEST_CASE("Missing nested list item", "[markdown][issue][#12]")
+{
+    MarkdownParser parser;
+    Result result;
+    MarkdownBlock::Stack markdown;
+    
+    const std::string source = \
+"\n\
++ Parent\n\
+\n\
+    + Item1\n\
+\n\
+    Para1\n\
+\n\
+    + Item2\n\
+";
+    
+    parser.parse(source, result, markdown);
+    
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.empty());
+    
+    REQUIRE(markdown.size() == 14);
+
+    REQUIRE(markdown[0].type == ListBlockBeginType);
+    REQUIRE(markdown[0].content.empty());
+    REQUIRE(markdown[1].type == ListItemBlockBeginType);
+    REQUIRE(markdown[1].content.empty());
+    
+    REQUIRE(markdown[2].type == ParagraphBlockType);
+    REQUIRE(markdown[2].content == "Parent");
+    
+    REQUIRE(markdown[3].type == ListBlockBeginType);
+    REQUIRE(markdown[3].content.empty());
+    REQUIRE(markdown[4].type == ListItemBlockBeginType);
+    REQUIRE(markdown[4].content.empty());
+    
+    REQUIRE(markdown[5].type == ListItemBlockEndType);
+    REQUIRE(markdown[5].content == "Item1\n");
+    REQUIRE(markdown[6].type == ListBlockEndType);
+    REQUIRE(markdown[6].content.empty());
+    
+    REQUIRE(markdown[7].type == ParagraphBlockType);
+    REQUIRE(markdown[7].content == "Para1");
+    
+    REQUIRE(markdown[8].type == ListBlockBeginType);
+    REQUIRE(markdown[8].content.empty());
+    REQUIRE(markdown[9].type == ListItemBlockBeginType);
+    REQUIRE(markdown[9].content.empty());
+
+    REQUIRE(markdown[10].type == ListItemBlockEndType);
+    REQUIRE(markdown[10].content == "Item2\n");
+    REQUIRE(markdown[11].type == ListBlockEndType);
+    REQUIRE(markdown[11].content.empty());
+    
+    REQUIRE(markdown[12].type == ListItemBlockEndType);
+    REQUIRE(markdown[12].content.empty());
+    REQUIRE(markdown[13].type == ListBlockEndType);
+    REQUIRE(markdown[13].content.empty());
+}
