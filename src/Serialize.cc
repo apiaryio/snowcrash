@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <iterator>
 #include "Serialize.h"
+#include "StringUtility.h"
 
 using namespace snowcrash;
 
@@ -32,11 +33,10 @@ const std::string SerializeKey::Object = "object";
 
 std::string snowcrash::EscapeNewlines(const std::string& input)
 {
-    std::ostringstream oss;
-    std::istringstream iss(input);
-    std::string line;
-    while (std::getline(iss, line))
-        oss << line << "\\n";
-    
-    return oss.str();
+    return ReplaceString(input, "\n", "\\n");
+}
+
+std::string snowcrash::EscapeDoubleQuotes(const std::string& input)
+{
+    return ReplaceString(input, "\"", "\\\"");
 }

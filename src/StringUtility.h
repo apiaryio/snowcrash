@@ -76,7 +76,27 @@ namespace snowcrash {
             elems.push_back(s.substr(pos + 1, std::string::npos));
         }
         return elems;
-    }    
+    }
+    
+    /**
+     *  \brief  Replace all occurences of a string.
+     *  \param  s       A string to search in.
+     *  \param  find    A string to look for.
+     *  \param  replace A string to replace with.
+     *  \return A copy of %s with all occurences of %find replaced by %replace.
+     */
+    inline std::string ReplaceString(const std::string& s,
+                                     const std::string& find,
+                                     const std::string& replace) {
+        size_t pos = 0;
+        std::string target(s);
+        while ((pos = target.find(find, pos)) != std::string::npos) {
+            target.replace(pos, target.length(), replace);
+            pos += replace.length();
+        }
+        return target;
+    }
+    
 }
 
 #endif

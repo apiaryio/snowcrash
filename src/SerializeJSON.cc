@@ -50,10 +50,11 @@ static void serialize(const std::string& key, const std::string& value, size_t l
     serialize(key, os);
     os << ": ";
     
-    if (value.find("\n") != std::string::npos)
-        serialize(EscapeNewlines(value), os);
+    std::string normValue = EscapeDoubleQuotes(value);
+    if (normValue.find("\n") != std::string::npos)
+        serialize(EscapeNewlines(normValue), os);
     else
-        serialize(value, os);
+        serialize(normValue, os);
     
     if (object) {
         os << "\n";
