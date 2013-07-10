@@ -467,10 +467,8 @@ TEST_CASE("bpparser/metadatarequired-name", "Test required blueprint name on blu
     CHECK(result.warnings.empty());
 }
 
-TEST_CASE("bparser/incorrect-duplicity-warn", "Issue: fix incorrect warning about duplicity")
+TEST_CASE("Incorrect warning about duplicate resources", "[blueprint][issue][3]")
 {
-    //https://github.com/apiaryio/snowcrash/issues/3
-    
     // Blueprint in question:
     //R"(
     //FORMAT: X-1A
@@ -513,3 +511,62 @@ TEST_CASE("bparser/incorrect-duplicity-warn", "Issue: fix incorrect warning abou
 
     REQUIRE(blueprint.resourceGroups.size() == 2);
 }
+
+TEST_CASE("Fail to parse nested lists in description", "[blueprint][issue][#16]")
+{
+    // Blueprint in question:
+    //R"(
+    //# API
+    //+ List
+    //    + Nested Item
+    //");
+    
+    const std::string source = \
+"# API\n\
++ List\n\
+    + Nested Item\n\
+";
+    
+    MarkdownBlock::Stack markdown;
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "API", 1, MakeSourceDataBlock(0, 6)));
+    
+    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+
+    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "Nested Item\n", 0, MakeSourceDataBlock(19, 12)));
+    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(17, 14)));
+    
+    SourceDataBlock block;
+    SourceDataRange r;
+    r.location = 8;
+    r.length = 5;
+    block.push_back(r);
+
+    r.location = 17;
+    r.length = 14;
+    block.push_back(r);
+    
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "List\n", 0, block));
+    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(6, 25)));
+    
+    Blueprint blueprint;
+    BlueprintParserCore parser(0, source, Blueprint());
+    ParseSectionResult result = BlueprintParserInner::Parse(markdown.begin(), markdown.end(), parser, blueprint);
+    
+    REQUIRE(result.first.error.code == Error::OK);
+    CHECK(result.first.warnings.empty());
+    
+    const MarkdownBlock::Stack &blocks = markdown;
+    REQUIRE(std::distance(blocks.begin(), result.second) == 9);
+
+    REQUIRE(blueprint.name == "API");
+    REQUIRE(blueprint.description == \
+"+ List\n\
+    + Nested Item\n\
+");
+    REQUIRE(blueprint.resourceGroups.empty());
+}
+

@@ -78,6 +78,7 @@ namespace snowcrash {
         return elems;
     }
     
+    
     /**
      *  \brief  Replace all occurences of a string.
      *  \param  s       A string to search in.
@@ -91,12 +92,11 @@ namespace snowcrash {
         size_t pos = 0;
         std::string target(s);
         while ((pos = target.find(find, pos)) != std::string::npos) {
-            target.replace(pos, target.length(), replace);
+            target.replace(pos, find.length(), replace);
             pos += replace.length();
         }
         return target;
     }
-    
 }
 
 #endif
