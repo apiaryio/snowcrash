@@ -33,13 +33,13 @@ namespace snowcrash {
     FORCEINLINE Collection<Request>::const_iterator FindRequest(const Method& method, const Request& request) {
         return std::find_if(method.requests.begin(),
                             method.requests.end(),
-                            std::bind2nd(MatchName<Request>(), request));
+                            std::bind2nd(MatchPayload(), request));
     }
     
     FORCEINLINE Collection<Request>::const_iterator FindResponse(const Method& method, const Response& response) {
         return std::find_if(method.responses.begin(),
                             method.responses.end(),
-                            std::bind2nd(MatchName<Response>(), response));
+                            std::bind2nd(MatchPayload(), response));
     }
     
     // Payload signature
@@ -453,7 +453,7 @@ namespace snowcrash {
             }
             
             if (!mediaType.empty()) {
-                Header header = std::make_pair("Content-Type", mediaType);
+                Header header = std::make_pair(HTTPHeaderName::ContentType, mediaType);
                 TrimString(header.second);
                 payload.headers.push_back(header);
             }

@@ -11,14 +11,14 @@
 
 using namespace snowcrash;
 
-TEST_CASE("parser/init", "Parser construction")
+TEST_CASE("Parser construction", "[parser]")
 {
     Parser* parser;
     REQUIRE_NOTHROW(parser = ::new Parser);
     REQUIRE_NOTHROW(delete parser);
 }
 
-TEST_CASE("parser/parse-empty", "Parse empty blueprint.")
+TEST_CASE("Parse empty blueprint", "[parser]")
 {
     Parser parser;
     Result result;
@@ -35,7 +35,7 @@ TEST_CASE("parser/parse-empty", "Parse empty blueprint.")
     REQUIRE(blueprint.resourceGroups.empty());
 }
 
-TEST_CASE("parser/parse-simple", "Parse simple blueprint.")
+TEST_CASE("Parse simple blueprint", "[parser]")
 {
     Parser parser;
     Result result;
@@ -82,7 +82,7 @@ Resource **description**\n\
     REQUIRE(response.body == "Text\n\n{ ... }\n");
 }
 
-TEST_CASE("parser/parse-sanity-check-loc", "Attempt to parse bluprint with unsupported characters")
+TEST_CASE("Parse bluprint with unsupported characters", "[parser]")
 {
     Parser parser;
     Result result;
@@ -100,4 +100,37 @@ TEST_CASE("parser/parse-sanity-check-loc", "Attempt to parse bluprint with unsup
     REQUIRE(result.error.location[0].location == 4);
     REQUIRE(result.error.location[0].length == 1);
     
+}
+
+TEST_CASE("Do not report duplicate response when media type differs", "[method][issue][#14]")
+{
+    // Blueprint in question:
+    //R"(
+    //# GET /message
+    //+ Response 200 (application/json)
+    //
+    //        { "msg": "Hello." }
+    //
+    //+ Response 200 (text/plain)
+    //
+    //        Hello.
+    //");
+    const std::string bluerpintSource = \
+"\n\
+# GET /message\n\
++ Response 200 (application/json)\n\
+\n\
+        { \"msg\": \"Hello.\" }\n\
+\n\
++ Response 200 (text/plain)\n\
+\n\
+        Hello.\n\
+";
+
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(bluerpintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.empty());
 }

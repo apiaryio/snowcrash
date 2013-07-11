@@ -216,7 +216,7 @@ namespace snowcrash {
                     
                     MetadataCollectionIterator duplicate = std::find_if(from,
                                                                         metadataCollection.end(),
-                                                                        std::bind2nd(MatchFirst<Metadata>(), *it));
+                                                                        std::bind2nd(MatchFirsts<Metadata>(), *it));
                     
                     if (duplicate != metadataCollection.end() &&
                         std::find(duplicateKeys.begin(), duplicateKeys.end(), it->first) == duplicateKeys.end()) {

@@ -54,7 +54,7 @@ namespace snowcrash {
         
         return std::find_if(headers.begin(),
                             headers.end(),
-                            std::bind2nd(MatchFirst<Header>(), header));
+                            std::bind2nd(MatchFirsts<Header>(), header));
     }
     
     

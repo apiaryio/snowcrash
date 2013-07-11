@@ -74,7 +74,7 @@ namespace snowcrash {
                                               const Resource& resource) {
         return std::find_if(group.resources.begin(),
                             group.resources.end(),
-                            std::bind2nd(MatchURI<Resource>(), resource));
+                            std::bind2nd(MatchResource(), resource));
     }
 
     // Resource iterator pair: its containment group and resource iterator itself

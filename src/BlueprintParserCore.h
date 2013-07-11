@@ -10,21 +10,17 @@
 #define SNOWCRASH_BLUEPRINTPARSERCORE_H
 
 #include <algorithm>
-#include "StringUtility.h"
 #include "ParserCore.h"
 #include "MarkdownBlock.h"
+#include "HTTP.h"
 #include "Blueprint.h"
+#include "BlueprintUtility.h"
+#include "StringUtility.h"
 #include "SymbolTable.h"
-
-// Recognized HTTP headers, regex string
-#define HTTP_METHODS "GET|POST|PUT|DELETE|OPTIONS|PATCH|PROPPATCH|LOCK|UNLOCK|COPY|MOVE|MKCOL|HEAD"
-
-// (Naive) URI Template, regex string
-#define URI_TEMPLATE "/[^]]+"
 
 namespace snowcrash {
     
-    // Block Classification Section
+    /** Block Classification Section. */
     enum Section {
         UndefinedSection,
         BlueprintSection,
@@ -44,7 +40,7 @@ namespace snowcrash {
         ForeignSection
     };
     
-    // Returns human readable name of given <Section>
+    /** Returns human readable name for given %Section */
     FORCEINLINE std::string SectionName(const Section& section) {
         switch (section) {
                 
@@ -71,51 +67,29 @@ namespace snowcrash {
         }
     }
     
-    // Parser iterator
+    /** Markdown block iterator */
     typedef MarkdownBlock::Stack::const_iterator BlockIterator;
     
-    // Parsing sub routine result
+    /**
+     *  \brief Parsing subroutine result 
+     *
+     *  Consists of a parsing result report (first) and
+     *  %BlockIterator (second) pointing to the last parsed 
+     *  markdown block.
+     */
     typedef std::pair<Result, BlockIterator> ParseSectionResult;
     
-    // Section boundaries (begin : end)
+    /** 
+     *  \brief Section boundaries.
+     *
+     *  A continuous range of markdown blocks <first, second).
+     */
     typedef std::pair<BlockIterator, BlockIterator> SectionBounds;
-    
-    // Name matching predicate
-    template <class T>
-    struct MatchName : std::binary_function<T, T, bool> {
-        bool operator()(const T& first, const T& second) const {
-            return first.name == second.name;
-        }
-    };
-    
-    // URI matching predicate
-    template <class T>
-    struct MatchURI : std::binary_function<T, T, bool> {
-        bool operator()(const T& first, const T& second) const {
-            return first.uriTemplate == second.uriTemplate;
-        }
-    };
-    
-    // Method matching predicate
-    template <class T>
-    struct MatchMethod : std::binary_function<T, T, bool> {
-        bool operator()(const T& first, const T& second) const {
-            return first.method == second.method;
-        }
-    };
-    
-    // Pair first matching predicate
-    template <class T>
-    struct MatchFirst : std::binary_function<T, T, bool> {
-        bool operator()(const T& left, const T& right) const {
-            return left.first == right.first;
-        }
-    };
     
     /**
      *  \brief Blueprint Parser Options.
      *
-     *  Controls blueprint parser behavi
+     *  Controls blueprint parser behavior.
      */
     enum BlueprintParserOption {
         RenderDescriptionsOption = (1 << 0),    /// < Render Markdown in description.
@@ -143,9 +117,9 @@ namespace snowcrash {
         BlueprintParserCore& operator=(const BlueprintParserCore&);
     };
     
-    //
-    // Section Parser prototype
-    //
+    /**
+     *  Section Parser prototype.
+     */
     template<class T>
     struct SectionParser {
         
@@ -157,17 +131,20 @@ namespace snowcrash {
                                                T& output);
     };
     
-    
-    //
-    // Classifier of internal list items prototype
-    //
+    /**
+     *  \brief Internal list items classifier prototype.
+     *
+     *  The classifier might look ahead.
+     */
     template <class T>
     Section ClassifyInternaListBlock(const BlockIterator& begin,
                                      const BlockIterator& end);
         
-    //
-    // Block Classifier prototype, Look Ahead
-    //
+    /**
+     *  \brief Block Classifier prototype.
+     *
+     *  The classifier might look ahead.
+     */
     template <class T>
     Section ClassifyBlock(const BlockIterator& begin,
                           const BlockIterator& end,
@@ -182,9 +159,11 @@ namespace snowcrash {
     extern bool HasAssetSignature(const BlockIterator& begin, const BlockIterator& end);
     extern bool HasHeaderSignature(const BlockIterator& begin, const BlockIterator& end);
     
-    //
-    // Block Parser, iterates over block and call section parser P<T>
-    //
+    /**
+     *  \brief A Markdown block parser.
+     *
+     *  Iterates over blocks classifying sections and calling relevant section parser P<T>.
+     */
     template <class T, class P>
     struct BlockParser : public P {
         
@@ -222,7 +201,17 @@ namespace snowcrash {
         }        
     };
     
-    // Advances iterator from sectionBegin to the same level' sectionEnd
+    /**
+     *  \brief  Skip to the end of a section.
+     *  \param  begin   Begin of the section inside a block buffer.
+     *  \param  end     End of the block buffer.
+     *  \param  sectionBegin    A %MarkdownBlockType of the beginning.
+     *  \param  sectionEnd      A %MarkdownBlockType of the end.
+     *  \return An iterator pointing to the end of the section.
+     *
+     *  Advances iterator from the begin of a section to the end 
+     *  of a section at the same nesting level.
+     */
     FORCEINLINE BlockIterator SkipToSectionEnd(const BlockIterator& begin,
                                                const BlockIterator& end,
                                                MarkdownBlockType sectionBegin,
@@ -247,8 +236,12 @@ namespace snowcrash {
         return currentBlock;
     }
     
-    // Parse one line of raw `key:value` data.
-    // Returns true on success, false otherwise.
+    /**
+     *  \brief  Parse one line of raw `key:value` data.
+     *  \param  line    A line to parse.
+     *  \param  keyValuePair    The output buffer to place the parsed data into.
+     *  \return True on success, false otherwise.
+     */
     FORCEINLINE bool KeyValueFromLine(const std::string& line,
                                       KeyValuePair& keyValuePair) {
         
@@ -265,11 +258,11 @@ namespace snowcrash {
     
     /**
      *  \brief Checks cursor validity within its container.
-     *  \param cur an iterator to be checked
-     *  \param bounds boundaries to check against
-     *  \param parent cursor's parent block to be used in case of error reporting
-     *  \param result error result output, an error object is added in case of failed check
-     *  \returns true if cursor appears to be valid false otherwise
+     *  \param cur  An iterator to be checked.
+     *  \param bounds   Boundaries to check against.
+     *  \param parent   Cursor's parent block to be used in case of error reporting.
+     *  \param result   Error result output, an error object is added in case of failed check.
+     *  \returns True if cursor appears to be valid false otherwise.
      */
     FORCEINLINE bool CheckCursor(const BlockIterator& cur,
                                  const SectionBounds& bounds,
