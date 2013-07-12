@@ -12,12 +12,18 @@
 #include <string>
 
 /**
- *  HTTP Methods 
+ *  \brief HTTP Methods 
+ *
+ *  Technical note: Using preprocessor macro instead of strict
+ *  defined type due to C++98 string concatenation limitations.
+ *  To be improved with migration to C++11.
  */
 #define HTTP_METHODS "GET|POST|PUT|DELETE|OPTIONS|PATCH|PROPPATCH|LOCK|UNLOCK|COPY|MOVE|MKCOL|HEAD"
 
 /** 
- *  URI Template 
+ *  \brief URI Template
+ *
+ *  See previous technical note (using macro).
  */
 #define URI_TEMPLATE "/[^]]+"
 
