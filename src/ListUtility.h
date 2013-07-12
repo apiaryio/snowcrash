@@ -150,7 +150,7 @@ namespace snowcrash {
                 ss << "found " << SectionName(listSection);
                 ss << " in description, description must not end with a listitem";
                 result.error = Error(ss.str(),
-                                     1,
+                                     BusinessError,
                                      (cur != end) ? cur->sourceMap : MakeSourceDataBlock(0,0));
             }
             if (cur != end)
@@ -190,7 +190,7 @@ namespace snowcrash {
                                                               SourceData& data,
                                                               SourceDataBlock& sourceMap) {
         
-        static const std::string FormattingWarning = "content is expected to be preformatted code block";
+        static const std::string FormattingWarningMesssage = "content is expected to be preformatted code block";
         
         ParseSectionResult result = std::make_pair(Result(), cur);
         BlockIterator sectionCur = cur;
@@ -208,9 +208,9 @@ namespace snowcrash {
                 // WARN: not a preformatted code block
                 BlockIterator nameBlock = ListItemNameBlock(sectionCur, bounds.second);
                 std::stringstream ss;
-                ss << SectionName(section) << " " << FormattingWarning;
+                ss << SectionName(section) << " " << FormattingWarningMesssage;
                 result.first.warnings.push_back(Warning(ss.str(),
-                                                        0,
+                                                        FormattingWarning,
                                                         nameBlock->sourceMap));
             }
             
@@ -235,9 +235,9 @@ namespace snowcrash {
             
             // WARN: not a preformatted code block
             std::stringstream ss;
-            ss << SectionName(section) << " " << FormattingWarning;
+            ss << SectionName(section) << " " << FormattingWarningMesssage;
             result.first.warnings.push_back(Warning(ss.str(),
-                                                    0,
+                                                    FormattingWarning,
                                                     sectionCur->sourceMap));
         }
         

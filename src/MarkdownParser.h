@@ -10,6 +10,7 @@
 #define SNOWCRASH_MARKDOWNPARSER_H
 
 #include "ParserCore.h"
+#include "SourceAnnotation.h"
 #include "MarkdownBlock.h"
 #include "markdown.h"
 

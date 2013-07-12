@@ -64,6 +64,7 @@
         'src/StringUtility.h',
         'src/snowcrash.cc',
         'src/snowcrash.h',
+        'src/SourceAnnotation.h',
         'src/SymbolTable.h'
       ],
       'conditions': [

@@ -108,7 +108,7 @@ namespace snowcrash {
                     break;
                     
                 default:
-                    result.first.error = Error("unexpected block", 1, cur->sourceMap);
+                    result.first.error = Error("unexpected block", BusinessError, cur->sourceMap);
                     break;
             }
             
@@ -146,7 +146,7 @@ namespace snowcrash {
                         std::stringstream ss;
                         ss << "duplicate definition of `" << header.first << "` header";
                         result.first.warnings.push_back(Warning(ss.str(),
-                                                                0   ,
+                                                                DuplicateWarnign,
                                                                 sourceMap));
                         
                     }
@@ -157,7 +157,7 @@ namespace snowcrash {
                     // WARN: unable to parse header
                     result.first.warnings.push_back(Warning("unable to parse HTTP header, expected"
                                                             " `<header name> : <header value>`, one header per line",
-                                               1,
+                                               FormattingWarning,
                                                sourceMap));
                 }
             }
@@ -185,7 +185,7 @@ namespace snowcrash {
         if (t.headers.size() == headerCount) {
             BlockIterator nameBlock = ListItemNameBlock(begin, end);
             result.first.warnings.push_back(Warning("no headers specified",
-                                                    0,
+                                                    FormattingWarning,
                                                     nameBlock->sourceMap));
         }
         return result;
@@ -204,7 +204,7 @@ namespace snowcrash {
                 std::stringstream ss;
                 ss << "overshadowing `" << it->first << "` header definition";
                 result.warnings.push_back(Warning(ss.str(),
-                                                  0,
+                                                  RedefinitionWarning,
                                                   rightSourceMap));
             }
         }

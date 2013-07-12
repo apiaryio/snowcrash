@@ -239,7 +239,7 @@ namespace snowcrash {
                     break;
                                         
                 default:
-                    result.first.error = Error("unexpected block", 1, cur->sourceMap);
+                    result.first.error = Error("unexpected block", BusinessError, cur->sourceMap);
                     break;
             }
             
@@ -296,7 +296,7 @@ namespace snowcrash {
                 std::stringstream ss;
                 ss << "empty " << SectionName(section) << " asset";
                 result.first.warnings.push_back(Warning(ss.str(),
-                                                        0,
+                                                        EmptyDefinitionWarnign,
                                                         nameBlock->sourceMap));
             }
             
@@ -307,7 +307,7 @@ namespace snowcrash {
                 std::stringstream ss;
                 ss << "ignoring " << SectionName(section) << " asset, asset already defined";
                 result.first.warnings.push_back(Warning(ss.str(),
-                                                        0,
+                                                        RedefinitionWarning,
                                                         nameBlock->sourceMap));
             }
             
@@ -335,7 +335,9 @@ namespace snowcrash {
                     // ERR: Undefined symbol
                     std::stringstream ss;
                     ss << "undefined symbol `" << symbol << "`";
-                    result.first.error = Error(ss.str(), 3, symbolSourceMap);
+                    result.first.error = Error(ss.str(),
+                                               SymbolError,
+                                               symbolSourceMap);
                     return result;
                 }
                 
@@ -410,7 +412,7 @@ namespace snowcrash {
                     std::stringstream ss;
                     ss << "ignoring extraneous content after symbol reference";
                     ss << ", expected symbol reference only e.g. `[" << symbolName << "][]`";
-                    result.first.warnings.push_back(Warning(ss.str(), 0, cur->sourceMap));
+                    result.first.warnings.push_back(Warning(ss.str(), IgnoringWarning, cur->sourceMap));
                 }
             }
             
@@ -447,7 +449,7 @@ namespace snowcrash {
                 (section == ResponseSection || section == ResponseBodySection)) {
                 BlockIterator nameBlock = ListItemNameBlock(begin, end);
                 result.warnings.push_back(Warning("missing response HTTP status code, assuming `Response 200`",
-                                                  0,
+                                                  EmptyDefinitionWarnign,
                                                   nameBlock->sourceMap));
                 payload.name = "200";
             }

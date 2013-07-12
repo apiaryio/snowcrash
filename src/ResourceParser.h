@@ -193,7 +193,7 @@ namespace snowcrash {
                     break;
                     
                 default:
-                    result.first.error = Error("unexpected block", 1, cur->sourceMap);
+                    result.first.error = Error("unexpected block", BusinessError, cur->sourceMap);
                     break;
             }
             
@@ -256,7 +256,7 @@ namespace snowcrash {
                 
                 BlockIterator nameBlock = ListItemNameBlock(begin, end);
                 result.first.warnings.push_back(Warning(ss.str(),
-                                                        0,
+                                                        DuplicateWarnign,
                                                         nameBlock->sourceMap));
             }
             else {
@@ -269,7 +269,7 @@ namespace snowcrash {
                     ss << "symbol `" << payload.name << "` already defined";
                     BlockIterator nameBlock = ListItemNameBlock(begin, end);
                     result.first.error = Error(ss.str(),
-                                               1,
+                                               SymbolError,
                                                nameBlock->sourceMap);
                 }
                 else {
@@ -313,7 +313,7 @@ namespace snowcrash {
                     std::stringstream ss;
                     ss << "ignoring extraneous content in method header `" << begin->content << "`";
                     ss << ", expected method-only e.g. `# " << method.method << "`";
-                    result.first.warnings.push_back(Warning(ss.str(), 0, begin->sourceMap));
+                    result.first.warnings.push_back(Warning(ss.str(), IgnoringWarning, begin->sourceMap));
                 }
             }
             
@@ -326,7 +326,7 @@ namespace snowcrash {
                                                         "` already defined for resource `" +
                                                         resource.uriTemplate +
                                                         "`",
-                                                        0,
+                                                        DuplicateWarnign,
                                                         begin->sourceMap));
             }
             
@@ -339,7 +339,7 @@ namespace snowcrash {
                                                         " " +
                                                         resource.uriTemplate +
                                                         "`",
-                                                        0,
+                                                        EmptyDefinitionWarnign,
                                                         begin->sourceMap));
             }
             
@@ -385,7 +385,7 @@ namespace snowcrash {
                 // WARN: ignoring possible method header
                 std::stringstream ss;
                 ss << "ambiguous method `" << begin->content << "`, check previous resource definition";
-                result.warnings.push_back(Warning(ss.str(), 0, begin->sourceMap));
+                result.warnings.push_back(Warning(ss.str(), IgnoringWarning, begin->sourceMap));
             }
         }
     };

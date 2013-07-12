@@ -108,6 +108,7 @@
 		BB3DD973174654B8004C4077 /* AssetParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AssetParser.h; path = src/AssetParser.h; sourceTree = "<group>"; };
 		BB3DD974174654FD004C4077 /* test-AssetParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-AssetParser.cc"; path = "test/test-AssetParser.cc"; sourceTree = "<group>"; };
 		BB4843D4174E30CF00F61291 /* Fixture.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Fixture.h; path = test/Fixture.h; sourceTree = "<group>"; };
+		BB6A9A7F17904C7300B2F283 /* SourceAnnotation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SourceAnnotation.h; path = src/SourceAnnotation.h; sourceTree = "<group>"; };
 		BB740991171C05B20023105F /* MarkdownParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = MarkdownParser.cc; path = src/MarkdownParser.cc; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		BB740992171C05B20023105F /* MarkdownParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = MarkdownParser.h; path = src/MarkdownParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BB740995171C065C0023105F /* MarkdownBlock.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MarkdownBlock.cc; path = src/MarkdownBlock.cc; sourceTree = "<group>"; };
@@ -361,6 +362,7 @@
 				BBE5355D174132B100BCA7AD /* SerializeYAML.h */,
 				BBFF48CC170B3EDE001E5FB2 /* snowcrash.cc */,
 				BBFF48D1170B4224001E5FB2 /* snowcrash.h */,
+				BB6A9A7F17904C7300B2F283 /* SourceAnnotation.h */,
 				BBB2A226173EA77A0020C1CE /* StringUtility.h */,
 			);
 			name = src;

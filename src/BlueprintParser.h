@@ -65,7 +65,7 @@ namespace snowcrash {
                     break;
                     
                 default:
-                    result.first.error = Error("unexpected block", 1, cur->sourceMap);
+                    result.first.error = Error("unexpected block", BusinessError, cur->sourceMap);
                     break;
             }
             
@@ -82,7 +82,7 @@ namespace snowcrash {
             
             // ERR: No API name specified
             result.error = Error(ExpectedAPINameMessage,
-                                 2,
+                                 BusinessError,
                                  block.sourceMap);
             return false;
         }
@@ -135,7 +135,7 @@ namespace snowcrash {
                     else {
                         // WARN: No API name specified
                         result.first.warnings.push_back(Warning(ExpectedAPINameMessage,
-                                                                0,
+                                                                APINameWarning,
                                                                 sectionCur->sourceMap));
                     }
                 }
@@ -172,7 +172,7 @@ namespace snowcrash {
                 }
                 ss << " is already defined";
                 
-                result.first.warnings.push_back(Warning(ss.str(), 0, begin->sourceMap));
+                result.first.warnings.push_back(Warning(ss.str(), DuplicateWarnign, begin->sourceMap));
             }
             
             output.resourceGroups.push_back(resourceGroup); // FIXME: C++11 move
@@ -227,7 +227,7 @@ namespace snowcrash {
                         std::stringstream ss;
                         ss << "duplicate definition of `" << it->first << "`";
                         result.first.warnings.push_back(Warning(ss.str(),
-                                                                0,
+                                                                DuplicateWarnign,
                                                                 cur->sourceMap));
                     }
                 }
@@ -243,7 +243,7 @@ namespace snowcrash {
                 // WARN: malformed metadata block
                 result.first.warnings.push_back(Warning("ignoring possible metadata, expected"
                                                         " `<key> : <value>`, one one per line",
-                                                        0,
+                                                        FormattingWarning,
                                                         cur->sourceMap));
             }
             

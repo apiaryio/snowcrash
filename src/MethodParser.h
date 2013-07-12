@@ -161,11 +161,13 @@ namespace snowcrash {
                     
                 case ObjectSection:
                     // ERR: Unexpected object definition
-                    result.first.error = Error("unexpected object definiton, object can be only defined in a resource section", 1, cur->sourceMap);
+                    result.first.error = Error("unexpected object definiton, object can be only defined in a resource section",
+                                               SymbolError,
+                                               cur->sourceMap);
                     break;
                     
                 default:
-                    result.first.error = Error("unexpected block", 1, cur->sourceMap);
+                    result.first.error = Error("unexpected block", BusinessError, cur->sourceMap);
                     break;
             }
             
@@ -220,7 +222,7 @@ namespace snowcrash {
                 ss << " already defined for `" << method.method << "` method";
                 BlockIterator nameBlock = ListItemNameBlock(begin, end);
                 result.first.warnings.push_back(Warning(ss.str(),
-                                                        0,
+                                                        DuplicateWarnign,
                                                         nameBlock->sourceMap));
                 
             }

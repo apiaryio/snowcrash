@@ -102,7 +102,7 @@ namespace snowcrash {
                     break;
                     
                 default:
-                    result.first.error = Error("unexpected block", 1, cur->sourceMap);
+                    result.first.error = Error("unexpected block", BusinessError, cur->sourceMap);
                     break;
             }
             
@@ -125,7 +125,7 @@ namespace snowcrash {
                     
                     // WARN: No Group name specified
                     result.first.warnings.push_back(Warning("expected resource group name, e.g. `# <Group Name>`",
-                                                            0,
+                                                            EmptyDefinitionWarnign,
                                                             cur->sourceMap));
                 }
                 
@@ -168,7 +168,7 @@ namespace snowcrash {
                 result.first.warnings.push_back(Warning("resource `" +
                                                         resource.uriTemplate +
                                                         "` is already defined",
-                                                        0,
+                                                        DuplicateWarnign,
                                                         begin->sourceMap));
             }
             

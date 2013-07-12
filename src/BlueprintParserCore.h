@@ -11,6 +11,7 @@
 
 #include <algorithm>
 #include "ParserCore.h"
+#include "SourceAnnotation.h"
 #include "MarkdownBlock.h"
 #include "HTTP.h"
 #include "Blueprint.h"
