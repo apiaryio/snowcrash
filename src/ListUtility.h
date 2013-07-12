@@ -129,35 +129,88 @@ namespace snowcrash {
         return result;
     }
     
-    // Skips to the end of a list in description, checks
+    /**
+     *  \brief  Skip to the end of a description list.
+     *  \param  begin   Begin of the description list.
+     *  \param  end     End of the block buffer.
+     *  \param  descriptionMap  Source map from the start
+     *  of the list to the list end or recognized section list item.
+     *  \return An iterator pointing to the last block of a description list.
+     *  Or, if one of description list items is recognized as a section, iterator
+     *  pointing to this section.
+     *
+     *  This functions checks any skipped list items for a section signature.
+     *  If a section signature is found this function returns the first block
+     *  of the recognized section. If no signature is found this function returns
+     *  the last (closing) block of the description list.
+     */
     template <class T>
     static BlockIterator SkipToDescriptionListEnd(const BlockIterator& begin,
                                                   const BlockIterator& end,
-                                                  Result& result) {
+                                                  SourceDataBlock& descriptionMap) {
         BlockIterator cur(begin);
-        if (++cur == end)
+        if (++cur == end)   // Skip leading ListBlockBeginType
             return cur;
+        
+        std::vector<SourceDataBlock> listItemMaps;
+        Section listItemSection = UndefinedSection;
+        BlockIterator recognizedCur = end;
         
         while (cur != end &&
                cur->type == ListItemBlockBeginType) {
             
-            Section listSection = ClassifyInternaListBlock<T>(cur, end);
-            cur = SkipToSectionEnd(cur, end, ListItemBlockBeginType, ListItemBlockEndType);
-            
-            if (listSection != UndefinedSection) {
-                // ERR: recognized section in description
-                std::stringstream ss;
-                ss << "found " << SectionName(listSection);
-                ss << " in description, description must not end with a listitem";
-                result.error = Error(ss.str(),
-                                     BusinessError,
-                                     (cur != end) ? cur->sourceMap : MakeSourceDataBlock(0,0));
+            // Classify list item
+            listItemSection = ClassifyInternaListBlock<T>(cur, end);
+            if (listItemSection != UndefinedSection) {
+                // Found a recognized section, record & skip to the end of the list.
+                recognizedCur = cur;
+                cur = SkipToSectionEnd(begin, end, ListBlockBeginType, ListBlockEndType);
             }
-            if (cur != end)
-                ++cur;
+            else {
+                // Skip one list item & take note of its source map
+                cur = SkipToSectionEnd(cur, end, ListItemBlockBeginType, ListItemBlockEndType);
+                listItemMaps.push_back(cur->sourceMap);
+                
+                if (cur != end)
+                    ++cur;
+            }
         }
         
-        return cur;
+        // Resolve
+        if (listItemSection == UndefinedSection) {
+            descriptionMap = cur->sourceMap;
+            return cur;
+        }
+        else {
+            // Resolve correct description source map
+            descriptionMap.clear();
+            if (!cur->sourceMap.empty() &&
+                !listItemMaps.empty() &&
+                !listItemMaps.front().empty()) {
+
+                SourceDataRange r;
+                r.location = cur->sourceMap.front().location;
+                r.length = listItemMaps.front().front().location - r.location;
+                descriptionMap.push_back(r);
+                
+                for (std::vector<SourceDataBlock>::iterator it = listItemMaps.begin();
+                     it != listItemMaps.end();
+                     ++it) {
+
+                    SourceDataRange gap;
+                    gap.location = descriptionMap.back().location + descriptionMap.back().length;
+                    gap.length = it->front().location - gap.location;
+                    if (gap.length) {
+                        SourceDataBlock gapBlock(1, gap);
+                        AppendSourceDataBlock(descriptionMap, gapBlock);
+                    }
+                    
+                    AppendSourceDataBlock(descriptionMap, *it);
+                }
+            }
+            
+            return recognizedCur;
+        }
     }
     
     // Extracts first line of a list item content - signature

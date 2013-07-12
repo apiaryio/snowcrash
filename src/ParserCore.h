@@ -44,8 +44,6 @@ namespace snowcrash {
      */
     SourceDataBlock MakeSourceDataBlock(size_t loc, size_t len);
     
-    // Append SourceDataBlock to existign blog, merging continuous blocks
-
     /**
      *  \brief  Append %SourceDataBlock to existign block, merging continuous blocks.
      *  \param  destination A block to append to.
@@ -54,7 +52,6 @@ namespace snowcrash {
      *  NOTE: A binding does not need to wrap this function.
      */
     void AppendSourceDataBlock(SourceDataBlock& destination, const SourceDataBlock& append);
-
     
     /**
      *  \brief A generic pair of two blocks

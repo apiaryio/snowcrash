@@ -220,7 +220,17 @@ namespace snowcrash {
                     sectionCur = SkipToSectionEnd(sectionCur, bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
                 }
                 else if (cur->type == ListBlockBeginType) {
-                    sectionCur = SkipToDescriptionListEnd<Resource>(sectionCur, bounds.second, result.first);
+                    
+                    SourceDataBlock descriptionMap;
+                    sectionCur = SkipToDescriptionListEnd<Resource>(sectionCur, bounds.second, descriptionMap);
+                    
+                    if (sectionCur->type != ListBlockEndType) {
+                        if (!descriptionMap.empty())
+                            resource.description += MapSourceData(parser.sourceData, descriptionMap);
+                        
+                        result.second = sectionCur;
+                        return result;
+                    }
                 }
                 
                 if (!CheckCursor(sectionCur, bounds, cur, result.first))

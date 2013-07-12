@@ -152,7 +152,7 @@ TEST_CASE("Parse canonical payload", "[payload]")
     REQUIRE(payload.schema == "Code 2");
 }
 
-TEST_CASE("Parse description with list", "[payload]")
+TEST_CASE("Parse description with list", "[payload][#8]")
 {
     // Blueprint in question:
     //R"(
@@ -161,7 +161,6 @@ TEST_CASE("Parse description with list", "[payload]")
     //  + Body
     //");
     
-    SourceData source = "01234";
     MarkdownBlock::Stack markdown;
 
     markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
@@ -172,19 +171,23 @@ TEST_CASE("Parse description with list", "[payload]")
     markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
     
     markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "B", 0, MakeSourceDataBlock(1, 1)));
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "B", 0, MakeSourceDataBlock(4, 1)));
     
     markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "Body", 0, MakeSourceDataBlock(2, 1)));
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "Body", 0, MakeSourceDataBlock(3, 1)));
     
     markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(3, 1)));
-    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(4, 1)));
+    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(1, 1)));
     
     Payload payload;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
     ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), parser, payload);
     
-    REQUIRE(result.first.error.code != Error::OK);
+    REQUIRE(result.first.error.code == Error::OK);
+    
+    REQUIRE(payload.name.empty());
+    REQUIRE(payload.description == "1234");
+    REQUIRE(payload.body.empty());
 }
 
 TEST_CASE("Parse just one payload in a list with multiple payloads", "[payload]")

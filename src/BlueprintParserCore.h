@@ -263,7 +263,7 @@ namespace snowcrash {
      *  \param bounds   Boundaries to check against.
      *  \param parent   Cursor's parent block to be used in case of error reporting.
      *  \param result   Error result output, an error object is added in case of failed check.
-     *  \returns True if cursor appears to be valid false otherwise.
+     *  \returns True if cursor appears to be valid, false otherwise.
      */
     FORCEINLINE bool CheckCursor(const BlockIterator& cur,
                                  const SectionBounds& bounds,

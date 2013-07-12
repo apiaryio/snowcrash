@@ -134,3 +134,39 @@ TEST_CASE("Do not report duplicate response when media type differs", "[method][
     REQUIRE(result.error.code == Error::OK);
     REQUIRE(result.warnings.empty());
 }
+
+TEST_CASE("Support description ending with an list item", "[parser][issue][#8]")
+{
+    // Blueprint in question:
+    //R"(
+    //# GET /1
+    //+ a description item 
+    //+ Response 200 
+    //
+    //        ...
+    //");
+    const std::string bluerpintSource = \
+"\n\
+# GET /1\n\
++ a description item\n\
++ Response 200\n\
+\n\
+        ...\n\
+";
+    
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(bluerpintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.empty());
+    
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].methods.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].methods[0].description == "+ a description item\n");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].methods[0].responses.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].methods[0].responses[0].name == "200");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].methods[0].responses[0].body == "...\n");
+}
+

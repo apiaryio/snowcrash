@@ -199,21 +199,25 @@ TEST_CASE("mparser/parse-list-description", "Parse description with list")
     markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
     
     markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "A", 0, MakeSourceDataBlock(1, 1)));
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "A", 0, MakeSourceDataBlock(4, 1)));
     
     markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "B", 0, MakeSourceDataBlock(2, 1)));
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "B", 0, MakeSourceDataBlock(3, 1)));
     
     markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "Request", 0, MakeSourceDataBlock(3, 1)));
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "Request", 0, MakeSourceDataBlock(2, 1)));
     
-    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(4, 1)));
+    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(1, 1)));
     
     Method method;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
     ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), parser, method);
     
-    REQUIRE(result.first.error.code != Error::OK);
+    REQUIRE(result.first.error.code == Error::OK);
+    
+    REQUIRE(method.description == "123");
+    REQUIRE(method.responses.empty());
+    REQUIRE(method.requests.size() == 1);
 }
 
 TEST_CASE("mparser/parse-list-description-request", "Parse description with list followed by a request")
