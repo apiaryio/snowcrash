@@ -111,11 +111,12 @@ namespace snowcrash {
     enum WarningCode {
         NoWarning = 0,
         APINameWarning = 1,
-        DuplicateWarnign = 2,
+        DuplicateWarning = 2,
         FormattingWarning = 3,
         RedefinitionWarning = 4,
         IgnoringWarning = 5,
-        EmptyDefinitionWarnign = 6
+        EmptyDefinitionWarning = 6,
+        NotEmptyDefinitionWarning = 7
     };
     
     /**

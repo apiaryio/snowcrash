@@ -146,7 +146,7 @@ namespace snowcrash {
                         std::stringstream ss;
                         ss << "duplicate definition of `" << header.first << "` header";
                         result.first.warnings.push_back(Warning(ss.str(),
-                                                                DuplicateWarnign,
+                                                                DuplicateWarning,
                                                                 sourceMap));
                         
                     }
@@ -196,7 +196,7 @@ namespace snowcrash {
     void CheckHeaderDuplicates(const T& left,
                                const R& right,
                                const SourceDataBlock& rightSourceMap,
-                                Result& result) {
+                               Result& result) {
         
         for (HeaderIterator it = right.headers.begin(); it != right.headers.end(); ++it) {
             if (FindHeader(left.headers, *it) != left.headers.end()) {

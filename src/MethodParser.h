@@ -14,6 +14,7 @@
 #include "RegexMatch.h"
 #include "PayloadParser.h"
 #include "HeaderParser.h"
+#include "HTTP.h"
 
 static const std::string MethodHeaderRegex("^(" HTTP_METHODS ")[ \\t]*(" URI_TEMPLATE ")?$");
 static const std::string NamedMethodHeaderRegex("^([^\\[]*)\\[(" HTTP_METHODS ")]$");
@@ -214,6 +215,14 @@ namespace snowcrash {
             return result;
         }
         
+        /**
+         *  \brief  Parse method payload
+         *  \param  begin   The begin of the block to be parsed.
+         *  \param  end     The end of the markdown block buffer.
+         *  \param  parser  A parser's instance.
+         *  \param  method  An output buffer to store parsed payload into.
+         *  \return A block parser section result.
+         */
         static ParseSectionResult HandlePayload(const Section &section,
                                                 const BlockIterator& begin,
                                                 const BlockIterator& end,
@@ -225,6 +234,7 @@ namespace snowcrash {
             if (result.first.error.code != Error::OK)
                 return result;
             
+            // Check for duplicate
             if (IsPayloadDuplicate(section, payload, method)) {
                 // WARN: duplicate payload
                 std::stringstream ss;
@@ -232,24 +242,81 @@ namespace snowcrash {
                 ss << " already defined for `" << method.method << "` method";
                 BlockIterator nameBlock = ListItemNameBlock(begin, end);
                 result.first.warnings.push_back(Warning(ss.str(),
-                                                        DuplicateWarnign,
+                                                        DuplicateWarning,
                                                         nameBlock->sourceMap));
-                
             }
             
-            if (section == RequestSection)
-                method.requests.push_back(payload);
-            else if (section == ResponseSection)
-                method.responses.push_back(payload);
-            
             BlockIterator nameBlock = ListItemNameBlock(begin, end);
+
+            // Check payload integrity
+            CheckPayload(section, payload, nameBlock->sourceMap, result.first);
+            
+            // Inject parsed payload into method
+            if (section == RequestSection) {
+                method.requests.push_back(payload);
+            }
+            else if (section == ResponseSection) {
+                method.responses.push_back(payload);
+            }
+            
+            // Check header duplicates
             CheckHeaderDuplicates(method, payload, nameBlock->sourceMap, result.first);
             
             return result;
         }
         
-        // Checks whether given section payload has duplicate.
-        // Returns true when a duplicate is found, false otherwise.
+        
+        /**
+         *  \brief  Check & report payload validity.
+         *  \param  section     A section of the payload.
+         *  \param  sourceMap   Payload signature source map.
+         *  \param  payload     The payload to be checked.
+         */
+        static void CheckPayload(const Section& section,
+                                 const Payload& payload,
+                                 const SourceDataBlock& sourceMap,
+                                 Result& result) {
+            
+            bool warnEmptyBody = false;
+            if (section == RequestSection) {
+                warnEmptyBody = payload.body.empty();
+            }
+            else if (section == ResponseSection) {
+                // Check status code
+                HTTPStatusCode code = 0;
+                if (!payload.name.empty()) {
+                    std::stringstream(payload.name) >> code;
+                }
+                StatusCodeTraits traits = GetStatusCodeTrait(code);
+                if (traits.allowBody) {
+                    warnEmptyBody = payload.body.empty();
+                }
+                else if (!payload.body.empty()) {
+                    // WARN: not empty body
+                    std::stringstream ss;
+                    ss << "the " << code << " response MUST NOT include a message-body";
+                    result.warnings.push_back(Warning(ss.str(),
+                                                      EmptyDefinitionWarning,
+                                                      sourceMap));
+                    return;
+                }
+            }
+            
+            // Issue the warning
+            if (warnEmptyBody) {
+                // WARN: empty body
+                std::stringstream ss;
+                ss << "empty " << SectionName(section) << " message-body";
+                result.warnings.push_back(Warning(ss.str(),
+                                                  EmptyDefinitionWarning,
+                                                  sourceMap));
+            }
+        }
+
+        /**
+         *  Checks whether given section payload has duplicate.
+         *  \return True when a duplicate is found, false otherwise.
+         */
         static bool IsPayloadDuplicate(const Section& section, const Payload& payload, Method& method) {
             
             if (section == RequestSection) {

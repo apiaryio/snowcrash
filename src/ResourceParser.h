@@ -266,7 +266,7 @@ namespace snowcrash {
                 
                 BlockIterator nameBlock = ListItemNameBlock(begin, end);
                 result.first.warnings.push_back(Warning(ss.str(),
-                                                        DuplicateWarnign,
+                                                        DuplicateWarning,
                                                         nameBlock->sourceMap));
             }
             else {
@@ -336,7 +336,7 @@ namespace snowcrash {
                                                         "` already defined for resource `" +
                                                         resource.uriTemplate +
                                                         "`",
-                                                        DuplicateWarnign,
+                                                        DuplicateWarning,
                                                         begin->sourceMap));
             }
             
@@ -349,7 +349,7 @@ namespace snowcrash {
                                                         " " +
                                                         resource.uriTemplate +
                                                         "`",
-                                                        EmptyDefinitionWarnign,
+                                                        EmptyDefinitionWarning,
                                                         begin->sourceMap));
             }
             

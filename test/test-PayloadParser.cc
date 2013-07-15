@@ -212,7 +212,7 @@ TEST_CASE("Parse just one payload in a list with multiple payloads", "[payload]"
     ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), parser, payload);
     
     REQUIRE(result.first.error.code == Error::OK);
-    CHECK(result.first.warnings.size() == 1); // empty body asset
+    REQUIRE(result.first.warnings.empty());
     
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 3);
@@ -247,7 +247,7 @@ TEST_CASE("Parse just one payload in a list with multiple items", "[payload]")
     ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), parser, payload);
     
     REQUIRE(result.first.error.code == Error::OK);
-    CHECK(result.first.warnings.size() == 1); // empty body asset
+    REQUIRE(result.first.warnings.empty());
     
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 3);

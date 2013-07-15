@@ -125,7 +125,7 @@ namespace snowcrash {
                     
                     // WARN: No Group name specified
                     result.first.warnings.push_back(Warning("expected resource group name, e.g. `# <Group Name>`",
-                                                            EmptyDefinitionWarnign,
+                                                            EmptyDefinitionWarning,
                                                             cur->sourceMap));
                 }
                 
@@ -168,7 +168,7 @@ namespace snowcrash {
                 result.first.warnings.push_back(Warning("resource `" +
                                                         resource.uriTemplate +
                                                         "` is already defined",
-                                                        DuplicateWarnign,
+                                                        DuplicateWarning,
                                                         begin->sourceMap));
             }
             

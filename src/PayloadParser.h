@@ -19,39 +19,36 @@
 #include "AssetParser.h"
 #include "HeaderParser.h"
 
-// Request matching regex
+/** Request matching regex */
 static const std::string RequestRegex("^[ \\t]*[Rr]equest([ \\t]+" SYMBOL_IDENTIFIER ")?([ \\t]\\(([^\\)]*)\\))?[ \\t]*$");
 
-// Response matching regex
+/** Response matching regex */
 static const std::string ResponseRegex("^[ \\t]*[Rr]esponse([ \\t]+([0-9_])*)?([ \\t]\\(([^\\)]*)\\))?[ \\t]*$");
 
-// Object matching regex
+/** Object matching regex */
 static const std::string ObjectRegex("^[ \\t]*(" SYMBOL_IDENTIFIER ")[ \\t][Oo]bject([ \\t]\\(([^\\)]*)\\))?[ \\t]*$");
 
 namespace snowcrash {
     
-    FORCEINLINE Collection<Request>::const_iterator FindRequest(const Method& method, const Request& request) {
-        return std::find_if(method.requests.begin(),
-                            method.requests.end(),
-                            std::bind2nd(MatchPayload(), request));
-    }
-    
-    FORCEINLINE Collection<Request>::const_iterator FindResponse(const Method& method, const Response& response) {
-        return std::find_if(method.responses.begin(),
-                            method.responses.end(),
-                            std::bind2nd(MatchPayload(), response));
-    }
-    
-    // Payload signature
+    /** 
+     *  Payload signature 
+     */
     enum PayloadSignature {
-        UndefinedPayloadSignature,
-        NoPayloadSignature,
-        RequestPayloadSignature,
-        ResponsePayloadSignature,
-        ObjectPayloadSignature
+        UndefinedPayloadSignature,  /// < Undefined payload.
+        NoPayloadSignature,         /// < Not a payload.
+        RequestPayloadSignature,    /// < Request payload.
+        ResponsePayloadSignature,   /// < Response payload.
+        ObjectPayloadSignature      /// < Resource object payload.
     };
     
-    // Query payload signature a of given block
+    /** 
+     *  \brief  Query the payload signature of a given block.
+     *  \param  begin   The begin of the block to be queried.
+     *  \param  end     The end of the markdown block buffer.
+     *  \param  name    A buffer to retrieve payload name into.
+     *  \param  mediaType   A buffer to retrieve payload media type into.
+     *  \return The %PayloadSignature of the given block.
+     */
     FORCEINLINE PayloadSignature GetPayloadSignature(const BlockIterator& begin,
                                                      const BlockIterator& end,
                                                      Name& name,
@@ -93,6 +90,9 @@ namespace snowcrash {
         return NoPayloadSignature;
     }
     
+    /**
+     *  Returns true if given block has any payload signature, false otherwise.
+     */
     FORCEINLINE bool HasPayloadSignature(const BlockIterator& begin,
                                          const BlockIterator& end) {
         Name name;
@@ -101,6 +101,10 @@ namespace snowcrash {
         return signature != NoPayloadSignature;
     }
     
+    /**
+     *  Retruns true if given block has any payload signature and 
+     *  is written in the abbreviated form. False otherwise.
+     */
     FORCEINLINE bool HasPayloadAssetSignature(const BlockIterator& begin,
                                               const BlockIterator& end) {
         if (!HasPayloadSignature(begin, end))
@@ -109,9 +113,9 @@ namespace snowcrash {
         return !HasNestedListBlock(begin, end);
     }
     
-    //
-    // Classifier of internal list items, Payload context
-    //
+    /**
+     *  Classifier of internal list items, payload context.
+     */
     template <>
     FORCEINLINE Section ClassifyInternaListBlock<Payload>(const BlockIterator& begin,
                                                           const BlockIterator& end) {
@@ -128,9 +132,9 @@ namespace snowcrash {
         return UndefinedSection;
     }
     
-    //
-    // Block Classifier, Payload Context
-    //
+    /**
+     *  Block Classifier, payload context.
+     */
     template <>
     FORCEINLINE Section ClassifyBlock<Payload>(const BlockIterator& begin,
                                                const BlockIterator& end,
@@ -194,9 +198,9 @@ namespace snowcrash {
                 context == ObjectSection) ? context : UndefinedSection;
     }
     
-    //
-    // Payload Section Parser
-    //
+    /**
+     *  Payload section parser.
+     */
     template<>
     struct SectionParser<Payload> {
         
@@ -246,6 +250,15 @@ namespace snowcrash {
             return result;
         }
         
+        /**
+         *  \brief  Parse Payload's overview blocks.
+         *  \param  section The current section's signature.
+         *  \param  cur     The actual position within Markdown block buffer.
+         *  \param  bound   Boundaries of Markdown block buffer.
+         *  \param  parser  A parser's instance.
+         *  \param  payload An output buffer to write overview description into.
+         *  \return A block parser section result.
+         */
         static ParseSectionResult HandleOverviewSectionBlock(const Section& section,
                                                              const BlockIterator& cur,
                                                              const SectionBounds& bounds,
@@ -291,6 +304,15 @@ namespace snowcrash {
             return result;
         }
         
+        /**
+         *  \brief  Parse an asset.
+         *  \param  section The current section's signature.
+         *  \param  begin   The begin of the block to be parsed.
+         *  \param  end     The end of the markdown block buffer.
+         *  \param  parser  A parser's instance.
+         *  \param  payload An output buffer to save the parsed asset to.
+         *  \return A block parser section result.
+         */
         static ParseSectionResult HandleAsset(const Section& section,
                                               const BlockIterator& begin,
                                               const BlockIterator& end,
@@ -300,17 +322,17 @@ namespace snowcrash {
             ParseSectionResult result = AssetParser::Parse(begin, end, parser, asset);
             if (result.first.error.code != Error::OK)
                 return result;
-            
-            if (asset.empty()) {
-                // WARN: empty asset
-                BlockIterator nameBlock = ListItemNameBlock(begin, end);
-                std::stringstream ss;
-                ss << "empty " << SectionName(section) << " asset";
-                result.first.warnings.push_back(Warning(ss.str(),
-                                                        EmptyDefinitionWarnign,
-                                                        nameBlock->sourceMap));
-            }
-            
+
+            // TODO: remove
+//            if (asset.empty()) {
+//                // WARN: empty asset
+//                BlockIterator nameBlock = ListItemNameBlock(begin, end);
+//                std::stringstream ss;
+//                ss << "empty " << SectionName(section) << " asset";
+//                result.first.warnings.push_back(Warning(ss.str(),
+//                                                        EmptyDefinitionWarning,
+//                                                        nameBlock->sourceMap));
+//            }
             
             if (!SetAsset(section, asset, payload)) {
                 // WARN: asset already set
@@ -325,7 +347,15 @@ namespace snowcrash {
             return result;
         }
         
-        // Handle payload + body asset abbreviation
+        /**
+         *  \brief  Parse payload and abbreviated asset.
+         *  \param  section The current section's signature.
+         *  \param  begin   The parsed of the block to be queried.
+         *  \param  end     The end of the markdown block buffer.
+         *  \param  parser  A parser's instance.
+         *  \param  payload An output buffer to save the parsed paylod and asset into.
+         *  \return A block parser section result.
+         */
         static ParseSectionResult HandlePayloadAsset(const Section& section,
                                                      const BlockIterator& begin,
                                                      const BlockIterator& end,
@@ -366,7 +396,15 @@ namespace snowcrash {
             return result;
         }
         
-        // Try to parse a symbol reference
+        /**
+         *  \brief  Parse a symbol reference.
+         *  \param  begin   The begin of the block to be parsed.
+         *  \param  end     The end of the markdown block buffer.
+         *  \param  parser  A parser's instance.
+         *  \param  symbolName  Output buffer to put parsed symbol's name into.
+         *  \param  symbolSourceMap Source map of the parsed symbol reference.
+         *  \return A block parser section result.
+         */
         static ParseSectionResult ParseSymbolReference(const BlockIterator& begin,
                                                        const BlockIterator& end,
                                                        BlueprintParserCore& parser,
@@ -433,7 +471,9 @@ namespace snowcrash {
             return result;
         }
         
-        // Retrieves & process payload name - signature
+        /**
+         *  Retrieve and process payload signature.
+         */
         static void ProcessSignature(const Section& section,
                                      const BlockIterator& begin,
                                      const BlockIterator& end,
@@ -460,7 +500,7 @@ namespace snowcrash {
                 (section == ResponseSection || section == ResponseBodySection)) {
                 BlockIterator nameBlock = ListItemNameBlock(begin, end);
                 result.warnings.push_back(Warning("missing response HTTP status code, assuming `Response 200`",
-                                                  EmptyDefinitionWarnign,
+                                                  EmptyDefinitionWarning,
                                                   nameBlock->sourceMap));
                 payload.name = "200";
             }
@@ -472,7 +512,10 @@ namespace snowcrash {
             }
         }
         
-        // Sets payload section asset. Returns true on success, false when asset is already set.
+        /**
+         *  \brief  Set payload's asset. 
+         *  \return True on success, false when an asset is already set.
+         */
         static bool SetAsset(const Section& section, const Asset& asset, Payload& payload) {
             
             if (section == BodySection) {
@@ -492,6 +535,7 @@ namespace snowcrash {
         }
     };
     
+    /** Payload Parser */
     typedef BlockParser<Payload, SectionParser<Payload> > PayloadParser;    
 }
 

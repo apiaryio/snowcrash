@@ -97,6 +97,30 @@ namespace snowcrash {
             return first.method == second.method;
         }
     };
+    
+    /**
+     *  \brief  Find a request withing given method.
+     *  \param  method  The method to check.
+     *  \param  request A request to look for.
+     *  \return Iterator pointing to the matching request within given method requests.
+     */
+    FORCEINLINE Collection<Request>::const_iterator FindRequest(const Method& method, const Request& request) {
+        return std::find_if(method.requests.begin(),
+                            method.requests.end(),
+                            std::bind2nd(MatchPayload(), request));
+    }
+
+    /**
+     *  \brief  Find a response withing responses of a given method.
+     *  \param  method  The method to check.
+     *  \param  response A response to look for.
+     *  \return Iterator pointing to the matching response within given method requests.
+     */
+    FORCEINLINE Collection<Response>::const_iterator FindResponse(const Method& method, const Response& response) {
+        return std::find_if(method.responses.begin(),
+                            method.responses.end(),
+                            std::bind2nd(MatchPayload(), response));
+    }
 }
 
 #endif

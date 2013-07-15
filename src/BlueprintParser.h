@@ -172,7 +172,7 @@ namespace snowcrash {
                 }
                 ss << " is already defined";
                 
-                result.first.warnings.push_back(Warning(ss.str(), DuplicateWarnign, begin->sourceMap));
+                result.first.warnings.push_back(Warning(ss.str(), DuplicateWarning, begin->sourceMap));
             }
             
             output.resourceGroups.push_back(resourceGroup); // FIXME: C++11 move
@@ -227,7 +227,7 @@ namespace snowcrash {
                         std::stringstream ss;
                         ss << "duplicate definition of `" << it->first << "`";
                         result.first.warnings.push_back(Warning(ss.str(),
-                                                                DuplicateWarnign,
+                                                                DuplicateWarning,
                                                                 cur->sourceMap));
                     }
                 }
