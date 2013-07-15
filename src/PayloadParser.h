@@ -323,17 +323,6 @@ namespace snowcrash {
             if (result.first.error.code != Error::OK)
                 return result;
 
-            // TODO: remove
-//            if (asset.empty()) {
-//                // WARN: empty asset
-//                BlockIterator nameBlock = ListItemNameBlock(begin, end);
-//                std::stringstream ss;
-//                ss << "empty " << SectionName(section) << " asset";
-//                result.first.warnings.push_back(Warning(ss.str(),
-//                                                        EmptyDefinitionWarning,
-//                                                        nameBlock->sourceMap));
-//            }
-            
             if (!SetAsset(section, asset, payload)) {
                 // WARN: asset already set
                 BlockIterator nameBlock = ListItemNameBlock(begin, end);
