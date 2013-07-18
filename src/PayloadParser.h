@@ -246,7 +246,7 @@ namespace snowcrash {
                     break;
                                         
                 default:
-                    result.first.error = Error("unexpected block", BusinessError, cur->sourceMap);
+                    result.first.error = UnexpectedBlockError(*cur);
                     break;
             }
             
@@ -330,7 +330,7 @@ namespace snowcrash {
                 // WARN: asset already set
                 BlockIterator nameBlock = ListItemNameBlock(begin, end);
                 std::stringstream ss;
-                ss << "ignoring " << SectionName(section) << " asset, asset already defined";
+                ss << "ignoring additional " << SectionName(section) << " content, content is already defined";
                 result.first.warnings.push_back(Warning(ss.str(),
                                                         RedefinitionWarning,
                                                         nameBlock->sourceMap));

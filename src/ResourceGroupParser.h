@@ -102,7 +102,7 @@ namespace snowcrash {
                     break;
                     
                 default:
-                    result.first.error = Error("unexpected block", BusinessError, cur->sourceMap);
+                    result.first.error = UnexpectedBlockError(*cur);
                     break;
             }
             
@@ -164,8 +164,8 @@ namespace snowcrash {
             if (duplicate != group.resources.end() ||
                 globalDuplicate.first != parser.blueprint.resourceGroups.end()) {
                 
-                // WARN: duplicate resource
-                result.first.warnings.push_back(Warning("resource `" +
+                // WARN: Duplicate resource
+                result.first.warnings.push_back(Warning("the resource `" +
                                                         resource.uriTemplate +
                                                         "` is already defined",
                                                         DuplicateWarning,

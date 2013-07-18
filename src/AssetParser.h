@@ -163,7 +163,7 @@ namespace snowcrash {
                     break;
                     
                 default:
-                    result.first.error = Error("unexpected block", BusinessError, cur->sourceMap);
+                    result.first.error = UnexpectedBlockError(*cur);
                     break;
             }
             
@@ -218,7 +218,7 @@ namespace snowcrash {
             
             // WARN: Dangling block
             std::stringstream ss;
-            ss << "dangling message-" << SectionName(originalSection);
+            ss << "dangling " << SectionName(originalSection);
             ss << ", increase its indentation to nest it properly";
             result.first.warnings.push_back(Warning(ss.str(),
                                                     FormattingWarning,

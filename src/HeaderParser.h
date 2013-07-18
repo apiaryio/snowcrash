@@ -108,7 +108,7 @@ namespace snowcrash {
                     break;
                     
                 default:
-                    result.first.error = Error("unexpected block", BusinessError, cur->sourceMap);
+                    result.first.error = UnexpectedBlockError(*cur);
                     break;
             }
             
@@ -202,7 +202,7 @@ namespace snowcrash {
             if (FindHeader(left.headers, *it) != left.headers.end()) {
                 // WARN: overshadowing header definition
                 std::stringstream ss;
-                ss << "overshadowing `" << it->first << "` header definition";
+                ss << "overshadowing previous `" << it->first << "` header definition";
                 result.warnings.push_back(Warning(ss.str(),
                                                   RedefinitionWarning,
                                                   rightSourceMap));

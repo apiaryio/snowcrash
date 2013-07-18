@@ -184,7 +184,7 @@ namespace snowcrash {
                     break;
                     
                 case UndefinedSection:
-                    CheckAmbiguousMethod(cur, bounds.second, result.first);
+                    CheckAmbiguousMethod(cur, bounds.second, resource, result.first);
                     result.second = CloseListItemBlock(cur, bounds.second);
                     break;
                     
@@ -193,7 +193,7 @@ namespace snowcrash {
                     break;
                     
                 default:
-                    result.first.error = Error("unexpected block", BusinessError, cur->sourceMap);
+                    result.first.error = UnexpectedBlockError(*cur);
                     break;
             }
             
@@ -253,7 +253,7 @@ namespace snowcrash {
                 return result;
             
             if (!resource.object.name.empty()) {
-                // WARN: object already defined
+                // WARN: Object already defined
                 std::stringstream ss;
                 ss << "ignoring additional object definiton for `";
                 if (!resource.name.empty()) {
@@ -262,7 +262,7 @@ namespace snowcrash {
                 else {
                     ss << resource.uriTemplate;
                 }
-                ss << "` resource, a resource can be represented single (1) object only";
+                ss << "` resource, a resource can be represented by a single object only";
                 
                 BlockIterator nameBlock = ListItemNameBlock(begin, end);
                 result.first.warnings.push_back(Warning(ss.str(),
@@ -274,7 +274,7 @@ namespace snowcrash {
                 
                 ResourceObjectSymbolTable::const_iterator it = parser.symbolTable.resourceObjects.find(payload.name);
                 if (it != parser.symbolTable.resourceObjects.end()) {
-                    // ERR: symbol already defined
+                    // ERR: Symbol already defined
                     std::stringstream ss;
                     ss << "symbol `" << payload.name << "` already defined";
                     BlockIterator nameBlock = ListItemNameBlock(begin, end);
@@ -381,6 +381,7 @@ namespace snowcrash {
         // method header -> implies possible additional method intended
         static void CheckAmbiguousMethod(const BlockIterator& begin,
                                          const BlockIterator& end,
+                                         const Resource& resource,
                                          Result& result) {
             
             if (begin == end ||
@@ -394,7 +395,9 @@ namespace snowcrash {
                 methodSignature == NamedMethodSignature) {
                 // WARN: ignoring possible method header
                 std::stringstream ss;
-                ss << "ambiguous method `" << begin->content << "`, check previous resource definition";
+                ss << "unexpected method `" << begin->content << "`, ";
+                ss << "to the define muliple methods for the `" << resource.uriTemplate << "` resource remove the method from its definition, ";
+                ss << "e.g. `# " << resource.uriTemplate << "`";
                 result.warnings.push_back(Warning(ss.str(), IgnoringWarning, begin->sourceMap));
             }
         }

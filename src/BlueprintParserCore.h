@@ -10,6 +10,7 @@
 #define SNOWCRASH_BLUEPRINTPARSERCORE_H
 
 #include <algorithm>
+#include <sstream>
 #include "ParserCore.h"
 #include "SourceAnnotation.h"
 #include "MarkdownBlock.h"
@@ -57,10 +58,10 @@ namespace snowcrash {
                 return "response";
                 
             case BodySection:
-                return "body";
+                return "message-body";
                 
             case SchemaSection:
-                return "schema";
+                return "message-schema";
                 
             case HeadersSection:
                 return "headers";
@@ -280,6 +281,39 @@ namespace snowcrash {
         // ERR: Sanity check
         result.error = Error("unexpected markdown closure", ApplicationError, parent->sourceMap);
         return false;
+    }
+    
+    /**
+     *  \brief  Construct an Unexpected block error.
+     *  \param  block   A Markdown block that is unexpected.
+     *  \return An Error with description relevant to the type of the unexpected block.
+     */
+    FORCEINLINE Error UnexpectedBlockError(const MarkdownBlock& block) {
+        static const char *NotExpectedMessage = " is either not appropriate for the current context or its keyword has not been recognized, ";
+        
+        std::stringstream ss;
+        ss << "unexpected block, ";
+        
+        switch (block.type) {
+            case HeaderBlockType:
+                ss << "this Markdown header" << NotExpectedMessage;
+                ss << "recognized keywords include: Group, <HTTP method>, <URI template>, Object ...";
+                break;
+                
+            case ListBlockBeginType:
+            case ListItemBlockBeginType:
+                
+                ss << "this Markdown list item"  << NotExpectedMessage;
+                ss << "recognized keywords include: Request, Response <HTTP status code>, Headers, Parameters ...";
+                break;
+                
+                
+            default:
+                ss << "a block of this type is not expected in the current context";
+                break;
+        }
+        
+        return Error(ss.str(), BusinessError, block.sourceMap);
     }
 }
 

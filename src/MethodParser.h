@@ -162,13 +162,13 @@ namespace snowcrash {
                     
                 case ObjectSection:
                     // ERR: Unexpected object definition
-                    result.first.error = Error("unexpected object definiton, object can be only defined in a resource section",
+                    result.first.error = Error("unexpected object definiton, an object can be only defined in the resource section",
                                                SymbolError,
                                                cur->sourceMap);
                     break;
                     
                 default:
-                    result.first.error = Error("unexpected block", BusinessError, cur->sourceMap);
+                    result.first.error = UnexpectedBlockError(*cur);
                     break;
             }
             
@@ -294,7 +294,7 @@ namespace snowcrash {
                 else if (!payload.body.empty()) {
                     // WARN: not empty body
                     std::stringstream ss;
-                    ss << "the " << code << " response MUST NOT include a message-body";
+                    ss << "the " << code << " response MUST NOT include a " << SectionName(BodySection);
                     result.warnings.push_back(Warning(ss.str(),
                                                       EmptyDefinitionWarning,
                                                       sourceMap));
@@ -306,7 +306,7 @@ namespace snowcrash {
             if (warnEmptyBody) {
                 // WARN: empty body
                 std::stringstream ss;
-                ss << "empty " << SectionName(section) << " message-body";
+                ss << "empty " << SectionName(section) << " " << SectionName(BodySection);
                 result.warnings.push_back(Warning(ss.str(),
                                                   EmptyDefinitionWarning,
                                                   sourceMap));
