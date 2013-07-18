@@ -163,7 +163,21 @@ if sys.platform == 'win32':
 else:
   # Posix systems
   gyp_args.extend(['-f', 'make'])
-  
+
+# Include common.gypi and config.gypi 
+if sys.platform == 'win32':
+  common_fn  = os.path.join(root_dir, 'common.gypi')
+  options_fn = os.path.join(root_dir, 'config.gypi')
+else:
+  common_fn  = os.path.join(os.path.abspath(root_dir), 'common.gypi')
+  options_fn = os.path.join(os.path.abspath(root_dir), 'config.gypi')
+
+if os.path.exists(common_fn):
+  gyp_args.extend(['-I', common_fn])
+
+if os.path.exists(options_fn):
+  gyp_args.extend(['-I', options_fn])
+
 subprocess.call([sys.executable, 'tools/gyp/gyp'] + gyp_args)
 
 # All done

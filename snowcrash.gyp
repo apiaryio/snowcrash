@@ -1,9 +1,4 @@
 {
-  'includes': [
-    'config.gypi',
-    'common.gypi'
-  ],
-
   'targets' : [
     {
       'target_name': 'sundown',
