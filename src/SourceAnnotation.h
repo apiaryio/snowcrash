@@ -58,7 +58,11 @@ namespace snowcrash {
             
             this->message = message;
             this->code = code;
-            this->location = location;
+            
+            this->location.clear();
+            if (!location.empty())
+                this->location.assign(location.begin(), location.end());
+
         }
         
         /** \brief  %SourceAnnotation destructor. */

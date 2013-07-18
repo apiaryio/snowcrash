@@ -504,7 +504,7 @@ TEST_CASE("mparser/parse-multi-request-incomplete", "Parse method with multiple 
     REQUIRE(method.requests[1].headers.empty());
 }
 
-TEST_CASE("mparser/parse-foreign", "Parse method with foreign item")
+TEST_CASE("Parse method with foreign item", "[method][foreign]")
 {
     // Blueprint in question:
     //R"(
@@ -542,7 +542,8 @@ TEST_CASE("mparser/parse-foreign", "Parse method with foreign item")
     ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), parser, method);
     
     REQUIRE(result.first.error.code == Error::OK);
-    CHECK(result.first.warnings.size() == 1); // ignoring unrecognized item
+    REQUIRE(result.first.warnings.size() == 1);
+    REQUIRE(result.first.warnings[0].code == IgnoringWarning);
     
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 15);

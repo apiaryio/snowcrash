@@ -70,13 +70,23 @@ namespace snowcrash {
         return (signature != NoAssetSignature);
     }
     
-    //
-    // Block Classifier, Asset Context
-    //
+    /**
+     *  Return true if given block might be a dangling asset block,
+     *  false otherwise.
+     */
+    FORCEINLINE bool IsDanglingBlock(const BlockIterator& begin, const BlockIterator& end) {
+        return (begin->type == ParagraphBlockType
+                || begin->type == CodeBlockType);
+    }
+    
+    /**
+     *  Block Classifier, asset context.
+     */
     template <>
     FORCEINLINE Section ClassifyBlock<Asset>(const BlockIterator& begin,
                                              const BlockIterator& end,
                                              const Section& context) {
+        
         if (context == UndefinedSection) {
             AssetSignature asset = GetAssetSignature(begin, end);
             if (asset == BodyAssetSignature || asset == PayloadBodyAssetSignature)
@@ -84,18 +94,44 @@ namespace snowcrash {
             if (asset == SchemaAssetSignature)
                 return SchemaSection;
         }
-        else if (context == BodySection || context == SchemaSection) {
+        else if (context == BodySection ||
+                 context == SchemaSection) {
+            
             // Section closure
+            if (begin->type == ListItemBlockEndType ||
+                begin->type == ListBlockEndType) {
+
+                // Look ahead for a dangling asset
+                BlockIterator cur = CloseList(begin, end);
+                if (cur == end)
+                    return UndefinedSection;
+                
+                if (IsDanglingBlock(cur, end))
+                    return (context == BodySection) ? DanglingBodySection : DanglingSchemaSection;
+                else
+                    return UndefinedSection;
+            }
+            
+            // Adjacent list item
+            if (begin->type == ListItemBlockBeginType) {
+                    return UndefinedSection;
+            }
+        }
+        else if (context == DanglingBodySection ||
+                 context == DanglingSchemaSection) {
+            
             if (begin->type == ListItemBlockEndType ||
                 begin->type == ListBlockEndType)
                 return UndefinedSection;
             
-            // Adjacent list item
-            if (begin->type == ListItemBlockBeginType)
+            if (!IsDanglingBlock(begin, end))
                 return UndefinedSection;
         }
         
-        return (context == BodySection || context == SchemaSection) ? context : UndefinedSection;
+        return (context == BodySection ||
+                context == SchemaSection ||
+                context == DanglingBodySection ||
+                context == DanglingSchemaSection) ? context : UndefinedSection;
     }
     
     //
@@ -115,6 +151,11 @@ namespace snowcrash {
                 case BodySection:
                 case SchemaSection: 
                     result = HandleAssetSectionBlock(section, cur, bounds, parser, asset);
+                    break;
+                    
+                case DanglingBodySection:
+                case DanglingSchemaSection:
+                    result = HandleDanglingAssetSectionBlock(section, cur, bounds, parser, asset);
                     break;
                     
                 case UndefinedSection:
@@ -144,10 +185,44 @@ namespace snowcrash {
                                                                    data,
                                                                    sourceMap);
             if (result.first.error.code != Error::OK ||
-                parser.sourceData.empty())
+                parser.sourceData.empty()) // TODO: change to data.empty()
                 return result;
             
             asset += data;
+            return result;
+        }
+        
+        static ParseSectionResult HandleDanglingAssetSectionBlock(const Section& section,
+                                                                  const BlockIterator& cur,
+                                                                  const SectionBounds& bounds,
+                                                                  BlueprintParserCore& parser,
+                                                                  Asset& asset) {
+            
+            // Skip any closing list blocks
+            BlockIterator sectionCur = CloseList(cur, bounds.second);
+            
+            Section originalSection = (section == DanglingSchemaSection) ? SchemaSection : BodySection;
+            SourceData data;
+            SourceDataBlock sourceMap;
+            ParseSectionResult result = ParseListPreformattedBlock(originalSection,
+                                                                   sectionCur,
+                                                                   bounds,
+                                                                   parser,
+                                                                   data,
+                                                                   sourceMap);
+            if (result.first.error.code != Error::OK ||
+                data.empty())
+                return result;
+            
+            asset += data;
+            
+            // WARN: Dangling block
+            std::stringstream ss;
+            ss << "dangling message-" << SectionName(originalSection);
+            ss << ", increase its indentation to nest it properly";
+            result.first.warnings.push_back(Warning(ss.str(),
+                                                    FormattingWarning,
+                                                    sourceMap));
             return result;
         }
 

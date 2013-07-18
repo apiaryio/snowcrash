@@ -220,7 +220,7 @@ TEST_CASE("aparser/parse-schema", "Parse schema asset")
     REQUIRE(asset == "Dolor Sit Amet");
 }
 
-TEST_CASE("aparser/parse-ajdacent", "Parse body asset followed by other blocks")
+TEST_CASE("Parse body asset followed by other blocks", "[asset][foreign][dangling]")
 {
     MarkdownBlock::Stack markdown = CanonicalBodyAssetFixture();
     
@@ -233,11 +233,11 @@ TEST_CASE("aparser/parse-ajdacent", "Parse body asset followed by other blocks")
     ParseSectionResult result = AssetParser::Parse(markdown.begin(), markdown.end(), parser, asset);
     
     REQUIRE(result.first.error.code == Error::OK);
-    CHECK(result.first.warnings.empty());
+    REQUIRE(result.first.warnings.size() == 2);
     
     const MarkdownBlock::Stack &blocks = markdown;
-    REQUIRE(std::distance(blocks.begin(), result.second) == 6);
-    REQUIRE(asset == "Lorem Ipsum");
+    REQUIRE(std::distance(blocks.begin(), result.second) == 7);
+    REQUIRE(asset == "Lorem Ipsum4");
 }
 
 TEST_CASE("aparser/parse-foreign", "Parse body asset with foreign block inside")
@@ -263,7 +263,7 @@ TEST_CASE("aparser/parse-foreign", "Parse body asset with foreign block inside")
     REQUIRE(asset == "Lorem Ipsum4");
 }
 
-TEST_CASE("aparser/parse-foreign-listitem", "Parse body asset with foreign list item inside")
+TEST_CASE("Parse body asset with foreign list item inside", "[asset][foreign]")
 {
     MarkdownBlock::Stack markdown = CanonicalBodyAssetFixture();
     
@@ -282,7 +282,7 @@ TEST_CASE("aparser/parse-foreign-listitem", "Parse body asset with foreign list 
     ParseSectionResult result = AssetParser::Parse(markdown.begin(), markdown.end(), parser, asset);
     
     REQUIRE(result.first.error.code == Error::OK);
-    CHECK(result.first.warnings.empty());
+    REQUIRE(result.first.warnings.empty());
     
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 5);

@@ -36,7 +36,9 @@ namespace snowcrash {
         ObjectSection,
         ObjectBodySection,
         BodySection,
+        DanglingBodySection,
         SchemaSection,
+        DanglingSchemaSection,
         HeadersSection,
         ForeignSection
     };
@@ -271,12 +273,14 @@ namespace snowcrash {
                                  Result& result) {
         if (cur != bounds.second)
             return true;
+
+        if (parent->sourceMap.empty())
+            return false;
         
-        result.error = Error("unexpected markdown closure", 1, parent->sourceMap);
+        // ERR: Sanity check
+        result.error = Error("unexpected markdown closure", ApplicationError, parent->sourceMap);
         return false;
     }
-    
-    
 }
 
 #endif

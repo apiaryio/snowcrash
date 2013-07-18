@@ -190,6 +190,9 @@ namespace snowcrash {
             if (listSection != UndefinedSection)
                 return listSection;
             
+            if (HasPayloadAssetSignature(begin, end))
+                return UndefinedSection;
+            
             return ForeignSection;
         }
         

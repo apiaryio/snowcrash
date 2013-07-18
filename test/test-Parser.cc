@@ -195,3 +195,117 @@ TEST_CASE("Invalid ‘warning: empty body asset’ for certain status codes", "[
     REQUIRE(blueprint.resourceGroups[0].resources[0].methods[0].responses[0].body.empty());
 }
 
+TEST_CASE("Parse adjacent asset blocks", "[parser][issue][#9]")
+{
+    // Blueprint in question:
+    //R"(
+    //# GET /1
+    //+ response 200
+    //
+    //asset
+    //
+    //    pre
+    //+ response 404
+    //
+    //    Not found
+    //
+    //");
+    const std::string bluerpintSource = \
+    "# GET /1\n"\
+    "+ response 200\n"\
+    "\n"\
+    "asset\n"\
+    "\n"\
+    "    pre\n"\
+    "+ response 404\n"\
+    "\n"\
+    "        Not found\n";
+    
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(bluerpintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.size() == 3);
+    
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].methods.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].methods[0].description.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].methods[0].responses.size() == 2);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].methods[0].responses[0].name == "200");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].methods[0].responses[0].body == "asset\n\npre\n");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].methods[0].responses[1].name == "404");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].methods[0].responses[1].body == "Not found\n");
+}
+
+TEST_CASE("Parse adjacent nested asset blocks", "[parser][issue][crash][#9][now]")
+{
+    // Blueprint in question:
+    //R"(
+    //# GET /1
+    //+ response 200
+    //    + body
+    //
+    //        A
+    //
+    //    B
+    //C
+    //");
+    const std::string bluerpintSource = \
+    "# GET /1\n"\
+    "+ response 200\n"\
+    "    + body\n"\
+    "\n"\
+    "        A\n"\
+    "\n"\
+    "    B\n"\
+    "C\n";
+    
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(bluerpintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    CHECK(result.warnings.size() == 3);
+    
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].methods.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].methods[0].description.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].methods[0].responses.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].methods[0].responses[0].name == "200");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].methods[0].responses[0].body == "A\nB\nC\n");
+}
+
+TEST_CASE("Parse adjacent asset list blocks", "[parser][issue][#9]")
+{
+    // Blueprint in question:
+    //R"(
+    //# GET /1
+    //+ response 200
+    //+ list
+    //");
+    const std::string bluerpintSource = \
+    "# GET /1\n"\
+    "+ response 200\n"\
+    "+ list\n";
+    
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(bluerpintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.size() == 2);
+    REQUIRE(result.warnings[0].code == EmptyDefinitionWarning);
+    REQUIRE(result.warnings[1].code == IgnoringWarning);
+    
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].methods.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].methods[0].description.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].methods[0].responses.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].methods[0].responses[0].name == "200");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].methods[0].responses[0].body.empty());
+}
+

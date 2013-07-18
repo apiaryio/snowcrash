@@ -260,7 +260,7 @@ TEST_CASE("Parse just one payload in a list with multiple items", "[payload]")
     REQUIRE(payload.schema.empty());
 }
 
-TEST_CASE("Parse payload with foreign list item", "[payload]")
+TEST_CASE("Parse payload with foreign list item", "[payload][foreign]")
 {
     // Blueprint in question:
     //R"(
@@ -300,7 +300,8 @@ TEST_CASE("Parse payload with foreign list item", "[payload]")
     ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), parser, payload);
     
     REQUIRE(result.first.error.code == Error::OK);
-    CHECK(result.first.warnings.size() == 1); // ignoring unrecognized item
+    REQUIRE(result.first.warnings.size() == 1);
+    REQUIRE(result.first.warnings[0].code == IgnoringWarning);
     
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 14);
@@ -312,7 +313,7 @@ TEST_CASE("Parse payload with foreign list item", "[payload]")
     REQUIRE(payload.schema.empty());
 }
 
-TEST_CASE("Parse payload with foreign block", "[payload]")
+TEST_CASE("Parse payload with foreign block", "[payload][foreign]")
 {
     // Blueprint in question:
     //R"(
@@ -350,7 +351,7 @@ TEST_CASE("Parse payload with foreign block", "[payload]")
     ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), parser, payload);
     
     REQUIRE(result.first.error.code == Error::OK);
-    CHECK(result.first.warnings.size() == 1); // ignoring unrecognized item
+    REQUIRE(result.first.warnings.size() == 2); // preformatted body content & dangling body
     
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 12);
@@ -358,7 +359,7 @@ TEST_CASE("Parse payload with foreign block", "[payload]")
     REQUIRE(payload.description.empty());
     REQUIRE(payload.parameters.empty());
     REQUIRE(payload.headers.empty());
-    REQUIRE(payload.body == "Foo");
+    REQUIRE(payload.body == "Foo5");
     REQUIRE(payload.schema.empty());
 }
 

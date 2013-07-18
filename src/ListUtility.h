@@ -93,6 +93,22 @@ namespace snowcrash {
         return cur;
     }
     
+    /**
+     *  \brief  Skips consecutive closing elements of a list or a list item.
+     *  \param  begin   The begin of a list or a list item.
+     *  \param  end     End of markdown block buffer.
+     *  \return An iterator pointing AFTER the last closing list or list item block.
+     */
+    FORCEINLINE BlockIterator CloseList(const BlockIterator& begin,
+                                        const BlockIterator& end) {
+        BlockIterator cur = begin;
+        while (cur != end &&
+               (cur->type == ListItemBlockEndType || cur->type == ListBlockEndType)) {
+            cur = CloseListItemBlock(cur, end);
+        }
+        return cur;
+    }
+    
     // Generic parser handler to warn & skip foreign blocks
     FORCEINLINE ParseSectionResult HandleForeignSection(const BlockIterator& cur,
                                                         const SectionBounds& bounds) {
@@ -102,7 +118,7 @@ namespace snowcrash {
 
             result.second = SkipToSectionEnd(cur, bounds.second, ListItemBlockBeginType, ListItemBlockEndType);
             result.first.warnings.push_back(Warning("ignoring unrecognized list item",
-                                                    0,
+                                                    IgnoringWarning,
                                                     result.second->sourceMap));
             result.second = CloseListItemBlock(result.second, bounds.second);
         }
@@ -110,7 +126,7 @@ namespace snowcrash {
 
             result.second = SkipToSectionEnd(cur, bounds.second, ListBlockBeginType, ListBlockEndType);
             result.first.warnings.push_back(Warning("ignoring unrecognized list",
-                                                    0,
+                                                    IgnoringWarning,
                                                     result.second->sourceMap));
             result.second = CloseListItemBlock(result.second, bounds.second);
         }
@@ -122,7 +138,7 @@ namespace snowcrash {
                 ++result.second;
             }
             result.first.warnings.push_back(Warning("ignoring unrecognized block, check indentation",
-                                                    0,
+                                                    IgnoringWarning,
                                                     result.second->sourceMap));
         }
 
@@ -280,6 +296,9 @@ namespace snowcrash {
             }
             else if (sectionCur->type == ListBlockBeginType) {
                 sectionCur = SkipToSectionEnd(sectionCur, bounds.second, ListBlockBeginType, ListBlockEndType);
+            }
+            else if (sectionCur->type == ListItemBlockBeginType) {
+                sectionCur = SkipToSectionEnd(sectionCur, bounds.second, ListItemBlockBeginType, ListItemBlockEndType);
             }
             
             if (!CheckCursor(sectionCur, bounds, cur, result.first))
