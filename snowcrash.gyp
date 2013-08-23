@@ -1,7 +1,8 @@
 {
   "includes": [
     "common.gypi"
-  ],  
+  ],
+  
   'targets' : [
     {
       'target_name': 'sundown',
@@ -25,7 +26,7 @@
 
     {
       'target_name': 'libsnowcrash',
-      'type': 'static_library',
+      'type': '<(library)',
       'include_dirs': [
         'src',
         'sundown/src',
@@ -71,6 +72,9 @@
           { 'sources': [ 'src/posix/RegexMatch.cc' ] } # OS != Windows
         ]
       ],
+      'dependencies': [
+          'sundown'
+      ]
     },
 
     {

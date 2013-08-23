@@ -24,12 +24,17 @@ parser = optparse.OptionParser()
 parser.add_option("--debug",
     action="store_true",
     dest="debug",
-    help="Also build debug build")
+    help="Also build the debug build.")
 
 parser.add_option("--dest-cpu",
     action="store",
     dest="dest_cpu",
-    help="CPU architecture to build for. Valid values are: ia32, x64")
+    help="CPU architecture to build for. Valid values are: ia32, x64.")
+
+parser.add_option("--shared",
+    action="store_true",
+    dest="shared",
+    help="Build and use shared libsnowcrash instead of static one.")
 
 (options, args) = parser.parse_args()
 
@@ -112,6 +117,7 @@ def configure_snowcrash(o):
   target_arch = host_arch # options.dest_cpu or host_arch
   o['variables']['host_arch'] = host_arch
   o['variables']['target_arch'] = target_arch
+  o['variables']['library'] = 'shared_library' if options.shared else 'static_library'
 
 #
 # config.gypi
