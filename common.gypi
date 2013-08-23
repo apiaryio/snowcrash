@@ -116,7 +116,7 @@
         ],
       }],
       [ 'OS in "linux freebsd openbsd solaris"', {
-        'cflags': [ '-pthread', ],
+        'cflags': [ '-pthread', '-fPIC' ],
         'ldflags': [ '-pthread' ],
       }],
       [ 'OS in "linux freebsd openbsd solaris android"', {
