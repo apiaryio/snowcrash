@@ -6,13 +6,23 @@ Snow Crash is the reference [API Blueprint](http://apiblueprint.org) parser buil
 API Blueprint is Web API documentation language. You can find API Blueprint documentation on the [API Blueprint site](http://apiblueprint.org).
 
 ## Status
-Snow Crash is Work in Progress. See its [Wiki status page](https://github.com/apiaryio/snowcrash/wiki/API-Blueprint-Implementation-Status) for details.
+Snow Crash is currently Work in Progress. See its [v1.0 Milestone](https://github.com/apiaryio/snowcrash/issues?milestone=1&state=open) for implemetnation status details.
 
 ## Bindings
 Snow Crash bindings in other languages:
 
 - [Protagonist](https://github.com/apiaryio/protagonist) (Node.js)
 - [snowcrashCLR](https://github.com/SeriousM/snowcrashCLR) (.NET)
+
+## Install
+OS X using Homebrew:
+
+```sh
+$ brew install --HEAD \
+  https://raw.github.com/apiaryio/snowcrash/master/tools/homebrew/snowcrash.rb
+``
+
+Other systems refer to [build notes](#build).
 
 ## Build
 1. Clone the repo + fetch the submodules:
