@@ -106,15 +106,7 @@
       'dependencies': [
         'libsnowcrash',
         'sundown'
-      ],
-      'ldflags': [
-        '-stdlib=libstdc++'
-      ],
-      'xcode_settings': {
-        'OTHER_LDFLAGS': [
-          '-stdlib=libstdc++'
-        ]
-      }
+      ]
     },
 
     {
@@ -131,15 +123,7 @@
       'dependencies': [
         'libsnowcrash',
         'sundown'
-      ],
-      'ldflags': [
-        '-stdlib=libstdc++'
-      ],
-      'xcode_settings': {
-        'OTHER_LDFLAGS': [
-          '-stdlib=libstdc++'
-        ]
-      }
+      ]
     }    
   ]
 }
