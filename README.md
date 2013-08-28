@@ -20,7 +20,7 @@ OS X using Homebrew:
 ```sh
 $ brew install --HEAD \
   https://raw.github.com/apiaryio/snowcrash/master/tools/homebrew/snowcrash.rb
-``
+```
 
 Other systems refer to [build notes](#build).
 
