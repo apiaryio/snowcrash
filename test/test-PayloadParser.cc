@@ -451,11 +451,11 @@ TEST_CASE("Parse inline payload with symbol reference", "[payload]")
     Payload payload;
     
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ResourceObject object;
-    object.name = "Symbol";
-    object.description = "Foo";
-    object.body = "Bar";
-    parser.symbolTable.resourceObjects[object.name] = object;
+    ResourceModel model;
+    model.name = "Symbol";
+    model.description = "Foo";
+    model.body = "Bar";
+    parser.symbolTable.resourceModels[model.name] = model;
     
     ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), parser, payload);
     
@@ -497,11 +497,11 @@ TEST_CASE("Parse payload with symbol reference", "[payload]")
     Payload payload;
     
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ResourceObject object;
-    object.name = "Symbol";
-    object.description = "Foo";
-    object.body = "Bar";
-    parser.symbolTable.resourceObjects[object.name] = object;
+    ResourceModel model;
+    model.name = "Symbol";
+    model.description = "Foo";
+    model.body = "Bar";
+    parser.symbolTable.resourceModels[model.name] = model;
     
     ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), parser, payload);
     

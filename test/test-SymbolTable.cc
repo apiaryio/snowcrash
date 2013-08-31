@@ -24,9 +24,9 @@ TEST_CASE("symbol/resource-object", "Parse object resource symbol")
     
     REQUIRE(result.first.error.code == Error::OK);
     
-    REQUIRE(parser.symbolTable.resourceObjects.size() == 1);
-    ResourceObjectSymbolTable::iterator it = parser.symbolTable.resourceObjects.find("My Resource");
-    REQUIRE(it != parser.symbolTable.resourceObjects.end());
+    REQUIRE(parser.symbolTable.resourceModels.size() == 1);
+    ResourceModelSymbolTable::iterator it = parser.symbolTable.resourceModels.find("My Resource");
+    REQUIRE(it != parser.symbolTable.resourceModels.end());
     REQUIRE(it->first == "My Resource");
     REQUIRE(it->second.body == "X.O.");
     

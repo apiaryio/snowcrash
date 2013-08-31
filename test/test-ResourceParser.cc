@@ -132,11 +132,11 @@ TEST_CASE("rparser/parse", "Parse resource")
     
     REQUIRE(resource.name == "My Resource");
     REQUIRE(resource.uriTemplate == "/resource");
-    REQUIRE(resource.object.name == "My Resource");
-    REQUIRE(resource.object.body == "X.O.");
-    REQUIRE(resource.object.headers.size() == 1);
-    REQUIRE(resource.object.headers[0].first == "Content-Type");
-    REQUIRE(resource.object.headers[0].second == "text/plain");
+    REQUIRE(resource.model.name == "My Resource");
+    REQUIRE(resource.model.body == "X.O.");
+    REQUIRE(resource.model.headers.size() == 1);
+    REQUIRE(resource.model.headers[0].first == "Content-Type");
+    REQUIRE(resource.model.headers[0].second == "text/plain");
     REQUIRE(resource.description == "1");
     REQUIRE(resource.headers.size() == 1);
     REQUIRE(resource.headers[0].first == "X-Resource-Header");
@@ -173,8 +173,8 @@ TEST_CASE("rparser/parse-partial", "Parse partially defined resource")
     REQUIRE(resource.name.empty());
     REQUIRE(resource.uriTemplate == "/1");
     REQUIRE(resource.description.empty());
-    REQUIRE(resource.object.name.empty());
-    REQUIRE(resource.object.body.empty());
+    REQUIRE(resource.model.name.empty());
+    REQUIRE(resource.model.body.empty());
     REQUIRE(resource.methods.size() == 1);
     REQUIRE(resource.methods.front().method == "GET");
     REQUIRE(resource.methods.front().description.empty());
@@ -205,8 +205,8 @@ TEST_CASE("rparser/parse-multi-method-desc", "Parse multiple method descriptions
     
     REQUIRE(resource.uriTemplate == "/1");
     REQUIRE(resource.description.empty());
-    REQUIRE(resource.object.name.empty());
-    REQUIRE(resource.object.body.empty());
+    REQUIRE(resource.model.name.empty());
+    REQUIRE(resource.model.body.empty());
     REQUIRE(resource.methods.size() == 2);
     REQUIRE(resource.methods[0].method == "GET");
     REQUIRE(resource.methods[0].description == "1");
@@ -288,8 +288,8 @@ TEST_CASE("rparser/parse-multi-method", "Parse multiple method")
     
     REQUIRE(resource.uriTemplate == "/1");
     REQUIRE(resource.description == "1");
-    REQUIRE(resource.object.name.empty());
-    REQUIRE(resource.object.body.empty());
+    REQUIRE(resource.model.name.empty());
+    REQUIRE(resource.model.body.empty());
     REQUIRE(resource.methods.size() == 3);
     REQUIRE(resource.methods[0].method == "GET");
     REQUIRE(resource.methods[0].description == "3");
@@ -355,8 +355,8 @@ TEST_CASE("rparser/parse-list-description", "Parse description with list")
     
     REQUIRE(resource.uriTemplate == "/1");
     REQUIRE(resource.description == "34");
-    REQUIRE(resource.object.name.empty());
-    REQUIRE(resource.object.body.empty());
+    REQUIRE(resource.model.name.empty());
+    REQUIRE(resource.model.body.empty());
     REQUIRE(resource.methods.empty());
 }
 
@@ -386,8 +386,8 @@ TEST_CASE("rparser/parse-hr", "Parse resource with a HR")
     
     REQUIRE(resource.uriTemplate == "/1");
     REQUIRE(resource.description == "12");
-    REQUIRE(resource.object.name.empty());
-    REQUIRE(resource.object.body.empty());
+    REQUIRE(resource.model.name.empty());
+    REQUIRE(resource.model.body.empty());
     REQUIRE(resource.methods.empty());
 }
 
@@ -453,8 +453,8 @@ TEST_CASE("rparser/parse-abbrev", "Parse resource method abbreviation")
     REQUIRE(std::distance(blocks.begin(), result.second) == 13);
     
     REQUIRE(resource.name.empty());
-    REQUIRE(resource.object.name.empty());
-    REQUIRE(resource.object.body.empty());
+    REQUIRE(resource.model.name.empty());
+    REQUIRE(resource.model.body.empty());
     REQUIRE(resource.methods.size() == 1);
     REQUIRE(resource.methods[0].method == "GET");
     REQUIRE(resource.methods[0].description == "1");
@@ -484,8 +484,8 @@ TEST_CASE("rparser/parse-abbrev-ambiguous", "Parse resource method abbreviation 
     REQUIRE(std::distance(blocks.begin(), result.second) == 1);
     
     REQUIRE(resource.name.empty());
-    REQUIRE(resource.object.name.empty());
-    REQUIRE(resource.object.body.empty());
+    REQUIRE(resource.model.name.empty());
+    REQUIRE(resource.model.body.empty());
     REQUIRE(resource.methods.size() == 1);
     REQUIRE(resource.methods[0].method == "GET");
 }
@@ -512,8 +512,8 @@ TEST_CASE("rparser/parse-nameless-resource", "Parse resource without name")
 
     REQUIRE(resource.uriTemplate == "/resource");
     REQUIRE(resource.name.empty());
-    REQUIRE(resource.object.name.empty());
-    REQUIRE(resource.object.body.empty());
+    REQUIRE(resource.model.name.empty());
+    REQUIRE(resource.model.body.empty());
     REQUIRE(resource.methods.size() == 0);
 }
 

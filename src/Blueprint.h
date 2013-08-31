@@ -111,7 +111,7 @@ namespace snowcrash {
     };
     
     /** Resource Object */
-    typedef Payload ResourceObject;
+    typedef Payload ResourceModel;
     
     /** Request */
     typedef Payload Request;
@@ -165,8 +165,8 @@ namespace snowcrash {
         /** Description of the resource */
         Description description;
         
-        /** Object model representing this Resource */
-        ResourceObject object;
+        /** Model representing this Resource */
+        ResourceModel model;
         
         /** Parameters */
         Collection<Parameter>::type parameters;

@@ -253,14 +253,14 @@ static void serialize(const Resource& resource, std::ostream &os)
     
     // Object
     indent(5, os);
-    serialize(SerializeKey::Object, os);
-    if (resource.object.name.empty()) {
+    serialize(SerializeKey::Model, os);
+    if (resource.model.name.empty()) {
         os << ": {}";
     }
     else {
         os << ": ";
         
-        serialize(resource.object, 6, os);
+        serialize(resource.model, 6, os);
         
 //        os << "\n";
 //        indent(5, os);

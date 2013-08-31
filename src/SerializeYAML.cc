@@ -138,9 +138,9 @@ static void serialize(const Resource& resource, std::ostream &os)
 
     // TODO: parameters
 
-    serialize(SerializeKey::Object, std::string(), 2, os);
-    if (!resource.object.name.empty())
-        serialize(resource.object, 3, false, os);
+    serialize(SerializeKey::Model, std::string(), 2, os);
+    if (!resource.model.name.empty())
+        serialize(resource.model, 3, false, os);
     
     if (!resource.headers.empty())
         serialize(resource.headers, 2, os);

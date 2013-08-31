@@ -362,8 +362,8 @@ namespace snowcrash {
             
             if (result.second != begin) {
                 // Process a symbol reference
-                ResourceObjectSymbolTable::const_iterator symbolEntry = parser.symbolTable.resourceObjects.find(symbol);
-                if (symbolEntry == parser.symbolTable.resourceObjects.end()) {
+                ResourceModelSymbolTable::const_iterator symbolEntry = parser.symbolTable.resourceModels.find(symbol);
+                if (symbolEntry == parser.symbolTable.resourceModels.end()) {
                     
                     // ERR: Undefined symbol
                     std::stringstream ss;

@@ -252,7 +252,7 @@ namespace snowcrash {
             if (result.first.error.code != Error::OK)
                 return result;
             
-            if (!resource.object.name.empty()) {
+            if (!resource.model.name.empty()) {
                 // WARN: Object already defined
                 std::stringstream ss;
                 ss << "ignoring additional object definiton for `";
@@ -270,10 +270,10 @@ namespace snowcrash {
                                                         nameBlock->sourceMap));
             }
             else {
-                resource.object = payload;
+                resource.model = payload;
                 
-                ResourceObjectSymbolTable::const_iterator it = parser.symbolTable.resourceObjects.find(payload.name);
-                if (it != parser.symbolTable.resourceObjects.end()) {
+                ResourceModelSymbolTable::const_iterator it = parser.symbolTable.resourceModels.find(payload.name);
+                if (it != parser.symbolTable.resourceModels.end()) {
                     // ERR: Symbol already defined
                     std::stringstream ss;
                     ss << "symbol `" << payload.name << "` already defined";
@@ -283,7 +283,7 @@ namespace snowcrash {
                                                nameBlock->sourceMap);
                 }
                 else {
-                    parser.symbolTable.resourceObjects[payload.name] = payload;
+                    parser.symbolTable.resourceModels[payload.name] = payload;
                 }
             }
             

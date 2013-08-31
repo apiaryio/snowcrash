@@ -32,15 +32,15 @@ namespace snowcrash {
     typedef SourceData SymbolName;
     
     // Resource Object Symbol
-    typedef std::pair<SymbolName, ResourceObject> ResourceObjectSymbol;
+    typedef std::pair<SymbolName, ResourceModel> ResourceModelSymbol;
     
     // Resource Object Symbol Table
-    typedef std::map<SymbolName, ResourceObject> ResourceObjectSymbolTable;
+    typedef std::map<SymbolName, ResourceModel> ResourceModelSymbolTable;
     
     struct SymbolTable {
         
         // Resource Object Symbol Table
-        ResourceObjectSymbolTable resourceObjects;
+        ResourceModelSymbolTable resourceModels;
     };
     
     
@@ -63,8 +63,8 @@ namespace snowcrash {
     FORCEINLINE void PrintSymbolTable(const SymbolTable& symbolTable) {
 
         std::cout << "Resource Object Symbols:\n";
-        for (ResourceObjectSymbolTable::const_iterator it = symbolTable.resourceObjects.begin();
-             it != symbolTable.resourceObjects.end();
+        for (ResourceModelSymbolTable::const_iterator it = symbolTable.resourceModels.begin();
+             it != symbolTable.resourceModels.end();
              ++it) {
             
             std::cout << "- " << it->first << " - body: `" << EscapeNewlines(it->second.body) << "`\n";
