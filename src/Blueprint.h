@@ -20,6 +20,9 @@
  *  Data types in this documents define the API Blueprint AST.
  */
 
+/** Version of API Blueprint AST */
+#define AST_VERSION "1.0"
+
 namespace snowcrash {
     
     /** Name of a an API Blueprint entity. */
@@ -41,7 +44,13 @@ namespace snowcrash {
     
     /** HTTP Method */
     typedef std::string HTTPMethod;
+
+    /** Parameter Type */
+    typedef std::string Type;
     
+    /** Parameter Value */
+    typedef std::string Value;
+     
     /** A generic key - value pair */
     typedef std::pair<std::string, std::string> KeyValuePair;
     
@@ -83,7 +92,20 @@ namespace snowcrash {
         /** Parameter Description */
         Description description;
         
-        // TODO: type, optional, default value
+        /** Type */
+        Type type;
+        
+        /** Required flag */
+        bool required;
+        
+        /** Default Value, applicable only when `required == false` */
+        Value defaultValue;
+        
+        /** Example Value */
+        Value exampleValue;
+        
+        /** Enumeration of possible values */
+        Collection<Value>::type values;
     };
     
     /**

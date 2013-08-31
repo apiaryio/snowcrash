@@ -62,7 +62,7 @@ namespace snowcrash {
     // Prints markdown block recursively to stdout
     FORCEINLINE void PrintSymbolTable(const SymbolTable& symbolTable) {
 
-        std::cout << "Resource Object Symbols:\n";
+        std::cout << "Resource Model Symbols:\n";
         for (ResourceModelSymbolTable::const_iterator it = symbolTable.resourceModels.begin();
              it != symbolTable.resourceModels.end();
              ++it) {

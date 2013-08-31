@@ -15,6 +15,7 @@
 
 using namespace snowcrash;
 
+const std::string SerializeKey::ASTVersion = "_version";
 const std::string SerializeKey::Metadata = "metadata";
 const std::string SerializeKey::Name = "name";
 const std::string SerializeKey::Description = "description";
@@ -33,6 +34,8 @@ const std::string SerializeKey::Body = "body";
 const std::string SerializeKey::Schema = "schema";
 const std::string SerializeKey::Headers = "headers";
 const std::string SerializeKey::Model = "model";
+const std::string SerializeKey::Value = "value";
+const std::string SerializeKey::Parameters = "parameters";
 
 std::string snowcrash::EscapeNewlines(const std::string& input)
 {
