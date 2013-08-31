@@ -59,7 +59,7 @@ static void serializeKeyValueCollection(const Collection<KeyValuePair>::type& co
     for (Collection<KeyValuePair>::const_iterator it = collection.begin(); it != collection.end(); ++it) {
         
         serialize(it->first, std::string(), level + 1, os);
-        serialize(SerializeKey::Name, it->first, level + 2, os);
+        //serialize(SerializeKey::Name, it->first, level + 2, os);
         serialize(SerializeKey::Value, it->second, level + 2, os);
     }
 }
@@ -150,6 +150,7 @@ static void serialize(const Transaction& transaction, std::ostream &os)
 static void serialize(const Action& action, std::ostream &os)
 {
     os << "    - ";   // indent 3
+    
     // Name
     serialize(SerializeKey::Name, action.name, 0, os);
     

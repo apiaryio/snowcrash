@@ -70,43 +70,72 @@ static void serialize(const std::string& key, const std::string& value, size_t l
 }
 
 /**
- * \brief Serialize array of key value pairs.
- * \param collection   Collection to serialize
- * \param level        Level of indentation
- * \param os           An output stream to serialize into
+ * \brief Serialize key value pair as an object into output stream
+ * \param key      Key to serialize
+ * \param value    Value to serialize
+ * \param level    Indentation level
+ * \param os       An output stream to serialize into
+ */
+static void serialize(const std::string& key, const std::string& value, size_t level, std::ostream &os)
+{
+    indent(level, os);
+    
+    serialize(key, os);
+    os << ": ";
+    
+    os << "{\n";
+    indent(level + 1, os);
+    
+    serialize(SerializeKey::Value, os);
+    os << ": ";
+    
+    std::string normValue = EscapeDoubleQuotes(value);
+    if (normValue.find("\n") != std::string::npos)
+        serialize(EscapeNewlines(normValue), os);
+    else
+        serialize(normValue, os);
+    
+    os << "\n";
+    indent(level, os);
+    os << "}";
+}
+
+/**
+ * \brief Serialize an array of key value pairs.
+ * \param collection    Collection to serialize
+ * \param level         Level of indentation
+ * \param os            An output stream to serialize into
  */
 static void serializeKeyValueCollection(const Collection<KeyValuePair>::type& collection, size_t level, std::ostream &os)
 {
-    os << "[\n";
-
-    size_t i = 0;
-    for (Collection<KeyValuePair>::const_iterator it = collection.begin(); it != collection.end(); ++i, ++it) {
-        
-        if (i > 0 && i < collection.size())
-            os << NewLineItemBlock;
-        
-        serialize(it->first, it->second, level + 1, true, os);
-    }
+    os << "{";
     
     if (!collection.empty()) {
+        os << "\n";
+        size_t i = 0;
+        for (Collection<KeyValuePair>::const_iterator it = collection.begin(); it != collection.end(); ++i, ++it) {
+            
+            if (i > 0 && i < collection.size())
+                os << NewLineItemBlock;
+            
+            
+            serialize(it->first, it->second, level + 1, os);
+        }
+        
         os << "\n";
         indent(level, os);
     }
 
-    os << "]";
+    os << "}";
 }
 /**
  * \brief Serialize Metadata into output stream.
- * \param metadata     Metadata to serialize
- * \param os           An output stream to serialize into
+ * \param metadata  Metadata to serialize
+ * \param os        An output stream to serialize into
  */
 static void serialize(const Collection<Metadata>::type& metadata, std::ostream &os)
 {
-    if (metadata.empty())
-        return;
-    
     indent(1, os);
-    
     serialize(SerializeKey::Metadata, os);
     os << ": ";
     
@@ -116,10 +145,25 @@ static void serialize(const Collection<Metadata>::type& metadata, std::ostream &
 }
 
 /**
+ * \brief Serialize Parameters into output stream.
+ * \param prarameters   Parameters to serialize.
+ * \param level         Level of indentation.
+ * \param os            An output stream to serialize into.
+ */
+static void serialize(const Collection<Parameter>::type& parameters, size_t level, std::ostream &os)
+{
+    indent(level, os);
+    serialize(SerializeKey::Parameters, os);
+    os << ": []";
+    
+    // TODO:
+}
+
+/**
  * \brief Serialize HTTP headers into output stream.
- * \param headers      Headers to serialize
- * \param level        Level of indentation
- * \param os           An output stream to serialize into
+ * \param headers   Headers to serialize.
+ * \param level Level of indentation.
+ * \param os    An output stream to serialize into.
  */
 static void serialize(const Collection<Header>::type& headers, size_t level, std::ostream &os)
 {
@@ -132,40 +176,39 @@ static void serialize(const Collection<Header>::type& headers, size_t level, std
 
 /**
  * \brief Serialize a payload into output stream.
- * \param payload      A payload to serialize
- * \param os           An output stream to serialize into
+ * \param payload   A payload to serialize.
+ * \param os    An output stream to serialize into.
  */
 static void serialize(const Payload& payload, size_t level, std::ostream &os)
 {
-//    indent(level, os);
     os << "{\n";
     
+    // Name
     serialize(SerializeKey::Name, payload.name, level + 1, false, os);
     os << NewLineItemBlock;
 
+    // Description
     serialize(SerializeKey::Description, payload.description, level + 1, false, os);
     os << NewLineItemBlock;
     
+    // Headers
+    serialize(payload.headers, level + 1, os);
+    os << NewLineItemBlock;
+    
+    // Body
     serialize(SerializeKey::Body, payload.body, level + 1, false, os);
     os << NewLineItemBlock;
     
+    // Schema
     serialize(SerializeKey::Schema, payload.schema, level + 1, false, os);
-    //os << NewLineItemBlock;
-    
-    if (!payload.headers.empty()) {
-        os << NewLineItemBlock;
-        serialize(payload.headers, level + 1, os);
-    }
-    
-    // TODO: parameters
-    
+
     os << "\n";
     indent(level, os);
     os << "}";
 }
 
 /**
- * \brief Serialize a method into output stream.
+ * \brief Serialize a transaction example into output stream.
  * \param transaction   A transaction example to serialize.
  * \param os            An output stream to serialize into.
  */
@@ -174,19 +217,22 @@ static void serialize(const Transaction& transaction, std::ostream &os)
     indent(8, os);
     os << "{\n";
     
+    // Name
     serialize(SerializeKey::Name, transaction.name, 9, false, os);
     os << NewLineItemBlock;
     
+    // Description
     serialize(SerializeKey::Description, transaction.description, 9, false, os);
+    os << NewLineItemBlock;
     
     // Requests
+    indent(9, os);
+    serialize(SerializeKey::Requests, os);
+    os << ": ";
+    os << "[";
+    
     if (!transaction.requests.empty()) {
-        os << NewLineItemBlock;
-        indent(9, os);
-        serialize(SerializeKey::Requests, os);
-        os << ": ";
-        os << "[\n";
-        
+        os << "\n";
         size_t i = 0;
         for (Collection<Request>::const_iterator it = transaction.requests.begin();
              it != transaction.requests.end();
@@ -201,17 +247,18 @@ static void serialize(const Transaction& transaction, std::ostream &os)
         
         os << "\n";
         indent(9, os);
-        os << "]";
     }
+    os << "]";
+    os << NewLineItemBlock;
     
     // Responses
+    indent(9, os);
+    serialize(SerializeKey::Responses, os);
+    os << ": ";
+    os << "[";
+    
     if (!transaction.responses.empty()) {
-        os << NewLineItemBlock;
-        indent(9, os);
-        serialize(SerializeKey::Responses, os);
-        os << ": ";
-        os << "[\n";
-        
+        os << "\n";
         size_t i = 0;
         for (Collection<Response>::const_iterator it = transaction.responses.begin();
              it != transaction.responses.end();
@@ -226,8 +273,8 @@ static void serialize(const Transaction& transaction, std::ostream &os)
         
         os << "\n";
         indent(9, os);
-        os << "]";
     }
+    os << "]";
     
     // Close the transaction
     os << "\n";
@@ -236,43 +283,43 @@ static void serialize(const Transaction& transaction, std::ostream &os)
 }
 
 /**
- * \brief Serialize a method into output stream.
- * \param action       A action to serialize
- * \param os           An output stream to serialize into
+ * \brief Serialize an action into output stream.
+ * \param action    The action to serialize.
+ * \param os        An output stream to serialize into.
  */
 static void serialize(const Action& action, std::ostream &os)
 {
     indent(6, os);
     os << "{\n";
     
-    serialize(SerializeKey::Method, action.method, 7, false, os);
-    os << NewLineItemBlock;
-    
+    // Name
     serialize(SerializeKey::Name, action.name, 7, false, os);
     os << NewLineItemBlock;
     
+    // Description
     serialize(SerializeKey::Description, action.description, 7, false, os);
+    os << NewLineItemBlock;
     
-    // TODO: parameters
+    // HTTP Method
+    serialize(SerializeKey::Method, action.method, 7, false, os);
+    os << NewLineItemBlock;
+    
+    // Parameters
+    serialize(action.parameters, 7, os);
+    os << NewLineItemBlock;
     
     // Headers
-    if (!action.headers.empty()) {
-        os << NewLineItemBlock;
-        serialize(action.headers, 7, os);
-    }
-    
-    // Transaction
+    serialize(action.headers, 7, os);
     os << NewLineItemBlock;
+    
+    // Transactions
     indent(7, os);
     serialize(SerializeKey::Transactions, os);
     os << ": ";
+    os << "[";
     
-    if (action.transactions.empty()) {
-        os << "[]\n";
-    }
-    else {
-        os << "[\n";
-        
+    if (!action.transactions.empty()) {
+        os << "\n";
         size_t i = 0;
         for (Collection<Transaction>::const_iterator it = action.transactions.begin();
              it != action.transactions.end();
@@ -286,8 +333,9 @@ static void serialize(const Action& action, std::ostream &os)
         
         os << "\n";
         indent(7, os);
-        os << "]";
     }
+    
+    os << "]";
     
     // Close the action
     os << "\n";
@@ -305,10 +353,6 @@ static void serialize(const Resource& resource, std::ostream &os)
     indent(4, os);
     os << "{\n";
 
-    // URI template
-    serialize(SerializeKey::URITemplate, resource.uriTemplate, 5, false, os);
-    os << NewLineItemBlock;
-    
     // Name
     serialize(SerializeKey::Name, resource.name, 5, false, os);
     os << NewLineItemBlock;
@@ -317,7 +361,11 @@ static void serialize(const Resource& resource, std::ostream &os)
     serialize(SerializeKey::Description, resource.description, 5, false, os);
     os << NewLineItemBlock;
     
-    // Object
+    // URI template
+    serialize(SerializeKey::URITemplate, resource.uriTemplate, 5, false, os);
+    os << NewLineItemBlock;
+    
+    // Model
     indent(5, os);
     serialize(SerializeKey::Model, os);
     if (resource.model.name.empty()) {
@@ -327,26 +375,25 @@ static void serialize(const Resource& resource, std::ostream &os)
         os << ": ";
         
         serialize(resource.model, 6, os);
-        
-//        os << "\n";
-//        indent(5, os);
-//        os << "}";
     }
+    os << NewLineItemBlock;
+    
+    // Parameters
+    serialize(resource.parameters, 5, os);
+    os << NewLineItemBlock;
     
     // Headers
-    if (!resource.headers.empty()) {
-        os << NewLineItemBlock;
-        serialize(resource.headers, 5, os);
-    }
+    serialize(resource.headers, 5, os);
+    os << NewLineItemBlock;
     
     // Actions
+    indent(5, os);
+    serialize(SerializeKey::Actions, os);
+    os << ": ";
+    os << "[";
+
     if (!resource.actions.empty()) {
-    
-        os << NewLineItemBlock;
-        indent(5, os);
-        serialize(SerializeKey::Actions, os);
-        os << ": ";
-        os << "[\n";
+        os << "\n";
         
         size_t i = 0;
         for (Collection<Action>::const_iterator it = resource.actions.begin();
@@ -360,9 +407,9 @@ static void serialize(const Resource& resource, std::ostream &os)
         }
         
         os << "\n";
-        indent(5, os);    
-        os << "]";
+        indent(5, os);
     }
+    os << "]";
     
     // Close the resource
     os << "\n";
@@ -372,8 +419,8 @@ static void serialize(const Resource& resource, std::ostream &os)
 
 /**
  * \brief Serialize a group of resources into output stream.
- * \param resourceGroup    A group to serialize
- * \brief os               An output stream to serialize into
+ * \param resourceGroup A group to serialize.
+ * \brief os    An output stream to serialize into.
  */
 static void serialize(const ResourceGroup& resourceGroup, std::ostream &os)
 {
@@ -386,16 +433,16 @@ static void serialize(const ResourceGroup& resourceGroup, std::ostream &os)
     
     // Description
     serialize(SerializeKey::Description, resourceGroup.description, 3, false, os);
+    os << NewLineItemBlock;
     
     // Resources
+    indent(3, os);
+    serialize(SerializeKey::Resources, os);
+    os << ": ";
+    os << "[";
+    
     if (!resourceGroup.resources.empty()) {
-
-        os << NewLineItemBlock;
-        indent(3, os);
-        serialize(SerializeKey::Resources, os);
-        os << ": ";
-        os << "[\n";
-        
+        os << "\n";
         size_t i = 0;
         for (Collection<Resource>::const_iterator it = resourceGroup.resources.begin();
              it != resourceGroup.resources.end();
@@ -411,53 +458,58 @@ static void serialize(const ResourceGroup& resourceGroup, std::ostream &os)
             os << "\n";
             indent(3, os);
         }
-        
-        os << "]";
     }
+    
+    os << "]";
     
     // Close the group
     os << "\n";
     indent(2, os);
     os << "}";
-    
 }
 
 /**
  * \brief Serialize Resource Group into output stream.
- * \param resourceGroup    Resource Groups to serialize
- * \param os               An output stream to serialize into
+ * \param resourceGroup Resource Groups to serialize.
+ * \param os            An output stream to serialize into.
  */
 static void serialize(const Collection<ResourceGroup>::type& resourceGroups, std::ostream &os)
 {
-    if (resourceGroups.empty())
-        return;
-    
     indent(1, os);
     serialize(SerializeKey::ResourceGroups, os);
     os << ": ";
-    os << "[\n";
-    
-    size_t i = 0;
-    for (Collection<ResourceGroup>::const_iterator it = resourceGroups.begin(); it != resourceGroups.end(); ++i, ++it) {
-        
-        if (i > 0 && i < resourceGroups.size())
-            os << NewLineItemBlock;
-        
-        serialize(*it, os);
-    }
+    os << "[";
     
     if (!resourceGroups.empty()) {
+        os << "\n";
+        size_t i = 0;
+        for (Collection<ResourceGroup>::const_iterator it = resourceGroups.begin(); it != resourceGroups.end(); ++i, ++it) {
+            
+            if (i > 0 && i < resourceGroups.size())
+                os << NewLineItemBlock;
+            
+            serialize(*it, os);
+        }
+        
         os << "\n";
         indent(1, os);
     }
     
     os << "]";
-    
 }
 
+/**
+ * \brief Serialize a blueprint into output stream.
+ * \param blueprint     The blueprint to serialize.
+ * \param os            An output stream to serialize into.
+ */
 static void serialize(const Blueprint& blueprint, std::ostream &os)
 {
     os << "{\n";
+    
+    // AST Version
+    serialize(SerializeKey::ASTVersion, AST_VERSION, 1, false, os);
+    os << NewLineItemBlock;
     
     // Metadata
     serialize(blueprint.metadata, os);
@@ -468,13 +520,10 @@ static void serialize(const Blueprint& blueprint, std::ostream &os)
 
     // Description
     serialize(SerializeKey::Description, blueprint.description, 1, false, os);
+    os << NewLineItemBlock;
 
     // Resource Groups
-    if (!blueprint.resourceGroups.empty()) {
-        os << NewLineItemBlock;
-        
-        serialize(blueprint.resourceGroups, os);
-    }
+    serialize(blueprint.resourceGroups, os);
     
     os << "\n}\n";
 }
