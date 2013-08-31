@@ -188,11 +188,12 @@ TEST_CASE("rgparser/parse-multiple-resource", "Parse multiple resources with pay
     REQUIRE(resource1.actions.size() == 1);
     REQUIRE(resource1.actions[0].method == "GET");
     REQUIRE(resource1.actions[0].description.empty());
-    REQUIRE(resource1.actions[0].requests.size() == 1);
-    REQUIRE(resource1.actions[0].requests[0].name.empty());
-    REQUIRE(resource1.actions[0].requests[0].description.empty());
-    REQUIRE(resource1.actions[0].requests[0].body.empty());
-    REQUIRE(resource1.actions[0].responses.empty());
+    REQUIRE(!resource1.actions[0].transactions.empty());
+    REQUIRE(resource1.actions[0].transactions[0].requests.size() == 1);
+    REQUIRE(resource1.actions[0].transactions[0].requests[0].name.empty());
+    REQUIRE(resource1.actions[0].transactions[0].requests[0].description.empty());
+    REQUIRE(resource1.actions[0].transactions[0].requests[0].body.empty());
+    REQUIRE(resource1.actions[0].transactions[0].responses.empty());
 
     Resource resource2 = resourceGroup.resources[1];
     REQUIRE(resource2.uriTemplate == "/2");
@@ -200,10 +201,11 @@ TEST_CASE("rgparser/parse-multiple-resource", "Parse multiple resources with pay
     REQUIRE(resource2.actions.size() == 1);
     REQUIRE(resource2.actions[0].method == "GET");
     REQUIRE(resource2.actions[0].description.empty());
-    REQUIRE(resource2.actions[0].requests[0].name.empty());
-    REQUIRE(resource2.actions[0].requests[0].description.empty());
-    REQUIRE(resource2.actions[0].requests[0].body.empty());
-    REQUIRE(resource2.actions[0].responses.empty());
+    REQUIRE(!resource2.actions[0].transactions.empty());
+    REQUIRE(resource2.actions[0].transactions[0].requests[0].name.empty());
+    REQUIRE(resource2.actions[0].transactions[0].requests[0].description.empty());
+    REQUIRE(resource2.actions[0].transactions[0].requests[0].body.empty());
+    REQUIRE(resource2.actions[0].transactions[0].responses.empty());
 }
 
 TEST_CASE("rgparser/parse-multiple-same", "Parse multiple resources with the same name")

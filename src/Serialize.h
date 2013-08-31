@@ -42,6 +42,8 @@ namespace snowcrash {
         static const std::string URITemplate;
         static const std::string Actions;
         static const std::string Action;
+        static const std::string Transactions;
+        static const std::string Transaction;
         static const std::string Method;
         static const std::string Requests;
         static const std::string Responses;

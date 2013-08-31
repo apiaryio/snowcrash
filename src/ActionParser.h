@@ -234,6 +234,11 @@ namespace snowcrash {
             if (result.first.error.code != Error::OK)
                 return result;
             
+            // Make sure a transaction is defined for the Action
+            if (action.transactions.empty()) {
+                action.transactions.push_back(Transaction());
+            }
+            
             // Check for duplicate
             if (IsPayloadDuplicate(section, payload, action)) {
                 // WARN: duplicate payload
@@ -251,12 +256,12 @@ namespace snowcrash {
             // Check payload integrity
             CheckPayload(section, payload, nameBlock->sourceMap, result.first);
             
-            // Inject parsed payload into method
+            // Inject parsed payload into the action
             if (section == RequestSection) {
-                action.requests.push_back(payload);
+                action.transactions.front().requests.push_back(payload);
             }
             else if (section == ResponseSection) {
-                action.responses.push_back(payload);
+                action.transactions.front().responses.push_back(payload);
             }
             
             // Check header duplicates
@@ -319,13 +324,16 @@ namespace snowcrash {
          */
         static bool IsPayloadDuplicate(const Section& section, const Payload& payload, Action& action) {
             
+            if (action.transactions.empty())
+                return false;
+            
             if (section == RequestSection) {
-                Collection<Request>::const_iterator duplicate = FindRequest(action, payload);
-                return duplicate != action.requests.end();
+                Collection<Request>::const_iterator duplicate = FindRequest(action.transactions.front(), payload);
+                return duplicate != action.transactions.front().requests.end();
             }
             else if (section == ResponseSection) {
-                Collection<Response>::const_iterator duplicate = FindResponse(action, payload);
-                return duplicate != action.responses.end();
+                Collection<Response>::const_iterator duplicate = FindResponse(action.transactions.front(), payload);
+                return duplicate != action.transactions.front().responses.end();
             }
 
             return false;

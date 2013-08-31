@@ -342,7 +342,8 @@ namespace snowcrash {
             
             DeepCheckHeaderDuplicates(resource, action, begin->sourceMap, result.first);
             
-            if (action.responses.empty()) {
+            if (action.transactions.empty() ||
+                action.transactions.front().responses.empty()) {
                 // WARN: method has no response
                 result.first.warnings.push_back(Warning("no response defined for `" +
                                                         action.method +
@@ -362,15 +363,18 @@ namespace snowcrash {
                                               const SourceDataBlock& sourceMap,
                                               Result& result) {
             
+            if (action.transactions.empty())
+                return;
+            
             CheckHeaderDuplicates(resource, action, sourceMap, result);
-            for (Collection<Request>::const_iterator it = action.requests.begin();
-                 it != action.requests.end();
+            for (Collection<Request>::const_iterator it = action.transactions.front().requests.begin();
+                 it != action.transactions.front().requests.end();
                  ++it) {
                 
                 CheckHeaderDuplicates(resource, *it, sourceMap, result);
             }
-            for (Collection<Response>::const_iterator it = action.responses.begin();
-                 it != action.responses.end();
+            for (Collection<Response>::const_iterator it = action.transactions.front().responses.begin();
+                 it != action.transactions.front().responses.end();
                  ++it) {
                 
                 CheckHeaderDuplicates(resource, *it, sourceMap, result);

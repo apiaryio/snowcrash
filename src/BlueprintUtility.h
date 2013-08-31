@@ -100,25 +100,25 @@ namespace snowcrash {
     
     /**
      *  \brief  Find a request withing given action.
-     *  \param  action  The action to check.
+     *  \param  transaction  A transaction to check.
      *  \param  request A request to look for.
      *  \return Iterator pointing to the matching request within given method requests.
      */
-    FORCEINLINE Collection<Request>::const_iterator FindRequest(const Action& action, const Request& request) {
-        return std::find_if(action.requests.begin(),
-                            action.requests.end(),
+    FORCEINLINE Collection<Request>::const_iterator FindRequest(const Transaction& transaction, const Request& request) {
+        return std::find_if(transaction.requests.begin(),
+                            transaction.requests.end(),
                             std::bind2nd(MatchPayload(), request));
     }
 
     /**
      *  \brief  Find a response withing responses of a given action.
-     *  \param  action  The action to check.
+     *  \param  transaction  A transaction to check.
      *  \param  response A response to look for.
      *  \return Iterator pointing to the matching response within given method requests.
      */
-    FORCEINLINE Collection<Response>::const_iterator FindResponse(const Action& action, const Response& response) {
-        return std::find_if(action.responses.begin(),
-                            action.responses.end(),
+    FORCEINLINE Collection<Response>::const_iterator FindResponse(const Transaction& transaction, const Response& response) {
+        return std::find_if(transaction.responses.begin(),
+                            transaction.responses.end(),
                             std::bind2nd(MatchPayload(), response));
     }
 }

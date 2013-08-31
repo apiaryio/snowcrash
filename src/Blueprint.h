@@ -110,7 +110,7 @@ namespace snowcrash {
         Asset schema;
     };
     
-    /** Resource Object */
+    /** Resource Model */
     typedef Payload ResourceModel;
     
     /** Request */
@@ -125,6 +125,24 @@ namespace snowcrash {
     typedef Payload Response;
     
     /**
+     *  An HTTP transaction example.
+     */
+    struct Transaction {
+        
+        /** An transaction name */
+        Name name;
+        
+        /** Description */
+        Description description;
+        
+        /** Requests */
+        Collection<Request>::type requests;
+        
+        /** Responses */
+        Collection<Response>::type responses;
+    };
+    
+    /**
      *  Action
      */
     struct Action {
@@ -132,7 +150,7 @@ namespace snowcrash {
         /** HTTP method */
         HTTPMethod method;
         
-        /** A Action name */
+        /** An Action name */
         Name name;
         
         /** Description */
@@ -143,12 +161,9 @@ namespace snowcrash {
         
         /** Action-specific HTTP headers */
         Collection<Header>::type headers;
-
-        /** Requests */
-        Collection<Request>::type requests;
         
-        /** Responses */
-        Collection<Response>::type responses;
+        /** Transactions examples */
+        Collection<Transaction>::type transactions;
     };
     
     /**

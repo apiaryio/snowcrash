@@ -99,7 +99,29 @@ static void serialize(const Payload& payload, size_t level, bool array, std::ost
     // TODO: parameters
 }
 
-// Serialize Method
+// Serialize Transaction Example
+static void serialize(const Transaction& transaction, std::ostream &os)
+{
+    os << "      - ";   // indent 4
+    serialize(SerializeKey::Name, transaction.name, 0, os);
+    serialize(SerializeKey::Description, transaction.description, 4, os);
+    
+    if (!transaction.requests.empty()) {
+        serialize(SerializeKey::Requests, std::string(), 4, os);
+        for (Collection<Request>::const_iterator it = transaction.requests.begin(); it != transaction.requests.end(); ++it) {
+            serialize(*it, 5, true, os);
+        }
+    }
+    
+    if (!transaction.responses.empty()) {
+        serialize(SerializeKey::Responses, std::string(), 4, os);
+        for (Collection<Response>::const_iterator it = transaction.responses.begin(); it != transaction.responses.end(); ++it) {
+            serialize(*it, 5, true, os);
+        }
+    }
+}
+
+// Serialize Action
 static void serialize(const Action& action, std::ostream &os)
 {
     os << "    - ";   // indent 3
@@ -113,17 +135,13 @@ static void serialize(const Action& action, std::ostream &os)
         serialize(action.headers, 3, os);
     }
     
-    if (!action.requests.empty()) {
-        serialize(SerializeKey::Requests, std::string(), 3, os);
-        for (Collection<Request>::const_iterator it = action.requests.begin(); it != action.requests.end(); ++it) {
-            serialize(*it, 4, true, os);
-        }
-    }
-
-    if (!action.responses.empty()) {
-        serialize(SerializeKey::Responses, std::string(), 3, os);
-        for (Collection<Response>::const_iterator it = action.responses.begin(); it != action.responses.end(); ++it) {
-            serialize(*it, 4, true, os);
+    // Transactions
+    serialize(SerializeKey::Transactions, action.description, 3, os);
+    if (!action.transactions.empty()) {
+        for (Collection<Transaction>::const_iterator it = action.transactions.begin();
+             it != action.transactions.end();
+             ++it) {
+            serialize(*it, os);
         }
     }
 }
