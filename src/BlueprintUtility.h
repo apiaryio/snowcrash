@@ -90,35 +90,35 @@ namespace snowcrash {
         }
     };
     
-    /**  Method matching predicate. */
+    /**  Action matching predicate. */
     template <class T>
-    struct MatchMethod : std::binary_function<T, T, bool> {
+    struct MatchAction : std::binary_function<T, T, bool> {
         bool operator()(const T& first, const T& second) const {
             return first.method == second.method;
         }
     };
     
     /**
-     *  \brief  Find a request withing given method.
-     *  \param  method  The method to check.
+     *  \brief  Find a request withing given action.
+     *  \param  action  The action to check.
      *  \param  request A request to look for.
      *  \return Iterator pointing to the matching request within given method requests.
      */
-    FORCEINLINE Collection<Request>::const_iterator FindRequest(const Method& method, const Request& request) {
-        return std::find_if(method.requests.begin(),
-                            method.requests.end(),
+    FORCEINLINE Collection<Request>::const_iterator FindRequest(const Action& action, const Request& request) {
+        return std::find_if(action.requests.begin(),
+                            action.requests.end(),
                             std::bind2nd(MatchPayload(), request));
     }
 
     /**
-     *  \brief  Find a response withing responses of a given method.
-     *  \param  method  The method to check.
+     *  \brief  Find a response withing responses of a given action.
+     *  \param  action  The action to check.
      *  \param  response A response to look for.
      *  \return Iterator pointing to the matching response within given method requests.
      */
-    FORCEINLINE Collection<Response>::const_iterator FindResponse(const Method& method, const Response& response) {
-        return std::find_if(method.responses.begin(),
-                            method.responses.end(),
+    FORCEINLINE Collection<Response>::const_iterator FindResponse(const Action& action, const Response& response) {
+        return std::find_if(action.responses.begin(),
+                            action.responses.end(),
                             std::bind2nd(MatchPayload(), response));
     }
 }

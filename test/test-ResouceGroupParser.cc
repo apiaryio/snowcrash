@@ -34,8 +34,8 @@ snowcrash::MarkdownBlock::Stack snowcrashtest::CanonicalResourceGroupFixture()
     markdown.push_back(MarkdownBlock(HeaderBlockType, "Group First", 1, MakeSourceDataBlock(0, 1)));
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "Fiber optics", 0, MakeSourceDataBlock(1, 1)));
 
-    MarkdownBlock::Stack methodBlocks = CanonicalResourceFixture();
-    markdown.insert(markdown.end(), methodBlocks.begin(), methodBlocks.end());
+    MarkdownBlock::Stack blocks = CanonicalResourceFixture();
+    markdown.insert(markdown.end(), blocks.begin(), blocks.end());
     
     markdown.push_back(MarkdownBlock(HeaderBlockType, "Group Second", 1, MakeSourceDataBlock(0, 1)));
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "Assembly language", 0, MakeSourceDataBlock(2, 1)));
@@ -185,25 +185,25 @@ TEST_CASE("rgparser/parse-multiple-resource", "Parse multiple resources with pay
     Resource resource1 = resourceGroup.resources[0];
     REQUIRE(resource1.uriTemplate == "/1");
     REQUIRE(resource1.description.empty());
-    REQUIRE(resource1.methods.size() == 1);
-    REQUIRE(resource1.methods[0].method == "GET");
-    REQUIRE(resource1.methods[0].description.empty());
-    REQUIRE(resource1.methods[0].requests.size() == 1);
-    REQUIRE(resource1.methods[0].requests[0].name.empty());
-    REQUIRE(resource1.methods[0].requests[0].description.empty());
-    REQUIRE(resource1.methods[0].requests[0].body.empty());
-    REQUIRE(resource1.methods[0].responses.empty());
+    REQUIRE(resource1.actions.size() == 1);
+    REQUIRE(resource1.actions[0].method == "GET");
+    REQUIRE(resource1.actions[0].description.empty());
+    REQUIRE(resource1.actions[0].requests.size() == 1);
+    REQUIRE(resource1.actions[0].requests[0].name.empty());
+    REQUIRE(resource1.actions[0].requests[0].description.empty());
+    REQUIRE(resource1.actions[0].requests[0].body.empty());
+    REQUIRE(resource1.actions[0].responses.empty());
 
     Resource resource2 = resourceGroup.resources[1];
     REQUIRE(resource2.uriTemplate == "/2");
     REQUIRE(resource2.description.empty());
-    REQUIRE(resource2.methods.size() == 1);
-    REQUIRE(resource2.methods[0].method == "GET");
-    REQUIRE(resource2.methods[0].description.empty());
-    REQUIRE(resource2.methods[0].requests[0].name.empty());
-    REQUIRE(resource2.methods[0].requests[0].description.empty());
-    REQUIRE(resource2.methods[0].requests[0].body.empty());
-    REQUIRE(resource2.methods[0].responses.empty());
+    REQUIRE(resource2.actions.size() == 1);
+    REQUIRE(resource2.actions[0].method == "GET");
+    REQUIRE(resource2.actions[0].description.empty());
+    REQUIRE(resource2.actions[0].requests[0].name.empty());
+    REQUIRE(resource2.actions[0].requests[0].description.empty());
+    REQUIRE(resource2.actions[0].requests[0].body.empty());
+    REQUIRE(resource2.actions[0].responses.empty());
 }
 
 TEST_CASE("rgparser/parse-multiple-same", "Parse multiple resources with the same name")
@@ -259,9 +259,9 @@ TEST_CASE("rgparser/parse-resource-description-list", "Parse resource with list 
     REQUIRE(resourceGroup.resources.size() == 1);
     REQUIRE(resourceGroup.resources[0].uriTemplate == "/1");
     REQUIRE(resourceGroup.resources[0].description.empty());
-    REQUIRE(resourceGroup.resources[0].methods.size() == 1);
-    REQUIRE(resourceGroup.resources[0].methods[0].method == "GET");
-    REQUIRE(resourceGroup.resources[0].methods[0].description == "");
+    REQUIRE(resourceGroup.resources[0].actions.size() == 1);
+    REQUIRE(resourceGroup.resources[0].actions[0].method == "GET");
+    REQUIRE(resourceGroup.resources[0].actions[0].description == "");
 }
 
 TEST_CASE("rgparser/parse-hr", "Parse resource groups with hr in description")

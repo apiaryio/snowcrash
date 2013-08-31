@@ -140,7 +140,7 @@ namespace snowcrash {
         /**
          *  \brief Append a result to this one, replacing the error source annotation.
          *
-         *  NOTE: A binding does not need to wrap this method.
+         *  NOTE: A binding does not need to wrap this action.
          */
         Result& operator+=(const Result& rhs) {
             error = rhs.error;

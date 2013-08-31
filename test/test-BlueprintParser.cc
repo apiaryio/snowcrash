@@ -34,8 +34,8 @@ snowcrash::MarkdownBlock::Stack snowcrashtest::CanonicalBlueprintFixture()
     markdown.push_back(MarkdownBlock(HeaderBlockType, "Character", 2, MakeSourceDataBlock(2, 1)));
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "Uncle Enzo", 0, MakeSourceDataBlock(3, 1)));
     
-    MarkdownBlock::Stack methodBlocks = CanonicalResourceGroupFixture();
-    markdown.insert(markdown.end(), methodBlocks.begin(), methodBlocks.end());
+    MarkdownBlock::Stack blocksFixture = CanonicalResourceGroupFixture();
+    markdown.insert(markdown.end(), blocksFixture.begin(), blocksFixture.end());
     
     return markdown;
 }
@@ -361,17 +361,17 @@ TEST_CASE("bpparser/parse-resource", "Parse simple resource.")
     REQUIRE(resource.description.empty());
     REQUIRE(resource.headers.empty());
     REQUIRE(resource.parameters.empty());
-    REQUIRE(resource.methods.size() == 1);
+    REQUIRE(resource.actions.size() == 1);
     
-    Method method = resource.methods.front();
-    REQUIRE(method.method == "GET");
-    REQUIRE(method.description == "1");
-    REQUIRE(method.parameters.empty());
-    REQUIRE(method.headers.empty());
-    REQUIRE(method.requests.empty());
-    REQUIRE(method.responses.size() == 1);
+    Action action = resource.actions.front();
+    REQUIRE(action.method == "GET");
+    REQUIRE(action.description == "1");
+    REQUIRE(action.parameters.empty());
+    REQUIRE(action.headers.empty());
+    REQUIRE(action.requests.empty());
+    REQUIRE(action.responses.size() == 1);
     
-    Response response = method.responses.front();
+    Response response = action.responses.front();
     REQUIRE(response.name == "200");
     REQUIRE(response.description.empty());
     REQUIRE(response.parameters.empty());

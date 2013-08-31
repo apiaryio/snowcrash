@@ -156,7 +156,7 @@ namespace snowcrash {
     
     // Forward declaration of classifier helpers
     extern bool HasResourceGroupSignature(const MarkdownBlock& block);
-    extern bool HasMethodSignature(const MarkdownBlock& block);
+    extern bool HasActionSignature(const MarkdownBlock& block);
     extern bool HasResourceSignature(const MarkdownBlock& block);
     extern bool HasPayloadSignature(const BlockIterator& begin, const BlockIterator& end);
     extern bool HasPayloadAssetSignature(const BlockIterator& begin, const BlockIterator& end);

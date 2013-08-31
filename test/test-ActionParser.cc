@@ -1,5 +1,5 @@
 //
-//  test-MethodParser.cc
+//  test-ActionParser.cc
 //  snowcrash
 //
 //  Created by Zdenek Nemec on 5/6/13.
@@ -8,7 +8,7 @@
 
 #include <iterator>
 #include "catch.hpp"
-#include "MethodParser.h"
+#include "ActionParser.h"
 #include "ResourceParser.h"
 #include "ResourceGroupParser.h"
 #include "Fixture.h"
@@ -16,7 +16,7 @@
 using namespace snowcrash;
 using namespace snowcrashtest;
 
-MarkdownBlock::Stack snowcrashtest::CanonicalMethodFixture()
+MarkdownBlock::Stack snowcrashtest::CanonicalActionFixture()
 {
     // Blueprint in question:
     //R"(
@@ -71,7 +71,7 @@ MarkdownBlock::Stack snowcrashtest::CanonicalMethodFixture()
 
 TEST_CASE("mparser/classifier", "Method block classifier")
 {
-    MarkdownBlock::Stack markdown = CanonicalMethodFixture();
+    MarkdownBlock::Stack markdown = CanonicalActionFixture();
     
     MarkdownBlock::Stack additionalListItems;
     additionalListItems.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
@@ -86,53 +86,53 @@ TEST_CASE("mparser/classifier", "Method block classifier")
     
     cur = markdown.begin();
     // HeaderBlockType - "GET"
-    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), UndefinedSection) == MethodSection);
-    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), MethodSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSection) == MethodSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), MethodSection) == UndefinedSection);
     
     ++cur; // ParagraphBlockType - "MethodSection"
-    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
-    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), MethodSection) == MethodSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), MethodSection) == MethodSection);
 
     ++cur; // ListBlockBeginType - "Response"
-    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), UndefinedSection) == ResponseSection);
-    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), MethodSection) == ResponseSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSection) == ResponseSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), MethodSection) == ResponseSection);
     
     ++cur; // ListItemBlockBeginType - "Response"
-    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), UndefinedSection) == ResponseSection);
-    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), MethodSection) == ResponseSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSection) == ResponseSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), MethodSection) == ResponseSection);
     
     std::advance(cur, 4); // ListItemBlockBeginType - "Headers"
-    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), UndefinedSection) == HeadersSection);
-    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), MethodSection) == HeadersSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSection) == HeadersSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), MethodSection) == HeadersSection);
     
     std::advance(cur, 4); // Request
-    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), UndefinedSection) == RequestSection);
-    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), MethodSection) == RequestSection);
-    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), HeadersSection) == RequestSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSection) == RequestSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), MethodSection) == RequestSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), HeadersSection) == RequestSection);
     
     std::advance(cur, 18); // Response
-    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), UndefinedSection) == ResponseSection);
-    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), MethodSection) == ResponseSection);
-    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), ResponseSection) == ResponseSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSection) == ResponseSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), MethodSection) == ResponseSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ResponseSection) == ResponseSection);
     
     std::advance(cur, 3); // Foreign
-    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), UndefinedSection) == ForeignSection);
-    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), MethodSection) == ForeignSection);
-    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), HeadersSection) == ForeignSection);
-    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), ResponseSection) == ForeignSection);
-    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), RequestSection) == ForeignSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSection) == ForeignSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), MethodSection) == ForeignSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), HeadersSection) == ForeignSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ResponseSection) == ForeignSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), RequestSection) == ForeignSection);
     
     // Nameless method
     markdown[0].content = "GET";
     cur = markdown.begin();
-    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), UndefinedSection) == MethodSection);
-    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), MethodSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSection) == MethodSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), MethodSection) == UndefinedSection);
 
     // Keyword "group"
     markdown[0].content = "Group A";
     cur = markdown.begin();
-    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
-    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), MethodSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), MethodSection) == UndefinedSection);
 }
 
 TEST_CASE("mparser/classifier-implicit-termination", "Method block classifier implicit termination")
@@ -145,19 +145,19 @@ TEST_CASE("mparser/classifier-implicit-termination", "Method block classifier im
     BlockIterator cur = markdown.begin();
     std::advance(cur, 2);
     
-    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), MethodSection) == UndefinedSection);
-    REQUIRE(ClassifyBlock<Method>(cur, markdown.end(), UndefinedSection) == UndefinedSection);    
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), MethodSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSection) == UndefinedSection);    
 }
 
 TEST_CASE("mparser/parse", "Parse method")
 {
-    MarkdownBlock::Stack markdown = CanonicalMethodFixture();   
-    Method method;
+    MarkdownBlock::Stack markdown = CanonicalActionFixture();   
+    Action action;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = MethodParser::Parse(markdown.begin(),
+    ParseSectionResult result = ActionParser::Parse(markdown.begin(),
                                                     markdown.end(),
                                                     parser,
-                                                    method);
+                                                    action);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.empty());
@@ -165,22 +165,22 @@ TEST_CASE("mparser/parse", "Parse method")
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 30);
     
-    REQUIRE(method.name == "My Method");
-    REQUIRE(method.method == "GET");
-    REQUIRE(method.description == "1");
+    REQUIRE(action.name == "My Method");
+    REQUIRE(action.method == "GET");
+    REQUIRE(action.description == "1");
 
-    REQUIRE(method.headers.size() == 1);
-    REQUIRE(method.headers[0].first == "X-Method-Header");
-    REQUIRE(method.headers[0].second == "0xdeadbeef");
-    REQUIRE(method.parameters.empty());
-    REQUIRE(method.requests.size() == 1);
-    REQUIRE(method.responses.size() == 1);
+    REQUIRE(action.headers.size() == 1);
+    REQUIRE(action.headers[0].first == "X-Method-Header");
+    REQUIRE(action.headers[0].second == "0xdeadbeef");
+    REQUIRE(action.parameters.empty());
+    REQUIRE(action.requests.size() == 1);
+    REQUIRE(action.responses.size() == 1);
     
-    REQUIRE(method.responses[0].name == "200");
-    REQUIRE(method.responses[0].body == "OK.");
-    REQUIRE(method.responses[0].headers.size() == 1);
-    REQUIRE(method.responses[0].headers[0].first == "Content-Type");
-    REQUIRE(method.responses[0].headers[0].second == "text/plain");
+    REQUIRE(action.responses[0].name == "200");
+    REQUIRE(action.responses[0].body == "OK.");
+    REQUIRE(action.responses[0].headers.size() == 1);
+    REQUIRE(action.responses[0].headers[0].first == "Content-Type");
+    REQUIRE(action.responses[0].headers[0].second == "text/plain");
 }
 
 TEST_CASE("mparser/parse-list-description", "Parse description with list")
@@ -209,15 +209,15 @@ TEST_CASE("mparser/parse-list-description", "Parse description with list")
     
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(1, 1)));
     
-    Method method;
+    Action action;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), parser, method);
+    ParseSectionResult result = ActionParser::Parse(markdown.begin(), markdown.end(), parser, action);
     
     REQUIRE(result.first.error.code == Error::OK);
     
-    REQUIRE(method.description == "123");
-    REQUIRE(method.responses.empty());
-    REQUIRE(method.requests.size() == 1);
+    REQUIRE(action.description == "123");
+    REQUIRE(action.responses.empty());
+    REQUIRE(action.requests.size() == 1);
 }
 
 TEST_CASE("mparser/parse-list-description-request", "Parse description with list followed by a request")
@@ -246,9 +246,9 @@ TEST_CASE("mparser/parse-list-description-request", "Parse description with list
     markdown.push_back(MarkdownBlock(ListItemBlockEndType, "Request", 0, MakeSourceDataBlock(4, 1)));
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(5, 1)));
     
-    Method method;
+    Action action;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());    
-    ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), parser, method);
+    ParseSectionResult result = ActionParser::Parse(markdown.begin(), markdown.end(), parser, action);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.size() == 1); // empty body asset
@@ -256,16 +256,16 @@ TEST_CASE("mparser/parse-list-description-request", "Parse description with list
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 10);
     
-    REQUIRE(method.name.empty());    
-    REQUIRE(method.method == "GET");
-    REQUIRE(method.description == "23");
-    REQUIRE(method.headers.empty());
-    REQUIRE(method.parameters.empty());
-    REQUIRE(method.responses.empty());
-    REQUIRE(method.requests.size() == 1);
-    REQUIRE(method.requests.front().name.empty());
-    REQUIRE(method.requests.front().description.empty());
-    REQUIRE(method.requests.front().body.empty());
+    REQUIRE(action.name.empty());    
+    REQUIRE(action.method == "GET");
+    REQUIRE(action.description == "23");
+    REQUIRE(action.headers.empty());
+    REQUIRE(action.parameters.empty());
+    REQUIRE(action.responses.empty());
+    REQUIRE(action.requests.size() == 1);
+    REQUIRE(action.requests.front().name.empty());
+    REQUIRE(action.requests.front().description.empty());
+    REQUIRE(action.requests.front().body.empty());
 }
 
 TEST_CASE("mparser/response-regex-problem", "Parse method with response not matching regex")
@@ -286,9 +286,9 @@ TEST_CASE("mparser/response-regex-problem", "Parse method with response not matc
     markdown.push_back(MarkdownBlock(ListItemBlockEndType, "Response 200\n  B\n", 0, MakeSourceDataBlock(1, 1)));
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(2, 1)));
 
-    Method method;
+    Action action;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), parser, method);
+    ParseSectionResult result = ActionParser::Parse(markdown.begin(), markdown.end(), parser, action);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.size() == 1); // preformatted asset
@@ -296,16 +296,16 @@ TEST_CASE("mparser/response-regex-problem", "Parse method with response not matc
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 5);
     
-    REQUIRE(method.name.empty());    
-    REQUIRE(method.method == "GET");
-    REQUIRE(method.description.empty());
-    REQUIRE(method.headers.empty());
-    REQUIRE(method.parameters.empty());
-    REQUIRE(method.requests.empty());
-    REQUIRE(method.responses.size() == 1);
-    REQUIRE(method.responses.front().name == "200");
-    REQUIRE(method.responses.front().description.empty());
-    REQUIRE(method.responses.front().body == "  B\n");
+    REQUIRE(action.name.empty());    
+    REQUIRE(action.method == "GET");
+    REQUIRE(action.description.empty());
+    REQUIRE(action.headers.empty());
+    REQUIRE(action.parameters.empty());
+    REQUIRE(action.requests.empty());
+    REQUIRE(action.responses.size() == 1);
+    REQUIRE(action.responses.front().name == "200");
+    REQUIRE(action.responses.front().description.empty());
+    REQUIRE(action.responses.front().body == "  B\n");
 }
 
 TEST_CASE("mparser/parse-multi-request-response", "Parse method with multiple requests and responses")
@@ -395,9 +395,9 @@ TEST_CASE("mparser/parse-multi-request-response", "Parse method with multiple re
     
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(29, 1)));
     
-    Method method;
+    Action action;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), parser, method);
+    ParseSectionResult result = ActionParser::Parse(markdown.begin(), markdown.end(), parser, action);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.size() == 1); // warn responses with the same name
@@ -405,43 +405,43 @@ TEST_CASE("mparser/parse-multi-request-response", "Parse method with multiple re
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 43);
     
-    REQUIRE(method.name.empty());    
-    REQUIRE(method.method == "PUT");
-    REQUIRE(method.description.empty());
-    REQUIRE(method.headers.empty());
-    REQUIRE(method.parameters.empty());
+    REQUIRE(action.name.empty());    
+    REQUIRE(action.method == "PUT");
+    REQUIRE(action.description.empty());
+    REQUIRE(action.headers.empty());
+    REQUIRE(action.parameters.empty());
     
-    REQUIRE(method.requests.size() == 2);
+    REQUIRE(action.requests.size() == 2);
     
-    REQUIRE(method.requests[0].name == "A");
-    REQUIRE(method.requests[0].description == "2");
-    REQUIRE(method.requests[0].body == "C");
-    REQUIRE(method.requests[0].schema.empty());
-    REQUIRE(method.requests[0].parameters.empty());
-    REQUIRE(method.requests[0].headers.empty());
+    REQUIRE(action.requests[0].name == "A");
+    REQUIRE(action.requests[0].description == "2");
+    REQUIRE(action.requests[0].body == "C");
+    REQUIRE(action.requests[0].schema.empty());
+    REQUIRE(action.requests[0].parameters.empty());
+    REQUIRE(action.requests[0].headers.empty());
     
-    REQUIRE(method.requests[1].name == "D");
-    REQUIRE(method.requests[1].description == "9");
-    REQUIRE(method.requests[1].body == "F");
-    REQUIRE(method.requests[1].schema.empty());
-    REQUIRE(method.requests[1].parameters.empty());
-    REQUIRE(method.requests[1].headers.empty());
+    REQUIRE(action.requests[1].name == "D");
+    REQUIRE(action.requests[1].description == "9");
+    REQUIRE(action.requests[1].body == "F");
+    REQUIRE(action.requests[1].schema.empty());
+    REQUIRE(action.requests[1].parameters.empty());
+    REQUIRE(action.requests[1].headers.empty());
     
-    REQUIRE(method.responses.size() == 2);
+    REQUIRE(action.responses.size() == 2);
     
-    REQUIRE(method.responses[0].name == "200");
-    REQUIRE(method.responses[0].description == "G");
-    REQUIRE(method.responses[0].body == "H");
-    REQUIRE(method.responses[0].schema.empty());
-    REQUIRE(method.responses[0].parameters.empty());
-    REQUIRE(method.responses[0].headers.empty());
+    REQUIRE(action.responses[0].name == "200");
+    REQUIRE(action.responses[0].description == "G");
+    REQUIRE(action.responses[0].body == "H");
+    REQUIRE(action.responses[0].schema.empty());
+    REQUIRE(action.responses[0].parameters.empty());
+    REQUIRE(action.responses[0].headers.empty());
     
-    REQUIRE(method.responses[1].name == "200");
-    REQUIRE(method.responses[1].description == "N");
-    REQUIRE(method.responses[1].body == "J");
-    REQUIRE(method.responses[1].schema.empty());
-    REQUIRE(method.responses[1].parameters.empty());
-    REQUIRE(method.responses[1].headers.empty());
+    REQUIRE(action.responses[1].name == "200");
+    REQUIRE(action.responses[1].description == "N");
+    REQUIRE(action.responses[1].body == "J");
+    REQUIRE(action.responses[1].schema.empty());
+    REQUIRE(action.responses[1].parameters.empty());
+    REQUIRE(action.responses[1].headers.empty());
 
 }
 
@@ -473,9 +473,9 @@ TEST_CASE("mparser/parse-multi-request-incomplete", "Parse method with multiple 
     
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(5, 1)));
 
-    Method method;
+    Action action;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), parser, method);
+    ParseSectionResult result = ActionParser::Parse(markdown.begin(), markdown.end(), parser, action);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.size() == 2); // empty asset & preformatted asset
@@ -483,25 +483,25 @@ TEST_CASE("mparser/parse-multi-request-incomplete", "Parse method with multiple 
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 9);
     
-    REQUIRE(method.name.empty());    
-    REQUIRE(method.method == "HEAD");
-    REQUIRE(method.description.empty());
-    REQUIRE(method.headers.empty());
-    REQUIRE(method.parameters.empty());
+    REQUIRE(action.name.empty());    
+    REQUIRE(action.method == "HEAD");
+    REQUIRE(action.description.empty());
+    REQUIRE(action.headers.empty());
+    REQUIRE(action.parameters.empty());
     
-    REQUIRE(method.requests.size() == 2);
-    REQUIRE(method.requests[0].name == "A");
-    REQUIRE(method.requests[0].body.empty());
-    REQUIRE(method.requests[0].schema.empty());
-    REQUIRE(method.requests[0].parameters.empty());
-    REQUIRE(method.requests[0].headers.empty());
+    REQUIRE(action.requests.size() == 2);
+    REQUIRE(action.requests[0].name == "A");
+    REQUIRE(action.requests[0].body.empty());
+    REQUIRE(action.requests[0].schema.empty());
+    REQUIRE(action.requests[0].parameters.empty());
+    REQUIRE(action.requests[0].headers.empty());
     
-    REQUIRE(method.requests[1].name == "B");
-    REQUIRE(method.requests[1].description.empty());
-    REQUIRE(method.requests[1].body == "3");
-    REQUIRE(method.requests[1].schema.empty());
-    REQUIRE(method.requests[1].parameters.empty());
-    REQUIRE(method.requests[1].headers.empty());
+    REQUIRE(action.requests[1].name == "B");
+    REQUIRE(action.requests[1].description.empty());
+    REQUIRE(action.requests[1].body == "3");
+    REQUIRE(action.requests[1].schema.empty());
+    REQUIRE(action.requests[1].parameters.empty());
+    REQUIRE(action.requests[1].headers.empty());
 }
 
 TEST_CASE("Parse method with foreign item", "[method][foreign]")
@@ -537,9 +537,9 @@ TEST_CASE("Parse method with foreign item", "[method][foreign]")
 
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(9, 1)));
     
-    Method method;
+    Action action;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), parser, method);
+    ParseSectionResult result = ActionParser::Parse(markdown.begin(), markdown.end(), parser, action);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.size() == 1);
@@ -548,18 +548,18 @@ TEST_CASE("Parse method with foreign item", "[method][foreign]")
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 15);
     
-    REQUIRE(method.name.empty());    
-    REQUIRE(method.method == "MKCOL");
-    REQUIRE(method.description.empty());
-    REQUIRE(method.headers.empty());
-    REQUIRE(method.parameters.empty());
+    REQUIRE(action.name.empty());    
+    REQUIRE(action.method == "MKCOL");
+    REQUIRE(action.description.empty());
+    REQUIRE(action.headers.empty());
+    REQUIRE(action.parameters.empty());
     
-    REQUIRE(method.requests.size() == 1);
-    REQUIRE(method.requests[0].name.empty());
-    REQUIRE(method.requests[0].body == "Foo");
-    REQUIRE(method.requests[0].schema.empty());
-    REQUIRE(method.requests[0].parameters.empty());
-    REQUIRE(method.requests[0].headers.empty());    
+    REQUIRE(action.requests.size() == 1);
+    REQUIRE(action.requests[0].name.empty());
+    REQUIRE(action.requests[0].body == "Foo");
+    REQUIRE(action.requests[0].schema.empty());
+    REQUIRE(action.requests[0].parameters.empty());
+    REQUIRE(action.requests[0].headers.empty());    
 }
 
 TEST_CASE("mparser/parse-inline-method-payload", "Parse method with inline payload")
@@ -585,9 +585,9 @@ TEST_CASE("mparser/parse-inline-method-payload", "Parse method with inline paylo
     markdown.push_back(MarkdownBlock(ListItemBlockEndType, "request", 0, MakeSourceDataBlock(3, 1)));
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(4, 1)));
     
-    Method method;
+    Action action;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), parser, method);
+    ParseSectionResult result = ActionParser::Parse(markdown.begin(), markdown.end(), parser, action);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.size() == 1); // empty asset
@@ -595,14 +595,14 @@ TEST_CASE("mparser/parse-inline-method-payload", "Parse method with inline paylo
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 9);
     
-    REQUIRE(method.name.empty());
-    REQUIRE(method.method == "POST");
-    REQUIRE(method.description.empty());
-    REQUIRE(method.responses.empty());
-    REQUIRE(method.requests.size() == 1);
-    REQUIRE(method.requests[0].name.empty());
-    REQUIRE(method.requests[0].description.empty());
-    REQUIRE(method.requests[0].body.empty());
+    REQUIRE(action.name.empty());
+    REQUIRE(action.method == "POST");
+    REQUIRE(action.description.empty());
+    REQUIRE(action.responses.empty());
+    REQUIRE(action.requests.size() == 1);
+    REQUIRE(action.requests[0].name.empty());
+    REQUIRE(action.requests[0].description.empty());
+    REQUIRE(action.requests[0].body.empty());
 }
 
 TEST_CASE("mparser/parse-hr", "Parse method with a HR")
@@ -620,9 +620,9 @@ TEST_CASE("mparser/parse-hr", "Parse method with a HR")
     markdown.push_back(MarkdownBlock(HRuleBlockType, SourceData(), 0, MakeSourceDataBlock(1, 1)));
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "A", 0, MakeSourceDataBlock(2, 1)));
     
-    Method method;
+    Action action;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), parser, method);
+    ParseSectionResult result = ActionParser::Parse(markdown.begin(), markdown.end(), parser, action);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.empty());
@@ -630,11 +630,11 @@ TEST_CASE("mparser/parse-hr", "Parse method with a HR")
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 3);
     
-    REQUIRE(method.name.empty());    
-    REQUIRE(method.method == "PATCH");
-    REQUIRE(method.description == "12");
-    REQUIRE(method.requests.empty());
-    REQUIRE(method.responses.empty());
+    REQUIRE(action.name.empty());    
+    REQUIRE(action.method == "PATCH");
+    REQUIRE(action.description == "12");
+    REQUIRE(action.requests.empty());
+    REQUIRE(action.responses.empty());
 }
 
 TEST_CASE("mparser/parse-implicit-termination", "Parse incomplete method followed by another resource")
@@ -649,9 +649,9 @@ TEST_CASE("mparser/parse-implicit-termination", "Parse incomplete method followe
     markdown.push_back(MarkdownBlock(HeaderBlockType, "GET", 2, MakeSourceDataBlock(0, 1)));
     markdown.push_back(MarkdownBlock(HeaderBlockType, "/2", 1, MakeSourceDataBlock(1, 1)));
     
-    Method method;
+    Action action;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), parser, method);
+    ParseSectionResult result = ActionParser::Parse(markdown.begin(), markdown.end(), parser, action);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.empty());
@@ -659,21 +659,21 @@ TEST_CASE("mparser/parse-implicit-termination", "Parse incomplete method followe
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 1);
     
-    REQUIRE(method.name.empty());    
-    REQUIRE(method.method == "GET");
-    REQUIRE(method.description.empty());
+    REQUIRE(action.name.empty());    
+    REQUIRE(action.method == "GET");
+    REQUIRE(action.description.empty());
 }
 
 TEST_CASE("mparser/header-warnings", "Check warnings on overshadowing a header")
 {
-    MarkdownBlock::Stack markdown = CanonicalMethodFixture();
-    Method method;
+    MarkdownBlock::Stack markdown = CanonicalActionFixture();
+    Action action;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    method.headers.push_back(std::make_pair("X-Header", "24"));
-    ParseSectionResult result = MethodParser::Parse(markdown.begin(),
+    action.headers.push_back(std::make_pair("X-Header", "24"));
+    ParseSectionResult result = ActionParser::Parse(markdown.begin(),
                                                     markdown.end(),
                                                     parser,
-                                                    method);
+                                                    action);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.size() == 1);
@@ -691,9 +691,9 @@ TEST_CASE("mparser/parse-nameless-method", "Parse method without name")
     MarkdownBlock::Stack markdown;
     markdown.push_back(MarkdownBlock(HeaderBlockType, "GET", 2, MakeSourceDataBlock(0, 1)));
     
-    Method method;
+    Action action;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), parser, method);
+    ParseSectionResult result = ActionParser::Parse(markdown.begin(), markdown.end(), parser, action);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.empty());
@@ -701,9 +701,9 @@ TEST_CASE("mparser/parse-nameless-method", "Parse method without name")
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 1);
     
-    REQUIRE(method.name.empty());
-    REQUIRE(method.method == "GET");
-    REQUIRE(method.description.empty());
+    REQUIRE(action.name.empty());
+    REQUIRE(action.method == "GET");
+    REQUIRE(action.description.empty());
 }
 
 TEST_CASE("mparser/not-parse-object", "Make sure method with object payload is not parsed")
@@ -724,9 +724,9 @@ TEST_CASE("mparser/not-parse-object", "Make sure method with object payload is n
     
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(2, 1)));
     
-    Method method;
+    Action action;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), parser, method);
+    ParseSectionResult result = ActionParser::Parse(markdown.begin(), markdown.end(), parser, action);
     
     REQUIRE(result.first.error.code != Error::OK);
 }
@@ -743,9 +743,9 @@ TEST_CASE("mparser/adjacent-group", "Make sure method followed by a group does n
     markdown.push_back(MarkdownBlock(HeaderBlockType, "POST", 2, MakeSourceDataBlock(0, 1)));
     markdown.push_back(MarkdownBlock(HeaderBlockType, "Group Two", 1, MakeSourceDataBlock(1, 1)));
     
-    Method method;
+    Action action;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = MethodParser::Parse(markdown.begin(), markdown.end(), parser, method);
+    ParseSectionResult result = ActionParser::Parse(markdown.begin(), markdown.end(), parser, action);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.empty());
@@ -753,7 +753,7 @@ TEST_CASE("mparser/adjacent-group", "Make sure method followed by a group does n
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 1);
 
-    REQUIRE(method.method == "POST");
-    REQUIRE(method.description.empty());
+    REQUIRE(action.method == "POST");
+    REQUIRE(action.description.empty());
 
 }

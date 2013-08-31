@@ -12,7 +12,7 @@
 #include <sstream>
 #include "BlueprintParserCore.h"
 #include "Blueprint.h"
-#include "MethodParser.h"
+#include "ActionParser.h"
 #include "RegexMatch.h"
 #include "StringUtility.h"
 
@@ -135,7 +135,7 @@ namespace snowcrash {
                     UndefinedSection;
         }
         
-        if (HasMethodSignature(*begin))
+        if (HasActionSignature(*begin))
             return (context != ResourceMethodSection) ? MethodSection : UndefinedSection;
         
         Section listSection = ClassifyInternaListBlock<Resource>(begin, end);
@@ -180,7 +180,7 @@ namespace snowcrash {
                     break;
                     
                 case MethodSection:
-                    result = HandleMethod(cur, bounds.second, parser, resource);
+                    result = HandleAction(cur, bounds.second, parser, resource);
                     break;
                     
                 case UndefinedSection:
@@ -299,40 +299,40 @@ namespace snowcrash {
             HTTPMethod method;
             GetResourceSignature(*cur, resource.name, resource.uriTemplate, method);
             
-            // Parse as a resource method abbreviation
-            return HandleMethod(cur, bounds.second, parser, resource, true);
+            // Parse as a resource action abbreviation
+            return HandleAction(cur, bounds.second, parser, resource, true);
         }
         
-        static ParseSectionResult HandleMethod(const BlockIterator& begin,
+        static ParseSectionResult HandleAction(const BlockIterator& begin,
                                                const BlockIterator& end,
                                                BlueprintParserCore& parser,
                                                Resource& resource,
                                                bool abbrev = false)
         {
-            Method method;
-            ParseSectionResult result = MethodParser::Parse(begin, end, parser, method);
+            Action action;
+            ParseSectionResult result = ActionParser::Parse(begin, end, parser, action);
             if (result.first.error.code != Error::OK)
                 return result;
 
             if (!abbrev) {
                 Name name;
                 HTTPMethod httpMethod;
-                MethodSignature methodSignature = GetMethodSignature(*begin, name, httpMethod);
-                if (methodSignature == MethodURIMethodSignature) {
-                    // WARN: ignoring extraneous content in method header
+                ActionSignature actionSignature = GetActionSignature(*begin, name, httpMethod);
+                if (actionSignature == MethodURIActionSignature) {
+                    // WARN: ignoring extraneous content in action header
                     std::stringstream ss;
                     ss << "ignoring extraneous content in method header `" << begin->content << "`";
-                    ss << ", expected method-only e.g. `# " << method.method << "`";
+                    ss << ", expected method-only e.g. `# " << action.method << "`";
                     result.first.warnings.push_back(Warning(ss.str(), IgnoringWarning, begin->sourceMap));
                 }
             }
             
-            Collection<Method>::iterator duplicate = FindMethod(resource, method);
-            if (duplicate != resource.methods.end()) {
+            Collection<Action>::iterator duplicate = FindAction(resource, action);
+            if (duplicate != resource.actions.end()) {
                 
                 // WARN: duplicate method
-                result.first.warnings.push_back(Warning("method `" +
-                                                        method.method +
+                result.first.warnings.push_back(Warning("action with method `" +
+                                                        action.method +
                                                         "` already defined for resource `" +
                                                         resource.uriTemplate +
                                                         "`",
@@ -340,12 +340,12 @@ namespace snowcrash {
                                                         begin->sourceMap));
             }
             
-            DeepCheckHeaderDuplicates(resource, method, begin->sourceMap, result.first);
+            DeepCheckHeaderDuplicates(resource, action, begin->sourceMap, result.first);
             
-            if (method.responses.empty()) {
+            if (action.responses.empty()) {
                 // WARN: method has no response
                 result.first.warnings.push_back(Warning("no response defined for `" +
-                                                        method.method +
+                                                        action.method +
                                                         " " +
                                                         resource.uriTemplate +
                                                         "`",
@@ -353,32 +353,32 @@ namespace snowcrash {
                                                         begin->sourceMap));
             }
             
-            resource.methods.push_back(method);
+            resource.actions.push_back(action);
             return result;
         }
         
         static void DeepCheckHeaderDuplicates(const Resource& resource,
-                                              const Method& method,
+                                              const Action& action,
                                               const SourceDataBlock& sourceMap,
                                               Result& result) {
             
-            CheckHeaderDuplicates(resource, method, sourceMap, result);
-            for (Collection<Request>::const_iterator it = method.requests.begin();
-                 it != method.requests.end();
+            CheckHeaderDuplicates(resource, action, sourceMap, result);
+            for (Collection<Request>::const_iterator it = action.requests.begin();
+                 it != action.requests.end();
                  ++it) {
                 
                 CheckHeaderDuplicates(resource, *it, sourceMap, result);
             }
-            for (Collection<Response>::const_iterator it = method.responses.begin();
-                 it != method.responses.end();
+            for (Collection<Response>::const_iterator it = action.responses.begin();
+                 it != action.responses.end();
                  ++it) {
                 
                 CheckHeaderDuplicates(resource, *it, sourceMap, result);
             }
         }
         
-        // Check whether abbreviated resource method isn't followed by a
-        // method header -> implies possible additional method intended
+        // Check whether abbreviated resource action isn't followed by an
+        // action header -> implies possible additional method intended
         static void CheckAmbiguousMethod(const BlockIterator& begin,
                                          const BlockIterator& end,
                                          const Resource& resource,
@@ -390,13 +390,13 @@ namespace snowcrash {
             
             Name name;
             HTTPMethod method;
-            MethodSignature methodSignature = GetMethodSignature(*begin, name, method);
-            if (methodSignature == MethodMethodSignature ||
-                methodSignature == NamedMethodSignature) {
+            ActionSignature actionSignature = GetActionSignature(*begin, name, method);
+            if (actionSignature == MethodActionSignature ||
+                actionSignature == NamedActionSignature) {
                 // WARN: ignoring possible method header
                 std::stringstream ss;
-                ss << "unexpected method `" << begin->content << "`, ";
-                ss << "to the define muliple methods for the `" << resource.uriTemplate << "` resource remove the method from its definition, ";
+                ss << "unexpected action `" << begin->content << "`, ";
+                ss << "to the define muliple actions for the `" << resource.uriTemplate << "` resource omit the HTTP method in its definition, ";
                 ss << "e.g. `# " << resource.uriTemplate << "`";
                 result.warnings.push_back(Warning(ss.str(), IgnoringWarning, begin->sourceMap));
             }

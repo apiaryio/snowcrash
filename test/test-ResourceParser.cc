@@ -30,7 +30,7 @@ MarkdownBlock::Stack snowcrashtest::CanonicalResourceFixture()
     //
     //        X-Resource-Header: Swordfighter XXII
     //
-    // <see CanonicalMethodFixture()>
+    // <see CanonicalActionFixture()>
     //
     //)";
     
@@ -52,8 +52,8 @@ MarkdownBlock::Stack snowcrashtest::CanonicalResourceFixture()
     
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(8, 1)));
     
-    MarkdownBlock::Stack methodBlocks = CanonicalMethodFixture();
-    markdown.insert(markdown.end(), methodBlocks.begin(), methodBlocks.end());
+    MarkdownBlock::Stack blocksFixture = CanonicalActionFixture();
+    markdown.insert(markdown.end(), blocksFixture.begin(), blocksFixture.end());
     
     return markdown;
 }
@@ -141,8 +141,8 @@ TEST_CASE("rparser/parse", "Parse resource")
     REQUIRE(resource.headers.size() == 1);
     REQUIRE(resource.headers[0].first == "X-Resource-Header");
     REQUIRE(resource.headers[0].second == "Swordfighter XXII");
-    REQUIRE(resource.methods.size() == 1);
-    REQUIRE(resource.methods.front().method == "GET");
+    REQUIRE(resource.actions.size() == 1);
+    REQUIRE(resource.actions.front().method == "GET");
 }
 
 TEST_CASE("rparser/parse-partial", "Parse partially defined resource")
@@ -175,13 +175,13 @@ TEST_CASE("rparser/parse-partial", "Parse partially defined resource")
     REQUIRE(resource.description.empty());
     REQUIRE(resource.model.name.empty());
     REQUIRE(resource.model.body.empty());
-    REQUIRE(resource.methods.size() == 1);
-    REQUIRE(resource.methods.front().method == "GET");
-    REQUIRE(resource.methods.front().description.empty());
-    REQUIRE(resource.methods.front().requests.size() == 1);
-    REQUIRE(resource.methods.front().requests.front().name.empty());
-    REQUIRE(resource.methods.front().requests.front().description.empty());
-    REQUIRE(resource.methods.front().requests.front().body == "3");
+    REQUIRE(resource.actions.size() == 1);
+    REQUIRE(resource.actions.front().method == "GET");
+    REQUIRE(resource.actions.front().description.empty());
+    REQUIRE(resource.actions.front().requests.size() == 1);
+    REQUIRE(resource.actions.front().requests.front().name.empty());
+    REQUIRE(resource.actions.front().requests.front().description.empty());
+    REQUIRE(resource.actions.front().requests.front().body == "3");
 }
 
 TEST_CASE("rparser/parse-multi-method-desc", "Parse multiple method descriptions")
@@ -207,11 +207,11 @@ TEST_CASE("rparser/parse-multi-method-desc", "Parse multiple method descriptions
     REQUIRE(resource.description.empty());
     REQUIRE(resource.model.name.empty());
     REQUIRE(resource.model.body.empty());
-    REQUIRE(resource.methods.size() == 2);
-    REQUIRE(resource.methods[0].method == "GET");
-    REQUIRE(resource.methods[0].description == "1");
-    REQUIRE(resource.methods[1].method == "POST");
-    REQUIRE(resource.methods[1].description == "3");
+    REQUIRE(resource.actions.size() == 2);
+    REQUIRE(resource.actions[0].method == "GET");
+    REQUIRE(resource.actions[0].description == "1");
+    REQUIRE(resource.actions[1].method == "POST");
+    REQUIRE(resource.actions[1].description == "3");
 }
 
 TEST_CASE("rparser/parse-multi-method", "Parse multiple method")
@@ -290,31 +290,31 @@ TEST_CASE("rparser/parse-multi-method", "Parse multiple method")
     REQUIRE(resource.description == "1");
     REQUIRE(resource.model.name.empty());
     REQUIRE(resource.model.body.empty());
-    REQUIRE(resource.methods.size() == 3);
-    REQUIRE(resource.methods[0].method == "GET");
-    REQUIRE(resource.methods[0].description == "3");
-    REQUIRE(resource.methods[0].requests.empty());
-    REQUIRE(resource.methods[0].responses.size() == 1);
-    REQUIRE(resource.methods[0].responses[0].name == "200");
-    REQUIRE(resource.methods[0].responses[0].description.empty());
-    REQUIRE(resource.methods[0].responses[0].body == "Code 1");
+    REQUIRE(resource.actions.size() == 3);
+    REQUIRE(resource.actions[0].method == "GET");
+    REQUIRE(resource.actions[0].description == "3");
+    REQUIRE(resource.actions[0].requests.empty());
+    REQUIRE(resource.actions[0].responses.size() == 1);
+    REQUIRE(resource.actions[0].responses[0].name == "200");
+    REQUIRE(resource.actions[0].responses[0].description.empty());
+    REQUIRE(resource.actions[0].responses[0].body == "Code 1");
     
-    REQUIRE(resource.methods[1].method == "HEAD");
-    REQUIRE(resource.methods[1].description == "C");
-    REQUIRE(resource.methods[1].requests.size() == 1);
-    REQUIRE(resource.methods[1].requests[0].name == "D");
-    REQUIRE(resource.methods[1].requests[0].description.empty());
-    REQUIRE(resource.methods[1].requests[0].description.empty());
+    REQUIRE(resource.actions[1].method == "HEAD");
+    REQUIRE(resource.actions[1].description == "C");
+    REQUIRE(resource.actions[1].requests.size() == 1);
+    REQUIRE(resource.actions[1].requests[0].name == "D");
+    REQUIRE(resource.actions[1].requests[0].description.empty());
+    REQUIRE(resource.actions[1].requests[0].description.empty());
     
-    REQUIRE(resource.methods[1].responses.size() == 1);
-    REQUIRE(resource.methods[1].responses[0].name == "200");
-    REQUIRE(resource.methods[1].responses[0].description.empty());
-    REQUIRE(resource.methods[1].responses[0].body.empty());
+    REQUIRE(resource.actions[1].responses.size() == 1);
+    REQUIRE(resource.actions[1].responses[0].name == "200");
+    REQUIRE(resource.actions[1].responses[0].description.empty());
+    REQUIRE(resource.actions[1].responses[0].body.empty());
     
-    REQUIRE(resource.methods[2].method == "PUT");
-    REQUIRE(resource.methods[2].description == "K");
-    REQUIRE(resource.methods[2].requests.empty());
-    REQUIRE(resource.methods[2].responses.empty());
+    REQUIRE(resource.actions[2].method == "PUT");
+    REQUIRE(resource.actions[2].description == "K");
+    REQUIRE(resource.actions[2].requests.empty());
+    REQUIRE(resource.actions[2].responses.empty());
 }
 
 TEST_CASE("rparser/parse-list-description", "Parse description with list")
@@ -357,7 +357,7 @@ TEST_CASE("rparser/parse-list-description", "Parse description with list")
     REQUIRE(resource.description == "34");
     REQUIRE(resource.model.name.empty());
     REQUIRE(resource.model.body.empty());
-    REQUIRE(resource.methods.empty());
+    REQUIRE(resource.actions.empty());
 }
 
 TEST_CASE("rparser/parse-hr", "Parse resource with a HR")
@@ -388,7 +388,7 @@ TEST_CASE("rparser/parse-hr", "Parse resource with a HR")
     REQUIRE(resource.description == "12");
     REQUIRE(resource.model.name.empty());
     REQUIRE(resource.model.body.empty());
-    REQUIRE(resource.methods.empty());
+    REQUIRE(resource.actions.empty());
 }
 
 TEST_CASE("rparser/header-warnings", "Check warnings on overshadowing a header")
@@ -455,10 +455,10 @@ TEST_CASE("rparser/parse-abbrev", "Parse resource method abbreviation")
     REQUIRE(resource.name.empty());
     REQUIRE(resource.model.name.empty());
     REQUIRE(resource.model.body.empty());
-    REQUIRE(resource.methods.size() == 1);
-    REQUIRE(resource.methods[0].method == "GET");
-    REQUIRE(resource.methods[0].description == "1");
-    REQUIRE(resource.methods[0].responses.size() == 1);
+    REQUIRE(resource.actions.size() == 1);
+    REQUIRE(resource.actions[0].method == "GET");
+    REQUIRE(resource.actions[0].description == "1");
+    REQUIRE(resource.actions[0].responses.size() == 1);
 }
 
 TEST_CASE("rparser/parse-abbrev-ambiguous", "Parse resource method abbreviation followed by a foreign method")
@@ -486,8 +486,8 @@ TEST_CASE("rparser/parse-abbrev-ambiguous", "Parse resource method abbreviation 
     REQUIRE(resource.name.empty());
     REQUIRE(resource.model.name.empty());
     REQUIRE(resource.model.body.empty());
-    REQUIRE(resource.methods.size() == 1);
-    REQUIRE(resource.methods[0].method == "GET");
+    REQUIRE(resource.actions.size() == 1);
+    REQUIRE(resource.actions[0].method == "GET");
 }
 
 TEST_CASE("rparser/parse-nameless-resource", "Parse resource without name")
@@ -514,6 +514,6 @@ TEST_CASE("rparser/parse-nameless-resource", "Parse resource without name")
     REQUIRE(resource.name.empty());
     REQUIRE(resource.model.name.empty());
     REQUIRE(resource.model.body.empty());
-    REQUIRE(resource.methods.size() == 0);
+    REQUIRE(resource.actions.size() == 0);
 }
 

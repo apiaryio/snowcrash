@@ -69,15 +69,15 @@ Resource **description**\n\
     
     Resource& resource = resourceGroup.resources.front();
     REQUIRE(resource.uriTemplate == "/resource");
-    REQUIRE(resource.methods.size() == 1);
+    REQUIRE(resource.actions.size() == 1);
     
-    Method& method = resource.methods[0];
-    REQUIRE(method.method == "GET");
-    REQUIRE(method.description == "Resource **description**\n\n");
-    REQUIRE(method.requests.empty());
-    REQUIRE(method.responses.size() == 1);
+    Action& action = resource.actions[0];
+    REQUIRE(action.method == "GET");
+    REQUIRE(action.description == "Resource **description**\n\n");
+    REQUIRE(action.requests.empty());
+    REQUIRE(action.responses.size() == 1);
     
-    Response& response = method.responses[0];
+    Response& response = action.responses[0];
     REQUIRE(response.name == "200");
     REQUIRE(response.body == "Text\n\n{ ... }\n");
 }
@@ -161,11 +161,11 @@ TEST_CASE("Support description ending with an list item", "[parser][issue][#8]")
     
     REQUIRE(blueprint.resourceGroups.size() == 1);
     REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].methods.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].methods[0].description == "+ a description item\n");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].methods[0].responses.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].methods[0].responses[0].name == "200");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].methods[0].responses[0].body == "...\n");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description == "+ a description item\n");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].responses.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].responses[0].name == "200");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].responses[0].body == "...\n");
 }
 
 TEST_CASE("Invalid ‘warning: empty body asset’ for certain status codes", "[parser][issue][#13]")
@@ -188,11 +188,11 @@ TEST_CASE("Invalid ‘warning: empty body asset’ for certain status codes", "[
     
     REQUIRE(blueprint.resourceGroups.size() == 1);
     REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].methods.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].methods[0].description.empty());
-    REQUIRE(blueprint.resourceGroups[0].resources[0].methods[0].responses.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].methods[0].responses[0].name == "304");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].methods[0].responses[0].body.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].responses.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].responses[0].name == "304");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].responses[0].body.empty());
 }
 
 TEST_CASE("Parse adjacent asset blocks", "[parser][issue][#9]")
@@ -230,13 +230,13 @@ TEST_CASE("Parse adjacent asset blocks", "[parser][issue][#9]")
     
     REQUIRE(blueprint.resourceGroups.size() == 1);
     REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].methods.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].methods[0].description.empty());
-    REQUIRE(blueprint.resourceGroups[0].resources[0].methods[0].responses.size() == 2);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].methods[0].responses[0].name == "200");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].methods[0].responses[0].body == "asset\n\npre\n");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].methods[0].responses[1].name == "404");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].methods[0].responses[1].body == "Not found\n");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].responses.size() == 2);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].responses[0].name == "200");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].responses[0].body == "asset\n\npre\n");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].responses[1].name == "404");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].responses[1].body == "Not found\n");
 }
 
 TEST_CASE("Parse adjacent nested asset blocks", "[parser][issue][crash][#9][now]")
@@ -271,11 +271,11 @@ TEST_CASE("Parse adjacent nested asset blocks", "[parser][issue][crash][#9][now]
     
     REQUIRE(blueprint.resourceGroups.size() == 1);
     REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].methods.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].methods[0].description.empty());
-    REQUIRE(blueprint.resourceGroups[0].resources[0].methods[0].responses.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].methods[0].responses[0].name == "200");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].methods[0].responses[0].body == "A\nB\nC\n");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].responses.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].responses[0].name == "200");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].responses[0].body == "A\nB\nC\n");
 }
 
 TEST_CASE("Parse adjacent asset list blocks", "[parser][issue][#9]")
@@ -302,10 +302,10 @@ TEST_CASE("Parse adjacent asset list blocks", "[parser][issue][#9]")
     
     REQUIRE(blueprint.resourceGroups.size() == 1);
     REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].methods.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].methods[0].description.empty());
-    REQUIRE(blueprint.resourceGroups[0].resources[0].methods[0].responses.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].methods[0].responses[0].name == "200");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].methods[0].responses[0].body.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].responses.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].responses[0].name == "200");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].responses[0].body.empty());
 }
 

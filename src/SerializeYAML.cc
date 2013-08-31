@@ -100,29 +100,29 @@ static void serialize(const Payload& payload, size_t level, bool array, std::ost
 }
 
 // Serialize Method
-static void serialize(const Method& method, std::ostream &os)
+static void serialize(const Action& action, std::ostream &os)
 {
     os << "    - ";   // indent 3
-    serialize(SerializeKey::Method, method.method, 0, os);
-    serialize(SerializeKey::Name, method.name, 3, os);
-    serialize(SerializeKey::Description, method.description, 3, os);
+    serialize(SerializeKey::Method, action.method, 0, os);
+    serialize(SerializeKey::Name, action.name, 3, os);
+    serialize(SerializeKey::Description, action.description, 3, os);
     
     // TODO: parameters
     
-    if (!method.headers.empty()) {
-        serialize(method.headers, 3, os);
+    if (!action.headers.empty()) {
+        serialize(action.headers, 3, os);
     }
     
-    if (!method.requests.empty()) {
+    if (!action.requests.empty()) {
         serialize(SerializeKey::Requests, std::string(), 3, os);
-        for (Collection<Request>::const_iterator it = method.requests.begin(); it != method.requests.end(); ++it) {
+        for (Collection<Request>::const_iterator it = action.requests.begin(); it != action.requests.end(); ++it) {
             serialize(*it, 4, true, os);
         }
     }
 
-    if (!method.responses.empty()) {
+    if (!action.responses.empty()) {
         serialize(SerializeKey::Responses, std::string(), 3, os);
-        for (Collection<Response>::const_iterator it = method.responses.begin(); it != method.responses.end(); ++it) {
+        for (Collection<Response>::const_iterator it = action.responses.begin(); it != action.responses.end(); ++it) {
             serialize(*it, 4, true, os);
         }
     }
@@ -145,11 +145,11 @@ static void serialize(const Resource& resource, std::ostream &os)
     if (!resource.headers.empty())
         serialize(resource.headers, 2, os);
 
-    if (resource.methods.empty())
+    if (resource.actions.empty())
         return;
     
-    serialize(SerializeKey::Methods, std::string(), 2, os);
-    for (Collection<Method>::const_iterator it = resource.methods.begin(); it != resource.methods.end(); ++it) {
+    serialize(SerializeKey::Actions, std::string(), 2, os);
+    for (Collection<Action>::const_iterator it = resource.actions.begin(); it != resource.actions.end(); ++it) {
         serialize(*it, os);
     }
 }

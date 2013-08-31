@@ -33,6 +33,7 @@
         'sundown/src/html'
       ],
       'sources': [
+        'src/ActionParser.h',      
         'src/Blueprint.h',
         'src/BlueprintParser.h',
         'src/BlueprintParserCore.h',
@@ -45,7 +46,6 @@
         'src/MarkdownBlock.h',
         'src/MarkdownParser.cc',
         'src/MarkdownParser.h',
-        'src/MethodParser.h',
         'src/Parser.cc',
         'src/Parser.h',
         'src/ParserCore.cc',
@@ -88,13 +88,13 @@
         'sundown/src/html'
       ],
       'sources': [
+        'test/test-ActionParser.cc',
         'test/test-AssetParser.cc',
         'test/test-Blueprint.cc',
         'test/test-BlueprintParser.cc',
         'test/test-HeaderParser.cc',
         'test/test-MarkdownBlock.cc',
         'test/test-MarkdownParser.cc',
-        'test/test-MethodParser.cc',
         'test/test-Parser.cc',
         'test/test-PayloadParser.cc',
         'test/test-RegexMatch.cc',

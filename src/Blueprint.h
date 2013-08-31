@@ -125,23 +125,23 @@ namespace snowcrash {
     typedef Payload Response;
     
     /**
-     *  Method
+     *  Action
      */
-    struct Method {
+    struct Action {
         
         /** HTTP method */
         HTTPMethod method;
         
-        /** A Method name */
+        /** A Action name */
         Name name;
         
         /** Description */
         Description description;
         
-        /** Method-specfic Parameters */
+        /** Action-specfic Parameters */
         Collection<Parameter>::type parameters;
         
-        /** Method-specific HTTP headers */
+        /** Action-specific HTTP headers */
         Collection<Header>::type headers;
 
         /** Requests */
@@ -174,8 +174,8 @@ namespace snowcrash {
         /** Resource-specific HTTP Headers */
         Collection<Header>::type headers;
         
-        /** A set of HTTP Methods specified for this Resource */
-        Collection<Method>::type methods;
+        /** A set of Actions specified for this Resource */
+        Collection<Action>::type actions;
     };
     
     /**

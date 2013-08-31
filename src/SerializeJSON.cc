@@ -154,29 +154,29 @@ static void serialize(const Payload& payload, size_t level, std::ostream &os)
 /// \brief Serialize a method into output stream.
 /// \param method       A method to serialize
 /// \brief os           An output stream to serialize into
-static void serialize(const Method& method, std::ostream &os)
+static void serialize(const Action& action, std::ostream &os)
 {
     indent(6, os);
     os << "{\n";
     
-    serialize(SerializeKey::Method, method.method, 7, false, os);
+    serialize(SerializeKey::Method, action.method, 7, false, os);
     os << NewLineItemBlock;
     
-    serialize(SerializeKey::Name, method.name, 7, false, os);
+    serialize(SerializeKey::Name, action.name, 7, false, os);
     os << NewLineItemBlock;
     
-    serialize(SerializeKey::Description, method.description, 7, false, os);
+    serialize(SerializeKey::Description, action.description, 7, false, os);
     
     // TODO: parameters
     
     // Headers
-    if (!method.headers.empty()) {
+    if (!action.headers.empty()) {
         os << NewLineItemBlock;
-        serialize(method.headers, 7, os);
+        serialize(action.headers, 7, os);
     }
     
     // Requests
-    if (!method.requests.empty()) {
+    if (!action.requests.empty()) {
         os << NewLineItemBlock;
         indent(7, os);
         serialize(SerializeKey::Requests, os);
@@ -184,11 +184,11 @@ static void serialize(const Method& method, std::ostream &os)
         os << "[\n";
         
         size_t i = 0;
-        for (Collection<Request>::const_iterator it = method.requests.begin();
-             it != method.requests.end();
+        for (Collection<Request>::const_iterator it = action.requests.begin();
+             it != action.requests.end();
              ++i, ++it) {
             
-            if (i > 0 && i < method.requests.size())
+            if (i > 0 && i < action.requests.size())
                 os << NewLineItemBlock;
             
             indent(8, os);
@@ -201,7 +201,7 @@ static void serialize(const Method& method, std::ostream &os)
     }
     
     // Responses
-    if (!method.responses.empty()) {
+    if (!action.responses.empty()) {
         os << NewLineItemBlock;
         indent(7, os);
         serialize(SerializeKey::Responses, os);
@@ -209,11 +209,11 @@ static void serialize(const Method& method, std::ostream &os)
         os << "[\n";
         
         size_t i = 0;
-        for (Collection<Response>::const_iterator it = method.responses.begin();
-             it != method.responses.end();
+        for (Collection<Response>::const_iterator it = action.responses.begin();
+             it != action.responses.end();
              ++i, ++it) {
             
-            if (i > 0 && i < method.responses.size())
+            if (i > 0 && i < action.responses.size())
                 os << NewLineItemBlock;
             
             indent(8, os);
@@ -273,21 +273,21 @@ static void serialize(const Resource& resource, std::ostream &os)
         serialize(resource.headers, 5, os);
     }
     
-    // Methods
-    if (!resource.methods.empty()) {
+    // Actions
+    if (!resource.actions.empty()) {
     
         os << NewLineItemBlock;
         indent(5, os);
-        serialize(SerializeKey::Methods, os);
+        serialize(SerializeKey::Actions, os);
         os << ": ";
         os << "[\n";
         
         size_t i = 0;
-        for (Collection<Method>::const_iterator it = resource.methods.begin();
-             it != resource.methods.end();
+        for (Collection<Action>::const_iterator it = resource.actions.begin();
+             it != resource.actions.end();
              ++i, ++it) {
             
-            if (i > 0 && i < resource.methods.size())
+            if (i > 0 && i < resource.actions.size())
                 os << NewLineItemBlock;
             
             serialize(*it, os);
