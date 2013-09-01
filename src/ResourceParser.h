@@ -106,6 +106,9 @@ namespace snowcrash {
         if (HasHeaderSignature(begin, end))
             return HeadersSection;
         
+        if (HasParametersSignature(begin, end))
+            return ParametersSection;
+        
         Name name;
         SourceData mediaType;
         PayloadSignature payloadSignature = GetPayloadSignature(begin, end, name, mediaType);
@@ -173,6 +176,10 @@ namespace snowcrash {
                     
                 case ObjectSection:
                     result = HandleObject(cur, bounds.second, parser, resource);
+                    break;
+                    
+                case ParametersSection:
+                    result = HandleParameters(cur, bounds, parser, resource);
                     break;
                     
                 case HeadersSection:
@@ -289,6 +296,23 @@ namespace snowcrash {
             
             return result;
         }
+        
+        /** Parse Parameters section */
+        static ParseSectionResult HandleParameters(const BlockIterator& cur,
+                                                   const SectionBounds& bounds,
+                                                   BlueprintParserCore& parser,
+                                                   Resource& resource) {
+            ParameterCollection parameters;
+            ParseSectionResult result = ParametersParser::Parse(cur, bounds.second, parser, parameters);
+            if (result.first.error.code != Error::OK)
+                return result;
+            
+            // TODO: additional checkings
+            resource.parameters.insert(resource.parameters.end(), parameters.begin(), parameters.end());
+            
+            return result;
+        }
+        
         
         static ParseSectionResult HandleResourceMethod(const BlockIterator& cur,
                                                        const SectionBounds& bounds,

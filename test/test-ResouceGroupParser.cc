@@ -61,7 +61,7 @@ TEST_CASE("rgparser/classifier", "Resource Group block classifier")
     REQUIRE(ClassifyBlock<ResourceGroup>(cur, markdown.end(), UndefinedSection) == ResourceSection);
     REQUIRE(ClassifyBlock<ResourceGroup>(cur, markdown.end(), ResourceGroupSection) == ResourceSection);
 
-    std::advance(cur, 42); // # Group Second
+    std::advance(cur, 42 + 2*55); // # Group Second
     REQUIRE(ClassifyBlock<ResourceGroup>(cur, markdown.end(), UndefinedSection) == ResourceGroupSection);
     REQUIRE(ClassifyBlock<ResourceGroup>(cur, markdown.end(), ResourceGroupSection) == UndefinedSection);
     REQUIRE(ClassifyBlock<ResourceGroup>(cur, markdown.end(), ResourceSection) == UndefinedSection);    
@@ -79,7 +79,7 @@ TEST_CASE("rgparser/parse", "Parse canonical resource group")
     REQUIRE(result.first.warnings.empty());
     
     const MarkdownBlock::Stack &blocks = markdown;
-    REQUIRE(std::distance(blocks.begin(), result.second) == 44);
+    REQUIRE(std::distance(blocks.begin(), result.second) == 44 + 2*55);
     
     REQUIRE(resourceGroup.name == "First");
     REQUIRE(resourceGroup.description == "1");

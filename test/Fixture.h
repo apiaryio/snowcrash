@@ -22,6 +22,8 @@ namespace snowcrashtest {
     extern snowcrash::MarkdownBlock::Stack CanonicalPayloadFixture();
     extern snowcrash::MarkdownBlock::Stack CanonicalBodyAssetFixture();
     extern snowcrash::MarkdownBlock::Stack CanonicalSchemaAssetFixture();
+    extern snowcrash::MarkdownBlock::Stack CanonicalParametersFixture();
+    extern snowcrash::MarkdownBlock::Stack CanonicalParameterDefinitionFixture();
 }
 
 #endif

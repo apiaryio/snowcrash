@@ -26,6 +26,8 @@ MarkdownBlock::Stack snowcrashtest::CanonicalResourceFixture()
     //
     //        X.O.
     //
+    //  <see CanonicalParametersFixture()>
+    //
     //+ Headers
     //
     //        X-Resource-Header: Swordfighter XXII
@@ -44,6 +46,14 @@ MarkdownBlock::Stack snowcrashtest::CanonicalResourceFixture()
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "My Resource Object (text/plain)", 0, MakeSourceDataBlock(2, 1)));
     markdown.push_back(MarkdownBlock(CodeBlockType, "X.O.", 0, MakeSourceDataBlock(3, 1)));
     markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(4, 1)));
+    
+    // Inject parameters
+    MarkdownBlock::Stack parameters = CanonicalParametersFixture();
+    MarkdownBlock::Stack::iterator begin = parameters.begin();
+    ++begin;
+    MarkdownBlock::Stack::iterator end = parameters.end();
+    --end;
+    markdown.insert(markdown.end(), begin, end);
     
     markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "Headers", 0, MakeSourceDataBlock(5, 1)));
@@ -79,7 +89,7 @@ TEST_CASE("rparser/classifier", "Resource block classifier")
     REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSection) == ObjectSection);
     REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ObjectSection) == ObjectSection);
 
-    std::advance(cur, 4); // ListItemBlockBeginType - "Headers"
+    std::advance(cur, 4+55); // ListItemBlockBeginType - "Headers"
     REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSection) == HeadersSection);
     REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSection) == HeadersSection);
     
@@ -128,7 +138,7 @@ TEST_CASE("rparser/parse", "Parse resource")
     CHECK(result.first.warnings.empty());
     
     const MarkdownBlock::Stack &blocks = markdown;
-    REQUIRE(std::distance(blocks.begin(), result.second) == 42);
+    REQUIRE(std::distance(blocks.begin(), result.second) == 42 + 2*55);
     
     REQUIRE(resource.name == "My Resource");
     REQUIRE(resource.uriTemplate == "/resource");
@@ -138,6 +148,9 @@ TEST_CASE("rparser/parse", "Parse resource")
     REQUIRE(resource.model.headers[0].first == "Content-Type");
     REQUIRE(resource.model.headers[0].second == "text/plain");
     REQUIRE(resource.description == "1");
+    REQUIRE(resource.parameters.size() == 2);
+    REQUIRE(resource.parameters[0].name == "id");
+    REQUIRE(resource.parameters[1].name == "limit");
     REQUIRE(resource.headers.size() == 1);
     REQUIRE(resource.headers[0].first == "X-Resource-Header");
     REQUIRE(resource.headers[0].second == "Swordfighter XXII");
@@ -409,7 +422,7 @@ TEST_CASE("rparser/header-warnings", "Check warnings on overshadowing a header")
     REQUIRE(result.first.warnings.size() == 1); // overshadowing header
     
     const MarkdownBlock::Stack &blocks = markdown;
-    REQUIRE(std::distance(blocks.begin(), result.second) == 42);
+    REQUIRE(std::distance(blocks.begin(), result.second) == 42 + 2*55);
 }
 
 TEST_CASE("rparser/parse-abbrev", "Parse resource method abbreviation")

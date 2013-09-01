@@ -23,6 +23,8 @@ MarkdownBlock::Stack snowcrashtest::CanonicalActionFixture()
     //# My Method [GET]
     //Method Description
     //
+    // <see CanonicalParametersFixture()>
+    //
     //+ Headers
     //
     //        X-Method-Header: 0xdeadbeef
@@ -38,6 +40,14 @@ MarkdownBlock::Stack snowcrashtest::CanonicalActionFixture()
     MarkdownBlock::Stack markdown;
     markdown.push_back(MarkdownBlock(HeaderBlockType, "My Method [GET]", 1, MakeSourceDataBlock(0, 1)));
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "Method Description", 0, MakeSourceDataBlock(1, 1)));
+    
+    // Inject parameters
+    MarkdownBlock::Stack parameters = CanonicalParametersFixture();
+    MarkdownBlock::Stack::iterator begin = parameters.begin();
+    ++begin;
+    MarkdownBlock::Stack::iterator end = parameters.end();
+    --end;
+    markdown.insert(markdown.end(), begin, end);
     
     MarkdownBlock::Stack headerList;
     headerList.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
@@ -93,7 +103,7 @@ TEST_CASE("mparser/classifier", "Method block classifier")
     REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
     REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), MethodSection) == MethodSection);
 
-    ++cur; // ListBlockBeginType - "Response"
+    std::advance(cur, 1+55); // ListBlockBeginType - "Response"
     REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSection) == ResponseSection);
     REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), MethodSection) == ResponseSection);
     
@@ -163,7 +173,7 @@ TEST_CASE("mparser/parse", "Parse method")
     CHECK(result.first.warnings.empty());
 
     const MarkdownBlock::Stack &blocks = markdown;
-    REQUIRE(std::distance(blocks.begin(), result.second) == 30);
+    REQUIRE(std::distance(blocks.begin(), result.second) == 30 + 55);
     
     REQUIRE(action.name == "My Method");
     REQUIRE(action.method == "GET");
@@ -172,7 +182,9 @@ TEST_CASE("mparser/parse", "Parse method")
     REQUIRE(action.headers.size() == 1);
     REQUIRE(action.headers[0].first == "X-Method-Header");
     REQUIRE(action.headers[0].second == "0xdeadbeef");
-    REQUIRE(action.parameters.empty());
+    REQUIRE(action.parameters.size() == 2);
+    REQUIRE(action.parameters[0].name == "id");
+    REQUIRE(action.parameters[1].name == "limit");
     REQUIRE(action.transactions.front().requests.size() == 1);
     REQUIRE(action.transactions.front().responses.size() == 1);
     
@@ -678,7 +690,7 @@ TEST_CASE("mparser/header-warnings", "Check warnings on overshadowing a header")
     REQUIRE(result.first.warnings.size() == 1);
     
     const MarkdownBlock::Stack &blocks = markdown;
-    REQUIRE(std::distance(blocks.begin(), result.second) == 30);
+    REQUIRE(std::distance(blocks.begin(), result.second) == 30 + 55);
 }
 
 TEST_CASE("mparser/parse-nameless-method", "Parse method without name")

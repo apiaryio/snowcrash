@@ -54,6 +54,12 @@ namespace snowcrash {
         static const std::string Model;
         static const std::string Value;
         static const std::string Parameters;
+        static const std::string Type;
+        static const std::string Required;
+        static const std::string Default;
+        static const std::string Example;
+        static const std::string Values;
+
     };
 }
 

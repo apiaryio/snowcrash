@@ -41,7 +41,15 @@ namespace snowcrash {
         SchemaSection,
         DanglingSchemaSection,
         HeadersSection,
-        ForeignSection
+        ForeignSection,
+        ParametersSection,
+        ParameterDefinitionSection,
+        ParameterTypeSection,
+        ParameterRequiredSection,
+        ParameterOptionalSection,
+        ParameterDefaultSection,
+        ParameterExampleSection,
+        ParameterValuesSection
     };
     
     /** Returns human readable name for given %Section */
@@ -162,6 +170,7 @@ namespace snowcrash {
     extern bool HasPayloadAssetSignature(const BlockIterator& begin, const BlockIterator& end);
     extern bool HasAssetSignature(const BlockIterator& begin, const BlockIterator& end);
     extern bool HasHeaderSignature(const BlockIterator& begin, const BlockIterator& end);
+    extern bool HasParametersSignature(const BlockIterator& begin, const BlockIterator& end);
     
     /**
      *  \brief A Markdown block parser.

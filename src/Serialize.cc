@@ -36,6 +36,11 @@ const std::string SerializeKey::Headers = "headers";
 const std::string SerializeKey::Model = "model";
 const std::string SerializeKey::Value = "value";
 const std::string SerializeKey::Parameters = "parameters";
+const std::string SerializeKey::Type = "type";
+const std::string SerializeKey::Required = "required";
+const std::string SerializeKey::Default = "default";
+const std::string SerializeKey::Example = "example";
+const std::string SerializeKey::Values = "values";
 
 std::string snowcrash::EscapeNewlines(const std::string& input)
 {

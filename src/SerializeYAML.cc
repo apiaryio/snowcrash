@@ -13,7 +13,51 @@ using namespace snowcrash;
 
 static std::string ReservedCharacters = "#-[]:|>!*&%@`,{}?\'";
 
-// Serialize key: value, escaping strings with new lines
+/** Normalizes string value for use in YAML and checks whether quotation is need */
+static std::string NormalizeStringValue(const std::string& value, bool& needsQuotation)
+{
+    std::string normalizedValue = value;
+    if (normalizedValue.find("\"") != std::string::npos)
+        normalizedValue = EscapeDoubleQuotes(normalizedValue);
+    
+    if (value.find("\n") != std::string::npos)
+        normalizedValue = EscapeNewlines(normalizedValue);
+    
+    needsQuotation = (normalizedValue != value);
+    if (!needsQuotation) {
+        for (std::string::const_iterator it = value.begin() ; it < value.end() ; ++it){
+            needsQuotation = ReservedCharacters.find(*it) != std::string::npos;
+            if (needsQuotation)
+                break;
+        }
+    }
+    
+    return normalizedValue;
+}
+
+/** Serialize an array value */
+static void serialize(const std::string& value, size_t level, std::ostream &os)
+{
+    if (value.empty())
+        return;
+    
+    for (size_t i = 0; i < level - 1; ++i)
+        os << "  ";
+    
+    os << "- ";
+    
+    bool needsQuotation = false;
+    std::string normalizedValue = NormalizeStringValue(value, needsQuotation);
+    
+    if (needsQuotation)
+        os << "\"" << normalizedValue << "\"";
+    else
+        os << value;
+    
+    os << std::endl;
+}
+
+/** Serialize key value pair */
 static void serialize(const std::string& key, const std::string& value, size_t level, std::ostream &os)
 {
     if (key.empty())
@@ -26,21 +70,8 @@ static void serialize(const std::string& key, const std::string& value, size_t l
         
         os << key << ": ";
 
-        std::string normalizedValue = value;
-        if (normalizedValue.find("\"") != std::string::npos)
-            normalizedValue = EscapeDoubleQuotes(normalizedValue);
-        
-        if (value.find("\n") != std::string::npos)
-            normalizedValue = EscapeNewlines(normalizedValue);
-
-        bool needsQuotation = (normalizedValue != value);
-        if (!needsQuotation) {
-            for (std::string::const_iterator it = value.begin() ; it < value.end() ; ++it){
-                needsQuotation = ReservedCharacters.find(*it) != std::string::npos;
-                if (needsQuotation)
-                    break;
-            }
-        }
+        bool needsQuotation = false;
+        std::string normalizedValue = NormalizeStringValue(value, needsQuotation);
         
         if (needsQuotation)
             os << "\"" << normalizedValue << "\"";
@@ -57,9 +88,11 @@ static void serialize(const std::string& key, const std::string& value, size_t l
 static void serializeKeyValueCollection(const Collection<KeyValuePair>::type& collection, size_t level, std::ostream &os)
 {
     for (Collection<KeyValuePair>::const_iterator it = collection.begin(); it != collection.end(); ++it) {
-        
+
+        // Key
         serialize(it->first, std::string(), level + 1, os);
-        //serialize(SerializeKey::Name, it->first, level + 2, os);
+
+        // Value
         serialize(SerializeKey::Value, it->second, level + 2, os);
     }
 }
@@ -84,7 +117,38 @@ static void serialize(const Collection<Header>::type& headers, size_t level, std
 /** Serialize Parameters */
 static void serialize(const Collection<Parameter>::type& parameters, size_t level, std::ostream &os)
 {
-    // TODO:
+    for (Collection<Parameter>::const_iterator it = parameters.begin(); it != parameters.end(); ++it) {
+        
+        // Key / name
+        serialize(it->name, std::string(), level + 1, os);
+
+        // Description
+        serialize(SerializeKey::Description, it->description, level + 2, os);
+        
+        // Type
+        serialize(SerializeKey::Type, it->type, level + 2, os);
+        
+        // Required
+        serialize(SerializeKey::Required, (it->required) ? "true" : "false", level + 2, os);
+        
+        // Default
+        serialize(SerializeKey::Default, it->defaultValue, level + 2, os);
+        
+        // Example
+        serialize(SerializeKey::Example, it->exampleValue, level + 2, os);
+        
+        // Values
+        serialize(SerializeKey::Values, std::string(), level + 2, os);
+        
+        if (!it->values.empty()) {
+            for (Collection<Value>::const_iterator val_it = it->values.begin();
+                 val_it != it->values.end();
+                 ++val_it) {
+
+                serialize(*val_it, level + 3, os);
+            }
+        }
+    }
 }
 
 /** Serialize Payload */

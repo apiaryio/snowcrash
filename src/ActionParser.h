@@ -14,6 +14,7 @@
 #include "RegexMatch.h"
 #include "PayloadParser.h"
 #include "HeaderParser.h"
+#include "ParametersParser.h"
 #include "HTTP.h"
 
 static const std::string ActionHeaderRegex("^(" HTTP_METHODS ")[ \\t]*(" URI_TEMPLATE ")?$");
@@ -85,6 +86,9 @@ namespace snowcrash {
         if (HasHeaderSignature(begin, end))
             return HeadersSection;
         
+        if (HasParametersSignature(begin, end))
+            return ParametersSection;
+        
         Name name;
         SourceData mediaType;
         PayloadSignature payload = GetPayloadSignature(begin, end, name, mediaType);
@@ -141,6 +145,10 @@ namespace snowcrash {
             switch (section) {                    
                 case MethodSection:
                     result = HandleActionOverviewBlock(cur, bounds, parser, action);
+                    break;
+                   
+                case ParametersSection:
+                    result = HandleParameters(cur, bounds, parser, action);
                     break;
                     
                 case HeadersSection:
@@ -212,6 +220,22 @@ namespace snowcrash {
             }
             
             result.second = ++sectionCur;
+            return result;
+        }
+        
+        /** Parse Parameters section */
+        static ParseSectionResult HandleParameters(const BlockIterator& cur,
+                                                   const SectionBounds& bounds,
+                                                   BlueprintParserCore& parser,
+                                                   Action& action) {
+            ParameterCollection parameters;
+            ParseSectionResult result = ParametersParser::Parse(cur, bounds.second, parser, parameters);
+            if (result.first.error.code != Error::OK)
+                return result;
+            
+            // TODO: additional checkings
+            action.parameters.insert(action.parameters.end(), parameters.begin(), parameters.end());
+            
             return result;
         }
         

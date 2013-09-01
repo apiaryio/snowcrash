@@ -85,7 +85,7 @@ TEST_CASE("bpparser/parse", "Parse canonical blueprint")
     CHECK(result.first.warnings.empty());
     
     const MarkdownBlock::Stack &blocks = markdown;
-    REQUIRE(std::distance(blocks.begin(), result.second) == 50);
+    REQUIRE(std::distance(blocks.begin(), result.second) == 50 + 2*55);
 
     REQUIRE(blueprint.metadata.size() == 1);
     REQUIRE(blueprint.metadata[0].first == "meta");

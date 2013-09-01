@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BB03DC6617D3718D00C51E52 /* test-ParametersParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB03DC6517D3718D00C51E52 /* test-ParametersParser.cc */; };
+		BB03DC6917D3723300C51E52 /* test-ParameterDefinitonParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB03DC6817D3723300C51E52 /* test-ParameterDefinitonParser.cc */; };
 		BB167D1D172931330030D1D5 /* test-BlueprintParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA01FF817292F9C0050B603 /* test-BlueprintParser.cc */; };
 		BB1865C91764DB8A00756B18 /* test-SymbolTable.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB1865C81764DB8A00756B18 /* test-SymbolTable.cc */; };
 		BB1D4D0B174D0932009BCB1C /* test-HeaderParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB1D4D08174D08C3009BCB1C /* test-HeaderParser.cc */; };
@@ -98,6 +100,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		BB03DC6417D3717B00C51E52 /* ParametersParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ParametersParser.h; path = src/ParametersParser.h; sourceTree = "<group>"; };
+		BB03DC6517D3718D00C51E52 /* test-ParametersParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-ParametersParser.cc"; path = "test/test-ParametersParser.cc"; sourceTree = "<group>"; };
+		BB03DC6717D3721600C51E52 /* ParameterDefinitonParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ParameterDefinitonParser.h; path = src/ParameterDefinitonParser.h; sourceTree = "<group>"; };
+		BB03DC6817D3723300C51E52 /* test-ParameterDefinitonParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-ParameterDefinitonParser.cc"; path = "test/test-ParameterDefinitonParser.cc"; sourceTree = "<group>"; };
 		BB0793BE1782C773005BB7CC /* Platform.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Platform.h; path = src/Platform.h; sourceTree = "<group>"; };
 		BB1865C71764D67B00756B18 /* SymbolTable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SymbolTable.h; path = src/SymbolTable.h; sourceTree = "<group>"; };
 		BB1865C81764DB8A00756B18 /* test-SymbolTable.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-SymbolTable.cc"; path = "test/test-SymbolTable.cc"; sourceTree = "<group>"; };
@@ -273,6 +279,8 @@
 				BBD5F9CF1735413A0049BBEE /* BlueprintParserCore.h */,
 				BB1D4D07174D0828009BCB1C /* HeaderParser.h */,
 				BB1EC203173FD06600CFB84A /* ListUtility.h */,
+				BB03DC6717D3721600C51E52 /* ParameterDefinitonParser.h */,
+				BB03DC6417D3717B00C51E52 /* ParametersParser.h */,
 				BBE5705F173927870086CE22 /* PayloadParser.h */,
 				BBD5F9C717353C300049BBEE /* ResourceGroupParser.h */,
 				BBD5F9CC17353CE00049BBEE /* ResourceParser.h */,
@@ -324,6 +332,8 @@
 				BB1D4D08174D08C3009BCB1C /* test-HeaderParser.cc */,
 				BB740999171C08240023105F /* test-MarkdownBlock.cc */,
 				BB74099B171C08850023105F /* test-MarkdownParser.cc */,
+				BB03DC6817D3723300C51E52 /* test-ParameterDefinitonParser.cc */,
+				BB03DC6517D3718D00C51E52 /* test-ParametersParser.cc */,
 				BBA889A917130239005A9570 /* test-Parser.cc */,
 				BBE5705C173922B70086CE22 /* test-PayloadParser.cc */,
 				BBB0F42B1731D04900C92465 /* test-RegexMatch.cc */,
@@ -530,9 +540,11 @@
 				BBD5F9DC173561DA0049BBEE /* test-ResouceGroupParser.cc in Sources */,
 				BBD5F9DE173578210049BBEE /* test-ResourceParser.cc in Sources */,
 				BBE5705D173922B70086CE22 /* test-PayloadParser.cc in Sources */,
+				BB03DC6617D3718D00C51E52 /* test-ParametersParser.cc in Sources */,
 				BB50F0BD17D1DCE00002C363 /* test-ActionParser.cc in Sources */,
 				BB3DD975174654FD004C4077 /* test-AssetParser.cc in Sources */,
 				BB1D4D0B174D0932009BCB1C /* test-HeaderParser.cc in Sources */,
+				BB03DC6917D3723300C51E52 /* test-ParameterDefinitonParser.cc in Sources */,
 				BB1865C91764DB8A00756B18 /* test-SymbolTable.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
