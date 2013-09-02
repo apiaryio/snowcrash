@@ -70,6 +70,21 @@ static void serialize(const std::string& key, const std::string& value, size_t l
 }
 
 /**
+ * \brief Serialize key boolean value pair into output stream
+ * \param key      Key to serialize
+ * \param value    Value to serialize
+ * \param level    Indentation level
+ * \param os       An output stream to serialize into
+ */
+static void serialize(const std::string& key, bool value, size_t level, std::ostream &os)
+{
+    indent(level, os);
+    serialize(key, os);
+    os << ": ";
+    os << ((value) ? "true" : "false");
+}
+
+/**
  * \brief Serialize key value pair as an object into output stream
  * \param key      Key to serialize
  * \param value    Value to serialize
@@ -154,9 +169,77 @@ static void serialize(const Collection<Parameter>::type& parameters, size_t leve
 {
     indent(level, os);
     serialize(SerializeKey::Parameters, os);
-    os << ": []";
+    os << ": {";
     
-    // TODO:
+    if (!parameters.empty()) {
+        os << "\n";
+        size_t i = 0;
+        for (Collection<Parameter>::const_iterator it = parameters.begin(); it != parameters.end(); ++i, ++it) {
+            
+            if (i > 0 && i < parameters.size())
+                os << NewLineItemBlock;
+            
+            // Key / name
+            indent(level + 1, os);
+            serialize(it->name, os);
+            os << ": {\n";
+            
+            // Description
+            serialize(SerializeKey::Description, it->description, level + 2, false, os);
+            os << NewLineItemBlock;
+            
+            // Type
+            serialize(SerializeKey::Type, it->type, level + 2, false, os);
+            os << NewLineItemBlock;
+            
+            // Requried
+            serialize(SerializeKey::Required, it->required, level + 2, os);
+            os << NewLineItemBlock;
+            
+            // Default
+            serialize(SerializeKey::Default, it->defaultValue, level + 2, false, os);
+            os << NewLineItemBlock;
+            
+            // Example
+            serialize(SerializeKey::Example, it->exampleValue, level + 2, false, os);
+            os << NewLineItemBlock;
+            
+            // Values
+            indent(level + 2, os);
+            serialize(SerializeKey::Values, os);
+            os << ": [";
+
+            if (!it->values.empty()) {
+                os << "\n";
+                size_t j = 0;
+                for (Collection<Value>::const_iterator val_it = it->values.begin(); val_it != it->values.end(); ++j, ++val_it) {
+                    
+                    if (j > 0 && j < it->values.size())
+                        os << NewLineItemBlock;
+                    
+                    indent(level + 3, os);
+                    serialize(*val_it, os);
+                    
+                }
+                
+                os << "\n";
+                indent(level + 2, os);
+            }
+            
+            // Close Values
+            os << "]";
+            
+            // Close Key / name object
+            os << "\n";
+            indent(level + 1, os);
+            os << "}";
+        }
+        
+        os << std::endl;
+        indent(level, os);
+    }
+    
+    os << "}";
 }
 
 /**
