@@ -117,7 +117,7 @@ def configure_snowcrash(o):
   target_arch = host_arch # options.dest_cpu or host_arch
   o['variables']['host_arch'] = host_arch
   o['variables']['target_arch'] = target_arch
-  o['variables']['library'] = 'shared_library' if options.shared else 'static_library'
+  o['variables']['libsnowcrash_type'] = 'shared_library' if options.shared else 'static_library'
 
 #
 # config.gypi

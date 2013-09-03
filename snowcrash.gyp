@@ -26,7 +26,7 @@
 
     {
       'target_name': 'libsnowcrash',
-      'type': '<(library)',
+      'type': '<(libsnowcrash_type)',
       'include_dirs': [
         'src',
         'sundown/src',

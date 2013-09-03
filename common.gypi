@@ -6,7 +6,7 @@
   #
   'variables': {
     'target_arch%': 'ia32',
-    'library%': 'static_library'
+    'libsnowcrash_type%': 'static_library'
   },
   'target_defaults': {
     'default_configuration': 'Release',
