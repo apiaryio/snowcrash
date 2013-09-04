@@ -243,7 +243,7 @@ namespace snowcrash {
             SourceData signature = GetListItemSignature(begin, end, remainingContent);
 
             // FIXME: For now consider complete signature as the parameter name
-            parameter.name = signature;
+            parameter.name = TrimString(signature);
             
             // Set default values
             parameter.required = true;
