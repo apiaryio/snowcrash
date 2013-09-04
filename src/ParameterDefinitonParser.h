@@ -125,6 +125,11 @@ namespace snowcrash {
             Section listSection = ClassifyInternaListBlock<Parameter>(begin, end);
             if (listSection != UndefinedSection)
                 return listSection;
+            
+            // Section closure
+            if (begin->type == ListItemBlockEndType ||
+                begin->type == ListBlockEndType)
+                return UndefinedSection;
         }
         
         // Report any alien list

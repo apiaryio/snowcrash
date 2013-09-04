@@ -243,7 +243,7 @@ TEST_CASE("Parse adjacent asset blocks", "[parser][issue][#9]")
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].transactions[0].responses[1].body == "Not found\n");
 }
 
-TEST_CASE("Parse adjacent nested asset blocks", "[parser][issue][crash][#9][now]")
+TEST_CASE("Parse adjacent nested asset blocks", "[parser][issue][crash][#9]")
 {
     // Blueprint in question:
     //R"(
