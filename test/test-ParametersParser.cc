@@ -9,6 +9,7 @@
 #include <iterator>
 #include "catch.hpp"
 #include "Fixture.h"
+#include "Parser.h"
 #include "ParametersParser.h"
 
 using namespace snowcrash;
@@ -52,7 +53,7 @@ TEST_CASE("Parameters block classifier", "[parameters][classifier]")
     
     // ListBlockBeginType
     REQUIRE(ClassifyBlock<ParameterCollection>(cur, markdown.end(), UndefinedSection) == ParametersSection);
-    REQUIRE(ClassifyBlock<ParameterCollection>(cur, markdown.end(), ParametersSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<ParameterCollection>(cur, markdown.end(), ParametersSection) == ForeignSection);
     
     ++cur; // ListItemBlockBeginType
     REQUIRE(ClassifyBlock<ParameterCollection>(cur, markdown.end(), UndefinedSection) == ParametersSection);
@@ -60,7 +61,7 @@ TEST_CASE("Parameters block classifier", "[parameters][classifier]")
     
     ++cur; // ParagraphBlockType
     REQUIRE(ClassifyBlock<ParameterCollection>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
-    REQUIRE(ClassifyBlock<ParameterCollection>(cur, markdown.end(), ParametersSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<ParameterCollection>(cur, markdown.end(), ParametersSection) == ParametersSection);
     
     ++cur; // ListBlockBeginType
     REQUIRE(ClassifyBlock<ParameterCollection>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
@@ -134,7 +135,7 @@ TEST_CASE("Parse description parameter only", "[parameters]")
     REQUIRE(parameters[0].values.empty());
 }
 
-TEST_CASE("Parse multiple parameters", "[parameters][now]")
+TEST_CASE("Parse multiple parameters", "[parameters]")
 {
     //+ Parameters
     //
@@ -228,8 +229,84 @@ TEST_CASE("Parse multiple parameters", "[parameters][now]")
     REQUIRE(parameters[2].defaultValue.empty());
     REQUIRE(parameters[2].exampleValue.empty());
     REQUIRE(parameters[2].values.empty());
-    
 }
 
+TEST_CASE("Parse ilegal parameter", "[parameters][now]")
+{
+    // Blueprint in question:
+    //R"(
+    //# GET /1
+    //
+    //+ Parameters
+    //    + i:legal
+    //
+    //+ Response 200
+    //
+    //        Ok.
+    //");
+    const std::string bluerpintSource = \
+    "# GET /1\n"\
+    "+ Parameters\n"\
+    "    + i:legal\n\n"\
+    "+ Response 200\n"\
+    "\n"\
+    "        Ok.\n";
+    
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(bluerpintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.size() == 1);
+    REQUIRE(result.warnings[0].code == IgnoringWarning);
+    
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters.empty());
+}
 
-
+TEST_CASE("Parse ilegal parameter among legal ones", "[parameters]")
+{
+    // Blueprint in question:
+    //R"(
+    //# GET /1
+    //+ Parameters
+    //    + OK-1
+    //    + i:legal
+    //    + OK-2
+    //
+    //+ Response 200
+    //
+    //        Ok.
+    //");
+    const std::string bluerpintSource = \
+    "# GET /1\n"\
+    "+ Parameters\n"\
+    "    + OK-1\n"\
+    "    + i:legal\n"\
+    "    + OK-2\n"\
+    "\n"\
+    "+ Response 200\n"\
+    "\n"\
+    "        Ok.\n";
+    
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(bluerpintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.size() == 1);
+    REQUIRE(result.warnings[0].code == IgnoringWarning);
+    
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters.size() == 2);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].name == "OK-1");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].description.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[1].name == "OK-2");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[1].description.empty());
+}

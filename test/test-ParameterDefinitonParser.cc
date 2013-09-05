@@ -181,3 +181,57 @@ TEST_CASE("Parse canonical parameter definition", "[parameter_definition]")
     REQUIRE(parameter.values[2] == "beef");
 }
 
+TEST_CASE("Parse canonical definition followed by another definition", "[parameter_definition]")
+{
+    MarkdownBlock::Stack markdown = CanonicalParameterDefinitionFixture();
+    
+    MarkdownBlock::Stack parameterBlocks;
+    parameterBlocks.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    parameterBlocks.push_back(MarkdownBlock(ParagraphBlockType, "additional_parameter", 0, MakeSourceDataBlock(1, 1)));
+    parameterBlocks.push_back(MarkdownBlock(ParagraphBlockType, "Hello World", 0, MakeSourceDataBlock(2, 1)));
+    parameterBlocks.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, MakeSourceDataBlock(3, 1)));
+
+    MarkdownBlock::Stack::iterator it = markdown.end();
+    --it;
+    markdown.insert(it, parameterBlocks.begin(), parameterBlocks.end());
+
+    
+    Parameter parameter;
+    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
+    ParseSectionResult result = ParameterDefinitionParser::Parse(markdown.begin(), markdown.end(), parser, parameter);
+    
+    REQUIRE(result.first.error.code == Error::OK);
+    REQUIRE(result.first.warnings.empty());
+    
+    const MarkdownBlock::Stack &blocks = markdown;
+    CHECK(std::distance(blocks.begin(), result.second) == 25);
+    
+    REQUIRE(parameter.name == "id");
+    REQUIRE(parameter.description == "2");
+}
+
+TEST_CASE("Parse canonical definition followed by ilegal one", "[parameter_definition]")
+{
+    MarkdownBlock::Stack markdown = CanonicalParameterDefinitionFixture();
+    
+    MarkdownBlock::Stack parameterBlocks;
+    parameterBlocks.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    parameterBlocks.push_back(MarkdownBlock(ListItemBlockBeginType, "i:legal", 0, MakeSourceDataBlock(1, 1)));
+    
+    MarkdownBlock::Stack::iterator it = markdown.end();
+    --it;
+    markdown.insert(it, parameterBlocks.begin(), parameterBlocks.end());
+    
+    Parameter parameter;
+    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
+    ParseSectionResult result = ParameterDefinitionParser::Parse(markdown.begin(), markdown.end(), parser, parameter);
+    
+    REQUIRE(result.first.error.code == Error::OK);
+    REQUIRE(result.first.warnings.empty());
+    
+    const MarkdownBlock::Stack &blocks = markdown;
+    CHECK(std::distance(blocks.begin(), result.second) == 25);
+    
+    REQUIRE(parameter.name == "id");
+    REQUIRE(parameter.description == "2");
+}

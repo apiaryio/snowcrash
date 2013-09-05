@@ -109,15 +109,27 @@ namespace snowcrash {
         return cur;
     }
     
-    // Generic parser handler to warn & skip foreign blocks
+    /**
+     *  \brief Generic parser handler to warn & skip foreign blocks 
+     *  \param cur      A cursor pointing to the beigin of foreign section.
+     *  \param bounds   Bounds of the parent section.
+     *  \param expected An optional string containing expected keywords or values.
+     */
     FORCEINLINE ParseSectionResult HandleForeignSection(const BlockIterator& cur,
-                                                        const SectionBounds& bounds) {
+                                                        const SectionBounds& bounds,
+                                                        const std::string& expected = std::string()) {
 
         ParseSectionResult result = std::make_pair(Result(), cur);
+        std::stringstream ss;
+
         if (cur->type == ListItemBlockBeginType) {
 
             result.second = SkipToSectionEnd(cur, bounds.second, ListItemBlockBeginType, ListItemBlockEndType);
-            result.first.warnings.push_back(Warning("ignoring unrecognized list item",
+            ss << "ignoring one unrecognized list item";
+            if (!expected.empty())
+                ss << ", expected: " << expected;
+            
+            result.first.warnings.push_back(Warning(ss.str(),
                                                     IgnoringWarning,
                                                     result.second->sourceMap));
             result.second = CloseListItemBlock(result.second, bounds.second);
@@ -125,7 +137,11 @@ namespace snowcrash {
         else if (cur->type == ListBlockBeginType) {
 
             result.second = SkipToSectionEnd(cur, bounds.second, ListBlockBeginType, ListBlockEndType);
-            result.first.warnings.push_back(Warning("ignoring unrecognized list",
+            ss << "ignoring whole unrecognized list";
+            if (!expected.empty())
+                ss << ", expected: " << expected;
+            
+            result.first.warnings.push_back(Warning(ss.str(),
                                                     IgnoringWarning,
                                                     result.second->sourceMap));
             result.second = CloseListItemBlock(result.second, bounds.second);
@@ -137,7 +153,11 @@ namespace snowcrash {
             else {
                 ++result.second;
             }
-            result.first.warnings.push_back(Warning("ignoring unrecognized block, check indentation",
+            
+            ss << "ignoring unrecognized block, check indentation";
+            if (!expected.empty())
+                ss << ", expected: " << expected;
+            result.first.warnings.push_back(Warning(ss.str(),
                                                     IgnoringWarning,
                                                     result.second->sourceMap));
         }

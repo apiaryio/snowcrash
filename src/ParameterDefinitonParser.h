@@ -41,6 +41,11 @@ static const std::string ParameterExampleRegex("^[ \\t]*[Ee]xample:[ \\t]*" PARA
 /** Parameter Values matching regex */
 static const std::string ParameterValuesRegex("^[ \\t]*[Vv]alues:[ \\t]*$");
 
+/** List of expected keywords */
+static const std::string ExpectedDefinitionItems = "`Type: <type>`, `Optional`, `Required`, "\
+"`Default: `<default value>``, `Example: `<example value>`` or `Values:`";
+
+
 namespace snowcrash {
     
     /**
@@ -91,8 +96,13 @@ namespace snowcrash {
             begin->type != ListItemBlockBeginType)
             return false;
         
+        // Since we are too generic make sure the signature is not inner list
         Section listSection = ClassifyInternaListBlock<Parameter>(begin, end);
         if (listSection != UndefinedSection)
+            return false;
+        
+        // Or any other reserved keyword
+        if (HasParametersSignature(begin, end))
             return false;
         
         SourceData remainingContent;
@@ -109,35 +119,44 @@ namespace snowcrash {
                                                  const BlockIterator& end,
                                                  const Section& context) {
         
-        // Check signature
-        if (HasParameterDefinitionSignature(begin, end))
-            return (context == UndefinedSection) ? ParameterDefinitionSection : UndefinedSection;
-        
-        // Check possible internal list items transitions
-        if (context == ParameterDefinitionSection ||
-            context == ParameterTypeSection ||
-            context == ParameterRequiredSection ||
-            context == ParameterOptionalSection ||
-            context == ParameterDefaultSection ||
-            context == ParameterExampleSection ||
-            context == ParameterValuesSection) {
+        if (context == UndefinedSection) {
+            if (HasParameterDefinitionSignature(begin, end))
+                return ParameterDefinitionSection;
+        }
+        else if (context == ParameterDefinitionSection) {
+
+            if (begin->type == ListItemBlockEndType ||
+                begin->type == ListBlockEndType)
+                return UndefinedSection;
             
             Section listSection = ClassifyInternaListBlock<Parameter>(begin, end);
             if (listSection != UndefinedSection)
                 return listSection;
             
-            // Section closure
+            if (begin->type == ListBlockBeginType ||
+                begin->type == ListItemBlockBeginType)
+                return UndefinedSection;
+        }
+        else if (context == ParameterTypeSection ||
+                 context == ParameterRequiredSection ||
+                 context == ParameterOptionalSection ||
+                 context == ParameterDefaultSection ||
+                 context == ParameterExampleSection ||
+                 context == ParameterValuesSection ||
+                 context == ForeignSection) {
+
             if (begin->type == ListItemBlockEndType ||
                 begin->type == ListBlockEndType)
                 return UndefinedSection;
-        }
-        
-        // Report any alien list
-        if (context != UndefinedSection &&
-            begin->type == ListItemBlockBeginType)
+            
+            Section listSection = ClassifyInternaListBlock<Parameter>(begin, end);
+            if (listSection != UndefinedSection)
+                return listSection;
+            
             return ForeignSection;
-        
-        return (context == ParameterDefinitionSection) ? ParameterDefinitionSection : UndefinedSection;
+        }
+
+        return (context == ParameterDefinitionSection) ? context : UndefinedSection;
     }
     
     /**
@@ -172,6 +191,10 @@ namespace snowcrash {
                     
                 case ParameterValuesSection:
                     result = HandleValuesSection(cur, bounds, parser, parameter);
+                    break;
+                    
+                case ForeignSection:
+                    result = HandleForeignSection(cur, bounds, ExpectedDefinitionItems);
                     break;
                     
                 case UndefinedSection:

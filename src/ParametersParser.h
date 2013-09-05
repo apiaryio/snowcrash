@@ -37,6 +37,7 @@ namespace snowcrash {
         
         SourceData remainingContent;
         SourceData content = GetListItemSignature(begin, end, remainingContent);
+        TrimString(content);
         return RegexMatch(content, ParametersRegex);
     }
     
@@ -48,16 +49,39 @@ namespace snowcrash {
                                                            const BlockIterator& end,
                                                            const Section& context) {
         
-        if (HasParametersSignature(begin, end))
-            return (context == UndefinedSection) ? ParametersSection : UndefinedSection;
-        
-        if (context == ParametersSection ||
-            context == ParameterDefinitionSection) {
+        if (context == UndefinedSection) {
+            if (HasParametersSignature(begin, end))
+                return ParametersSection;
+        }
+        else if (context == ParametersSection) {
+            
+            if (begin->type == ListItemBlockEndType ||
+                begin->type == ListBlockEndType)
+                return UndefinedSection;
+            
             if (HasParameterDefinitionSignature(begin, end))
                 return ParameterDefinitionSection;
+            
+            if (begin->type == ListBlockBeginType)
+                return ForeignSection;
+            
+            if (begin->type == ListItemBlockBeginType)
+                return UndefinedSection;
+        }
+        else if (context == ParameterDefinitionSection ||
+                 context == ForeignSection) {
+            
+            if (begin->type == ListItemBlockEndType ||
+                begin->type == ListBlockEndType)
+                return UndefinedSection;
+            
+            if (HasParameterDefinitionSignature(begin, end))
+                return ParameterDefinitionSection;
+            
+            return ForeignSection;
         }
         
-        return UndefinedSection;
+        return (context == ParametersSection) ? context : UndefinedSection;
     }
 
     /**
@@ -80,6 +104,10 @@ namespace snowcrash {
                     
                 case ParameterDefinitionSection:
                     result = HandleParmeterDefinitionSection(cur, bounds, parser, parameters);
+                    break;
+                    
+                case ForeignSection:
+                    result = HandleForeignSection(cur, bounds, "`<parameter identifier>`");
                     break;
                     
                 case UndefinedSection:
@@ -108,12 +136,31 @@ namespace snowcrash {
                                                          ParameterCollection& parameters) {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
-
-            // Eat first block, skipping to the content
-            BlockIterator sectionCur = FirstContentBlock(cur, bounds.second);
+            BlockIterator sectionCur = cur;
+            
+            if (sectionCur == bounds.first) {
+                // Signature
+                // TODO: Check additional content
+                sectionCur = FirstContentBlock(cur, bounds.second);
+            }
+            else {
+                // Description
+                if (sectionCur->type == QuoteBlockBeginType) {
+                    sectionCur = SkipToSectionEnd(sectionCur, bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
+                }
+                else if (sectionCur->type == ListBlockBeginType) {
+                    sectionCur = SkipToSectionEnd(sectionCur, bounds.second, ListBlockBeginType, ListItemBlockEndType);
+                }
+                
+                if (!CheckCursor(sectionCur, bounds, cur, result.first))
+                    return result;
+                
+                // TODO: Warn on ignoring additional content
+            }
+            
             if (sectionCur != bounds.second)
                 result.second = ++sectionCur;
-            
+
             return result;
         }
         
