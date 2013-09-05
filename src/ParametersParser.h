@@ -63,7 +63,7 @@ namespace snowcrash {
                 return ParameterDefinitionSection;
             
             if (begin->type == ListBlockBeginType)
-                return ForeignSection;
+                return ForeignSection; // Foreign nested list-item
             
             if (begin->type == ListItemBlockBeginType)
                 return UndefinedSection;
@@ -138,25 +138,27 @@ namespace snowcrash {
             ParseSectionResult result = std::make_pair(Result(), cur);
             BlockIterator sectionCur = cur;
             
+            // Signature
             if (sectionCur == bounds.first) {
-                // Signature
+                
                 // TODO: Check additional content
-                sectionCur = FirstContentBlock(cur, bounds.second);
-            }
-            else {
-                // Description
-                if (sectionCur->type == QuoteBlockBeginType) {
-                    sectionCur = SkipToSectionEnd(sectionCur, bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
-                }
-                else if (sectionCur->type == ListBlockBeginType) {
-                    sectionCur = SkipToSectionEnd(sectionCur, bounds.second, ListBlockBeginType, ListItemBlockEndType);
-                }
                 
-                if (!CheckCursor(sectionCur, bounds, cur, result.first))
-                    return result;
-                
-                // TODO: Warn on ignoring additional content
+                result.second = SkipSignatureBlock(sectionCur, bounds.second);
+                return result;
             }
+            
+            // Description
+            if (sectionCur->type == QuoteBlockBeginType) {
+                sectionCur = SkipToSectionEnd(sectionCur, bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
+            }
+            else if (sectionCur->type == ListBlockBeginType) {
+                sectionCur = SkipToSectionEnd(sectionCur, bounds.second, ListBlockBeginType, ListItemBlockEndType);
+            }
+            
+            if (!CheckCursor(sectionCur, bounds, cur, result.first))
+                return result;
+            
+            // TODO: Warn on ignoring additional content
             
             if (sectionCur != bounds.second)
                 result.second = ++sectionCur;

@@ -231,7 +231,7 @@ TEST_CASE("Parse multiple parameters", "[parameters]")
     REQUIRE(parameters[2].values.empty());
 }
 
-TEST_CASE("Parse ilegal parameter", "[parameters][now]")
+TEST_CASE("Parse ilegal parameter", "[parameters]")
 {
     // Blueprint in question:
     //R"(

@@ -133,8 +133,10 @@ namespace snowcrash {
             if (listSection != UndefinedSection)
                 return listSection;
             
-            if (begin->type == ListBlockBeginType ||
-                begin->type == ListItemBlockBeginType)
+            if (begin->type == ListBlockBeginType)
+                return ForeignSection; // Foreign nested list-item
+            
+            if (begin->type == ListItemBlockBeginType)
                 return UndefinedSection;
         }
         else if (context == ParameterTypeSection ||
@@ -217,35 +219,36 @@ namespace snowcrash {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
             BlockIterator sectionCur = cur;
-            
+
+            // Signature
             if (sectionCur == bounds.first) {
-                // Signature
-                ProcessSignature(sectionCur, bounds.first, parser.sourceData, result.first, parameter);
-                sectionCur = FirstContentBlock(cur, bounds.second);
+                ProcessSignature(sectionCur, bounds.second, parser.sourceData, result.first, parameter);
+                result.second = SkipSignatureBlock(sectionCur, bounds.second);
+                return result;
             }
-            else {
-                // Description
-                if (sectionCur->type == QuoteBlockBeginType) {
-                    sectionCur = SkipToSectionEnd(sectionCur, bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
-                }
-                else if (sectionCur->type == ListBlockBeginType) {
-                    
-                    SourceDataBlock descriptionMap;
-                    sectionCur = SkipToDescriptionListEnd<Parameter>(sectionCur, bounds.second, descriptionMap);
-                    
-                    if (sectionCur->type != ListBlockEndType) {
-                        if (!descriptionMap.empty())
-                            parameter.description += MapSourceData(parser.sourceData, descriptionMap);
-                        
-                        result.second = sectionCur;
-                        return result;
-                    }
-                }
+
+            // Description
+            if (sectionCur->type == QuoteBlockBeginType) {
+                sectionCur = SkipToSectionEnd(sectionCur, bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
+            }
+            else if (sectionCur->type == ListBlockBeginType) {
                 
-                if (!CheckCursor(sectionCur, bounds, cur, result.first))
+                SourceDataBlock descriptionMap;
+                sectionCur = SkipToDescriptionListEnd<Parameter>(sectionCur, bounds.second, descriptionMap);
+                
+                if (sectionCur->type != ListBlockEndType) {
+                    if (!descriptionMap.empty())
+                        parameter.description += MapSourceData(parser.sourceData, descriptionMap);
+                    
+                    result.second = sectionCur;
                     return result;
-                parameter.description += MapSourceData(parser.sourceData, sectionCur->sourceMap);
+                }
             }
+            
+            if (!CheckCursor(sectionCur, bounds, cur, result.first))
+                return result;
+            
+            parameter.description += MapSourceData(parser.sourceData, sectionCur->sourceMap);
             
             if (sectionCur != bounds.second)
                 result.second = ++sectionCur;

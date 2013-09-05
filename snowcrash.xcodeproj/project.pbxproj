@@ -24,6 +24,7 @@
 		BB74099C171C08860023105F /* test-MarkdownParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB74099B171C08850023105F /* test-MarkdownParser.cc */; };
 		BB86DEC11723E3A700063644 /* src_map.c in Sources */ = {isa = PBXBuildFile; fileRef = BB86DEC01723E3A700063644 /* src_map.c */; };
 		BB86DEC31723E3C600063644 /* src_map.h in Headers */ = {isa = PBXBuildFile; fileRef = BB86DEC21723E3C600063644 /* src_map.h */; };
+		BB8AEFD817D899B900298807 /* test-ListUtility.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB8AEFD717D899B900298807 /* test-ListUtility.cc */; };
 		BB92D891178EF7C10098A63C /* HTTP.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB92D890178EF7C10098A63C /* HTTP.cc */; };
 		BBA25671172BFEB800C1AD5E /* snowcrash.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA25670172BFEB800C1AD5E /* snowcrash.cc */; };
 		BBA889A71712FF37005A9570 /* Parser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA889A51712FF37005A9570 /* Parser.cc */; };
@@ -126,6 +127,7 @@
 		BB86DEC01723E3A700063644 /* src_map.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = src_map.c; path = sundown/src/src_map.c; sourceTree = "<group>"; };
 		BB86DEC21723E3C600063644 /* src_map.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = src_map.h; path = sundown/src/src_map.h; sourceTree = "<group>"; };
 		BB89458C17817B5B0079084F /* RegexMatch.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RegexMatch.cc; path = src/win/RegexMatch.cc; sourceTree = "<group>"; };
+		BB8AEFD717D899B900298807 /* test-ListUtility.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-ListUtility.cc"; path = "test/test-ListUtility.cc"; sourceTree = "<group>"; };
 		BB92D88F178EF4160098A63C /* HTTP.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = HTTP.h; path = src/HTTP.h; sourceTree = "<group>"; };
 		BB92D890178EF7C10098A63C /* HTTP.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = HTTP.cc; path = src/HTTP.cc; sourceTree = "<group>"; };
 		BB92D892178EFA370098A63C /* BlueprintUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = BlueprintUtility.h; path = src/BlueprintUtility.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
@@ -330,6 +332,7 @@
 				BBFF48D7170C57F1001E5FB2 /* test-Blueprint.cc */,
 				BBA01FF817292F9C0050B603 /* test-BlueprintParser.cc */,
 				BB1D4D08174D08C3009BCB1C /* test-HeaderParser.cc */,
+				BB8AEFD717D899B900298807 /* test-ListUtility.cc */,
 				BB740999171C08240023105F /* test-MarkdownBlock.cc */,
 				BB74099B171C08850023105F /* test-MarkdownParser.cc */,
 				BB03DC6817D3723300C51E52 /* test-ParameterDefinitonParser.cc */,
@@ -538,6 +541,7 @@
 				BB167D1D172931330030D1D5 /* test-BlueprintParser.cc in Sources */,
 				BBB0F42C1731D04900C92465 /* test-RegexMatch.cc in Sources */,
 				BBD5F9DC173561DA0049BBEE /* test-ResouceGroupParser.cc in Sources */,
+				BB8AEFD817D899B900298807 /* test-ListUtility.cc in Sources */,
 				BBD5F9DE173578210049BBEE /* test-ResourceParser.cc in Sources */,
 				BBE5705D173922B70086CE22 /* test-PayloadParser.cc in Sources */,
 				BB03DC6617D3718D00C51E52 /* test-ParametersParser.cc in Sources */,

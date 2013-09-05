@@ -41,7 +41,8 @@ namespace snowcrash {
     }
     
     // Return first list / list item content block block (paragraph)
-    // This is the first block inside the list / list item or the list item's closing block 
+    // This is the first block inside the list / list item or the list item's closing block
+    // DEPRECATED - use ContentBlock() or SkipSignatureBlock() instead
     FORCEINLINE BlockIterator FirstContentBlock(const BlockIterator& begin,
                                                 const BlockIterator& end) {
         
@@ -56,6 +57,74 @@ namespace snowcrash {
         
         return cur;
     }
+    
+    /**
+     *  \brief Return a first non-signature content block of a list(item).
+     *  \param  begin    Begin of the block buffer to examine.
+     *  \param  end      Endo of the block buffer.
+     *  \return First non-signature content block or begin.
+     *
+     *  Returns first block with the actual content of a list or list item.
+     */
+    FORCEINLINE BlockIterator ContentBlock(const BlockIterator& begin,
+                                           const BlockIterator& end) {
+        
+        BlockIterator cur = begin;
+        if (cur->type == ListBlockBeginType) {
+            if (++cur == end)
+                return end;
+            
+            return cur;
+        }
+        
+        if (cur->type == ListItemBlockBeginType) {
+            if (++cur == end)
+                return end;
+            
+            if (cur->type == ListItemBlockEndType)
+                return begin;
+            
+            if (cur->type == ParagraphBlockType)
+                if (++cur == end)
+                    return end;
+        }
+        
+        return cur;
+    }
+    
+    /** 
+     * \brief Skips first list item' signature block
+     *
+     * This function effectively returns the first content block of 
+     * a list item that is not a signature block. If no such a block exists.
+     * a block following the list item is returned. If a list is provided it 
+     * uses its firt list item.
+     */
+    FORCEINLINE BlockIterator SkipSignatureBlock(const BlockIterator& begin,
+                                                 const BlockIterator& end) {
+        
+        BlockIterator cur = begin;
+        
+        // Skip to fist list item if appropriate
+        if (cur->type == ListBlockBeginType) {
+            cur = ContentBlock(cur, end);
+        }
+        
+        // Skip to first list item content
+        if (cur->type == ListItemBlockBeginType) {
+            BlockIterator firstContent = ContentBlock(cur, end);
+            if (cur != firstContent) {
+                cur = firstContent;
+            }
+            else {
+                // No content, just move to the next block
+                ++cur;
+            }
+        }
+        
+        return cur;
+    }
+
 
     // Return name block of list item; that is either FirstContentBlock() or
     // matching closing item block for inline items

@@ -95,6 +95,7 @@
         'test/test-Blueprint.cc',
         'test/test-BlueprintParser.cc',
         'test/test-HeaderParser.cc',
+        'test/test-ListUtility.cc ',
         'test/test-MarkdownBlock.cc',
         'test/test-MarkdownParser.cc',
         'test/test-Parser.cc',
