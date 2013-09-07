@@ -128,7 +128,7 @@ TEST_CASE("Parse description parameter only", "[parameters]")
     
     REQUIRE(parameters[0].name == "Param1");
     REQUIRE(parameters[0].description == "2");
-    REQUIRE(parameters[0].required == true);
+    REQUIRE(parameters[0].use == UndefinedParameterUse);
     REQUIRE(parameters[0].type.empty());
     REQUIRE(parameters[0].defaultValue.empty());
     REQUIRE(parameters[0].exampleValue.empty());
@@ -208,7 +208,7 @@ TEST_CASE("Parse multiple parameters", "[parameters]")
     
     REQUIRE(parameters[0].name == "Param1");
     REQUIRE(parameters[0].description == "2");
-    REQUIRE(parameters[0].required == false);
+    REQUIRE(parameters[0].use == OptionalParameterUse);
     REQUIRE(parameters[0].type.empty());
     REQUIRE(parameters[0].defaultValue.empty());
     REQUIRE(parameters[0].exampleValue.empty());
@@ -216,7 +216,7 @@ TEST_CASE("Parse multiple parameters", "[parameters]")
     
     REQUIRE(parameters[1].name == "Param2");
     REQUIRE(parameters[1].description == "7");
-    REQUIRE(parameters[1].required == true);
+    REQUIRE(parameters[1].use == UndefinedParameterUse);
     REQUIRE(parameters[1].type.empty());
     REQUIRE(parameters[1].defaultValue.empty());
     REQUIRE(parameters[1].exampleValue == "B-2");
@@ -224,7 +224,7 @@ TEST_CASE("Parse multiple parameters", "[parameters]")
     
     REQUIRE(parameters[2].name == "Param3");
     REQUIRE(parameters[2].description.empty());
-    REQUIRE(parameters[2].required == true);
+    REQUIRE(parameters[2].use == UndefinedParameterUse);
     REQUIRE(parameters[2].type.empty());
     REQUIRE(parameters[2].defaultValue.empty());
     REQUIRE(parameters[2].exampleValue.empty());

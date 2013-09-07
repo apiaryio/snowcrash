@@ -272,7 +272,7 @@ namespace snowcrash {
             parameter.name = TrimString(signature);
             
             // Set default values
-            parameter.required = true;
+            parameter.use = UndefinedParameterUse;
         }
         
         /** Parse parameter type section blocks. */
@@ -353,7 +353,7 @@ namespace snowcrash {
             
             // TODO: check superfluous content in signature
             
-            parameter.required = (section == ParameterRequiredSection);
+            parameter.use = (section == ParameterRequiredSection) ? RequiredParameterUse : OptionalParameterUse;
             
             // Close list item
             BlockIterator endCur = cur;

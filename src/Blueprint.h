@@ -83,6 +83,13 @@ namespace snowcrash {
      */
     typedef KeyValuePair Header;
     
+    /** Parameter Use flag */
+    enum ParameterUse {
+        UndefinedParameterUse,
+        OptionalParameterUse,
+        RequiredParameterUse
+    };
+    
     /** Parameter */
     struct Parameter {
         
@@ -96,7 +103,7 @@ namespace snowcrash {
         Type type;
         
         /** Required flag */
-        bool required;
+        ParameterUse use;
         
         /** Default Value, applicable only when `required == false` */
         Value defaultValue;
@@ -107,6 +114,7 @@ namespace snowcrash {
         /** Enumeration of possible values */
         Collection<Value>::type values;
     };
+
     
     /**
      *  Payload

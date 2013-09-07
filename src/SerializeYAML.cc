@@ -129,7 +129,7 @@ static void serialize(const Collection<Parameter>::type& parameters, size_t leve
         serialize(SerializeKey::Type, it->type, level + 2, os);
         
         // Required
-        serialize(SerializeKey::Required, (it->required) ? "true" : "false", level + 2, os);
+        serialize(SerializeKey::Required, (it->use == OptionalParameterUse) ? "false" : "true", level + 2, os);
         
         // Default
         serialize(SerializeKey::Default, it->defaultValue, level + 2, os);

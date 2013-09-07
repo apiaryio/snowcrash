@@ -173,7 +173,7 @@ TEST_CASE("Parse canonical parameter definition", "[parameter_definition][now]")
     REQUIRE(parameter.name == "id");
     REQUIRE(parameter.description == "2");
     REQUIRE(parameter.type == "number");
-    REQUIRE(parameter.required == false);
+    REQUIRE(parameter.use == OptionalParameterUse);
     REQUIRE(parameter.defaultValue == "1234");
     REQUIRE(parameter.exampleValue == "0000");
     REQUIRE(parameter.values.size() == 3);
