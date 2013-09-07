@@ -372,6 +372,7 @@ namespace snowcrash {
             // Set the attribute
             parameter.use = (section == ParameterRequiredSection) ? RequiredParameterUse : OptionalParameterUse;
             
+            // Build hint strings
             std::stringstream ss;
             ss << "the `" << ParameterUseName(parameter.use) << "`";
             ss << " specification for parameter `" << parameter.name << "`";
@@ -382,7 +383,7 @@ namespace snowcrash {
             std::string expectedHint = ss.str();
             
             // Check Signature
-            CheckSignatureAdditionalContent(cur, bounds, placeHint, ss.str(), result.first);
+            CheckSignatureAdditionalContent(cur, bounds, placeHint, expectedHint, result.first);
             
             // Close Signature
             result.second = CloseSignatureOnlyListItem(cur, bounds, placeHint, expectedHint, result.first);
