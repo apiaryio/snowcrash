@@ -356,21 +356,7 @@ namespace snowcrash {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
             
-            SourceData remainingContent;
-            SourceData signature = GetListItemSignature(cur, bounds.second, remainingContent);
-            if (!remainingContent.empty()) {
-                // WARM: Superfluous content in signature
-                BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
-                std::stringstream ss;
-                ss << "ignoring additional content after the `";
-                ss << ParameterUseName(parameter.use);
-                ss << "` specification for parameter `" << parameter.name << "`";
-                ss << ", expected `" << ParameterUseName(parameter.use) << "` only";
-                result.first.warnings.push_back(Warning(ss.str(),
-                                                        IgnoringWarning,
-                                                        nameBlock->sourceMap));
-            }
-            
+            // Check redefinition
             if (parameter.use != UndefinedParameterUse) {
                 // WARN: parameter use flag already defined
                 BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
@@ -386,48 +372,22 @@ namespace snowcrash {
             // Set the attribute
             parameter.use = (section == ParameterRequiredSection) ? RequiredParameterUse : OptionalParameterUse;
             
-            // Close list item
-            BlockIterator sectionCur = SkipSignatureBlock(cur, bounds.second);
-            BlockIterator endCur = cur;
-            if (endCur->type == ListBlockBeginType)
-                ++endCur;
-            endCur = SkipToSectionEnd(endCur, bounds.second, ListItemBlockBeginType, ListItemBlockEndType);
+            std::stringstream ss;
+            ss << "the `" << ParameterUseName(parameter.use) << "`";
+            ss << " specification for parameter `" << parameter.name << "`";
+            std::string placeHint = ss.str();
+
+            ss.str(std::string());
+            ss << "`" << ParameterUseName(parameter.use) << "` only";
+            std::string expectedHint = ss.str();
             
-            // Check extraneous content
-            if (sectionCur != endCur) {
-                for (; sectionCur != endCur; ++sectionCur) {
-                    
-                    if (sectionCur->type == QuoteBlockBeginType)
-                        sectionCur = SkipToSectionEnd(sectionCur, endCur, QuoteBlockBeginType, QuoteBlockEndType);
-                    
-                    if (sectionCur->type == ListBlockBeginType)
-                        sectionCur = SkipToSectionEnd(sectionCur, endCur, ListBlockBeginType, ListBlockEndType);
-                    
-                    // WARN: ignoring extraneous content after symbol reference
-                    std::stringstream ss;
-                    ss << "ignoring additional content in the `";
-                    ss << ParameterUseName(parameter.use);
-                    ss << "` specification for parameter `" << parameter.name << "`";
-                    ss << ", expected `" << ParameterUseName(parameter.use) << "` only";
-                    result.first.warnings.push_back(Warning(ss.str(), IgnoringWarning, sectionCur->sourceMap));
-                }
-            }
+            // Check Signature
+            CheckSignatureAdditionalContent(cur, bounds, placeHint, ss.str(), result.first);
             
-            endCur = CloseListItemBlock(sectionCur, bounds.second);
-            result.second = endCur;
+            // Close Signature
+            result.second = CloseSignatureOnlyListItem(cur, bounds, placeHint, expectedHint, result.first);
             
             return result;
-            
-            // Close list item
-//            BlockIterator endCur = cur;
-//            if (endCur->type == ListBlockBeginType)
-//                ++endCur;
-//            
-//            endCur = SkipToSectionEnd(endCur, bounds.second, ListItemBlockBeginType, ListItemBlockEndType);
-//            endCur = CloseListItemBlock(endCur, bounds.second);
-//            result.second = endCur;
-//            
-//            return result;
         }
         
         /** Parse possible values enumeration section blocks. */

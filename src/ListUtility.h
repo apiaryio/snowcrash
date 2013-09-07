@@ -318,7 +318,12 @@ namespace snowcrash {
         }
     }
     
-    // Extracts first line of a list item content - signature
+    /** 
+     *  \brief Extract the first line of a list item content - its signature
+     *  \param cur  The begining of the list item to get its signature.
+     *  \param end  The begining of a block buffer.
+     *  \param remainingContent Any additonal content after the first line of signature.
+     */
     FORCEINLINE SourceData GetListItemSignature(const BlockIterator& cur,
                                                 const BlockIterator& end,
                                                 SourceData& remainingContent) {
@@ -339,6 +344,92 @@ namespace snowcrash {
     }
     
     
+    /**
+     *  \brief Check List Item signature for an addtional content and issue a warning.
+     *  \param cur      The begining of the list item to check.
+     *  \param bounds   Bounds within the block buffer.
+     *  \param placeHint    A string explaining the possible place of failure. Might be empty.
+     *  \param expectedHint A string defining expected content. Might be empty.
+     *  \param result   Result to append the possible warning into.
+     *  \return True if signagure contains no additional content, false otherwise.
+     */
+    FORCEINLINE bool CheckSignatureAdditionalContent(const BlockIterator& cur,
+                                                     const SectionBounds& bounds,
+                                                     const std::string& placeHint,
+                                                     const std::string& expectedHint,
+                                                     Result& result)
+    {
+        SourceData remainingContent;
+        SourceData signature = GetListItemSignature(cur, bounds.second, remainingContent);
+        
+        if (!remainingContent.empty()) {
+            // WARN: Superfluous content in signature
+            BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
+            std::stringstream ss;
+            ss << "ignoring additional content";
+            
+            if (!placeHint.empty())
+                ss << " after " << placeHint;
+            
+            if (!expectedHint.empty())
+                ss << ", expected " << expectedHint;
+            
+            result.warnings.push_back(Warning(ss.str(),
+                                              IgnoringWarning,
+                                              nameBlock->sourceMap));
+        }
+        
+        return remainingContent.empty();
+    }
+    
+    /**
+     *  \brief Skips to the end of a signature-only list item ignoring and reporting any additional content.
+     *  \param cur          The begining of the list item to close.
+     *  \param bounds       Bounds within the block buffer.
+     *  \param placeHint    A string explaining the possible place of failure. Might be empty.
+     *  \param expectedHint A string defining expected content. Might be empty.
+     *  \param result       Result to append the possible warning into.
+     *  \return An iterator pointing AFTER the last closing list or list item block.
+     */
+    FORCEINLINE BlockIterator CloseSignatureOnlyListItem(const BlockIterator& cur,
+                                                         const SectionBounds& bounds,
+                                                         const std::string& placeHint,
+                                                         const std::string& expectedHint,
+                                                         Result& result)
+    {
+        // Close list item
+        BlockIterator sectionCur = SkipSignatureBlock(cur, bounds.second);
+        BlockIterator endCur = cur;
+        if (endCur->type == ListBlockBeginType)
+            ++endCur;
+        endCur = SkipToSectionEnd(endCur, bounds.second, ListItemBlockBeginType, ListItemBlockEndType);
+        
+        // Check extraneous content
+        if (sectionCur != endCur) {
+            for (; sectionCur != endCur; ++sectionCur) {
+                
+                if (sectionCur->type == QuoteBlockBeginType)
+                    sectionCur = SkipToSectionEnd(sectionCur, endCur, QuoteBlockBeginType, QuoteBlockEndType);
+                
+                if (sectionCur->type == ListBlockBeginType)
+                    sectionCur = SkipToSectionEnd(sectionCur, endCur, ListBlockBeginType, ListBlockEndType);
+                
+                // WARN: ignoring extraneous content after symbol reference
+                std::stringstream ss;
+                ss << "ignoring additional content";
+                if (!placeHint.empty())
+                    ss << " of " << placeHint;
+                
+                if (!expectedHint.empty())
+                    ss << ", expected " << expectedHint;
+                
+                result.warnings.push_back(Warning(ss.str(), IgnoringWarning, sectionCur->sourceMap));
+            }
+        }
+        
+        endCur = CloseListItemBlock(sectionCur, bounds.second);
+        return endCur;
+    }
     
     // Parse preformatted source data from block(s) of a list item block
     FORCEINLINE ParseSectionResult ParseListPreformattedBlock(const Section& section,
