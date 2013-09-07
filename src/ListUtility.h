@@ -61,7 +61,7 @@ namespace snowcrash {
     /**
      *  \brief Return a first non-signature content block of a list(item).
      *  \param  begin    Begin of the block buffer to examine.
-     *  \param  end      Endo of the block buffer.
+     *  \param  end      End of the block buffer.
      *  \return First non-signature content block or begin.
      *
      *  Returns first block with the actual content of a list or list item.

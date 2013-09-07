@@ -157,7 +157,7 @@ TEST_CASE("Parameter definition block classifier", "[parameter_definition][class
     REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterValuesSection) == ParameterValuesSection);
 }
 
-TEST_CASE("Parse canonical parameter definition", "[parameter_definition][now]")
+TEST_CASE("Parse canonical parameter definition", "[parameter_definition]")
 {
     MarkdownBlock::Stack markdown = CanonicalParameterDefinitionFixture();
     Parameter parameter;
@@ -276,3 +276,122 @@ TEST_CASE("Parse ilegal parameter trait at the begining", "[parameter_definition
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].transactions[0].responses.size() == 1);
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].transactions[0].responses[0].name == "200");
 }
+
+TEST_CASE("Warn when re-setting the use attribute", "[parameter_definition]")
+{
+    // Blueprint in question:
+    //R"(
+    //# GET /1
+    //+ Parameters
+    //    + id
+    //        + optional
+    //        + required
+    //
+    //+ Response 204
+    //");
+    const std::string bluerpintSource = \
+    "# GET /1\n"\
+    "+ Parameters\n"\
+    "    + id\n"\
+    "        + optional\n"\
+    "        + required\n"\
+    "\n"\
+    "+ Response 204\n\n";
+    
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(bluerpintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.size() == 1);
+    REQUIRE(result.warnings[0].code == RedefinitionWarning);
+    
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].name == "id");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].use == RequiredParameterUse);
+}
+
+TEST_CASE("Warn about superfluous content in the use attribute", "[parameter_definition]")
+{
+    // Blueprint in question:
+    //R"(
+    //# GET /1
+    //+ Parameters
+    //    + id
+    //        + optional
+    //          extra-1
+    //
+    //+ Response 204
+    //");
+    const std::string bluerpintSource = \
+    "# GET /1\n"\
+    "+ Parameters\n"\
+    "    + id\n"\
+    "        + optional\n"\
+    "          extra-1\n"\
+    "\n"\
+    "+ Response 204\n\n";
+    
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(bluerpintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.size() == 1);
+    REQUIRE(result.warnings[0].code == IgnoringWarning);
+    
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].name == "id");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].use == OptionalParameterUse);
+}
+
+TEST_CASE("Warn about superfluous blocks in the use attribute", "[parameter_definition]")
+{
+    // Blueprint in question:
+    //R"(
+    //# GET /1
+    //+ Parameters
+    //    + id
+    //        + optional
+    //        
+    //          extra-1
+    //
+    //+ Response 204
+    //");
+    const std::string bluerpintSource = \
+    "# GET /1\n"\
+    "+ Parameters\n"\
+    "    + id\n"\
+    "        + optional\n"\
+    "        \n"\
+    "          extra-1\n"\
+    "\n"\
+    "+ Response 204\n\n";
+    
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(bluerpintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.size() == 1);
+    REQUIRE(result.warnings[0].code == IgnoringWarning);
+    
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].name == "id");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].use == OptionalParameterUse);
+}
+
+
+

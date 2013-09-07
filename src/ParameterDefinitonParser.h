@@ -161,6 +161,11 @@ namespace snowcrash {
         return (context == ParameterDefinitionSection) ? context : UndefinedSection;
     }
     
+    /** \returns Specification name for the parameter use attribute */
+    FORCEINLINE std::string ParameterUseName(ParameterUse use) {
+        return (use == RequiredParameterUse) ? "required" : "optional";
+    }
+    
     /**
      *  Parameter section parser.
      */
@@ -351,20 +356,78 @@ namespace snowcrash {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
             
-            // TODO: check superfluous content in signature
+            SourceData remainingContent;
+            SourceData signature = GetListItemSignature(cur, bounds.second, remainingContent);
+            if (!remainingContent.empty()) {
+                // WARM: Superfluous content in signature
+                BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
+                std::stringstream ss;
+                ss << "ignoring additional content after the `";
+                ss << ParameterUseName(parameter.use);
+                ss << "` specification for parameter `" << parameter.name << "`";
+                ss << ", expected `" << ParameterUseName(parameter.use) << "` only";
+                result.first.warnings.push_back(Warning(ss.str(),
+                                                        IgnoringWarning,
+                                                        nameBlock->sourceMap));
+            }
             
+            if (parameter.use != UndefinedParameterUse) {
+                // WARN: parameter use flag already defined
+                BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
+                std::stringstream ss;
+                ss << "overshadowing previous `";
+                ss << ((parameter.use == RequiredParameterUse) ? "required" : "optional");
+                ss << "` specification for parameter `" << parameter.name << "`";
+                result.first.warnings.push_back(Warning(ss.str(),
+                                                        RedefinitionWarning,
+                                                        nameBlock->sourceMap));
+            }
+            
+            // Set the attribute
             parameter.use = (section == ParameterRequiredSection) ? RequiredParameterUse : OptionalParameterUse;
             
             // Close list item
+            BlockIterator sectionCur = SkipSignatureBlock(cur, bounds.second);
             BlockIterator endCur = cur;
             if (endCur->type == ListBlockBeginType)
                 ++endCur;
-            
             endCur = SkipToSectionEnd(endCur, bounds.second, ListItemBlockBeginType, ListItemBlockEndType);
-            endCur = CloseListItemBlock(endCur, bounds.second);
+            
+            // Check extraneous content
+            if (sectionCur != endCur) {
+                for (; sectionCur != endCur; ++sectionCur) {
+                    
+                    if (sectionCur->type == QuoteBlockBeginType)
+                        sectionCur = SkipToSectionEnd(sectionCur, endCur, QuoteBlockBeginType, QuoteBlockEndType);
+                    
+                    if (sectionCur->type == ListBlockBeginType)
+                        sectionCur = SkipToSectionEnd(sectionCur, endCur, ListBlockBeginType, ListBlockEndType);
+                    
+                    // WARN: ignoring extraneous content after symbol reference
+                    std::stringstream ss;
+                    ss << "ignoring additional content in the `";
+                    ss << ParameterUseName(parameter.use);
+                    ss << "` specification for parameter `" << parameter.name << "`";
+                    ss << ", expected `" << ParameterUseName(parameter.use) << "` only";
+                    result.first.warnings.push_back(Warning(ss.str(), IgnoringWarning, sectionCur->sourceMap));
+                }
+            }
+            
+            endCur = CloseListItemBlock(sectionCur, bounds.second);
             result.second = endCur;
             
             return result;
+            
+            // Close list item
+//            BlockIterator endCur = cur;
+//            if (endCur->type == ListBlockBeginType)
+//                ++endCur;
+//            
+//            endCur = SkipToSectionEnd(endCur, bounds.second, ListItemBlockBeginType, ListItemBlockEndType);
+//            endCur = CloseListItemBlock(endCur, bounds.second);
+//            result.second = endCur;
+//            
+//            return result;
         }
         
         /** Parse possible values enumeration section blocks. */
