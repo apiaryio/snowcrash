@@ -307,8 +307,15 @@ namespace snowcrash {
             if (result.first.error.code != Error::OK)
                 return result;
             
-            // TODO: additional checkings
-            resource.parameters.insert(resource.parameters.end(), parameters.begin(), parameters.end());
+            if (parameters.empty()) {
+                BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
+                result.first.warnings.push_back(Warning(NoParametersMessage,
+                                                        FormattingWarning,
+                                                        nameBlock->sourceMap));
+            }
+            else {
+                resource.parameters.insert(resource.parameters.end(), parameters.begin(), parameters.end());
+            }            
             
             return result;
         }
@@ -345,7 +352,7 @@ namespace snowcrash {
                 if (actionSignature == MethodURIActionSignature) {
                     // WARN: ignoring extraneous content in action header
                     std::stringstream ss;
-                    ss << "ignoring extraneous content in method header '" << begin->content << "'";
+                    ss << "ignoring additional content in method header '" << begin->content << "'";
                     ss << ", expected method-only e.g. '# " << action.method << "'";
                     result.first.warnings.push_back(Warning(ss.str(), IgnoringWarning, begin->sourceMap));
                 }
@@ -364,6 +371,10 @@ namespace snowcrash {
                                                         begin->sourceMap));
             }
             
+            // Check for parameters duplicates
+            // TODO:
+            
+            // Check for header duplictes
             DeepCheckHeaderDuplicates(resource, action, begin->sourceMap, result.first);
             
             if (action.transactions.empty() ||

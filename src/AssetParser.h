@@ -185,7 +185,7 @@ namespace snowcrash {
                                                                    data,
                                                                    sourceMap);
             if (result.first.error.code != Error::OK ||
-                parser.sourceData.empty()) // TODO: change to data.empty()
+                parser.sourceData.empty())
                 return result;
             
             asset += data;

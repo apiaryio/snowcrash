@@ -233,8 +233,15 @@ namespace snowcrash {
             if (result.first.error.code != Error::OK)
                 return result;
             
-            // TODO: additional checkings
-            action.parameters.insert(action.parameters.end(), parameters.begin(), parameters.end());
+            if (parameters.empty()) {
+                BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
+                result.first.warnings.push_back(Warning(NoParametersMessage,
+                                                        FormattingWarning,
+                                                        nameBlock->sourceMap));
+            }
+            else {
+                action.parameters.insert(action.parameters.end(), parameters.begin(), parameters.end());
+            }
             
             return result;
         }

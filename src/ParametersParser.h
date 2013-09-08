@@ -22,7 +22,10 @@ static const std::string ParametersRegex("^[ \\t]*[Pp]arameters?[ \\t]*$");
 
 /** Expected parameters content */
 static const std::string ExpectedParametersContent = "'parameters' only followed by a nested list of parameters, "\
-                                                     "one parameter per item";
+                                                     "one parameter per list item";
+
+/** No parameters specified message */
+static const std::string NoParametersMessage = "no parameters specified, expected a nested list of parameters, one parameter per list item";
 
 namespace snowcrash {
     
@@ -184,7 +187,7 @@ namespace snowcrash {
             if (result.first.error.code != Error::OK)
                 return result;
             
-            // TODO: check duplicates & elegibility
+            // TODO: check duplicates on this level - look for other parameters with the same name
             parameters.push_back(parameter);
             
             return result;

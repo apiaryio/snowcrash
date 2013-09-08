@@ -257,8 +257,9 @@ TEST_CASE("Parse ilegal parameter", "[parameters]")
     Blueprint blueprint;
     parser.parse(blueprintSource, 0, result, blueprint);
     REQUIRE(result.error.code == Error::OK);
-    REQUIRE(result.warnings.size() == 1);
+    REQUIRE(result.warnings.size() == 2);
     REQUIRE(result.warnings[0].code == IgnoringWarning);
+    REQUIRE(result.warnings[1].code == FormattingWarning); // no parameters specified
     
     REQUIRE(blueprint.resourceGroups.size() == 1);
     REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
@@ -350,7 +351,7 @@ TEST_CASE("Warn about additional content in parameters section", "[parameters]")
 }
 
 
-TEST_CASE("Warn about additional content block in parameters section", "[parameters][now]")
+TEST_CASE("Warn about additional content block in parameters section", "[parameters]")
 {
     // Blueprint in question:
     //R"(
