@@ -20,6 +20,10 @@
 /** Parameters matching regex */
 static const std::string ParametersRegex("^[ \\t]*[Pp]arameters?[ \\t]*$");
 
+/** Expected parameters content */
+static const std::string ExpectedParametersContent = "'parameters' only followed by a nested list of parameters, "\
+                                                     "one parameter per item";
+
 namespace snowcrash {
     
     /** Internal type alias for Collection of Paramaeter */
@@ -141,8 +145,7 @@ namespace snowcrash {
             // Signature
             if (sectionCur == bounds.first) {
                 
-                // TODO: Check additional content
-                
+                CheckSignatureAdditionalContent(sectionCur, bounds, "'parameters' keyword", ExpectedParametersContent, result.first);
                 result.second = SkipSignatureBlock(sectionCur, bounds.second);
                 return result;
             }
@@ -158,7 +161,12 @@ namespace snowcrash {
             if (!CheckCursor(sectionCur, bounds, cur, result.first))
                 return result;
             
-            // TODO: Warn on ignoring additional content
+            // WARN: on ignoring additional content
+            std::stringstream ss;
+            ss << "ignoring additional content in the 'parameters' definition, expected " << ExpectedParametersContent;
+            result.first.warnings.push_back(Warning(ss.str(),
+                                                    IgnoringWarning,
+                                                    sectionCur->sourceMap));
             
             if (sectionCur != bounds.second)
                 result.second = ++sectionCur;

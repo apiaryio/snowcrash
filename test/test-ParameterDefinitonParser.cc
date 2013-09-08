@@ -509,7 +509,7 @@ TEST_CASE("Warn about superfluous blocks in a key-value attribute", "[parameter_
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].exampleValue == "42");
 }
 
-TEST_CASE("Warn superfluous content in values attribute", "[parameter_definition][now]")
+TEST_CASE("Warn superfluous content in values attribute", "[parameter_definition]")
 {
     // Blueprint in question:
     //R"(

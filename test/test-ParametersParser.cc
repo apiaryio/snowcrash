@@ -244,7 +244,7 @@ TEST_CASE("Parse ilegal parameter", "[parameters]")
     //
     //        Ok.
     //");
-    const std::string bluerpintSource = \
+    const std::string blueprintSource = \
     "# GET /1\n"\
     "+ Parameters\n"\
     "    + i:legal\n\n"\
@@ -255,7 +255,7 @@ TEST_CASE("Parse ilegal parameter", "[parameters]")
     Parser parser;
     Result result;
     Blueprint blueprint;
-    parser.parse(bluerpintSource, 0, result, blueprint);
+    parser.parse(blueprintSource, 0, result, blueprint);
     REQUIRE(result.error.code == Error::OK);
     REQUIRE(result.warnings.size() == 1);
     REQUIRE(result.warnings[0].code == IgnoringWarning);
@@ -281,7 +281,7 @@ TEST_CASE("Parse ilegal parameter among legal ones", "[parameters]")
     //
     //        Ok.
     //");
-    const std::string bluerpintSource = \
+    const std::string blueprintSource = \
     "# GET /1\n"\
     "+ Parameters\n"\
     "    + OK-1\n"\
@@ -295,7 +295,7 @@ TEST_CASE("Parse ilegal parameter among legal ones", "[parameters]")
     Parser parser;
     Result result;
     Blueprint blueprint;
-    parser.parse(bluerpintSource, 0, result, blueprint);
+    parser.parse(blueprintSource, 0, result, blueprint);
     REQUIRE(result.error.code == Error::OK);
     REQUIRE(result.warnings.size() == 1);
     REQUIRE(result.warnings[0].code == IgnoringWarning);
@@ -309,4 +309,83 @@ TEST_CASE("Parse ilegal parameter among legal ones", "[parameters]")
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].description.empty());
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[1].name == "OK-2");
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[1].description.empty());
+}
+
+TEST_CASE("Warn about additional content in parameters section", "[parameters]")
+{
+    // Blueprint in question:
+    //R"(
+    //# GET /1
+    //+ Parameters
+    //  extra-1
+    //
+    //    + id
+    //
+    //+ Response 204
+    //");
+    const std::string blueprintSource = \
+    "# GET /1\n"\
+    "+ Parameters\n"\
+    "  extra-1\n"\
+    "\n"\
+    "    + id\n"\
+    "\n"\
+    "+ Response 204\n\n";
+    
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(blueprintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.size() == 1);
+    REQUIRE(result.warnings[0].code == IgnoringWarning);
+    
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].name == "id");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].description.empty());
+}
+
+
+TEST_CASE("Warn about additional content block in parameters section", "[parameters][now]")
+{
+    // Blueprint in question:
+    //R"(
+    //# GET /1
+    //+ Parameters
+    //
+    //  extra-1
+    //
+    //    + id
+    //
+    //+ Response 204
+    //");
+    const std::string blueprintSource = \
+    "# GET /1\n"\
+    "+ Parameters\n"\
+    "  \n"\
+    "   extra-1\n"\
+    "\n"\
+    "    + id\n"\
+    "\n"\
+    "+ Response 204\n\n";
+    
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(blueprintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.size() == 1);
+    REQUIRE(result.warnings[0].code == IgnoringWarning);
+    
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].name == "id");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].description.empty());
 }
