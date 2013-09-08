@@ -45,7 +45,6 @@ static const std::string ParameterValuesRegex("^[ \\t]*[Vv]alues:[ \\t]*$");
 static const std::string ExpectedDefinitionItems = "`Type: <type>`, `Optional`, `Required`, "\
 "`Default: `<default value>``, `Example: `<example value>`` or `Values:`";
 
-
 namespace snowcrash {
     
     /**
@@ -161,9 +160,60 @@ namespace snowcrash {
         return (context == ParameterDefinitionSection) ? context : UndefinedSection;
     }
     
-    /** \returns Specification name for the parameter use attribute */
-    FORCEINLINE std::string ParameterUseName(ParameterUse use) {
+    /** \returns Specification keyword for the parameter use attribute */
+    FORCEINLINE std::string ParameterUseKeyword(ParameterUse use) {
         return (use == RequiredParameterUse) ? "required" : "optional";
+    }
+    
+    /** \returns Specification keyword for a key-value section */
+    FORCEINLINE std::string ParameterKeyValueKeyword(const Section& keyValueSection) {
+        switch (keyValueSection) {
+            case ParameterDefaultSection:
+                return "default";
+
+            case ParameterExampleSection:
+                return "example";
+                
+            case ParameterTypeSection:
+                return "type";
+                
+            default:
+                return std::string();
+        }
+    }
+    
+    /** \returns Specification value a key-value section */
+    FORCEINLINE std::string ParameterKeyValueValue(const Section& keyValueSection) {
+        switch (keyValueSection) {
+            case ParameterDefaultSection:
+                return "`<default value>`";
+                
+            case ParameterExampleSection:
+                return "`<example value>`";
+                
+            case ParameterTypeSection:
+                return "<type>";
+                
+            default:
+                return std::string();
+        }
+    }
+    
+    /** \returns True if parameter has a value already set for given key value section, false otherwise */
+    FORCEINLINE bool IsParameterKeyValueRedefiniton(const Section& keyValueSection, const Parameter& parameter) {
+        switch (keyValueSection) {
+            case ParameterDefaultSection:
+                return !parameter.defaultValue.empty();
+                
+            case ParameterExampleSection:
+                return !parameter.exampleValue.empty();
+                
+            case ParameterTypeSection:
+                return !parameter.type.empty();
+                
+            default:
+                return false;
+        }
     }
     
     /**
@@ -188,7 +238,7 @@ namespace snowcrash {
                 case ParameterTypeSection:
                 case ParameterDefaultSection:
                 case ParameterExampleSection:
-                    result = HandleKeywordValueSection(section, cur, bounds, parser, parameter);
+                    result = HandleKeyValueSection(section, cur, bounds, parser, parameter);
                     break;
                     
                 case ParameterOptionalSection:
@@ -281,18 +331,31 @@ namespace snowcrash {
         }
         
         /** Parse parameter type section blocks. */
-        static ParseSectionResult HandleKeywordValueSection(const Section& section,
-                                                            const BlockIterator& cur,
-                                                            const SectionBounds& bounds,
-                                                            BlueprintParserCore& parser,
-                                                            Parameter& parameter) {
+        static ParseSectionResult HandleKeyValueSection(const Section& section,
+                                                        const BlockIterator& cur,
+                                                        const SectionBounds& bounds,
+                                                        BlueprintParserCore& parser,
+                                                        Parameter& parameter) {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
+            
+            // Check redefinition
+            if (IsParameterKeyValueRedefiniton(section, parameter)) {
+                // WARN: parameter use flag already defined
+                BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
+                std::stringstream ss;
+                ss << "overshadowing previous definition of `";
+                ss << ParameterKeyValueKeyword(section);
+                ss << "` value for parameter `" << parameter.name << "`";
+                result.first.warnings.push_back(Warning(ss.str(),
+                                                        RedefinitionWarning,
+                                                        nameBlock->sourceMap));
+            }
+            
 
             SourceData remainingContent;
             SourceData content = GetListItemSignature(cur, bounds.second, remainingContent);
             content = TrimString(content);
-            // TODO: check remainingContent for remnants
 
             // Retrieve type
             CaptureGroups captureGroups;
@@ -334,16 +397,23 @@ namespace snowcrash {
                     break;
             }
             
-            // TODO: check superluous nested blocks
+            // Specification hint strings
+            std::stringstream ss;
+            ss << "the `" << ParameterKeyValueKeyword(section) << "`";
+            ss << " specification for parameter `" << parameter.name << "`";
+            std::string placeHint = ss.str();
             
-            // Close list item
-            BlockIterator endCur = cur;
-            if (endCur->type == ListBlockBeginType)
-                ++endCur;
-
-            endCur = SkipToSectionEnd(endCur, bounds.second, ListItemBlockBeginType, ListItemBlockEndType);
-            endCur = CloseListItemBlock(endCur, bounds.second);
-            result.second = endCur;
+            // Expected hint string
+            ss.str(std::string());
+            ss << "`" << ParameterKeyValueKeyword(section) << ": ";
+            ss << ParameterKeyValueValue(section) << "` only";
+            std::string expectedHint = ss.str();
+            
+            // Check Signature
+            CheckSignatureAdditionalContent(cur, bounds, placeHint, expectedHint, result.first);
+            
+            // Close Signature
+            result.second = CloseSignatureOnlyListItem(cur, bounds, placeHint, expectedHint, result.first);
             return result;
         }
         
@@ -372,14 +442,15 @@ namespace snowcrash {
             // Set the attribute
             parameter.use = (section == ParameterRequiredSection) ? RequiredParameterUse : OptionalParameterUse;
             
-            // Build hint strings
+            // Specification hint strings
             std::stringstream ss;
-            ss << "the `" << ParameterUseName(parameter.use) << "`";
+            ss << "the `" << ParameterUseKeyword(parameter.use) << "`";
             ss << " specification for parameter `" << parameter.name << "`";
             std::string placeHint = ss.str();
-
+            
+            // Expected hint string
             ss.str(std::string());
-            ss << "`" << ParameterUseName(parameter.use) << "` only";
+            ss << "`" << ParameterUseKeyword(parameter.use) << "` only";
             std::string expectedHint = ss.str();
             
             // Check Signature

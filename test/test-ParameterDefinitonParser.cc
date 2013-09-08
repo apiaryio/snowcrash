@@ -393,5 +393,118 @@ TEST_CASE("Warn about superfluous blocks in the use attribute", "[parameter_defi
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].use == OptionalParameterUse);
 }
 
+TEST_CASE("Warn when re-setting a key-value attribute", "[parameter_definition]")
+{
+    // Blueprint in question:
+    //R"(
+    //# GET /1
+    //+ Parameters
+    //    + id
+    //        + Example: `42`
+    //        + Example: `43`
+    //
+    //+ Response 204
+    //");
+    const std::string bluerpintSource = \
+    "# GET /1\n"\
+    "+ Parameters\n"\
+    "    + id\n"\
+    "        + Example: `42`\n"\
+    "        + Example: `43`\n"\
+    "\n"\
+    "+ Response 204\n\n";
+    
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(bluerpintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.size() == 1);
+    REQUIRE(result.warnings[0].code == RedefinitionWarning);
+    
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].name == "id");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].exampleValue == "43");
+}
 
+TEST_CASE("Warn superfluous content in a key-value attribute", "[parameter_definition]")
+{
+    // Blueprint in question:
+    //R"(
+    //# GET /1
+    //+ Parameters
+    //    + id
+    //        + Example: `42`
+    //          extra-1
+    //
+    //+ Response 204
+    //");
+    const std::string bluerpintSource = \
+    "# GET /1\n"\
+    "+ Parameters\n"\
+    "    + id\n"\
+    "        + Example: `42`\n"\
+    "          extra-1\n"\
+    "\n"\
+    "+ Response 204\n\n";
+    
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(bluerpintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.size() == 1);
+    REQUIRE(result.warnings[0].code == IgnoringWarning);
+    
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].name == "id");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].exampleValue == "42");
+}
 
+TEST_CASE("Warn about superfluous blocks in a key-value attribute", "[parameter_definition]")
+{
+    // Blueprint in question:
+    //R"(
+    //# GET /1
+    //+ Parameters
+    //    + id
+    //        + Example: `42`
+    //
+    //          extra-1
+    //
+    //+ Response 204
+    //");
+    const std::string bluerpintSource = \
+    "# GET /1\n"\
+    "+ Parameters\n"\
+    "    + id\n"\
+    "        + Example: `42`\n"\
+    "        \n"\
+    "          extra-1\n"\
+    "\n"\
+    "+ Response 204\n\n";
+    
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(bluerpintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.size() == 1);
+    REQUIRE(result.warnings[0].code == IgnoringWarning);
+    
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].name == "id");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].exampleValue == "42");
+}
