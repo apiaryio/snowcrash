@@ -67,7 +67,7 @@ namespace snowcrash {
              it != symbolTable.resourceModels.end();
              ++it) {
             
-            std::cout << "- " << it->first << " - body: `" << EscapeNewlines(it->second.body) << "`\n";
+            std::cout << "- " << it->first << " - body: '" << EscapeNewlines(it->second.body) << "'\n";
         }
         
         std::cout << std::endl;

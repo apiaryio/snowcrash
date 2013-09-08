@@ -79,7 +79,7 @@ int main(int argc, const char *argv[])
     std::stringstream ss;
     ss << "<input file>\n\n";
     ss << "API Blueprint Parser\n";
-    ss << "If called without <input file>, `snowcrash` will listen on stdin.\n";
+    ss << "If called without <input file>, 'snowcrash' will listen on stdin.\n";
     argumentParser.footer(ss.str());
 
     argumentParser.add<std::string>(OutputArgument, 'o', "save output AST into file", false);
@@ -106,7 +106,7 @@ int main(int argc, const char *argv[])
         std::string inputFileName = argumentParser.rest().front();
         inputFileStream.open(inputFileName.c_str());
         if (!inputFileStream.is_open()) {
-            std::cerr << "fatal: unable to open input file `" << inputFileName << "`\n";
+            std::cerr << "fatal: unable to open input file '" << inputFileName << "'\n";
             exit(EXIT_FAILURE);
         }
         
@@ -138,7 +138,7 @@ int main(int argc, const char *argv[])
             std::ofstream outputFileStream;
             outputFileStream.open(outputFileName.c_str());
             if (!outputFileStream.is_open()) {
-                std::cerr << "fatal: unable to write to file `" <<  outputFileName << "`\n";
+                std::cerr << "fatal: unable to write to file '" <<  outputFileName << "'\n";
                 exit(EXIT_FAILURE);
             }
             

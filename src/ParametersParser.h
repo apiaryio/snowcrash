@@ -107,7 +107,7 @@ namespace snowcrash {
                     break;
                     
                 case ForeignSection:
-                    result = HandleForeignSection(cur, bounds, "`<parameter identifier>`");
+                    result = HandleForeignSection(cur, bounds, "'<parameter identifier>'");
                     break;
                     
                 case UndefinedSection:

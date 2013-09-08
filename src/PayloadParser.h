@@ -367,7 +367,7 @@ namespace snowcrash {
                     
                     // ERR: Undefined symbol
                     std::stringstream ss;
-                    ss << "undefined symbol `" << symbol << "`";
+                    ss << "undefined symbol '" << symbol << "'";
                     result.first.error = Error(ss.str(),
                                                SymbolError,
                                                symbolSourceMap);
@@ -452,7 +452,7 @@ namespace snowcrash {
                     // WARN: ignoring extraneous content after symbol reference
                     std::stringstream ss;
                     ss << "ignoring extraneous content after symbol reference";
-                    ss << ", expected symbol reference only e.g. `[" << symbolName << "][]`";
+                    ss << ", expected symbol reference only e.g. '[" << symbolName << "][]'";
                     result.first.warnings.push_back(Warning(ss.str(), IgnoringWarning, cur->sourceMap));
                 }
             }
@@ -491,7 +491,7 @@ namespace snowcrash {
             if (payload.name.empty() &&
                 (section == ResponseSection || section == ResponseBodySection)) {
                 BlockIterator nameBlock = ListItemNameBlock(begin, end);
-                result.warnings.push_back(Warning("missing response HTTP status code, assuming `Response 200`",
+                result.warnings.push_back(Warning("missing response HTTP status code, assuming 'Response 200'",
                                                   EmptyDefinitionWarning,
                                                   nameBlock->sourceMap));
                 payload.name = "200";

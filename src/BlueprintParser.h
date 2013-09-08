@@ -168,7 +168,7 @@ namespace snowcrash {
                     ss << "anonymous group";
                 }
                 else {
-                    ss << "group `" << resourceGroup.name << "`";
+                    ss << "group '" << resourceGroup.name << "'";
                 }
                 ss << " is already defined";
                 
@@ -225,7 +225,7 @@ namespace snowcrash {
                         
                         // WARN: duplicate metada definition
                         std::stringstream ss;
-                        ss << "duplicate definition of `" << it->first << "`";
+                        ss << "duplicate definition of '" << it->first << "'";
                         result.first.warnings.push_back(Warning(ss.str(),
                                                                 DuplicateWarning,
                                                                 cur->sourceMap));
@@ -242,7 +242,7 @@ namespace snowcrash {
             else if (!metadataCollection.empty()) {
                 // WARN: malformed metadata block
                 result.first.warnings.push_back(Warning("ignoring possible metadata, expected"
-                                                        " `<key> : <value>`, one one per line",
+                                                        " '<key> : <value>', one one per line",
                                                         FormattingWarning,
                                                         cur->sourceMap));
             }

@@ -144,7 +144,7 @@ namespace snowcrash {
                     if (FindHeader(headers, header) != headers.end()) {
                         // WARN: duplicate header on this level
                         std::stringstream ss;
-                        ss << "duplicate definition of `" << header.first << "` header";
+                        ss << "duplicate definition of '" << header.first << "' header";
                         result.first.warnings.push_back(Warning(ss.str(),
                                                                 DuplicateWarning,
                                                                 sourceMap));
@@ -156,7 +156,7 @@ namespace snowcrash {
                 else {
                     // WARN: unable to parse header
                     result.first.warnings.push_back(Warning("unable to parse HTTP header, expected"
-                                                            " `<header name> : <header value>`, one header per line",
+                                                            " '<header name> : <header value>', one header per line",
                                                FormattingWarning,
                                                sourceMap));
                 }
@@ -202,7 +202,7 @@ namespace snowcrash {
             if (FindHeader(left.headers, *it) != left.headers.end()) {
                 // WARN: overshadowing header definition
                 std::stringstream ss;
-                ss << "overshadowing previous `" << it->first << "` header definition";
+                ss << "overshadowing previous '" << it->first << "' header definition";
                 result.warnings.push_back(Warning(ss.str(),
                                                   RedefinitionWarning,
                                                   rightSourceMap));

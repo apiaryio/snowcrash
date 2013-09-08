@@ -42,8 +42,8 @@ static const std::string ParameterExampleRegex("^[ \\t]*[Ee]xample:[ \\t]*" PARA
 static const std::string ParameterValuesRegex("^[ \\t]*[Vv]alues:[ \\t]*$");
 
 /** List of expected keywords */
-static const std::string ExpectedDefinitionItems = "`Type: <type>`, `Optional`, `Required`, "\
-"`Default: `<default value>``, `Example: `<example value>`` or `Values:`";
+static const std::string ExpectedDefinitionItems = "'Type: <type>', 'Optional', 'Required', "\
+"'Default: `<default value>`', 'Example: `<example value>`' or `Values:`";
 
 namespace snowcrash {
     
@@ -344,9 +344,9 @@ namespace snowcrash {
                 // WARN: parameter use flag already defined
                 BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
                 std::stringstream ss;
-                ss << "overshadowing previous definition of `";
+                ss << "overshadowing previous definition of '";
                 ss << ParameterKeyValueKeyword(section);
-                ss << "` value for parameter `" << parameter.name << "`";
+                ss << "' value for parameter '" << parameter.name << "'";
                 result.first.warnings.push_back(Warning(ss.str(),
                                                         RedefinitionWarning,
                                                         nameBlock->sourceMap));
@@ -399,14 +399,14 @@ namespace snowcrash {
             
             // Specification hint strings
             std::stringstream ss;
-            ss << "the `" << ParameterKeyValueKeyword(section) << "`";
-            ss << " specification for parameter `" << parameter.name << "`";
+            ss << "the '" << ParameterKeyValueKeyword(section) << "'";
+            ss << " specification for parameter '" << parameter.name << "'";
             std::string placeHint = ss.str();
             
             // Expected hint string
             ss.str(std::string());
-            ss << "`" << ParameterKeyValueKeyword(section) << ": ";
-            ss << ParameterKeyValueValue(section) << "` only";
+            ss << "'" << ParameterKeyValueKeyword(section) << ": ";
+            ss << ParameterKeyValueValue(section) << "' only";
             std::string expectedHint = ss.str();
             
             // Check Signature
@@ -431,9 +431,9 @@ namespace snowcrash {
                 // WARN: parameter use flag already defined
                 BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
                 std::stringstream ss;
-                ss << "overshadowing previous `";
+                ss << "overshadowing previous '";
                 ss << ((parameter.use == RequiredParameterUse) ? "required" : "optional");
-                ss << "` specification for parameter `" << parameter.name << "`";
+                ss << "' specification for parameter '" << parameter.name << "'";
                 result.first.warnings.push_back(Warning(ss.str(),
                                                         RedefinitionWarning,
                                                         nameBlock->sourceMap));
@@ -444,13 +444,13 @@ namespace snowcrash {
             
             // Specification hint strings
             std::stringstream ss;
-            ss << "the `" << ParameterUseKeyword(parameter.use) << "`";
-            ss << " specification for parameter `" << parameter.name << "`";
+            ss << "the '" << ParameterUseKeyword(parameter.use) << "'";
+            ss << " specification for parameter '" << parameter.name << "'";
             std::string placeHint = ss.str();
             
             // Expected hint string
             ss.str(std::string());
-            ss << "`" << ParameterUseKeyword(parameter.use) << "` only";
+            ss << "'" << ParameterUseKeyword(parameter.use) << "' only";
             std::string expectedHint = ss.str();
             
             // Check Signature

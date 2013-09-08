@@ -262,14 +262,14 @@ namespace snowcrash {
             if (!resource.model.name.empty()) {
                 // WARN: Object already defined
                 std::stringstream ss;
-                ss << "ignoring additional object definiton for `";
+                ss << "ignoring additional object definiton for '";
                 if (!resource.name.empty()) {
                     ss << resource.name << "(" << resource.uriTemplate << ")";
                 }
                 else {
                     ss << resource.uriTemplate;
                 }
-                ss << "` resource, a resource can be represented by a single object only";
+                ss << "' resource, a resource can be represented by a single object only";
                 
                 BlockIterator nameBlock = ListItemNameBlock(begin, end);
                 result.first.warnings.push_back(Warning(ss.str(),
@@ -283,7 +283,7 @@ namespace snowcrash {
                 if (it != parser.symbolTable.resourceModels.end()) {
                     // ERR: Symbol already defined
                     std::stringstream ss;
-                    ss << "symbol `" << payload.name << "` already defined";
+                    ss << "symbol '" << payload.name << "' already defined";
                     BlockIterator nameBlock = ListItemNameBlock(begin, end);
                     result.first.error = Error(ss.str(),
                                                SymbolError,
@@ -345,8 +345,8 @@ namespace snowcrash {
                 if (actionSignature == MethodURIActionSignature) {
                     // WARN: ignoring extraneous content in action header
                     std::stringstream ss;
-                    ss << "ignoring extraneous content in method header `" << begin->content << "`";
-                    ss << ", expected method-only e.g. `# " << action.method << "`";
+                    ss << "ignoring extraneous content in method header '" << begin->content << "'";
+                    ss << ", expected method-only e.g. '# " << action.method << "'";
                     result.first.warnings.push_back(Warning(ss.str(), IgnoringWarning, begin->sourceMap));
                 }
             }
@@ -355,11 +355,11 @@ namespace snowcrash {
             if (duplicate != resource.actions.end()) {
                 
                 // WARN: duplicate method
-                result.first.warnings.push_back(Warning("action with method `" +
+                result.first.warnings.push_back(Warning("action with method '" +
                                                         action.method +
-                                                        "` already defined for resource `" +
+                                                        "' already defined for resource '" +
                                                         resource.uriTemplate +
-                                                        "`",
+                                                        "'",
                                                         DuplicateWarning,
                                                         begin->sourceMap));
             }
@@ -369,11 +369,11 @@ namespace snowcrash {
             if (action.transactions.empty() ||
                 action.transactions.front().responses.empty()) {
                 // WARN: method has no response
-                result.first.warnings.push_back(Warning("no response defined for `" +
+                result.first.warnings.push_back(Warning("no response defined for '" +
                                                         action.method +
                                                         " " +
                                                         resource.uriTemplate +
-                                                        "`",
+                                                        "'",
                                                         EmptyDefinitionWarning,
                                                         begin->sourceMap));
             }
@@ -423,9 +423,9 @@ namespace snowcrash {
                 actionSignature == NamedActionSignature) {
                 // WARN: ignoring possible method header
                 std::stringstream ss;
-                ss << "unexpected action `" << begin->content << "`, ";
-                ss << "to the define muliple actions for the `" << resource.uriTemplate << "` resource omit the HTTP method in its definition, ";
-                ss << "e.g. `# " << resource.uriTemplate << "`";
+                ss << "unexpected action '" << begin->content << "', ";
+                ss << "to the define muliple actions for the '" << resource.uriTemplate << "' resource omit the HTTP method in its definition, ";
+                ss << "e.g. '# " << resource.uriTemplate << "'";
                 result.warnings.push_back(Warning(ss.str(), IgnoringWarning, begin->sourceMap));
             }
         }
