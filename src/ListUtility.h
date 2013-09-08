@@ -414,7 +414,7 @@ namespace snowcrash {
                 if (sectionCur->type == ListBlockBeginType)
                     sectionCur = SkipToSectionEnd(sectionCur, endCur, ListBlockBeginType, ListBlockEndType);
                 
-                // WARN: ignoring extraneous content after symbol reference
+                // WARN: ignoring extraneous content
                 std::stringstream ss;
                 ss << "ignoring additional content";
                 if (!placeHint.empty())

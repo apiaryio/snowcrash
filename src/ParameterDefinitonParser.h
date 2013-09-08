@@ -45,6 +45,9 @@ static const std::string ParameterValuesRegex("^[ \\t]*[Vv]alues:[ \\t]*$");
 static const std::string ExpectedDefinitionItems = "'Type: <type>', 'Optional', 'Required', "\
 "'Default: `<default value>`', 'Example: `<example value>`' or `Values:`";
 
+/** Values expected content */
+static const std::string ExpectedValuesContent = "nested list of possible parameter values, one element per list item";
+
 namespace snowcrash {
     
     /**
@@ -160,61 +163,6 @@ namespace snowcrash {
         return (context == ParameterDefinitionSection) ? context : UndefinedSection;
     }
     
-    /** \returns Specification keyword for the parameter use attribute */
-    FORCEINLINE std::string ParameterUseKeyword(ParameterUse use) {
-        return (use == RequiredParameterUse) ? "required" : "optional";
-    }
-    
-    /** \returns Specification keyword for a key-value section */
-    FORCEINLINE std::string ParameterKeyValueKeyword(const Section& keyValueSection) {
-        switch (keyValueSection) {
-            case ParameterDefaultSection:
-                return "default";
-
-            case ParameterExampleSection:
-                return "example";
-                
-            case ParameterTypeSection:
-                return "type";
-                
-            default:
-                return std::string();
-        }
-    }
-    
-    /** \returns Specification value a key-value section */
-    FORCEINLINE std::string ParameterKeyValueValue(const Section& keyValueSection) {
-        switch (keyValueSection) {
-            case ParameterDefaultSection:
-                return "`<default value>`";
-                
-            case ParameterExampleSection:
-                return "`<example value>`";
-                
-            case ParameterTypeSection:
-                return "<type>";
-                
-            default:
-                return std::string();
-        }
-    }
-    
-    /** \returns True if parameter has a value already set for given key value section, false otherwise */
-    FORCEINLINE bool IsParameterKeyValueRedefiniton(const Section& keyValueSection, const Parameter& parameter) {
-        switch (keyValueSection) {
-            case ParameterDefaultSection:
-                return !parameter.defaultValue.empty();
-                
-            case ParameterExampleSection:
-                return !parameter.exampleValue.empty();
-                
-            case ParameterTypeSection:
-                return !parameter.type.empty();
-                
-            default:
-                return false;
-        }
-    }
     
     /**
      *  Parameter section parser.
@@ -470,36 +418,95 @@ namespace snowcrash {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
             
-            // TODO: check existing values in parameter
-            parameter.values.clear();
-            
-            // TODO: check superfluous content in signature
-            
-            BlockIterator sectionCur = FirstContentBlock(cur, bounds.second);
-            
-            if (sectionCur == bounds.second ||
-                sectionCur->type != ListBlockBeginType) {
-                // WARN: expected nested elements
+            // Check redefinition
+            if (!parameter.values.empty()) {
+                // WARN: parameter values are already defined
                 BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
                 std::stringstream ss;
-                ss << "expected nested list of possible parameter values, one element per list item";
+                ss << "overshadowing previous 'values' definition";
+                ss << " for parameter '" << parameter.name << "'";
                 result.first.warnings.push_back(Warning(ss.str(),
-                                                        FormattingWarning,
+                                                        RedefinitionWarning,
                                                         nameBlock->sourceMap));
-                
-                result.second = nameBlock;
-                return result;
             }
             
-            ++sectionCur;
-            if (sectionCur == bounds.second ||
-                sectionCur->type != ListItemBlockBeginType) {
-                // ERR: unexpected block
-                BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
-                result.first.error = (Error("unexpected block",
-                                            BusinessError,
-                                            nameBlock->sourceMap));
+            // Clear any previous content
+            parameter.values.clear();
+            
+            // Check additional content in signature
+            CheckSignatureAdditionalContent(cur, bounds, "'values:' keyword", ExpectedValuesContent, result.first);
+
+            // Parse inner list of entities
+            BlockIterator sectionCur = SkipSignatureBlock(cur, bounds.second);
+            BlockIterator endCur = cur;
+            if (endCur->type == ListBlockBeginType)
+                ++endCur;
+            endCur = SkipToSectionEnd(endCur, bounds.second, ListItemBlockBeginType, ListItemBlockEndType);
+            
+            if (sectionCur != endCur) {
+
+                // Iterate over list blocks, try to parse any nested lists of possible elements
+                for (; sectionCur != endCur; ++sectionCur) {
+                    
+                    if (sectionCur->type == QuoteBlockBeginType)
+                        sectionCur = SkipToSectionEnd(sectionCur, endCur, QuoteBlockBeginType, QuoteBlockEndType);
+                    
+                    bool entitiesParsed = false;
+                    if (sectionCur->type == ListBlockBeginType) {
+                        if (parameter.values.empty()) {
+                            
+                            // Try to parse some values
+                            ParseSectionResult valuesResult = ParseValuesEntities(sectionCur,
+                                                                                  bounds,
+                                                                                  parser,
+                                                                                  parameter.values);
+                            result.first += valuesResult.first;
+                            sectionCur = valuesResult.second;
+                            if (result.first.error.code != Error::OK)
+                                return result;
+
+                            entitiesParsed = true;
+                        }
+                        else {
+                            sectionCur = SkipToSectionEnd(sectionCur, endCur, ListBlockBeginType, ListBlockEndType);
+                        }
+                    }
+                    
+                    if (!entitiesParsed) {
+                        // WARN: ignoring extraneous content
+                        std::stringstream ss;
+                        ss << "ignoring additional content in the 'values' attribute of the '";
+                        ss << parameter.name << "' parameter";
+                        ss << ", " << ExpectedValuesContent;
+                        result.first.warnings.push_back(Warning(ss.str(), IgnoringWarning, sectionCur->sourceMap));
+                    }
+                }
             }
+            
+            if (parameter.values.empty()) {
+                // WARN: empty definition
+                std::stringstream ss;
+                ss << "no possible values specified for parameter '" << parameter.name << "'";
+                result.first.warnings.push_back(Warning(ss.str(), EmptyDefinitionWarning, sectionCur->sourceMap));
+            }
+            
+            endCur = CloseListItemBlock(sectionCur, bounds.second);
+            result.second = endCur;
+            return result;
+        }
+        
+        /** Parse entities in values attribute */
+        static ParseSectionResult ParseValuesEntities(const BlockIterator& cur,
+                                                      const SectionBounds& bounds,
+                                                      BlueprintParserCore& parser,
+                                                      Collection<Value>::type& values) {
+         
+            ParseSectionResult result = std::make_pair(Result(), cur);
+            
+            if (cur->type != ListBlockBeginType)
+                return result;
+            
+            BlockIterator sectionCur = ContentBlock(cur, bounds.second);
             
             while (sectionCur != bounds.second &&
                    sectionCur->type == ListItemBlockBeginType) {
@@ -507,20 +514,86 @@ namespace snowcrash {
                 sectionCur = SkipToSectionEnd(sectionCur, bounds.second, ListItemBlockBeginType, ListItemBlockEndType);
                 
                 CaptureGroups captureGroups;
-                RegexCapture(sectionCur->content, PARAMETER_VALUE, captureGroups);
+                std::string content = sectionCur->content;
+                if (content.empty()) {
+                    // Not inline list, map from source
+                    content = MapSourceData(parser.sourceData, sectionCur->sourceMap);
+                }
+
+                RegexCapture(content, PARAMETER_VALUE, captureGroups);
                 if (captureGroups.size() > 1) {
-                    parameter.values.push_back(captureGroups[1]);
+                    values.push_back(captureGroups[1]);
+                }
+                else {
+                    // WARN: Ignoring unexpected content
+                    TrimString(content);
+                    std::stringstream ss;
+                    ss << "ignoring the '" << content << "' element";
+                    ss << ", expected '`" << content << "`'";
+                    result.first.warnings.push_back(Warning(ss.str(), IgnoringWarning, sectionCur->sourceMap));
                 }
                 
                 ++sectionCur;
             }
             
-            if (!parameter.values.empty())
-                sectionCur = CloseListItemBlock(sectionCur, bounds.second);
-            
-            sectionCur = CloseListItemBlock(sectionCur, bounds.second);
             result.second = sectionCur;
             return result;
+        }
+        
+        /** \returns Specification keyword for the parameter use attribute */
+        static std::string ParameterUseKeyword(ParameterUse use) {
+            return (use == RequiredParameterUse) ? "required" : "optional";
+        }
+        
+        /** \returns Specification keyword for a key-value section */
+        static std::string ParameterKeyValueKeyword(const Section& keyValueSection) {
+            switch (keyValueSection) {
+                case ParameterDefaultSection:
+                    return "default";
+                    
+                case ParameterExampleSection:
+                    return "example";
+                    
+                case ParameterTypeSection:
+                    return "type";
+                    
+                default:
+                    return std::string();
+            }
+        }
+        
+        /** \returns Specification value a key-value section */
+        static std::string ParameterKeyValueValue(const Section& keyValueSection) {
+            switch (keyValueSection) {
+                case ParameterDefaultSection:
+                    return "`<default value>`";
+                    
+                case ParameterExampleSection:
+                    return "`<example value>`";
+                    
+                case ParameterTypeSection:
+                    return "<type>";
+                    
+                default:
+                    return std::string();
+            }
+        }
+        
+        /** \returns True if parameter has a value already set for given key value section, false otherwise */
+        static bool IsParameterKeyValueRedefiniton(const Section& keyValueSection, const Parameter& parameter) {
+            switch (keyValueSection) {
+                case ParameterDefaultSection:
+                    return !parameter.defaultValue.empty();
+                    
+                case ParameterExampleSection:
+                    return !parameter.exampleValue.empty();
+                    
+                case ParameterTypeSection:
+                    return !parameter.type.empty();
+                    
+                default:
+                    return false;
+            }
         }
     };
     

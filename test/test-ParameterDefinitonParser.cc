@@ -250,7 +250,7 @@ TEST_CASE("Parse ilegal parameter trait at the begining", "[parameter_definition
     //
     //        Ok.
     //");
-    const std::string bluerpintSource = \
+    const std::string blueprintSource = \
     "# GET /1\n"\
     "+ Parameters\n"\
     "    + 4\n"\
@@ -263,7 +263,7 @@ TEST_CASE("Parse ilegal parameter trait at the begining", "[parameter_definition
     Parser parser;
     Result result;
     Blueprint blueprint;
-    parser.parse(bluerpintSource, 0, result, blueprint);
+    parser.parse(blueprintSource, 0, result, blueprint);
     REQUIRE(result.error.code == Error::OK);
     REQUIRE(result.warnings.size() == 1);
     REQUIRE(result.warnings[0].code == IgnoringWarning);
@@ -289,7 +289,7 @@ TEST_CASE("Warn when re-setting the use attribute", "[parameter_definition]")
     //
     //+ Response 204
     //");
-    const std::string bluerpintSource = \
+    const std::string blueprintSource = \
     "# GET /1\n"\
     "+ Parameters\n"\
     "    + id\n"\
@@ -301,7 +301,7 @@ TEST_CASE("Warn when re-setting the use attribute", "[parameter_definition]")
     Parser parser;
     Result result;
     Blueprint blueprint;
-    parser.parse(bluerpintSource, 0, result, blueprint);
+    parser.parse(blueprintSource, 0, result, blueprint);
     REQUIRE(result.error.code == Error::OK);
     REQUIRE(result.warnings.size() == 1);
     REQUIRE(result.warnings[0].code == RedefinitionWarning);
@@ -327,7 +327,7 @@ TEST_CASE("Warn about superfluous content in the use attribute", "[parameter_def
     //
     //+ Response 204
     //");
-    const std::string bluerpintSource = \
+    const std::string blueprintSource = \
     "# GET /1\n"\
     "+ Parameters\n"\
     "    + id\n"\
@@ -339,7 +339,7 @@ TEST_CASE("Warn about superfluous content in the use attribute", "[parameter_def
     Parser parser;
     Result result;
     Blueprint blueprint;
-    parser.parse(bluerpintSource, 0, result, blueprint);
+    parser.parse(blueprintSource, 0, result, blueprint);
     REQUIRE(result.error.code == Error::OK);
     REQUIRE(result.warnings.size() == 1);
     REQUIRE(result.warnings[0].code == IgnoringWarning);
@@ -366,7 +366,7 @@ TEST_CASE("Warn about superfluous blocks in the use attribute", "[parameter_defi
     //
     //+ Response 204
     //");
-    const std::string bluerpintSource = \
+    const std::string blueprintSource = \
     "# GET /1\n"\
     "+ Parameters\n"\
     "    + id\n"\
@@ -379,7 +379,7 @@ TEST_CASE("Warn about superfluous blocks in the use attribute", "[parameter_defi
     Parser parser;
     Result result;
     Blueprint blueprint;
-    parser.parse(bluerpintSource, 0, result, blueprint);
+    parser.parse(blueprintSource, 0, result, blueprint);
     REQUIRE(result.error.code == Error::OK);
     REQUIRE(result.warnings.size() == 1);
     REQUIRE(result.warnings[0].code == IgnoringWarning);
@@ -405,7 +405,7 @@ TEST_CASE("Warn when re-setting a key-value attribute", "[parameter_definition]"
     //
     //+ Response 204
     //");
-    const std::string bluerpintSource = \
+    const std::string blueprintSource = \
     "# GET /1\n"\
     "+ Parameters\n"\
     "    + id\n"\
@@ -417,7 +417,7 @@ TEST_CASE("Warn when re-setting a key-value attribute", "[parameter_definition]"
     Parser parser;
     Result result;
     Blueprint blueprint;
-    parser.parse(bluerpintSource, 0, result, blueprint);
+    parser.parse(blueprintSource, 0, result, blueprint);
     REQUIRE(result.error.code == Error::OK);
     REQUIRE(result.warnings.size() == 1);
     REQUIRE(result.warnings[0].code == RedefinitionWarning);
@@ -443,7 +443,7 @@ TEST_CASE("Warn superfluous content in a key-value attribute", "[parameter_defin
     //
     //+ Response 204
     //");
-    const std::string bluerpintSource = \
+    const std::string blueprintSource = \
     "# GET /1\n"\
     "+ Parameters\n"\
     "    + id\n"\
@@ -455,7 +455,7 @@ TEST_CASE("Warn superfluous content in a key-value attribute", "[parameter_defin
     Parser parser;
     Result result;
     Blueprint blueprint;
-    parser.parse(bluerpintSource, 0, result, blueprint);
+    parser.parse(blueprintSource, 0, result, blueprint);
     REQUIRE(result.error.code == Error::OK);
     REQUIRE(result.warnings.size() == 1);
     REQUIRE(result.warnings[0].code == IgnoringWarning);
@@ -482,7 +482,7 @@ TEST_CASE("Warn about superfluous blocks in a key-value attribute", "[parameter_
     //
     //+ Response 204
     //");
-    const std::string bluerpintSource = \
+    const std::string blueprintSource = \
     "# GET /1\n"\
     "+ Parameters\n"\
     "    + id\n"\
@@ -495,7 +495,7 @@ TEST_CASE("Warn about superfluous blocks in a key-value attribute", "[parameter_
     Parser parser;
     Result result;
     Blueprint blueprint;
-    parser.parse(bluerpintSource, 0, result, blueprint);
+    parser.parse(blueprintSource, 0, result, blueprint);
     REQUIRE(result.error.code == Error::OK);
     REQUIRE(result.warnings.size() == 1);
     REQUIRE(result.warnings[0].code == IgnoringWarning);
@@ -508,3 +508,172 @@ TEST_CASE("Warn about superfluous blocks in a key-value attribute", "[parameter_
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].name == "id");
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].exampleValue == "42");
 }
+
+TEST_CASE("Warn superfluous content in values attribute", "[parameter_definition][now]")
+{
+    // Blueprint in question:
+    //R"(
+    //# GET /1
+    //+ Parameters
+    //    + id
+    //        + Values:
+    //         xx
+    //
+    //            + `Hello`
+    //
+    //+ Response 204
+    //");
+    const std::string blueprintSource = \
+    "# GET /1\n"\
+    "+ Parameters\n"\
+    "    + id\n"\
+    "        + Values:\n"\
+    "         extra-1\n"\
+    "\n"\
+    "            + `Hello`\n"\
+    "\n"\
+    "+ Response 204\n\n";
+    
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(blueprintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.size() == 1);
+    REQUIRE(result.warnings[0].code == IgnoringWarning);
+    
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].name == "id");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].values.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].values[0] == "Hello");
+    
+}
+
+TEST_CASE("Warn about illegal entities in values attribute", "[parameter_definition]")
+{
+    // Blueprint in question:
+    //R"(
+    //# GET /1
+    //+ Parameters
+    //    + id
+    //        + Values:
+    //            + `Hello`
+    //            + ilegal
+    //            + `Ahoy`
+    //
+    //+ Response 204
+    //");
+    const std::string blueprintSource = \
+    "# GET /1\n"\
+    "+ Parameters\n"\
+    "    + id\n"\
+    "        + Values:\n"\
+    "            + `Hello`\n"\
+    "            + ilegal\n"\
+    "            + `Ahoy`\n"\
+    "\n"\
+    "+ Response 204\n\n";
+    
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(blueprintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.size() == 1);
+    REQUIRE(result.warnings[0].code == IgnoringWarning);
+    
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].name == "id");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].values.size() == 2);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].values[0] == "Hello");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].values[1] == "Ahoy");
+}
+
+TEST_CASE("Warn when re-setting the values attribute", "[parameter_definition]")
+{
+    // Blueprint in question:
+    //R"(
+    //# GET /1
+    //+ Parameters
+    //    + id
+    //        + Values:
+    //            + `Ahoy`
+    //        + Values:
+    //            + `Hello`
+    //
+    //+ Response 204
+    //");
+    const std::string blueprintSource = \
+    "# GET /1\n"\
+    "+ Parameters\n"\
+    "    + id\n"\
+    "        + Values:\n"\
+    "            + `Ahoy`\n"\
+    "        + Values:\n"\
+    "            + `Hello`\n"\
+    "\n"\
+    "+ Response 204\n\n";
+    
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(blueprintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.size() == 1);
+    REQUIRE(result.warnings[0].code == RedefinitionWarning);
+    
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].name == "id");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].values.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].values[0] == "Hello");
+}
+
+
+TEST_CASE("Warn when there are no values in the values attribute", "[parameter_definition]")
+{
+    // Blueprint in question:
+    //R"(
+    //# GET /1
+    //+ Parameters
+    //    + id
+    //        + Values:
+    //
+    //+ Response 204
+    //");
+    const std::string blueprintSource = \
+    "# GET /1\n"\
+    "+ Parameters\n"\
+    "    + id\n"\
+    "        + Values:\n"\
+    "\n"\
+    "+ Response 204\n\n";
+    
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(blueprintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.size() == 1);
+    REQUIRE(result.warnings[0].code == EmptyDefinitionWarning);
+    
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].name == "id");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].values.empty());
+}
+
