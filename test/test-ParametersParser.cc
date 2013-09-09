@@ -390,3 +390,43 @@ TEST_CASE("Warn about additional content block in parameters section", "[paramet
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].name == "id");
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].description.empty());
 }
+
+TEST_CASE("Warn about required vs default clash", "[parameters]")
+{
+    // Blueprint in question:
+    //R"(
+    //# GET /1
+    //+ Parameters
+    //    + id
+    //        + Required
+    //        + Default: `42`
+    //
+    //+ Response 204
+    //");
+    const std::string blueprintSource = \
+    "# GET /1\n"\
+    "+ Parameters\n"\
+    "    + id\n"\
+    "        + Required\n"\
+    "        + Default: `42`\n"\
+    "\n"\
+    "+ Response 204\n\n";
+    
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(blueprintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.size() == 1);
+    REQUIRE(result.warnings[0].code == LogicalErrorWarning);
+    
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].name == "id");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].use == RequiredParameterUse);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].defaultValue == "42");
+}
+

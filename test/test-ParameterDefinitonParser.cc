@@ -676,4 +676,3 @@ TEST_CASE("Warn when there are no values in the values attribute", "[parameter_d
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].name == "id");
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].values.empty());
 }
-

@@ -187,6 +187,20 @@ namespace snowcrash {
             if (result.first.error.code != Error::OK)
                 return result;
             
+
+            // Check possible required vs default clash
+            if (parameter.use == RequiredParameterUse &&
+                !parameter.defaultValue.empty()) {
+                
+                // WARN: Required vs default clash
+                BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
+                std::stringstream ss;
+                ss << "specifying parameter '" << parameter.name << "' as required supersedes its default value";
+                result.first.warnings.push_back(Warning(ss.str(),
+                                                        LogicalErrorWarning,
+                                                        nameBlock->sourceMap));
+            }
+            
             // TODO: check duplicates on this level - look for other parameters with the same name
             parameters.push_back(parameter);
             

@@ -120,7 +120,8 @@ namespace snowcrash {
         RedefinitionWarning = 4,
         IgnoringWarning = 5,
         EmptyDefinitionWarning = 6,
-        NotEmptyDefinitionWarning = 7
+        NotEmptyDefinitionWarning = 7,
+        LogicalErrorWarning = 8
     };
     
     /**
