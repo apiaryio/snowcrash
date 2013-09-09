@@ -241,7 +241,7 @@ TEST_CASE("Parse ilegal parameter trait at the begining", "[parameter_definition
 {
     // Blueprint in question:
     //R"(
-    //# GET /1
+    //# GET /1/{4}
     //+ Parameters
     //    + 4
     //        + ilegal
@@ -251,7 +251,7 @@ TEST_CASE("Parse ilegal parameter trait at the begining", "[parameter_definition
     //        Ok.
     //");
     const std::string blueprintSource = \
-    "# GET /1\n"\
+    "# GET /1/{4}\n"\
     "+ Parameters\n"\
     "    + 4\n"\
     "        + ilegal\n"\
@@ -281,7 +281,7 @@ TEST_CASE("Warn when re-setting the use attribute", "[parameter_definition]")
 {
     // Blueprint in question:
     //R"(
-    //# GET /1
+    //# GET /1/{id}
     //+ Parameters
     //    + id
     //        + optional
@@ -290,7 +290,7 @@ TEST_CASE("Warn when re-setting the use attribute", "[parameter_definition]")
     //+ Response 204
     //");
     const std::string blueprintSource = \
-    "# GET /1\n"\
+    "# GET /1/{id}\n"\
     "+ Parameters\n"\
     "    + id\n"\
     "        + optional\n"\
@@ -319,7 +319,7 @@ TEST_CASE("Warn about superfluous content in the use attribute", "[parameter_def
 {
     // Blueprint in question:
     //R"(
-    //# GET /1
+    //# GET /1/{id}
     //+ Parameters
     //    + id
     //        + optional
@@ -328,7 +328,7 @@ TEST_CASE("Warn about superfluous content in the use attribute", "[parameter_def
     //+ Response 204
     //");
     const std::string blueprintSource = \
-    "# GET /1\n"\
+    "# GET /1/{id}\n"\
     "+ Parameters\n"\
     "    + id\n"\
     "        + optional\n"\
@@ -357,7 +357,7 @@ TEST_CASE("Warn about superfluous blocks in the use attribute", "[parameter_defi
 {
     // Blueprint in question:
     //R"(
-    //# GET /1
+    //# GET /1/{id}
     //+ Parameters
     //    + id
     //        + optional
@@ -367,7 +367,7 @@ TEST_CASE("Warn about superfluous blocks in the use attribute", "[parameter_defi
     //+ Response 204
     //");
     const std::string blueprintSource = \
-    "# GET /1\n"\
+    "# GET /1/{id}\n"\
     "+ Parameters\n"\
     "    + id\n"\
     "        + optional\n"\
@@ -397,7 +397,7 @@ TEST_CASE("Warn when re-setting a key-value attribute", "[parameter_definition]"
 {
     // Blueprint in question:
     //R"(
-    //# GET /1
+    //# GET /1/{id}
     //+ Parameters
     //    + id
     //        + Example: `42`
@@ -406,7 +406,7 @@ TEST_CASE("Warn when re-setting a key-value attribute", "[parameter_definition]"
     //+ Response 204
     //");
     const std::string blueprintSource = \
-    "# GET /1\n"\
+    "# GET /1/{id}\n"\
     "+ Parameters\n"\
     "    + id\n"\
     "        + Example: `42`\n"\
@@ -435,7 +435,7 @@ TEST_CASE("Warn superfluous content in a key-value attribute", "[parameter_defin
 {
     // Blueprint in question:
     //R"(
-    //# GET /1
+    //# GET /1/{id}
     //+ Parameters
     //    + id
     //        + Example: `42`
@@ -444,7 +444,7 @@ TEST_CASE("Warn superfluous content in a key-value attribute", "[parameter_defin
     //+ Response 204
     //");
     const std::string blueprintSource = \
-    "# GET /1\n"\
+    "# GET /1/{id}\n"\
     "+ Parameters\n"\
     "    + id\n"\
     "        + Example: `42`\n"\
@@ -473,7 +473,7 @@ TEST_CASE("Warn about superfluous blocks in a key-value attribute", "[parameter_
 {
     // Blueprint in question:
     //R"(
-    //# GET /1
+    //# GET /1/{id}
     //+ Parameters
     //    + id
     //        + Example: `42`
@@ -483,7 +483,7 @@ TEST_CASE("Warn about superfluous blocks in a key-value attribute", "[parameter_
     //+ Response 204
     //");
     const std::string blueprintSource = \
-    "# GET /1\n"\
+    "# GET /1/{id}\n"\
     "+ Parameters\n"\
     "    + id\n"\
     "        + Example: `42`\n"\
@@ -524,7 +524,7 @@ TEST_CASE("Warn superfluous content in values attribute", "[parameter_definition
     //+ Response 204
     //");
     const std::string blueprintSource = \
-    "# GET /1\n"\
+    "# GET /1/{id}\n"\
     "+ Parameters\n"\
     "    + id\n"\
     "        + Values:\n"\
@@ -557,7 +557,7 @@ TEST_CASE("Warn about illegal entities in values attribute", "[parameter_definit
 {
     // Blueprint in question:
     //R"(
-    //# GET /1
+    //# GET /1/{id}
     //+ Parameters
     //    + id
     //        + Values:
@@ -568,7 +568,7 @@ TEST_CASE("Warn about illegal entities in values attribute", "[parameter_definit
     //+ Response 204
     //");
     const std::string blueprintSource = \
-    "# GET /1\n"\
+    "# GET /1/{id}\n"\
     "+ Parameters\n"\
     "    + id\n"\
     "        + Values:\n"\
@@ -601,7 +601,7 @@ TEST_CASE("Warn when re-setting the values attribute", "[parameter_definition]")
 {
     // Blueprint in question:
     //R"(
-    //# GET /1
+    //# GET /1/{id}
     //+ Parameters
     //    + id
     //        + Values:
@@ -612,7 +612,7 @@ TEST_CASE("Warn when re-setting the values attribute", "[parameter_definition]")
     //+ Response 204
     //");
     const std::string blueprintSource = \
-    "# GET /1\n"\
+    "# GET /1/{id}\n"\
     "+ Parameters\n"\
     "    + id\n"\
     "        + Values:\n"\
@@ -645,7 +645,7 @@ TEST_CASE("Warn when there are no values in the values attribute", "[parameter_d
 {
     // Blueprint in question:
     //R"(
-    //# GET /1
+    //# GET /1/{id}
     //+ Parameters
     //    + id
     //        + Values:
@@ -653,7 +653,7 @@ TEST_CASE("Warn when there are no values in the values attribute", "[parameter_d
     //+ Response 204
     //");
     const std::string blueprintSource = \
-    "# GET /1\n"\
+    "# GET /1/{id}\n"\
     "+ Parameters\n"\
     "    + id\n"\
     "        + Values:\n"\

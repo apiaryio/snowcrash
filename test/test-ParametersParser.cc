@@ -272,7 +272,7 @@ TEST_CASE("Parse ilegal parameter among legal ones", "[parameters]")
 {
     // Blueprint in question:
     //R"(
-    //# GET /1
+    //# GET /1/{OK-1}/{OK-2}
     //+ Parameters
     //    + OK-1
     //    + i:legal
@@ -283,7 +283,7 @@ TEST_CASE("Parse ilegal parameter among legal ones", "[parameters]")
     //        Ok.
     //");
     const std::string blueprintSource = \
-    "# GET /1\n"\
+    "# GET /1/{OK-1}/{OK-2}\n"\
     "+ Parameters\n"\
     "    + OK-1\n"\
     "    + i:legal\n"\
@@ -316,7 +316,7 @@ TEST_CASE("Warn about additional content in parameters section", "[parameters]")
 {
     // Blueprint in question:
     //R"(
-    //# GET /1
+    //# GET /1/{id}
     //+ Parameters
     //  extra-1
     //
@@ -325,7 +325,7 @@ TEST_CASE("Warn about additional content in parameters section", "[parameters]")
     //+ Response 204
     //");
     const std::string blueprintSource = \
-    "# GET /1\n"\
+    "# GET /1/{id}\n"\
     "+ Parameters\n"\
     "  extra-1\n"\
     "\n"\
@@ -355,7 +355,7 @@ TEST_CASE("Warn about additional content block in parameters section", "[paramet
 {
     // Blueprint in question:
     //R"(
-    //# GET /1
+    //# GET /1/{id}
     //+ Parameters
     //
     //  extra-1
@@ -365,7 +365,7 @@ TEST_CASE("Warn about additional content block in parameters section", "[paramet
     //+ Response 204
     //");
     const std::string blueprintSource = \
-    "# GET /1\n"\
+    "# GET /1/{id}\n"\
     "+ Parameters\n"\
     "  \n"\
     "   extra-1\n"\
@@ -395,7 +395,7 @@ TEST_CASE("Warn about required vs default clash", "[parameters]")
 {
     // Blueprint in question:
     //R"(
-    //# GET /1
+    //# GET /1/{id}
     //+ Parameters
     //    + id
     //        + Required
@@ -404,7 +404,7 @@ TEST_CASE("Warn about required vs default clash", "[parameters]")
     //+ Response 204
     //");
     const std::string blueprintSource = \
-    "# GET /1\n"\
+    "# GET /1/{id}\n"\
     "+ Parameters\n"\
     "    + id\n"\
     "        + Required\n"\
@@ -434,7 +434,7 @@ TEST_CASE("Warn about multiple parameters with the same name", "[parameters]")
 {
     // Blueprint in question:
     //R"(
-    //# GET /1
+    //# GET /1/{id}
     //+ Parameters
     //    + id
     //        + Example: `42`
@@ -443,7 +443,7 @@ TEST_CASE("Warn about multiple parameters with the same name", "[parameters]")
     //+ Response 204
     //");
     const std::string blueprintSource = \
-    "# GET /1\n"\
+    "# GET /1/{id}\n"\
     "+ Parameters\n"\
     "    + id\n"\
     "        + Example: `42`\n"\

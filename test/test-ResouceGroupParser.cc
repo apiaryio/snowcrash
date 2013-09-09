@@ -84,7 +84,7 @@ TEST_CASE("rgparser/parse", "Parse canonical resource group")
     REQUIRE(resourceGroup.name == "First");
     REQUIRE(resourceGroup.description == "1");
     REQUIRE(resourceGroup.resources.size() == 1);
-    REQUIRE(resourceGroup.resources.front().uriTemplate == "/resource");
+    REQUIRE(resourceGroup.resources.front().uriTemplate == "/resource/{id}{?limit}");
     REQUIRE(resourceGroup.resources.front().name == "My Resource");
 }
 

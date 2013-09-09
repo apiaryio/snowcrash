@@ -15,6 +15,7 @@
 #include "ActionParser.h"
 #include "RegexMatch.h"
 #include "StringUtility.h"
+#include "ParametersParser.h"
 
 static const std::string ResourceHeaderRegex("^[ \\t]*((" HTTP_METHODS ")[ \\t]+)?(" URI_TEMPLATE ")$");
 static const std::string NamedResourceHeaderRegex("^[ \\t]*(" SYMBOL_IDENTIFIER ")[ \\t]+\\[(" URI_TEMPLATE ")]$");
@@ -314,14 +315,40 @@ namespace snowcrash {
                                                         nameBlock->sourceMap));
             }
             else {
-                resource.parameters.insert(resource.parameters.end(), parameters.begin(), parameters.end());
+                // Check Eligibility
+                BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
+                CheckParametersEligibility(resource, parameters, nameBlock->sourceMap, result.first);
                 
-                // TODO: Check parameters are defined in URI Template
-            }            
+                // Insert
+                resource.parameters.insert(resource.parameters.end(), parameters.begin(), parameters.end());
+            }
             
             return result;
         }
         
+        /** Check parameter eligibility - report if a parameter is not specified in URI template */
+        static void CheckParametersEligibility(const Resource& resource,
+                                               const ParameterCollection& parameters,
+                                               const SourceDataBlock& location,
+                                               Result& result)
+        {
+            for (ParameterCollection::const_iterator it = parameters.begin();
+                 it != parameters.end();
+                 ++it) {
+                
+                // Naive check whether parameter is present in URI Template
+                if (resource.uriTemplate.find(it->name) == std::string::npos) {
+                    // WARN: parameter name not present
+                    std::stringstream ss;
+                    ss << "parameter '" << it->name << "' not specified in ";
+                    if (!resource.name.empty())
+                        ss << "'" << resource.name << "' ";
+                    ss << "its '" << resource.uriTemplate << "' URI template";
+
+                    result.warnings.push_back(Warning(ss.str(), LogicalErrorWarning, location));
+                }
+            }
+        }
         
         static ParseSectionResult HandleResourceMethod(const BlockIterator& cur,
                                                        const SectionBounds& bounds,
@@ -373,8 +400,12 @@ namespace snowcrash {
                                                         begin->sourceMap));
             }
             
-            // Check for parameters duplicates
-            // TODO:
+            // FIXME: Do we want to check heck for parameters duplicates at this level?
+            
+            // Check Eligibility
+            if (!action.parameters.empty())
+                CheckParametersEligibility(resource, action.parameters, begin->sourceMap, result.first);
+            
             
             // Check for header duplictes
             DeepCheckHeaderDuplicates(resource, action, begin->sourceMap, result.first);

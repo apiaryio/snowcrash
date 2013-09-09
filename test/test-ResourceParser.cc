@@ -10,6 +10,7 @@
 #include "catch.hpp"
 #include "ResourceParser.h"
 #include "ResourceGroupParser.h"
+#include "Parser.h"
 #include "Fixture.h"
 
 using namespace snowcrash;
@@ -19,7 +20,7 @@ MarkdownBlock::Stack snowcrashtest::CanonicalResourceFixture()
 {
     // Blueprint in question:
     //R"(
-    //# My Resource [/resource]
+    //# My Resource [/resource/{id}]
     //Resource Description
     //
     //+ My Resource Object (text/plain)
@@ -37,7 +38,7 @@ MarkdownBlock::Stack snowcrashtest::CanonicalResourceFixture()
     //)";
     
     MarkdownBlock::Stack markdown;
-    markdown.push_back(MarkdownBlock(HeaderBlockType, "My Resource [/resource]", 1, MakeSourceDataBlock(0, 1)));
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "My Resource [/resource/{id}{?limit}]", 1, MakeSourceDataBlock(0, 1)));
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "Resource Description", 0, MakeSourceDataBlock(1, 1)));    
 
     markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
@@ -141,7 +142,7 @@ TEST_CASE("rparser/parse", "Parse resource")
     REQUIRE(std::distance(blocks.begin(), result.second) == 42 + 2*55);
     
     REQUIRE(resource.name == "My Resource");
-    REQUIRE(resource.uriTemplate == "/resource");
+    REQUIRE(resource.uriTemplate == "/resource/{id}{?limit}");
     REQUIRE(resource.model.name == "My Resource");
     REQUIRE(resource.model.body == "X.O.");
     REQUIRE(resource.model.headers.size() == 1);
@@ -530,5 +531,52 @@ TEST_CASE("rparser/parse-nameless-resource", "Parse resource without name")
     REQUIRE(resource.model.name.empty());
     REQUIRE(resource.model.body.empty());
     REQUIRE(resource.actions.size() == 0);
+}
+
+TEST_CASE("Warn about parameters not in URI template", "[resource][now]")
+{
+    // Blueprint in question:
+    //R"(
+    //# GET /1
+    //# /resource/{id}
+    //+ Parameters
+    //    + olive
+    //
+    //## GET
+    //+ Parameters
+    //    + cheese
+    //    + id
+    //
+    //+ Response 204
+    //");
+    const std::string blueprintSource = \
+    "# /resource/{id}\n"\
+    "+ Parameters\n"\
+    "    + olive\n"\
+    "\n"\
+    "## GET\n"\
+    "+ Parameters\n"\
+    "    + cheese\n"\
+    "    + id\n"\
+    "\n"\
+    "+ Response 204\n\n";
+    
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(blueprintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.size() == 2);
+    REQUIRE(result.warnings[0].code == LogicalErrorWarning);
+    REQUIRE(result.warnings[1].code == LogicalErrorWarning);
+    
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].name == "olive");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters.size() == 2);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].name == "cheese");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[1].name == "id");
 }
 
