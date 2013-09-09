@@ -430,3 +430,41 @@ TEST_CASE("Warn about required vs default clash", "[parameters]")
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].defaultValue == "42");
 }
 
+TEST_CASE("Warn about multiple parameters with the same name", "[parameters]")
+{
+    // Blueprint in question:
+    //R"(
+    //# GET /1
+    //+ Parameters
+    //    + id
+    //        + Example: `42`
+    //    + id
+    //        + Example: `43`
+    //+ Response 204
+    //");
+    const std::string blueprintSource = \
+    "# GET /1\n"\
+    "+ Parameters\n"\
+    "    + id\n"\
+    "        + Example: `42`\n"\
+    "    + id\n"\
+    "        + Example: `43`\n"\
+    "+ Response 204\n";
+    
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(blueprintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.size() == 1);
+    REQUIRE(result.warnings[0].code == RedefinitionWarning);
+    
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].name == "id");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].exampleValue == "43");
+}
+

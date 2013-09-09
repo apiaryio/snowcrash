@@ -315,6 +315,8 @@ namespace snowcrash {
             }
             else {
                 resource.parameters.insert(resource.parameters.end(), parameters.begin(), parameters.end());
+                
+                // TODO: Check parameters are defined in URI Template
             }            
             
             return result;

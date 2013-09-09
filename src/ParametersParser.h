@@ -32,6 +32,15 @@ namespace snowcrash {
     /** Internal type alias for Collection of Paramaeter */
     typedef Collection<Parameter>::type ParameterCollection;
 
+    
+    /** Finds a parameter inside a parameters collection */
+    FORCEINLINE ParameterCollection::iterator FindParameter(ParameterCollection& parameters,
+                                                           const Parameter& parameter) {
+        return std::find_if(parameters.begin(),
+                            parameters.end(),
+                            std::bind2nd(MatchName<Parameter>(), parameter));
+    }
+    
     /**
      *  Returns true if given block has parameters signature, false otherwise.
      */
@@ -187,7 +196,6 @@ namespace snowcrash {
             if (result.first.error.code != Error::OK)
                 return result;
             
-
             // Check possible required vs default clash
             if (parameter.use == RequiredParameterUse &&
                 !parameter.defaultValue.empty()) {
@@ -201,7 +209,24 @@ namespace snowcrash {
                                                         nameBlock->sourceMap));
             }
             
-            // TODO: check duplicates on this level - look for other parameters with the same name
+            // Check duplicates
+            if (!parameters.empty()) {
+                ParameterCollection::iterator duplicate = FindParameter(parameters, parameter);
+                if (duplicate != parameters.end()) {
+
+                    // WARN: Parameter already defined
+                    BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
+                    std::stringstream ss;
+                    ss << "overshadowing previous parameter '" << parameter.name << "' definition";
+                    result.first.warnings.push_back(Warning(ss.str(),
+                                                            RedefinitionWarning,
+                                                            nameBlock->sourceMap));
+                    
+                    // Erase origan duplicate 
+                    parameters.erase(duplicate);
+                }
+            }
+            
             parameters.push_back(parameter);
             
             return result;
