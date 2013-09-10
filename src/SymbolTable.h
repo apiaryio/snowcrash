@@ -21,7 +21,7 @@
 #include "Blueprint.h"
 
 // Symbol identifier regex
-//#define SYMBOL_IDENTIFIER "([A-Za-z0-9_\\-]|[ \\t])*"
+// FIXME: Remove extraneous surounding group
 #define SYMBOL_IDENTIFIER "([[:alnum:][:blank:]_\\-]+)"
 
 // Symbol reference regex

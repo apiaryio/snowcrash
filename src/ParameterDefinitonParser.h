@@ -23,6 +23,9 @@
 /** Parameter Definition matching regex */
 static const std::string ParameterDefinitionRegex("^[ \\t]*(" SYMBOL_IDENTIFIER ")[ \\t]*$");
 
+/** Parameter Abbreviated definition matching regex */
+static const std::string ParameterAbbrevDefinitionRegex("^([[:alnum:][:blank:]_\\-]+)([[:blank:]]*=[[:blank:]]*`([^`]*)`[[:blank:]]*)?([[:blank:]]*\\((.*)\\)[[:blank:]]*)?([[:blank:]]*\\.\\.\\.[[:blank:]]*(.*))?$");
+
 /** Parameter Type matching regex */
 static const std::string ParameterTypeRegex("^[ \\t]*[Tt]ype:[ \\t]*(" SYMBOL_IDENTIFIER ")$");
 
@@ -31,6 +34,12 @@ static const std::string ParameterRequiredRegex("^[ \\t]*[Rr]equired[ \\t]*$");
 
 /** Parameter Optional matching regex */
 static const std::string ParameterOptionalRegex("^[ \\t]*[Oo]ptional[ \\t]*$");
+
+/** Abbreviated Additonal Parameters Use matching regex */
+static const std::string ParameterAbbrevDefinitionUseRegex("([Oo]ptional|[Rr]equired)");
+
+/** Abbreviated Additonal Parameters Type matching regex */
+static const std::string ParameterAbbrevDefinitionTypeRegex("[[:blank:]]*[,]?[[:blank:]]*(.*)[[:blank:]]*[,][[:blank:]]*");
 
 /** Parameter Default matching regex */
 static const std::string ParameterDefaultRegex("^[ \\t]*[Dd]efault:[ \\t]*" PARAMETER_VALUE "[ \\t]*$");
@@ -110,7 +119,7 @@ namespace snowcrash {
         SourceData remainingContent;
         SourceData content = GetListItemSignature(begin, end, remainingContent);
         content = TrimString(content);
-        return RegexMatch(content, ParameterDefinitionRegex);
+        return RegexMatch(content, ParameterAbbrevDefinitionRegex);
     }
     
     /**
@@ -268,14 +277,84 @@ namespace snowcrash {
                                      Result& result,
                                      Parameter& parameter) {
             
-            SourceData remainingContent;
-            SourceData signature = GetListItemSignature(begin, end, remainingContent);
-
-            // FIXME: For now consider complete signature as the parameter name
-            parameter.name = TrimString(signature);
             
             // Set default values
             parameter.use = UndefinedParameterUse;
+            
+            // Process signature
+            SourceData remainingContent;
+            SourceData signature = GetListItemSignature(begin, end, remainingContent);
+
+            TrimString(signature);
+            CaptureGroups captureGroups;
+            if (RegexCapture(signature, ParameterAbbrevDefinitionRegex, captureGroups) &&
+                captureGroups.size() == 8) {
+                
+                // Name
+                parameter.name = captureGroups[1];
+                TrimString(parameter.name);
+                
+                // Default value
+                if (!captureGroups[3].empty())
+                    parameter.defaultValue = captureGroups[3];
+                
+                // Additional Attributes
+                if (!captureGroups[5].empty())
+                    ProcessSignatureAdditionalParameters(captureGroups[5], result, parameter);
+                
+                // Description
+                if (!captureGroups[7].empty())
+                    parameter.description = captureGroups[7];
+                
+                if (!remainingContent.empty()) {
+                    parameter.description += "\n";
+                    parameter.description += remainingContent;
+                }
+            }
+            else {
+                // TODO: Sanity check
+            }
+        }
+        
+        /** Parse additional parameter attributes from abbrev definition bracket */
+        static void ProcessSignatureAdditionalParameters(const std::string& additionalParameters,
+                                                         Result& result,
+                                                         Parameter& parameter)
+        {
+            
+            // Cherry pick example value, if any
+            std::string source = additionalParameters;
+            TrimString(source);
+            CaptureGroups captureGroups;
+            if (RegexCapture(source, PARAMETER_VALUE, captureGroups) &&
+                captureGroups.size() > 1) {
+                
+                parameter.exampleValue = captureGroups[1];
+                std::string::size_type pos = source.find(captureGroups[0]);
+                if (pos != std::string::npos)
+                    source.replace(pos, captureGroups[0].length(), std::string());
+            }
+            
+            // Cherry pick use attribute, if any
+            captureGroups.clear();
+            if (RegexCapture(source, ParameterAbbrevDefinitionUseRegex, captureGroups) &&
+                captureGroups.size() > 1) {
+                
+                parameter.use = (RegexMatch(captureGroups[1], ParameterOptionalRegex)) ? OptionalParameterUse : RequiredParameterUse;
+
+                std::string::size_type pos = source.find(captureGroups[0]);
+                if (pos != std::string::npos)
+                    source.replace(pos, captureGroups[0].length(), std::string());
+            }
+            
+            // Finish with type
+            captureGroups.clear();
+            if (RegexCapture(source, ParameterAbbrevDefinitionTypeRegex, captureGroups) &&
+                captureGroups.size() > 1) {
+                
+                parameter.type = captureGroups[1];
+            }
+            
         }
         
         /** Parse parameter type section blocks. */

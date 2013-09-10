@@ -640,7 +640,6 @@ TEST_CASE("Warn when re-setting the values attribute", "[parameter_definition]")
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].values[0] == "Hello");
 }
 
-
 TEST_CASE("Warn when there are no values in the values attribute", "[parameter_definition]")
 {
     // Blueprint in question:
@@ -676,3 +675,46 @@ TEST_CASE("Warn when there are no values in the values attribute", "[parameter_d
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].name == "id");
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].values.empty());
 }
+
+TEST_CASE("Parse full abbreviated syntax", "[parameter_definition][now]")
+{
+    // Blueprint in question:
+    //R"(
+    //# /machine{?limit}
+    //## GET 
+    //
+    //+ Parameters
+    //    + limit = `20` (optional, number, `42`) ... This is a limit
+    //
+    //+ Response 204
+    //");
+    const std::string blueprintSource = \
+    "# /machine{?limit}\n"\
+    "## GET\n"\
+    "\n"\
+    "+ Parameters\n"\
+    "    + limit = `20` (optional, number, `42`) ... This is a limit\n"\
+    "\n"\
+    "+ Response 204\n\n";
+    
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(blueprintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.empty());
+    
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].name == "limit");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].description == "This is a limit" );
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].defaultValue == "20");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].exampleValue == "42");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].type == "number");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].use == OptionalParameterUse);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].values.empty());
+}
+

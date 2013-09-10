@@ -533,7 +533,7 @@ TEST_CASE("rparser/parse-nameless-resource", "Parse resource without name")
     REQUIRE(resource.actions.size() == 0);
 }
 
-TEST_CASE("Warn about parameters not in URI template", "[resource][now]")
+TEST_CASE("Warn about parameters not in URI template", "[resource]")
 {
     // Blueprint in question:
     //R"(
