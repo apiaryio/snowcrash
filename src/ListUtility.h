@@ -223,7 +223,7 @@ namespace snowcrash {
                 ++result.second;
             }
             
-            ss << "ignoring unrecognized block, check indentation";
+            ss << "ignoring unrecognized block";
             if (!expected.empty())
                 ss << ", expected: " << expected;
             result.first.warnings.push_back(Warning(ss.str(),

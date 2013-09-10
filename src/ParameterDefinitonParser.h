@@ -39,7 +39,7 @@ static const std::string ParameterOptionalRegex("^[ \\t]*[Oo]ptional[ \\t]*$");
 static const std::string ParameterAbbrevDefinitionUseRegex("([Oo]ptional|[Rr]equired)");
 
 /** Abbreviated Additonal Parameters Type matching regex */
-static const std::string ParameterAbbrevDefinitionTypeRegex("[[:blank:]]*[,]?[[:blank:]]*(.*)[[:blank:]]*[,][[:blank:]]*");
+static const std::string ParameterAbbrevDefinitionTypeRegex("[[:blank:],]*([^,]*)");
 
 /** Parameter Default matching regex */
 static const std::string ParameterDefaultRegex("^[ \\t]*[Dd]efault:[ \\t]*" PARAMETER_VALUE "[ \\t]*$");
@@ -259,7 +259,7 @@ namespace snowcrash {
             
             if (!CheckCursor(sectionCur, bounds, cur, result.first))
                 return result;
-            
+
             parameter.description += MapSourceData(parser.sourceData, sectionCur->sourceMap);
             
             if (sectionCur != bounds.second)
@@ -309,10 +309,16 @@ namespace snowcrash {
                 if (!remainingContent.empty()) {
                     parameter.description += "\n";
                     parameter.description += remainingContent;
+                    parameter.description += "\n";
                 }
             }
             else {
-                // TODO: Sanity check
+                // ERR: unable to parse 
+                BlockIterator nameBlock = ListItemNameBlock(begin, end);
+                std::stringstream ss;
+                result.error = (Error("unable to parse parameter specification",
+                                      BusinessError,
+                                      nameBlock->sourceMap));
             }
         }
         
