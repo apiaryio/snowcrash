@@ -104,9 +104,9 @@ namespace snowcrash {
      *  \param  request A request to look for.
      *  \return Iterator pointing to the matching request within given method requests.
      */
-    FORCEINLINE Collection<Request>::const_iterator FindRequest(const Transaction& transaction, const Request& request) {
-        return std::find_if(transaction.requests.begin(),
-                            transaction.requests.end(),
+    FORCEINLINE Collection<Request>::const_iterator FindRequest(const TransactionExample& example, const Request& request) {
+        return std::find_if(example.requests.begin(),
+                            example.requests.end(),
                             std::bind2nd(MatchPayload(), request));
     }
 
@@ -116,9 +116,9 @@ namespace snowcrash {
      *  \param  response A response to look for.
      *  \return Iterator pointing to the matching response within given method requests.
      */
-    FORCEINLINE Collection<Response>::const_iterator FindResponse(const Transaction& transaction, const Response& response) {
-        return std::find_if(transaction.responses.begin(),
-                            transaction.responses.end(),
+    FORCEINLINE Collection<Response>::const_iterator FindResponse(const TransactionExample& example, const Response& response) {
+        return std::find_if(example.responses.begin(),
+                            example.responses.end(),
                             std::bind2nd(MatchPayload(), response));
     }
 }

@@ -140,7 +140,7 @@ namespace snowcrash {
         }
         
         if (HasActionSignature(*begin))
-            return (context != ResourceMethodSection) ? MethodSection : UndefinedSection;
+            return (context != ResourceMethodSection) ? ActionSection : UndefinedSection;
         
         Section listSection = ClassifyInternaListBlock<Resource>(begin, end);
         if (listSection != UndefinedSection)
@@ -187,7 +187,7 @@ namespace snowcrash {
                     result = HandleHeaders(cur, bounds.second, parser, resource);
                     break;
                     
-                case MethodSection:
+                case ActionSection:
                     result = HandleAction(cur, bounds.second, parser, resource);
                     break;
                     
@@ -410,8 +410,8 @@ namespace snowcrash {
             // Check for header duplictes
             DeepCheckHeaderDuplicates(resource, action, begin->sourceMap, result.first);
             
-            if (action.transactions.empty() ||
-                action.transactions.front().responses.empty()) {
+            if (action.examples.empty() ||
+                action.examples.front().responses.empty()) {
                 // WARN: method has no response
                 result.first.warnings.push_back(Warning("no response defined for '" +
                                                         action.method +
@@ -431,18 +431,18 @@ namespace snowcrash {
                                               const SourceDataBlock& sourceMap,
                                               Result& result) {
             
-            if (action.transactions.empty())
+            if (action.examples.empty())
                 return;
             
             CheckHeaderDuplicates(resource, action, sourceMap, result);
-            for (Collection<Request>::const_iterator it = action.transactions.front().requests.begin();
-                 it != action.transactions.front().requests.end();
+            for (Collection<Request>::const_iterator it = action.examples.front().requests.begin();
+                 it != action.examples.front().requests.end();
                  ++it) {
                 
                 CheckHeaderDuplicates(resource, *it, sourceMap, result);
             }
-            for (Collection<Response>::const_iterator it = action.transactions.front().responses.begin();
-                 it != action.transactions.front().responses.end();
+            for (Collection<Response>::const_iterator it = action.examples.front().responses.begin();
+                 it != action.examples.front().responses.end();
                  ++it) {
                 
                 CheckHeaderDuplicates(resource, *it, sourceMap, result);

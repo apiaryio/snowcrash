@@ -29,7 +29,7 @@ namespace snowcrash {
         ResourceGroupSection,
         ResourceSection,
         ResourceMethodSection,
-        MethodSection,
+        ActionSection,
         RequestSection,
         RequestBodySection,
         ResponseSection,

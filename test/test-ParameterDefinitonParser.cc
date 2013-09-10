@@ -272,9 +272,9 @@ TEST_CASE("Parse ilegal parameter trait at the begining", "[parameter_definition
     REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].transactions.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].transactions[0].responses.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].transactions[0].responses[0].name == "200");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
 }
 
 TEST_CASE("Warn when re-setting the use attribute", "[parameter_definition]")

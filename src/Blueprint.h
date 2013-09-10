@@ -157,9 +157,9 @@ namespace snowcrash {
     /**
      *  An HTTP transaction example.
      */
-    struct Transaction {
+    struct TransactionExample {
         
-        /** An transaction name */
+        /** An example name */
         Name name;
         
         /** Description */
@@ -193,7 +193,7 @@ namespace snowcrash {
         Collection<Header>::type headers;
         
         /** Transactions examples */
-        Collection<Transaction>::type transactions;
+        Collection<TransactionExample>::type examples;
     };
     
     /**

@@ -111,7 +111,7 @@ namespace snowcrash {
                                               const Section& context) {
 
         if (HasActionSignature(*begin))
-            return (context == UndefinedSection) ? MethodSection : UndefinedSection;
+            return (context == UndefinedSection) ? ActionSection : UndefinedSection;
         
         if (HasResourceSignature(*begin) ||
             HasResourceGroupSignature(*begin))
@@ -125,7 +125,7 @@ namespace snowcrash {
         if (begin->type == ListItemBlockBeginType)
             return ForeignSection;
         
-        return (context == MethodSection) ? MethodSection : UndefinedSection;
+        return (context == ActionSection) ? ActionSection : UndefinedSection;
     }
     
     //
@@ -143,7 +143,7 @@ namespace snowcrash {
             ParseSectionResult result = std::make_pair(Result(), cur);
             
             switch (section) {                    
-                case MethodSection:
+                case ActionSection:
                     result = HandleActionOverviewBlock(cur, bounds, parser, action);
                     break;
                    
@@ -266,8 +266,8 @@ namespace snowcrash {
                 return result;
             
             // Make sure a transaction is defined for the Action
-            if (action.transactions.empty()) {
-                action.transactions.push_back(Transaction());
+            if (action.examples.empty()) {
+                action.examples.push_back(TransactionExample());
             }
             
             // Check for duplicate
@@ -289,10 +289,10 @@ namespace snowcrash {
             
             // Inject parsed payload into the action
             if (section == RequestSection) {
-                action.transactions.front().requests.push_back(payload);
+                action.examples.front().requests.push_back(payload);
             }
             else if (section == ResponseSection) {
-                action.transactions.front().responses.push_back(payload);
+                action.examples.front().responses.push_back(payload);
             }
             
             // Check header duplicates
@@ -355,16 +355,16 @@ namespace snowcrash {
          */
         static bool IsPayloadDuplicate(const Section& section, const Payload& payload, Action& action) {
             
-            if (action.transactions.empty())
+            if (action.examples.empty())
                 return false;
             
             if (section == RequestSection) {
-                Collection<Request>::const_iterator duplicate = FindRequest(action.transactions.front(), payload);
-                return duplicate != action.transactions.front().requests.end();
+                Collection<Request>::const_iterator duplicate = FindRequest(action.examples.front(), payload);
+                return duplicate != action.examples.front().requests.end();
             }
             else if (section == ResponseSection) {
-                Collection<Response>::const_iterator duplicate = FindResponse(action.transactions.front(), payload);
-                return duplicate != action.transactions.front().responses.end();
+                Collection<Response>::const_iterator duplicate = FindResponse(action.examples.front(), payload);
+                return duplicate != action.examples.front().responses.end();
             }
 
             return false;

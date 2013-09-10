@@ -368,10 +368,10 @@ TEST_CASE("bpparser/parse-resource", "Parse simple resource.")
     REQUIRE(action.description == "1");
     REQUIRE(action.parameters.empty());
     REQUIRE(action.headers.empty());
-    REQUIRE(action.transactions.front().requests.empty());
-    REQUIRE(action.transactions.front().responses.size() == 1);
+    REQUIRE(action.examples.front().requests.empty());
+    REQUIRE(action.examples.front().responses.size() == 1);
     
-    Response response = action.transactions.front().responses.front();
+    Response response = action.examples.front().responses.front();
     REQUIRE(response.name == "200");
     REQUIRE(response.description.empty());
     REQUIRE(response.parameters.empty());

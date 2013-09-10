@@ -95,9 +95,9 @@ TEST_CASE("rparser/classifier", "Resource block classifier")
     REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSection) == HeadersSection);
     
     std::advance(cur, 5); // Method
-    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSection) == MethodSection);
-    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSection) == MethodSection);
-    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), HeadersSection) == MethodSection);
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSection) == ActionSection);
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSection) == ActionSection);
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), HeadersSection) == ActionSection);
     
     // Nameless resource: "/resource"
     markdown[0].content = "/resource";
@@ -124,7 +124,7 @@ TEST_CASE("rparser/classifier-abbrev", "Abbreviated Resource Method block classi
     REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceMethodSection) == UndefinedSection);
     
     ++cur; // "POST"
-    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSection) == MethodSection);
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSection) == ActionSection);
     REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceMethodSection) == UndefinedSection);
 }
 
@@ -192,11 +192,11 @@ TEST_CASE("rparser/parse-partial", "Parse partially defined resource")
     REQUIRE(resource.actions.size() == 1);
     REQUIRE(resource.actions.front().method == "GET");
     REQUIRE(resource.actions.front().description.empty());
-    REQUIRE(!resource.actions.front().transactions.empty());
-    REQUIRE(resource.actions.front().transactions.front().requests.size() == 1);
-    REQUIRE(resource.actions.front().transactions.front().requests.front().name.empty());
-    REQUIRE(resource.actions.front().transactions.front().requests.front().description.empty());
-    REQUIRE(resource.actions.front().transactions.front().requests.front().body == "3");
+    REQUIRE(!resource.actions.front().examples.empty());
+    REQUIRE(resource.actions.front().examples.front().requests.size() == 1);
+    REQUIRE(resource.actions.front().examples.front().requests.front().name.empty());
+    REQUIRE(resource.actions.front().examples.front().requests.front().description.empty());
+    REQUIRE(resource.actions.front().examples.front().requests.front().body == "3");
 }
 
 TEST_CASE("rparser/parse-multi-method-desc", "Parse multiple method descriptions")
@@ -308,29 +308,29 @@ TEST_CASE("rparser/parse-multi-method", "Parse multiple method")
     REQUIRE(resource.actions.size() == 3);
     REQUIRE(resource.actions[0].method == "GET");
     REQUIRE(resource.actions[0].description == "3");
-    REQUIRE(!resource.actions[0].transactions.empty());
-    REQUIRE(resource.actions[0].transactions[0].requests.empty());
-    REQUIRE(resource.actions[0].transactions[0].responses.size() == 1);
-    REQUIRE(resource.actions[0].transactions[0].responses[0].name == "200");
-    REQUIRE(resource.actions[0].transactions[0].responses[0].description.empty());
-    REQUIRE(resource.actions[0].transactions[0].responses[0].body == "Code 1");
+    REQUIRE(!resource.actions[0].examples.empty());
+    REQUIRE(resource.actions[0].examples[0].requests.empty());
+    REQUIRE(resource.actions[0].examples[0].responses.size() == 1);
+    REQUIRE(resource.actions[0].examples[0].responses[0].name == "200");
+    REQUIRE(resource.actions[0].examples[0].responses[0].description.empty());
+    REQUIRE(resource.actions[0].examples[0].responses[0].body == "Code 1");
     
     REQUIRE(resource.actions[1].method == "HEAD");
     REQUIRE(resource.actions[1].description == "C");
-    REQUIRE(!resource.actions[1].transactions.empty());
-    REQUIRE(resource.actions[1].transactions[0].requests.size() == 1);
-    REQUIRE(resource.actions[1].transactions[0].requests[0].name == "D");
-    REQUIRE(resource.actions[1].transactions[0].requests[0].description.empty());
-    REQUIRE(resource.actions[1].transactions[0].requests[0].description.empty());
+    REQUIRE(!resource.actions[1].examples.empty());
+    REQUIRE(resource.actions[1].examples[0].requests.size() == 1);
+    REQUIRE(resource.actions[1].examples[0].requests[0].name == "D");
+    REQUIRE(resource.actions[1].examples[0].requests[0].description.empty());
+    REQUIRE(resource.actions[1].examples[0].requests[0].description.empty());
     
-    REQUIRE(resource.actions[1].transactions[0].responses.size() == 1);
-    REQUIRE(resource.actions[1].transactions[0].responses[0].name == "200");
-    REQUIRE(resource.actions[1].transactions[0].responses[0].description.empty());
-    REQUIRE(resource.actions[1].transactions[0].responses[0].body.empty());
+    REQUIRE(resource.actions[1].examples[0].responses.size() == 1);
+    REQUIRE(resource.actions[1].examples[0].responses[0].name == "200");
+    REQUIRE(resource.actions[1].examples[0].responses[0].description.empty());
+    REQUIRE(resource.actions[1].examples[0].responses[0].body.empty());
     
     REQUIRE(resource.actions[2].method == "PUT");
     REQUIRE(resource.actions[2].description == "K");
-    REQUIRE(resource.actions[2].transactions.empty());
+    REQUIRE(resource.actions[2].examples.empty());
 }
 
 TEST_CASE("rparser/parse-list-description", "Parse description with list")
@@ -474,7 +474,7 @@ TEST_CASE("rparser/parse-abbrev", "Parse resource method abbreviation")
     REQUIRE(resource.actions.size() == 1);
     REQUIRE(resource.actions[0].method == "GET");
     REQUIRE(resource.actions[0].description == "1");
-    REQUIRE(resource.actions[0].transactions[0].responses.size() == 1);
+    REQUIRE(resource.actions[0].examples[0].responses.size() == 1);
 }
 
 TEST_CASE("rparser/parse-abbrev-ambiguous", "Parse resource method abbreviation followed by a foreign method")

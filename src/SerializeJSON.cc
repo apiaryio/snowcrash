@@ -295,17 +295,17 @@ static void serialize(const Payload& payload, size_t level, std::ostream &os)
  * \param transaction   A transaction example to serialize.
  * \param os            An output stream to serialize into.
  */
-static void serialize(const Transaction& transaction, std::ostream &os)
+static void serialize(const TransactionExample& example, std::ostream &os)
 {
     indent(8, os);
     os << "{\n";
     
     // Name
-    serialize(SerializeKey::Name, transaction.name, 9, false, os);
+    serialize(SerializeKey::Name, example.name, 9, false, os);
     os << NewLineItemBlock;
     
     // Description
-    serialize(SerializeKey::Description, transaction.description, 9, false, os);
+    serialize(SerializeKey::Description, example.description, 9, false, os);
     os << NewLineItemBlock;
     
     // Requests
@@ -314,14 +314,14 @@ static void serialize(const Transaction& transaction, std::ostream &os)
     os << ": ";
     os << "[";
     
-    if (!transaction.requests.empty()) {
+    if (!example.requests.empty()) {
         os << "\n";
         size_t i = 0;
-        for (Collection<Request>::const_iterator it = transaction.requests.begin();
-             it != transaction.requests.end();
+        for (Collection<Request>::const_iterator it = example.requests.begin();
+             it != example.requests.end();
              ++i, ++it) {
             
-            if (i > 0 && i < transaction.requests.size())
+            if (i > 0 && i < example.requests.size())
                 os << NewLineItemBlock;
             
             indent(10, os);
@@ -340,14 +340,14 @@ static void serialize(const Transaction& transaction, std::ostream &os)
     os << ": ";
     os << "[";
     
-    if (!transaction.responses.empty()) {
+    if (!example.responses.empty()) {
         os << "\n";
         size_t i = 0;
-        for (Collection<Response>::const_iterator it = transaction.responses.begin();
-             it != transaction.responses.end();
+        for (Collection<Response>::const_iterator it = example.responses.begin();
+             it != example.responses.end();
              ++i, ++it) {
             
-            if (i > 0 && i < transaction.responses.size())
+            if (i > 0 && i < example.responses.size())
                 os << NewLineItemBlock;
             
             indent(10, os);
@@ -397,18 +397,18 @@ static void serialize(const Action& action, std::ostream &os)
     
     // Transactions
     indent(7, os);
-    serialize(SerializeKey::Transactions, os);
+    serialize(SerializeKey::Examples, os);
     os << ": ";
     os << "[";
     
-    if (!action.transactions.empty()) {
+    if (!action.examples.empty()) {
         os << "\n";
         size_t i = 0;
-        for (Collection<Transaction>::const_iterator it = action.transactions.begin();
-             it != action.transactions.end();
+        for (Collection<TransactionExample>::const_iterator it = action.examples.begin();
+             it != action.examples.end();
              ++i, ++it) {
             
-            if (i > 0 && i < action.transactions.size())
+            if (i > 0 && i < action.examples.size())
                 os << NewLineItemBlock;
             
             serialize(*it, os);

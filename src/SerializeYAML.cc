@@ -184,27 +184,27 @@ static void serialize(const Payload& payload, size_t level, bool array, std::ost
 }
 
 // Serialize Transaction Example
-static void serialize(const Transaction& transaction, std::ostream &os)
+static void serialize(const TransactionExample& example, std::ostream &os)
 {
     os << "      - ";   // indent 4
     // Name
-    serialize(SerializeKey::Name, transaction.name, 0, os);
+    serialize(SerializeKey::Name, example.name, 0, os);
     
     // Description
-    serialize(SerializeKey::Description, transaction.description, 4, os);
+    serialize(SerializeKey::Description, example.description, 4, os);
     
     // Requests
     serialize(SerializeKey::Requests, std::string(), 4, os);
-    if (!transaction.requests.empty()) {
-        for (Collection<Request>::const_iterator it = transaction.requests.begin(); it != transaction.requests.end(); ++it) {
+    if (!example.requests.empty()) {
+        for (Collection<Request>::const_iterator it = example.requests.begin(); it != example.requests.end(); ++it) {
             serialize(*it, 5, true, os);
         }
     }
     
     // Responses
     serialize(SerializeKey::Responses, std::string(), 4, os);
-    if (!transaction.responses.empty()) {
-        for (Collection<Response>::const_iterator it = transaction.responses.begin(); it != transaction.responses.end(); ++it) {
+    if (!example.responses.empty()) {
+        for (Collection<Response>::const_iterator it = example.responses.begin(); it != example.responses.end(); ++it) {
             serialize(*it, 5, true, os);
         }
     }
@@ -234,11 +234,11 @@ static void serialize(const Action& action, std::ostream &os)
     if (!action.headers.empty())
         serialize(action.headers, 3, os);
 
-    // Transactions
-    serialize(SerializeKey::Transactions, std::string(), 3, os);
-    if (!action.transactions.empty()) {
-        for (Collection<Transaction>::const_iterator it = action.transactions.begin();
-             it != action.transactions.end();
+    // Examples
+    serialize(SerializeKey::Examples, std::string(), 3, os);
+    if (!action.examples.empty()) {
+        for (Collection<TransactionExample>::const_iterator it = action.examples.begin();
+             it != action.examples.end();
              ++it) {
             serialize(*it, os);
         }

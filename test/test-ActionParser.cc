@@ -96,38 +96,38 @@ TEST_CASE("mparser/classifier", "Method block classifier")
     
     cur = markdown.begin();
     // HeaderBlockType - "GET"
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSection) == MethodSection);
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), MethodSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSection) == ActionSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSection) == UndefinedSection);
     
-    ++cur; // ParagraphBlockType - "MethodSection"
+    ++cur; // ParagraphBlockType - "ActionSection"
     REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), MethodSection) == MethodSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSection) == ActionSection);
 
     std::advance(cur, 1+55); // ListBlockBeginType - "Response"
     REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSection) == ResponseSection);
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), MethodSection) == ResponseSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSection) == ResponseSection);
     
     ++cur; // ListItemBlockBeginType - "Response"
     REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSection) == ResponseSection);
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), MethodSection) == ResponseSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSection) == ResponseSection);
     
     std::advance(cur, 4); // ListItemBlockBeginType - "Headers"
     REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSection) == HeadersSection);
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), MethodSection) == HeadersSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSection) == HeadersSection);
     
     std::advance(cur, 4); // Request
     REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSection) == RequestSection);
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), MethodSection) == RequestSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSection) == RequestSection);
     REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), HeadersSection) == RequestSection);
     
     std::advance(cur, 18); // Response
     REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSection) == ResponseSection);
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), MethodSection) == ResponseSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSection) == ResponseSection);
     REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ResponseSection) == ResponseSection);
     
     std::advance(cur, 3); // Foreign
     REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSection) == ForeignSection);
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), MethodSection) == ForeignSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSection) == ForeignSection);
     REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), HeadersSection) == ForeignSection);
     REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ResponseSection) == ForeignSection);
     REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), RequestSection) == ForeignSection);
@@ -135,14 +135,14 @@ TEST_CASE("mparser/classifier", "Method block classifier")
     // Nameless method
     markdown[0].content = "GET";
     cur = markdown.begin();
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSection) == MethodSection);
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), MethodSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSection) == ActionSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSection) == UndefinedSection);
 
     // Keyword "group"
     markdown[0].content = "Group A";
     cur = markdown.begin();
     REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), MethodSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSection) == UndefinedSection);
 }
 
 TEST_CASE("mparser/classifier-implicit-termination", "Method block classifier implicit termination")
@@ -155,7 +155,7 @@ TEST_CASE("mparser/classifier-implicit-termination", "Method block classifier im
     BlockIterator cur = markdown.begin();
     std::advance(cur, 2);
     
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), MethodSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSection) == UndefinedSection);
     REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSection) == UndefinedSection);    
 }
 
@@ -185,14 +185,14 @@ TEST_CASE("mparser/parse", "Parse method")
     REQUIRE(action.parameters.size() == 2);
     REQUIRE(action.parameters[0].name == "id");
     REQUIRE(action.parameters[1].name == "limit");
-    REQUIRE(action.transactions.front().requests.size() == 1);
-    REQUIRE(action.transactions.front().responses.size() == 1);
+    REQUIRE(action.examples.front().requests.size() == 1);
+    REQUIRE(action.examples.front().responses.size() == 1);
     
-    REQUIRE(action.transactions.front().responses[0].name == "200");
-    REQUIRE(action.transactions.front().responses[0].body == "OK.");
-    REQUIRE(action.transactions.front().responses[0].headers.size() == 1);
-    REQUIRE(action.transactions.front().responses[0].headers[0].first == "Content-Type");
-    REQUIRE(action.transactions.front().responses[0].headers[0].second == "text/plain");
+    REQUIRE(action.examples.front().responses[0].name == "200");
+    REQUIRE(action.examples.front().responses[0].body == "OK.");
+    REQUIRE(action.examples.front().responses[0].headers.size() == 1);
+    REQUIRE(action.examples.front().responses[0].headers[0].first == "Content-Type");
+    REQUIRE(action.examples.front().responses[0].headers[0].second == "text/plain");
 }
 
 TEST_CASE("mparser/parse-list-description", "Parse description with list")
@@ -228,8 +228,8 @@ TEST_CASE("mparser/parse-list-description", "Parse description with list")
     REQUIRE(result.first.error.code == Error::OK);
     
     REQUIRE(action.description == "123");
-    REQUIRE(action.transactions.front().responses.empty());
-    REQUIRE(action.transactions.front().requests.size() == 1);
+    REQUIRE(action.examples.front().responses.empty());
+    REQUIRE(action.examples.front().requests.size() == 1);
 }
 
 TEST_CASE("mparser/parse-list-description-request", "Parse description with list followed by a request")
@@ -273,11 +273,11 @@ TEST_CASE("mparser/parse-list-description-request", "Parse description with list
     REQUIRE(action.description == "23");
     REQUIRE(action.headers.empty());
     REQUIRE(action.parameters.empty());
-    REQUIRE(action.transactions.front().responses.empty());
-    REQUIRE(action.transactions.front().requests.size() == 1);
-    REQUIRE(action.transactions.front().requests.front().name.empty());
-    REQUIRE(action.transactions.front().requests.front().description.empty());
-    REQUIRE(action.transactions.front().requests.front().body.empty());
+    REQUIRE(action.examples.front().responses.empty());
+    REQUIRE(action.examples.front().requests.size() == 1);
+    REQUIRE(action.examples.front().requests.front().name.empty());
+    REQUIRE(action.examples.front().requests.front().description.empty());
+    REQUIRE(action.examples.front().requests.front().body.empty());
 }
 
 TEST_CASE("mparser/response-regex-problem", "Parse method with response not matching regex")
@@ -313,11 +313,11 @@ TEST_CASE("mparser/response-regex-problem", "Parse method with response not matc
     REQUIRE(action.description.empty());
     REQUIRE(action.headers.empty());
     REQUIRE(action.parameters.empty());
-    REQUIRE(action.transactions.front().requests.empty());
-    REQUIRE(action.transactions.front().responses.size() == 1);
-    REQUIRE(action.transactions.front().responses.front().name == "200");
-    REQUIRE(action.transactions.front().responses.front().description.empty());
-    REQUIRE(action.transactions.front().responses.front().body == "  B\n");
+    REQUIRE(action.examples.front().requests.empty());
+    REQUIRE(action.examples.front().responses.size() == 1);
+    REQUIRE(action.examples.front().responses.front().name == "200");
+    REQUIRE(action.examples.front().responses.front().description.empty());
+    REQUIRE(action.examples.front().responses.front().body == "  B\n");
 }
 
 TEST_CASE("mparser/parse-multi-request-response", "Parse method with multiple requests and responses")
@@ -423,37 +423,37 @@ TEST_CASE("mparser/parse-multi-request-response", "Parse method with multiple re
     REQUIRE(action.headers.empty());
     REQUIRE(action.parameters.empty());
     
-    REQUIRE(action.transactions.front().requests.size() == 2);
+    REQUIRE(action.examples.front().requests.size() == 2);
     
-    REQUIRE(action.transactions.front().requests[0].name == "A");
-    REQUIRE(action.transactions.front().requests[0].description == "2");
-    REQUIRE(action.transactions.front().requests[0].body == "C");
-    REQUIRE(action.transactions.front().requests[0].schema.empty());
-    REQUIRE(action.transactions.front().requests[0].parameters.empty());
-    REQUIRE(action.transactions.front().requests[0].headers.empty());
+    REQUIRE(action.examples.front().requests[0].name == "A");
+    REQUIRE(action.examples.front().requests[0].description == "2");
+    REQUIRE(action.examples.front().requests[0].body == "C");
+    REQUIRE(action.examples.front().requests[0].schema.empty());
+    REQUIRE(action.examples.front().requests[0].parameters.empty());
+    REQUIRE(action.examples.front().requests[0].headers.empty());
     
-    REQUIRE(action.transactions.front().requests[1].name == "D");
-    REQUIRE(action.transactions.front().requests[1].description == "9");
-    REQUIRE(action.transactions.front().requests[1].body == "F");
-    REQUIRE(action.transactions.front().requests[1].schema.empty());
-    REQUIRE(action.transactions.front().requests[1].parameters.empty());
-    REQUIRE(action.transactions.front().requests[1].headers.empty());
+    REQUIRE(action.examples.front().requests[1].name == "D");
+    REQUIRE(action.examples.front().requests[1].description == "9");
+    REQUIRE(action.examples.front().requests[1].body == "F");
+    REQUIRE(action.examples.front().requests[1].schema.empty());
+    REQUIRE(action.examples.front().requests[1].parameters.empty());
+    REQUIRE(action.examples.front().requests[1].headers.empty());
     
-    REQUIRE(action.transactions.front().responses.size() == 2);
+    REQUIRE(action.examples.front().responses.size() == 2);
     
-    REQUIRE(action.transactions.front().responses[0].name == "200");
-    REQUIRE(action.transactions.front().responses[0].description == "G");
-    REQUIRE(action.transactions.front().responses[0].body == "H");
-    REQUIRE(action.transactions.front().responses[0].schema.empty());
-    REQUIRE(action.transactions.front().responses[0].parameters.empty());
-    REQUIRE(action.transactions.front().responses[0].headers.empty());
+    REQUIRE(action.examples.front().responses[0].name == "200");
+    REQUIRE(action.examples.front().responses[0].description == "G");
+    REQUIRE(action.examples.front().responses[0].body == "H");
+    REQUIRE(action.examples.front().responses[0].schema.empty());
+    REQUIRE(action.examples.front().responses[0].parameters.empty());
+    REQUIRE(action.examples.front().responses[0].headers.empty());
     
-    REQUIRE(action.transactions.front().responses[1].name == "200");
-    REQUIRE(action.transactions.front().responses[1].description == "N");
-    REQUIRE(action.transactions.front().responses[1].body == "J");
-    REQUIRE(action.transactions.front().responses[1].schema.empty());
-    REQUIRE(action.transactions.front().responses[1].parameters.empty());
-    REQUIRE(action.transactions.front().responses[1].headers.empty());
+    REQUIRE(action.examples.front().responses[1].name == "200");
+    REQUIRE(action.examples.front().responses[1].description == "N");
+    REQUIRE(action.examples.front().responses[1].body == "J");
+    REQUIRE(action.examples.front().responses[1].schema.empty());
+    REQUIRE(action.examples.front().responses[1].parameters.empty());
+    REQUIRE(action.examples.front().responses[1].headers.empty());
 
 }
 
@@ -501,19 +501,19 @@ TEST_CASE("mparser/parse-multi-request-incomplete", "Parse method with multiple 
     REQUIRE(action.headers.empty());
     REQUIRE(action.parameters.empty());
     
-    REQUIRE(action.transactions.front().requests.size() == 2);
-    REQUIRE(action.transactions.front().requests[0].name == "A");
-    REQUIRE(action.transactions.front().requests[0].body.empty());
-    REQUIRE(action.transactions.front().requests[0].schema.empty());
-    REQUIRE(action.transactions.front().requests[0].parameters.empty());
-    REQUIRE(action.transactions.front().requests[0].headers.empty());
+    REQUIRE(action.examples.front().requests.size() == 2);
+    REQUIRE(action.examples.front().requests[0].name == "A");
+    REQUIRE(action.examples.front().requests[0].body.empty());
+    REQUIRE(action.examples.front().requests[0].schema.empty());
+    REQUIRE(action.examples.front().requests[0].parameters.empty());
+    REQUIRE(action.examples.front().requests[0].headers.empty());
     
-    REQUIRE(action.transactions.front().requests[1].name == "B");
-    REQUIRE(action.transactions.front().requests[1].description.empty());
-    REQUIRE(action.transactions.front().requests[1].body == "3");
-    REQUIRE(action.transactions.front().requests[1].schema.empty());
-    REQUIRE(action.transactions.front().requests[1].parameters.empty());
-    REQUIRE(action.transactions.front().requests[1].headers.empty());
+    REQUIRE(action.examples.front().requests[1].name == "B");
+    REQUIRE(action.examples.front().requests[1].description.empty());
+    REQUIRE(action.examples.front().requests[1].body == "3");
+    REQUIRE(action.examples.front().requests[1].schema.empty());
+    REQUIRE(action.examples.front().requests[1].parameters.empty());
+    REQUIRE(action.examples.front().requests[1].headers.empty());
 }
 
 TEST_CASE("Parse method with foreign item", "[method][foreign]")
@@ -566,12 +566,12 @@ TEST_CASE("Parse method with foreign item", "[method][foreign]")
     REQUIRE(action.headers.empty());
     REQUIRE(action.parameters.empty());
     
-    REQUIRE(action.transactions.front().requests.size() == 1);
-    REQUIRE(action.transactions.front().requests[0].name.empty());
-    REQUIRE(action.transactions.front().requests[0].body == "Foo");
-    REQUIRE(action.transactions.front().requests[0].schema.empty());
-    REQUIRE(action.transactions.front().requests[0].parameters.empty());
-    REQUIRE(action.transactions.front().requests[0].headers.empty());    
+    REQUIRE(action.examples.front().requests.size() == 1);
+    REQUIRE(action.examples.front().requests[0].name.empty());
+    REQUIRE(action.examples.front().requests[0].body == "Foo");
+    REQUIRE(action.examples.front().requests[0].schema.empty());
+    REQUIRE(action.examples.front().requests[0].parameters.empty());
+    REQUIRE(action.examples.front().requests[0].headers.empty());    
 }
 
 TEST_CASE("mparser/parse-inline-method-payload", "Parse method with inline payload")
@@ -610,11 +610,11 @@ TEST_CASE("mparser/parse-inline-method-payload", "Parse method with inline paylo
     REQUIRE(action.name.empty());
     REQUIRE(action.method == "POST");
     REQUIRE(action.description.empty());
-    REQUIRE(action.transactions.front().responses.empty());
-    REQUIRE(action.transactions.front().requests.size() == 1);
-    REQUIRE(action.transactions.front().requests[0].name.empty());
-    REQUIRE(action.transactions.front().requests[0].description.empty());
-    REQUIRE(action.transactions.front().requests[0].body.empty());
+    REQUIRE(action.examples.front().responses.empty());
+    REQUIRE(action.examples.front().requests.size() == 1);
+    REQUIRE(action.examples.front().requests[0].name.empty());
+    REQUIRE(action.examples.front().requests[0].description.empty());
+    REQUIRE(action.examples.front().requests[0].body.empty());
 }
 
 TEST_CASE("mparser/parse-hr", "Parse method with a HR")
@@ -645,7 +645,7 @@ TEST_CASE("mparser/parse-hr", "Parse method with a HR")
     REQUIRE(action.name.empty());    
     REQUIRE(action.method == "PATCH");
     REQUIRE(action.description == "12");
-    REQUIRE(action.transactions.empty());
+    REQUIRE(action.examples.empty());
 }
 
 TEST_CASE("mparser/parse-implicit-termination", "Parse incomplete method followed by another resource")
