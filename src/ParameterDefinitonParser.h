@@ -18,7 +18,7 @@
 
 
 /** Parameter Value regex */
-#define PARAMETER_VALUE "`(.+)`"
+#define PARAMETER_VALUE "`([^`]+)`"
 
 /** Parameter Definition matching regex */
 static const std::string ParameterDefinitionRegex("^[ \\t]*(" SYMBOL_IDENTIFIER ")[ \\t]*$");

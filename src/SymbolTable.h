@@ -21,7 +21,8 @@
 #include "Blueprint.h"
 
 // Symbol identifier regex
-#define SYMBOL_IDENTIFIER "([A-Za-z0-9_\\-]|[ \\t])*"
+//#define SYMBOL_IDENTIFIER "([A-Za-z0-9_\\-]|[ \\t])*"
+#define SYMBOL_IDENTIFIER "([[:alnum:][:blank:]_\\-]+)"
 
 // Symbol reference regex
 static const std::string SymbolReferenceRegex("^[ \\t]*\\[(" SYMBOL_IDENTIFIER ")]\\[][ \\t]*$");
