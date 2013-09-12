@@ -44,11 +44,6 @@ namespace snowcrash {
         ForeignSection,
         ParametersSection,
         ParameterDefinitionSection,
-        ParameterTypeSection,
-        ParameterRequiredSection,
-        ParameterOptionalSection,
-        ParameterDefaultSection,
-        ParameterExampleSection,
         ParameterValuesSection
     };
     

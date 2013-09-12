@@ -146,11 +146,11 @@ namespace snowcrash {
                 case ActionSection:
                     result = HandleActionOverviewBlock(cur, bounds, parser, action);
                     break;
-                   
+
                 case ParametersSection:
                     result = HandleParameters(cur, bounds, parser, action);
                     break;
-                    
+
                 case HeadersSection:
                     result = HandleHeaders(cur, bounds.second, parser, action);
                     break;

@@ -89,8 +89,12 @@ TEST_CASE("rparser/classifier", "Resource block classifier")
     ++cur; // ListItemBlockBeginType - "My Resource Object"
     REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSection) == ObjectSection);
     REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ObjectSection) == ObjectSection);
+    
+    std::advance(cur, 4); // ListItemBlockBeginType - "Parameters"
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSection) == ParametersSection);
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSection) == ParametersSection);
 
-    std::advance(cur, 4+55); // ListItemBlockBeginType - "Headers"
+    std::advance(cur, 39); // ListItemBlockBeginType - "Headers"
     REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSection) == HeadersSection);
     REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSection) == HeadersSection);
     
@@ -139,7 +143,7 @@ TEST_CASE("rparser/parse", "Parse resource")
     CHECK(result.first.warnings.empty());
     
     const MarkdownBlock::Stack &blocks = markdown;
-    REQUIRE(std::distance(blocks.begin(), result.second) == 42 + 2*55);
+    REQUIRE(std::distance(blocks.begin(), result.second) == 42 + 39);
     
     REQUIRE(resource.name == "My Resource");
     REQUIRE(resource.uriTemplate == "/resource/{id}{?limit}");
@@ -423,7 +427,7 @@ TEST_CASE("rparser/header-warnings", "Check warnings on overshadowing a header")
     REQUIRE(result.first.warnings.size() == 1); // overshadowing header
     
     const MarkdownBlock::Stack &blocks = markdown;
-    REQUIRE(std::distance(blocks.begin(), result.second) == 42 + 2*55);
+    REQUIRE(std::distance(blocks.begin(), result.second) == 42 + 39);
 }
 
 TEST_CASE("rparser/parse-abbrev", "Parse resource method abbreviation")

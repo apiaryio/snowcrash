@@ -26,9 +26,6 @@ static const std::string ParameterDefinitionRegex("^[ \\t]*(" SYMBOL_IDENTIFIER 
 /** Parameter Abbreviated definition matching regex */
 static const std::string ParameterAbbrevDefinitionRegex("^([[:alnum:][:blank:]_\\-]+)([[:blank:]]*=[[:blank:]]*`([^`]*)`[[:blank:]]*)?([[:blank:]]*\\((.*)\\)[[:blank:]]*)?([[:blank:]]*\\.\\.\\.[[:blank:]]*(.*))?$");
 
-/** Parameter Type matching regex */
-static const std::string ParameterTypeRegex("^[ \\t]*[Tt]ype:[ \\t]*(" SYMBOL_IDENTIFIER ")$");
-
 /** Parameter Required matching regex */
 static const std::string ParameterRequiredRegex("^[ \\t]*[Rr]equired[ \\t]*$");
 
@@ -41,21 +38,18 @@ static const std::string ParameterAbbrevDefinitionUseRegex("([Oo]ptional|[Rr]equ
 /** Abbreviated Additonal Parameters Type matching regex */
 static const std::string ParameterAbbrevDefinitionTypeRegex("[[:blank:],]*([^,]*)");
 
-/** Parameter Default matching regex */
-static const std::string ParameterDefaultRegex("^[ \\t]*[Dd]efault:[ \\t]*" PARAMETER_VALUE "[ \\t]*$");
-
-/** Parameter Example matching regex */
-static const std::string ParameterExampleRegex("^[ \\t]*[Ee]xample:[ \\t]*" PARAMETER_VALUE "[ \\t]*$");
-
 /** Parameter Values matching regex */
-static const std::string ParameterValuesRegex("^[ \\t]*[Vv]alues:[ \\t]*$");
+static const std::string ParameterValuesRegex("^[ \\t]*[Vv]alues[ \\t]*$");
 
-/** List of expected keywords */
-static const std::string ExpectedDefinitionItems = "'Type: <type>', 'Optional', 'Required', "\
-"'Default: `<default value>`', 'Example: `<example value>`' or `Values:`";
+/** List of expected nested attributes */
+static const std::string ExpectedTraitItems = "'Values' followed by a nested list of possbile values";
+
+/** Expected parameter definiton */
+static const std::string ExpectedParameterDefinition = "'<parameter identifier>' or a full parameter specification"\
+                                                       " e.g. 'id (required, number, `42`) ... Id of the resource'";
 
 /** Values expected content */
-static const std::string ExpectedValuesContent = "nested list of possible parameter values, one element per list item";
+static const std::string ExpectedValuesContent = "nested list of possible parameter values, one element per list item e.g. '`value`'";
 
 namespace snowcrash {
     
@@ -75,21 +69,6 @@ namespace snowcrash {
         SourceData content = GetListItemSignature(begin, end, remainingContent);
         
         content = TrimString(content);
-        
-        if (RegexMatch(content, ParameterTypeRegex))
-            return ParameterTypeSection;
-        
-        if (RegexMatch(content, ParameterRequiredRegex))
-            return ParameterRequiredSection;
-        
-        if (RegexMatch(content, ParameterOptionalRegex))
-            return ParameterOptionalSection;
-        
-        if (RegexMatch(content, ParameterDefaultRegex))
-            return ParameterDefaultSection;
-        
-        if (RegexMatch(content, ParameterExampleRegex))
-            return ParameterExampleSection;
         
         if (RegexMatch(content, ParameterValuesRegex))
             return ParameterValuesSection;
@@ -150,12 +129,7 @@ namespace snowcrash {
             if (begin->type == ListItemBlockBeginType)
                 return UndefinedSection;
         }
-        else if (context == ParameterTypeSection ||
-                 context == ParameterRequiredSection ||
-                 context == ParameterOptionalSection ||
-                 context == ParameterDefaultSection ||
-                 context == ParameterExampleSection ||
-                 context == ParameterValuesSection ||
+        else if (context == ParameterValuesSection ||
                  context == ForeignSection) {
 
             if (begin->type == ListItemBlockEndType ||
@@ -192,23 +166,12 @@ namespace snowcrash {
                     result = HandleParmeterDefinitionSection(cur, bounds, parser, parameter);
                     break;
                     
-                case ParameterTypeSection:
-                case ParameterDefaultSection:
-                case ParameterExampleSection:
-                    result = HandleKeyValueSection(section, cur, bounds, parser, parameter);
-                    break;
-                    
-                case ParameterOptionalSection:
-                case ParameterRequiredSection:
-                    result = HandleOptionSection(section, cur, bounds, parser, parameter);
-                    break;
-                    
                 case ParameterValuesSection:
                     result = HandleValuesSection(cur, bounds, parser, parameter);
                     break;
                     
                 case ForeignSection:
-                    result = HandleForeignSection(cur, bounds, ExpectedDefinitionItems);
+                    result = HandleForeignSection(cur, bounds, ExpectedTraitItems);
                     break;
                     
                 case UndefinedSection:
@@ -311,6 +274,22 @@ namespace snowcrash {
                     parameter.description += remainingContent;
                     parameter.description += "\n";
                 }
+                
+                
+                // Check possible required vs default clash
+                if (parameter.use == RequiredParameterUse &&
+                    !parameter.defaultValue.empty()) {
+                    
+                    // WARN: Required vs default clash
+                    BlockIterator nameBlock = ListItemNameBlock(begin, end);
+                    std::stringstream ss;
+                    ss << "specifying parameter '" << parameter.name << "' as required supersedes its default value"\
+                          ", only an optional parmater can have an associated default value";
+                    result.warnings.push_back(Warning(ss.str(),
+                                                      LogicalErrorWarning,
+                                                      nameBlock->sourceMap));
+                }
+
             }
             else {
                 // ERR: unable to parse 
@@ -361,138 +340,6 @@ namespace snowcrash {
                 parameter.type = captureGroups[1];
             }
             
-        }
-        
-        /** Parse parameter type section blocks. */
-        static ParseSectionResult HandleKeyValueSection(const Section& section,
-                                                        const BlockIterator& cur,
-                                                        const SectionBounds& bounds,
-                                                        BlueprintParserCore& parser,
-                                                        Parameter& parameter) {
-            
-            ParseSectionResult result = std::make_pair(Result(), cur);
-            
-            // Check redefinition
-            if (IsParameterKeyValueRedefiniton(section, parameter)) {
-                // WARN: parameter use flag already defined
-                BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
-                std::stringstream ss;
-                ss << "overshadowing previous definition of '";
-                ss << ParameterKeyValueKeyword(section);
-                ss << "' value for parameter '" << parameter.name << "'";
-                result.first.warnings.push_back(Warning(ss.str(),
-                                                        RedefinitionWarning,
-                                                        nameBlock->sourceMap));
-            }
-            
-
-            SourceData remainingContent;
-            SourceData content = GetListItemSignature(cur, bounds.second, remainingContent);
-            content = TrimString(content);
-
-            // Retrieve type
-            CaptureGroups captureGroups;
-            
-            // Section-specific retrieval
-            switch (section) {
-                case ParameterTypeSection:
-                {
-                    RegexCapture(content, ParameterTypeRegex, captureGroups);
-                    if (captureGroups.size() > 1) {
-                        std::string type = captureGroups[1];
-                        parameter.type = TrimString(type);
-                    }
-                }
-                    break;
-                    
-                case ParameterDefaultSection:
-                {
-                    RegexCapture(content, ParameterDefaultRegex, captureGroups);
-                    if (captureGroups.size() > 1) {
-                        std::string type = captureGroups[1];
-                        parameter.defaultValue = TrimString(type);
-                    }
-                }
-                    break;
-                    
-                case ParameterExampleSection:
-                {
-                    RegexCapture(content, ParameterExampleRegex, captureGroups);
-                    if (captureGroups.size() > 1) {
-                        std::string type = captureGroups[1];
-                        parameter.exampleValue = TrimString(type);
-                    }
-                }
-                    break;
-
-                    
-                default:
-                    break;
-            }
-            
-            // Specification hint strings
-            std::stringstream ss;
-            ss << "the '" << ParameterKeyValueKeyword(section) << "'";
-            ss << " specification for parameter '" << parameter.name << "'";
-            std::string placeHint = ss.str();
-            
-            // Expected hint string
-            ss.str(std::string());
-            ss << "'" << ParameterKeyValueKeyword(section) << ": ";
-            ss << ParameterKeyValueValue(section) << "' only";
-            std::string expectedHint = ss.str();
-            
-            // Check Signature
-            CheckSignatureAdditionalContent(cur, bounds, placeHint, expectedHint, result.first);
-            
-            // Close Signature
-            result.second = CloseSignatureOnlyListItem(cur, bounds, placeHint, expectedHint, result.first);
-            return result;
-        }
-        
-        /** Parse optional & required section blocks. */
-        static ParseSectionResult HandleOptionSection(const Section& section,
-                                                      const BlockIterator& cur,
-                                                      const SectionBounds& bounds,
-                                                      BlueprintParserCore& parser,
-                                                      Parameter& parameter) {
-            
-            ParseSectionResult result = std::make_pair(Result(), cur);
-            
-            // Check redefinition
-            if (parameter.use != UndefinedParameterUse) {
-                // WARN: parameter use flag already defined
-                BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
-                std::stringstream ss;
-                ss << "overshadowing previous '";
-                ss << ((parameter.use == RequiredParameterUse) ? "required" : "optional");
-                ss << "' specification for parameter '" << parameter.name << "'";
-                result.first.warnings.push_back(Warning(ss.str(),
-                                                        RedefinitionWarning,
-                                                        nameBlock->sourceMap));
-            }
-            
-            // Set the attribute
-            parameter.use = (section == ParameterRequiredSection) ? RequiredParameterUse : OptionalParameterUse;
-            
-            // Specification hint strings
-            std::stringstream ss;
-            ss << "the '" << ParameterUseKeyword(parameter.use) << "'";
-            ss << " specification for parameter '" << parameter.name << "'";
-            std::string placeHint = ss.str();
-            
-            // Expected hint string
-            ss.str(std::string());
-            ss << "'" << ParameterUseKeyword(parameter.use) << "' only";
-            std::string expectedHint = ss.str();
-            
-            // Check Signature
-            CheckSignatureAdditionalContent(cur, bounds, placeHint, expectedHint, result.first);
-            
-            // Close Signature
-            result.second = CloseSignatureOnlyListItem(cur, bounds, placeHint, expectedHint, result.first);
-            
-            return result;
         }
         
         /** Parse possible values enumeration section blocks. */
@@ -624,62 +471,7 @@ namespace snowcrash {
             result.second = sectionCur;
             return result;
         }
-        
-        /** \returns Specification keyword for the parameter use attribute */
-        static std::string ParameterUseKeyword(ParameterUse use) {
-            return (use == RequiredParameterUse) ? "required" : "optional";
-        }
-        
-        /** \returns Specification keyword for a key-value section */
-        static std::string ParameterKeyValueKeyword(const Section& keyValueSection) {
-            switch (keyValueSection) {
-                case ParameterDefaultSection:
-                    return "default";
-                    
-                case ParameterExampleSection:
-                    return "example";
-                    
-                case ParameterTypeSection:
-                    return "type";
-                    
-                default:
-                    return std::string();
-            }
-        }
-        
-        /** \returns Specification value a key-value section */
-        static std::string ParameterKeyValueValue(const Section& keyValueSection) {
-            switch (keyValueSection) {
-                case ParameterDefaultSection:
-                    return "`<default value>`";
-                    
-                case ParameterExampleSection:
-                    return "`<example value>`";
-                    
-                case ParameterTypeSection:
-                    return "<type>";
-                    
-                default:
-                    return std::string();
-            }
-        }
-        
-        /** \returns True if parameter has a value already set for given key value section, false otherwise */
-        static bool IsParameterKeyValueRedefiniton(const Section& keyValueSection, const Parameter& parameter) {
-            switch (keyValueSection) {
-                case ParameterDefaultSection:
-                    return !parameter.defaultValue.empty();
-                    
-                case ParameterExampleSection:
-                    return !parameter.exampleValue.empty();
-                    
-                case ParameterTypeSection:
-                    return !parameter.type.empty();
-                    
-                default:
-                    return false;
-            }
-        }
+
     };
     
     typedef BlockParser<Parameter, SectionParser<Parameter> > ParameterDefinitionParser;

@@ -152,7 +152,7 @@ TEST_CASE("Parse canonical payload", "[payload]")
     REQUIRE(payload.schema == "Code 2");
 }
 
-TEST_CASE("Parse description with list", "[payload][#8]")
+TEST_CASE("Parse payload description with list", "[payload][#8]")
 {
     // Blueprint in question:
     //R"(

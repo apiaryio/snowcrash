@@ -12,6 +12,7 @@
 #include "ResourceParser.h"
 #include "ResourceGroupParser.h"
 #include "Fixture.h"
+#include "Parser.h"
 
 using namespace snowcrash;
 using namespace snowcrashtest;
@@ -22,8 +23,6 @@ MarkdownBlock::Stack snowcrashtest::CanonicalActionFixture()
     //R"(
     //# My Method [GET]
     //Method Description
-    //
-    // <see CanonicalParametersFixture()>
     //
     //+ Headers
     //
@@ -40,14 +39,6 @@ MarkdownBlock::Stack snowcrashtest::CanonicalActionFixture()
     MarkdownBlock::Stack markdown;
     markdown.push_back(MarkdownBlock(HeaderBlockType, "My Method [GET]", 1, MakeSourceDataBlock(0, 1)));
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "Method Description", 0, MakeSourceDataBlock(1, 1)));
-    
-    // Inject parameters
-    MarkdownBlock::Stack parameters = CanonicalParametersFixture();
-    MarkdownBlock::Stack::iterator begin = parameters.begin();
-    ++begin;
-    MarkdownBlock::Stack::iterator end = parameters.end();
-    --end;
-    markdown.insert(markdown.end(), begin, end);
     
     MarkdownBlock::Stack headerList;
     headerList.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
@@ -75,11 +66,11 @@ MarkdownBlock::Stack snowcrashtest::CanonicalActionFixture()
     
     // inject complete list into final markdown
     markdown.insert(markdown.end(), listBlock.begin(), listBlock.end());
-
+    
     return markdown;
 }
 
-TEST_CASE("mparser/classifier", "Method block classifier")
+TEST_CASE("Method block classifier", "[action][classifier][blocks]")
 {
     MarkdownBlock::Stack markdown = CanonicalActionFixture();
     
@@ -103,7 +94,7 @@ TEST_CASE("mparser/classifier", "Method block classifier")
     REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
     REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSection) == ActionSection);
 
-    std::advance(cur, 1+55); // ListBlockBeginType - "Response"
+    ++cur; // ListBlockBeginType - "Response"
     REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSection) == ResponseSection);
     REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSection) == ResponseSection);
     
@@ -145,7 +136,7 @@ TEST_CASE("mparser/classifier", "Method block classifier")
     REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSection) == UndefinedSection);
 }
 
-TEST_CASE("mparser/classifier-implicit-termination", "Method block classifier implicit termination")
+TEST_CASE("Method block classifier implicit termination", "[action][blocks]")
 {
     MarkdownBlock::Stack markdown;
     markdown.push_back(MarkdownBlock(HeaderBlockType, "PUT", 1, MakeSourceDataBlock(0, 1)));
@@ -159,7 +150,7 @@ TEST_CASE("mparser/classifier-implicit-termination", "Method block classifier im
     REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSection) == UndefinedSection);    
 }
 
-TEST_CASE("mparser/parse", "Parse method")
+TEST_CASE("Parse method", "[action][blocks]")
 {
     MarkdownBlock::Stack markdown = CanonicalActionFixture();   
     Action action;
@@ -173,7 +164,7 @@ TEST_CASE("mparser/parse", "Parse method")
     CHECK(result.first.warnings.empty());
 
     const MarkdownBlock::Stack &blocks = markdown;
-    REQUIRE(std::distance(blocks.begin(), result.second) == 30 + 55);
+    REQUIRE(std::distance(blocks.begin(), result.second) == 30);
     
     REQUIRE(action.name == "My Method");
     REQUIRE(action.method == "GET");
@@ -182,9 +173,6 @@ TEST_CASE("mparser/parse", "Parse method")
     REQUIRE(action.headers.size() == 1);
     REQUIRE(action.headers[0].first == "X-Method-Header");
     REQUIRE(action.headers[0].second == "0xdeadbeef");
-    REQUIRE(action.parameters.size() == 2);
-    REQUIRE(action.parameters[0].name == "id");
-    REQUIRE(action.parameters[1].name == "limit");
     REQUIRE(action.examples.front().requests.size() == 1);
     REQUIRE(action.examples.front().responses.size() == 1);
     
@@ -195,7 +183,7 @@ TEST_CASE("mparser/parse", "Parse method")
     REQUIRE(action.examples.front().responses[0].headers[0].second == "text/plain");
 }
 
-TEST_CASE("mparser/parse-list-description", "Parse description with list")
+TEST_CASE("Parse Action description with list", "[action][blocks]")
 {
     // Blueprint in question:
     //R"(
@@ -232,7 +220,7 @@ TEST_CASE("mparser/parse-list-description", "Parse description with list")
     REQUIRE(action.examples.front().requests.size() == 1);
 }
 
-TEST_CASE("mparser/parse-list-description-request", "Parse description with list followed by a request")
+TEST_CASE("Parse description with list followed by a request", "[action][blocks]")
 {
     // Blueprint in question:
     //R"(
@@ -280,7 +268,7 @@ TEST_CASE("mparser/parse-list-description-request", "Parse description with list
     REQUIRE(action.examples.front().requests.front().body.empty());
 }
 
-TEST_CASE("mparser/response-regex-problem", "Parse method with response not matching regex")
+TEST_CASE("Parse method with response not matching regex", "[action][blocks]")
 {
     // Specific test case aimed at posix regex problem of multiline Response string matching
     // Blueprint in question:
@@ -320,7 +308,7 @@ TEST_CASE("mparser/response-regex-problem", "Parse method with response not matc
     REQUIRE(action.examples.front().responses.front().body == "  B\n");
 }
 
-TEST_CASE("mparser/parse-multi-request-response", "Parse method with multiple requests and responses")
+TEST_CASE("Parse method with multiple requests and responses", "[action][blocks]")
 {
     
     // Blueprint in question:
@@ -457,7 +445,7 @@ TEST_CASE("mparser/parse-multi-request-response", "Parse method with multiple re
 
 }
 
-TEST_CASE("mparser/parse-multi-request-incomplete", "Parse method with multiple incomplete requests")
+TEST_CASE("Parse method with multiple incomplete requests", "[action][blocks]")
 {
     // Blueprint in question:
     //R"(
@@ -516,7 +504,7 @@ TEST_CASE("mparser/parse-multi-request-incomplete", "Parse method with multiple 
     REQUIRE(action.examples.front().requests[1].headers.empty());
 }
 
-TEST_CASE("Parse method with foreign item", "[method][foreign]")
+TEST_CASE("Parse method with foreign item", "[action][foreign][blocks]")
 {
     // Blueprint in question:
     //R"(
@@ -574,7 +562,7 @@ TEST_CASE("Parse method with foreign item", "[method][foreign]")
     REQUIRE(action.examples.front().requests[0].headers.empty());    
 }
 
-TEST_CASE("mparser/parse-inline-method-payload", "Parse method with inline payload")
+TEST_CASE("Parse method with inline payload", "[action][blocks]")
 {
     // Blueprint in question:
     //R"(
@@ -617,7 +605,7 @@ TEST_CASE("mparser/parse-inline-method-payload", "Parse method with inline paylo
     REQUIRE(action.examples.front().requests[0].body.empty());
 }
 
-TEST_CASE("mparser/parse-hr", "Parse method with a HR")
+TEST_CASE("Parse method with a HR", "[action][blocks]")
 {
     
     // Blueprint in question:
@@ -648,7 +636,7 @@ TEST_CASE("mparser/parse-hr", "Parse method with a HR")
     REQUIRE(action.examples.empty());
 }
 
-TEST_CASE("mparser/parse-implicit-termination", "Parse incomplete method followed by another resource")
+TEST_CASE( "Parse incomplete method followed by another resource", "[action][blocks]")
 {
     // Blueprint in question:
     //R"(
@@ -675,7 +663,7 @@ TEST_CASE("mparser/parse-implicit-termination", "Parse incomplete method followe
     REQUIRE(action.description.empty());
 }
 
-TEST_CASE("mparser/header-warnings", "Check warnings on overshadowing a header")
+TEST_CASE("Check warnings on overshadowing a header", "[action][blocks]")
 {
     MarkdownBlock::Stack markdown = CanonicalActionFixture();
     Action action;
@@ -690,10 +678,10 @@ TEST_CASE("mparser/header-warnings", "Check warnings on overshadowing a header")
     REQUIRE(result.first.warnings.size() == 1);
     
     const MarkdownBlock::Stack &blocks = markdown;
-    REQUIRE(std::distance(blocks.begin(), result.second) == 30 + 55);
+    REQUIRE(std::distance(blocks.begin(), result.second) == 30);
 }
 
-TEST_CASE("mparser/parse-nameless-method", "Parse method without name")
+TEST_CASE("Parse method without name", "[action][blocks]")
 {
     // Blueprint in question:
     //R"(
@@ -717,7 +705,7 @@ TEST_CASE("mparser/parse-nameless-method", "Parse method without name")
     REQUIRE(action.description.empty());
 }
 
-TEST_CASE("mparser/not-parse-object", "Make sure method with object payload is not parsed")
+TEST_CASE("Make sure method with object payload is not parsed", "[action][blocks]")
 {
     // Blueprint in question:
     //R"(
@@ -742,7 +730,7 @@ TEST_CASE("mparser/not-parse-object", "Make sure method with object payload is n
     REQUIRE(result.first.error.code != Error::OK);
 }
 
-TEST_CASE("mparser/adjacent-group", "Make sure method followed by a group does not eat the group")
+TEST_CASE("Make sure method followed by a group does not eat the group", "[action][blocks]")
 {
     // Blueprint in question:
     //R"(
@@ -768,3 +756,42 @@ TEST_CASE("mparser/adjacent-group", "Make sure method followed by a group does n
     REQUIRE(action.description.empty());
 
 }
+
+TEST_CASE("Parse action with parameters", "[action][parameters][source]")
+{
+    // Blueprint in question:
+    //R"(
+    //# GET /resrouce/{id}
+    //+ Parameters
+    //    + id (required, number, `42`) ... Resource Id
+    //
+    //+ Response 204
+    //");
+    const std::string blueprintSource = \
+    "# GET /resrouce/{id}\n"\
+    "+ Parameters\n"\
+    "    + id (required, number, `42`) ... Resource Id\n"\
+    "\n"\
+    "+ Response 204\n"\
+    "\n";
+    
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(blueprintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.empty());
+    
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].name == "id");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].description == "Resource Id");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].type == "number");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].defaultValue.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].exampleValue == "42");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].values.empty());
+}
+

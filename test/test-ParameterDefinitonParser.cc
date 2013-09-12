@@ -18,15 +18,11 @@ using namespace snowcrashtest;
 MarkdownBlock::Stack snowcrashtest::CanonicalParameterDefinitionFixture()
 {
     //R"(
-    //+ id
+    //+ id = `1234` (optional, number, `0000`)
     //
     //    Lorem ipsum.
     //
-    //    + Type: number
-    //    + Optional
-    //    + Default: `1234`
-    //    + Example: `0000`
-    //    + Values:
+    //    + Values
     //        + `1234`
     //        + `0000`
     //        + `beef`
@@ -37,23 +33,11 @@ MarkdownBlock::Stack snowcrashtest::CanonicalParameterDefinitionFixture()
     // id BEGIN
     markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
     markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-    markdown.push_back(MarkdownBlock(ParagraphBlockType, "id", 0, MakeSourceDataBlock(1, 1)));
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "id = `1234` (optional, number, `0000`)", 0, MakeSourceDataBlock(1, 1)));
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "Lorem ipsum.", 0, MakeSourceDataBlock(2, 1)));
     
     // traits BEGIN
     markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
-
-    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "Type: number\n", 0, MakeSourceDataBlock(3, 1)));
-    
-    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "Optional\n", 0, MakeSourceDataBlock(4, 1)));
-    
-    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "Default: `1234`\n", 0, MakeSourceDataBlock(5, 1)));
-    
-    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "Example: `0000`\n", 0, MakeSourceDataBlock(6, 1)));
     
     // Values BEGIN
     markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
@@ -70,7 +54,7 @@ MarkdownBlock::Stack snowcrashtest::CanonicalParameterDefinitionFixture()
     
     // Values END
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0,MakeSourceDataBlock(10, 1)));
-    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "Values:\n", 0, MakeSourceDataBlock(11, 1)));
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "Values\n", 0, MakeSourceDataBlock(11, 1)));
     
     // traits END
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0,MakeSourceDataBlock(12, 1)));
@@ -86,7 +70,7 @@ TEST_CASE("Parameter definition block classifier", "[parameter_definition][class
 {
     MarkdownBlock::Stack markdown = CanonicalParameterDefinitionFixture();
     
-    REQUIRE(markdown.size() == 26);
+    REQUIRE(markdown.size() == 18);
     
     BlockIterator cur = markdown.begin();
     
@@ -108,52 +92,7 @@ TEST_CASE("Parameter definition block classifier", "[parameter_definition][class
     
     ++cur; // type trait BEGIN
     REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterDefinitionSection) == ParameterTypeSection);
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterTypeSection) == ParameterTypeSection);
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterRequiredSection) == ParameterTypeSection);
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterOptionalSection) == ParameterTypeSection);
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterDefaultSection) == ParameterTypeSection);
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterExampleSection) == ParameterTypeSection);
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterValuesSection) == ParameterTypeSection);
-    
-    std::advance(cur, 3); // optional trait BEGIN
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterDefinitionSection) == ParameterOptionalSection);
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterOptionalSection) == ParameterOptionalSection);
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterRequiredSection) == ParameterOptionalSection);
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterOptionalSection) == ParameterOptionalSection);
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterDefaultSection) == ParameterOptionalSection);
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterExampleSection) == ParameterOptionalSection);
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterValuesSection) == ParameterOptionalSection);
-    
-    std::advance(cur, 2); // default trait BEGIN
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterDefinitionSection) == ParameterDefaultSection);
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterOptionalSection) == ParameterDefaultSection);
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterRequiredSection) == ParameterDefaultSection);
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterOptionalSection) == ParameterDefaultSection);
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterDefaultSection) == ParameterDefaultSection);
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterExampleSection) == ParameterDefaultSection);
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterValuesSection) == ParameterDefaultSection);
-    
-    std::advance(cur, 2); // example trait BEGIN
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterDefinitionSection) == ParameterExampleSection);
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterOptionalSection) == ParameterExampleSection);
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterRequiredSection) == ParameterExampleSection);
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterOptionalSection) == ParameterExampleSection);
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterDefaultSection) == ParameterExampleSection);
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterExampleSection) == ParameterExampleSection);
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterValuesSection) == ParameterExampleSection);
-    
-    std::advance(cur, 2); // values trait BEGIN
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
     REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterDefinitionSection) == ParameterValuesSection);
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterOptionalSection) == ParameterValuesSection);
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterRequiredSection) == ParameterValuesSection);
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterOptionalSection) == ParameterValuesSection);
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterDefaultSection) == ParameterValuesSection);
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterExampleSection) == ParameterValuesSection);
     REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterValuesSection) == ParameterValuesSection);
 }
 
@@ -168,7 +107,7 @@ TEST_CASE("Parse canonical parameter definition", "[parameter_definition]")
     REQUIRE(result.first.warnings.empty());
     
     const MarkdownBlock::Stack &blocks = markdown;
-    CHECK(std::distance(blocks.begin(), result.second) == 26);
+    CHECK(std::distance(blocks.begin(), result.second) == 18);
         
     REQUIRE(parameter.name == "id");
     REQUIRE(parameter.description == "2");
@@ -205,7 +144,7 @@ TEST_CASE("Parse canonical definition followed by another definition", "[paramet
     REQUIRE(result.first.warnings.empty());
     
     const MarkdownBlock::Stack &blocks = markdown;
-    CHECK(std::distance(blocks.begin(), result.second) == 25);
+    CHECK(std::distance(blocks.begin(), result.second) == 17);
     
     REQUIRE(parameter.name == "id");
     REQUIRE(parameter.description == "2");
@@ -231,7 +170,7 @@ TEST_CASE("Parse canonical definition followed by ilegal one", "[parameter_defin
     REQUIRE(result.first.warnings.empty());
     
     const MarkdownBlock::Stack &blocks = markdown;
-    CHECK(std::distance(blocks.begin(), result.second) == 25);
+    CHECK(std::distance(blocks.begin(), result.second) == 17);
     
     REQUIRE(parameter.name == "id");
     REQUIRE(parameter.description == "2");
@@ -241,24 +180,18 @@ TEST_CASE("Parse ilegal parameter trait at the begining", "[parameter_definition
 {
     // Blueprint in question:
     //R"(
-    //# GET /1/{4}
+    //# /1/{4}
     //+ Parameters
     //    + 4
-    //        + ilegal
+    //       + ilegal
     //
-    //+ Response 200
-    //
-    //        Ok.
     //");
     const std::string blueprintSource = \
-    "# GET /1/{4}\n"\
+    "# /1/{4}\n"\
     "+ Parameters\n"\
     "    + 4\n"\
     "        + ilegal\n"\
-    "\n"\
-    "+ Response 200\n"\
-    "\n"\
-    "        Ok.\n";
+    "\n";
     
     Parser parser;
     Result result;
@@ -270,269 +203,31 @@ TEST_CASE("Parse ilegal parameter trait at the begining", "[parameter_definition
     
     REQUIRE(blueprint.resourceGroups.size() == 1);
     REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
-}
-
-TEST_CASE("Warn when re-setting the use attribute", "[parameter_definition]")
-{
-    // Blueprint in question:
-    //R"(
-    //# GET /1/{id}
-    //+ Parameters
-    //    + id
-    //        + optional
-    //        + required
-    //
-    //+ Response 204
-    //");
-    const std::string blueprintSource = \
-    "# GET /1/{id}\n"\
-    "+ Parameters\n"\
-    "    + id\n"\
-    "        + optional\n"\
-    "        + required\n"\
-    "\n"\
-    "+ Response 204\n\n";
-    
-    Parser parser;
-    Result result;
-    Blueprint blueprint;
-    parser.parse(blueprintSource, 0, result, blueprint);
-    REQUIRE(result.error.code == Error::OK);
-    REQUIRE(result.warnings.size() == 1);
-    REQUIRE(result.warnings[0].code == RedefinitionWarning);
-    
-    REQUIRE(blueprint.resourceGroups.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].name == "id");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].use == RequiredParameterUse);
-}
-
-TEST_CASE("Warn about superfluous content in the use attribute", "[parameter_definition]")
-{
-    // Blueprint in question:
-    //R"(
-    //# GET /1/{id}
-    //+ Parameters
-    //    + id
-    //        + optional
-    //          extra-1
-    //
-    //+ Response 204
-    //");
-    const std::string blueprintSource = \
-    "# GET /1/{id}\n"\
-    "+ Parameters\n"\
-    "    + id\n"\
-    "        + optional\n"\
-    "          extra-1\n"\
-    "\n"\
-    "+ Response 204\n\n";
-    
-    Parser parser;
-    Result result;
-    Blueprint blueprint;
-    parser.parse(blueprintSource, 0, result, blueprint);
-    REQUIRE(result.error.code == Error::OK);
-    REQUIRE(result.warnings.size() == 1);
-    REQUIRE(result.warnings[0].code == IgnoringWarning);
-    
-    REQUIRE(blueprint.resourceGroups.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].name == "id");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].use == OptionalParameterUse);
-}
-
-TEST_CASE("Warn about superfluous blocks in the use attribute", "[parameter_definition]")
-{
-    // Blueprint in question:
-    //R"(
-    //# GET /1/{id}
-    //+ Parameters
-    //    + id
-    //        + optional
-    //        
-    //          extra-1
-    //
-    //+ Response 204
-    //");
-    const std::string blueprintSource = \
-    "# GET /1/{id}\n"\
-    "+ Parameters\n"\
-    "    + id\n"\
-    "        + optional\n"\
-    "        \n"\
-    "          extra-1\n"\
-    "\n"\
-    "+ Response 204\n\n";
-    
-    Parser parser;
-    Result result;
-    Blueprint blueprint;
-    parser.parse(blueprintSource, 0, result, blueprint);
-    REQUIRE(result.error.code == Error::OK);
-    REQUIRE(result.warnings.size() == 1);
-    REQUIRE(result.warnings[0].code == IgnoringWarning);
-    
-    REQUIRE(blueprint.resourceGroups.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].name == "id");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].use == OptionalParameterUse);
-}
-
-TEST_CASE("Warn when re-setting a key-value attribute", "[parameter_definition]")
-{
-    // Blueprint in question:
-    //R"(
-    //# GET /1/{id}
-    //+ Parameters
-    //    + id
-    //        + Example: `42`
-    //        + Example: `43`
-    //
-    //+ Response 204
-    //");
-    const std::string blueprintSource = \
-    "# GET /1/{id}\n"\
-    "+ Parameters\n"\
-    "    + id\n"\
-    "        + Example: `42`\n"\
-    "        + Example: `43`\n"\
-    "\n"\
-    "+ Response 204\n\n";
-    
-    Parser parser;
-    Result result;
-    Blueprint blueprint;
-    parser.parse(blueprintSource, 0, result, blueprint);
-    REQUIRE(result.error.code == Error::OK);
-    REQUIRE(result.warnings.size() == 1);
-    REQUIRE(result.warnings[0].code == RedefinitionWarning);
-    
-    REQUIRE(blueprint.resourceGroups.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].name == "id");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].exampleValue == "43");
-}
-
-TEST_CASE("Warn superfluous content in a key-value attribute", "[parameter_definition]")
-{
-    // Blueprint in question:
-    //R"(
-    //# GET /1/{id}
-    //+ Parameters
-    //    + id
-    //        + Example: `42`
-    //          extra-1
-    //
-    //+ Response 204
-    //");
-    const std::string blueprintSource = \
-    "# GET /1/{id}\n"\
-    "+ Parameters\n"\
-    "    + id\n"\
-    "        + Example: `42`\n"\
-    "          extra-1\n"\
-    "\n"\
-    "+ Response 204\n\n";
-    
-    Parser parser;
-    Result result;
-    Blueprint blueprint;
-    parser.parse(blueprintSource, 0, result, blueprint);
-    REQUIRE(result.error.code == Error::OK);
-    REQUIRE(result.warnings.size() == 1);
-    REQUIRE(result.warnings[0].code == IgnoringWarning);
-    
-    REQUIRE(blueprint.resourceGroups.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].name == "id");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].exampleValue == "42");
-}
-
-TEST_CASE("Warn about superfluous blocks in a key-value attribute", "[parameter_definition]")
-{
-    // Blueprint in question:
-    //R"(
-    //# GET /1/{id}
-    //+ Parameters
-    //    + id
-    //        + Example: `42`
-    //
-    //          extra-1
-    //
-    //+ Response 204
-    //");
-    const std::string blueprintSource = \
-    "# GET /1/{id}\n"\
-    "+ Parameters\n"\
-    "    + id\n"\
-    "        + Example: `42`\n"\
-    "        \n"\
-    "          extra-1\n"\
-    "\n"\
-    "+ Response 204\n\n";
-    
-    Parser parser;
-    Result result;
-    Blueprint blueprint;
-    parser.parse(blueprintSource, 0, result, blueprint);
-    REQUIRE(result.error.code == Error::OK);
-    REQUIRE(result.warnings.size() == 1);
-    REQUIRE(result.warnings[0].code == IgnoringWarning);
-    
-    REQUIRE(blueprint.resourceGroups.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].name == "id");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].exampleValue == "42");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].description.empty());
 }
 
 TEST_CASE("Warn superfluous content in values attribute", "[parameter_definition]")
 {
     // Blueprint in question:
     //R"(
-    //# GET /1
+    //# /1
     //+ Parameters
     //    + id
-    //        + Values:
+    //        + Values
     //         xx
     //
     //            + `Hello`
-    //
-    //+ Response 204
     //");
     const std::string blueprintSource = \
-    "# GET /1/{id}\n"\
+    "# /1/{id}\n"\
     "+ Parameters\n"\
     "    + id\n"\
-    "        + Values:\n"\
-    "         extra-1\n"\
+    "        + Values\n"\
+    "          extra-1\n"\
     "\n"\
     "            + `Hello`\n"\
-    "\n"\
-    "+ Response 204\n\n";
+    "\n";
     
     Parser parser;
     Result result;
@@ -544,39 +239,35 @@ TEST_CASE("Warn superfluous content in values attribute", "[parameter_definition
     
     REQUIRE(blueprint.resourceGroups.size() == 1);
     REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].name == "id");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].values.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].values[0] == "Hello");
-    
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].description.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].name == "id");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].values.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].values[0] == "Hello");
 }
 
 TEST_CASE("Warn about illegal entities in values attribute", "[parameter_definition]")
 {
     // Blueprint in question:
     //R"(
-    //# GET /1/{id}
+    //# /1/{id}
     //+ Parameters
     //    + id
-    //        + Values:
+    //        + Values
     //            + `Hello`
     //            + ilegal
     //            + `Ahoy`
-    //
-    //+ Response 204
     //");
     const std::string blueprintSource = \
-    "# GET /1/{id}\n"\
+    "# /1/{id}\n"\
     "+ Parameters\n"\
     "    + id\n"\
-    "        + Values:\n"\
+    "        + Values\n"\
     "            + `Hello`\n"\
     "            + ilegal\n"\
     "            + `Ahoy`\n"\
-    "\n"\
-    "+ Response 204\n\n";
+    "\n";
     
     Parser parser;
     Result result;
@@ -588,39 +279,36 @@ TEST_CASE("Warn about illegal entities in values attribute", "[parameter_definit
     
     REQUIRE(blueprint.resourceGroups.size() == 1);
     REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].name == "id");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].values.size() == 2);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].values[0] == "Hello");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].values[1] == "Ahoy");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].description.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].name == "id");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].values.size() == 2);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].values[0] == "Hello");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].values[1] == "Ahoy");
 }
 
 TEST_CASE("Warn when re-setting the values attribute", "[parameter_definition]")
 {
     // Blueprint in question:
     //R"(
-    //# GET /1/{id}
+    //# /1/{id}
     //+ Parameters
     //    + id
-    //        + Values:
+    //        + Values
     //            + `Ahoy`
-    //        + Values:
+    //        + Values
     //            + `Hello`
-    //
-    //+ Response 204
     //");
     const std::string blueprintSource = \
-    "# GET /1/{id}\n"\
+    "# /1/{id}\n"\
     "+ Parameters\n"\
     "    + id\n"\
-    "        + Values:\n"\
+    "        + Values\n"\
     "            + `Ahoy`\n"\
-    "        + Values:\n"\
+    "        + Values\n"\
     "            + `Hello`\n"\
-    "\n"\
-    "+ Response 204\n\n";
+    "\n";
     
     Parser parser;
     Result result;
@@ -632,32 +320,30 @@ TEST_CASE("Warn when re-setting the values attribute", "[parameter_definition]")
     
     REQUIRE(blueprint.resourceGroups.size() == 1);
     REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].name == "id");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].values.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].values[0] == "Hello");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].description.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].name == "id");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].values.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].values[0] == "Hello");
 }
 
 TEST_CASE("Warn when there are no values in the values attribute", "[parameter_definition]")
 {
     // Blueprint in question:
     //R"(
-    //# GET /1/{id}
+    //# /1/{id}
     //+ Parameters
     //    + id
-    //        + Values:
+    //        + Values
     //
-    //+ Response 204
     //");
     const std::string blueprintSource = \
-    "# GET /1/{id}\n"\
+    "# /1/{id}\n"\
     "+ Parameters\n"\
     "    + id\n"\
-    "        + Values:\n"\
-    "\n"\
-    "+ Response 204\n\n";
+    "        + Values\n"\
+    "\n";
     
     Parser parser;
     Result result;
@@ -669,33 +355,26 @@ TEST_CASE("Warn when there are no values in the values attribute", "[parameter_d
     
     REQUIRE(blueprint.resourceGroups.size() == 1);
     REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].name == "id");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].values.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].description.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].name == "id");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].values.empty());
 }
 
-TEST_CASE("Parse full abbreviated syntax", "[parameter_definition][now]")
+TEST_CASE("Parse full abbreviated syntax", "[parameter_definition]")
 {
     // Blueprint in question:
     //R"(
     //# /machine{?limit}
-    //## GET 
-    //
     //+ Parameters
     //    + limit = `20` (optional, number, `42`) ... This is a limit
-    //
-    //+ Response 204
     //");
     const std::string blueprintSource = \
     "# /machine{?limit}\n"\
-    "## GET\n"\
-    "\n"\
     "+ Parameters\n"\
     "    + limit = `20` (optional, number, `42`) ... This is a limit\n"\
-    "\n"\
-    "+ Response 204\n\n";
+    "\n";
     
     Parser parser;
     Result result;
@@ -706,15 +385,46 @@ TEST_CASE("Parse full abbreviated syntax", "[parameter_definition][now]")
     
     REQUIRE(blueprint.resourceGroups.size() == 1);
     REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].name == "limit");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].description == "This is a limit" );
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].defaultValue == "20");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].exampleValue == "42");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].type == "number");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].use == OptionalParameterUse);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].values.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].description.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].name == "limit");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].description == "This is a limit" );
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].defaultValue == "20");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].exampleValue == "42");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].type == "number");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].use == OptionalParameterUse);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].values.empty());
 }
 
+TEST_CASE("Warn about required vs default clash", "[parameter_definition]")
+{
+    // Blueprint in question:
+    //R"(
+    //# /1/{id}
+    //+ Parameters
+    //   + id = `42` (required)
+    //");
+    const std::string blueprintSource = \
+    "# /1/{id}\n"\
+    "+ Parameters\n"\
+    "    + id = `42` (required)\n"\
+    "\n";
+    
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(blueprintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.size() == 1);
+    REQUIRE(result.warnings[0].code == LogicalErrorWarning);
+    
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].description.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].name == "id");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].use == RequiredParameterUse);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].defaultValue == "42");
+}

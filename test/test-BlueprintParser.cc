@@ -73,7 +73,7 @@ TEST_CASE("bpparser/init", "Blueprint parser construction")
     REQUIRE_NOTHROW(::delete parser);
 }
 
-TEST_CASE("bpparser/parse", "Parse canonical blueprint")
+TEST_CASE("Parse canonical blueprint", "[blueprint]")
 {
     MarkdownBlock::Stack markdown = CanonicalBlueprintFixture();
     
@@ -85,7 +85,7 @@ TEST_CASE("bpparser/parse", "Parse canonical blueprint")
     CHECK(result.first.warnings.empty());
     
     const MarkdownBlock::Stack &blocks = markdown;
-    REQUIRE(std::distance(blocks.begin(), result.second) == 50 + 2*55);
+    REQUIRE(std::distance(blocks.begin(), result.second) == 50 + 39);
 
     REQUIRE(blueprint.metadata.size() == 1);
     REQUIRE(blueprint.metadata[0].first == "meta");

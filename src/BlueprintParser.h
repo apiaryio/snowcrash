@@ -17,7 +17,7 @@
 #include "ResourceParser.h"
 #include "ResourceGroupParser.h"
 
-static const std::string ExpectedAPINameMessage = "expected API name, e.g. `# <API Name>`";
+static const std::string ExpectedAPINameMessage = "expected API name, e.g. '# <API Name>'";
 
 namespace snowcrash {
     

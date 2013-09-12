@@ -21,8 +21,7 @@
 static const std::string ParametersRegex("^[ \\t]*[Pp]arameters?[ \\t]*$");
 
 /** Expected parameters content */
-static const std::string ExpectedParametersContent = "'parameters' only followed by a nested list of parameters, "\
-                                                     "one parameter per list item";
+static const std::string ExpectedParametersContent = "a nested list of parameters, one parameter per list item";
 
 /** No parameters specified message */
 static const std::string NoParametersMessage = "no parameters specified, expected a nested list of parameters, one parameter per list item";
@@ -123,7 +122,7 @@ namespace snowcrash {
                     break;
                     
                 case ForeignSection:
-                    result = HandleForeignSection(cur, bounds, "'<parameter identifier>'");
+                    result = HandleForeignSection(cur, bounds, ExpectedParameterDefinition);
                     break;
                     
                 case UndefinedSection:
@@ -162,7 +161,7 @@ namespace snowcrash {
                 return result;
             }
             
-            // Description
+            // Unexpected description
             if (sectionCur->type == QuoteBlockBeginType) {
                 sectionCur = SkipToSectionEnd(sectionCur, bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
             }
@@ -176,6 +175,7 @@ namespace snowcrash {
             // WARN: on ignoring additional content
             std::stringstream ss;
             ss << "ignoring additional content in the 'parameters' definition, expected " << ExpectedParametersContent;
+            
             result.first.warnings.push_back(Warning(ss.str(),
                                                     IgnoringWarning,
                                                     sectionCur->sourceMap));
@@ -195,20 +195,7 @@ namespace snowcrash {
             ParseSectionResult result = ParameterDefinitionParser::Parse(cur, bounds.second, parser, parameter);
             if (result.first.error.code != Error::OK)
                 return result;
-            
-            // Check possible required vs default clash
-            if (parameter.use == RequiredParameterUse &&
-                !parameter.defaultValue.empty()) {
-                
-                // WARN: Required vs default clash
-                BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
-                std::stringstream ss;
-                ss << "specifying parameter '" << parameter.name << "' as required supersedes its default value";
-                result.first.warnings.push_back(Warning(ss.str(),
-                                                        LogicalErrorWarning,
-                                                        nameBlock->sourceMap));
-            }
-            
+
             // Check duplicates
             if (!parameters.empty()) {
                 ParameterCollection::iterator duplicate = FindParameter(parameters, parameter);
