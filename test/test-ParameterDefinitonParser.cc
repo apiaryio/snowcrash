@@ -66,7 +66,7 @@ MarkdownBlock::Stack snowcrashtest::CanonicalParameterDefinitionFixture()
     return markdown;
 }
 
-TEST_CASE("Parameter definition block classifier", "[parameter_definition][classifier]")
+TEST_CASE("Parameter definition block classifier", "[parameter_definition][classifier][block]")
 {
     MarkdownBlock::Stack markdown = CanonicalParameterDefinitionFixture();
     
@@ -96,7 +96,7 @@ TEST_CASE("Parameter definition block classifier", "[parameter_definition][class
     REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterValuesSection) == ParameterValuesSection);
 }
 
-TEST_CASE("Parse canonical parameter definition", "[parameter_definition]")
+TEST_CASE("Parse canonical parameter definition", "[parameter_definition][block]")
 {
     MarkdownBlock::Stack markdown = CanonicalParameterDefinitionFixture();
     Parameter parameter;
@@ -121,7 +121,7 @@ TEST_CASE("Parse canonical parameter definition", "[parameter_definition]")
     REQUIRE(parameter.values[2] == "beef");
 }
 
-TEST_CASE("Parse canonical definition followed by another definition", "[parameter_definition]")
+TEST_CASE("Parse canonical definition followed by another definition", "[parameter_definition][block]")
 {
     MarkdownBlock::Stack markdown = CanonicalParameterDefinitionFixture();
     
@@ -150,7 +150,7 @@ TEST_CASE("Parse canonical definition followed by another definition", "[paramet
     REQUIRE(parameter.description == "2");
 }
 
-TEST_CASE("Parse canonical definition followed by ilegal one", "[parameter_definition]")
+TEST_CASE("Parse canonical definition followed by ilegal one", "[parameter_definition][block]")
 {
     MarkdownBlock::Stack markdown = CanonicalParameterDefinitionFixture();
     
@@ -176,7 +176,7 @@ TEST_CASE("Parse canonical definition followed by ilegal one", "[parameter_defin
     REQUIRE(parameter.description == "2");
 }
 
-TEST_CASE("Parse ilegal parameter trait at the begining", "[parameter_definition]")
+TEST_CASE("Parse ilegal parameter trait at the begining", "[parameter_definition][source]")
 {
     // Blueprint in question:
     //R"(
@@ -207,7 +207,7 @@ TEST_CASE("Parse ilegal parameter trait at the begining", "[parameter_definition
     REQUIRE(blueprint.resourceGroups[0].resources[0].description.empty());
 }
 
-TEST_CASE("Warn superfluous content in values attribute", "[parameter_definition]")
+TEST_CASE("Warn superfluous content in values attribute", "[parameter_definition][source]")
 {
     // Blueprint in question:
     //R"(
@@ -247,7 +247,7 @@ TEST_CASE("Warn superfluous content in values attribute", "[parameter_definition
     REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].values[0] == "Hello");
 }
 
-TEST_CASE("Warn about illegal entities in values attribute", "[parameter_definition]")
+TEST_CASE("Warn about illegal entities in values attribute", "[parameter_definition][source]")
 {
     // Blueprint in question:
     //R"(
@@ -288,7 +288,7 @@ TEST_CASE("Warn about illegal entities in values attribute", "[parameter_definit
     REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].values[1] == "Ahoy");
 }
 
-TEST_CASE("Warn when re-setting the values attribute", "[parameter_definition]")
+TEST_CASE("Warn when re-setting the values attribute", "[parameter_definition][source]")
 {
     // Blueprint in question:
     //R"(
@@ -328,7 +328,7 @@ TEST_CASE("Warn when re-setting the values attribute", "[parameter_definition]")
     REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].values[0] == "Hello");
 }
 
-TEST_CASE("Warn when there are no values in the values attribute", "[parameter_definition]")
+TEST_CASE("Warn when there are no values in the values attribute", "[parameter_definition][source]")
 {
     // Blueprint in question:
     //R"(
@@ -362,7 +362,7 @@ TEST_CASE("Warn when there are no values in the values attribute", "[parameter_d
     REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].values.empty());
 }
 
-TEST_CASE("Parse full abbreviated syntax", "[parameter_definition]")
+TEST_CASE("Parse full abbreviated syntax", "[parameter_definition][source]")
 {
     // Blueprint in question:
     //R"(
@@ -397,7 +397,43 @@ TEST_CASE("Parse full abbreviated syntax", "[parameter_definition]")
     REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].values.empty());
 }
 
-TEST_CASE("Warn about required vs default clash", "[parameter_definition]")
+TEST_CASE("Warn on error in  abbreviated syntax attribute bracket", "[parameter_definition][source][now]")
+{
+    // Blueprint in question:
+    //R"(
+    //# /machine{?limit}
+    //+ Parameters
+    //    + limit (string1, string2, string3) ... This is a limit
+    //");
+    const std::string blueprintSource = \
+    "# /machine{?limit}\n"\
+    "+ Parameters\n"\
+    "    + limit (string1, string2, string3) ... This is a limit\n"\
+    "\n";
+    
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(blueprintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.size() == 1);
+    REQUIRE(result.warnings[0].code == FormattingWarning);
+    
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].description.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].name == "limit");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].description == "This is a limit" );
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].defaultValue.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].exampleValue.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].type.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].use == UndefinedParameterUse);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].values.empty());
+}
+
+TEST_CASE("Warn about required vs default clash", "[parameter_definition][source]")
 {
     // Blueprint in question:
     //R"(
@@ -426,5 +462,37 @@ TEST_CASE("Warn about required vs default clash", "[parameter_definition]")
     REQUIRE(blueprint.resourceGroups[0].resources[0].parameters.size() == 1);
     REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].name == "id");
     REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].use == RequiredParameterUse);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].defaultValue == "42");
+}
+
+TEST_CASE("Warn about implicit required vs default clash", "[parameter_definition][source]")
+{
+    // Blueprint in question:
+    //R"(
+    //# /1/{id}
+    //+ Parameters
+    //   + id = `42`
+    //");
+    const std::string blueprintSource = \
+    "# /1/{id}\n"\
+    "+ Parameters\n"\
+    "    + id = `42`\n"\
+    "\n";
+    
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(blueprintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.size() == 1);
+    REQUIRE(result.warnings[0].code == LogicalErrorWarning);
+    
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].description.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].name == "id");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].use == UndefinedParameterUse);
     REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].defaultValue == "42");
 }

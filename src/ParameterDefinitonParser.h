@@ -32,11 +32,17 @@ static const std::string ParameterRequiredRegex("^[ \\t]*[Rr]equired[ \\t]*$");
 /** Parameter Optional matching regex */
 static const std::string ParameterOptionalRegex("^[ \\t]*[Oo]ptional[ \\t]*$");
 
-/** Abbreviated Additonal Parameters Use matching regex */
-static const std::string ParameterAbbrevDefinitionUseRegex("([Oo]ptional|[Rr]equired)");
+/** Lead in and out for comma separated values regex */
+# define CSV_LEADINOUT "[[:blank:]]*,?[[:blank:]]*"
 
-/** Abbreviated Additonal Parameters Type matching regex */
-static const std::string ParameterAbbrevDefinitionTypeRegex("[[:blank:],]*([^,]*)");
+/** Additonal Parameter Traits Example matching regex */
+static const std::string AdditionalTraitsExampleRegex(CSV_LEADINOUT "`([^`]*)`" CSV_LEADINOUT);
+
+/** Additonal Parameter Traits Use matching regex */
+static const std::string AdditionalTraitsUseRegex(CSV_LEADINOUT "([Oo]ptional|[Rr]equired)" CSV_LEADINOUT);
+
+/** Additonal Parameter Traits Type matching regex */
+static const std::string AdditionalTraitsTypeRegex(CSV_LEADINOUT "([^,]*)" CSV_LEADINOUT);
 
 /** Parameter Values matching regex */
 static const std::string ParameterValuesRegex("^[ \\t]*[Vv]alues[ \\t]*$");
@@ -263,7 +269,7 @@ namespace snowcrash {
                 
                 // Additional Attributes
                 if (!captureGroups[5].empty())
-                    ProcessSignatureAdditionalParameters(captureGroups[5], result, parameter);
+                    ProcessSignatureAdditionalTraits(begin, end, captureGroups[5], result, parameter);
                 
                 // Description
                 if (!captureGroups[7].empty())
@@ -277,14 +283,14 @@ namespace snowcrash {
                 
                 
                 // Check possible required vs default clash
-                if (parameter.use == RequiredParameterUse &&
+                if (parameter.use != OptionalParameterUse &&
                     !parameter.defaultValue.empty()) {
                     
                     // WARN: Required vs default clash
                     BlockIterator nameBlock = ListItemNameBlock(begin, end);
                     std::stringstream ss;
                     ss << "specifying parameter '" << parameter.name << "' as required supersedes its default value"\
-                          ", only an optional parmater can have an associated default value";
+                          ", declare the parameter as 'optional' to specify its default value";
                     result.warnings.push_back(Warning(ss.str(),
                                                       LogicalErrorWarning,
                                                       nameBlock->sourceMap));
@@ -302,16 +308,18 @@ namespace snowcrash {
         }
         
         /** Parse additional parameter attributes from abbrev definition bracket */
-        static void ProcessSignatureAdditionalParameters(const std::string& additionalParameters,
-                                                         Result& result,
-                                                         Parameter& parameter)
+        static void ProcessSignatureAdditionalTraits(const BlockIterator& begin,
+                                                     const BlockIterator& end,
+                                                     const SourceData& additionalTraits,
+                                                     Result& result,
+                                                     Parameter& parameter)
         {
             
             // Cherry pick example value, if any
-            std::string source = additionalParameters;
+            std::string source = additionalTraits;
             TrimString(source);
             CaptureGroups captureGroups;
-            if (RegexCapture(source, PARAMETER_VALUE, captureGroups) &&
+            if (RegexCapture(source, AdditionalTraitsExampleRegex, captureGroups) &&
                 captureGroups.size() > 1) {
                 
                 parameter.exampleValue = captureGroups[1];
@@ -322,7 +330,7 @@ namespace snowcrash {
             
             // Cherry pick use attribute, if any
             captureGroups.clear();
-            if (RegexCapture(source, ParameterAbbrevDefinitionUseRegex, captureGroups) &&
+            if (RegexCapture(source, AdditionalTraitsUseRegex, captureGroups) &&
                 captureGroups.size() > 1) {
                 
                 parameter.use = (RegexMatch(captureGroups[1], ParameterOptionalRegex)) ? OptionalParameterUse : RequiredParameterUse;
@@ -334,12 +342,34 @@ namespace snowcrash {
             
             // Finish with type
             captureGroups.clear();
-            if (RegexCapture(source, ParameterAbbrevDefinitionTypeRegex, captureGroups) &&
+            if (RegexCapture(source, AdditionalTraitsTypeRegex, captureGroups) &&
                 captureGroups.size() > 1) {
                 
                 parameter.type = captureGroups[1];
+                
+                std::string::size_type pos = source.find(captureGroups[0]);
+                if (pos != std::string::npos)
+                    source.replace(pos, captureGroups[0].length(), std::string());
             }
             
+            // Check whats left
+            TrimString(source);
+            if (!source.empty()) {
+                // WARN: Additional parameters traits warning
+                BlockIterator nameBlock = ListItemNameBlock(begin, end);
+                std::stringstream ss;
+                ss << "unable to parse additional parameter traits";
+                ss << ", expected '([required | optional], [<type>], [`<example value>`])'";
+                ss << ", e.g. '(optional, string, `Hello World`)'";
+
+                result.warnings.push_back(Warning(ss.str(),
+                                                  FormattingWarning,
+                                                  nameBlock->sourceMap));
+                
+                parameter.type.clear();
+                parameter.exampleValue.clear();
+                parameter.use = UndefinedParameterUse;
+            }
         }
         
         /** Parse possible values enumeration section blocks. */
