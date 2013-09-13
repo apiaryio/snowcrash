@@ -318,7 +318,23 @@ namespace snowcrash {
             
             bool warnEmptyBody = false;
             if (section == RequestSection) {
-                warnEmptyBody = payload.body.empty();
+                
+                if (payload.body.empty()) {
+                    
+                    // Warn when content type is specified or both headers and body are empty
+                    if (payload.headers.empty()) {
+                        warnEmptyBody = true;
+                    }
+                    else {
+                        for (Collection<Header>::const_iterator it = payload.headers.begin();
+                             it != payload.headers.end();
+                             ++it) {
+
+                            if (it->first == HTTPHeaderName::ContentType)
+                                warnEmptyBody = true;
+                        }
+                    }
+                }
             }
             else if (section == ResponseSection) {
                 // Check status code

@@ -795,3 +795,43 @@ TEST_CASE("Parse action with parameters", "[action][parameters][source]")
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].values.empty());
 }
 
+TEST_CASE("Do not report empty message body for requests", "[action][#20][source][now]")
+{
+    // Blueprint in question:
+    //R"(
+    //# GET /1
+    //+ Request
+    //    + Headers 
+    //
+    //            Accept: application/json, application/javascript
+    //
+    //+ Response 204
+    //");
+    const std::string blueprintSource = \
+    "# GET /1\n"\
+    "+ Request\n"\
+    "    + Headers \n"\
+    "\n"\
+    "            Accept: application/json, application/javascript\n\n"\
+    "+ Response 204\n\n";
+    
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(blueprintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.empty());
+    
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].requests.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].requests[0].headers.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].requests[0].headers[0].first == "Accept");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].requests[0].headers[0].second == "application/json, application/javascript");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].requests[0].body.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
+}
+
