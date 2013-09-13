@@ -19,17 +19,20 @@
 #include "AssetParser.h"
 #include "HeaderParser.h"
 
+/** Media type in brackets regex */
+#define MEDIA_TYPE "([[:blank:]]*\\(([^\\)]*)\\))"
+
 /** Request matching regex */
-static const std::string RequestRegex("^[ \\t]*[Rr]equest([ \\t]+" SYMBOL_IDENTIFIER ")?([ \\t]\\(([^\\)]*)\\))?[ \\t]*$");
+static const std::string RequestRegex("^[[:blank:]]*[Rr]equest" SYMBOL_IDENTIFIER "?" MEDIA_TYPE "?[[:blank:]]*");
 
 /** Response matching regex */
-static const std::string ResponseRegex("^[ \\t]*[Rr]esponse([ \\t]+([0-9_])*)?([ \\t]\\(([^\\)]*)\\))?[ \\t]*$");
+static const std::string ResponseRegex("^[[:blank:]]*[Rr]esponse([[:blank:][:digit:]]+)?" MEDIA_TYPE "?[[:blank:]]*");
 
 /** Object matching regex */
 static const std::string ObjectRegex("^[ \\t]*(" SYMBOL_IDENTIFIER ")[ \\t][Oo]bject([ \\t]\\(([^\\)]*)\\))?[ \\t]*$");
 
 /** Model matching regex */
-static const std::string ModelRegex("^[[:blank:]]*" SYMBOL_IDENTIFIER "?[Mm]odel([[:blank:]]*\\(([^\\)]*)\\))?[[:blank:]]*");
+static const std::string ModelRegex("^[[:blank:]]*" SYMBOL_IDENTIFIER "?[Mm]odel" MEDIA_TYPE "?[[:blank:]]*");
 
 namespace snowcrash {
     
@@ -74,13 +77,13 @@ namespace snowcrash {
             if (RegexCapture(content, RequestRegex, captureGroups, 5)) {
                 name = captureGroups[1];
                 TrimString(name);
-                mediaType = captureGroups[4];
+                mediaType = captureGroups[3];
                 return RequestPayloadSignature;
             }
             else if (RegexCapture(content, ResponseRegex, captureGroups, 5)) {
                 name = captureGroups[1];
                 TrimString(name);
-                mediaType = captureGroups[4];
+                mediaType = captureGroups[3];
                 return ResponsePayloadSignature;
             }
             else if (RegexCapture(content, ObjectRegex, captureGroups, 5)) {
@@ -498,6 +501,14 @@ namespace snowcrash {
             SourceData mediaType;
             GetPayloadSignature(begin, end, payload.name, mediaType);
             
+            // Check signature
+            if (!CheckSignature(section, begin, end, signature, result)) {
+                // Clear and readouts
+                payload.name.clear();
+                mediaType.clear();
+                remainingContent.clear();
+            }
+            
             // Add any extra lines to description unless abbreviated body
             if (!remainingContent.empty() &&
                 section != RequestBodySection &&
@@ -531,6 +542,85 @@ namespace snowcrash {
                 TrimString(header.second);
                 payload.headers.push_back(header);
             }
+        }
+        
+        /** 
+         *  \brief Checks and report invalid signature 
+         *  \return True if signature is correct, false otherwise.
+         */
+        static bool CheckSignature(const Section& section,
+                                   const BlockIterator& begin,
+                                   const BlockIterator& end,
+                                   const SourceData& signature,
+                                   Result& result) {
+            
+            std::string regex;
+            switch (section) {
+                    
+                case RequestSection:
+                case RequestBodySection:
+                    regex = RequestRegex;
+                    break;
+                    
+                case ResponseBodySection:
+                case ResponseSection:
+                    regex = ResponseRegex;
+                    break;
+                    
+                case ModelSection:
+                case ModelBodySection:
+                    regex = ModelRegex;
+                    break;
+                    
+                default:
+                    return true;
+            }
+            
+            CaptureGroups captureGroups;
+            if (RegexCapture(signature, regex, captureGroups) &&
+                !captureGroups.empty()) {
+
+                std::string target = signature;
+                std::string::size_type pos = target.find(captureGroups[0]);
+                if (pos != std::string::npos)
+                    target.replace(pos, captureGroups[0].length(), std::string());
+
+                TrimString(target);
+                if (!target.empty()) {
+                    // WARN: unable to parse payload signature
+                    BlockIterator nameBlock = ListItemNameBlock(begin, end);
+                    std::stringstream ss;
+                    ss << "unable to parse " << SectionName(section) << " signature, expected ";
+        
+                    switch (section) {
+                            
+                        case RequestSection:
+                        case RequestBodySection:
+                            ss << "'request [<identifier>] [(<media type>)]'";
+                            break;
+                            
+                        case ResponseBodySection:
+                        case ResponseSection:
+                            ss << "'response [<HTTP status code>] [(<media type>)]'";
+                            break;
+                            
+                        case ModelSection:
+                        case ModelBodySection:
+                            ss << "'model [(<media type>)]'";
+                            break;
+                            
+                        default:
+                            return false;
+                    }
+                    result.warnings.push_back(Warning(ss.str(),
+                                                      FormattingWarning,
+                                                      nameBlock->sourceMap));
+                    
+                    return false;
+                }
+            }
+            
+            return true;
         }
         
         /**

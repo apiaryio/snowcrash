@@ -795,7 +795,7 @@ TEST_CASE("Parse action with parameters", "[action][parameters][source]")
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].values.empty());
 }
 
-TEST_CASE("Do not report empty message body for requests", "[action][#20][source][now]")
+TEST_CASE("Do not report empty message body for requests", "[action][#20][source]")
 {
     // Blueprint in question:
     //R"(

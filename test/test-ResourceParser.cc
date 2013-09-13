@@ -642,7 +642,7 @@ TEST_CASE("Parse nameless resource with nameless model", "[resource][model][sour
     REQUIRE(blueprint.resourceGroups.empty());
 }
 
-TEST_CASE("Parse named resource with nameless model", "[resource][model][source][now]")
+TEST_CASE("Parse named resource with nameless model", "[resource][model][source]")
 {
     // Blueprint in question:
     //R"(

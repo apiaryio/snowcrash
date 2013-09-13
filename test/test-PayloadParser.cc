@@ -664,3 +664,39 @@ TEST_CASE("Parse nameless model", "[payload][model][block]")
     REQUIRE(payload.schema.empty());
 }
 
+TEST_CASE("Warn on malformed payload signature", "[payload][block][#20][now]")
+{
+    // Blueprint in question:
+    //R"(
+    //+ Request This is FUN! (text/plain)
+    //
+    //        Hello World!
+    //");
+    
+    MarkdownBlock::Stack markdown;
+    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Request This is FUN! (text/plain)", 0, MakeSourceDataBlock(0, 1)));
+    markdown.push_back(MarkdownBlock(CodeBlockType, "Hello World!", 0, MakeSourceDataBlock(1, 1)));
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(2, 1)));
+    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(3, 1)));
+    
+    Payload payload;
+    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
+    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), parser, payload);
+    
+    REQUIRE(result.first.error.code == Error::OK);
+    REQUIRE(result.first.warnings.size() == 1);
+    REQUIRE(result.first.warnings[0].code == FormattingWarning);
+    
+    const MarkdownBlock::Stack &blocks = markdown;
+    REQUIRE(std::distance(blocks.begin(), result.second) == 6);
+    
+    REQUIRE(payload.name.empty());
+    REQUIRE(payload.description.empty());
+    REQUIRE(payload.parameters.empty());
+    REQUIRE(payload.headers.empty());
+    REQUIRE(payload.body == "Hello World!");
+    REQUIRE(payload.schema.empty());
+}
+

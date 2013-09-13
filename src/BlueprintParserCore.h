@@ -54,15 +54,19 @@ namespace snowcrash {
         switch (section) {
 
             case ModelSection:
+            case ModelBodySection:
                 return "model";
                 
             case ObjectSection:
+            case ObjectBodySection:
                 return "object";
                 
             case RequestSection:
+            case RequestBodySection:
                 return "request";
                 
             case ResponseSection:
+            case ResponseBodySection:
                 return "response";
                 
             case BodySection:
