@@ -397,7 +397,7 @@ TEST_CASE("Parse full abbreviated syntax", "[parameter_definition][source]")
     REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].values.empty());
 }
 
-TEST_CASE("Warn on error in  abbreviated syntax attribute bracket", "[parameter_definition][source][now]")
+TEST_CASE("Warn on error in  abbreviated syntax attribute bracket", "[parameter_definition][source]")
 {
     // Blueprint in question:
     //R"(

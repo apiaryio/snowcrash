@@ -115,6 +115,8 @@ namespace snowcrash {
         PayloadSignature payloadSignature = GetPayloadSignature(begin, end, name, mediaType);
         if (payloadSignature == ObjectPayloadSignature)
             return ObjectSection;
+        else if (payloadSignature == ModelPayloadSignature)
+            return ModelSection;
 
         return UndefinedSection;
     }
@@ -174,9 +176,10 @@ namespace snowcrash {
                 case ResourceMethodSection:
                     result = HandleResourceMethod(cur, bounds, parser, resource);
                     break;
-                    
+                
+                case ModelSection:
                 case ObjectSection:
-                    result = HandleObject(cur, bounds.second, parser, resource);
+                    result = HandleModel(cur, bounds.second, parser, resource);
                     break;
                     
                 case ParametersSection:
@@ -250,50 +253,74 @@ namespace snowcrash {
             return result;
         }
         
-        static ParseSectionResult HandleObject(const BlockIterator& begin,
-                                               const BlockIterator& end,
-                                               BlueprintParserCore& parser,
-                                               Resource& resource)
+        static ParseSectionResult HandleModel(const BlockIterator& begin,
+                                              const BlockIterator& end,
+                                              BlueprintParserCore& parser,
+                                              Resource& resource)
         {
             Payload payload;
             ParseSectionResult result = PayloadParser::Parse(begin, end, parser, payload);
             if (result.first.error.code != Error::OK)
                 return result;
             
+            // Check whether there isnt a model already
             if (!resource.model.name.empty()) {
-                // WARN: Object already defined
+
+                // WARN: Model already defined
                 std::stringstream ss;
-                ss << "ignoring additional object definiton for '";
-                if (!resource.name.empty()) {
+                ss << "overshadowing previous model definiton for '";
+
+                if (!resource.name.empty())
                     ss << resource.name << "(" << resource.uriTemplate << ")";
-                }
-                else {
+                else
                     ss << resource.uriTemplate;
-                }
-                ss << "' resource, a resource can be represented by a single object only";
+
+                ss << "' resource, a resource can be represented by a single model only";
                 
                 BlockIterator nameBlock = ListItemNameBlock(begin, end);
                 result.first.warnings.push_back(Warning(ss.str(),
                                                         DuplicateWarning,
                                                         nameBlock->sourceMap));
-            }
-            else {
-                resource.model = payload;
                 
-                ResourceModelSymbolTable::const_iterator it = parser.symbolTable.resourceModels.find(payload.name);
-                if (it != parser.symbolTable.resourceModels.end()) {
-                    // ERR: Symbol already defined
+                return result;
+            }
+
+            // Check symbol name
+            if (payload.name.empty()) {
+                
+                if (!resource.name.empty()) {
+                    payload.name = resource.name;
+                }
+                else {
+                    // ERR: No name specified for resource model
                     std::stringstream ss;
-                    ss << "symbol '" << payload.name << "' already defined";
+                    ss << "resource model can be specified only for a named resource";
+                    ss << ", name your resource, e.g. '# <resource name> [" << resource.uriTemplate << "]'";
                     BlockIterator nameBlock = ListItemNameBlock(begin, end);
                     result.first.error = Error(ss.str(),
                                                SymbolError,
                                                nameBlock->sourceMap);
                 }
-                else {
-                    parser.symbolTable.resourceModels[payload.name] = payload;
-                }
             }
+            
+            // Check whether symbol isn't already defined
+            ResourceModelSymbolTable::const_iterator it = parser.symbolTable.resourceModels.find(payload.name);
+            if (it == parser.symbolTable.resourceModels.end()) {
+
+                parser.symbolTable.resourceModels[payload.name] = payload;
+            }
+            else {
+                // ERR: Symbol already defined
+                std::stringstream ss;
+                ss << "symbol '" << payload.name << "' already defined";
+                BlockIterator nameBlock = ListItemNameBlock(begin, end);
+                result.first.error = Error(ss.str(),
+                                           SymbolError,
+                                           nameBlock->sourceMap);
+            }
+            
+            // Assign model
+            resource.model = payload;
             
             return result;
         }

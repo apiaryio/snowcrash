@@ -98,6 +98,8 @@ namespace snowcrash {
             return ResponseSection;
         else if (payload == ObjectPayloadSignature)
             return ObjectSection;
+        else if (payload == ModelPayloadSignature)
+            return ModelSection;
         
         return UndefinedSection;
     }
@@ -167,10 +169,11 @@ namespace snowcrash {
                 case UndefinedSection:
                     result.second = CloseListItemBlock(cur, bounds.second);
                     break;
-                    
+                
+                case ModelSection:
                 case ObjectSection:
-                    // ERR: Unexpected object definition
-                    result.first.error = Error("unexpected object definiton, an object can be only defined in the resource section",
+                    // ERR: Unexpected model definition
+                    result.first.error = Error("unexpected model definiton, a model can be only defined in the resource section",
                                                SymbolError,
                                                cur->sourceMap);
                     break;

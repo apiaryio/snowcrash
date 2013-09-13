@@ -65,7 +65,7 @@ MarkdownBlock::Stack snowcrashtest::CanonicalPayloadFixture()
     return markdown;
 }
 
-TEST_CASE("Payload block classifier", "[payload]")
+TEST_CASE("Payload block classifier", "[payload][block]")
 {
     MarkdownBlock::Stack markdown = CanonicalPayloadFixture();
     
@@ -127,7 +127,7 @@ TEST_CASE("Payload block classifier", "[payload]")
     
 }
 
-TEST_CASE("Parse canonical payload", "[payload]")
+TEST_CASE("Parse canonical payload", "[payload][block]")
 {
     MarkdownBlock::Stack markdown = CanonicalPayloadFixture();    
     Payload payload;
@@ -152,7 +152,7 @@ TEST_CASE("Parse canonical payload", "[payload]")
     REQUIRE(payload.schema == "Code 2");
 }
 
-TEST_CASE("Parse payload description with list", "[payload][#8]")
+TEST_CASE("Parse payload description with list", "[payload][block][#8]")
 {
     // Blueprint in question:
     //R"(
@@ -190,7 +190,7 @@ TEST_CASE("Parse payload description with list", "[payload][#8]")
     REQUIRE(payload.body.empty());
 }
 
-TEST_CASE("Parse just one payload in a list with multiple payloads", "[payload]")
+TEST_CASE("Parse just one payload in a list with multiple payloads", "[payload][block]")
 {
     // Blueprint in question:
     //R"(
@@ -225,7 +225,7 @@ TEST_CASE("Parse just one payload in a list with multiple payloads", "[payload]"
     REQUIRE(payload.schema.empty());
 }
 
-TEST_CASE("Parse just one payload in a list with multiple items", "[payload]")
+TEST_CASE("Parse just one payload in a list with multiple items", "[payload][block]")
 {
     // Blueprint in question:
     //R"(
@@ -260,7 +260,7 @@ TEST_CASE("Parse just one payload in a list with multiple items", "[payload]")
     REQUIRE(payload.schema.empty());
 }
 
-TEST_CASE("Parse payload with foreign list item", "[payload][foreign]")
+TEST_CASE("Parse payload with foreign list item", "[payload][foreign][block]")
 {
     // Blueprint in question:
     //R"(
@@ -313,7 +313,7 @@ TEST_CASE("Parse payload with foreign list item", "[payload][foreign]")
     REQUIRE(payload.schema.empty());
 }
 
-TEST_CASE("Parse payload with foreign block", "[payload][foreign]")
+TEST_CASE("Parse payload with foreign block", "[payload][foreign][block]")
 {
     // Blueprint in question:
     //R"(
@@ -364,7 +364,7 @@ TEST_CASE("Parse payload with foreign block", "[payload][foreign]")
 }
 
 
-TEST_CASE("Parse abbreviated payload body", "[payload]")
+TEST_CASE("Parse abbreviated payload body", "[payload][block]")
 {
     // Blueprint in question:
     //R"(
@@ -400,7 +400,7 @@ TEST_CASE("Parse abbreviated payload body", "[payload]")
     REQUIRE(payload.schema.empty());
 }
 
-TEST_CASE("Parse abbreviated inline payload body", "[payload]")
+TEST_CASE("Parse abbreviated inline payload body", "[payload][block]")
 {
     // Blueprint in question:
     //R"(
@@ -433,7 +433,7 @@ TEST_CASE("Parse abbreviated inline payload body", "[payload]")
     REQUIRE(payload.schema.empty());
 }
 
-TEST_CASE("Parse inline payload with symbol reference", "[payload]")
+TEST_CASE("Parse inline payload with symbol reference", "[payload][block]")
 {
     // Blueprint in question:
     //R"(
@@ -473,7 +473,7 @@ TEST_CASE("Parse inline payload with symbol reference", "[payload]")
     REQUIRE(payload.schema.empty());
 }
 
-TEST_CASE("Parse payload with symbol reference", "[payload]")
+TEST_CASE("Parse payload with symbol reference", "[payload][block]")
 {
     // Blueprint in question:
     //R"(
@@ -519,7 +519,7 @@ TEST_CASE("Parse payload with symbol reference", "[payload]")
     REQUIRE(payload.schema.empty());
 }
 
-TEST_CASE("Missing 'expected pre-formatted code block' warning source map", "[payload][issue][#2]")
+TEST_CASE("Missing 'expected pre-formatted code block' warning source map", "[payload][issue][#2][block]")
 {
     // Blueprint in question:
     //R"(
@@ -554,3 +554,113 @@ TEST_CASE("Missing 'expected pre-formatted code block' warning source map", "[pa
     
     REQUIRE(result.first.warnings[0].location.size() == 1);
 }
+
+TEST_CASE("Test deprecated object payload", "[payload][object][block]")
+{
+    // Blueprint in question:
+    //R"(
+    //# /message
+    //    + Message Object
+    //    
+    //    AAA
+    //
+    //");
+    
+    MarkdownBlock::Stack markdown;
+    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Message Object", 0, MakeSourceDataBlock(0, 1)));
+    markdown.push_back(MarkdownBlock(CodeBlockType, "AAA", 0, MakeSourceDataBlock(1, 1)));
+    
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(2, 1)));
+    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(3, 1)));
+    
+    Payload payload;
+    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
+    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), parser, payload);
+    
+    REQUIRE(result.first.error.code == Error::OK);
+    REQUIRE(result.first.warnings.size() == 1);
+    REQUIRE(result.first.warnings[0].code == DeprecatedWarning);
+    
+    const MarkdownBlock::Stack &blocks = markdown;
+    REQUIRE(std::distance(blocks.begin(), result.second) == 6);
+    REQUIRE(payload.name == "Message");
+    REQUIRE(payload.body == "AAA");
+}
+
+TEST_CASE("Parse named model", "[payload][model][block]")
+{
+    // Blueprint in question:
+    //R"(
+    //+ Super Model (text/plain)
+    //
+    //        Hello World!
+    //");
+    
+    MarkdownBlock::Stack markdown;
+    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Super Model (text/plain)", 0, MakeSourceDataBlock(0, 1)));
+    markdown.push_back(MarkdownBlock(CodeBlockType, "Hello World!", 0, MakeSourceDataBlock(1, 1)));
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(2, 1)));
+    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(3, 1)));
+    
+    Payload payload;
+    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
+    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), parser, payload);
+    
+    REQUIRE(result.first.error.code == Error::OK);
+    REQUIRE(result.first.warnings.empty());
+    
+    const MarkdownBlock::Stack &blocks = markdown;
+    REQUIRE(std::distance(blocks.begin(), result.second) == 6);
+    
+    REQUIRE(payload.name == "Super");
+    REQUIRE(payload.description.empty());
+    REQUIRE(payload.parameters.empty());
+    REQUIRE(payload.headers.size() == 1);
+    REQUIRE(payload.headers[0].first == "Content-Type");
+    REQUIRE(payload.headers[0].second == "text/plain");
+    REQUIRE(payload.body == "Hello World!");
+    REQUIRE(payload.schema.empty());
+}
+
+TEST_CASE("Parse nameless model", "[payload][model][block]")
+{
+    // Blueprint in question:
+    //R"(
+    //+ Model (text/plain)
+    //
+    //        Hello World!
+    //");
+    
+    MarkdownBlock::Stack markdown;
+    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Model (text/plain)", 0, MakeSourceDataBlock(0, 1)));
+    markdown.push_back(MarkdownBlock(CodeBlockType, "Hello World!", 0, MakeSourceDataBlock(1, 1)));
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(2, 1)));
+    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(3, 1)));
+    
+    Payload payload;
+    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
+    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), parser, payload);
+    
+    REQUIRE(result.first.error.code == Error::OK);
+    REQUIRE(result.first.warnings.empty());
+    
+    const MarkdownBlock::Stack &blocks = markdown;
+    REQUIRE(std::distance(blocks.begin(), result.second) == 6);
+    
+    REQUIRE(payload.name.empty());
+    REQUIRE(payload.description.empty());
+    REQUIRE(payload.parameters.empty());
+    REQUIRE(payload.headers.size() == 1);
+    REQUIRE(payload.headers[0].first == "Content-Type");
+    REQUIRE(payload.headers[0].second == "text/plain");
+    REQUIRE(payload.body == "Hello World!");
+    REQUIRE(payload.schema.empty());
+}
+

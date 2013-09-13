@@ -28,6 +28,9 @@ static const std::string ResponseRegex("^[ \\t]*[Rr]esponse([ \\t]+([0-9_])*)?([
 /** Object matching regex */
 static const std::string ObjectRegex("^[ \\t]*(" SYMBOL_IDENTIFIER ")[ \\t][Oo]bject([ \\t]\\(([^\\)]*)\\))?[ \\t]*$");
 
+/** Model matching regex */
+static const std::string ModelRegex("^[[:blank:]]*" SYMBOL_IDENTIFIER "?[Mm]odel([[:blank:]]*\\(([^\\)]*)\\))?[[:blank:]]*");
+
 namespace snowcrash {
     
     /** 
@@ -38,7 +41,8 @@ namespace snowcrash {
         NoPayloadSignature,         /// < Not a payload.
         RequestPayloadSignature,    /// < Request payload.
         ResponsePayloadSignature,   /// < Response payload.
-        ObjectPayloadSignature      /// < Resource object payload.
+        ObjectPayloadSignature,     /// < Resource object payload.
+        ModelPayloadSignature       /// < Resource Model payload.
     };
     
     /** 
@@ -84,6 +88,12 @@ namespace snowcrash {
                 TrimString(name);
                 mediaType = captureGroups[4];
                 return ObjectPayloadSignature;
+            }
+            else if (RegexCapture(content, ModelRegex, captureGroups, 5)) {
+                name = captureGroups[1];
+                TrimString(name);
+                mediaType = captureGroups[3];
+                return ModelPayloadSignature;
             }
         }
 
@@ -157,11 +167,16 @@ namespace snowcrash {
                 
                 return (HasNestedListBlock(begin, end)) ? ObjectSection : ObjectBodySection;
             }
+            else if (payload == ModelPayloadSignature) {
+                
+                return (HasNestedListBlock(begin, end)) ? ModelSection : ModelBodySection;
+            }
 
         }
         else if (context == RequestSection ||
                  context == ResponseSection ||
-                 context == ObjectSection) {
+                 context == ObjectSection ||
+                 context == ModelSection) {
             
             // Section closure
             if (begin->type == ListItemBlockEndType ||
@@ -198,7 +213,8 @@ namespace snowcrash {
         
         return (context == RequestSection ||
                 context == ResponseSection ||
-                context == ObjectSection) ? context : UndefinedSection;
+                context == ObjectSection ||
+                context == ModelSection) ? context : UndefinedSection;
     }
     
     /**
@@ -219,12 +235,14 @@ namespace snowcrash {
                 case RequestSection:
                 case ResponseSection:
                 case ObjectSection:
+                case ModelSection:
                     result = HandleOverviewSectionBlock(section, cur, bounds, parser, payload);
                     break;
                     
                 case RequestBodySection:
                 case ResponseBodySection:
                 case ObjectBodySection:
+                case ModelBodySection:
                     result = HandlePayloadAsset(section, cur, bounds.second, parser, payload);
                     break;
                     
@@ -273,7 +291,7 @@ namespace snowcrash {
 
             if (sectionCur == bounds.first) {
                 // Signature
-                ProcessSignature(section, sectionCur, bounds.first, parser.sourceData, result.first, payload);
+                ProcessSignature(section, sectionCur, bounds.second, parser.sourceData, result.first, payload);
                 sectionCur = FirstContentBlock(cur, bounds.second);
             }
             else {
@@ -495,6 +513,17 @@ namespace snowcrash {
                                                   EmptyDefinitionWarning,
                                                   nameBlock->sourceMap));
                 payload.name = "200";
+            }
+            
+            
+            // WARN: Object deprecation
+            if (section == ObjectSection || section == ObjectBodySection) {
+                BlockIterator nameBlock = ListItemNameBlock(begin, end);
+                std::stringstream ss;
+                ss << "the 'object' keyword is deprecated and as such it will be removed in a future release, please use the 'model' keyword instead";
+                result.warnings.push_back(Warning(ss.str(),
+                                                  DeprecatedWarning,
+                                                  nameBlock->sourceMap));
             }
             
             if (!mediaType.empty()) {

@@ -23,7 +23,7 @@ MarkdownBlock::Stack snowcrashtest::CanonicalResourceFixture()
     //# My Resource [/resource/{id}]
     //Resource Description
     //
-    //+ My Resource Object (text/plain)
+    //+ Model (text/plain)
     //
     //        X.O.
     //
@@ -44,7 +44,7 @@ MarkdownBlock::Stack snowcrashtest::CanonicalResourceFixture()
     markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
 
     markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-    markdown.push_back(MarkdownBlock(ParagraphBlockType, "My Resource Object (text/plain)", 0, MakeSourceDataBlock(2, 1)));
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Model (text/plain)", 0, MakeSourceDataBlock(2, 1)));
     markdown.push_back(MarkdownBlock(CodeBlockType, "X.O.", 0, MakeSourceDataBlock(3, 1)));
     markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(4, 1)));
     
@@ -69,7 +69,7 @@ MarkdownBlock::Stack snowcrashtest::CanonicalResourceFixture()
     return markdown;
 }
 
-TEST_CASE("rparser/classifier", "Resource block classifier")
+TEST_CASE("Resource block classifier", "[resource][block]")
 {
     MarkdownBlock::Stack markdown = CanonicalResourceFixture();
     
@@ -82,13 +82,13 @@ TEST_CASE("rparser/classifier", "Resource block classifier")
     REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
     REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSection) == ResourceSection);
 
-    ++cur; // ListBlockBeginType - "My Resource Object"
-    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSection) == ObjectSection);
-    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSection) == ObjectSection);
+    ++cur; // ListBlockBeginType - "Model"
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSection) == ModelSection);
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSection) == ModelSection);
     
     ++cur; // ListItemBlockBeginType - "My Resource Object"
-    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSection) == ObjectSection);
-    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ObjectSection) == ObjectSection);
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSection) == ModelSection);
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ModelSection) == ModelSection);
     
     std::advance(cur, 4); // ListItemBlockBeginType - "Parameters"
     REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSection) == ParametersSection);
@@ -116,7 +116,7 @@ TEST_CASE("rparser/classifier", "Resource block classifier")
     REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSection) == UndefinedSection);
 }
 
-TEST_CASE("rparser/classifier-abbrev", "Abbreviated Resource Method block classifier")
+TEST_CASE("Abbreviated Resource Method block classifier", "[resource][block]")
 {
     MarkdownBlock::Stack markdown;
     markdown.push_back(MarkdownBlock(HeaderBlockType, "GET /resource", 1, MakeSourceDataBlock(0, 1)));
@@ -132,7 +132,7 @@ TEST_CASE("rparser/classifier-abbrev", "Abbreviated Resource Method block classi
     REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceMethodSection) == UndefinedSection);
 }
 
-TEST_CASE("rparser/parse", "Parse resource")
+TEST_CASE("Parse resource", "[resource][block]")
 {
     MarkdownBlock::Stack markdown = CanonicalResourceFixture();
     Resource resource;
@@ -163,7 +163,7 @@ TEST_CASE("rparser/parse", "Parse resource")
     REQUIRE(resource.actions.front().method == "GET");
 }
 
-TEST_CASE("rparser/parse-partial", "Parse partially defined resource")
+TEST_CASE("Parse partially defined resource", "[resource][block]")
 {
     MarkdownBlock::Stack markdown;
     markdown.push_back(MarkdownBlock(HeaderBlockType, "/1", 1, MakeSourceDataBlock(0, 1)));
@@ -203,7 +203,7 @@ TEST_CASE("rparser/parse-partial", "Parse partially defined resource")
     REQUIRE(resource.actions.front().examples.front().requests.front().body == "3");
 }
 
-TEST_CASE("rparser/parse-multi-method-desc", "Parse multiple method descriptions")
+TEST_CASE("Parse multiple method descriptions", "[resource][block]")
 {
     MarkdownBlock::Stack markdown;
     markdown.push_back(MarkdownBlock(HeaderBlockType, "/1", 1, MakeSourceDataBlock(0, 1)));    
@@ -233,7 +233,7 @@ TEST_CASE("rparser/parse-multi-method-desc", "Parse multiple method descriptions
     REQUIRE(resource.actions[1].description == "3");
 }
 
-TEST_CASE("rparser/parse-multi-method", "Parse multiple method")
+TEST_CASE("Parse multiple method", "[resource][block]")
 {    
     // Blueprint in question:
     //R"(
@@ -337,7 +337,7 @@ TEST_CASE("rparser/parse-multi-method", "Parse multiple method")
     REQUIRE(resource.actions[2].examples.empty());
 }
 
-TEST_CASE("rparser/parse-list-description", "Parse description with list")
+TEST_CASE("Parse description with list", "[resource][block]")
 {
     // Blueprint in question:
     //R"(
@@ -380,7 +380,7 @@ TEST_CASE("rparser/parse-list-description", "Parse description with list")
     REQUIRE(resource.actions.empty());
 }
 
-TEST_CASE("rparser/parse-hr", "Parse resource with a HR")
+TEST_CASE("Parse resource with a HR", "[resource][block]")
 {
     
     // Blueprint in question:
@@ -411,7 +411,7 @@ TEST_CASE("rparser/parse-hr", "Parse resource with a HR")
     REQUIRE(resource.actions.empty());
 }
 
-TEST_CASE("rparser/header-warnings", "Check warnings on overshadowing a header")
+TEST_CASE("Check overshadowing header warning", "[resource][block]")
 {
     MarkdownBlock::Stack markdown = CanonicalResourceFixture();
     Resource resource;
@@ -430,7 +430,7 @@ TEST_CASE("rparser/header-warnings", "Check warnings on overshadowing a header")
     REQUIRE(std::distance(blocks.begin(), result.second) == 42 + 39);
 }
 
-TEST_CASE("rparser/parse-abbrev", "Parse resource method abbreviation")
+TEST_CASE("Parse resource method abbreviation", "[resource][block]")
 {
     // Blueprint in question:
     //R"(
@@ -481,7 +481,7 @@ TEST_CASE("rparser/parse-abbrev", "Parse resource method abbreviation")
     REQUIRE(resource.actions[0].examples[0].responses.size() == 1);
 }
 
-TEST_CASE("rparser/parse-abbrev-ambiguous", "Parse resource method abbreviation followed by a foreign method")
+TEST_CASE("Parse resource method abbreviation followed by a foreign method", "[resource][block]")
 {
     // Blueprint in question:
     //R"(
@@ -510,7 +510,7 @@ TEST_CASE("rparser/parse-abbrev-ambiguous", "Parse resource method abbreviation 
     REQUIRE(resource.actions[0].method == "GET");
 }
 
-TEST_CASE("rparser/parse-nameless-resource", "Parse resource without name")
+TEST_CASE("Parse resource without name", "[resource][block]")
 {
     // Blueprint in question:
     //R"(
@@ -537,7 +537,7 @@ TEST_CASE("rparser/parse-nameless-resource", "Parse resource without name")
     REQUIRE(resource.actions.size() == 0);
 }
 
-TEST_CASE("Warn about parameters not in URI template", "[resource]")
+TEST_CASE("Warn about parameters not in URI template", "[resource][source]")
 {
     // Blueprint in question:
     //R"(
@@ -584,3 +584,106 @@ TEST_CASE("Warn about parameters not in URI template", "[resource]")
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[1].name == "id");
 }
 
+TEST_CASE("Parse nameless resource with named model", "[resource][model][source]")
+{
+    // Blueprint in question:
+    //R"(
+    //# /message
+    //+ Super Model
+    //  
+    //        AAA
+    //
+    //");
+    const std::string blueprintSource = \
+    "# /message\n"\
+    "+ Super Model\n"\
+    "\n"\
+    "        AAA\n"\
+    "\n";
+    
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(blueprintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.empty());
+    
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].model.name == "Super");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].model.body == "AAA\n");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.empty());
+}
+
+TEST_CASE("Parse nameless resource with nameless model", "[resource][model][source]")
+{
+    // Blueprint in question:
+    //R"(
+    //# /message
+    //+ Model
+    //
+    //        AAA
+    //
+    //");
+    const std::string blueprintSource = \
+    "# /message\n"\
+    "+ Model\n"\
+    "\n"\
+    "        AAA\n"\
+    "\n";
+    
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(blueprintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == SymbolError);
+    REQUIRE(result.warnings.empty());
+    
+    REQUIRE(blueprint.resourceGroups.empty());
+}
+
+TEST_CASE("Parse named resource with nameless model", "[resource][model][source][now]")
+{
+    // Blueprint in question:
+    //R"(
+    //# Message [/message]
+    //+ Model
+    //  
+    //        AAA
+    //
+    //## Retrieve a message [GET]
+    //+ Response 200
+    //    
+    //    [Message][]
+    //");
+    
+    const std::string blueprintSource = \
+    "# Message [/message]\n"\
+    "+ Model\n"\
+    "  \n"\
+    "        AAA\n"\
+    "\n"\
+    "## Retrieve a message [GET]\n"\
+    "+ Response 200\n"\
+    "    \n"\
+    "    [Message][]\n\n";
+    
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(blueprintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.empty());
+    
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].model.name == "Message");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].model.body == "AAA\n");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].name == "Retrieve a message");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].method == "GET");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body == "AAA\n");
+}
