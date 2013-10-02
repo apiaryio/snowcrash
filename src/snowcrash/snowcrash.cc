@@ -44,7 +44,9 @@ void PrintAnnotation(const std::string& prefix, const snowcrash::SourceAnnotatio
     }
     
     if (!annotation.location.empty()) {
-        for (snowcrash::SourceDataBlock::const_iterator it = annotation.location.begin(); it != annotation.location.end(); ++it) {
+        for (snowcrash::SourceCharactersBlock::const_iterator it = annotation.location.begin();
+             it != annotation.location.end();
+             ++it) {
             std::cerr << ((it == annotation.location.begin()) ? " :" : ";");
             std::cerr << it->location << ":" << it->length;
         }
