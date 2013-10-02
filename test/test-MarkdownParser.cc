@@ -11,14 +11,14 @@
 
 using namespace snowcrash;
 
-TEST_CASE("mdparser/init", "MD parser construction")
+TEST_CASE("MD parser construction", "[markdown]")
 {
     MarkdownParser* parser;
     REQUIRE_NOTHROW(parser = ::new MarkdownParser);
     REQUIRE_NOTHROW(::delete parser);
 }
 
-TEST_CASE("mdparser/parse-params", "parse() method parameters.")
+TEST_CASE("parse() method parameters", "[markdown]")
 {
     MarkdownParser parser;
     Result result;
@@ -29,7 +29,7 @@ TEST_CASE("mdparser/parse-params", "parse() method parameters.")
     REQUIRE(result.warnings.empty());
 }
 
-TEST_CASE("mdparser/parse-flat", "parsing flat Markdown into AST")
+TEST_CASE("parsing flat Markdown into AST", "[markdown]")
 {
     MarkdownParser parser;
     Result result;
@@ -74,7 +74,7 @@ paragraph\n\
     REQUIRE(sourceData == "    code\n");
 }
 
-TEST_CASE("mdparser/parse-html", "parsing Markdown with HTML into AST")
+TEST_CASE("parsing Markdown with HTML into AST", "[markdown]")
 {
     MarkdownParser parser;
     Result result;
@@ -104,7 +104,7 @@ TEST_CASE("mdparser/parse-html", "parsing Markdown with HTML into AST")
     REQUIRE(sourceData == "<p>some text</p>\n");
 }
 
-TEST_CASE("mdparser/parse-hr", "parsing Markdown with horizontal rule into AST")
+TEST_CASE("parsing Markdown with horizontal rule into AST", "[markdown]")
 {
     Result result;
     MarkdownBlock::Stack markdown;
@@ -136,7 +136,7 @@ TEST_CASE("mdparser/parse-hr", "parsing Markdown with horizontal rule into AST")
 
 }
 
-TEST_CASE("mdparser/parse-blockquote", "parsing Markdown with blockquote into AST")
+TEST_CASE("parsing Markdown with blockquote into AST", "[markdown]")
 {
     MarkdownParser parser;
     Result result;
@@ -231,7 +231,7 @@ paragraph-1\n\
     REQUIRE(sourceData7 == "paragraph-1\n\n");
 }
 
-TEST_CASE("mdparser/parse-src-map", "parsing simple nested Markdown into AST and testing its source mapping")
+TEST_CASE("parsing simple nested Markdown into AST and testing its source mapping", "[markdown]")
 {
     MarkdownParser parser;
     Result result;
@@ -312,7 +312,7 @@ TEST_CASE("mdparser/parse-src-map", "parsing simple nested Markdown into AST and
     
 }
 
-TEST_CASE("mdparser/parse-src-map-inline-nested", "parse nested inline list testing source maps")
+TEST_CASE("parse nested inline list testing source maps", "[markdown]")
 {
     MarkdownParser parser;
     Result result;
@@ -391,7 +391,7 @@ TEST_CASE("mdparser/parse-src-map-inline-nested", "parse nested inline list test
     REQUIRE(markdown[11].sourceMap[0].length == 35);
 }
 
-TEST_CASE("mdparser/parse-nested", "parsing complex nested Markdown into AST")
+TEST_CASE("parsing complex nested Markdown into AST", "[markdown]")
 {
     MarkdownParser parser;
     Result result;
@@ -535,7 +535,7 @@ paragraph-2\n\
     REQUIRE(markdown[24].content.empty());
 }
 
-TEST_CASE("mdparser/parse-fenced-code", "parsing fenced code block into AST")
+TEST_CASE("parsing fenced code block into AST", "[markdown]")
 {
     MarkdownParser parser;
     Result result;
@@ -559,7 +559,7 @@ code\n\
     REQUIRE(markdown[0].data == 0);
 }
 
-TEST_CASE("mdparser/parse-inline-list", "parsing inplace-list")
+TEST_CASE("parsing inplace-list", "[markdown]")
 {
     MarkdownParser parser;
     Result result;
@@ -593,7 +593,7 @@ TEST_CASE("mdparser/parse-inline-list", "parsing inplace-list")
     REQUIRE(markdown[3].data == 0);
 }
 
-TEST_CASE("mdparser/parse-header-only", "parsing asserting header one liner")
+TEST_CASE("parsing asserting header one liner", "[markdown]")
 {
     MarkdownParser parser;
     Result result;
@@ -672,3 +672,168 @@ TEST_CASE("Missing nested list item", "[markdown][issue][#12]")
     REQUIRE(markdown[13].type == ListBlockEndType);
     REQUIRE(markdown[13].content.empty());
 }
+
+TEST_CASE("Multi-byte characters English", "[markdown][sourcemap]")
+{
+    MarkdownParser parser;
+    Result result;
+    MarkdownBlock::Stack markdown;
+    
+    const std::string source = "The quick brown fox jumps over the lazy dog\n";
+    
+    parser.parse(source, result, markdown);
+    
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.empty());
+    
+    REQUIRE(markdown.size() == 1);
+    
+    REQUIRE(markdown[0].sourceMap.size() == 1);
+    REQUIRE(markdown[0].sourceMap[0].location == 0);
+    REQUIRE(markdown[0].sourceMap[0].length == 44);
+    
+    std::string mappedString = MapSourceData(source, markdown[0].sourceMap);
+    REQUIRE(mappedString == source);
+    
+    SourceCharacterBlock characterBlock = MapSourceDataBlock(markdown[0].sourceMap, source);
+    REQUIRE(characterBlock.size() == 1);
+    REQUIRE(characterBlock[0].location == 0);
+    REQUIRE(characterBlock[0].length == 44);
+}
+
+TEST_CASE("Multi-byte characters Czech", "[markdown][sourcemap]")
+{
+    MarkdownParser parser;
+    Result result;
+    MarkdownBlock::Stack markdown;
+    
+    const std::string source = "P\u0159\u00ED\u0161ern\u011B \u017Elu\u0165ou\u010Dk\u00FD k\u016F\u0148 \u00FAp\u011Bl \u010F\u00E1belsk\u00E9 \u00F3dy\n"; // "Priserne zlutoucky kun upel dabelske ody"
+    
+    parser.parse(source, result, markdown);
+    
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.empty());
+    
+    REQUIRE(markdown.size() == 1);
+    
+    REQUIRE(markdown[0].sourceMap.size() == 1);
+    REQUIRE(markdown[0].sourceMap[0].location == 0);
+    REQUIRE(markdown[0].sourceMap[0].length == 57);
+    
+    std::string mappedString = MapSourceData(source, markdown[0].sourceMap);
+    REQUIRE(mappedString == source);
+    
+    SourceCharacterBlock characterBlock = MapSourceDataBlock(markdown[0].sourceMap, source);
+    REQUIRE(characterBlock.size() == 1);
+    REQUIRE(characterBlock[0].location == 0);
+    REQUIRE(characterBlock[0].length == 41);
+}
+
+TEST_CASE("Multi-byte characters Chinese", "[markdown][sourcemap]")
+{
+    MarkdownParser parser;
+    Result result;
+    MarkdownBlock::Stack markdown;
+    
+    const std::string source = "\u4F60\u597D\n"; // "Ni Hao"
+    
+    parser.parse(source, result, markdown);
+    
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.empty());
+    
+    REQUIRE(markdown.size() == 1);
+    
+    REQUIRE(markdown[0].sourceMap.size() == 1);
+    REQUIRE(markdown[0].sourceMap[0].location == 0);
+    REQUIRE(markdown[0].sourceMap[0].length == 7); // UTF8 'Ni', 'Hao' and '\n'
+    
+    std::string mappedString = MapSourceData(source, markdown[0].sourceMap);
+    REQUIRE(mappedString == source);
+    
+    SourceCharacterBlock characterBlock = MapSourceDataBlock(markdown[0].sourceMap, source);
+    REQUIRE(characterBlock.size() == 1);
+    REQUIRE(characterBlock[0].location == 0);
+    REQUIRE(characterBlock[0].length == 3);
+}
+
+TEST_CASE("Multi-byte characters in multiple blocks", "[markdown][sourcemap]")
+{
+    MarkdownParser parser;
+    Result result;
+    MarkdownBlock::Stack markdown;
+    
+    // "Ni Hao + Kon'nichiwa"
+    const std::string source = "\u4F60\u597D\n\n\u3053\u3093\u306B\u3061\u306F\n";
+    
+    parser.parse(source, result, markdown);
+    
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.empty());
+    
+    REQUIRE(markdown.size() == 2);
+    
+    REQUIRE(markdown[0].sourceMap.size() == 1);
+    REQUIRE(markdown[0].sourceMap[0].location == 0);
+    REQUIRE(markdown[0].sourceMap[0].length == 8); // UTF8 Ni Hao + 2xLF
+    
+    SourceCharacterBlock characterBlock = MapSourceDataBlock(markdown[0].sourceMap, source);
+    REQUIRE(characterBlock.size() == 1);
+    REQUIRE(characterBlock[0].location == 0);
+    REQUIRE(characterBlock[0].length == 4);
+    
+    REQUIRE(markdown[1].sourceMap.size() == 1);
+    REQUIRE(markdown[1].sourceMap[0].location == 8);
+    REQUIRE(markdown[1].sourceMap[0].length == 16); // UTF8 Kon'nichiwa + LF
+    
+    characterBlock = MapSourceDataBlock(markdown[1].sourceMap, source);
+    REQUIRE(characterBlock.size() == 1);
+    REQUIRE(characterBlock[0].location == 4);
+    REQUIRE(characterBlock[0].length == 6);
+}
+
+TEST_CASE("Multi-byte characters in blockquote", "[markdown][sourcemap][now]")
+{
+    MarkdownParser parser;
+    Result result;
+    MarkdownBlock::Stack markdown;
+    
+    // "> Ni Hao"
+    const std::string source = "> \u4F60\u597D\n";
+    
+    parser.parse(source, result, markdown);
+    
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.empty());
+    
+    REQUIRE(markdown.size() == 3);
+    
+    REQUIRE(markdown[0].sourceMap.size() == 0);
+    
+    REQUIRE(markdown[1].sourceMap.size() == 1);
+    REQUIRE(markdown[1].sourceMap[0].location == 2);
+    REQUIRE(markdown[1].sourceMap[0].length == 7);
+    
+    REQUIRE(markdown[2].sourceMap.size() == 1);
+    REQUIRE(markdown[2].sourceMap[0].location == 0);
+    REQUIRE(markdown[2].sourceMap[0].length == 9);
+    
+    std::string mappedString = MapSourceData(source, markdown[1].sourceMap);
+    REQUIRE(mappedString == "\u4F60\u597D\n");
+
+    mappedString = MapSourceData(source, markdown[2].sourceMap);
+    REQUIRE(mappedString == source);
+    
+    SourceCharacterBlock characterBlock = MapSourceDataBlock(markdown[1].sourceMap, source);
+    REQUIRE(characterBlock.size() == 1);
+    REQUIRE(characterBlock[0].location == 2);
+    REQUIRE(characterBlock[0].length == 3);
+    
+    characterBlock = MapSourceDataBlock(markdown[2].sourceMap, source);
+    REQUIRE(characterBlock.size() == 1);
+    REQUIRE(characterBlock[0].location == 0);
+    REQUIRE(characterBlock[0].length == 5);
+}
+
+
+

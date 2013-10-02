@@ -195,16 +195,16 @@ namespace snowcrash {
                     break;
                     
                 case UndefinedSection:
-                    CheckAmbiguousMethod(cur, bounds.second, resource, result.first);
+                    CheckAmbiguousMethod(cur, bounds.second, resource, parser.sourceData, result.first);
                     result.second = CloseListItemBlock(cur, bounds.second);
                     break;
                     
                 case ForeignSection:
-                    result = HandleForeignSection(cur, bounds);
+                    result = HandleForeignSection(cur, bounds, parser.sourceData);
                     break;
                     
                 default:
-                    result.first.error = UnexpectedBlockError(*cur);
+                    result.first.error = UnexpectedBlockError(*cur, parser.sourceData);
                     break;
             }
             
@@ -244,7 +244,7 @@ namespace snowcrash {
                     }
                 }
                 
-                if (!CheckCursor(sectionCur, bounds, cur, result.first))
+                if (!CheckCursor(sectionCur, bounds, parser.sourceData, cur, result.first))
                     return result;
                 resource.description += MapSourceData(parser.sourceData, sectionCur->sourceMap);
             }
@@ -280,7 +280,7 @@ namespace snowcrash {
                 BlockIterator nameBlock = ListItemNameBlock(begin, end);
                 result.first.warnings.push_back(Warning(ss.str(),
                                                         DuplicateWarning,
-                                                        nameBlock->sourceMap));
+                                                        MapSourceDataBlock(nameBlock->sourceMap, parser.sourceData)));
                 
                 return result;
             }
@@ -299,7 +299,7 @@ namespace snowcrash {
                     BlockIterator nameBlock = ListItemNameBlock(begin, end);
                     result.first.error = Error(ss.str(),
                                                SymbolError,
-                                               nameBlock->sourceMap);
+                                               MapSourceDataBlock(nameBlock->sourceMap, parser.sourceData));
                 }
             }
             
@@ -316,7 +316,7 @@ namespace snowcrash {
                 BlockIterator nameBlock = ListItemNameBlock(begin, end);
                 result.first.error = Error(ss.str(),
                                            SymbolError,
-                                           nameBlock->sourceMap);
+                                           MapSourceDataBlock(nameBlock->sourceMap, parser.sourceData));
             }
             
             // Assign model
@@ -339,12 +339,12 @@ namespace snowcrash {
                 BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
                 result.first.warnings.push_back(Warning(NoParametersMessage,
                                                         FormattingWarning,
-                                                        nameBlock->sourceMap));
+                                                        MapSourceDataBlock(nameBlock->sourceMap, parser.sourceData)));
             }
             else {
                 // Check Eligibility
                 BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
-                CheckParametersEligibility(resource, parameters, nameBlock->sourceMap, result.first);
+                CheckParametersEligibility(resource, parameters, nameBlock->sourceMap, parser.sourceData, result.first);
                 
                 // Insert
                 resource.parameters.insert(resource.parameters.end(), parameters.begin(), parameters.end());
@@ -357,6 +357,7 @@ namespace snowcrash {
         static void CheckParametersEligibility(const Resource& resource,
                                                const ParameterCollection& parameters,
                                                const SourceDataBlock& location,
+                                               const SourceData& sourceData,
                                                Result& result)
         {
             for (ParameterCollection::const_iterator it = parameters.begin();
@@ -372,7 +373,9 @@ namespace snowcrash {
                         ss << "'" << resource.name << "' ";
                     ss << "its '" << resource.uriTemplate << "' URI template";
 
-                    result.warnings.push_back(Warning(ss.str(), LogicalErrorWarning, location));
+                    result.warnings.push_back(Warning(ss.str(),
+                                                      LogicalErrorWarning,
+                                                      MapSourceDataBlock(location, sourceData)));
                 }
             }
         }
@@ -410,7 +413,9 @@ namespace snowcrash {
                     std::stringstream ss;
                     ss << "ignoring additional content in method header '" << begin->content << "'";
                     ss << ", expected method-only e.g. '# " << action.method << "'";
-                    result.first.warnings.push_back(Warning(ss.str(), IgnoringWarning, begin->sourceMap));
+                    result.first.warnings.push_back(Warning(ss.str(),
+                                                            IgnoringWarning,
+                                                            MapSourceDataBlock(begin->sourceMap, parser.sourceData)));
                 }
             }
             
@@ -424,18 +429,18 @@ namespace snowcrash {
                                                         resource.uriTemplate +
                                                         "'",
                                                         DuplicateWarning,
-                                                        begin->sourceMap));
+                                                        MapSourceDataBlock(begin->sourceMap, parser.sourceData)));
             }
             
             // FIXME: Do we want to check heck for parameters duplicates at this level?
             
             // Check Eligibility
             if (!action.parameters.empty())
-                CheckParametersEligibility(resource, action.parameters, begin->sourceMap, result.first);
+                CheckParametersEligibility(resource, action.parameters, begin->sourceMap, parser.sourceData, result.first);
             
             
             // Check for header duplictes
-            DeepCheckHeaderDuplicates(resource, action, begin->sourceMap, result.first);
+            DeepCheckHeaderDuplicates(resource, action, begin->sourceMap, parser.sourceData, result.first);
             
             if (action.examples.empty() ||
                 action.examples.front().responses.empty()) {
@@ -446,7 +451,7 @@ namespace snowcrash {
                                                         resource.uriTemplate +
                                                         "'",
                                                         EmptyDefinitionWarning,
-                                                        begin->sourceMap));
+                                                        MapSourceDataBlock(begin->sourceMap, parser.sourceData)));
             }
             
             resource.actions.push_back(action);
@@ -456,23 +461,24 @@ namespace snowcrash {
         static void DeepCheckHeaderDuplicates(const Resource& resource,
                                               const Action& action,
                                               const SourceDataBlock& sourceMap,
+                                              const SourceData& sourceData,
                                               Result& result) {
             
             if (action.examples.empty())
                 return;
             
-            CheckHeaderDuplicates(resource, action, sourceMap, result);
+            CheckHeaderDuplicates(resource, action, sourceMap, sourceData, result);
             for (Collection<Request>::const_iterator it = action.examples.front().requests.begin();
                  it != action.examples.front().requests.end();
                  ++it) {
                 
-                CheckHeaderDuplicates(resource, *it, sourceMap, result);
+                CheckHeaderDuplicates(resource, *it, sourceMap, sourceData, result);
             }
             for (Collection<Response>::const_iterator it = action.examples.front().responses.begin();
                  it != action.examples.front().responses.end();
                  ++it) {
                 
-                CheckHeaderDuplicates(resource, *it, sourceMap, result);
+                CheckHeaderDuplicates(resource, *it, sourceMap, sourceData, result);
             }
         }
         
@@ -481,6 +487,7 @@ namespace snowcrash {
         static void CheckAmbiguousMethod(const BlockIterator& begin,
                                          const BlockIterator& end,
                                          const Resource& resource,
+                                         const SourceData& sourceData,
                                          Result& result) {
             
             if (begin == end ||
@@ -497,7 +504,9 @@ namespace snowcrash {
                 ss << "unexpected action '" << begin->content << "', ";
                 ss << "to the define muliple actions for the '" << resource.uriTemplate << "' resource omit the HTTP method in its definition, ";
                 ss << "e.g. '# " << resource.uriTemplate << "'";
-                result.warnings.push_back(Warning(ss.str(), IgnoringWarning, begin->sourceMap));
+                result.warnings.push_back(Warning(ss.str(),
+                                                  IgnoringWarning,
+                                                  MapSourceDataBlock(begin->sourceMap, sourceData)));
             }
         }
     };

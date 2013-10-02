@@ -72,7 +72,12 @@ namespace snowcrash {
         SourceDataBlock sourceMap;
     };
 
-    // Return source data using from source and source map
+    /**
+     *  \brief  Maps block of source data bytes into source string.
+     *  \param  block   A %SourceDataBlock to map into %SourceCharacterBlock
+     *  \param  data    A mapped source data.
+     *  \returns A string concatenated from the source string using the byte map.
+     */
     std::string MapSourceData(const SourceData& source, const SourceDataBlock& sourceMap);
         
 #ifdef DEBUG

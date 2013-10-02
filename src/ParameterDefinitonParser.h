@@ -185,7 +185,7 @@ namespace snowcrash {
                     break;
                     
                 default:
-                    result.first.error = UnexpectedBlockError(*cur);
+                    result.first.error = UnexpectedBlockError(*cur, parser.sourceData);
                     break;
             }
             
@@ -226,7 +226,7 @@ namespace snowcrash {
                 }
             }
             
-            if (!CheckCursor(sectionCur, bounds, cur, result.first))
+            if (!CheckCursor(sectionCur, bounds, parser.sourceData, cur, result.first))
                 return result;
 
             parameter.description += MapSourceData(parser.sourceData, sectionCur->sourceMap);
@@ -269,7 +269,7 @@ namespace snowcrash {
                 
                 // Additional Attributes
                 if (!captureGroups[5].empty())
-                    ProcessSignatureAdditionalTraits(begin, end, captureGroups[5], result, parameter);
+                    ProcessSignatureAdditionalTraits(begin, end, captureGroups[5], sourceData, result, parameter);
                 
                 // Description
                 if (!captureGroups[7].empty())
@@ -293,7 +293,7 @@ namespace snowcrash {
                           ", declare the parameter as 'optional' to specify its default value";
                     result.warnings.push_back(Warning(ss.str(),
                                                       LogicalErrorWarning,
-                                                      nameBlock->sourceMap));
+                                                      MapSourceDataBlock(nameBlock->sourceMap, sourceData)));
                 }
 
             }
@@ -303,7 +303,7 @@ namespace snowcrash {
                 std::stringstream ss;
                 result.error = (Error("unable to parse parameter specification",
                                       BusinessError,
-                                      nameBlock->sourceMap));
+                                      MapSourceDataBlock(nameBlock->sourceMap, sourceData)));
             }
         }
         
@@ -311,6 +311,7 @@ namespace snowcrash {
         static void ProcessSignatureAdditionalTraits(const BlockIterator& begin,
                                                      const BlockIterator& end,
                                                      const SourceData& additionalTraits,
+                                                     const SourceData& sourceData,
                                                      Result& result,
                                                      Parameter& parameter)
         {
@@ -364,7 +365,7 @@ namespace snowcrash {
 
                 result.warnings.push_back(Warning(ss.str(),
                                                   FormattingWarning,
-                                                  nameBlock->sourceMap));
+                                                  MapSourceDataBlock(nameBlock->sourceMap, sourceData)));
                 
                 parameter.type.clear();
                 parameter.exampleValue.clear();
@@ -389,14 +390,14 @@ namespace snowcrash {
                 ss << " for parameter '" << parameter.name << "'";
                 result.first.warnings.push_back(Warning(ss.str(),
                                                         RedefinitionWarning,
-                                                        nameBlock->sourceMap));
+                                                        MapSourceDataBlock(nameBlock->sourceMap, parser.sourceData)));
             }
             
             // Clear any previous content
             parameter.values.clear();
             
             // Check additional content in signature
-            CheckSignatureAdditionalContent(cur, bounds, "'values:' keyword", ExpectedValuesContent, result.first);
+            CheckSignatureAdditionalContent(cur, bounds, parser.sourceData, "'values:' keyword", ExpectedValuesContent, result.first);
 
             // Parse inner list of entities
             BlockIterator sectionCur = SkipSignatureBlock(cur, bounds.second);
@@ -440,7 +441,9 @@ namespace snowcrash {
                         ss << "ignoring additional content in the 'values' attribute of the '";
                         ss << parameter.name << "' parameter";
                         ss << ", " << ExpectedValuesContent;
-                        result.first.warnings.push_back(Warning(ss.str(), IgnoringWarning, sectionCur->sourceMap));
+                        result.first.warnings.push_back(Warning(ss.str(),
+                                                                IgnoringWarning,
+                                                                MapSourceDataBlock(sectionCur->sourceMap, parser.sourceData)));
                     }
                 }
             }
@@ -449,7 +452,9 @@ namespace snowcrash {
                 // WARN: empty definition
                 std::stringstream ss;
                 ss << "no possible values specified for parameter '" << parameter.name << "'";
-                result.first.warnings.push_back(Warning(ss.str(), EmptyDefinitionWarning, sectionCur->sourceMap));
+                result.first.warnings.push_back(Warning(ss.str(),
+                                                        EmptyDefinitionWarning,
+                                                        MapSourceDataBlock(sectionCur->sourceMap, parser.sourceData)));
             }
             
             endCur = CloseListItemBlock(sectionCur, bounds.second);
@@ -492,7 +497,9 @@ namespace snowcrash {
                     std::stringstream ss;
                     ss << "ignoring the '" << content << "' element";
                     ss << ", expected '`" << content << "`'";
-                    result.first.warnings.push_back(Warning(ss.str(), IgnoringWarning, sectionCur->sourceMap));
+                    result.first.warnings.push_back(Warning(ss.str(),
+                                                            IgnoringWarning,
+                                                            MapSourceDataBlock(sectionCur->sourceMap, parser.sourceData)));
                 }
                 
                 ++sectionCur;

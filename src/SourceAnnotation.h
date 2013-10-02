@@ -11,9 +11,23 @@
 
 #include <string>
 #include <vector>
-#include "ParserCore.h"
 
 namespace snowcrash {
+    
+    /**
+     *  \brief  A character range within the source code string.
+     */
+    struct SourceCharacterRange {
+        size_t location;
+        size_t length;
+    };
+    
+    /**
+     *  \brief  A block (set of ranges) of source code characters. A character map.
+     *
+     *  NOTE: The block does not have to be continuous.
+     */
+    typedef std::vector<SourceCharacterRange> SourceCharacterBlock;
     
     /**
      *  \brief  A source data annotation.
@@ -54,7 +68,7 @@ namespace snowcrash {
          */
         SourceAnnotation(const std::string& message,
                          int code = OK,
-                         const SourceDataBlock& location = SourceDataBlock()) {
+                         const SourceCharacterBlock& location = SourceCharacterBlock()) {
             
             this->message = message;
             this->code = code;
@@ -62,7 +76,6 @@ namespace snowcrash {
             this->location.clear();
             if (!location.empty())
                 this->location.assign(location.begin(), location.end());
-
         }
         
         /** \brief  %SourceAnnotation destructor. */
@@ -80,7 +93,7 @@ namespace snowcrash {
         }
         
         /** The location of this annotation within the source data buffer. */
-        SourceDataBlock location;
+        SourceCharacterBlock location;
         
         /** An annotation code. */
         int code;

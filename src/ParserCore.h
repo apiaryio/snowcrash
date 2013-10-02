@@ -11,17 +11,20 @@
 
 #include <string>
 #include <vector>
+#include "SourceAnnotation.h"
 #include "Platform.h"
 
 namespace snowcrash {
     
     /**
-     *  \brief  Textual source data. A markdown-formatted text.
+     *  \brief  Textual source data byte buffer. A markdown-formatted text.
      */
     typedef std::string SourceData;
     
     /**
-     *  \brief  A range of data within the source data buffer.
+     *  \brief  A byte range of data within the source data buffer.
+     *
+     *  Improtant note: All ranges are in bytes not characters.
      */
     struct SourceDataRange {
         size_t location;
@@ -29,9 +32,10 @@ namespace snowcrash {
     };
 
     /**
-     *  \brief  A block of source data.
+     *  \brief  A block of source data bytes - a byte map.
      * 
      *  NOTE: The block does not have to be continuous.
+     *  Data Blocks are in bytes not characters.
      */
     typedef std::vector<SourceDataRange> SourceDataBlock;
     
@@ -39,8 +43,6 @@ namespace snowcrash {
      *  \brief  Create a %SourceDataBlock with a range.
      *  \param  loc     A location in source data buffer.
      *  \param  len     Length of the range.
-     *
-     *  NOTE: A binding does not need to wrap this function.
      */
     SourceDataBlock MakeSourceDataBlock(size_t loc, size_t len);
     
@@ -48,15 +50,11 @@ namespace snowcrash {
      *  \brief  Append %SourceDataBlock to existign block, merging continuous blocks.
      *  \param  destination A block to append to.
      *  \param  append      A block to be appended.
-     *
-     *  NOTE: A binding does not need to wrap this function.
      */
     void AppendSourceDataBlock(SourceDataBlock& destination, const SourceDataBlock& append);
     
     /**
      *  \brief A generic pair of two blocks
-     *
-     *  NOTE: A binding does not need to wrap this data type.
      */
     typedef std::pair<SourceDataBlock, SourceDataBlock> SourceDataBlockPair;
     
@@ -64,10 +62,21 @@ namespace snowcrash {
      *  \brief  Splits %SourceDataBlock into two blocks.
      *  \param  block   A block to be split.
      *  \param  len     The length of first block after which the split occurs.
-     *
-     *  NOTE: A binding does not need to wrap this function.
      */
     SourceDataBlockPair SplitSourceDataBlock(const SourceDataBlock& block, size_t len);
+    
+    /**
+     *  \brief  Maps range of source data bytes into range of characters
+     */
+    SourceCharacterRange MapSourceDataRange(const SourceDataRange& range, const SourceData& data);
+    
+    /**
+     *  \brief  Maps block of source data bytes into block of characters.
+     *  \param  block   A %SourceDataBlock to map into %SourceCharacterBlock
+     *  \param  data    A mapped source data.
+     *  \returns A character-map constructed from given byte map
+     */
+    SourceCharacterBlock MapSourceDataBlock(const SourceDataBlock& block, const SourceData& data);
 }
 
 #endif

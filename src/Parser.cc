@@ -24,7 +24,7 @@ static bool CheckSource(const SourceData& source, Result& result)
     if (pos != std::string::npos) {
         result.error = Error("the use of tab(s) '\\t' in source data isn't currently supported, please contact makers",
                              2,
-                             MakeSourceDataBlock(pos, 1));
+                             MapSourceDataBlock(MakeSourceDataBlock(pos, 1), source));
         return false;
     }
 
@@ -32,7 +32,7 @@ static bool CheckSource(const SourceData& source, Result& result)
     if (pos != std::string::npos) {
         result.error = Error("the use of carriage return(s) '\\r' in source data isn't currently supported, please contact makers",
                              2,
-                             MakeSourceDataBlock(pos, 1));
+                             MapSourceDataBlock(MakeSourceDataBlock(pos, 1), source));
         return false;
     }
     

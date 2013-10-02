@@ -163,7 +163,7 @@ namespace snowcrash {
                     break;
                     
                 default:
-                    result.first.error = UnexpectedBlockError(*cur);
+                    result.first.error = UnexpectedBlockError(*cur, parser.sourceData);
                     break;
             }
             
@@ -222,7 +222,7 @@ namespace snowcrash {
             ss << ", increase its indentation to nest it properly";
             result.first.warnings.push_back(Warning(ss.str(),
                                                     FormattingWarning,
-                                                    sourceMap));
+                                                    MapSourceDataBlock(sourceMap, parser.sourceData)));
             return result;
         }
 

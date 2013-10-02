@@ -65,7 +65,7 @@ namespace snowcrash {
                     break;
                     
                 default:
-                    result.first.error = UnexpectedBlockError(*cur);
+                    result.first.error = UnexpectedBlockError(*cur, parser.sourceData);
                     break;
             }
             
@@ -83,7 +83,7 @@ namespace snowcrash {
             // ERR: No API name specified
             result.error = Error(ExpectedAPINameMessage,
                                  BusinessError,
-                                 block.sourceMap);
+                                 MapSourceDataBlock(block.sourceMap, parser.sourceData));
             return false;
         }
         
@@ -136,11 +136,11 @@ namespace snowcrash {
                         // WARN: No API name specified
                         result.first.warnings.push_back(Warning(ExpectedAPINameMessage,
                                                                 APINameWarning,
-                                                                sectionCur->sourceMap));
+                                                                MapSourceDataBlock(sectionCur->sourceMap, parser.sourceData)));
                     }
                 }
                 
-                if (!CheckCursor(sectionCur, bounds, cur, result.first))
+                if (!CheckCursor(sectionCur, bounds, parser.sourceData, cur, result.first))
                     return result;
                 output.description += MapSourceData(parser.sourceData, sectionCur->sourceMap);
             }
@@ -172,7 +172,9 @@ namespace snowcrash {
                 }
                 ss << " is already defined";
                 
-                result.first.warnings.push_back(Warning(ss.str(), DuplicateWarning, begin->sourceMap));
+                result.first.warnings.push_back(Warning(ss.str(),
+                                                        DuplicateWarning,
+                                                        MapSourceDataBlock(begin->sourceMap, parser.sourceData)));
             }
             
             output.resourceGroups.push_back(resourceGroup); // FIXME: C++11 move
@@ -228,7 +230,7 @@ namespace snowcrash {
                         ss << "duplicate definition of '" << it->first << "'";
                         result.first.warnings.push_back(Warning(ss.str(),
                                                                 DuplicateWarning,
-                                                                cur->sourceMap));
+                                                                MapSourceDataBlock(cur->sourceMap, parser.sourceData)));
                     }
                 }
                 
@@ -244,7 +246,7 @@ namespace snowcrash {
                 result.first.warnings.push_back(Warning("ignoring possible metadata, expected"
                                                         " '<key> : <value>', one one per line",
                                                         FormattingWarning,
-                                                        cur->sourceMap));
+                                                        MapSourceDataBlock(cur->sourceMap, parser.sourceData)));
             }
             
             return result;

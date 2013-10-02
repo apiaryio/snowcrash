@@ -130,7 +130,7 @@ namespace snowcrash {
                     break;
                     
                 default:
-                    result.first.error = UnexpectedBlockError(*cur);
+                    result.first.error = UnexpectedBlockError(*cur, parser.sourceData);
                     break;
             }
             
@@ -156,7 +156,12 @@ namespace snowcrash {
             // Signature
             if (sectionCur == bounds.first) {
                 
-                CheckSignatureAdditionalContent(sectionCur, bounds, "'parameters' keyword", ExpectedParametersContent, result.first);
+                CheckSignatureAdditionalContent(sectionCur,
+                                                bounds,
+                                                parser.sourceData,
+                                                "'parameters' keyword",
+                                                ExpectedParametersContent,
+                                                result.first);
                 result.second = SkipSignatureBlock(sectionCur, bounds.second);
                 return result;
             }
@@ -169,7 +174,7 @@ namespace snowcrash {
                 sectionCur = SkipToSectionEnd(sectionCur, bounds.second, ListBlockBeginType, ListItemBlockEndType);
             }
             
-            if (!CheckCursor(sectionCur, bounds, cur, result.first))
+            if (!CheckCursor(sectionCur, bounds, parser.sourceData, cur, result.first))
                 return result;
             
             // WARN: on ignoring additional content
@@ -178,7 +183,7 @@ namespace snowcrash {
             
             result.first.warnings.push_back(Warning(ss.str(),
                                                     IgnoringWarning,
-                                                    sectionCur->sourceMap));
+                                                    MapSourceDataBlock(sectionCur->sourceMap, parser.sourceData)));
             
             if (sectionCur != bounds.second)
                 result.second = ++sectionCur;
@@ -207,7 +212,7 @@ namespace snowcrash {
                     ss << "overshadowing previous parameter '" << parameter.name << "' definition";
                     result.first.warnings.push_back(Warning(ss.str(),
                                                             RedefinitionWarning,
-                                                            nameBlock->sourceMap));
+                                                            MapSourceDataBlock(nameBlock->sourceMap, parser.sourceData)));
                     
                     // Erase origan duplicate 
                     parameters.erase(duplicate);

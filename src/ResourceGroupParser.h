@@ -102,7 +102,7 @@ namespace snowcrash {
                     break;
                     
                 default:
-                    result.first.error = UnexpectedBlockError(*cur);
+                    result.first.error = UnexpectedBlockError(*cur, parser.sourceData);
                     break;
             }
             
@@ -126,7 +126,7 @@ namespace snowcrash {
                     // WARN: No Group name specified
                     result.first.warnings.push_back(Warning("expected resource group name, e.g. '# <Group Name>'",
                                                             EmptyDefinitionWarning,
-                                                            cur->sourceMap));
+                                                            MapSourceDataBlock(cur->sourceMap, parser.sourceData)));
                 }
                 
                 
@@ -137,7 +137,7 @@ namespace snowcrash {
                     sectionCur = SkipToSectionEnd(cur, bounds.second, ListBlockBeginType, ListBlockEndType);
                 }
                 
-                if (!CheckCursor(sectionCur, bounds, cur, result.first))
+                if (!CheckCursor(sectionCur, bounds, parser.sourceData, cur, result.first))
                     return result;
                 group.description += MapSourceData(parser.sourceData, sectionCur->sourceMap);
             }
@@ -169,7 +169,7 @@ namespace snowcrash {
                                                         resource.uriTemplate +
                                                         "' is already defined",
                                                         DuplicateWarning,
-                                                        begin->sourceMap));
+                                                        MapSourceDataBlock(begin->sourceMap, parser.sourceData)));
             }
             
             group.resources.push_back(resource); // FIXME: C++11 move

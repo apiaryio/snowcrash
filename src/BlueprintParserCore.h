@@ -277,12 +277,14 @@ namespace snowcrash {
      *  \brief Checks cursor validity within its container.
      *  \param cur  An iterator to be checked.
      *  \param bounds   Boundaries to check against.
+     *  \param sourceData   Source data byte buffer.
      *  \param parent   Cursor's parent block to be used in case of error reporting.
      *  \param result   Error result output, an error object is added in case of failed check.
      *  \returns True if cursor appears to be valid, false otherwise.
      */
     FORCEINLINE bool CheckCursor(const BlockIterator& cur,
                                  const SectionBounds& bounds,
+                                 const SourceData& sourceData,
                                  const BlockIterator& parent,
                                  Result& result) {
         if (cur != bounds.second)
@@ -292,16 +294,19 @@ namespace snowcrash {
             return false;
         
         // ERR: Sanity check
-        result.error = Error("unexpected markdown closure", ApplicationError, parent->sourceMap);
+        result.error = Error("unexpected markdown closure",
+                             ApplicationError,
+                             MapSourceDataBlock(parent->sourceMap, sourceData));
         return false;
     }
     
     /**
      *  \brief  Construct an Unexpected block error.
      *  \param  block   A Markdown block that is unexpected.
+     *  \param  sourceData   Source data byte buffer.
      *  \return An Error with description relevant to the type of the unexpected block.
      */
-    FORCEINLINE Error UnexpectedBlockError(const MarkdownBlock& block) {
+    FORCEINLINE Error UnexpectedBlockError(const MarkdownBlock& block, const SourceData& sourceData) {
         static const char *NotExpectedMessage = " is either not appropriate for the current context or its keyword has not been recognized, ";
         
         std::stringstream ss;
@@ -326,7 +331,9 @@ namespace snowcrash {
                 break;
         }
         
-        return Error(ss.str(), BusinessError, block.sourceMap);
+        return Error(ss.str(),
+                     BusinessError,
+                     MapSourceDataBlock(block.sourceMap, sourceData));
     }
 }
 

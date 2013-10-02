@@ -163,7 +163,7 @@ namespace snowcrash {
                     break;
                     
                 case ForeignSection:
-                    result = HandleForeignSection(cur, bounds);
+                    result = HandleForeignSection(cur, bounds, parser.sourceData);
                     break;
                     
                 case UndefinedSection:
@@ -175,11 +175,11 @@ namespace snowcrash {
                     // ERR: Unexpected model definition
                     result.first.error = Error("unexpected model definiton, a model can be only defined in the resource section",
                                                SymbolError,
-                                               cur->sourceMap);
+                                               MapSourceDataBlock(cur->sourceMap, parser.sourceData));
                     break;
                     
                 default:
-                    result.first.error = UnexpectedBlockError(*cur);
+                    result.first.error = UnexpectedBlockError(*cur, parser.sourceData);
                     break;
             }
             
@@ -217,7 +217,7 @@ namespace snowcrash {
                     }
                 }
                 
-                if (!CheckCursor(sectionCur, bounds, cur, result.first))
+                if (!CheckCursor(sectionCur, bounds, parser.sourceData, cur, result.first))
                     return result;
                 action.description += MapSourceData(parser.sourceData, sectionCur->sourceMap);
             }
@@ -240,7 +240,7 @@ namespace snowcrash {
                 BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
                 result.first.warnings.push_back(Warning(NoParametersMessage,
                                                         FormattingWarning,
-                                                        nameBlock->sourceMap));
+                                                        MapSourceDataBlock(nameBlock->sourceMap, parser.sourceData)));
             }
             else {
                 action.parameters.insert(action.parameters.end(), parameters.begin(), parameters.end());
@@ -282,13 +282,13 @@ namespace snowcrash {
                 BlockIterator nameBlock = ListItemNameBlock(begin, end);
                 result.first.warnings.push_back(Warning(ss.str(),
                                                         DuplicateWarning,
-                                                        nameBlock->sourceMap));
+                                                        MapSourceDataBlock(nameBlock->sourceMap, parser.sourceData)));
             }
             
             BlockIterator nameBlock = ListItemNameBlock(begin, end);
 
             // Check payload integrity
-            CheckPayload(section, payload, nameBlock->sourceMap, result.first);
+            CheckPayload(section, payload, nameBlock->sourceMap, parser.sourceData, result.first);
             
             // Inject parsed payload into the action
             if (section == RequestSection) {
@@ -299,7 +299,7 @@ namespace snowcrash {
             }
             
             // Check header duplicates
-            CheckHeaderDuplicates(action, payload, nameBlock->sourceMap, result.first);
+            CheckHeaderDuplicates(action, payload, nameBlock->sourceMap, parser.sourceData, result.first);
             
             return result;
         }
@@ -314,6 +314,7 @@ namespace snowcrash {
         static void CheckPayload(const Section& section,
                                  const Payload& payload,
                                  const SourceDataBlock& sourceMap,
+                                 const SourceData& sourceData,
                                  Result& result) {
             
             bool warnEmptyBody = false;
@@ -352,7 +353,7 @@ namespace snowcrash {
                     ss << "the " << code << " response MUST NOT include a " << SectionName(BodySection);
                     result.warnings.push_back(Warning(ss.str(),
                                                       EmptyDefinitionWarning,
-                                                      sourceMap));
+                                                      MapSourceDataBlock(sourceMap, sourceData)));
                     return;
                 }
             }
@@ -364,7 +365,7 @@ namespace snowcrash {
                 ss << "empty " << SectionName(section) << " " << SectionName(BodySection);
                 result.warnings.push_back(Warning(ss.str(),
                                                   EmptyDefinitionWarning,
-                                                  sourceMap));
+                                                  MapSourceDataBlock(sourceMap, sourceData)));
             }
         }
 

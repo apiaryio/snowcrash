@@ -263,11 +263,11 @@ namespace snowcrash {
                     break;
                     
                 case ForeignSection:
-                    result = HandleForeignSection(cur, bounds);
+                    result = HandleForeignSection(cur, bounds, parser.sourceData);
                     break;
                                         
                 default:
-                    result.first.error = UnexpectedBlockError(*cur);
+                    result.first.error = UnexpectedBlockError(*cur, parser.sourceData);
                     break;
             }
             
@@ -317,7 +317,7 @@ namespace snowcrash {
                     }
                 }
                 
-                if (!CheckCursor(sectionCur, bounds, cur, result.first))
+                if (!CheckCursor(sectionCur, bounds, parser.sourceData, cur, result.first))
                     return result;
                 payload.description += MapSourceData(parser.sourceData, sectionCur->sourceMap);
             }
@@ -354,7 +354,7 @@ namespace snowcrash {
                 ss << "ignoring additional " << SectionName(section) << " content, content is already defined";
                 result.first.warnings.push_back(Warning(ss.str(),
                                                         RedefinitionWarning,
-                                                        nameBlock->sourceMap));
+                                                        MapSourceDataBlock(nameBlock->sourceMap, parser.sourceData)));
             }
             
             return result;
@@ -391,7 +391,7 @@ namespace snowcrash {
                     ss << "undefined symbol '" << symbol << "'";
                     result.first.error = Error(ss.str(),
                                                SymbolError,
-                                               symbolSourceMap);
+                                               MapSourceDataBlock(symbolSourceMap, parser.sourceData));
                     return result;
                 }
                 
@@ -474,7 +474,9 @@ namespace snowcrash {
                     std::stringstream ss;
                     ss << "ignoring extraneous content after symbol reference";
                     ss << ", expected symbol reference only e.g. '[" << symbolName << "][]'";
-                    result.first.warnings.push_back(Warning(ss.str(), IgnoringWarning, cur->sourceMap));
+                    result.first.warnings.push_back(Warning(ss.str(),
+                                                            IgnoringWarning,
+                                                            MapSourceDataBlock(cur->sourceMap, parser.sourceData)));
                 }
             }
             
@@ -502,7 +504,7 @@ namespace snowcrash {
             GetPayloadSignature(begin, end, payload.name, mediaType);
             
             // Check signature
-            if (!CheckSignature(section, begin, end, signature, result)) {
+            if (!CheckSignature(section, begin, end, signature, sourceData, result)) {
                 // Clear and readouts
                 payload.name.clear();
                 mediaType.clear();
@@ -522,7 +524,7 @@ namespace snowcrash {
                 BlockIterator nameBlock = ListItemNameBlock(begin, end);
                 result.warnings.push_back(Warning("missing response HTTP status code, assuming 'Response 200'",
                                                   EmptyDefinitionWarning,
-                                                  nameBlock->sourceMap));
+                                                  MapSourceDataBlock(nameBlock->sourceMap, sourceData)));
                 payload.name = "200";
             }
             
@@ -534,7 +536,7 @@ namespace snowcrash {
                 ss << "the 'object' keyword is deprecated and as such it will be removed in a future release, please use the 'model' keyword instead";
                 result.warnings.push_back(Warning(ss.str(),
                                                   DeprecatedWarning,
-                                                  nameBlock->sourceMap));
+                                                  MapSourceDataBlock(nameBlock->sourceMap, sourceData)));
             }
             
             if (!mediaType.empty()) {
@@ -552,6 +554,7 @@ namespace snowcrash {
                                    const BlockIterator& begin,
                                    const BlockIterator& end,
                                    const SourceData& signature,
+                                   const SourceData& sourceData,
                                    Result& result) {
             
             std::string regex;
@@ -614,7 +617,7 @@ namespace snowcrash {
                     }
                     result.warnings.push_back(Warning(ss.str(),
                                                       FormattingWarning,
-                                                      nameBlock->sourceMap));
+                                                      MapSourceDataBlock(nameBlock->sourceMap, sourceData)));
                     
                     return false;
                 }

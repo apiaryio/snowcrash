@@ -186,6 +186,7 @@ namespace snowcrash {
      */
     FORCEINLINE ParseSectionResult HandleForeignSection(const BlockIterator& cur,
                                                         const SectionBounds& bounds,
+                                                        const SourceData& sourceData,
                                                         const std::string& expected = std::string()) {
 
         ParseSectionResult result = std::make_pair(Result(), cur);
@@ -200,7 +201,7 @@ namespace snowcrash {
             
             result.first.warnings.push_back(Warning(ss.str(),
                                                     IgnoringWarning,
-                                                    result.second->sourceMap));
+                                                    MapSourceDataBlock(result.second->sourceMap, sourceData)));
             result.second = CloseListItemBlock(result.second, bounds.second);
         }
         else if (cur->type == ListBlockBeginType) {
@@ -212,7 +213,7 @@ namespace snowcrash {
             
             result.first.warnings.push_back(Warning(ss.str(),
                                                     IgnoringWarning,
-                                                    result.second->sourceMap));
+                                                    MapSourceDataBlock(result.second->sourceMap, sourceData)));
             result.second = CloseListItemBlock(result.second, bounds.second);
         }
         else {
@@ -228,7 +229,7 @@ namespace snowcrash {
                 ss << ", expected: " << expected;
             result.first.warnings.push_back(Warning(ss.str(),
                                                     IgnoringWarning,
-                                                    result.second->sourceMap));
+                                                    MapSourceDataBlock(result.second->sourceMap, sourceData)));
         }
 
         return result;
@@ -348,6 +349,7 @@ namespace snowcrash {
      *  \brief Check List Item signature for an addtional content and issue a warning.
      *  \param cur      The begining of the list item to check.
      *  \param bounds   Bounds within the block buffer.
+     *  \param sourceData   Source data byte buffer.
      *  \param placeHint    A string explaining the possible place of failure. Might be empty.
      *  \param expectedHint A string defining expected content. Might be empty.
      *  \param result   Result to append the possible warning into.
@@ -355,6 +357,7 @@ namespace snowcrash {
      */
     FORCEINLINE bool CheckSignatureAdditionalContent(const BlockIterator& cur,
                                                      const SectionBounds& bounds,
+                                                     const SourceData& sourceData,
                                                      const std::string& placeHint,
                                                      const std::string& expectedHint,
                                                      Result& result)
@@ -376,7 +379,7 @@ namespace snowcrash {
             
             result.warnings.push_back(Warning(ss.str(),
                                               IgnoringWarning,
-                                              nameBlock->sourceMap));
+                                              MapSourceDataBlock(nameBlock->sourceMap, sourceData)));
         }
         
         return remainingContent.empty();
@@ -386,6 +389,7 @@ namespace snowcrash {
      *  \brief Skips to the end of a signature-only list item ignoring and reporting any additional content.
      *  \param cur          The begining of the list item to close.
      *  \param bounds       Bounds within the block buffer.
+     *  \param  sourceData   Source data byte buffer.
      *  \param placeHint    A string explaining the possible place of failure. Might be empty.
      *  \param expectedHint A string defining expected content. Might be empty.
      *  \param result       Result to append the possible warning into.
@@ -393,6 +397,7 @@ namespace snowcrash {
      */
     FORCEINLINE BlockIterator CloseSignatureOnlyListItem(const BlockIterator& cur,
                                                          const SectionBounds& bounds,
+                                                         const SourceData& sourceData,
                                                          const std::string& placeHint,
                                                          const std::string& expectedHint,
                                                          Result& result)
@@ -423,7 +428,9 @@ namespace snowcrash {
                 if (!expectedHint.empty())
                     ss << ", expected " << expectedHint;
                 
-                result.warnings.push_back(Warning(ss.str(), IgnoringWarning, sectionCur->sourceMap));
+                result.warnings.push_back(Warning(ss.str(),
+                                                  IgnoringWarning,
+                                                  MapSourceDataBlock(sectionCur->sourceMap, sourceData)));
             }
         }
         
@@ -461,7 +468,7 @@ namespace snowcrash {
                 ss << SectionName(section) << " " << FormattingWarningMesssage;
                 result.first.warnings.push_back(Warning(ss.str(),
                                                         FormattingWarning,
-                                                        nameBlock->sourceMap));
+                                                        MapSourceDataBlock(nameBlock->sourceMap, parser.sourceData)));
             }
             
             sectionCur = FirstContentBlock(cur, bounds.second);
@@ -482,7 +489,7 @@ namespace snowcrash {
                 sectionCur = SkipToSectionEnd(sectionCur, bounds.second, ListItemBlockBeginType, ListItemBlockEndType);
             }
             
-            if (!CheckCursor(sectionCur, bounds, cur, result.first))
+            if (!CheckCursor(sectionCur, bounds, parser.sourceData, cur, result.first))
                 return result;
             dataStream << MapSourceData(parser.sourceData, sectionCur->sourceMap);
             
@@ -491,7 +498,7 @@ namespace snowcrash {
             ss << SectionName(section) << " " << FormattingWarningMesssage;
             result.first.warnings.push_back(Warning(ss.str(),
                                                     FormattingWarning,
-                                                    sectionCur->sourceMap));
+                                                    MapSourceDataBlock(sectionCur->sourceMap, parser.sourceData)));
         }
         
         data = dataStream.str();

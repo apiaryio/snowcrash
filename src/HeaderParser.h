@@ -108,7 +108,7 @@ namespace snowcrash {
                     break;
                     
                 default:
-                    result.first.error = UnexpectedBlockError(*cur);
+                    result.first.error = UnexpectedBlockError(*cur, parser.sourceData);
                     break;
             }
             
@@ -147,7 +147,7 @@ namespace snowcrash {
                         ss << "duplicate definition of '" << header.first << "' header";
                         result.first.warnings.push_back(Warning(ss.str(),
                                                                 DuplicateWarning,
-                                                                sourceMap));
+                                                                MapSourceDataBlock(sourceMap, parser.sourceData)));
                         
                     }
                         
@@ -158,7 +158,7 @@ namespace snowcrash {
                     result.first.warnings.push_back(Warning("unable to parse HTTP header, expected"
                                                             " '<header name> : <header value>', one header per line",
                                                FormattingWarning,
-                                               sourceMap));
+                                               MapSourceDataBlock(sourceMap, parser.sourceData)));
                 }
             }
             
@@ -186,7 +186,7 @@ namespace snowcrash {
             BlockIterator nameBlock = ListItemNameBlock(begin, end);
             result.first.warnings.push_back(Warning("no headers specified",
                                                     FormattingWarning,
-                                                    nameBlock->sourceMap));
+                                                    MapSourceDataBlock(nameBlock->sourceMap, parser.sourceData)));
         }
         return result;
     }
@@ -196,6 +196,7 @@ namespace snowcrash {
     void CheckHeaderDuplicates(const T& left,
                                const R& right,
                                const SourceDataBlock& rightSourceMap,
+                               const SourceData& sourceData,
                                Result& result) {
         
         for (HeaderIterator it = right.headers.begin(); it != right.headers.end(); ++it) {
@@ -205,7 +206,7 @@ namespace snowcrash {
                 ss << "overshadowing previous '" << it->first << "' header definition";
                 result.warnings.push_back(Warning(ss.str(),
                                                   RedefinitionWarning,
-                                                  rightSourceMap));
+                                                  MapSourceDataBlock(rightSourceMap, sourceData)));
             }
         }
     }
