@@ -74,7 +74,7 @@ namespace snowcrash {
 
     /**
      *  \brief  Maps block of source data bytes into source string.
-     *  \param  block   A %SourceDataBlock to map into %SourceCharacterBlock
+     *  \param  block   A %SourceDataBlock to map into %SourceCharactersBlock
      *  \param  data    A mapped source data.
      *  \returns A string concatenated from the source string using the byte map.
      */

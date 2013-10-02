@@ -17,7 +17,7 @@ namespace snowcrash {
     /**
      *  \brief  A character range within the source code string.
      */
-    struct SourceCharacterRange {
+    struct SourceCharactersRange {
         size_t location;
         size_t length;
     };
@@ -27,7 +27,7 @@ namespace snowcrash {
      *
      *  NOTE: The block does not have to be continuous.
      */
-    typedef std::vector<SourceCharacterRange> SourceCharacterBlock;
+    typedef std::vector<SourceCharactersRange> SourceCharactersBlock;
     
     /**
      *  \brief  A source data annotation.
@@ -68,7 +68,7 @@ namespace snowcrash {
          */
         SourceAnnotation(const std::string& message,
                          int code = OK,
-                         const SourceCharacterBlock& location = SourceCharacterBlock()) {
+                         const SourceCharactersBlock& location = SourceCharactersBlock()) {
             
             this->message = message;
             this->code = code;
@@ -93,7 +93,7 @@ namespace snowcrash {
         }
         
         /** The location of this annotation within the source data buffer. */
-        SourceCharacterBlock location;
+        SourceCharactersBlock location;
         
         /** An annotation code. */
         int code;

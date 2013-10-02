@@ -68,15 +68,15 @@ namespace snowcrash {
     /**
      *  \brief  Maps range of source data bytes into range of characters
      */
-    SourceCharacterRange MapSourceDataRange(const SourceDataRange& range, const SourceData& data);
+    SourceCharactersRange MapSourceDataRange(const SourceDataRange& range, const SourceData& data);
     
     /**
      *  \brief  Maps block of source data bytes into block of characters.
-     *  \param  block   A %SourceDataBlock to map into %SourceCharacterBlock
+     *  \param  block   A %SourceDataBlock to map into %SourceCharactersBlock
      *  \param  data    A mapped source data.
      *  \returns A character-map constructed from given byte map
      */
-    SourceCharacterBlock MapSourceDataBlock(const SourceDataBlock& block, const SourceData& data);
+    SourceCharactersBlock MapSourceDataBlock(const SourceDataBlock& block, const SourceData& data);
 }
 
 #endif

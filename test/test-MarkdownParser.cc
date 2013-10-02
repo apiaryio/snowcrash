@@ -695,7 +695,7 @@ TEST_CASE("Multi-byte characters English", "[markdown][sourcemap]")
     std::string mappedString = MapSourceData(source, markdown[0].sourceMap);
     REQUIRE(mappedString == source);
     
-    SourceCharacterBlock characterBlock = MapSourceDataBlock(markdown[0].sourceMap, source);
+    SourceCharactersBlock characterBlock = MapSourceDataBlock(markdown[0].sourceMap, source);
     REQUIRE(characterBlock.size() == 1);
     REQUIRE(characterBlock[0].location == 0);
     REQUIRE(characterBlock[0].length == 44);
@@ -723,7 +723,7 @@ TEST_CASE("Multi-byte characters Czech", "[markdown][sourcemap]")
     std::string mappedString = MapSourceData(source, markdown[0].sourceMap);
     REQUIRE(mappedString == source);
     
-    SourceCharacterBlock characterBlock = MapSourceDataBlock(markdown[0].sourceMap, source);
+    SourceCharactersBlock characterBlock = MapSourceDataBlock(markdown[0].sourceMap, source);
     REQUIRE(characterBlock.size() == 1);
     REQUIRE(characterBlock[0].location == 0);
     REQUIRE(characterBlock[0].length == 41);
@@ -751,7 +751,7 @@ TEST_CASE("Multi-byte characters Chinese", "[markdown][sourcemap]")
     std::string mappedString = MapSourceData(source, markdown[0].sourceMap);
     REQUIRE(mappedString == source);
     
-    SourceCharacterBlock characterBlock = MapSourceDataBlock(markdown[0].sourceMap, source);
+    SourceCharactersBlock characterBlock = MapSourceDataBlock(markdown[0].sourceMap, source);
     REQUIRE(characterBlock.size() == 1);
     REQUIRE(characterBlock[0].location == 0);
     REQUIRE(characterBlock[0].length == 3);
@@ -777,7 +777,7 @@ TEST_CASE("Multi-byte characters in multiple blocks", "[markdown][sourcemap]")
     REQUIRE(markdown[0].sourceMap[0].location == 0);
     REQUIRE(markdown[0].sourceMap[0].length == 8); // UTF8 Ni Hao + 2xLF
     
-    SourceCharacterBlock characterBlock = MapSourceDataBlock(markdown[0].sourceMap, source);
+    SourceCharactersBlock characterBlock = MapSourceDataBlock(markdown[0].sourceMap, source);
     REQUIRE(characterBlock.size() == 1);
     REQUIRE(characterBlock[0].location == 0);
     REQUIRE(characterBlock[0].length == 4);
@@ -824,7 +824,7 @@ TEST_CASE("Multi-byte characters in blockquote", "[markdown][sourcemap][now]")
     mappedString = MapSourceData(source, markdown[2].sourceMap);
     REQUIRE(mappedString == source);
     
-    SourceCharacterBlock characterBlock = MapSourceDataBlock(markdown[1].sourceMap, source);
+    SourceCharactersBlock characterBlock = MapSourceDataBlock(markdown[1].sourceMap, source);
     REQUIRE(characterBlock.size() == 1);
     REQUIRE(characterBlock[0].location == 2);
     REQUIRE(characterBlock[0].length == 3);
