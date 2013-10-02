@@ -664,7 +664,7 @@ TEST_CASE("Parse nameless model", "[payload][model][block]")
     REQUIRE(payload.schema.empty());
 }
 
-TEST_CASE("Warn on malformed payload signature", "[payload][block][#20][now]")
+TEST_CASE("Warn on malformed payload signature", "[payload][block][#20]")
 {
     // Blueprint in question:
     //R"(
