@@ -707,8 +707,7 @@ TEST_CASE("Multi-byte characters Czech", "[markdown][sourcemap]")
     Result result;
     MarkdownBlock::Stack markdown;
     
-    const std::string source = "P\u0159\u00ED\u0161ern\u011B \u017Elu\u0165ou\u010Dk\u00FD k\u016F\u0148 \u00FAp\u011Bl \u010F\u00E1belsk\u00E9 \u00F3dy\n"; // "Priserne zlutoucky kun upel dabelske ody"
-    
+    const std::string source = "\x50\xC5\x99\xC3\xAD\xC5\xA1\x65\x72\x6E\xC4\x9B\x20\xC5\xBE\x6C\x75\xC5\xA5\x6F\x75\xC4\x8D\x6B\xC3\xBD\x20\x6B\xC5\xAF\xC5\x88\x20\xC3\xBA\x70\xC4\x9B\x6C\x20\xC4\x8F\xC3\xA1\x62\x65\x6C\x73\x6B\xC3\xA9\x20\xC3\xB3\x64\x79\n";
     parser.parse(source, result, markdown);
     
     REQUIRE(result.error.code == Error::OK);
@@ -735,7 +734,7 @@ TEST_CASE("Multi-byte characters Chinese", "[markdown][sourcemap]")
     Result result;
     MarkdownBlock::Stack markdown;
     
-    const std::string source = "\u4F60\u597D\n"; // "Ni Hao"
+    const std::string source = "\xE4\xBD\xA0\xE5\xA5\xBD\n"; // "Ni Hao"
     
     parser.parse(source, result, markdown);
     
@@ -764,7 +763,7 @@ TEST_CASE("Multi-byte characters in multiple blocks", "[markdown][sourcemap]")
     MarkdownBlock::Stack markdown;
     
     // "Ni Hao + Kon'nichiwa"
-    const std::string source = "\u4F60\u597D\n\n\u3053\u3093\u306B\u3061\u306F\n";
+    const std::string source = "\xE4\xBD\xA0\xE5\xA5\xBD\n\n\xE3\x81\x93\xE3\x82\x93\xE3\x81\xAB\xE3\x81\xA1\xE3\x81\xAF\n";
     
     parser.parse(source, result, markdown);
     
@@ -799,7 +798,7 @@ TEST_CASE("Multi-byte characters in blockquote", "[markdown][sourcemap][now]")
     MarkdownBlock::Stack markdown;
     
     // "> Ni Hao"
-    const std::string source = "> \u4F60\u597D\n";
+    const std::string source = "> \xE4\xBD\xA0\xE5\xA5\xBD\n";
     
     parser.parse(source, result, markdown);
     
@@ -819,7 +818,7 @@ TEST_CASE("Multi-byte characters in blockquote", "[markdown][sourcemap][now]")
     REQUIRE(markdown[2].sourceMap[0].length == 9);
     
     std::string mappedString = MapSourceData(source, markdown[1].sourceMap);
-    REQUIRE(mappedString == "\u4F60\u597D\n");
+    REQUIRE(mappedString == "\xE4\xBD\xA0\xE5\xA5\xBD\n");
 
     mappedString = MapSourceData(source, markdown[2].sourceMap);
     REQUIRE(mappedString == source);
