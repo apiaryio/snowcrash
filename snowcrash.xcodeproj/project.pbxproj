@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		BB03DC6617D3718D00C51E52 /* test-ParametersParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB03DC6517D3718D00C51E52 /* test-ParametersParser.cc */; };
 		BB03DC6917D3723300C51E52 /* test-ParameterDefinitonParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB03DC6817D3723300C51E52 /* test-ParameterDefinitonParser.cc */; };
+		BB05B9D81804493500243E1B /* perf-snowcrash.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB05B9D71804493500243E1B /* perf-snowcrash.cc */; };
+		BB05B9D918044C8200243E1B /* libsnowcrash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBFF4898170B34E6001E5FB2 /* libsnowcrash.a */; };
 		BB167D1D172931330030D1D5 /* test-BlueprintParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA01FF817292F9C0050B603 /* test-BlueprintParser.cc */; };
 		BB1865C91764DB8A00756B18 /* test-SymbolTable.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB1865C81764DB8A00756B18 /* test-SymbolTable.cc */; };
 		BB1D4D0B174D0932009BCB1C /* test-HeaderParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB1D4D08174D08C3009BCB1C /* test-HeaderParser.cc */; };
@@ -70,6 +72,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		BB05B9DC18044CA100243E1B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BBFF4890170B34E6001E5FB2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BBFF4897170B34E6001E5FB2;
+			remoteInfo = libsnowcrash;
+		};
 		BB4D8E55172D15AA0024EB04 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = BBFF4890170B34E6001E5FB2 /* Project object */;
@@ -80,6 +89,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		BB05B9CC180448E300243E1B /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
 		BBA25665172BFE4C00C1AD5E /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -105,6 +123,8 @@
 		BB03DC6517D3718D00C51E52 /* test-ParametersParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-ParametersParser.cc"; path = "test/test-ParametersParser.cc"; sourceTree = "<group>"; };
 		BB03DC6717D3721600C51E52 /* ParameterDefinitonParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = ParameterDefinitonParser.h; path = src/ParameterDefinitonParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BB03DC6817D3723300C51E52 /* test-ParameterDefinitonParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = "test-ParameterDefinitonParser.cc"; path = "test/test-ParameterDefinitonParser.cc"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
+		BB05B9CE180448E300243E1B /* perf-snowcrash */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "perf-snowcrash"; sourceTree = BUILT_PRODUCTS_DIR; };
+		BB05B9D71804493500243E1B /* perf-snowcrash.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "perf-snowcrash.cc"; path = "test/performance/perf-snowcrash.cc"; sourceTree = SOURCE_ROOT; };
 		BB0793BE1782C773005BB7CC /* Platform.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Platform.h; path = src/Platform.h; sourceTree = "<group>"; };
 		BB1865C71764D67B00756B18 /* SymbolTable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = SymbolTable.h; path = src/SymbolTable.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BB1865C81764DB8A00756B18 /* test-SymbolTable.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-SymbolTable.cc"; path = "test/test-SymbolTable.cc"; sourceTree = "<group>"; };
@@ -182,6 +202,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		BB05B9CB180448E300243E1B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BB05B9D918044C8200243E1B /* libsnowcrash.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		BBA25664172BFE4C00C1AD5E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -208,6 +236,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		BB05B9CF180448E300243E1B /* perf-snowcrash */ = {
+			isa = PBXGroup;
+			children = (
+				BB05B9D71804493500243E1B /* perf-snowcrash.cc */,
+			);
+			path = "perf-snowcrash";
+			sourceTree = "<group>";
+		};
 		BB810F781779AB5400B89CD8 /* cmdline */ = {
 			isa = PBXGroup;
 			children = (
@@ -309,6 +345,7 @@
 				BBFF48CB170B3ECB001E5FB2 /* src */,
 				BBA889AB17131AEB005A9570 /* sundown */,
 				BBFF48B9170B3AF6001E5FB2 /* test */,
+				BB05B9CF180448E300243E1B /* perf-snowcrash */,
 				BBFF4899170B34E6001E5FB2 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -319,6 +356,7 @@
 				BBFF4898170B34E6001E5FB2 /* libsnowcrash.a */,
 				BBFF48C0170B3C30001E5FB2 /* test-snowcrash */,
 				BBA25667172BFE4C00C1AD5E /* snowcrash */,
+				BB05B9CE180448E300243E1B /* perf-snowcrash */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -414,6 +452,24 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		BB05B9CD180448E300243E1B /* perf-snowcrash */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BB05B9D6180448E300243E1B /* Build configuration list for PBXNativeTarget "perf-snowcrash" */;
+			buildPhases = (
+				BB05B9CA180448E300243E1B /* Sources */,
+				BB05B9CB180448E300243E1B /* Frameworks */,
+				BB05B9CC180448E300243E1B /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				BB05B9DD18044CA100243E1B /* PBXTargetDependency */,
+			);
+			name = "perf-snowcrash";
+			productName = "perf-snowcrash";
+			productReference = BB05B9CE180448E300243E1B /* perf-snowcrash */;
+			productType = "com.apple.product-type.tool";
+		};
 		BBA25666172BFE4C00C1AD5E /* snowcrash */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = BBA2566F172BFE4C00C1AD5E /* Build configuration list for PBXNativeTarget "snowcrash" */;
@@ -490,11 +546,20 @@
 				BBFF4897170B34E6001E5FB2 /* libsnowcrash */,
 				BBFF48BF170B3C30001E5FB2 /* test-snowcrash */,
 				BBA25666172BFE4C00C1AD5E /* snowcrash */,
+				BB05B9CD180448E300243E1B /* perf-snowcrash */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
+		BB05B9CA180448E300243E1B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BB05B9D81804493500243E1B /* perf-snowcrash.cc in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		BBA25663172BFE4C00C1AD5E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -556,6 +621,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		BB05B9DD18044CA100243E1B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BBFF4897170B34E6001E5FB2 /* libsnowcrash */;
+			targetProxy = BB05B9DC18044CA100243E1B /* PBXContainerItemProxy */;
+		};
 		BB4D8E56172D15AA0024EB04 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = BBFF4897170B34E6001E5FB2 /* libsnowcrash */;
@@ -564,6 +634,52 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		BB05B9D4180448E300243E1B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		BB05B9D5180448E300243E1B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-g",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		BBA2566D172BFE4C00C1AD5E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -662,6 +778,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		BB05B9D6180448E300243E1B /* Build configuration list for PBXNativeTarget "perf-snowcrash" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BB05B9D4180448E300243E1B /* Debug */,
+				BB05B9D5180448E300243E1B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		BBA2566F172BFE4C00C1AD5E /* Build configuration list for PBXNativeTarget "snowcrash" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
