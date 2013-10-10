@@ -108,6 +108,8 @@ int main(int argc, const char *argv[])
     inputStream << inputFileStream.rdbuf();
     inputFileStream.close();
     
+    std::cout << "running snowcrash performance test...\n";
+    
     double mean = 0, total = 0, stddev = 0;
     int result = testfunc(inputStream.str(), total, mean, stddev);
     

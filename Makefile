@@ -18,6 +18,13 @@ libsnowcrash: config.gypi $(BUILD_DIR)/Makefile
 
 test-snowcrash: config.gypi $(BUILD_DIR)/Makefile
 	$(MAKE) -C $(BUILD_DIR) V=$(V) test-snowcrash
+	mkdir -p ./bin
+	cp -f $(BUILD_DIR)/out/Release/test-snowcrash ./bin/test-snowcrash
+
+perf-snowcrash: config.gypi $(BUILD_DIR)/Makefile
+	$(MAKE) -C $(BUILD_DIR) V=$(V) perf-snowcrash
+	mkdir -p ./bin
+	cp -f $(BUILD_DIR)/out/Release/perf-snowcrash ./bin/perf-snowcrash
 
 snowcrash: config.gypi $(BUILD_DIR)/Makefile
 	$(MAKE) -C $(BUILD_DIR) V=$(V) snowcrash
@@ -43,7 +50,10 @@ distclean:
 test: test-snowcrash
 	$(BUILD_DIR)/out/Release/test-snowcrash
 
-install: snowcrash
-	cp -f $(BUILD_DIR)/out/Release/snowcrash /usr/local/bin/snowcrash	
+perf: perf-snowcrash
+	$(BUILD_DIR)/out/Release/perf-snowcrash ./test/performance/fixtures/fixture-1.md
 
-.PHONY: libsnowcrash test-snowcrash snowcrash clean distclean test
+install: snowcrash
+	cp -f $(BUILD_DIR)/out/Release/snowcrash /usr/local/bin/snowcrash
+
+.PHONY: libsnowcrash test-snowcrash perf-snowcrash snowcrash clean distclean test

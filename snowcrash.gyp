@@ -129,6 +129,24 @@
         'libsnowcrash',
         'sundown'
       ]
-    }    
+    },
+
+    {
+      'target_name': 'perf-snowcrash',
+      'type': 'executable',
+      'include_dirs': [
+        'src',
+        'cmdline',
+        'test',
+        'test/performance',
+      ],
+      'sources': [
+        'test/performance/perf-snowcrash.cc'
+      ],
+      'dependencies': [
+        'libsnowcrash',
+        'sundown'
+      ]
+    }
   ]
 }
