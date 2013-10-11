@@ -12,7 +12,7 @@ Snow Crash is currently Work in Progress. See its [v1.0 Milestone](https://githu
 Snow Crash bindings in other languages:
 
 - [Protagonist](https://github.com/apiaryio/protagonist) (Node.js)
-- [snowcrashCLR](https://github.com/SeriousM/snowcrashCLR) (.NET)
+- [Snow Crash .NET](https://github.com/brutski/snowcrash-dot-net-wrapper) (.NET)
 
 ## Install
 OS X using Homebrew:
