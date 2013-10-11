@@ -42,15 +42,6 @@ static int testfunc(const std::string& input, double& total, double& mean, doubl
             std::cerr << "fatal: gettimeofday failed";
 			exit(EXIT_FAILURE);
 		}
-		
-        // TODO: Remove intentional leak
-//        int* foo = new int[10];
-//        
-//        foo[3] = 23;
-//        foo[8] = 45;
-//        printf("%d %d\n", foo[3], foo[8]);
-//        foo = NULL;
-        //
         
         snowcrash::parse(input, options, result, blueprint);
         
@@ -77,7 +68,7 @@ static int testfunc(const std::string& input, double& total, double& mean, doubl
 int main(int argc, const char *argv[])
 {
     // FIXME: Intstrumetns helper
-    // ::sleep(20);
+    ::sleep(20);
     
     // Setup commandline Argument Parser
     cmdline::parser argumentParser;
@@ -117,7 +108,7 @@ int main(int argc, const char *argv[])
     std::cout << "total: " << total << "s mean: " << mean << " +/- " << stddev << "s\n";
     
     // FIXME: Intstrumetns helper
-    // ::sleep(20);
+    ::sleep(20);
 }
 
 
