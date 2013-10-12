@@ -193,7 +193,7 @@ static void serialize(const Collection<Parameter>::type& parameters, size_t leve
             os << NewLineItemBlock;
             
             // Requried
-            serialize(SerializeKey::Required, (it->use == OptionalParameterUse), level + 2, os);
+            serialize(SerializeKey::Required, (it->use != OptionalParameterUse), level + 2, os);
             os << NewLineItemBlock;
             
             // Default
