@@ -154,12 +154,12 @@ namespace snowcrash {
                     break;
 
                 case HeadersSection:
-                    result = HandleHeaders(cur, bounds.second, parser, action);
+                    result = HandleHeaders(cur, bounds, parser, action);
                     break;
                     
                 case RequestSection:
                 case ResponseSection:
-                    result = HandlePayload(section, cur, bounds.second, parser, action);
+                    result = HandlePayload(section, cur, bounds, parser, action);
                     break;
                     
                 case ForeignSection:
@@ -172,10 +172,13 @@ namespace snowcrash {
                 
                 case ModelSection:
                 case ObjectSection:
-                    // ERR: Unexpected model definition
-                    result.first.error = Error("unexpected model definiton, a model can be only defined in the resource section",
-                                               SymbolError,
-                                               MapSourceDataBlock(cur->sourceMap, parser.sourceData));
+                    {
+                        // ERR: Unexpected model definition
+                        SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, bounds, bounds.second, parser.sourceData);
+                        result.first.error = Error("unexpected model definiton, a model can be only defined in the resource section",
+                                                   SymbolError,
+                                                   sourceBlock);
+                    }
                     break;
                     
                 default:
@@ -238,9 +241,10 @@ namespace snowcrash {
             
             if (parameters.empty()) {
                 BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, bounds, cur, parser.sourceData);
                 result.first.warnings.push_back(Warning(NoParametersMessage,
                                                         FormattingWarning,
-                                                        MapSourceDataBlock(nameBlock->sourceMap, parser.sourceData)));
+                                                        sourceBlock));
             }
             else {
                 action.parameters.insert(action.parameters.end(), parameters.begin(), parameters.end());
@@ -258,13 +262,13 @@ namespace snowcrash {
          *  \return A block parser section result.
          */
         static ParseSectionResult HandlePayload(const Section &section,
-                                                const BlockIterator& begin,
-                                                const BlockIterator& end,
+                                                const BlockIterator& cur,
+                                                const SectionBounds& bounds,
                                                 BlueprintParserCore& parser,
                                                 Action& action)
         {
             Payload payload;
-            ParseSectionResult result = PayloadParser::Parse(begin, end, parser, payload);
+            ParseSectionResult result = PayloadParser::Parse(cur, bounds.second, parser, payload);
             if (result.first.error.code != Error::OK)
                 return result;
             
@@ -273,19 +277,20 @@ namespace snowcrash {
                 action.examples.push_back(TransactionExample());
             }
             
+            BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
+            
             // Check for duplicate
             if (IsPayloadDuplicate(section, payload, action)) {
                 // WARN: duplicate payload
                 std::stringstream ss;
                 ss << SectionName(section) << " payload `" << payload.name << "`";
                 ss << " already defined for `" << action.method << "` method";
-                BlockIterator nameBlock = ListItemNameBlock(begin, end);
+
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, bounds, cur, parser.sourceData);
                 result.first.warnings.push_back(Warning(ss.str(),
                                                         DuplicateWarning,
-                                                        MapSourceDataBlock(nameBlock->sourceMap, parser.sourceData)));
+                                                        sourceBlock));
             }
-            
-            BlockIterator nameBlock = ListItemNameBlock(begin, end);
 
             // Check payload integrity
             CheckPayload(section, payload, nameBlock->sourceMap, parser.sourceData, result.first);

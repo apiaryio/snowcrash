@@ -179,7 +179,7 @@ namespace snowcrash {
                 
                 case ModelSection:
                 case ObjectSection:
-                    result = HandleModel(cur, bounds.second, parser, resource);
+                    result = HandleModel(cur, bounds, parser, resource);
                     break;
                     
                 case ParametersSection:
@@ -187,15 +187,15 @@ namespace snowcrash {
                     break;
                     
                 case HeadersSection:
-                    result = HandleHeaders(cur, bounds.second, parser, resource);
+                    result = HandleHeaders(cur, bounds, parser, resource);
                     break;
                     
                 case ActionSection:
-                    result = HandleAction(cur, bounds.second, parser, resource);
+                    result = HandleAction(cur, bounds, parser, resource);
                     break;
                     
                 case UndefinedSection:
-                    CheckAmbiguousMethod(cur, bounds.second, resource, parser.sourceData, result.first);
+                    CheckAmbiguousMethod(cur, bounds, resource, parser.sourceData, result.first);
                     result.second = CloseListItemBlock(cur, bounds.second);
                     break;
                     
@@ -253,13 +253,13 @@ namespace snowcrash {
             return result;
         }
         
-        static ParseSectionResult HandleModel(const BlockIterator& begin,
-                                              const BlockIterator& end,
+        static ParseSectionResult HandleModel(const BlockIterator& cur,
+                                              const SectionBounds& bounds,
                                               BlueprintParserCore& parser,
                                               Resource& resource)
         {
             Payload payload;
-            ParseSectionResult result = PayloadParser::Parse(begin, end, parser, payload);
+            ParseSectionResult result = PayloadParser::Parse(cur, bounds.second, parser, payload);
             if (result.first.error.code != Error::OK)
                 return result;
             
@@ -277,10 +277,11 @@ namespace snowcrash {
 
                 ss << "' resource, a resource can be represented by a single model only";
                 
-                BlockIterator nameBlock = ListItemNameBlock(begin, end);
+                BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, bounds, cur, parser.sourceData);
                 result.first.warnings.push_back(Warning(ss.str(),
                                                         DuplicateWarning,
-                                                        MapSourceDataBlock(nameBlock->sourceMap, parser.sourceData)));
+                                                        sourceBlock));
                 
                 return result;
             }
@@ -296,10 +297,12 @@ namespace snowcrash {
                     std::stringstream ss;
                     ss << "resource model can be specified only for a named resource";
                     ss << ", name your resource, e.g. '# <resource name> [" << resource.uriTemplate << "]'";
-                    BlockIterator nameBlock = ListItemNameBlock(begin, end);
+
+                    BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
+                    SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, bounds, cur, parser.sourceData);
                     result.first.error = Error(ss.str(),
                                                SymbolError,
-                                               MapSourceDataBlock(nameBlock->sourceMap, parser.sourceData));
+                                               sourceBlock);
                 }
             }
             
@@ -313,10 +316,12 @@ namespace snowcrash {
                 // ERR: Symbol already defined
                 std::stringstream ss;
                 ss << "symbol '" << payload.name << "' already defined";
-                BlockIterator nameBlock = ListItemNameBlock(begin, end);
+
+                BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, bounds, cur, parser.sourceData);
                 result.first.error = Error(ss.str(),
                                            SymbolError,
-                                           MapSourceDataBlock(nameBlock->sourceMap, parser.sourceData));
+                                           sourceBlock);
             }
             
             // Assign model
@@ -337,9 +342,10 @@ namespace snowcrash {
             
             if (parameters.empty()) {
                 BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, bounds, cur, parser.sourceData);
                 result.first.warnings.push_back(Warning(NoParametersMessage,
                                                         FormattingWarning,
-                                                        MapSourceDataBlock(nameBlock->sourceMap, parser.sourceData)));
+                                                        sourceBlock));
             }
             else {
                 // Check Eligibility
@@ -390,32 +396,35 @@ namespace snowcrash {
             GetResourceSignature(*cur, resource.name, resource.uriTemplate, method);
             
             // Parse as a resource action abbreviation
-            return HandleAction(cur, bounds.second, parser, resource, true);
+            return HandleAction(cur, bounds, parser, resource, true);
         }
         
-        static ParseSectionResult HandleAction(const BlockIterator& begin,
-                                               const BlockIterator& end,
+        static ParseSectionResult HandleAction(const BlockIterator& cur,
+                                               const SectionBounds& bounds,
                                                BlueprintParserCore& parser,
                                                Resource& resource,
                                                bool abbrev = false)
         {
             Action action;
-            ParseSectionResult result = ActionParser::Parse(begin, end, parser, action);
+            ParseSectionResult result = ActionParser::Parse(cur, bounds.second, parser, action);
             if (result.first.error.code != Error::OK)
                 return result;
 
             if (!abbrev) {
                 Name name;
                 HTTPMethod httpMethod;
-                ActionSignature actionSignature = GetActionSignature(*begin, name, httpMethod);
+                ActionSignature actionSignature = GetActionSignature(*cur, name, httpMethod);
+
                 if (actionSignature == MethodURIActionSignature) {
                     // WARN: ignoring extraneous content in action header
                     std::stringstream ss;
-                    ss << "ignoring additional content in method header '" << begin->content << "'";
+                    ss << "ignoring additional content in method header '" << cur->content << "'";
                     ss << ", expected method-only e.g. '# " << action.method << "'";
+                    
+                    SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, bounds, bounds.second, parser.sourceData);
                     result.first.warnings.push_back(Warning(ss.str(),
                                                             IgnoringWarning,
-                                                            MapSourceDataBlock(begin->sourceMap, parser.sourceData)));
+                                                            sourceBlock));
                 }
             }
             
@@ -423,35 +432,36 @@ namespace snowcrash {
             if (duplicate != resource.actions.end()) {
                 
                 // WARN: duplicate method
-                result.first.warnings.push_back(Warning("action with method '" +
-                                                        action.method +
-                                                        "' already defined for resource '" +
-                                                        resource.uriTemplate +
-                                                        "'",
+                std::stringstream ss;
+                ss << "action with method '" << action.method << "' already defined for resource '";
+                ss << resource.uriTemplate << "'";
+                
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, bounds, bounds.second, parser.sourceData);
+                result.first.warnings.push_back(Warning(ss.str(),
                                                         DuplicateWarning,
-                                                        MapSourceDataBlock(begin->sourceMap, parser.sourceData)));
+                                                        sourceBlock));
             }
             
             // FIXME: Do we want to check heck for parameters duplicates at this level?
             
             // Check Eligibility
             if (!action.parameters.empty())
-                CheckParametersEligibility(resource, action.parameters, begin->sourceMap, parser.sourceData, result.first);
+                CheckParametersEligibility(resource, action.parameters, cur->sourceMap, parser.sourceData, result.first);
             
             
             // Check for header duplictes
-            DeepCheckHeaderDuplicates(resource, action, begin->sourceMap, parser.sourceData, result.first);
+            DeepCheckHeaderDuplicates(resource, action, cur->sourceMap, parser.sourceData, result.first);
             
             if (action.examples.empty() ||
                 action.examples.front().responses.empty()) {
                 // WARN: method has no response
-                result.first.warnings.push_back(Warning("no response defined for '" +
-                                                        action.method +
-                                                        " " +
-                                                        resource.uriTemplate +
-                                                        "'",
+                std::stringstream ss;
+                ss << "no response defined for '" << action.method << " " << resource.uriTemplate << "'";
+                
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, bounds, bounds.second, parser.sourceData);
+                result.first.warnings.push_back(Warning(ss.str(),
                                                         EmptyDefinitionWarning,
-                                                        MapSourceDataBlock(begin->sourceMap, parser.sourceData)));
+                                                        sourceBlock));
             }
             
             resource.actions.push_back(action);
@@ -484,29 +494,31 @@ namespace snowcrash {
         
         // Check whether abbreviated resource action isn't followed by an
         // action header -> implies possible additional method intended
-        static void CheckAmbiguousMethod(const BlockIterator& begin,
-                                         const BlockIterator& end,
+        static void CheckAmbiguousMethod(const BlockIterator& cur,
+                                         const SectionBounds& bounds,
                                          const Resource& resource,
                                          const SourceData& sourceData,
                                          Result& result) {
             
-            if (begin == end ||
-                begin->type != HeaderBlockType)
+            if (cur == bounds.second ||
+                cur->type != HeaderBlockType)
                 return;
             
             Name name;
             HTTPMethod method;
-            ActionSignature actionSignature = GetActionSignature(*begin, name, method);
+            ActionSignature actionSignature = GetActionSignature(*cur, name, method);
             if (actionSignature == MethodActionSignature ||
                 actionSignature == NamedActionSignature) {
                 // WARN: ignoring possible method header
                 std::stringstream ss;
-                ss << "unexpected action '" << begin->content << "', ";
+                ss << "unexpected action '" << cur->content << "', ";
                 ss << "to the define muliple actions for the '" << resource.uriTemplate << "' resource omit the HTTP method in its definition, ";
                 ss << "e.g. '# " << resource.uriTemplate << "'";
+                
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, bounds, bounds.second, sourceData);
                 result.warnings.push_back(Warning(ss.str(),
                                                   IgnoringWarning,
-                                                  MapSourceDataBlock(begin->sourceMap, sourceData)));
+                                                  sourceBlock));
             }
         }
     };

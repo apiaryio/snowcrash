@@ -145,6 +145,7 @@ namespace snowcrash {
                         // WARN: duplicate header on this level
                         std::stringstream ss;
                         ss << "duplicate definition of '" << header.first << "' header";
+                        
                         result.first.warnings.push_back(Warning(ss.str(),
                                                                 DuplicateWarning,
                                                                 MapSourceDataBlock(sourceMap, parser.sourceData)));
@@ -172,21 +173,22 @@ namespace snowcrash {
     // Generic HeaderSection parser handler
     //
     template <class T>
-    ParseSectionResult HandleHeaders(const BlockIterator& begin,
-                                     const BlockIterator& end,
+    ParseSectionResult HandleHeaders(const BlockIterator& cur,
+                                     const SectionBounds& bounds,
                                      BlueprintParserCore& parser,
                                      T& t)
     {
         size_t headerCount = t.headers.size();
-        ParseSectionResult result = HeadersParser::Parse(begin, end, parser, t.headers);
+        ParseSectionResult result = HeadersParser::Parse(cur, bounds.second, parser, t.headers);
         if (result.first.error.code != Error::OK)
             return result;
         
         if (t.headers.size() == headerCount) {
-            BlockIterator nameBlock = ListItemNameBlock(begin, end);
+            BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
+            SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, bounds, cur, parser.sourceData);
             result.first.warnings.push_back(Warning("no headers specified",
                                                     FormattingWarning,
-                                                    MapSourceDataBlock(nameBlock->sourceMap, parser.sourceData)));
+                                                    sourceBlock));
         }
         return result;
     }

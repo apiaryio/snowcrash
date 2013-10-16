@@ -246,16 +246,16 @@ namespace snowcrash {
                 case ResponseBodySection:
                 case ObjectBodySection:
                 case ModelBodySection:
-                    result = HandlePayloadAsset(section, cur, bounds.second, parser, payload);
+                    result = HandlePayloadAsset(section, cur, bounds, parser, payload);
                     break;
                     
                 case HeadersSection:
-                    result = HandleHeaders(cur, bounds.second, parser, payload);
+                    result = HandleHeaders(cur, bounds, parser, payload);
                     break;
                     
                 case BodySection:
                 case SchemaSection:
-                    result = HandleAsset(section, cur, bounds.second, parser, payload);
+                    result = HandleAsset(section, cur, bounds, parser, payload);
                     break;
                     
                 case UndefinedSection:
@@ -294,7 +294,7 @@ namespace snowcrash {
 
             if (sectionCur == bounds.first) {
                 // Signature
-                ProcessSignature(section, sectionCur, bounds.second, parser.sourceData, result.first, payload);
+                ProcessSignature(section, sectionCur, bounds, parser.sourceData, result.first, payload);
                 sectionCur = FirstContentBlock(cur, bounds.second);
             }
             else {
@@ -338,23 +338,25 @@ namespace snowcrash {
          *  \return A block parser section result.
          */
         static ParseSectionResult HandleAsset(const Section& section,
-                                              const BlockIterator& begin,
-                                              const BlockIterator& end,
+                                              const BlockIterator& cur,
+                                              const SectionBounds& bounds,
                                               BlueprintParserCore& parser,
                                               Payload& payload) {
             Asset asset;
-            ParseSectionResult result = AssetParser::Parse(begin, end, parser, asset);
+            ParseSectionResult result = AssetParser::Parse(cur, bounds.second, parser, asset);
             if (result.first.error.code != Error::OK)
                 return result;
 
             if (!SetAsset(section, asset, payload)) {
                 // WARN: asset already set
-                BlockIterator nameBlock = ListItemNameBlock(begin, end);
                 std::stringstream ss;
                 ss << "ignoring additional " << SectionName(section) << " content, content is already defined";
+                
+                BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, bounds, cur, parser.sourceData);
                 result.first.warnings.push_back(Warning(ss.str(),
                                                         RedefinitionWarning,
-                                                        MapSourceDataBlock(nameBlock->sourceMap, parser.sourceData)));
+                                                        sourceBlock));
             }
             
             return result;
@@ -370,18 +372,18 @@ namespace snowcrash {
          *  \return A block parser section result.
          */
         static ParseSectionResult HandlePayloadAsset(const Section& section,
-                                                     const BlockIterator& begin,
-                                                     const BlockIterator& end,
+                                                     const BlockIterator& cur,
+                                                     const SectionBounds& bounds,
                                                      BlueprintParserCore& parser,
                                                      Payload& payload) {
             // Try to parse as a Symbol reference
             SymbolName symbol;
             SourceDataBlock symbolSourceMap;
-            ParseSectionResult result = ParseSymbolReference(begin, end, parser, symbol, symbolSourceMap);
+            ParseSectionResult result = ParseSymbolReference(cur, bounds, parser, symbol, symbolSourceMap);
             if (result.first.error.code != Error::OK)
                 return result;
             
-            if (result.second != begin) {
+            if (result.second != cur) {
                 // Process a symbol reference
                 ResourceModelSymbolTable::const_iterator symbolEntry = parser.symbolTable.resourceModels.find(symbol);
                 if (symbolEntry == parser.symbolTable.resourceModels.end()) {
@@ -400,11 +402,11 @@ namespace snowcrash {
             }
             else {
                 // Parse as an asset
-                result = HandleAsset(BodySection, begin, end, parser, payload);
+                result = HandleAsset(BodySection, cur, bounds, parser, payload);
             }
             
             // Retrieve signature
-            ProcessSignature(section, begin, end, parser.sourceData, result.first, payload);
+            ProcessSignature(section, cur, bounds, parser.sourceData, result.first, payload);
             
             return result;
         }
@@ -418,31 +420,31 @@ namespace snowcrash {
          *  \param  symbolSourceMap Source map of the parsed symbol reference.
          *  \return A block parser section result.
          */
-        static ParseSectionResult ParseSymbolReference(const BlockIterator& begin,
-                                                       const BlockIterator& end,
+        static ParseSectionResult ParseSymbolReference(const BlockIterator& cur,
+                                                       const SectionBounds& bounds,
                                                        BlueprintParserCore& parser,
                                                        SymbolName& symbolName,
                                                        SourceDataBlock& symbolSourceMap) {
             
-            ParseSectionResult result = std::make_pair(Result(), begin);
-            BlockIterator cur = begin;
+            ParseSectionResult result = std::make_pair(Result(), cur);
+            BlockIterator sectionCur = cur;
             SourceData content;
-            SourceData signature = GetListItemSignature(cur, end, content);
+            SourceData signature = GetListItemSignature(sectionCur, bounds.second, content);
             if (!content.empty()) {
-                cur = ListItemNameBlock(cur, end);
+                sectionCur = ListItemNameBlock(sectionCur, bounds.second);
             }
             else {
-                cur = FirstContentBlock(begin, end);
-                if (cur == end ||
-                    cur->type != ParagraphBlockType)
+                sectionCur = FirstContentBlock(cur, bounds.second);
+                if (sectionCur == bounds.second ||
+                    sectionCur->type != ParagraphBlockType)
                     return result;
 
                 // Try the next block
-                if (++cur == end ||
-                    cur->type != ParagraphBlockType)
+                if (++sectionCur == bounds.second ||
+                    sectionCur->type != ParagraphBlockType)
                     return result;
                 
-                content = cur->content;
+                content = sectionCur->content;
             }
             
             TrimString(content);
@@ -451,36 +453,38 @@ namespace snowcrash {
                 return result;
             
             symbolName = symbol;
-            symbolSourceMap = cur->sourceMap;
+            symbolSourceMap = sectionCur->sourceMap;
             
             // Close list item
-            BlockIterator endCur = begin;
+            BlockIterator endCur = cur;
             if (endCur->type == ListBlockBeginType)
                 ++endCur;
-            endCur = SkipToSectionEnd(endCur, end, ListItemBlockBeginType, ListItemBlockEndType);
+            endCur = SkipToSectionEnd(endCur, bounds.second, ListItemBlockBeginType, ListItemBlockEndType);
             
             // Check extraneous content
-            if (cur != endCur) {
-                ++cur;
-                for (; cur != endCur; ++cur) {
+            if (sectionCur != endCur) {
+                ++sectionCur;
+                for (; sectionCur != endCur; ++sectionCur) {
 
-                    if (cur->type == QuoteBlockBeginType)
-                        cur = SkipToSectionEnd(cur, endCur, QuoteBlockBeginType, QuoteBlockEndType);
+                    if (sectionCur->type == QuoteBlockBeginType)
+                        sectionCur = SkipToSectionEnd(sectionCur, endCur, QuoteBlockBeginType, QuoteBlockEndType);
                     
-                    if (cur->type == ListBlockBeginType)
-                        cur = SkipToSectionEnd(cur, endCur, ListBlockBeginType, ListBlockEndType);
+                    if (sectionCur->type == ListBlockBeginType)
+                        sectionCur = SkipToSectionEnd(sectionCur, endCur, ListBlockBeginType, ListBlockEndType);
                     
                     // WARN: ignoring extraneous content after symbol reference
                     std::stringstream ss;
                     ss << "ignoring extraneous content after symbol reference";
                     ss << ", expected symbol reference only e.g. '[" << symbolName << "][]'";
+                    
+                    SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, bounds, cur, parser.sourceData);
                     result.first.warnings.push_back(Warning(ss.str(),
                                                             IgnoringWarning,
-                                                            MapSourceDataBlock(cur->sourceMap, parser.sourceData)));
+                                                            sourceBlock));
                 }
             }
             
-            endCur = CloseListItemBlock(cur, end);
+            endCur = CloseListItemBlock(sectionCur, bounds.second);
             result.second = endCur;
             
             return result;
@@ -490,21 +494,21 @@ namespace snowcrash {
          *  Retrieve and process payload signature.
          */
         static void ProcessSignature(const Section& section,
-                                     const BlockIterator& begin,
-                                     const BlockIterator& end,
+                                     const BlockIterator& cur,
+                                     const SectionBounds& bounds,
                                      const SourceData& sourceData,
                                      Result& result,
                                      Payload& payload) {
             
             SourceData remainingContent;
-            SourceData signature = GetListItemSignature(begin, end, remainingContent);
+            SourceData signature = GetListItemSignature(cur, bounds.second, remainingContent);
 
             // Capture name & payload type
             SourceData mediaType;
-            GetPayloadSignature(begin, end, payload.name, mediaType);
+            GetPayloadSignature(cur, bounds.second, payload.name, mediaType);
             
             // Check signature
-            if (!CheckSignature(section, begin, end, signature, sourceData, result)) {
+            if (!CheckSignature(section, cur, bounds, signature, sourceData, result)) {
                 // Clear and readouts
                 payload.name.clear();
                 mediaType.clear();
@@ -521,22 +525,27 @@ namespace snowcrash {
             // WARN: missing status code
             if (payload.name.empty() &&
                 (section == ResponseSection || section == ResponseBodySection)) {
-                BlockIterator nameBlock = ListItemNameBlock(begin, end);
+                
+                BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, bounds, cur, sourceData);
                 result.warnings.push_back(Warning("missing response HTTP status code, assuming 'Response 200'",
                                                   EmptyDefinitionWarning,
-                                                  MapSourceDataBlock(nameBlock->sourceMap, sourceData)));
+                                                  sourceBlock));
                 payload.name = "200";
             }
             
             
             // WARN: Object deprecation
             if (section == ObjectSection || section == ObjectBodySection) {
-                BlockIterator nameBlock = ListItemNameBlock(begin, end);
+
                 std::stringstream ss;
                 ss << "the 'object' keyword is deprecated and as such it will be removed in a future release, please use the 'model' keyword instead";
+                
+                BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, bounds, cur, sourceData);
                 result.warnings.push_back(Warning(ss.str(),
                                                   DeprecatedWarning,
-                                                  MapSourceDataBlock(nameBlock->sourceMap, sourceData)));
+                                                  sourceBlock));
             }
             
             if (!mediaType.empty()) {
@@ -551,8 +560,8 @@ namespace snowcrash {
          *  \return True if signature is correct, false otherwise.
          */
         static bool CheckSignature(const Section& section,
-                                   const BlockIterator& begin,
-                                   const BlockIterator& end,
+                                   const BlockIterator& cur,
+                                   const SectionBounds& bounds,
                                    const SourceData& signature,
                                    const SourceData& sourceData,
                                    Result& result) {
@@ -591,7 +600,6 @@ namespace snowcrash {
                 TrimString(target);
                 if (!target.empty()) {
                     // WARN: unable to parse payload signature
-                    BlockIterator nameBlock = ListItemNameBlock(begin, end);
                     std::stringstream ss;
                     ss << "unable to parse " << SectionName(section) << " signature, expected ";
         
@@ -615,9 +623,12 @@ namespace snowcrash {
                         default:
                             return false;
                     }
+                    
+                    BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
+                    SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, bounds, cur, sourceData);
                     result.warnings.push_back(Warning(ss.str(),
                                                       FormattingWarning,
-                                                      MapSourceDataBlock(nameBlock->sourceMap, sourceData)));
+                                                      sourceBlock));
                     
                     return false;
                 }

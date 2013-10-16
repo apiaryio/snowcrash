@@ -181,9 +181,10 @@ namespace snowcrash {
             std::stringstream ss;
             ss << "ignoring additional content in the 'parameters' definition, expected " << ExpectedParametersContent;
             
+            SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, bounds, cur, parser.sourceData);
             result.first.warnings.push_back(Warning(ss.str(),
                                                     IgnoringWarning,
-                                                    MapSourceDataBlock(sectionCur->sourceMap, parser.sourceData)));
+                                                    sourceBlock));
             
             if (sectionCur != bounds.second)
                 result.second = ++sectionCur;
@@ -207,12 +208,14 @@ namespace snowcrash {
                 if (duplicate != parameters.end()) {
 
                     // WARN: Parameter already defined
-                    BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
                     std::stringstream ss;
                     ss << "overshadowing previous parameter '" << parameter.name << "' definition";
+
+                    BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
+                    SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, bounds, cur, parser.sourceData);
                     result.first.warnings.push_back(Warning(ss.str(),
                                                             RedefinitionWarning,
-                                                            MapSourceDataBlock(nameBlock->sourceMap, parser.sourceData)));
+                                                            sourceBlock));
                     
                     // Erase origan duplicate 
                     parameters.erase(duplicate);

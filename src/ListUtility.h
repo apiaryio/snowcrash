@@ -190,46 +190,55 @@ namespace snowcrash {
                                                         const std::string& expected = std::string()) {
 
         ParseSectionResult result = std::make_pair(Result(), cur);
+        BlockIterator sectionCur = cur;
         std::stringstream ss;
 
         if (cur->type == ListItemBlockBeginType) {
 
-            result.second = SkipToSectionEnd(cur, bounds.second, ListItemBlockBeginType, ListItemBlockEndType);
+            sectionCur = SkipToSectionEnd(cur, bounds.second, ListItemBlockBeginType, ListItemBlockEndType);
             ss << "ignoring one unrecognized list item";
             if (!expected.empty())
                 ss << ", expected: " << expected;
             
+            SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, bounds, cur, sourceData);
             result.first.warnings.push_back(Warning(ss.str(),
                                                     IgnoringWarning,
-                                                    MapSourceDataBlock(result.second->sourceMap, sourceData)));
-            result.second = CloseListItemBlock(result.second, bounds.second);
+                                                    sourceBlock));
+            result.second = CloseListItemBlock(sectionCur, bounds.second);
         }
         else if (cur->type == ListBlockBeginType) {
 
-            result.second = SkipToSectionEnd(cur, bounds.second, ListBlockBeginType, ListBlockEndType);
+            sectionCur = SkipToSectionEnd(cur, bounds.second, ListBlockBeginType, ListBlockEndType);
             ss << "ignoring whole unrecognized list";
             if (!expected.empty())
                 ss << ", expected: " << expected;
             
+            SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, bounds, cur, sourceData);
             result.first.warnings.push_back(Warning(ss.str(),
                                                     IgnoringWarning,
-                                                    MapSourceDataBlock(result.second->sourceMap, sourceData)));
-            result.second = CloseListItemBlock(result.second, bounds.second);
+                                                    sourceBlock));
+            result.second = CloseListItemBlock(sectionCur, bounds.second);
         }
         else {
             if (cur->type == QuoteBlockBeginType) {
-                result.second = SkipToSectionEnd(cur, bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
+                sectionCur = SkipToSectionEnd(cur, bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
             }
             else {
-                ++result.second;
+                ++sectionCur;
             }
-            
+
             ss << "ignoring unrecognized block";
             if (!expected.empty())
                 ss << ", expected: " << expected;
+
+            SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, bounds, cur, sourceData);
             result.first.warnings.push_back(Warning(ss.str(),
                                                     IgnoringWarning,
-                                                    MapSourceDataBlock(result.second->sourceMap, sourceData)));
+                                                    sourceBlock));
+            
+            if (!CheckCursor(sectionCur, bounds, sourceData, cur, result.first))
+                return result;
+            result.second = ++sectionCur;
         }
 
         return result;
@@ -367,7 +376,7 @@ namespace snowcrash {
         
         if (!remainingContent.empty()) {
             // WARN: Superfluous content in signature
-            BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
+
             std::stringstream ss;
             ss << "ignoring additional content";
             
@@ -377,9 +386,11 @@ namespace snowcrash {
             if (!expectedHint.empty())
                 ss << ", expected " << expectedHint;
             
+            BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
+            SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, bounds, cur, sourceData);
             result.warnings.push_back(Warning(ss.str(),
                                               IgnoringWarning,
-                                              MapSourceDataBlock(nameBlock->sourceMap, sourceData)));
+                                              sourceBlock));
         }
         
         return remainingContent.empty();
@@ -428,9 +439,10 @@ namespace snowcrash {
                 if (!expectedHint.empty())
                     ss << ", expected " << expectedHint;
                 
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, bounds, cur, sourceData);
                 result.warnings.push_back(Warning(ss.str(),
                                                   IgnoringWarning,
-                                                  MapSourceDataBlock(sectionCur->sourceMap, sourceData)));
+                                                  sourceBlock));
             }
         }
         
@@ -463,12 +475,15 @@ namespace snowcrash {
                 dataStream << content;
                 
                 // WARN: not a preformatted code block
-                BlockIterator nameBlock = ListItemNameBlock(sectionCur, bounds.second);
+                
                 std::stringstream ss;
                 ss << SectionName(section) << " " << FormattingWarningMesssage;
+
+                BlockIterator nameBlock = ListItemNameBlock(sectionCur, bounds.second);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, bounds, cur, parser.sourceData);
                 result.first.warnings.push_back(Warning(ss.str(),
                                                         FormattingWarning,
-                                                        MapSourceDataBlock(nameBlock->sourceMap, parser.sourceData)));
+                                                        sourceBlock));
             }
             
             sectionCur = FirstContentBlock(cur, bounds.second);
@@ -496,9 +511,11 @@ namespace snowcrash {
             // WARN: not a preformatted code block
             std::stringstream ss;
             ss << SectionName(section) << " " << FormattingWarningMesssage;
+            
+            SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, bounds, cur, parser.sourceData);
             result.first.warnings.push_back(Warning(ss.str(),
                                                     FormattingWarning,
-                                                    MapSourceDataBlock(sectionCur->sourceMap, parser.sourceData)));
+                                                    sourceBlock));
         }
         
         data = dataStream.str();

@@ -61,7 +61,7 @@ namespace snowcrash {
                     break;
                     
                 case ResourceGroupSection:
-                    result = HandleResourceGroup(cur, bounds.second, parser, output);
+                    result = HandleResourceGroup(cur, bounds, parser, output);
                     break;
                     
                 default:
@@ -134,9 +134,10 @@ namespace snowcrash {
                     }
                     else {
                         // WARN: No API name specified
+                        SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, bounds, cur, parser.sourceData);
                         result.first.warnings.push_back(Warning(ExpectedAPINameMessage,
                                                                 APINameWarning,
-                                                                MapSourceDataBlock(sectionCur->sourceMap, parser.sourceData)));
+                                                                sourceBlock));
                     }
                 }
                 
@@ -149,13 +150,13 @@ namespace snowcrash {
             return result;
         }
         
-        static ParseSectionResult HandleResourceGroup(const BlockIterator& begin,
-                                                      const BlockIterator& end,
+        static ParseSectionResult HandleResourceGroup(const BlockIterator& cur,
+                                                      const SectionBounds& bounds,
                                                       BlueprintParserCore& parser,
                                                       Blueprint& output)
         {
             ResourceGroup resourceGroup;
-            ParseSectionResult result = ResourceGroupParser::Parse(begin, end, parser, resourceGroup);
+            ParseSectionResult result = ResourceGroupParser::Parse(cur, bounds.second, parser, resourceGroup);
             if (result.first.error.code != Error::OK)
                 return result;
             
@@ -172,9 +173,10 @@ namespace snowcrash {
                 }
                 ss << " is already defined";
                 
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, bounds, bounds.second, parser.sourceData);
                 result.first.warnings.push_back(Warning(ss.str(),
                                                         DuplicateWarning,
-                                                        MapSourceDataBlock(begin->sourceMap, parser.sourceData)));
+                                                        sourceBlock));
             }
             
             output.resourceGroups.push_back(resourceGroup); // FIXME: C++11 move
@@ -228,9 +230,11 @@ namespace snowcrash {
                         // WARN: duplicate metada definition
                         std::stringstream ss;
                         ss << "duplicate definition of '" << it->first << "'";
+                        
+                        SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, bounds, bounds.second, parser.sourceData);
                         result.first.warnings.push_back(Warning(ss.str(),
                                                                 DuplicateWarning,
-                                                                MapSourceDataBlock(cur->sourceMap, parser.sourceData)));
+                                                                sourceBlock));
                     }
                 }
                 
@@ -243,10 +247,11 @@ namespace snowcrash {
             }
             else if (!metadataCollection.empty()) {
                 // WARN: malformed metadata block
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, bounds, bounds.second, parser.sourceData);
                 result.first.warnings.push_back(Warning("ignoring possible metadata, expected"
                                                         " '<key> : <value>', one one per line",
                                                         FormattingWarning,
-                                                        MapSourceDataBlock(cur->sourceMap, parser.sourceData)));
+                                                        sourceBlock));
             }
             
             return result;

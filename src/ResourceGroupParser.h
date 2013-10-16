@@ -95,7 +95,7 @@ namespace snowcrash {
                     break;
                     
                 case ResourceSection:
-                    result = HandleResource(cur, bounds.second, parser, group);
+                    result = HandleResource(cur, bounds, parser, group);
                     break;
                     
                 case UndefinedSection:
@@ -124,9 +124,10 @@ namespace snowcrash {
                 if (sectionCur == bounds.first) {
                     
                     // WARN: No Group name specified
+                    SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, bounds, bounds.second, parser.sourceData);
                     result.first.warnings.push_back(Warning("expected resource group name, e.g. '# <Group Name>'",
                                                             EmptyDefinitionWarning,
-                                                            MapSourceDataBlock(cur->sourceMap, parser.sourceData)));
+                                                            sourceBlock));
                 }
                 
                 
@@ -146,13 +147,13 @@ namespace snowcrash {
             return result;
         }
         
-        static ParseSectionResult HandleResource(const BlockIterator& begin,
-                                                 const BlockIterator& end,
+        static ParseSectionResult HandleResource(const BlockIterator& cur,
+                                                 const SectionBounds& bounds,
                                                  BlueprintParserCore& parser,
                                                  ResourceGroup& group)
         {
             Resource resource;
-            ParseSectionResult result = ResourceParser::Parse(begin, end, parser, resource);
+            ParseSectionResult result = ResourceParser::Parse(cur, bounds.second, parser, resource);
             if (result.first.error.code != Error::OK)
                 return result;
             
@@ -165,11 +166,12 @@ namespace snowcrash {
                 globalDuplicate.first != parser.blueprint.resourceGroups.end()) {
                 
                 // WARN: Duplicate resource
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, bounds, bounds.second, parser.sourceData);
                 result.first.warnings.push_back(Warning("the resource '" +
                                                         resource.uriTemplate +
                                                         "' is already defined",
                                                         DuplicateWarning,
-                                                        MapSourceDataBlock(begin->sourceMap, parser.sourceData)));
+                                                        sourceBlock));
             }
             
             group.resources.push_back(resource); // FIXME: C++11 move

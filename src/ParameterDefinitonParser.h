@@ -203,7 +203,7 @@ namespace snowcrash {
 
             // Signature
             if (sectionCur == bounds.first) {
-                ProcessSignature(sectionCur, bounds.second, parser.sourceData, result.first, parameter);
+                ProcessSignature(sectionCur, bounds, parser.sourceData, result.first, parameter);
                 result.second = SkipSignatureBlock(sectionCur, bounds.second);
                 return result;
             }
@@ -240,8 +240,8 @@ namespace snowcrash {
         /**
          *  Retrieve and process parameter definition signature.
          */
-        static void ProcessSignature(const BlockIterator& begin,
-                                     const BlockIterator& end,
+        static void ProcessSignature(const BlockIterator& cur,
+                                     const SectionBounds& bounds,
                                      const SourceData& sourceData,
                                      Result& result,
                                      Parameter& parameter) {
@@ -252,7 +252,7 @@ namespace snowcrash {
             
             // Process signature
             SourceData remainingContent;
-            SourceData signature = GetListItemSignature(begin, end, remainingContent);
+            SourceData signature = GetListItemSignature(cur, bounds.second, remainingContent);
 
             TrimString(signature);
             CaptureGroups captureGroups;
@@ -269,7 +269,7 @@ namespace snowcrash {
                 
                 // Additional Attributes
                 if (!captureGroups[5].empty())
-                    ProcessSignatureAdditionalTraits(begin, end, captureGroups[5], sourceData, result, parameter);
+                    ProcessSignatureAdditionalTraits(cur, bounds, captureGroups[5], sourceData, result, parameter);
                 
                 // Description
                 if (!captureGroups[7].empty())
@@ -287,29 +287,31 @@ namespace snowcrash {
                     !parameter.defaultValue.empty()) {
                     
                     // WARN: Required vs default clash
-                    BlockIterator nameBlock = ListItemNameBlock(begin, end);
                     std::stringstream ss;
                     ss << "specifying parameter '" << parameter.name << "' as required supersedes its default value"\
                           ", declare the parameter as 'optional' to specify its default value";
+                    
+                    BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
+                    SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, bounds, cur, sourceData);
                     result.warnings.push_back(Warning(ss.str(),
                                                       LogicalErrorWarning,
-                                                      MapSourceDataBlock(nameBlock->sourceMap, sourceData)));
+                                                      sourceBlock));
                 }
 
             }
             else {
                 // ERR: unable to parse 
-                BlockIterator nameBlock = ListItemNameBlock(begin, end);
-                std::stringstream ss;
+                BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, bounds, cur, sourceData);
                 result.error = (Error("unable to parse parameter specification",
                                       BusinessError,
-                                      MapSourceDataBlock(nameBlock->sourceMap, sourceData)));
+                                      sourceBlock));
             }
         }
         
         /** Parse additional parameter attributes from abbrev definition bracket */
-        static void ProcessSignatureAdditionalTraits(const BlockIterator& begin,
-                                                     const BlockIterator& end,
+        static void ProcessSignatureAdditionalTraits(const BlockIterator& cur,
+                                                     const SectionBounds& bounds,
                                                      const SourceData& additionalTraits,
                                                      const SourceData& sourceData,
                                                      Result& result,
@@ -357,15 +359,16 @@ namespace snowcrash {
             TrimString(source);
             if (!source.empty()) {
                 // WARN: Additional parameters traits warning
-                BlockIterator nameBlock = ListItemNameBlock(begin, end);
                 std::stringstream ss;
                 ss << "unable to parse additional parameter traits";
                 ss << ", expected '([required | optional], [<type>], [`<example value>`])'";
                 ss << ", e.g. '(optional, string, `Hello World`)'";
 
+                BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, bounds, cur, sourceData);
                 result.warnings.push_back(Warning(ss.str(),
                                                   FormattingWarning,
-                                                  MapSourceDataBlock(nameBlock->sourceMap, sourceData)));
+                                                  sourceBlock));
                 
                 parameter.type.clear();
                 parameter.exampleValue.clear();
@@ -384,13 +387,15 @@ namespace snowcrash {
             // Check redefinition
             if (!parameter.values.empty()) {
                 // WARN: parameter values are already defined
-                BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
                 std::stringstream ss;
                 ss << "overshadowing previous 'values' definition";
                 ss << " for parameter '" << parameter.name << "'";
+                
+                BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, bounds, cur, parser.sourceData);
                 result.first.warnings.push_back(Warning(ss.str(),
                                                         RedefinitionWarning,
-                                                        MapSourceDataBlock(nameBlock->sourceMap, parser.sourceData)));
+                                                        sourceBlock));
             }
             
             // Clear any previous content
@@ -441,9 +446,11 @@ namespace snowcrash {
                         ss << "ignoring additional content in the 'values' attribute of the '";
                         ss << parameter.name << "' parameter";
                         ss << ", " << ExpectedValuesContent;
+                        
+                        SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, bounds, cur, parser.sourceData);
                         result.first.warnings.push_back(Warning(ss.str(),
                                                                 IgnoringWarning,
-                                                                MapSourceDataBlock(sectionCur->sourceMap, parser.sourceData)));
+                                                                sourceBlock));
                     }
                 }
             }
@@ -452,9 +459,10 @@ namespace snowcrash {
                 // WARN: empty definition
                 std::stringstream ss;
                 ss << "no possible values specified for parameter '" << parameter.name << "'";
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, bounds, cur, parser.sourceData);
                 result.first.warnings.push_back(Warning(ss.str(),
                                                         EmptyDefinitionWarning,
-                                                        MapSourceDataBlock(sectionCur->sourceMap, parser.sourceData)));
+                                                        sourceBlock));
             }
             
             endCur = CloseListItemBlock(sectionCur, bounds.second);
@@ -497,9 +505,11 @@ namespace snowcrash {
                     std::stringstream ss;
                     ss << "ignoring the '" << content << "' element";
                     ss << ", expected '`" << content << "`'";
+                    
+                    SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, bounds, cur, parser.sourceData);
                     result.first.warnings.push_back(Warning(ss.str(),
                                                             IgnoringWarning,
-                                                            MapSourceDataBlock(sectionCur->sourceMap, parser.sourceData)));
+                                                            sourceBlock));
                 }
                 
                 ++sectionCur;

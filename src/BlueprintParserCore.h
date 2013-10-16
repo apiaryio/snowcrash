@@ -274,33 +274,6 @@ namespace snowcrash {
     }
     
     /**
-     *  \brief Checks cursor validity within its container.
-     *  \param cur  An iterator to be checked.
-     *  \param bounds   Boundaries to check against.
-     *  \param sourceData   Source data byte buffer.
-     *  \param parent   Cursor's parent block to be used in case of error reporting.
-     *  \param result   Error result output, an error object is added in case of failed check.
-     *  \returns True if cursor appears to be valid, false otherwise.
-     */
-    FORCEINLINE bool CheckCursor(const BlockIterator& cur,
-                                 const SectionBounds& bounds,
-                                 const SourceData& sourceData,
-                                 const BlockIterator& parent,
-                                 Result& result) {
-        if (cur != bounds.second)
-            return true;
-
-        if (parent->sourceMap.empty())
-            return false;
-        
-        // ERR: Sanity check
-        result.error = Error("unexpected markdown closure",
-                             ApplicationError,
-                             MapSourceDataBlock(parent->sourceMap, sourceData));
-        return false;
-    }
-    
-    /**
      *  \brief  Construct an Unexpected block error.
      *  \param  block   A Markdown block that is unexpected.
      *  \param  sourceData   Source data byte buffer.
@@ -334,6 +307,64 @@ namespace snowcrash {
         return Error(ss.str(),
                      BusinessError,
                      MapSourceDataBlock(block.sourceMap, sourceData));
+    }
+    
+    
+    /** 
+     *  \brief  Retrieves character for a markdown block
+     *  \param  cur     A block to retrieve the map for.
+     *  \param  bounds  Boundaries of %cur contaier.
+     *  \param  parent  Alternative block if %cur map does not exists.
+     *  \param  sourceData Source data to map.
+     *  \returns Character map for given markdown block or its parent's map if exists.
+     *  Empty source character map otherwise.
+     */
+    FORCEINLINE SourceCharactersBlock CharacterMapForBlock(const BlockIterator& cur,
+                                                           const SectionBounds& bounds,
+                                                           const BlockIterator& parent,
+                                                           const SourceData& sourceData)
+    {
+        // Try to use cursor's source map
+        if (cur != bounds.second &&
+            !cur->sourceMap.empty()) {
+            return MapSourceDataBlock(cur->sourceMap, sourceData);
+        }
+        
+        // Fallback to parent (previous) block
+        if (parent != bounds.second &&
+            !parent->sourceMap.empty()) {
+            return MapSourceDataBlock(parent->sourceMap, sourceData);
+        }
+        
+        return SourceCharactersBlock();
+    }
+    
+    /**
+     *  \brief Checks cursor validity within its container.
+     *  \param cur  An iterator to be checked.
+     *  \param bounds   Boundaries to check against.
+     *  \param sourceData   Source data byte buffer.
+     *  \param parent   Cursor's parent block to be used in case of error reporting.
+     *  \param result   Error result output, an error object is added in case of failed check.
+     *  \returns True if cursor appears to be valid, false otherwise.
+     */
+    FORCEINLINE bool CheckCursor(const BlockIterator& cur,
+                                 const SectionBounds& bounds,
+                                 const SourceData& sourceData,
+                                 const BlockIterator& parent,
+                                 Result& result) {
+        if (cur != bounds.second)
+            return true;
+        
+        if (parent->sourceMap.empty())
+            return false;
+        
+        // ERR: Sanity check
+        SourceCharactersBlock sourceBlock = CharacterMapForBlock(parent, bounds, bounds.second, sourceData);
+        result.error = Error("unexpected markdown closure",
+                             ApplicationError,
+                             sourceBlock);
+        return false;
     }
 }
 

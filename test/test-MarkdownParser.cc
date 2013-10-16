@@ -791,7 +791,7 @@ TEST_CASE("Multi-byte characters in multiple blocks", "[markdown][sourcemap]")
     REQUIRE(characterBlock[0].length == 6);
 }
 
-TEST_CASE("Multi-byte characters in blockquote", "[markdown][sourcemap][now]")
+TEST_CASE("Multi-byte characters in blockquote", "[markdown][sourcemap]")
 {
     MarkdownParser parser;
     Result result;
@@ -833,6 +833,3 @@ TEST_CASE("Multi-byte characters in blockquote", "[markdown][sourcemap][now]")
     REQUIRE(characterBlock[0].location == 0);
     REQUIRE(characterBlock[0].length == 5);
 }
-
-
-
