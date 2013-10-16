@@ -313,7 +313,7 @@ TEST_CASE("Parse adjacent asset list blocks", "[parser][issue][#9]")
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body.empty());
 }
 
-TEST_CASE("SIGTERM parsing blueprint", "[parser][issue][#45][now]")
+TEST_CASE("SIGTERM parsing blueprint", "[parser][issue][#45]")
 {
     // Blueprint in question: See GH issue #45
     const std::string bluerpintSource = "# A\n# B\nC\n\nD\n\nE\n\nF\n\nG\n\n# /1\n# GET\n+ Request\n+ Response 200\n    + Body\n\n            H\n\nI\n# J\n> K";

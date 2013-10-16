@@ -687,3 +687,28 @@ TEST_CASE("Parse named resource with nameless model", "[resource][model][source]
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body == "AAA\n");
 }
+
+TEST_CASE("Parse root resource", "[resource][source][issue][#40]")
+{
+    // Blueprint in question:
+    //R"(
+    //# API Root [/]
+    //");
+    
+    const std::string blueprintSource = \
+    "# API Root [/]\n";
+    
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(blueprintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.empty());
+    
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].name == "API Root");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].uriTemplate == "/");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.empty());
+}
+
