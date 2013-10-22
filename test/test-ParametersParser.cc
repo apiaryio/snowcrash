@@ -390,3 +390,37 @@ TEST_CASE("Warn about multiple parameters with the same name", "[parameters]")
     REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].exampleValue == "43");
 }
 
+TEST_CASE("Parse parameters with dot in its name", "[parameters][issue][#47][source]")
+{
+    // Blueprint in question:
+    //R"(
+    //# GET /contracts?product.id=4
+    //
+    //+ Parameters
+    //    + product.id ... Hello
+    //
+    //+ Response 204
+    //");
+    const std::string blueprintSource = \
+    "# GET /contracts?product.id=4\n"\
+    "\n"\
+    "+ Parameters\n"\
+    "    + product.id ... Hello\n"\
+    "\n"\
+    "+ Response 204\n\n";
+    
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(blueprintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.empty());
+    
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].name == "product.id");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].description == "Hello");
+}

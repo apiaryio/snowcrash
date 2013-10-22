@@ -22,7 +22,7 @@
 
 // Symbol identifier regex
 // FIXME: Remove extraneous surounding group
-#define SYMBOL_IDENTIFIER "([[:alnum:][:blank:]_\\-]+)"
+#define SYMBOL_IDENTIFIER "([[:alnum:][:blank:]_-]+)"
 
 // Symbol reference regex
 static const std::string SymbolReferenceRegex("^[ \\t]*\\[(" SYMBOL_IDENTIFIER ")]\\[][ \\t]*$");

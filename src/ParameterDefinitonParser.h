@@ -16,15 +16,14 @@
 #include "RegexMatch.h"
 #include "StringUtility.h"
 
-
 /** Parameter Value regex */
 #define PARAMETER_VALUE "`([^`]+)`"
 
-/** Parameter Definition matching regex */
-static const std::string ParameterDefinitionRegex("^[ \\t]*(" SYMBOL_IDENTIFIER ")[ \\t]*$");
+/** Parameter Identifier */
+#define PARAMETER_IDENTIFIER "([[:alnum:]_.-]+)"
 
 /** Parameter Abbreviated definition matching regex */
-static const std::string ParameterAbbrevDefinitionRegex("^([[:alnum:][:blank:]_\\-]+)([[:blank:]]*=[[:blank:]]*`([^`]*)`[[:blank:]]*)?([[:blank:]]*\\((.*)\\)[[:blank:]]*)?([[:blank:]]*\\.\\.\\.[[:blank:]]*(.*))?$");
+static const std::string ParameterAbbrevDefinitionRegex("^" PARAMETER_IDENTIFIER "([[:blank:]]*=[[:blank:]]*`([^`]*)`[[:blank:]]*)?([[:blank:]]*\\((.*)\\)[[:blank:]]*)?([[:blank:]]*\\.\\.\\.[[:blank:]]*(.*))?$");
 
 /** Parameter Required matching regex */
 static const std::string ParameterRequiredRegex("^[ \\t]*[Rr]equired[ \\t]*$");
