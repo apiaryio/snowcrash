@@ -24,8 +24,17 @@ std::string snowcrash::MapSourceData(const SourceData& source, const SourceDataB
     std::stringstream ss;
     for (SourceDataBlock::const_iterator it = sourceMap.begin(); it != sourceMap.end(); ++it) {
         
-        if (it->location + it->length > length)
-            return std::string();   // wrong map
+        if (it->location + it->length > length) {
+            // Sundown adds an extra newline on the source input if needed.
+            if (it->location + it->length - length) {
+                ss << source.substr(it->location, length - it->location);
+                return ss.str();
+            }
+            else {
+                // Wrong map
+                return std::string();
+            }
+        }
         
         ss << source.substr(it->location, it->length);
     }

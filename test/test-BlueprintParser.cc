@@ -570,3 +570,35 @@ TEST_CASE("Fail to parse nested lists in description", "[blueprint][issue][#16]"
     REQUIRE(blueprint.resourceGroups.empty());
 }
 
+
+TEST_CASE("Fail to parse paragraph without final newline", "[blueprint][issue][#43]")
+{
+    // Blueprint in question:
+    //R"(
+    //# API
+    //Lorem Ipsum
+    //");
+    
+    const std::string source = \
+    "# API\n"\
+    "Lorem Ipsum";
+    
+    MarkdownBlock::Stack markdown;
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "API", 1, MakeSourceDataBlock(0, 6)));
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Lorem Ipsum", 0, MakeSourceDataBlock(6, 12)));
+    
+    Blueprint blueprint;
+    BlueprintParserCore parser(0, source, Blueprint());
+    ParseSectionResult result = BlueprintParserInner::Parse(markdown.begin(), markdown.end(), parser, blueprint);
+    
+    REQUIRE(result.first.error.code == Error::OK);
+    CHECK(result.first.warnings.empty());
+    
+    const MarkdownBlock::Stack &blocks = markdown;
+    REQUIRE(std::distance(blocks.begin(), result.second) == 2);
+    
+    REQUIRE(blueprint.name == "API");
+    REQUIRE(blueprint.description == "Lorem Ipsum");
+    REQUIRE(blueprint.resourceGroups.empty());
+}
+
