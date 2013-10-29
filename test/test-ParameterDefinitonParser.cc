@@ -496,3 +496,65 @@ TEST_CASE("Warn about implicit required vs default clash", "[parameter_definitio
     REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].use == UndefinedParameterUse);
     REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].defaultValue == "42");
 }
+
+
+TEST_CASE("Unrecognized 'values' keyword", "[parameter_definition][issue][#44][source]")
+{
+    // Blueprint in question:
+    //R"(
+    //FORMAT: X-1A
+    //HOST: xxxxxxxxxxxxxxxxxxxxxxx
+    //
+    //# A very long API name
+    //
+    //# Resource [/1/{param}]
+    //
+    //## GET
+    //
+    //+ Parameters
+    //    + param
+    //        + Values:
+    //            + `lorem`
+    //
+    //+ Response 204
+    //");
+    const std::string blueprintSource = \
+    "FORMAT: X-1A\n"\
+    "HOST: xxxxxxxxxxxxxxxxxxxxxxx\n"\
+    "\n"\
+    "# A very long API name\n"\
+    "\n"\
+    "# Resource [/1/{param}]\n"\
+    "\n"\
+    "## GET\n"\
+    "\n"\
+    "+ Parameters\n"\
+    "    + param\n"\
+    "        + Values:\n"\
+    "            + `lorem`\n"\
+    "\n"\
+    "+ Response 204\n";
+    
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(blueprintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.size() == 1);
+    REQUIRE(result.warnings[0].code == IgnoringWarning);
+    
+    REQUIRE(result.warnings[0].location.size() == 2);
+    REQUIRE(result.warnings[0].location[0].location == 134);
+    REQUIRE(result.warnings[0].location[0].length == 10);
+    REQUIRE(result.warnings[0].location[1].location == 152);
+    REQUIRE(result.warnings[0].location[1].length == 14);
+    
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].description.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].name == "param");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].use == UndefinedParameterUse);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].values.empty());
+}

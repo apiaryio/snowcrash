@@ -176,7 +176,7 @@ namespace snowcrash {
                     break;
                     
                 case ForeignSection:
-                    result = HandleForeignSection(cur, bounds, ExpectedTraitItems);
+                    result = HandleForeignSection(cur, bounds, parser.sourceData, ExpectedTraitItems);
                     break;
                     
                 case UndefinedSection:
