@@ -424,3 +424,37 @@ TEST_CASE("Parse parameters with dot in its name", "[parameters][issue][#47][sou
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].name == "product.id");
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].description == "Hello");
 }
+
+TEST_CASE("Parentheses in parameter description ", "[parameters][issue][#49][source]")
+{
+    // Blueprint in question:
+    //R"(
+    //# GET /{id}
+    //+ Parameters
+    //  + id (string) ... lorem (ipsum)
+    //
+    //+ response 204
+    //");
+    const std::string blueprintSource = \
+    "# GET /{id}\n"\
+    "+ Parameters\n"\
+    "  + id (string) ... lorem (ipsum)\n"\
+    "\n"\
+    "+ response 204\n";
+    
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(blueprintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.empty());
+    
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].name == "id");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].type == "string");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].description == "lorem (ipsum)");
+}

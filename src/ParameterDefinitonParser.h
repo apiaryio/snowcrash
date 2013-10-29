@@ -23,7 +23,7 @@
 #define PARAMETER_IDENTIFIER "([[:alnum:]_.-]+)"
 
 /** Parameter Abbreviated definition matching regex */
-static const std::string ParameterAbbrevDefinitionRegex("^" PARAMETER_IDENTIFIER "([[:blank:]]*=[[:blank:]]*`([^`]*)`[[:blank:]]*)?([[:blank:]]*\\((.*)\\)[[:blank:]]*)?([[:blank:]]*\\.\\.\\.[[:blank:]]*(.*))?$");
+static const std::string ParameterAbbrevDefinitionRegex("^" PARAMETER_IDENTIFIER "([[:blank:]]*=[[:blank:]]*`([^`]*)`[[:blank:]]*)?([[:blank:]]*\\(([^)]*)\\)[[:blank:]]*)?([[:blank:]]*\\.\\.\\.[[:blank:]]*(.*))?$");
 
 /** Parameter Required matching regex */
 static const std::string ParameterRequiredRegex("^[ \\t]*[Rr]equired[ \\t]*$");
