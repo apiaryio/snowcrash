@@ -300,7 +300,7 @@ TEST_CASE("Parse multiple method", "[resource][block]")
     ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), parser, resource);
     
     REQUIRE(result.first.error.code == Error::OK);
-    CHECK(result.first.warnings.size() == 3); // 2x empty body asset & no response
+    CHECK(result.first.warnings.size() == 2); // empty body asset & no response
     
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 30);

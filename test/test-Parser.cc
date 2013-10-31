@@ -300,9 +300,8 @@ TEST_CASE("Parse adjacent asset list blocks", "[parser][issue][#9]")
     Blueprint blueprint;
     parser.parse(bluerpintSource, 0, result, blueprint);
     REQUIRE(result.error.code == Error::OK);
-    REQUIRE(result.warnings.size() == 2);
-    REQUIRE(result.warnings[0].code == EmptyDefinitionWarning);
-    REQUIRE(result.warnings[1].code == IgnoringWarning);
+    REQUIRE(result.warnings.size() == 1);
+    REQUIRE(result.warnings[0].code == IgnoringWarning);
     
     REQUIRE(blueprint.resourceGroups.size() == 1);
     REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
