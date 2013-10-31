@@ -323,6 +323,16 @@ namespace snowcrash {
                                  Result& result) {
             
             bool warnEmptyBody = false;
+            std::string contentType;
+            for (Collection<Header>::const_iterator it = payload.headers.begin();
+                 it != payload.headers.end();
+                 ++it) {
+                
+                if (it->first == HTTPHeaderName::ContentType) {
+                    contentType = it->second;
+                }
+            }
+            
             if (section == RequestSection) {
                 
                 if (payload.body.empty()) {
@@ -332,13 +342,7 @@ namespace snowcrash {
                         warnEmptyBody = true;
                     }
                     else {
-                        for (Collection<Header>::const_iterator it = payload.headers.begin();
-                             it != payload.headers.end();
-                             ++it) {
-
-                            if (it->first == HTTPHeaderName::ContentType)
-                                warnEmptyBody = true;
-                        }
+                        warnEmptyBody = !contentType.empty();
                     }
                 }
             }
@@ -350,7 +354,7 @@ namespace snowcrash {
                 }
                 StatusCodeTraits traits = GetStatusCodeTrait(code);
                 if (traits.allowBody) {
-                    warnEmptyBody = payload.body.empty();
+                    warnEmptyBody = payload.body.empty() & !contentType.empty();
                 }
                 else if (!payload.body.empty()) {
                     // WARN: not empty body
@@ -361,6 +365,16 @@ namespace snowcrash {
                                                       MapSourceDataBlock(sourceMap, sourceData)));
                     return;
                 }
+                else if (!contentType.empty()) {
+                    // WARN: unexpected content-type
+                    std::stringstream ss;
+                    ss << "the " << code << " response SHOULD NOT include the '" << contentType << "' Content-Type";
+                    result.warnings.push_back(Warning(ss.str(),
+                                                      LogicalErrorWarning,
+                                                      MapSourceDataBlock(sourceMap, sourceData)));
+                    return;
+   
+                }
             }
             
             // Issue the warning
@@ -368,6 +382,10 @@ namespace snowcrash {
                 // WARN: empty body
                 std::stringstream ss;
                 ss << "empty " << SectionName(section) << " " << SectionName(BodySection);
+                if (!contentType.empty()) {
+                    ss << ", expected " << SectionName(BodySection) << " for '" << contentType << "' Content-Type";
+                }
+                
                 result.warnings.push_back(Warning(ss.str(),
                                                   EmptyDefinitionWarning,
                                                   MapSourceDataBlock(sourceMap, sourceData)));
