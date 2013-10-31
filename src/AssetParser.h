@@ -26,13 +26,13 @@ static const std::string AssetFormattingWarning = " asset is expected to be pref
 
 namespace snowcrash {
     
-    // Asset signature
+    /// Asset signature
     enum AssetSignature {
         UndefinedAssetSignature,
         NoAssetSignature,
-        BodyAssetSignature,
-        PayloadBodyAssetSignature,
-        SchemaAssetSignature,
+        BodyAssetSignature,         /// < Explicit body asset
+        PayloadBodyAssetSignature,  /// < Body asset using abbreviated syntax
+        SchemaAssetSignature,       /// < Explicit Schema asset
         GenericAssetSignature
     };
     

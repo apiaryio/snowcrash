@@ -458,8 +458,9 @@ namespace snowcrash {
                                                               SourceData& data,
                                                               SourceDataBlock& sourceMap) {
         
+        
         static const std::string FormattingWarningMesssage = "content is expected to be a pre-formatted code block, "\
-        "separate it by an empty line and indent every of its line by at least 4 spaces or 1 tab";
+        "separate it by an empty line and indent every of its line by exactly 8 spaces or 2 tabs relative to its level";
         
         ParseSectionResult result = std::make_pair(Result(), cur);
         BlockIterator sectionCur = cur;
@@ -475,7 +476,6 @@ namespace snowcrash {
                 dataStream << content;
                 
                 // WARN: not a preformatted code block
-                
                 std::stringstream ss;
                 ss << SectionName(section) << " " << FormattingWarningMesssage;
 
