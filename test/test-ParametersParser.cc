@@ -52,20 +52,20 @@ TEST_CASE("Parameters block classifier", "[parameters][classifier]")
     BlockIterator cur = markdown.begin();
     
     // ListBlockBeginType
-    REQUIRE(ClassifyBlock<ParameterCollection>(cur, markdown.end(), UndefinedSection) == ParametersSection);
-    REQUIRE(ClassifyBlock<ParameterCollection>(cur, markdown.end(), ParametersSection) == ForeignSection);
+    REQUIRE(ClassifyBlock<ParameterCollection>(cur, markdown.end(), UndefinedSectionType) == ParametersSectionType);
+    REQUIRE(ClassifyBlock<ParameterCollection>(cur, markdown.end(), ParametersSectionType) == ForeignSectionType);
     
     ++cur; // ListItemBlockBeginType
-    REQUIRE(ClassifyBlock<ParameterCollection>(cur, markdown.end(), UndefinedSection) == ParametersSection);
-    REQUIRE(ClassifyBlock<ParameterCollection>(cur, markdown.end(), ParametersSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<ParameterCollection>(cur, markdown.end(), UndefinedSectionType) == ParametersSectionType);
+    REQUIRE(ClassifyBlock<ParameterCollection>(cur, markdown.end(), ParametersSectionType) == UndefinedSectionType);
     
     ++cur; // ParagraphBlockType
-    REQUIRE(ClassifyBlock<ParameterCollection>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
-    REQUIRE(ClassifyBlock<ParameterCollection>(cur, markdown.end(), ParametersSection) == ParametersSection);
+    REQUIRE(ClassifyBlock<ParameterCollection>(cur, markdown.end(), UndefinedSectionType) == UndefinedSectionType);
+    REQUIRE(ClassifyBlock<ParameterCollection>(cur, markdown.end(), ParametersSectionType) == ParametersSectionType);
     
     ++cur; // ListBlockBeginType
-    REQUIRE(ClassifyBlock<ParameterCollection>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
-    REQUIRE(ClassifyBlock<ParameterCollection>(cur, markdown.end(), ParametersSection) == ParameterDefinitionSection);
+    REQUIRE(ClassifyBlock<ParameterCollection>(cur, markdown.end(), UndefinedSectionType) == UndefinedSectionType);
+    REQUIRE(ClassifyBlock<ParameterCollection>(cur, markdown.end(), ParametersSectionType) == ParameterDefinitionSectionType);
 }
 
 TEST_CASE("Parse canonical parameters", "[parameters]")

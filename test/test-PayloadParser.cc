@@ -74,56 +74,56 @@ TEST_CASE("Payload block classifier", "[payload][block]")
     BlockIterator cur = markdown.begin();
 
     // ListBlockBeginType
-    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), UndefinedSection) == RequestSection);
-    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), RequestSection) == RequestSection);
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), UndefinedSectionType) == RequestSectionType);
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), RequestSectionType) == RequestSectionType);
 
     ++cur; // ListItemBlockBeginType
-    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), UndefinedSection) == RequestSection);
-    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), RequestSection) == UndefinedSection); 
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), UndefinedSectionType) == RequestSectionType);
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), RequestSectionType) == UndefinedSectionType); 
 
     ++cur; // ParagraphBlockType
-    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
-    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), RequestSection) == RequestSection);
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), UndefinedSectionType) == UndefinedSectionType);
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), RequestSectionType) == RequestSectionType);
 
     std::advance(cur, 2); // ListBlockBeginType
-    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
-    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), RequestSection) == HeadersSection);
-    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), HeadersSection) == HeadersSection);
-    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), BodySection) == HeadersSection);
-    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), SchemaSection) == HeadersSection); 
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), UndefinedSectionType) == UndefinedSectionType);
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), RequestSectionType) == HeadersSectionType);
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), HeadersSectionType) == HeadersSectionType);
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), BodySectionType) == HeadersSectionType);
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), SchemaSectionType) == HeadersSectionType); 
 
     ++cur; // ListItemBlockBeginType - Headers
-    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
-    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), RequestSection) == HeadersSection);
-    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), HeadersSection) == HeadersSection);
-    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), BodySection) == HeadersSection);
-    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), SchemaSection) == HeadersSection);
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), UndefinedSectionType) == UndefinedSectionType);
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), RequestSectionType) == HeadersSectionType);
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), HeadersSectionType) == HeadersSectionType);
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), BodySectionType) == HeadersSectionType);
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), SchemaSectionType) == HeadersSectionType);
     
     std::advance(cur, 4); // ListItemBlockBeginType - Body
-    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
-    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), RequestSection) == BodySection);
-    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), BodySection) == BodySection);
-    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), SchemaSection) == BodySection);
-    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), HeadersSection) == BodySection);
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), UndefinedSectionType) == UndefinedSectionType);
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), RequestSectionType) == BodySectionType);
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), BodySectionType) == BodySectionType);
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), SchemaSectionType) == BodySectionType);
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), HeadersSectionType) == BodySectionType);
     
     std::advance(cur, 4); // ListItemBlockBeginType - Schema
-    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
-    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), RequestSection) == SchemaSection);
-    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), SchemaSection) == SchemaSection);
-    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), BodySection) == SchemaSection);
-    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), HeadersSection) == SchemaSection);
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), UndefinedSectionType) == UndefinedSectionType);
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), RequestSectionType) == SchemaSectionType);
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), SchemaSectionType) == SchemaSectionType);
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), BodySectionType) == SchemaSectionType);
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), HeadersSectionType) == SchemaSectionType);
     
     // Test object payload
     markdown[2].content = "My Resource Object (application/json)";
     cur = markdown.begin();
     
     // ListBlockBeginType
-    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), UndefinedSection) == ObjectSection);
-    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), ObjectSection) == ObjectSection);
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), UndefinedSectionType) == ObjectSectionType);
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), ObjectSectionType) == ObjectSectionType);
     
     ++cur; // ListItemBlockBeginType
-    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), UndefinedSection) == ObjectSection);
-    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), ObjectSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), UndefinedSectionType) == ObjectSectionType);
+    REQUIRE(ClassifyBlock<Payload>(cur, markdown.end(), ObjectSectionType) == UndefinedSectionType);
     
 }
 

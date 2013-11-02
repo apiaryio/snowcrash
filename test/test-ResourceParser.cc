@@ -75,45 +75,45 @@ TEST_CASE("Resource block classifier", "[resource][block]")
     
     BlockIterator cur = markdown.begin();
     // Named resource: "My Resource [/resource]"
-    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSection) == ResourceSection);
-    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSectionType) == ResourceSectionType);
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSectionType) == UndefinedSectionType);
     
     ++cur; // "Resource Description"
-    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
-    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSection) == ResourceSection);
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSectionType) == UndefinedSectionType);
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSectionType) == ResourceSectionType);
 
     ++cur; // ListBlockBeginType - "Model"
-    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSection) == ModelSection);
-    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSection) == ModelSection);
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSectionType) == ModelSectionType);
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSectionType) == ModelSectionType);
     
     ++cur; // ListItemBlockBeginType - "My Resource Object"
-    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSection) == ModelSection);
-    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ModelSection) == ModelSection);
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSectionType) == ModelSectionType);
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ModelSectionType) == ModelSectionType);
     
     std::advance(cur, 4); // ListItemBlockBeginType - "Parameters"
-    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSection) == ParametersSection);
-    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSection) == ParametersSection);
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSectionType) == ParametersSectionType);
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSectionType) == ParametersSectionType);
 
     std::advance(cur, 39); // ListItemBlockBeginType - "Headers"
-    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSection) == HeadersSection);
-    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSection) == HeadersSection);
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSectionType) == HeadersSectionType);
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSectionType) == HeadersSectionType);
     
     std::advance(cur, 5); // Method
-    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSection) == ActionSection);
-    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSection) == ActionSection);
-    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), HeadersSection) == ActionSection);
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSectionType) == ActionSectionType);
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSectionType) == ActionSectionType);
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), HeadersSectionType) == ActionSectionType);
     
     // Nameless resource: "/resource"
     markdown[0].content = "/resource";
     cur = markdown.begin();
-    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSection) == ResourceSection);
-    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSectionType) == ResourceSectionType);
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSectionType) == UndefinedSectionType);
     
     // Keyword "group"
     markdown[0].content = "Group A";
     cur = markdown.begin();
-    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
-    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSectionType) == UndefinedSectionType);
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSectionType) == UndefinedSectionType);
 }
 
 TEST_CASE("Abbreviated Resource Method block classifier", "[resource][block]")
@@ -124,12 +124,12 @@ TEST_CASE("Abbreviated Resource Method block classifier", "[resource][block]")
     
     BlockIterator cur = markdown.begin();
     // "GET /resource"
-    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSection) == ResourceMethodSection);
-    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceMethodSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSectionType) == ResourceMethodSectionType);
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceMethodSectionType) == UndefinedSectionType);
     
     ++cur; // "POST"
-    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSection) == ActionSection);
-    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceMethodSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSectionType) == ActionSectionType);
+    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceMethodSectionType) == UndefinedSectionType);
 }
 
 TEST_CASE("Parse resource", "[resource][block]")

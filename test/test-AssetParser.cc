@@ -127,28 +127,28 @@ TEST_CASE("aparser/classifier-body", "Body asset block classifier")
     
     BlockIterator cur = markdown.begin();
     // ListBlockBeginType
-    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == BodySection);
-    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), BodySection) == BodySection);
+    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), UndefinedSectionType) == BodySectionType);
+    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), BodySectionType) == BodySectionType);
     
     ++cur; // ListItemBlockBeginType
-    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == BodySection);
-    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), BodySection) == UndefinedSection); // treat new list item as foreign
+    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), UndefinedSectionType) == BodySectionType);
+    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), BodySectionType) == UndefinedSectionType); // treat new list item as foreign
     
     ++cur; // ParagraphBlockType
-    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
-    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), BodySection) == BodySection);
+    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), UndefinedSectionType) == UndefinedSectionType);
+    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), BodySectionType) == BodySectionType);
 
     ++cur; // CodeBlockType
-    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
-    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), BodySection) == BodySection);
+    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), UndefinedSectionType) == UndefinedSectionType);
+    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), BodySectionType) == BodySectionType);
     
     ++cur; // ListItemBlockEndType
-    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
-    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), BodySection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), UndefinedSectionType) == UndefinedSectionType);
+    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), BodySectionType) == UndefinedSectionType);
     
     ++cur; // ListBlockEndType
-    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
-    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), BodySection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), UndefinedSectionType) == UndefinedSectionType);
+    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), BodySectionType) == UndefinedSectionType);
 }
 
 TEST_CASE("aparser/classifier-schema", "Schema asset block classifier")
@@ -160,28 +160,28 @@ TEST_CASE("aparser/classifier-schema", "Schema asset block classifier")
     
     BlockIterator cur = markdown.begin();
     // ListBlockBeginType
-    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == SchemaSection);
-    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), SchemaSection) == SchemaSection);
+    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), UndefinedSectionType) == SchemaSectionType);
+    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), SchemaSectionType) == SchemaSectionType);
     
     ++cur; // ListItemBlockBeginType
-    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == SchemaSection);
-    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), SchemaSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), UndefinedSectionType) == SchemaSectionType);
+    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), SchemaSectionType) == UndefinedSectionType);
     
     ++cur; // ParagraphBlockType
-    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
-    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), SchemaSection) == SchemaSection);
+    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), UndefinedSectionType) == UndefinedSectionType);
+    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), SchemaSectionType) == SchemaSectionType);
     
     ++cur; // CodeBlockType
-    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
-    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), SchemaSection) == SchemaSection);
+    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), UndefinedSectionType) == UndefinedSectionType);
+    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), SchemaSectionType) == SchemaSectionType);
     
     ++cur; // ListItemBlockEndType
-    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
-    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), SchemaSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), UndefinedSectionType) == UndefinedSectionType);
+    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), SchemaSectionType) == UndefinedSectionType);
     
     ++cur; // ListBlockEndType
-    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
-    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), SchemaSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), UndefinedSectionType) == UndefinedSectionType);
+    REQUIRE(ClassifyBlock<Asset>(cur, markdown.end(), SchemaSectionType) == UndefinedSectionType);
 }
 
 TEST_CASE("aparser/parse-body", "Parse body asset")

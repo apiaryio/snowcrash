@@ -97,28 +97,28 @@ TEST_CASE("hparser/classifier", "Headers block classifier")
     BlockIterator cur = markdown.begin();
 
     // ListBlockBeginType
-    REQUIRE(ClassifyBlock<HeaderCollection>(cur, markdown.end(), UndefinedSection) == HeadersSection);
-    REQUIRE(ClassifyBlock<HeaderCollection>(cur, markdown.end(), HeadersSection) == HeadersSection);
+    REQUIRE(ClassifyBlock<HeaderCollection>(cur, markdown.end(), UndefinedSectionType) == HeadersSectionType);
+    REQUIRE(ClassifyBlock<HeaderCollection>(cur, markdown.end(), HeadersSectionType) == HeadersSectionType);
     
     ++cur; // ListItemBlockBeginType
-    REQUIRE(ClassifyBlock<HeaderCollection>(cur, markdown.end(), UndefinedSection) == HeadersSection);
-    REQUIRE(ClassifyBlock<HeaderCollection>(cur, markdown.end(), HeadersSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<HeaderCollection>(cur, markdown.end(), UndefinedSectionType) == HeadersSectionType);
+    REQUIRE(ClassifyBlock<HeaderCollection>(cur, markdown.end(), HeadersSectionType) == UndefinedSectionType);
     
     ++cur; // ParagraphBlockType
-    REQUIRE(ClassifyBlock<HeaderCollection>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
-    REQUIRE(ClassifyBlock<HeaderCollection>(cur, markdown.end(), HeadersSection) == HeadersSection);
+    REQUIRE(ClassifyBlock<HeaderCollection>(cur, markdown.end(), UndefinedSectionType) == UndefinedSectionType);
+    REQUIRE(ClassifyBlock<HeaderCollection>(cur, markdown.end(), HeadersSectionType) == HeadersSectionType);
 
     ++cur; // CodeBlockType
-    REQUIRE(ClassifyBlock<HeaderCollection>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
-    REQUIRE(ClassifyBlock<HeaderCollection>(cur, markdown.end(), HeadersSection) == HeadersSection);
+    REQUIRE(ClassifyBlock<HeaderCollection>(cur, markdown.end(), UndefinedSectionType) == UndefinedSectionType);
+    REQUIRE(ClassifyBlock<HeaderCollection>(cur, markdown.end(), HeadersSectionType) == HeadersSectionType);
 
     ++cur; // ListItemBlockEndType
-    REQUIRE(ClassifyBlock<HeaderCollection>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
-    REQUIRE(ClassifyBlock<HeaderCollection>(cur, markdown.end(), HeadersSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<HeaderCollection>(cur, markdown.end(), UndefinedSectionType) == UndefinedSectionType);
+    REQUIRE(ClassifyBlock<HeaderCollection>(cur, markdown.end(), HeadersSectionType) == UndefinedSectionType);
     
     ++cur; // ListBlockEndType
-    REQUIRE(ClassifyBlock<HeaderCollection>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
-    REQUIRE(ClassifyBlock<HeaderCollection>(cur, markdown.end(), HeadersSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<HeaderCollection>(cur, markdown.end(), UndefinedSectionType) == UndefinedSectionType);
+    REQUIRE(ClassifyBlock<HeaderCollection>(cur, markdown.end(), HeadersSectionType) == UndefinedSectionType);
 }
 
 TEST_CASE("hparser/parse", "Parse canonical header section")

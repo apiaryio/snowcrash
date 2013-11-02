@@ -25,24 +25,24 @@ namespace snowcrash {
     // Block Classifier, Resource Context
     //
     template <>
-    FORCEINLINE Section ClassifyBlock<Blueprint>(const BlockIterator& begin,
-                                                 const BlockIterator& end,
-                                                 const Section& context) {
+    FORCEINLINE SectionType ClassifyBlock<Blueprint>(const BlockIterator& begin,
+                                                     const BlockIterator& end,
+                                                     const SectionType& context) {
         
         if (HasResourceGroupSignature(*begin) ||
             HasResourceSignature(*begin))
-            return ResourceGroupSection; // Treat Resource as anonymous resource group
+            return ResourceGroupSectionType; // Treat Resource as anonymous resource group
         
-        return (context == ResourceGroupSection) ? UndefinedSection : BlueprintSection;
+        return (context == ResourceGroupSectionType) ? UndefinedSectionType : BlueprintSectionType;
     }
     
     //
-    // Blueprint Section Parser
+    // Blueprint SectionType Parser
     //
     template<>
     struct SectionParser<Blueprint> {
         
-        static ParseSectionResult ParseSection(const Section& section,
+        static ParseSectionResult ParseSection(const SectionType& section,
                                                const BlockIterator& cur,
                                                const SectionBounds& bounds,
                                                BlueprintParserCore& parser,
@@ -50,17 +50,17 @@ namespace snowcrash {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
             
-            if ((section != BlueprintSection) &&
+            if ((section != BlueprintSectionType) &&
                 !CheckBlueprintName(*cur, parser, result.first))
                 return result;
             
             switch (section) {
                     
-                case BlueprintSection:
+                case BlueprintSectionType:
                     result = HandleBlueprintOverviewBlock(cur, bounds, parser, output);
                     break;
                     
-                case ResourceGroupSection:
+                case ResourceGroupSectionType:
                     result = HandleResourceGroup(cur, bounds, parser, output);
                     break;
                     

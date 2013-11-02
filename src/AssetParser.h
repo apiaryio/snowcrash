@@ -83,64 +83,64 @@ namespace snowcrash {
      *  Block Classifier, asset context.
      */
     template <>
-    FORCEINLINE Section ClassifyBlock<Asset>(const BlockIterator& begin,
+    FORCEINLINE SectionType ClassifyBlock<Asset>(const BlockIterator& begin,
                                              const BlockIterator& end,
-                                             const Section& context) {
+                                             const SectionType& context) {
         
-        if (context == UndefinedSection) {
+        if (context == UndefinedSectionType) {
             AssetSignature asset = GetAssetSignature(begin, end);
             if (asset == BodyAssetSignature || asset == PayloadBodyAssetSignature)
-                return BodySection;
+                return BodySectionType;
             if (asset == SchemaAssetSignature)
-                return SchemaSection;
+                return SchemaSectionType;
         }
-        else if (context == BodySection ||
-                 context == SchemaSection) {
+        else if (context == BodySectionType ||
+                 context == SchemaSectionType) {
             
-            // Section closure
+            // SectionType closure
             if (begin->type == ListItemBlockEndType ||
                 begin->type == ListBlockEndType) {
 
                 // Look ahead for a dangling asset
                 BlockIterator cur = CloseList(begin, end);
                 if (cur == end)
-                    return UndefinedSection;
+                    return UndefinedSectionType;
                 
                 if (IsDanglingBlock(cur, end))
-                    return (context == BodySection) ? DanglingBodySection : DanglingSchemaSection;
+                    return (context == BodySectionType) ? DanglingBodySectionType : DanglingSchemaSectionType;
                 else
-                    return UndefinedSection;
+                    return UndefinedSectionType;
             }
             
             // Adjacent list item
             if (begin->type == ListItemBlockBeginType) {
-                    return UndefinedSection;
+                    return UndefinedSectionType;
             }
         }
-        else if (context == DanglingBodySection ||
-                 context == DanglingSchemaSection) {
+        else if (context == DanglingBodySectionType ||
+                 context == DanglingSchemaSectionType) {
             
             if (begin->type == ListItemBlockEndType ||
                 begin->type == ListBlockEndType)
-                return UndefinedSection;
+                return UndefinedSectionType;
             
             if (!IsDanglingBlock(begin, end))
-                return UndefinedSection;
+                return UndefinedSectionType;
         }
         
-        return (context == BodySection ||
-                context == SchemaSection ||
-                context == DanglingBodySection ||
-                context == DanglingSchemaSection) ? context : UndefinedSection;
+        return (context == BodySectionType ||
+                context == SchemaSectionType ||
+                context == DanglingBodySectionType ||
+                context == DanglingSchemaSectionType) ? context : UndefinedSectionType;
     }
     
     //
-    // Asset Section Parser
+    // Asset SectionType Parser
     //
     template<>
     struct SectionParser<Asset> {
         
-        static ParseSectionResult ParseSection(const Section& section,
+        static ParseSectionResult ParseSection(const SectionType& section,
                                                const BlockIterator& cur,
                                                const SectionBounds& bounds,
                                                BlueprintParserCore& parser,
@@ -148,17 +148,17 @@ namespace snowcrash {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
             switch (section) {
-                case BodySection:
-                case SchemaSection: 
+                case BodySectionType:
+                case SchemaSectionType: 
                     result = HandleAssetSectionBlock(section, cur, bounds, parser, asset);
                     break;
                     
-                case DanglingBodySection:
-                case DanglingSchemaSection:
+                case DanglingBodySectionType:
+                case DanglingSchemaSectionType:
                     result = HandleDanglingAssetSectionBlock(section, cur, bounds, parser, asset);
                     break;
                     
-                case UndefinedSection:
+                case UndefinedSectionType:
                     result.second = CloseListItemBlock(cur, bounds.second);
                     break;
                     
@@ -170,7 +170,7 @@ namespace snowcrash {
             return result;
         }
         
-        static ParseSectionResult HandleAssetSectionBlock(const Section& section,
+        static ParseSectionResult HandleAssetSectionBlock(const SectionType& section,
                                                           const BlockIterator& cur,
                                                           const SectionBounds& bounds,
                                                           BlueprintParserCore& parser,
@@ -192,7 +192,7 @@ namespace snowcrash {
             return result;
         }
         
-        static ParseSectionResult HandleDanglingAssetSectionBlock(const Section& section,
+        static ParseSectionResult HandleDanglingAssetSectionBlock(const SectionType& section,
                                                                   const BlockIterator& cur,
                                                                   const SectionBounds& bounds,
                                                                   BlueprintParserCore& parser,
@@ -201,7 +201,7 @@ namespace snowcrash {
             // Skip any closing list blocks
             BlockIterator sectionCur = CloseList(cur, bounds.second);
             
-            Section originalSection = (section == DanglingSchemaSection) ? SchemaSection : BodySection;
+            SectionType originalSection = (section == DanglingSchemaSectionType) ? SchemaSectionType : BodySectionType;
             SourceData data;
             SourceDataBlock sourceMap;
             ParseSectionResult result = ParseListPreformattedBlock(originalSection,

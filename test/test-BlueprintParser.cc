@@ -47,23 +47,23 @@ TEST_CASE("bparser/classifier", "Blueprint block classifier")
     BlockIterator cur = markdown.begin();
 
     // meta: verse
-    REQUIRE(ClassifyBlock<Blueprint>(cur, markdown.end(), UndefinedSection) == BlueprintSection);
+    REQUIRE(ClassifyBlock<Blueprint>(cur, markdown.end(), UndefinedSectionType) == BlueprintSectionType);
     
     ++cur; // # Snowcrash API
-    REQUIRE(ClassifyBlock<Blueprint>(cur, markdown.end(), UndefinedSection) == BlueprintSection);
-    REQUIRE(ClassifyBlock<Blueprint>(cur, markdown.end(), BlueprintSection) == BlueprintSection);
+    REQUIRE(ClassifyBlock<Blueprint>(cur, markdown.end(), UndefinedSectionType) == BlueprintSectionType);
+    REQUIRE(ClassifyBlock<Blueprint>(cur, markdown.end(), BlueprintSectionType) == BlueprintSectionType);
     
     ++cur; // ## Character
-    REQUIRE(ClassifyBlock<Blueprint>(cur, markdown.end(), UndefinedSection) == BlueprintSection);
-    REQUIRE(ClassifyBlock<Blueprint>(cur, markdown.end(), BlueprintSection) == BlueprintSection);
+    REQUIRE(ClassifyBlock<Blueprint>(cur, markdown.end(), UndefinedSectionType) == BlueprintSectionType);
+    REQUIRE(ClassifyBlock<Blueprint>(cur, markdown.end(), BlueprintSectionType) == BlueprintSectionType);
     
     ++cur; // Uncle Enzo
-    REQUIRE(ClassifyBlock<Blueprint>(cur, markdown.end(), UndefinedSection) == BlueprintSection);    
-    REQUIRE(ClassifyBlock<Blueprint>(cur, markdown.end(), BlueprintSection) == BlueprintSection);
+    REQUIRE(ClassifyBlock<Blueprint>(cur, markdown.end(), UndefinedSectionType) == BlueprintSectionType);    
+    REQUIRE(ClassifyBlock<Blueprint>(cur, markdown.end(), BlueprintSectionType) == BlueprintSectionType);
     
     ++cur; // # Group First
-    REQUIRE(ClassifyBlock<Blueprint>(cur, markdown.end(), UndefinedSection) == ResourceGroupSection);
-    REQUIRE(ClassifyBlock<Blueprint>(cur, markdown.end(), BlueprintSection) == ResourceGroupSection);
+    REQUIRE(ClassifyBlock<Blueprint>(cur, markdown.end(), UndefinedSectionType) == ResourceGroupSectionType);
+    REQUIRE(ClassifyBlock<Blueprint>(cur, markdown.end(), BlueprintSectionType) == ResourceGroupSectionType);
 }
 
 TEST_CASE("bpparser/init", "Blueprint parser construction")
@@ -481,7 +481,7 @@ TEST_CASE("Incorrect warning about duplicate resources", "[blueprint][issue][3]"
     //
     //        ...
     //
-    //# Group Section Header
+    //# Group SectionType Header
     //## Resource 2 [/2]
     //");
     
@@ -499,7 +499,7 @@ TEST_CASE("Incorrect warning about duplicate resources", "[blueprint][issue][3]"
     markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(5, 1)));
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(6, 1)));
     
-    markdown.push_back(MarkdownBlock(HeaderBlockType, "Group Section Header", 1, MakeSourceDataBlock(7, 1)));
+    markdown.push_back(MarkdownBlock(HeaderBlockType, "Group SectionType Header", 1, MakeSourceDataBlock(7, 1)));
     markdown.push_back(MarkdownBlock(HeaderBlockType, "Resource 2 [/2]", 1, MakeSourceDataBlock(8, 1)));
     
     Result result;

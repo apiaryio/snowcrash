@@ -62,36 +62,36 @@ namespace snowcrash {
     // Block Classifier, Headers Context
     //
     template <>
-    FORCEINLINE Section ClassifyBlock<HeaderCollection>(const BlockIterator& begin,
+    FORCEINLINE SectionType ClassifyBlock<HeaderCollection>(const BlockIterator& begin,
                                                         const BlockIterator& end,
-                                                        const Section& context) {
+                                                        const SectionType& context) {
         
-        if (context == UndefinedSection &&
+        if (context == UndefinedSectionType &&
             HasHeaderSignature(begin, end)) {
-            return HeadersSection;
+            return HeadersSectionType;
         }
-        else if (context == HeadersSection) {
+        else if (context == HeadersSectionType) {
             
-            // Section closure
+            // SectionType closure
             if (begin->type == ListItemBlockEndType ||
                 begin->type == ListBlockEndType)
-                return UndefinedSection;
+                return UndefinedSectionType;
             
             // Adjacent list item
             if (begin->type == ListItemBlockBeginType)
-                return UndefinedSection;
+                return UndefinedSectionType;
         }
         
-        return (context == HeadersSection) ? context : UndefinedSection;
+        return (context == HeadersSectionType) ? context : UndefinedSectionType;
     }
     
     //
-    // Headers Section Parser
+    // Headers SectionType Parser
     //
     template<>
     struct SectionParser<HeaderCollection> {
         
-        static ParseSectionResult ParseSection(const Section& section,
+        static ParseSectionResult ParseSection(const SectionType& section,
                                                const BlockIterator& cur,
                                                const SectionBounds& bounds,
                                                BlueprintParserCore& parser,
@@ -99,11 +99,11 @@ namespace snowcrash {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
             switch (section) {
-                case HeadersSection:
+                case HeadersSectionType:
                     result = HandleHeadersSectionBlock(cur, bounds, parser, headers);
                     break;
                     
-                case UndefinedSection:
+                case UndefinedSectionType:
                     result.second = CloseListItemBlock(cur, bounds.second);
                     break;
                     
@@ -122,7 +122,7 @@ namespace snowcrash {
 
             SourceData data;
             SourceDataBlock sourceMap;
-            ParseSectionResult result = ParseListPreformattedBlock(HeadersSection,
+            ParseSectionResult result = ParseListPreformattedBlock(HeadersSectionType,
                                                                    cur,
                                                                    bounds,
                                                                    parser,

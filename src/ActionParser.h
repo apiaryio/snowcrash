@@ -81,62 +81,62 @@ namespace snowcrash {
     // Classifier of internal list items, Payload context
     //
     template <>
-    FORCEINLINE Section ClassifyInternaListBlock<Action>(const BlockIterator& begin,
+    FORCEINLINE SectionType ClassifyInternaListBlock<Action>(const BlockIterator& begin,
                                                          const BlockIterator& end) {        
         if (HasHeaderSignature(begin, end))
-            return HeadersSection;
+            return HeadersSectionType;
         
         if (HasParametersSignature(begin, end))
-            return ParametersSection;
+            return ParametersSectionType;
         
         Name name;
         SourceData mediaType;
         PayloadSignature payload = GetPayloadSignature(begin, end, name, mediaType);
         if (payload == RequestPayloadSignature)
-            return RequestSection;
+            return RequestSectionType;
         else if (payload == ResponsePayloadSignature)
-            return ResponseSection;
+            return ResponseSectionType;
         else if (payload == ObjectPayloadSignature)
-            return ObjectSection;
+            return ObjectSectionType;
         else if (payload == ModelPayloadSignature)
-            return ModelSection;
+            return ModelSectionType;
         
-        return UndefinedSection;
+        return UndefinedSectionType;
     }
         
     //
     // Block Classifier, Method Context
     //
     template <>
-    FORCEINLINE Section ClassifyBlock<Action>(const BlockIterator& begin,
+    FORCEINLINE SectionType ClassifyBlock<Action>(const BlockIterator& begin,
                                               const BlockIterator& end,
-                                              const Section& context) {
+                                              const SectionType& context) {
 
         if (HasActionSignature(*begin))
-            return (context == UndefinedSection) ? ActionSection : UndefinedSection;
+            return (context == UndefinedSectionType) ? ActionSectionType : UndefinedSectionType;
         
         if (HasResourceSignature(*begin) ||
             HasResourceGroupSignature(*begin))
-            return UndefinedSection;
+            return UndefinedSectionType;
         
-        Section listSection = ClassifyInternaListBlock<Action>(begin, end);
-        if (listSection != UndefinedSection)
+        SectionType listSection = ClassifyInternaListBlock<Action>(begin, end);
+        if (listSection != UndefinedSectionType)
             return listSection;
         
         // Unrecognized list item at this level
         if (begin->type == ListItemBlockBeginType)
-            return ForeignSection;
+            return ForeignSectionType;
         
-        return (context == ActionSection) ? ActionSection : UndefinedSection;
+        return (context == ActionSectionType) ? ActionSectionType : UndefinedSectionType;
     }
     
     //
-    // Method Section Parser
+    // Method SectionType Parser
     //
     template<>
     struct SectionParser<Action> {
         
-        static ParseSectionResult ParseSection(const Section& section,
+        static ParseSectionResult ParseSection(const SectionType& section,
                                                const BlockIterator& cur,
                                                const SectionBounds& bounds,
                                                BlueprintParserCore& parser,
@@ -145,33 +145,33 @@ namespace snowcrash {
             ParseSectionResult result = std::make_pair(Result(), cur);
             
             switch (section) {                    
-                case ActionSection:
+                case ActionSectionType:
                     result = HandleActionOverviewBlock(cur, bounds, parser, action);
                     break;
 
-                case ParametersSection:
+                case ParametersSectionType:
                     result = HandleParameters(cur, bounds, parser, action);
                     break;
 
-                case HeadersSection:
+                case HeadersSectionType:
                     result = HandleHeaders(cur, bounds, parser, action);
                     break;
                     
-                case RequestSection:
-                case ResponseSection:
+                case RequestSectionType:
+                case ResponseSectionType:
                     result = HandlePayload(section, cur, bounds, parser, action);
                     break;
                     
-                case ForeignSection:
+                case ForeignSectionType:
                     result = HandleForeignSection(cur, bounds, parser.sourceData);
                     break;
                     
-                case UndefinedSection:
+                case UndefinedSectionType:
                     result.second = CloseListItemBlock(cur, bounds.second);
                     break;
                 
-                case ModelSection:
-                case ObjectSection:
+                case ModelSectionType:
+                case ObjectSectionType:
                     {
                         // ERR: Unexpected model definition
                         SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, bounds, bounds.second, parser.sourceData);
@@ -261,7 +261,7 @@ namespace snowcrash {
          *  \param  method  An output buffer to store parsed payload into.
          *  \return A block parser section result.
          */
-        static ParseSectionResult HandlePayload(const Section &section,
+        static ParseSectionResult HandlePayload(const SectionType &section,
                                                 const BlockIterator& cur,
                                                 const SectionBounds& bounds,
                                                 BlueprintParserCore& parser,
@@ -296,10 +296,10 @@ namespace snowcrash {
             CheckPayload(section, payload, nameBlock->sourceMap, parser.sourceData, result.first);
             
             // Inject parsed payload into the action
-            if (section == RequestSection) {
+            if (section == RequestSectionType) {
                 action.examples.front().requests.push_back(payload);
             }
-            else if (section == ResponseSection) {
+            else if (section == ResponseSectionType) {
                 action.examples.front().responses.push_back(payload);
             }
             
@@ -316,7 +316,7 @@ namespace snowcrash {
          *  \param  sourceMap   Payload signature source map.
          *  \param  payload     The payload to be checked.
          */
-        static void CheckPayload(const Section& section,
+        static void CheckPayload(const SectionType& section,
                                  const Payload& payload,
                                  const SourceDataBlock& sourceMap,
                                  const SourceData& sourceData,
@@ -333,7 +333,7 @@ namespace snowcrash {
                 }
             }
             
-            if (section == RequestSection) {
+            if (section == RequestSectionType) {
                 
                 if (payload.body.empty()) {
                     
@@ -346,7 +346,7 @@ namespace snowcrash {
                     }
                 }
             }
-            else if (section == ResponseSection) {
+            else if (section == ResponseSectionType) {
                 // Check status code
                 HTTPStatusCode code = 0;
                 if (!payload.name.empty()) {
@@ -359,7 +359,7 @@ namespace snowcrash {
                 else if (!payload.body.empty()) {
                     // WARN: not empty body
                     std::stringstream ss;
-                    ss << "the " << code << " response MUST NOT include a " << SectionName(BodySection);
+                    ss << "the " << code << " response MUST NOT include a " << SectionName(BodySectionType);
                     result.warnings.push_back(Warning(ss.str(),
                                                       EmptyDefinitionWarning,
                                                       MapSourceDataBlock(sourceMap, sourceData)));
@@ -381,9 +381,9 @@ namespace snowcrash {
             if (warnEmptyBody) {
                 // WARN: empty body
                 std::stringstream ss;
-                ss << "empty " << SectionName(section) << " " << SectionName(BodySection);
+                ss << "empty " << SectionName(section) << " " << SectionName(BodySectionType);
                 if (!contentType.empty()) {
-                    ss << ", expected " << SectionName(BodySection) << " for '" << contentType << "' Content-Type";
+                    ss << ", expected " << SectionName(BodySectionType) << " for '" << contentType << "' Content-Type";
                 }
                 
                 result.warnings.push_back(Warning(ss.str(),
@@ -396,16 +396,16 @@ namespace snowcrash {
          *  Checks whether given section payload has duplicate.
          *  \return True when a duplicate is found, false otherwise.
          */
-        static bool IsPayloadDuplicate(const Section& section, const Payload& payload, Action& action) {
+        static bool IsPayloadDuplicate(const SectionType& section, const Payload& payload, Action& action) {
             
             if (action.examples.empty())
                 return false;
             
-            if (section == RequestSection) {
+            if (section == RequestSectionType) {
                 Collection<Request>::const_iterator duplicate = FindRequest(action.examples.front(), payload);
                 return duplicate != action.examples.front().requests.end();
             }
-            else if (section == ResponseSection) {
+            else if (section == ResponseSectionType) {
                 Collection<Response>::const_iterator duplicate = FindResponse(action.examples.front(), payload);
                 return duplicate != action.examples.front().responses.end();
             }

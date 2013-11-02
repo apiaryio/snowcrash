@@ -75,25 +75,25 @@ TEST_CASE("Parameter definition block classifier", "[parameter_definition][class
     BlockIterator cur = markdown.begin();
     
     // ListBlockBeginType
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), UndefinedSection) == ParameterDefinitionSection);
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterDefinitionSection) == ForeignSection);
+    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), UndefinedSectionType) == ParameterDefinitionSectionType);
+    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterDefinitionSectionType) == ForeignSectionType);
     
     ++cur; // ListItemBlockBeginType
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), UndefinedSection) == ParameterDefinitionSection);
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterDefinitionSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), UndefinedSectionType) == ParameterDefinitionSectionType);
+    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterDefinitionSectionType) == UndefinedSectionType);
     
     ++cur; // ParagraphBlockType
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterDefinitionSection) == ParameterDefinitionSection);
+    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), UndefinedSectionType) == UndefinedSectionType);
+    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterDefinitionSectionType) == ParameterDefinitionSectionType);
     
     ++cur; // ParagraphBlockType
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterDefinitionSection) == ParameterDefinitionSection);
+    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), UndefinedSectionType) == UndefinedSectionType);
+    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterDefinitionSectionType) == ParameterDefinitionSectionType);
     
     ++cur; // type trait BEGIN
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterDefinitionSection) == ParameterValuesSection);
-    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterValuesSection) == ParameterValuesSection);
+    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), UndefinedSectionType) == UndefinedSectionType);
+    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterDefinitionSectionType) == ParameterValuesSectionType);
+    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterValuesSectionType) == ParameterValuesSectionType);
 }
 
 TEST_CASE("Parse canonical parameter definition", "[parameter_definition][block]")

@@ -135,7 +135,8 @@ namespace snowcrash {
         EmptyDefinitionWarning = 6,
         NotEmptyDefinitionWarning = 7,
         LogicalErrorWarning = 8,
-        DeprecatedWarning = 9
+        DeprecatedWarning = 9,
+        IndentationWarning = 10
     };
     
     /**

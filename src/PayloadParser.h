@@ -130,94 +130,94 @@ namespace snowcrash {
      *  Classifier of internal list items, payload context.
      */
     template <>
-    FORCEINLINE Section ClassifyInternaListBlock<Payload>(const BlockIterator& begin,
+    FORCEINLINE SectionType ClassifyInternaListBlock<Payload>(const BlockIterator& begin,
                                                           const BlockIterator& end) {
         
         AssetSignature asset = GetAssetSignature(begin, end);
         if (asset == BodyAssetSignature)
-            return BodySection;
+            return BodySectionType;
         else if (asset == SchemaAssetSignature)
-            return SchemaSection;
+            return SchemaSectionType;
         
         if (HasHeaderSignature(begin, end))
-            return HeadersSection;
+            return HeadersSectionType;
         
-        return UndefinedSection;
+        return UndefinedSectionType;
     }
     
     /**
      *  Block Classifier, payload context.
      */
     template <>
-    FORCEINLINE Section ClassifyBlock<Payload>(const BlockIterator& begin,
+    FORCEINLINE SectionType ClassifyBlock<Payload>(const BlockIterator& begin,
                                                const BlockIterator& end,
-                                               const Section& context) {
+                                               const SectionType& context) {
         
-        if (context == UndefinedSection) {
+        if (context == UndefinedSectionType) {
             
             Name name;
             SourceData mediaType;
             PayloadSignature payload = GetPayloadSignature(begin, end, name, mediaType);
             if (payload == RequestPayloadSignature) {
 
-                return (HasNestedListBlock(begin, end)) ? RequestSection : RequestBodySection;
+                return (HasNestedListBlock(begin, end)) ? RequestSectionType : RequestBodySectionType;
             }
             else if (payload == ResponsePayloadSignature) {
                 
-                return (HasNestedListBlock(begin, end)) ? ResponseSection : ResponseBodySection;
+                return (HasNestedListBlock(begin, end)) ? ResponseSectionType : ResponseBodySectionType;
             }
             else if (payload == ObjectPayloadSignature) {
                 
-                return (HasNestedListBlock(begin, end)) ? ObjectSection : ObjectBodySection;
+                return (HasNestedListBlock(begin, end)) ? ObjectSectionType : ObjectBodySectionType;
             }
             else if (payload == ModelPayloadSignature) {
                 
-                return (HasNestedListBlock(begin, end)) ? ModelSection : ModelBodySection;
+                return (HasNestedListBlock(begin, end)) ? ModelSectionType : ModelBodySectionType;
             }
 
         }
-        else if (context == RequestSection ||
-                 context == ResponseSection ||
-                 context == ObjectSection ||
-                 context == ModelSection) {
+        else if (context == RequestSectionType ||
+                 context == ResponseSectionType ||
+                 context == ObjectSectionType ||
+                 context == ModelSectionType) {
             
-            // Section closure
+            // SectionType closure
             if (begin->type == ListItemBlockEndType ||
                 begin->type == ListBlockEndType)
-                return UndefinedSection;
+                return UndefinedSectionType;
 
-            Section listSection = ClassifyInternaListBlock<Payload>(begin, end);
-            if (listSection != UndefinedSection)
+            SectionType listSection = ClassifyInternaListBlock<Payload>(begin, end);
+            if (listSection != UndefinedSectionType)
                 return listSection;
             
             // Adjacent list item
             if (begin->type == ListItemBlockBeginType)
-                return UndefinedSection;
+                return UndefinedSectionType;
         }
-        else if (context == HeadersSection ||
-                 context == BodySection ||
-                 context == SchemaSection ||
-                 context == ForeignSection) {
+        else if (context == HeadersSectionType ||
+                 context == BodySectionType ||
+                 context == SchemaSectionType ||
+                 context == ForeignSectionType) {
 
-            // Section closure
+            // SectionType closure
             if (begin->type == ListItemBlockEndType ||
                 begin->type == ListBlockEndType)
-                return UndefinedSection;
+                return UndefinedSectionType;
             
-            Section listSection = ClassifyInternaListBlock<Payload>(begin, end);
-            if (listSection != UndefinedSection)
+            SectionType listSection = ClassifyInternaListBlock<Payload>(begin, end);
+            if (listSection != UndefinedSectionType)
                 return listSection;
             
             if (HasPayloadAssetSignature(begin, end))
-                return UndefinedSection;
+                return UndefinedSectionType;
             
-            return ForeignSection;
+            return ForeignSectionType;
         }
         
-        return (context == RequestSection ||
-                context == ResponseSection ||
-                context == ObjectSection ||
-                context == ModelSection) ? context : UndefinedSection;
+        return (context == RequestSectionType ||
+                context == ResponseSectionType ||
+                context == ObjectSectionType ||
+                context == ModelSectionType) ? context : UndefinedSectionType;
     }
     
     /**
@@ -226,7 +226,7 @@ namespace snowcrash {
     template<>
     struct SectionParser<Payload> {
         
-        static ParseSectionResult ParseSection(const Section& section,
+        static ParseSectionResult ParseSection(const SectionType& section,
                                                const BlockIterator& cur,
                                                const SectionBounds& bounds,
                                                BlueprintParserCore& parser,
@@ -235,34 +235,34 @@ namespace snowcrash {
             ParseSectionResult result = std::make_pair(Result(), cur);
 
             switch (section) {
-                case RequestSection:
-                case ResponseSection:
-                case ObjectSection:
-                case ModelSection:
+                case RequestSectionType:
+                case ResponseSectionType:
+                case ObjectSectionType:
+                case ModelSectionType:
                     result = HandleOverviewSectionBlock(section, cur, bounds, parser, payload);
                     break;
                     
-                case RequestBodySection:
-                case ResponseBodySection:
-                case ObjectBodySection:
-                case ModelBodySection:
+                case RequestBodySectionType:
+                case ResponseBodySectionType:
+                case ObjectBodySectionType:
+                case ModelBodySectionType:
                     result = HandlePayloadAsset(section, cur, bounds, parser, payload);
                     break;
                     
-                case HeadersSection:
+                case HeadersSectionType:
                     result = HandleHeaders(cur, bounds, parser, payload);
                     break;
                     
-                case BodySection:
-                case SchemaSection:
+                case BodySectionType:
+                case SchemaSectionType:
                     result = HandleAsset(section, cur, bounds, parser, payload);
                     break;
                     
-                case UndefinedSection:
+                case UndefinedSectionType:
                     result.second = CloseListItemBlock(cur, bounds.second);
                     break;
                     
-                case ForeignSection:
+                case ForeignSectionType:
                     result = HandleForeignSection(cur, bounds, parser.sourceData);
                     break;
                                         
@@ -283,7 +283,7 @@ namespace snowcrash {
          *  \param  payload An output buffer to write overview description into.
          *  \return A block parser section result.
          */
-        static ParseSectionResult HandleOverviewSectionBlock(const Section& section,
+        static ParseSectionResult HandleOverviewSectionBlock(const SectionType& section,
                                                              const BlockIterator& cur,
                                                              const SectionBounds& bounds,
                                                              BlueprintParserCore& parser,
@@ -337,7 +337,7 @@ namespace snowcrash {
          *  \param  payload An output buffer to save the parsed asset to.
          *  \return A block parser section result.
          */
-        static ParseSectionResult HandleAsset(const Section& section,
+        static ParseSectionResult HandleAsset(const SectionType& section,
                                               const BlockIterator& cur,
                                               const SectionBounds& bounds,
                                               BlueprintParserCore& parser,
@@ -371,7 +371,7 @@ namespace snowcrash {
          *  \param  payload An output buffer to save the parsed paylod and asset into.
          *  \return A block parser section result.
          */
-        static ParseSectionResult HandlePayloadAsset(const Section& section,
+        static ParseSectionResult HandlePayloadAsset(const SectionType& section,
                                                      const BlockIterator& cur,
                                                      const SectionBounds& bounds,
                                                      BlueprintParserCore& parser,
@@ -402,7 +402,7 @@ namespace snowcrash {
             }
             else {
                 // Parse as an asset
-                result = HandleAsset(BodySection, cur, bounds, parser, payload);
+                result = HandleAsset(BodySectionType, cur, bounds, parser, payload);
             }
             
             // Retrieve signature
@@ -493,7 +493,7 @@ namespace snowcrash {
         /**
          *  Retrieve and process payload signature.
          */
-        static void ProcessSignature(const Section& section,
+        static void ProcessSignature(const SectionType& section,
                                      const BlockIterator& cur,
                                      const SectionBounds& bounds,
                                      const SourceData& sourceData,
@@ -517,14 +517,14 @@ namespace snowcrash {
             
             // Add any extra lines to description unless abbreviated body
             if (!remainingContent.empty() &&
-                section != RequestBodySection &&
-                section != ResponseBodySection) {
+                section != RequestBodySectionType &&
+                section != ResponseBodySectionType) {
                 payload.description += remainingContent;
             }
             
             // WARN: missing status code
             if (payload.name.empty() &&
-                (section == ResponseSection || section == ResponseBodySection)) {
+                (section == ResponseSectionType || section == ResponseBodySectionType)) {
                 
                 BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
                 SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, bounds, cur, sourceData);
@@ -536,7 +536,7 @@ namespace snowcrash {
             
             
             // WARN: Object deprecation
-            if (section == ObjectSection || section == ObjectBodySection) {
+            if (section == ObjectSectionType || section == ObjectBodySectionType) {
 
                 std::stringstream ss;
                 ss << "the 'object' keyword is deprecated and as such it will be removed in a future release, please use the 'model' keyword instead";
@@ -559,7 +559,7 @@ namespace snowcrash {
          *  \brief Checks and report invalid signature 
          *  \return True if signature is correct, false otherwise.
          */
-        static bool CheckSignature(const Section& section,
+        static bool CheckSignature(const SectionType& section,
                                    const BlockIterator& cur,
                                    const SectionBounds& bounds,
                                    const SourceData& signature,
@@ -569,18 +569,18 @@ namespace snowcrash {
             std::string regex;
             switch (section) {
                     
-                case RequestSection:
-                case RequestBodySection:
+                case RequestSectionType:
+                case RequestBodySectionType:
                     regex = RequestRegex;
                     break;
                     
-                case ResponseBodySection:
-                case ResponseSection:
+                case ResponseBodySectionType:
+                case ResponseSectionType:
                     regex = ResponseRegex;
                     break;
                     
-                case ModelSection:
-                case ModelBodySection:
+                case ModelSectionType:
+                case ModelBodySectionType:
                     regex = ModelRegex;
                     break;
                     
@@ -605,18 +605,18 @@ namespace snowcrash {
         
                     switch (section) {
                             
-                        case RequestSection:
-                        case RequestBodySection:
+                        case RequestSectionType:
+                        case RequestBodySectionType:
                             ss << "'request [<identifier>] [(<media type>)]'";
                             break;
                             
-                        case ResponseBodySection:
-                        case ResponseSection:
+                        case ResponseBodySectionType:
+                        case ResponseSectionType:
                             ss << "'response [<HTTP status code>] [(<media type>)]'";
                             break;
                             
-                        case ModelSection:
-                        case ModelBodySection:
+                        case ModelSectionType:
+                        case ModelBodySectionType:
                             ss << "'model [(<media type>)]'";
                             break;
                             
@@ -641,15 +641,15 @@ namespace snowcrash {
          *  \brief  Set payload's asset. 
          *  \return True on success, false when an asset is already set.
          */
-        static bool SetAsset(const Section& section, const Asset& asset, Payload& payload) {
+        static bool SetAsset(const SectionType& section, const Asset& asset, Payload& payload) {
             
-            if (section == BodySection) {
+            if (section == BodySectionType) {
                 if (!payload.body.empty())
                     return false;
 
                 payload.body = asset;
             }
-            else if (section == SchemaSection) {
+            else if (section == SchemaSectionType) {
                 if (!payload.schema.empty())
                     return false;
                 

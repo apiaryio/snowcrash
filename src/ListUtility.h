@@ -268,7 +268,7 @@ namespace snowcrash {
             return cur;
         
         std::vector<SourceDataBlock> listItemMaps;
-        Section listItemSection = UndefinedSection;
+        SectionType listItemSection = UndefinedSectionType;
         BlockIterator recognizedCur = end;
         
         while (cur != end &&
@@ -276,7 +276,7 @@ namespace snowcrash {
             
             // Classify list item
             listItemSection = ClassifyInternaListBlock<T>(cur, end);
-            if (listItemSection != UndefinedSection) {
+            if (listItemSection != UndefinedSectionType) {
                 // Found a recognized section, record & skip to the end of the list.
                 recognizedCur = cur;
                 cur = SkipToSectionEnd(begin, end, ListBlockBeginType, ListBlockEndType);
@@ -292,7 +292,7 @@ namespace snowcrash {
         }
         
         // Resolve
-        if (listItemSection == UndefinedSection) {
+        if (listItemSection == UndefinedSectionType) {
             descriptionMap = cur->sourceMap;
             return cur;
         }
@@ -450,8 +450,34 @@ namespace snowcrash {
         return endCur;
     }
     
+    /**
+     *  \brief Skips to the end of a signature-only list item ignoring and reporting any additional content.
+     *  \param cur          The begining of the list item to close.
+     *  \param bounds       Bounds within the block buffer.
+     *  \param  sourceData   Source data byte buffer.
+     *  \param placeHint    A string explaining the possible place of failure. Might be empty.
+     *  \param expectedHint A string defining expected content. Might be empty.
+     *  \param result       Result to append the possible warning into.
+     *  \return An iterator pointing AFTER the last closing list or list item block.
+     */
+    
+
+    
+//    /**
+//     *  \brief  Parses given block as a preformatted code block.
+//     *  \param  cur
+//     */
+//    FORCEINLINE ParseSectionResult ParsePreformattedBlock(const BlockIterator& cur,
+//                                                          const SectionBounds& bounds,
+//                                                          BlueprintParserCore& parser,
+//                                                          SourceData& data,
+//                                                          SourceDataBlock& sourceMap) {
+//        
+//        
+//    }
+    
     // Parse preformatted source data from block(s) of a list item block
-    FORCEINLINE ParseSectionResult ParseListPreformattedBlock(const Section& section,
+    FORCEINLINE ParseSectionResult ParseListPreformattedBlock(const SectionType& section,
                                                               const BlockIterator& cur,
                                                               const SectionBounds& bounds,
                                                               BlueprintParserCore& parser,
@@ -482,7 +508,7 @@ namespace snowcrash {
                 BlockIterator nameBlock = ListItemNameBlock(sectionCur, bounds.second);
                 SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, bounds, cur, parser.sourceData);
                 result.first.warnings.push_back(Warning(ss.str(),
-                                                        FormattingWarning,
+                                                        IndentationWarning,
                                                         sourceBlock));
             }
             

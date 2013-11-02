@@ -61,27 +61,27 @@ namespace snowcrash {
     /// \struct Block Classifier, Resource Group Context
     ///
     template <>
-    FORCEINLINE Section ClassifyBlock<ResourceGroup>(const BlockIterator& begin,
+    FORCEINLINE SectionType ClassifyBlock<ResourceGroup>(const BlockIterator& begin,
                                                      const BlockIterator& end,
-                                                     const Section& context) {
+                                                     const SectionType& context) {
         
         if (HasResourceGroupSignature(*begin))
-            return (context == UndefinedSection) ? ResourceGroupSection : UndefinedSection;
+            return (context == UndefinedSectionType) ? ResourceGroupSectionType : UndefinedSectionType;
         
         if (HasResourceSignature(*begin))
-            return ResourceSection;
+            return ResourceSectionType;
 
-        return (context == ResourceGroupSection) ? context : UndefinedSection;
+        return (context == ResourceGroupSectionType) ? context : UndefinedSectionType;
     }
     
 
     ///
-    /// \struct Resource Group Section Parser
+    /// \struct Resource Group SectionType Parser
     ///
     template<>
     struct SectionParser<ResourceGroup> {
         
-        static ParseSectionResult ParseSection(const Section& section,
+        static ParseSectionResult ParseSection(const SectionType& section,
                                                const BlockIterator& cur,
                                                const SectionBounds& bounds,
                                                BlueprintParserCore& parser,
@@ -90,15 +90,15 @@ namespace snowcrash {
             ParseSectionResult result = std::make_pair(Result(), cur);
             switch (section) {
                     
-                case ResourceGroupSection:
+                case ResourceGroupSectionType:
                     result = HandleResourceGroupOverviewBlock(cur, bounds, parser, group);
                     break;
                     
-                case ResourceSection:
+                case ResourceSectionType:
                     result = HandleResource(cur, bounds, parser, group);
                     break;
                     
-                case UndefinedSection:
+                case UndefinedSectionType:
                     break;
                     
                 default:

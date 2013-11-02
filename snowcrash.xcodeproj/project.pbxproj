@@ -15,6 +15,7 @@
 		BB1865C91764DB8A00756B18 /* test-SymbolTable.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB1865C81764DB8A00756B18 /* test-SymbolTable.cc */; };
 		BB1D4D0B174D0932009BCB1C /* test-HeaderParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB1D4D08174D08C3009BCB1C /* test-HeaderParser.cc */; };
 		BB3DD975174654FD004C4077 /* test-AssetParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB3DD974174654FD004C4077 /* test-AssetParser.cc */; };
+		BB45781E182326EE00D0293A /* test-Indentation.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB45781D182326EE00D0293A /* test-Indentation.cc */; };
 		BB4D8E57172D15CA0024EB04 /* libsnowcrash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBFF4898170B34E6001E5FB2 /* libsnowcrash.a */; };
 		BB50F0BD17D1DCE00002C363 /* test-ActionParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB50F0BC17D1DC9B0002C363 /* test-ActionParser.cc */; };
 		BB65939117845C2D00321230 /* RegexMatch.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB0F4271731CE0D00C92465 /* RegexMatch.cc */; };
@@ -63,6 +64,7 @@
 		BBE53566174132B100BCA7AD /* SerializeYAML.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBE53560174132B100BCA7AD /* SerializeYAML.cc */; };
 		BBE5705D173922B70086CE22 /* test-PayloadParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBE5705C173922B70086CE22 /* test-PayloadParser.cc */; };
 		BBE57061173927870086CE22 /* PayloadParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE5705F173927870086CE22 /* PayloadParser.h */; };
+		BBF46B921824554A009029DA /* BlueprintSection.h in Headers */ = {isa = PBXBuildFile; fileRef = BBF46B911824554A009029DA /* BlueprintSection.h */; };
 		BBFF48CA170B3C49001E5FB2 /* test-snowcrash.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBFF48C9170B3C49001E5FB2 /* test-snowcrash.cc */; };
 		BBFF48CD170B3EDE001E5FB2 /* snowcrash.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBFF48CC170B3EDE001E5FB2 /* snowcrash.cc */; };
 		BBFF48D0170B3FBB001E5FB2 /* libsnowcrash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBFF4898170B34E6001E5FB2 /* libsnowcrash.a */; };
@@ -130,9 +132,10 @@
 		BB1865C81764DB8A00756B18 /* test-SymbolTable.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-SymbolTable.cc"; path = "test/test-SymbolTable.cc"; sourceTree = "<group>"; };
 		BB1D4D07174D0828009BCB1C /* HeaderParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = HeaderParser.h; path = src/HeaderParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BB1D4D08174D08C3009BCB1C /* test-HeaderParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-HeaderParser.cc"; path = "test/test-HeaderParser.cc"; sourceTree = "<group>"; };
-		BB1EC203173FD06600CFB84A /* ListUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ListUtility.h; path = src/ListUtility.h; sourceTree = "<group>"; };
-		BB3DD973174654B8004C4077 /* AssetParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AssetParser.h; path = src/AssetParser.h; sourceTree = "<group>"; };
+		BB1EC203173FD06600CFB84A /* ListUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = ListUtility.h; path = src/ListUtility.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		BB3DD973174654B8004C4077 /* AssetParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = AssetParser.h; path = src/AssetParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BB3DD974174654FD004C4077 /* test-AssetParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-AssetParser.cc"; path = "test/test-AssetParser.cc"; sourceTree = "<group>"; };
+		BB45781D182326EE00D0293A /* test-Indentation.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-Indentation.cc"; path = "test/test-Indentation.cc"; sourceTree = "<group>"; };
 		BB4843D4174E30CF00F61291 /* Fixture.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Fixture.h; path = test/Fixture.h; sourceTree = "<group>"; };
 		BB50F0BB17D1DB4D0002C363 /* ActionParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = ActionParser.h; path = src/ActionParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BB50F0BC17D1DC9B0002C363 /* test-ActionParser.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = "test-ActionParser.cc"; path = "test/test-ActionParser.cc"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
@@ -182,7 +185,7 @@
 		BBD5F9CF1735413A0049BBEE /* BlueprintParserCore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = BlueprintParserCore.h; path = src/BlueprintParserCore.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BBD5F9D0173542D60049BBEE /* ParserCore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ParserCore.h; path = src/ParserCore.h; sourceTree = "<group>"; };
 		BBD5F9D11735439B0049BBEE /* ParserCore.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ParserCore.cc; path = src/ParserCore.cc; sourceTree = "<group>"; };
-		BBD5F9DB173561DA0049BBEE /* test-ResouceGroupParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-ResouceGroupParser.cc"; path = "test/test-ResouceGroupParser.cc"; sourceTree = "<group>"; };
+		BBD5F9DB173561DA0049BBEE /* test-ResouceGroupParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = "test-ResouceGroupParser.cc"; path = "test/test-ResouceGroupParser.cc"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		BBD5F9DD173578210049BBEE /* test-ResourceParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = "test-ResourceParser.cc"; path = "test/test-ResourceParser.cc"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		BBE5355B174132B100BCA7AD /* Serialize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Serialize.h; path = src/Serialize.h; sourceTree = "<group>"; };
 		BBE5355C174132B100BCA7AD /* SerializeJSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SerializeJSON.h; path = src/SerializeJSON.h; sourceTree = "<group>"; };
@@ -192,6 +195,7 @@
 		BBE53560174132B100BCA7AD /* SerializeYAML.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = SerializeYAML.cc; path = src/SerializeYAML.cc; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		BBE5705C173922B70086CE22 /* test-PayloadParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-PayloadParser.cc"; path = "test/test-PayloadParser.cc"; sourceTree = "<group>"; };
 		BBE5705F173927870086CE22 /* PayloadParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = PayloadParser.h; path = src/PayloadParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		BBF46B911824554A009029DA /* BlueprintSection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BlueprintSection.h; path = src/BlueprintSection.h; sourceTree = "<group>"; };
 		BBFF4898170B34E6001E5FB2 /* libsnowcrash.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libsnowcrash.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BBFF48C0170B3C30001E5FB2 /* test-snowcrash */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "test-snowcrash"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BBFF48C9170B3C49001E5FB2 /* test-snowcrash.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-snowcrash.cc"; path = "test/test-snowcrash.cc"; sourceTree = "<group>"; };
@@ -315,6 +319,7 @@
 				BB3DD973174654B8004C4077 /* AssetParser.h */,
 				BBA91DC0171D402600649B05 /* BlueprintParser.h */,
 				BBD5F9CF1735413A0049BBEE /* BlueprintParserCore.h */,
+				BBF46B911824554A009029DA /* BlueprintSection.h */,
 				BB1D4D07174D0828009BCB1C /* HeaderParser.h */,
 				BB1EC203173FD06600CFB84A /* ListUtility.h */,
 				BB03DC6717D3721600C51E52 /* ParameterDefinitonParser.h */,
@@ -370,6 +375,7 @@
 				BBFF48D7170C57F1001E5FB2 /* test-Blueprint.cc */,
 				BBA01FF817292F9C0050B603 /* test-BlueprintParser.cc */,
 				BB1D4D08174D08C3009BCB1C /* test-HeaderParser.cc */,
+				BB45781D182326EE00D0293A /* test-Indentation.cc */,
 				BB8AEFD717D899B900298807 /* test-ListUtility.cc */,
 				BB740999171C08240023105F /* test-MarkdownBlock.cc */,
 				BB74099B171C08850023105F /* test-MarkdownParser.cc */,
@@ -439,6 +445,7 @@
 				BB740998171C065C0023105F /* MarkdownBlock.h in Headers */,
 				BBA91DC2171D402600649B05 /* BlueprintParser.h in Headers */,
 				BB86DEC31723E3C600063644 /* src_map.h in Headers */,
+				BBF46B921824554A009029DA /* BlueprintSection.h in Headers */,
 				BBB0F42A1731CE0D00C92465 /* RegexMatch.h in Headers */,
 				BBD5F9C917353C310049BBEE /* ResourceGroupParser.h in Headers */,
 				BBD5F9CE17353CE00049BBEE /* ResourceParser.h in Headers */,
@@ -607,6 +614,7 @@
 				BBB0F42C1731D04900C92465 /* test-RegexMatch.cc in Sources */,
 				BBD5F9DC173561DA0049BBEE /* test-ResouceGroupParser.cc in Sources */,
 				BB8AEFD817D899B900298807 /* test-ListUtility.cc in Sources */,
+				BB45781E182326EE00D0293A /* test-Indentation.cc in Sources */,
 				BBD5F9DE173578210049BBEE /* test-ResourceParser.cc in Sources */,
 				BBE5705D173922B70086CE22 /* test-PayloadParser.cc in Sources */,
 				BB03DC6617D3718D00C51E52 /* test-ParametersParser.cc in Sources */,

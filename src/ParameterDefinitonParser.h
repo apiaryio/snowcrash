@@ -62,13 +62,13 @@ namespace snowcrash {
      *  Classifier of internal list items, ParameterCollection context.
      */
     template <>
-    FORCEINLINE Section ClassifyInternaListBlock<Parameter>(const BlockIterator& begin,
+    FORCEINLINE SectionType ClassifyInternaListBlock<Parameter>(const BlockIterator& begin,
                                                             const BlockIterator& end) {
 
 
         if (begin->type != ListBlockBeginType &&
             begin->type != ListItemBlockBeginType)
-            return UndefinedSection;
+            return UndefinedSectionType;
         
         SourceData remainingContent;
         SourceData content = GetListItemSignature(begin, end, remainingContent);
@@ -76,9 +76,9 @@ namespace snowcrash {
         content = TrimString(content);
         
         if (RegexMatch(content, ParameterValuesRegex))
-            return ParameterValuesSection;
+            return ParameterValuesSectionType;
         
-        return UndefinedSection;
+        return UndefinedSectionType;
     }
     
     /**
@@ -92,8 +92,8 @@ namespace snowcrash {
             return false;
         
         // Since we are too generic make sure the signature is not inner list
-        Section listSection = ClassifyInternaListBlock<Parameter>(begin, end);
-        if (listSection != UndefinedSection)
+        SectionType listSection = ClassifyInternaListBlock<Parameter>(begin, end);
+        if (listSection != UndefinedSectionType)
             return false;
         
         // Or any other reserved keyword
@@ -110,45 +110,45 @@ namespace snowcrash {
      *  Block Classifier, Parameter context.
      */
     template <>
-    FORCEINLINE Section ClassifyBlock<Parameter>(const BlockIterator& begin,
+    FORCEINLINE SectionType ClassifyBlock<Parameter>(const BlockIterator& begin,
                                                  const BlockIterator& end,
-                                                 const Section& context) {
+                                                 const SectionType& context) {
         
-        if (context == UndefinedSection) {
+        if (context == UndefinedSectionType) {
             if (HasParameterDefinitionSignature(begin, end))
-                return ParameterDefinitionSection;
+                return ParameterDefinitionSectionType;
         }
-        else if (context == ParameterDefinitionSection) {
+        else if (context == ParameterDefinitionSectionType) {
 
             if (begin->type == ListItemBlockEndType ||
                 begin->type == ListBlockEndType)
-                return UndefinedSection;
+                return UndefinedSectionType;
             
-            Section listSection = ClassifyInternaListBlock<Parameter>(begin, end);
-            if (listSection != UndefinedSection)
+            SectionType listSection = ClassifyInternaListBlock<Parameter>(begin, end);
+            if (listSection != UndefinedSectionType)
                 return listSection;
             
             if (begin->type == ListBlockBeginType)
-                return ForeignSection; // Foreign nested list-item
+                return ForeignSectionType; // Foreign nested list-item
             
             if (begin->type == ListItemBlockBeginType)
-                return UndefinedSection;
+                return UndefinedSectionType;
         }
-        else if (context == ParameterValuesSection ||
-                 context == ForeignSection) {
+        else if (context == ParameterValuesSectionType ||
+                 context == ForeignSectionType) {
 
             if (begin->type == ListItemBlockEndType ||
                 begin->type == ListBlockEndType)
-                return UndefinedSection;
+                return UndefinedSectionType;
             
-            Section listSection = ClassifyInternaListBlock<Parameter>(begin, end);
-            if (listSection != UndefinedSection)
+            SectionType listSection = ClassifyInternaListBlock<Parameter>(begin, end);
+            if (listSection != UndefinedSectionType)
                 return listSection;
             
-            return ForeignSection;
+            return ForeignSectionType;
         }
 
-        return (context == ParameterDefinitionSection) ? context : UndefinedSection;
+        return (context == ParameterDefinitionSectionType) ? context : UndefinedSectionType;
     }
     
     
@@ -158,7 +158,7 @@ namespace snowcrash {
     template<>
     struct SectionParser<Parameter> {
         
-        static ParseSectionResult ParseSection(const Section& section,
+        static ParseSectionResult ParseSection(const SectionType& section,
                                                const BlockIterator& cur,
                                                const SectionBounds& bounds,
                                                BlueprintParserCore& parser,
@@ -167,19 +167,19 @@ namespace snowcrash {
             ParseSectionResult result = std::make_pair(Result(), cur);
             switch (section) {
                     
-                case ParameterDefinitionSection:
+                case ParameterDefinitionSectionType:
                     result = HandleParmeterDefinitionSection(cur, bounds, parser, parameter);
                     break;
                     
-                case ParameterValuesSection:
+                case ParameterValuesSectionType:
                     result = HandleValuesSection(cur, bounds, parser, parameter);
                     break;
                     
-                case ForeignSection:
+                case ForeignSectionType:
                     result = HandleForeignSection(cur, bounds, parser.sourceData, ExpectedTraitItems);
                     break;
                     
-                case UndefinedSection:
+                case UndefinedSectionType:
                     result.second = CloseListItemBlock(cur, bounds.second);
                     break;
                     

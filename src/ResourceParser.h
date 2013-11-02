@@ -102,66 +102,66 @@ namespace snowcrash {
     // Classifier of internal list items, Resource context
     //
     template <>
-    FORCEINLINE Section ClassifyInternaListBlock<Resource>(const BlockIterator& begin,
+    FORCEINLINE SectionType ClassifyInternaListBlock<Resource>(const BlockIterator& begin,
                                                            const BlockIterator& end) {
         if (HasHeaderSignature(begin, end))
-            return HeadersSection;
+            return HeadersSectionType;
         
         if (HasParametersSignature(begin, end))
-            return ParametersSection;
+            return ParametersSectionType;
         
         Name name;
         SourceData mediaType;
         PayloadSignature payloadSignature = GetPayloadSignature(begin, end, name, mediaType);
         if (payloadSignature == ObjectPayloadSignature)
-            return ObjectSection;
+            return ObjectSectionType;
         else if (payloadSignature == ModelPayloadSignature)
-            return ModelSection;
+            return ModelSectionType;
 
-        return UndefinedSection;
+        return UndefinedSectionType;
     }
     
     //
     // Block Classifier, Resource Context
     //
     template <>
-    FORCEINLINE Section ClassifyBlock<Resource>(const BlockIterator& begin,
+    FORCEINLINE SectionType ClassifyBlock<Resource>(const BlockIterator& begin,
                                                 const BlockIterator& end,
-                                                const Section& context) {
+                                                const SectionType& context) {
         if (HasResourceGroupSignature(*begin))
-            return UndefinedSection;
+            return UndefinedSectionType;
 
         Name name;
         URITemplate uri;
         HTTPMethod method;
         ResourceSignature resourceSignature = GetResourceSignature(*begin, name, uri, method);
         if (resourceSignature != NoResourceSignature) {
-            return (context == UndefinedSection) ?
-                    ((resourceSignature == MethodURIResourceSignature) ? ResourceMethodSection : ResourceSection) :
-                    UndefinedSection;
+            return (context == UndefinedSectionType) ?
+                    ((resourceSignature == MethodURIResourceSignature) ? ResourceMethodSectionType : ResourceSectionType) :
+                    UndefinedSectionType;
         }
         
         if (HasActionSignature(*begin))
-            return (context != ResourceMethodSection) ? ActionSection : UndefinedSection;
+            return (context != ResourceMethodSectionType) ? ActionSectionType : UndefinedSectionType;
         
-        Section listSection = ClassifyInternaListBlock<Resource>(begin, end);
-        if (listSection != UndefinedSection)
+        SectionType listSection = ClassifyInternaListBlock<Resource>(begin, end);
+        if (listSection != UndefinedSectionType)
             return listSection;
         
         // Unrecognized list item at this level
         if (begin->type == ListItemBlockBeginType)
-            return ForeignSection;
+            return ForeignSectionType;
         
-        return (context == ResourceSection) ? context : UndefinedSection;
+        return (context == ResourceSectionType) ? context : UndefinedSectionType;
     }
         
     //
-    // Resource Section Parser
+    // Resource SectionType Parser
     //
     template<>
     struct SectionParser<Resource> {
         
-        static ParseSectionResult ParseSection(const Section& section,
+        static ParseSectionResult ParseSection(const SectionType& section,
                                                const BlockIterator& cur,
                                                const SectionBounds& bounds,
                                                BlueprintParserCore& parser,
@@ -169,37 +169,37 @@ namespace snowcrash {
 
             ParseSectionResult result = std::make_pair(Result(), cur);
             switch (section) {                    
-                case ResourceSection:
+                case ResourceSectionType:
                     result = HandleResourceOverviewBlock(cur, bounds, parser, resource);
                     break;
                     
-                case ResourceMethodSection:
+                case ResourceMethodSectionType:
                     result = HandleResourceMethod(cur, bounds, parser, resource);
                     break;
                 
-                case ModelSection:
-                case ObjectSection:
+                case ModelSectionType:
+                case ObjectSectionType:
                     result = HandleModel(cur, bounds, parser, resource);
                     break;
                     
-                case ParametersSection:
+                case ParametersSectionType:
                     result = HandleParameters(cur, bounds, parser, resource);
                     break;
                     
-                case HeadersSection:
+                case HeadersSectionType:
                     result = HandleHeaders(cur, bounds, parser, resource);
                     break;
                     
-                case ActionSection:
+                case ActionSectionType:
                     result = HandleAction(cur, bounds, parser, resource);
                     break;
                     
-                case UndefinedSection:
+                case UndefinedSectionType:
                     CheckAmbiguousMethod(cur, bounds, resource, parser.sourceData, result.first);
                     result.second = CloseListItemBlock(cur, bounds.second);
                     break;
                     
-                case ForeignSection:
+                case ForeignSectionType:
                     result = HandleForeignSection(cur, bounds, parser.sourceData);
                     break;
                     

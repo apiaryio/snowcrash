@@ -14,93 +14,15 @@
 #include "ParserCore.h"
 #include "SourceAnnotation.h"
 #include "MarkdownBlock.h"
+#include "BlueprintSection.h"
 #include "HTTP.h"
 #include "Blueprint.h"
 #include "BlueprintUtility.h"
 #include "StringUtility.h"
 #include "SymbolTable.h"
 
-namespace snowcrash {
-    
-    /** Block Classification Section. */
-    enum Section {
-        UndefinedSection,
-        BlueprintSection,
-        ResourceGroupSection,
-        ResourceSection,
-        ResourceMethodSection,
-        ActionSection,
-        RequestSection,
-        RequestBodySection,
-        ResponseSection,
-        ResponseBodySection,
-        ObjectSection,
-        ObjectBodySection,
-        ModelSection,
-        ModelBodySection,
-        BodySection,
-        DanglingBodySection,
-        SchemaSection,
-        DanglingSchemaSection,
-        HeadersSection,
-        ForeignSection,
-        ParametersSection,
-        ParameterDefinitionSection,
-        ParameterValuesSection
-    };
-    
-    /** Returns human readable name for given %Section */
-    FORCEINLINE std::string SectionName(const Section& section) {
-        switch (section) {
 
-            case ModelSection:
-            case ModelBodySection:
-                return "model";
-                
-            case ObjectSection:
-            case ObjectBodySection:
-                return "object";
-                
-            case RequestSection:
-            case RequestBodySection:
-                return "request";
-                
-            case ResponseSection:
-            case ResponseBodySection:
-                return "response";
-                
-            case BodySection:
-                return "message-body";
-                
-            case SchemaSection:
-                return "message-schema";
-                
-            case HeadersSection:
-                return "headers";
-                
-            default:
-                return "section";
-        }
-    }
-    
-    /** Markdown block iterator */
-    typedef MarkdownBlock::Stack::const_iterator BlockIterator;
-    
-    /**
-     *  \brief Parsing subroutine result 
-     *
-     *  Consists of a parsing result report (first) and
-     *  %BlockIterator (second) pointing to the last parsed 
-     *  markdown block.
-     */
-    typedef std::pair<Result, BlockIterator> ParseSectionResult;
-    
-    /** 
-     *  \brief Section boundaries.
-     *
-     *  A continuous range of markdown blocks <first, second).
-     */
-    typedef std::pair<BlockIterator, BlockIterator> SectionBounds;
+namespace snowcrash {
     
     /**
      *  \brief Blueprint Parser Options.
@@ -111,7 +33,18 @@ namespace snowcrash {
         RenderDescriptionsOption = (1 << 0),    /// < Render Markdown in description.
         RequireBlueprintNameOption = (1 << 1)   /// < Treat missing blueprint name as error
     };
+    
     typedef unsigned int BlueprintParserOptions;
+    
+    /**
+     *  \brief Parsing subroutine result
+     *
+     *  Consists of a parsing result report (first) and
+     *  %BlockIterator (second) pointing to the last parsed
+     *  markdown block.
+     */
+    typedef std::pair<Result, BlockIterator> ParseSectionResult;
+    
     
     /**
      *  Parser Core Data
@@ -122,9 +55,16 @@ namespace snowcrash {
                             const Blueprint& bp)
         : options(opts), sourceData(src), blueprint(bp) {}
         
+        /** Parser Options */
         BlueprintParserOptions options;
+        
+        /** Symbol Table */
         SymbolTable symbolTable;
+        
+        /** Source Data */
         const SourceData& sourceData;
+        
+        /** AST being parsed **/
         const Blueprint& blueprint;
         
     private:
@@ -134,13 +74,13 @@ namespace snowcrash {
     };
     
     /**
-     *  Section Parser prototype.
+     *  SectionType Parser prototype.
      */
     template<class T>
     struct SectionParser {
         
         // Parse classified blocks
-        static ParseSectionResult ParseSection(const Section& section,
+        static ParseSectionResult ParseSection(const SectionType& section,
                                                const BlockIterator& cur,
                                                const SectionBounds& bounds,
                                                BlueprintParserCore& parser,
@@ -153,8 +93,8 @@ namespace snowcrash {
      *  The classifier might look ahead.
      */
     template <class T>
-    Section ClassifyInternaListBlock(const BlockIterator& begin,
-                                     const BlockIterator& end);
+    SectionType ClassifyInternaListBlock(const BlockIterator& begin,
+                                         const BlockIterator& end);
         
     /**
      *  \brief Block Classifier prototype.
@@ -162,9 +102,9 @@ namespace snowcrash {
      *  The classifier might look ahead.
      */
     template <class T>
-    Section ClassifyBlock(const BlockIterator& begin,
-                          const BlockIterator& end,
-                          const Section& context);
+    SectionType ClassifyBlock(const BlockIterator& begin,
+                              const BlockIterator& end,
+                              const SectionType& context);
     
     // Forward declaration of classifier helpers
     extern bool HasResourceGroupSignature(const MarkdownBlock& block);
@@ -179,7 +119,7 @@ namespace snowcrash {
     /**
      *  \brief A Markdown block parser.
      *
-     *  Iterates over blocks classifying sections and calling relevant section parser P<T>.
+     *  Iterates over blocks classifying sections and calling relevant %SectionParser P<T>.
      */
     template <class T, class P>
     struct BlockParser : public P {
@@ -190,7 +130,7 @@ namespace snowcrash {
                                         BlueprintParserCore& parser,
                                         T& output) {
             Result result;
-            Section currentSection = UndefinedSection;
+            SectionType currentSection = UndefinedSectionType;
             BlockIterator currentBlock = begin;
             while (currentBlock != end) {
                 
@@ -210,7 +150,7 @@ namespace snowcrash {
 
                 currentBlock = sectionResult.second;
 
-                if (currentSection == UndefinedSection)
+                if (currentSection == UndefinedSectionType)
                     break;
             }
             

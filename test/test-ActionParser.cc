@@ -87,53 +87,53 @@ TEST_CASE("Method block classifier", "[action][classifier][blocks]")
     
     cur = markdown.begin();
     // HeaderBlockType - "GET"
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSection) == ActionSection);
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSectionType) == ActionSectionType);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSectionType) == UndefinedSectionType);
     
-    ++cur; // ParagraphBlockType - "ActionSection"
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSection) == ActionSection);
+    ++cur; // ParagraphBlockType - "ActionSectionType"
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSectionType) == UndefinedSectionType);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSectionType) == ActionSectionType);
 
     ++cur; // ListBlockBeginType - "Response"
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSection) == ResponseSection);
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSection) == ResponseSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSectionType) == ResponseSectionType);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSectionType) == ResponseSectionType);
     
     ++cur; // ListItemBlockBeginType - "Response"
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSection) == ResponseSection);
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSection) == ResponseSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSectionType) == ResponseSectionType);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSectionType) == ResponseSectionType);
     
     std::advance(cur, 4); // ListItemBlockBeginType - "Headers"
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSection) == HeadersSection);
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSection) == HeadersSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSectionType) == HeadersSectionType);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSectionType) == HeadersSectionType);
     
     std::advance(cur, 4); // Request
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSection) == RequestSection);
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSection) == RequestSection);
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), HeadersSection) == RequestSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSectionType) == RequestSectionType);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSectionType) == RequestSectionType);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), HeadersSectionType) == RequestSectionType);
     
     std::advance(cur, 18); // Response
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSection) == ResponseSection);
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSection) == ResponseSection);
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ResponseSection) == ResponseSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSectionType) == ResponseSectionType);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSectionType) == ResponseSectionType);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ResponseSectionType) == ResponseSectionType);
     
     std::advance(cur, 3); // Foreign
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSection) == ForeignSection);
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSection) == ForeignSection);
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), HeadersSection) == ForeignSection);
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ResponseSection) == ForeignSection);
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), RequestSection) == ForeignSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSectionType) == ForeignSectionType);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSectionType) == ForeignSectionType);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), HeadersSectionType) == ForeignSectionType);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ResponseSectionType) == ForeignSectionType);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), RequestSectionType) == ForeignSectionType);
     
     // Nameless method
     markdown[0].content = "GET";
     cur = markdown.begin();
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSection) == ActionSection);
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSectionType) == ActionSectionType);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSectionType) == UndefinedSectionType);
 
     // Keyword "group"
     markdown[0].content = "Group A";
     cur = markdown.begin();
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSectionType) == UndefinedSectionType);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSectionType) == UndefinedSectionType);
 }
 
 TEST_CASE("Method block classifier implicit termination", "[action][blocks]")
@@ -146,8 +146,8 @@ TEST_CASE("Method block classifier implicit termination", "[action][blocks]")
     BlockIterator cur = markdown.begin();
     std::advance(cur, 2);
     
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSection) == UndefinedSection);
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSection) == UndefinedSection);    
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSectionType) == UndefinedSectionType);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSectionType) == UndefinedSectionType);    
 }
 
 TEST_CASE("Parse method", "[action][blocks]")

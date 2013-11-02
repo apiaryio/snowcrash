@@ -50,21 +50,21 @@ TEST_CASE("rgparser/classifier", "Resource Group block classifier")
     BlockIterator cur = markdown.begin();
 
     // # Group First
-    REQUIRE(ClassifyBlock<ResourceGroup>(cur, markdown.end(), UndefinedSection) == ResourceGroupSection);
-    REQUIRE(ClassifyBlock<ResourceGroup>(cur, markdown.end(), ResourceGroupSection) == UndefinedSection);
+    REQUIRE(ClassifyBlock<ResourceGroup>(cur, markdown.end(), UndefinedSectionType) == ResourceGroupSectionType);
+    REQUIRE(ClassifyBlock<ResourceGroup>(cur, markdown.end(), ResourceGroupSectionType) == UndefinedSectionType);
     
     ++cur; // Fiber optics
-    REQUIRE(ClassifyBlock<ResourceGroup>(cur, markdown.end(), UndefinedSection) == UndefinedSection);
-    REQUIRE(ClassifyBlock<ResourceGroup>(cur, markdown.end(), ResourceGroupSection) == ResourceGroupSection);
+    REQUIRE(ClassifyBlock<ResourceGroup>(cur, markdown.end(), UndefinedSectionType) == UndefinedSectionType);
+    REQUIRE(ClassifyBlock<ResourceGroup>(cur, markdown.end(), ResourceGroupSectionType) == ResourceGroupSectionType);
 
     ++cur; // # My Resource [/resource]
-    REQUIRE(ClassifyBlock<ResourceGroup>(cur, markdown.end(), UndefinedSection) == ResourceSection);
-    REQUIRE(ClassifyBlock<ResourceGroup>(cur, markdown.end(), ResourceGroupSection) == ResourceSection);
+    REQUIRE(ClassifyBlock<ResourceGroup>(cur, markdown.end(), UndefinedSectionType) == ResourceSectionType);
+    REQUIRE(ClassifyBlock<ResourceGroup>(cur, markdown.end(), ResourceGroupSectionType) == ResourceSectionType);
 
     std::advance(cur, 42 + 39); // # Group Second
-    REQUIRE(ClassifyBlock<ResourceGroup>(cur, markdown.end(), UndefinedSection) == ResourceGroupSection);
-    REQUIRE(ClassifyBlock<ResourceGroup>(cur, markdown.end(), ResourceGroupSection) == UndefinedSection);
-    REQUIRE(ClassifyBlock<ResourceGroup>(cur, markdown.end(), ResourceSection) == UndefinedSection);    
+    REQUIRE(ClassifyBlock<ResourceGroup>(cur, markdown.end(), UndefinedSectionType) == ResourceGroupSectionType);
+    REQUIRE(ClassifyBlock<ResourceGroup>(cur, markdown.end(), ResourceGroupSectionType) == UndefinedSectionType);
+    REQUIRE(ClassifyBlock<ResourceGroup>(cur, markdown.end(), ResourceSectionType) == UndefinedSectionType);    
 }
 
 TEST_CASE("rgparser/parse", "Parse canonical resource group")

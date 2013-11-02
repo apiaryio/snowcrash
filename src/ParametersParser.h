@@ -60,43 +60,43 @@ namespace snowcrash {
      *  Block Classifier, ParameterCollection context.
      */
     template <>
-    FORCEINLINE Section ClassifyBlock<ParameterCollection>(const BlockIterator& begin,
+    FORCEINLINE SectionType ClassifyBlock<ParameterCollection>(const BlockIterator& begin,
                                                            const BlockIterator& end,
-                                                           const Section& context) {
+                                                           const SectionType& context) {
         
-        if (context == UndefinedSection) {
+        if (context == UndefinedSectionType) {
             if (HasParametersSignature(begin, end))
-                return ParametersSection;
+                return ParametersSectionType;
         }
-        else if (context == ParametersSection) {
+        else if (context == ParametersSectionType) {
             
             if (begin->type == ListItemBlockEndType ||
                 begin->type == ListBlockEndType)
-                return UndefinedSection;
+                return UndefinedSectionType;
             
             if (HasParameterDefinitionSignature(begin, end))
-                return ParameterDefinitionSection;
+                return ParameterDefinitionSectionType;
             
             if (begin->type == ListBlockBeginType)
-                return ForeignSection; // Foreign nested list-item
+                return ForeignSectionType; // Foreign nested list-item
             
             if (begin->type == ListItemBlockBeginType)
-                return UndefinedSection;
+                return UndefinedSectionType;
         }
-        else if (context == ParameterDefinitionSection ||
-                 context == ForeignSection) {
+        else if (context == ParameterDefinitionSectionType ||
+                 context == ForeignSectionType) {
             
             if (begin->type == ListItemBlockEndType ||
                 begin->type == ListBlockEndType)
-                return UndefinedSection;
+                return UndefinedSectionType;
             
             if (HasParameterDefinitionSignature(begin, end))
-                return ParameterDefinitionSection;
+                return ParameterDefinitionSectionType;
             
-            return ForeignSection;
+            return ForeignSectionType;
         }
         
-        return (context == ParametersSection) ? context : UndefinedSection;
+        return (context == ParametersSectionType) ? context : UndefinedSectionType;
     }
 
     /**
@@ -105,7 +105,7 @@ namespace snowcrash {
     template<>
     struct SectionParser<ParameterCollection> {
         
-        static ParseSectionResult ParseSection(const Section& section,
+        static ParseSectionResult ParseSection(const SectionType& section,
                                                const BlockIterator& cur,
                                                const SectionBounds& bounds,
                                                BlueprintParserCore& parser,
@@ -113,19 +113,19 @@ namespace snowcrash {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
             switch (section) {
-                case ParametersSection:
+                case ParametersSectionType:
                     result = HandleParmetersSection(cur, bounds, parser, parameters);
                     break;
                     
-                case ParameterDefinitionSection:
+                case ParameterDefinitionSectionType:
                     result = HandleParmeterDefinitionSection(cur, bounds, parser, parameters);
                     break;
                     
-                case ForeignSection:
+                case ForeignSectionType:
                     result = HandleForeignSection(cur, bounds, parser.sourceData, ExpectedParameterDefinition);
                     break;
                     
-                case UndefinedSection:
+                case UndefinedSectionType:
                     result.second = CloseListItemBlock(cur, bounds.second);
                     break;
                     
