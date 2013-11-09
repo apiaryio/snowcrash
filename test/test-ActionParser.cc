@@ -155,8 +155,10 @@ TEST_CASE("Parse method", "[action][blocks]")
     MarkdownBlock::Stack markdown = CanonicalActionFixture();   
     Action action;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
     ParseSectionResult result = ActionParser::Parse(markdown.begin(),
                                                     markdown.end(),
+                                                    rootSection,
                                                     parser,
                                                     action);
     
@@ -211,7 +213,8 @@ TEST_CASE("Parse Action description with list", "[action][blocks]")
     
     Action action;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = ActionParser::Parse(markdown.begin(), markdown.end(), parser, action);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = ActionParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, action);
     
     REQUIRE(result.first.error.code == Error::OK);
     
@@ -247,8 +250,9 @@ TEST_CASE("Parse description with list followed by a request", "[action][blocks]
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(5, 1)));
     
     Action action;
-    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());    
-    ParseSectionResult result = ActionParser::Parse(markdown.begin(), markdown.end(), parser, action);
+    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = ActionParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, action);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.size() == 1); // empty body asset
@@ -288,7 +292,8 @@ TEST_CASE("Parse method with response not matching regex", "[action][blocks]")
 
     Action action;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = ActionParser::Parse(markdown.begin(), markdown.end(), parser, action);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = ActionParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, action);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.size() == 1); // preformatted asset
@@ -397,7 +402,8 @@ TEST_CASE("Parse method with multiple requests and responses", "[action][blocks]
     
     Action action;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = ActionParser::Parse(markdown.begin(), markdown.end(), parser, action);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = ActionParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, action);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.size() == 1); // warn responses with the same name
@@ -475,7 +481,8 @@ TEST_CASE("Parse method with multiple incomplete requests", "[action][blocks]")
 
     Action action;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = ActionParser::Parse(markdown.begin(), markdown.end(), parser, action);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = ActionParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, action);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.size() == 2); // empty asset & preformatted asset
@@ -539,7 +546,8 @@ TEST_CASE("Parse method with foreign item", "[action][foreign][blocks]")
     
     Action action;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = ActionParser::Parse(markdown.begin(), markdown.end(), parser, action);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = ActionParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, action);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.size() == 1);
@@ -587,7 +595,8 @@ TEST_CASE("Parse method with inline payload", "[action][blocks]")
     
     Action action;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = ActionParser::Parse(markdown.begin(), markdown.end(), parser, action);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = ActionParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, action);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.size() == 1); // empty asset
@@ -622,7 +631,8 @@ TEST_CASE("Parse method with a HR", "[action][blocks]")
     
     Action action;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = ActionParser::Parse(markdown.begin(), markdown.end(), parser, action);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = ActionParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, action);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.empty());
@@ -650,7 +660,8 @@ TEST_CASE( "Parse incomplete method followed by another resource", "[action][blo
     
     Action action;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = ActionParser::Parse(markdown.begin(), markdown.end(), parser, action);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = ActionParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, action);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.empty());
@@ -669,8 +680,10 @@ TEST_CASE("Check warnings on overshadowing a header", "[action][blocks]")
     Action action;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
     action.headers.push_back(std::make_pair("X-Header", "24"));
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
     ParseSectionResult result = ActionParser::Parse(markdown.begin(),
                                                     markdown.end(),
+                                                    rootSection,
                                                     parser,
                                                     action);
     
@@ -692,7 +705,8 @@ TEST_CASE("Parse method without name", "[action][blocks]")
     
     Action action;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = ActionParser::Parse(markdown.begin(), markdown.end(), parser, action);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = ActionParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, action);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.empty());
@@ -725,7 +739,8 @@ TEST_CASE("Make sure method with object payload is not parsed", "[action][blocks
     
     Action action;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = ActionParser::Parse(markdown.begin(), markdown.end(), parser, action);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = ActionParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, action);
     
     REQUIRE(result.first.error.code != Error::OK);
 }
@@ -744,7 +759,8 @@ TEST_CASE("Make sure method followed by a group does not eat the group", "[actio
     
     Action action;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = ActionParser::Parse(markdown.begin(), markdown.end(), parser, action);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = ActionParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, action);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.empty());

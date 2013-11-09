@@ -150,8 +150,8 @@ namespace snowcrash {
      */
     template <>
     FORCEINLINE SectionType ClassifyBlock<Payload>(const BlockIterator& begin,
-                                               const BlockIterator& end,
-                                               const SectionType& context) {
+                                                   const BlockIterator& end,
+                                                   const SectionType& context) {
         
         if (context == UndefinedSectionType) {
             
@@ -226,44 +226,43 @@ namespace snowcrash {
     template<>
     struct SectionParser<Payload> {
         
-        static ParseSectionResult ParseSection(const SectionType& section,
+        static ParseSectionResult ParseSection(const BlueprintSection& section,
                                                const BlockIterator& cur,
-                                               const SectionBounds& bounds,
                                                BlueprintParserCore& parser,
                                                Payload& payload) {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
 
-            switch (section) {
+            switch (section.type) {
                 case RequestSectionType:
                 case ResponseSectionType:
                 case ObjectSectionType:
                 case ModelSectionType:
-                    result = HandleOverviewSectionBlock(section, cur, bounds, parser, payload);
+                    result = HandleOverviewSectionBlock(section, cur, parser, payload);
                     break;
                     
                 case RequestBodySectionType:
                 case ResponseBodySectionType:
                 case ObjectBodySectionType:
                 case ModelBodySectionType:
-                    result = HandlePayloadAsset(section, cur, bounds, parser, payload);
+                    result = HandlePayloadAsset(section, cur, parser, payload);
                     break;
                     
                 case HeadersSectionType:
-                    result = HandleHeaders(cur, bounds, parser, payload);
+                    result = HandleHeaders(section, cur, parser, payload);
                     break;
                     
                 case BodySectionType:
                 case SchemaSectionType:
-                    result = HandleAsset(section, cur, bounds, parser, payload);
+                    result = HandleAsset(section, cur, parser, payload);
                     break;
                     
                 case UndefinedSectionType:
-                    result.second = CloseListItemBlock(cur, bounds.second);
+                    result.second = CloseListItemBlock(cur, section.bounds.second);
                     break;
                     
                 case ForeignSectionType:
-                    result = HandleForeignSection(cur, bounds, parser.sourceData);
+                    result = HandleForeignSection(section, cur, parser.sourceData);
                     break;
                                         
                 default:
@@ -283,29 +282,28 @@ namespace snowcrash {
          *  \param  payload An output buffer to write overview description into.
          *  \return A block parser section result.
          */
-        static ParseSectionResult HandleOverviewSectionBlock(const SectionType& section,
+        static ParseSectionResult HandleOverviewSectionBlock(const BlueprintSection& section,
                                                              const BlockIterator& cur,
-                                                             const SectionBounds& bounds,
                                                              BlueprintParserCore& parser,
                                                              Payload& payload) {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
             BlockIterator sectionCur = cur;
 
-            if (sectionCur == bounds.first) {
+            if (sectionCur == section.bounds.first) {
                 // Signature
-                ProcessSignature(section, sectionCur, bounds, parser.sourceData, result.first, payload);
-                sectionCur = FirstContentBlock(cur, bounds.second);
+                ProcessSignature(section, sectionCur, parser.sourceData, result.first, payload);
+                sectionCur = FirstContentBlock(cur, section.bounds.second);
             }
             else {
                 // Description
                 if (sectionCur->type == QuoteBlockBeginType) {
-                    sectionCur = SkipToSectionEnd(sectionCur, bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
+                    sectionCur = SkipToSectionEnd(sectionCur, section.bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
                 }
                 else if (sectionCur->type == ListBlockBeginType) {
 
                     SourceDataBlock descriptionMap;
-                    sectionCur = SkipToDescriptionListEnd<Payload>(sectionCur, bounds.second, descriptionMap);
+                    sectionCur = SkipToDescriptionListEnd<Payload>(sectionCur, section.bounds.second, descriptionMap);
                     
                     if (sectionCur->type != ListBlockEndType) {
                         // Found recognized section in description
@@ -317,12 +315,12 @@ namespace snowcrash {
                     }
                 }
                 
-                if (!CheckCursor(sectionCur, bounds, parser.sourceData, cur, result.first))
+                if (!CheckCursor(section, sectionCur, parser.sourceData, result.first))
                     return result;
                 payload.description += MapSourceData(parser.sourceData, sectionCur->sourceMap);
             }
             
-            if (sectionCur != bounds.second)
+            if (sectionCur != section.bounds.second)
                 result.second = ++sectionCur;
             
             return result;
@@ -337,23 +335,22 @@ namespace snowcrash {
          *  \param  payload An output buffer to save the parsed asset to.
          *  \return A block parser section result.
          */
-        static ParseSectionResult HandleAsset(const SectionType& section,
+        static ParseSectionResult HandleAsset(const BlueprintSection& section,
                                               const BlockIterator& cur,
-                                              const SectionBounds& bounds,
                                               BlueprintParserCore& parser,
                                               Payload& payload) {
             Asset asset;
-            ParseSectionResult result = AssetParser::Parse(cur, bounds.second, parser, asset);
+            ParseSectionResult result = AssetParser::Parse(cur, section.bounds.second, section, parser, asset);
             if (result.first.error.code != Error::OK)
                 return result;
 
-            if (!SetAsset(section, asset, payload)) {
+            if (!SetAsset(section.type, asset, payload)) {
                 // WARN: asset already set
                 std::stringstream ss;
-                ss << "ignoring additional " << SectionName(section) << " content, content is already defined";
+                ss << "ignoring additional " << SectionName(section.type) << " content, content is already defined";
                 
-                BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
-                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, bounds, cur, parser.sourceData);
+                BlockIterator nameBlock = ListItemNameBlock(cur, section.bounds.second);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, section.bounds, cur, parser.sourceData);
                 result.first.warnings.push_back(Warning(ss.str(),
                                                         RedefinitionWarning,
                                                         sourceBlock));
@@ -371,15 +368,14 @@ namespace snowcrash {
          *  \param  payload An output buffer to save the parsed paylod and asset into.
          *  \return A block parser section result.
          */
-        static ParseSectionResult HandlePayloadAsset(const SectionType& section,
+        static ParseSectionResult HandlePayloadAsset(const BlueprintSection& section,
                                                      const BlockIterator& cur,
-                                                     const SectionBounds& bounds,
                                                      BlueprintParserCore& parser,
                                                      Payload& payload) {
             // Try to parse as a Symbol reference
             SymbolName symbol;
             SourceDataBlock symbolSourceMap;
-            ParseSectionResult result = ParseSymbolReference(cur, bounds, parser, symbol, symbolSourceMap);
+            ParseSectionResult result = ParseSymbolReference(cur, section.bounds, parser, symbol, symbolSourceMap);
             if (result.first.error.code != Error::OK)
                 return result;
             
@@ -402,11 +398,11 @@ namespace snowcrash {
             }
             else {
                 // Parse as an asset
-                result = HandleAsset(BodySectionType, cur, bounds, parser, payload);
+                result = HandleAsset(section, cur, parser, payload);
             }
             
             // Retrieve signature
-            ProcessSignature(section, cur, bounds, parser.sourceData, result.first, payload);
+            ProcessSignature(section, cur, parser.sourceData, result.first, payload);
             
             return result;
         }
@@ -493,22 +489,21 @@ namespace snowcrash {
         /**
          *  Retrieve and process payload signature.
          */
-        static void ProcessSignature(const SectionType& section,
+        static void ProcessSignature(const BlueprintSection& section,
                                      const BlockIterator& cur,
-                                     const SectionBounds& bounds,
                                      const SourceData& sourceData,
                                      Result& result,
                                      Payload& payload) {
             
             SourceData remainingContent;
-            SourceData signature = GetListItemSignature(cur, bounds.second, remainingContent);
+            SourceData signature = GetListItemSignature(cur, section.bounds.second, remainingContent);
 
             // Capture name & payload type
             SourceData mediaType;
-            GetPayloadSignature(cur, bounds.second, payload.name, mediaType);
+            GetPayloadSignature(cur, section.bounds.second, payload.name, mediaType);
             
             // Check signature
-            if (!CheckSignature(section, cur, bounds, signature, sourceData, result)) {
+            if (!CheckSignature(section, cur, signature, sourceData, result)) {
                 // Clear and readouts
                 payload.name.clear();
                 mediaType.clear();
@@ -517,17 +512,17 @@ namespace snowcrash {
             
             // Add any extra lines to description unless abbreviated body
             if (!remainingContent.empty() &&
-                section != RequestBodySectionType &&
-                section != ResponseBodySectionType) {
+                section.type != RequestBodySectionType &&
+                section.type != ResponseBodySectionType) {
                 payload.description += remainingContent;
             }
             
             // WARN: missing status code
             if (payload.name.empty() &&
-                (section == ResponseSectionType || section == ResponseBodySectionType)) {
+                (section.type == ResponseSectionType || section.type == ResponseBodySectionType)) {
                 
-                BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
-                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, bounds, cur, sourceData);
+                BlockIterator nameBlock = ListItemNameBlock(cur, section.bounds.second);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, section.bounds, cur, sourceData);
                 result.warnings.push_back(Warning("missing response HTTP status code, assuming 'Response 200'",
                                                   EmptyDefinitionWarning,
                                                   sourceBlock));
@@ -536,13 +531,13 @@ namespace snowcrash {
             
             
             // WARN: Object deprecation
-            if (section == ObjectSectionType || section == ObjectBodySectionType) {
+            if (section.type == ObjectSectionType || section.type == ObjectBodySectionType) {
 
                 std::stringstream ss;
                 ss << "the 'object' keyword is deprecated and as such it will be removed in a future release, please use the 'model' keyword instead";
                 
-                BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
-                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, bounds, cur, sourceData);
+                BlockIterator nameBlock = ListItemNameBlock(cur, section.bounds.second);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, section.bounds, cur, sourceData);
                 result.warnings.push_back(Warning(ss.str(),
                                                   DeprecatedWarning,
                                                   sourceBlock));
@@ -559,15 +554,14 @@ namespace snowcrash {
          *  \brief Checks and report invalid signature 
          *  \return True if signature is correct, false otherwise.
          */
-        static bool CheckSignature(const SectionType& section,
+        static bool CheckSignature(const BlueprintSection& section,
                                    const BlockIterator& cur,
-                                   const SectionBounds& bounds,
                                    const SourceData& signature,
                                    const SourceData& sourceData,
                                    Result& result) {
             
             std::string regex;
-            switch (section) {
+            switch (section.type) {
                     
                 case RequestSectionType:
                 case RequestBodySectionType:
@@ -601,9 +595,9 @@ namespace snowcrash {
                 if (!target.empty()) {
                     // WARN: unable to parse payload signature
                     std::stringstream ss;
-                    ss << "unable to parse " << SectionName(section) << " signature, expected ";
+                    ss << "unable to parse " << SectionName(section.type) << " signature, expected ";
         
-                    switch (section) {
+                    switch (section.type) {
                             
                         case RequestSectionType:
                         case RequestBodySectionType:
@@ -624,8 +618,8 @@ namespace snowcrash {
                             return false;
                     }
                     
-                    BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
-                    SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, bounds, cur, sourceData);
+                    BlockIterator nameBlock = ListItemNameBlock(cur, section.bounds.second);
+                    SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, section.bounds, cur, sourceData);
                     result.warnings.push_back(Warning(ss.str(),
                                                       FormattingWarning,
                                                       sourceBlock));
@@ -641,15 +635,21 @@ namespace snowcrash {
          *  \brief  Set payload's asset. 
          *  \return True on success, false when an asset is already set.
          */
-        static bool SetAsset(const SectionType& section, const Asset& asset, Payload& payload) {
+        static bool SetAsset(const SectionType& sectionType, const Asset& asset, Payload& payload) {
             
-            if (section == BodySectionType) {
+            if (sectionType == BodySectionType ||
+                sectionType == RequestBodySectionType ||
+                sectionType == ResponseBodySectionType ||
+                sectionType == ModelBodySectionType ||
+                sectionType == ObjectBodySectionType ||
+                sectionType == DanglingBodySectionType) {
                 if (!payload.body.empty())
                     return false;
 
                 payload.body = asset;
             }
-            else if (section == SchemaSectionType) {
+            else if (sectionType == SchemaSectionType ||
+                     sectionType == DanglingSchemaSectionType) {
                 if (!payload.schema.empty())
                     return false;
                 

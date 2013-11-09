@@ -137,7 +137,8 @@ TEST_CASE("Parse resource", "[resource][block]")
     MarkdownBlock::Stack markdown = CanonicalResourceFixture();
     Resource resource;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), parser, resource);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, resource);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.empty());
@@ -180,7 +181,8 @@ TEST_CASE("Parse partially defined resource", "[resource][block]")
     
     Resource resource;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), parser, resource);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, resource);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.size() == 2); // no response & preformatted asset
@@ -214,7 +216,8 @@ TEST_CASE("Parse multiple method descriptions", "[resource][block]")
     
     Resource resource;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), parser, resource);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, resource);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.size() == 2); // 2x no response
@@ -297,7 +300,8 @@ TEST_CASE("Parse multiple method", "[resource][block]")
     
     Resource resource;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), parser, resource);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, resource);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.size() == 2); // empty body asset & no response
@@ -365,7 +369,8 @@ TEST_CASE("Parse description with list", "[resource][block]")
     
     Resource resource;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), parser, resource);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, resource);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.empty());
@@ -396,7 +401,8 @@ TEST_CASE("Parse resource with a HR", "[resource][block]")
     
     Resource resource;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), parser, resource);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, resource);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.empty());
@@ -418,8 +424,10 @@ TEST_CASE("Check overshadowing header warning", "[resource][block]")
     resource.headers.push_back(std::make_pair("X-Header", "24"));
     
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
     ParseSectionResult result = ResourceParser::Parse(markdown.begin(),
                                                       markdown.end(),
+                                                      rootSection,
                                                       parser,
                                                       resource);
     
@@ -463,8 +471,9 @@ TEST_CASE("Parse resource method abbreviation", "[resource][block]")
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(8, 1)));
     
     Resource resource;
-    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());    
-    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), parser, resource);
+    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, resource);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.empty());
@@ -495,7 +504,8 @@ TEST_CASE("Parse resource method abbreviation followed by a foreign method", "[r
     
     Resource resource;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), parser, resource);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, resource);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.size() == 2); // no response & ignoring possible resource method
@@ -522,7 +532,8 @@ TEST_CASE("Parse resource without name", "[resource][block]")
     
     Resource resource;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), parser, resource);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, resource);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.size() == 0);

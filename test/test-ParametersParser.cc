@@ -73,7 +73,8 @@ TEST_CASE("Parse canonical parameters", "[parameters]")
     MarkdownBlock::Stack markdown = CanonicalParametersFixture();
     ParameterCollection parameters;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = ParametersParser::Parse(markdown.begin(), markdown.end(), parser, parameters);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = ParametersParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, parameters);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.empty());
@@ -116,7 +117,8 @@ TEST_CASE("Parse description parameter only", "[parameters]")
     
     ParameterCollection parameters;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = ParametersParser::Parse(markdown.begin(), markdown.end(), parser, parameters);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = ParametersParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, parameters);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.empty());
@@ -181,7 +183,8 @@ TEST_CASE("Parse multiple parameters", "[parameters]")
 
     ParameterCollection parameters;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = ParametersParser::Parse(markdown.begin(), markdown.end(), parser, parameters);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = ParametersParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, parameters);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.empty());

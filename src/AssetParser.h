@@ -140,26 +140,25 @@ namespace snowcrash {
     template<>
     struct SectionParser<Asset> {
         
-        static ParseSectionResult ParseSection(const SectionType& section,
+        static ParseSectionResult ParseSection(const BlueprintSection& section,
                                                const BlockIterator& cur,
-                                               const SectionBounds& bounds,
                                                BlueprintParserCore& parser,
                                                Asset& asset) {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
-            switch (section) {
+            switch (section.type) {
                 case BodySectionType:
                 case SchemaSectionType: 
-                    result = HandleAssetSectionBlock(section, cur, bounds, parser, asset);
+                    result = HandleAssetSectionBlock(section, cur, parser, asset);
                     break;
                     
                 case DanglingBodySectionType:
                 case DanglingSchemaSectionType:
-                    result = HandleDanglingAssetSectionBlock(section, cur, bounds, parser, asset);
+                    result = HandleDanglingAssetSectionBlock(section, cur, parser, asset);
                     break;
                     
                 case UndefinedSectionType:
-                    result.second = CloseListItemBlock(cur, bounds.second);
+                    result.second = CloseListItemBlock(cur, section.bounds.second);
                     break;
                     
                 default:
@@ -170,9 +169,8 @@ namespace snowcrash {
             return result;
         }
         
-        static ParseSectionResult HandleAssetSectionBlock(const SectionType& section,
+        static ParseSectionResult HandleAssetSectionBlock(const BlueprintSection& section,
                                                           const BlockIterator& cur,
-                                                          const SectionBounds& bounds,
                                                           BlueprintParserCore& parser,
                                                           Asset& asset) {
 
@@ -180,7 +178,6 @@ namespace snowcrash {
             SourceDataBlock sourceMap;
             ParseSectionResult result = ParseListPreformattedBlock(section,
                                                                    cur,
-                                                                   bounds,
                                                                    parser,
                                                                    data,
                                                                    sourceMap);
@@ -192,21 +189,19 @@ namespace snowcrash {
             return result;
         }
         
-        static ParseSectionResult HandleDanglingAssetSectionBlock(const SectionType& section,
+        static ParseSectionResult HandleDanglingAssetSectionBlock(const BlueprintSection& section,
                                                                   const BlockIterator& cur,
-                                                                  const SectionBounds& bounds,
                                                                   BlueprintParserCore& parser,
                                                                   Asset& asset) {
             
             // Skip any closing list blocks
-            BlockIterator sectionCur = CloseList(cur, bounds.second);
+            BlockIterator sectionCur = CloseList(cur, section.bounds.second);
             
-            SectionType originalSection = (section == DanglingSchemaSectionType) ? SchemaSectionType : BodySectionType;
+            SectionType originalSection = (section.type == DanglingSchemaSectionType) ? SchemaSectionType : BodySectionType;
             SourceData data;
             SourceDataBlock sourceMap;
-            ParseSectionResult result = ParseListPreformattedBlock(originalSection,
+            ParseSectionResult result = ParseListPreformattedBlock(section,
                                                                    sectionCur,
-                                                                   bounds,
                                                                    parser,
                                                                    data,
                                                                    sourceMap);

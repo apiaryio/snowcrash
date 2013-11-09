@@ -91,20 +91,19 @@ namespace snowcrash {
     template<>
     struct SectionParser<HeaderCollection> {
         
-        static ParseSectionResult ParseSection(const SectionType& section,
+        static ParseSectionResult ParseSection(const BlueprintSection& section,
                                                const BlockIterator& cur,
-                                               const SectionBounds& bounds,
                                                BlueprintParserCore& parser,
                                                HeaderCollection& headers) {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
-            switch (section) {
+            switch (section.type) {
                 case HeadersSectionType:
-                    result = HandleHeadersSectionBlock(cur, bounds, parser, headers);
+                    result = HandleHeadersSectionBlock(section, cur, parser, headers);
                     break;
                     
                 case UndefinedSectionType:
-                    result.second = CloseListItemBlock(cur, bounds.second);
+                    result.second = CloseListItemBlock(cur, section.bounds.second);
                     break;
                     
                 default:
@@ -115,16 +114,15 @@ namespace snowcrash {
             return result;
         }
         
-        static ParseSectionResult HandleHeadersSectionBlock(const BlockIterator& cur,
-                                                            const SectionBounds& bounds,
+        static ParseSectionResult HandleHeadersSectionBlock(const BlueprintSection& section,
+                                                            const BlockIterator& cur,
                                                             BlueprintParserCore& parser,
                                                             HeaderCollection& headers) {
 
             SourceData data;
             SourceDataBlock sourceMap;
-            ParseSectionResult result = ParseListPreformattedBlock(HeadersSectionType,
+            ParseSectionResult result = ParseListPreformattedBlock(section,
                                                                    cur,
-                                                                   bounds,
                                                                    parser,
                                                                    data,
                                                                    sourceMap);
@@ -173,19 +171,23 @@ namespace snowcrash {
     // Generic HeaderSection parser handler
     //
     template <class T>
-    ParseSectionResult HandleHeaders(const BlockIterator& cur,
-                                     const SectionBounds& bounds,
+    ParseSectionResult HandleHeaders(const BlueprintSection& section,
+                                     const BlockIterator& cur,
                                      BlueprintParserCore& parser,
                                      T& t)
     {
         size_t headerCount = t.headers.size();
-        ParseSectionResult result = HeadersParser::Parse(cur, bounds.second, parser, t.headers);
+        ParseSectionResult result = HeadersParser::Parse(cur,
+                                                         section.bounds.second,
+                                                         section,
+                                                         parser,
+                                                         t.headers);
         if (result.first.error.code != Error::OK)
             return result;
         
         if (t.headers.size() == headerCount) {
-            BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
-            SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, bounds, cur, parser.sourceData);
+            BlockIterator nameBlock = ListItemNameBlock(cur, section.bounds.second);
+            SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, section.bounds, cur, parser.sourceData);
             result.first.warnings.push_back(Warning("no headers specified",
                                                     FormattingWarning,
                                                     sourceBlock));

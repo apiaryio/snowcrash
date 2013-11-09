@@ -101,7 +101,8 @@ TEST_CASE("Parse canonical parameter definition", "[parameter_definition][block]
     MarkdownBlock::Stack markdown = CanonicalParameterDefinitionFixture();
     Parameter parameter;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = ParameterDefinitionParser::Parse(markdown.begin(), markdown.end(), parser, parameter);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = ParameterDefinitionParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, parameter);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.empty());
@@ -138,7 +139,8 @@ TEST_CASE("Parse canonical definition followed by another definition", "[paramet
     
     Parameter parameter;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = ParameterDefinitionParser::Parse(markdown.begin(), markdown.end(), parser, parameter);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = ParameterDefinitionParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, parameter);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.empty());
@@ -164,7 +166,8 @@ TEST_CASE("Parse canonical definition followed by ilegal one", "[parameter_defin
     
     Parameter parameter;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = ParameterDefinitionParser::Parse(markdown.begin(), markdown.end(), parser, parameter);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = ParameterDefinitionParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, parameter);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.empty());

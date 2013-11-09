@@ -42,26 +42,25 @@ namespace snowcrash {
     template<>
     struct SectionParser<Blueprint> {
         
-        static ParseSectionResult ParseSection(const SectionType& section,
+        static ParseSectionResult ParseSection(const BlueprintSection& section,
                                                const BlockIterator& cur,
-                                               const SectionBounds& bounds,
                                                BlueprintParserCore& parser,
                                                Blueprint& output) {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
             
-            if ((section != BlueprintSectionType) &&
+            if ((section.type != BlueprintSectionType) &&
                 !CheckBlueprintName(*cur, parser, result.first))
                 return result;
             
-            switch (section) {
+            switch (section.type) {
                     
                 case BlueprintSectionType:
-                    result = HandleBlueprintOverviewBlock(cur, bounds, parser, output);
+                    result = HandleBlueprintOverviewBlock(section, cur, parser, output);
                     break;
                     
                 case ResourceGroupSectionType:
-                    result = HandleResourceGroup(cur, bounds, parser, output);
+                    result = HandleResourceGroup(section, cur, parser, output);
                     break;
                     
                 default:
@@ -99,49 +98,49 @@ namespace snowcrash {
             return std::distance(bounds.first, cur) == 1;
         }
 
-        static ParseSectionResult HandleBlueprintOverviewBlock(const BlockIterator& cur,
-                                                               const SectionBounds& bounds,
+        static ParseSectionResult HandleBlueprintOverviewBlock(const BlueprintSection& section,
+                                                               const BlockIterator& cur,
                                                                BlueprintParserCore& parser,
                                                                Blueprint& output) {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
             BlockIterator sectionCur(cur);
             if (cur->type == HeaderBlockType &&
-                IsFirstBlock(cur, bounds, output)) {
+                IsFirstBlock(cur, section.bounds, output)) {
                 output.name = cur->content;
             }
             else {
-                if (sectionCur == bounds.first &&
+                if (sectionCur == section.bounds.first &&
                     sectionCur->type == ParagraphBlockType) {
                     
                     // Try to parse first paragraph as metadata
-                    result = ParseMetadataBlock(sectionCur, bounds, parser, output);
+                    result = ParseMetadataBlock(sectionCur, section.bounds, parser, output);
                     if (result.second != sectionCur)
                         return result;
                 }
                 
                 if (sectionCur->type == QuoteBlockBeginType) {
-                    sectionCur = SkipToSectionEnd(cur, bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
+                    sectionCur = SkipToSectionEnd(cur, section.bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
                 }
                 else if (sectionCur->type == ListBlockBeginType) {
-                    sectionCur = SkipToSectionEnd(cur, bounds.second, ListBlockBeginType, ListBlockEndType);
+                    sectionCur = SkipToSectionEnd(cur, section.bounds.second, ListBlockBeginType, ListBlockEndType);
                 }
                 
-                if (IsFirstBlock(cur, bounds, output)) {
+                if (IsFirstBlock(cur, section.bounds, output)) {
                     if (parser.options & RequireBlueprintNameOption) {
                         if (!CheckBlueprintName(*sectionCur, parser, result.first))
                             return result;
                     }
                     else {
                         // WARN: No API name specified
-                        SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, bounds, cur, parser.sourceData);
+                        SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, section.bounds, cur, parser.sourceData);
                         result.first.warnings.push_back(Warning(ExpectedAPINameMessage,
                                                                 APINameWarning,
                                                                 sourceBlock));
                     }
                 }
                 
-                if (!CheckCursor(sectionCur, bounds, parser.sourceData, cur, result.first))
+                if (!CheckCursor(section, sectionCur, parser.sourceData, result.first))
                     return result;
                 output.description += MapSourceData(parser.sourceData, sectionCur->sourceMap);
             }
@@ -150,13 +149,17 @@ namespace snowcrash {
             return result;
         }
         
-        static ParseSectionResult HandleResourceGroup(const BlockIterator& cur,
-                                                      const SectionBounds& bounds,
+        static ParseSectionResult HandleResourceGroup(const BlueprintSection& section,
+                                                      const BlockIterator& cur,
                                                       BlueprintParserCore& parser,
                                                       Blueprint& output)
         {
             ResourceGroup resourceGroup;
-            ParseSectionResult result = ResourceGroupParser::Parse(cur, bounds.second, parser, resourceGroup);
+            ParseSectionResult result = ResourceGroupParser::Parse(cur,
+                                                                   section.bounds.second,
+                                                                   section,
+                                                                   parser,
+                                                                   resourceGroup);
             if (result.first.error.code != Error::OK)
                 return result;
             
@@ -173,7 +176,7 @@ namespace snowcrash {
                 }
                 ss << " is already defined";
                 
-                SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, bounds, bounds.second, parser.sourceData);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, section.bounds, section.bounds.second, parser.sourceData);
                 result.first.warnings.push_back(Warning(ss.str(),
                                                         DuplicateWarning,
                                                         sourceBlock));
@@ -274,8 +277,10 @@ namespace snowcrash {
                           Blueprint& blueprint) {
             
             BlueprintParserCore parser(options, sourceData, blueprint);
+            BlueprintSection rootSection(std::make_pair(source.begin(), source.end()));
             ParseSectionResult sectionResult = BlueprintParserInner::Parse(source.begin(),
                                                                            source.end(),
+                                                                           rootSection,
                                                                            parser,
                                                                            blueprint);
             result += sectionResult.first;

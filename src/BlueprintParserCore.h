@@ -21,7 +21,6 @@
 #include "StringUtility.h"
 #include "SymbolTable.h"
 
-
 namespace snowcrash {
     
     /**
@@ -79,10 +78,17 @@ namespace snowcrash {
     template<class T>
     struct SectionParser {
         
-        // Parse classified blocks
-        static ParseSectionResult ParseSection(const SectionType& section,
+        /**
+         *  \brief  Parse section's blocks.
+         *  \param  section     Actual section being parsed.
+         *  \param  cur         Cursor withing the section boundaries.
+         *  \param  parser      Parser innstance.
+         *  \param  output      AST node parsed.
+         *  \return %ParseSectionResult pointing to the last block parsed & including 
+         *  any possible source annotiations in the form of results or warnigns.
+         */
+        static ParseSectionResult ParseSection(const BlueprintSection& section,
                                                const BlockIterator& cur,
-                                               const SectionBounds& bounds,
                                                BlueprintParserCore& parser,
                                                T& output);
     };
@@ -127,17 +133,23 @@ namespace snowcrash {
         // Iterate blocks, classify & parse
         static ParseSectionResult Parse(const BlockIterator& begin,
                                         const BlockIterator& end,
+                                        const BlueprintSection& parentSection,
                                         BlueprintParserCore& parser,
                                         T& output) {
             Result result;
-            SectionType currentSection = UndefinedSectionType;
+            SectionType currentSectionType = UndefinedSectionType;
             BlockIterator currentBlock = begin;
             while (currentBlock != end) {
                 
-                currentSection = ClassifyBlock<T>(currentBlock, end, currentSection);
+                currentSectionType = ClassifyBlock<T>(currentBlock, end, currentSectionType);
+                
+                // TODO:
+                // Bounds were: std::make_pair(begin, end)
+                // Changing bounds to start at current block and use parents bounds to judge first block is the way to go
+                BlueprintSection currentSection(currentSectionType, std::make_pair(begin, end), parentSection);
+                
                 ParseSectionResult sectionResult = P::ParseSection(currentSection,
                                                                    currentBlock,
-                                                                   std::make_pair(begin, end),
                                                                    parser,
                                                                    output);
                 
@@ -150,7 +162,7 @@ namespace snowcrash {
 
                 currentBlock = sectionResult.second;
 
-                if (currentSection == UndefinedSectionType)
+                if (currentSectionType == UndefinedSectionType)
                     break;
             }
             
@@ -251,7 +263,7 @@ namespace snowcrash {
     
     
     /** 
-     *  \brief  Retrieves character for a markdown block
+     *  \brief  Retrieves characters for a markdown block
      *  \param  cur     A block to retrieve the map for.
      *  \param  bounds  Boundaries of %cur contaier.
      *  \param  parent  Alternative block if %cur map does not exists.
@@ -264,6 +276,8 @@ namespace snowcrash {
                                                            const BlockIterator& parent,
                                                            const SourceData& sourceData)
     {
+        // TODO: verify behavior in regards to the BlueprintSection revamp
+        
         // Try to use cursor's source map
         if (cur != bounds.second &&
             !cur->sourceMap.empty()) {
@@ -281,26 +295,28 @@ namespace snowcrash {
     
     /**
      *  \brief Checks cursor validity within its container.
+     *  \param section   A section to check against.
      *  \param cur  An iterator to be checked.
-     *  \param bounds   Boundaries to check against.
      *  \param sourceData   Source data byte buffer.
-     *  \param parent   Cursor's parent block to be used in case of error reporting.
      *  \param result   Error result output, an error object is added in case of failed check.
      *  \returns True if cursor appears to be valid, false otherwise.
      */
-    FORCEINLINE bool CheckCursor(const BlockIterator& cur,
-                                 const SectionBounds& bounds,
+    FORCEINLINE bool CheckCursor(const BlueprintSection& section,
+                                 const BlockIterator& cur,
                                  const SourceData& sourceData,
-                                 const BlockIterator& parent,
                                  Result& result) {
-        if (cur != bounds.second)
+        if (cur != section.bounds.second)
             return true;
         
-        if (parent->sourceMap.empty())
+        if (!section.hasParent() ||
+            section.parent().bounds.first->sourceMap.empty())
             return false;
         
         // ERR: Sanity check
-        SourceCharactersBlock sourceBlock = CharacterMapForBlock(parent, bounds, bounds.second, sourceData);
+        SourceCharactersBlock sourceBlock = CharacterMapForBlock(section.parent().bounds.first,
+                                                                 section.parent().bounds,
+                                                                 section.parent().bounds.second,
+                                                                 sourceData);
         result.error = Error("unexpected markdown closure",
                              ApplicationError,
                              sourceBlock);

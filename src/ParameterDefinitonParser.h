@@ -158,29 +158,28 @@ namespace snowcrash {
     template<>
     struct SectionParser<Parameter> {
         
-        static ParseSectionResult ParseSection(const SectionType& section,
+        static ParseSectionResult ParseSection(const BlueprintSection& section,
                                                const BlockIterator& cur,
-                                               const SectionBounds& bounds,
                                                BlueprintParserCore& parser,
                                                Parameter& parameter) {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
-            switch (section) {
+            switch (section.type) {
                     
                 case ParameterDefinitionSectionType:
-                    result = HandleParmeterDefinitionSection(cur, bounds, parser, parameter);
+                    result = HandleParmeterDefinitionSection(section, cur, parser, parameter);
                     break;
                     
                 case ParameterValuesSectionType:
-                    result = HandleValuesSection(cur, bounds, parser, parameter);
+                    result = HandleValuesSection(section, cur, parser, parameter);
                     break;
                     
                 case ForeignSectionType:
-                    result = HandleForeignSection(cur, bounds, parser.sourceData, ExpectedTraitItems);
+                    result = HandleForeignSection(section, cur, parser.sourceData, ExpectedTraitItems);
                     break;
                     
                 case UndefinedSectionType:
-                    result.second = CloseListItemBlock(cur, bounds.second);
+                    result.second = CloseListItemBlock(cur, section.bounds.second);
                     break;
                     
                 default:
@@ -192,8 +191,8 @@ namespace snowcrash {
         }
         
         /** Parse a parameter definition top-level section blocks. */
-        static ParseSectionResult HandleParmeterDefinitionSection(const BlockIterator& cur,
-                                                                  const SectionBounds& bounds,
+        static ParseSectionResult HandleParmeterDefinitionSection(const BlueprintSection& section,
+                                                                  const BlockIterator& cur,
                                                                   BlueprintParserCore& parser,
                                                                   Parameter& parameter) {
             
@@ -201,20 +200,20 @@ namespace snowcrash {
             BlockIterator sectionCur = cur;
 
             // Signature
-            if (sectionCur == bounds.first) {
-                ProcessSignature(sectionCur, bounds, parser.sourceData, result.first, parameter);
-                result.second = SkipSignatureBlock(sectionCur, bounds.second);
+            if (sectionCur == section.bounds.first) {
+                ProcessSignature(section, sectionCur, parser.sourceData, result.first, parameter);
+                result.second = SkipSignatureBlock(sectionCur, section.bounds.second);
                 return result;
             }
 
             // Description
             if (sectionCur->type == QuoteBlockBeginType) {
-                sectionCur = SkipToSectionEnd(sectionCur, bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
+                sectionCur = SkipToSectionEnd(sectionCur, section.bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
             }
             else if (sectionCur->type == ListBlockBeginType) {
                 
                 SourceDataBlock descriptionMap;
-                sectionCur = SkipToDescriptionListEnd<Parameter>(sectionCur, bounds.second, descriptionMap);
+                sectionCur = SkipToDescriptionListEnd<Parameter>(sectionCur, section.bounds.second, descriptionMap);
                 
                 if (sectionCur->type != ListBlockEndType) {
                     if (!descriptionMap.empty())
@@ -225,12 +224,12 @@ namespace snowcrash {
                 }
             }
             
-            if (!CheckCursor(sectionCur, bounds, parser.sourceData, cur, result.first))
+            if (!CheckCursor(section, sectionCur, parser.sourceData, result.first))
                 return result;
 
             parameter.description += MapSourceData(parser.sourceData, sectionCur->sourceMap);
             
-            if (sectionCur != bounds.second)
+            if (sectionCur != section.bounds.second)
                 result.second = ++sectionCur;
             
             return result;
@@ -239,8 +238,8 @@ namespace snowcrash {
         /**
          *  Retrieve and process parameter definition signature.
          */
-        static void ProcessSignature(const BlockIterator& cur,
-                                     const SectionBounds& bounds,
+        static void ProcessSignature(const BlueprintSection& section,
+                                     const BlockIterator& cur,
                                      const SourceData& sourceData,
                                      Result& result,
                                      Parameter& parameter) {
@@ -251,7 +250,7 @@ namespace snowcrash {
             
             // Process signature
             SourceData remainingContent;
-            SourceData signature = GetListItemSignature(cur, bounds.second, remainingContent);
+            SourceData signature = GetListItemSignature(cur, section.bounds.second, remainingContent);
 
             TrimString(signature);
             CaptureGroups captureGroups;
@@ -268,7 +267,7 @@ namespace snowcrash {
                 
                 // Additional Attributes
                 if (!captureGroups[5].empty())
-                    ProcessSignatureAdditionalTraits(cur, bounds, captureGroups[5], sourceData, result, parameter);
+                    ProcessSignatureAdditionalTraits(section, cur, captureGroups[5], sourceData, result, parameter);
                 
                 // Description
                 if (!captureGroups[7].empty())
@@ -290,8 +289,8 @@ namespace snowcrash {
                     ss << "specifying parameter '" << parameter.name << "' as required supersedes its default value"\
                           ", declare the parameter as 'optional' to specify its default value";
                     
-                    BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
-                    SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, bounds, cur, sourceData);
+                    BlockIterator nameBlock = ListItemNameBlock(cur, section.bounds.second);
+                    SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, section.bounds, cur, sourceData);
                     result.warnings.push_back(Warning(ss.str(),
                                                       LogicalErrorWarning,
                                                       sourceBlock));
@@ -300,8 +299,8 @@ namespace snowcrash {
             }
             else {
                 // ERR: unable to parse 
-                BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
-                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, bounds, cur, sourceData);
+                BlockIterator nameBlock = ListItemNameBlock(cur, section.bounds.second);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, section.bounds, cur, sourceData);
                 result.error = (Error("unable to parse parameter specification",
                                       BusinessError,
                                       sourceBlock));
@@ -309,8 +308,8 @@ namespace snowcrash {
         }
         
         /** Parse additional parameter attributes from abbrev definition bracket */
-        static void ProcessSignatureAdditionalTraits(const BlockIterator& cur,
-                                                     const SectionBounds& bounds,
+        static void ProcessSignatureAdditionalTraits(const BlueprintSection& section,
+                                                     const BlockIterator& cur,
                                                      const SourceData& additionalTraits,
                                                      const SourceData& sourceData,
                                                      Result& result,
@@ -363,8 +362,8 @@ namespace snowcrash {
                 ss << ", expected '([required | optional], [<type>], [`<example value>`])'";
                 ss << ", e.g. '(optional, string, `Hello World`)'";
 
-                BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
-                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, bounds, cur, sourceData);
+                BlockIterator nameBlock = ListItemNameBlock(cur, section.bounds.second);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, section.bounds, cur, sourceData);
                 result.warnings.push_back(Warning(ss.str(),
                                                   FormattingWarning,
                                                   sourceBlock));
@@ -376,8 +375,8 @@ namespace snowcrash {
         }
         
         /** Parse possible values enumeration section blocks. */
-        static ParseSectionResult HandleValuesSection(const BlockIterator& cur,
-                                                      const SectionBounds& bounds,
+        static ParseSectionResult HandleValuesSection(const BlueprintSection& section,
+                                                      const BlockIterator& cur,
                                                       BlueprintParserCore& parser,
                                                       Parameter& parameter) {
             
@@ -390,8 +389,8 @@ namespace snowcrash {
                 ss << "overshadowing previous 'values' definition";
                 ss << " for parameter '" << parameter.name << "'";
                 
-                BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
-                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, bounds, cur, parser.sourceData);
+                BlockIterator nameBlock = ListItemNameBlock(cur, section.bounds.second);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, section.bounds, cur, parser.sourceData);
                 result.first.warnings.push_back(Warning(ss.str(),
                                                         RedefinitionWarning,
                                                         sourceBlock));
@@ -401,14 +400,19 @@ namespace snowcrash {
             parameter.values.clear();
             
             // Check additional content in signature
-            CheckSignatureAdditionalContent(cur, bounds, parser.sourceData, "'values:' keyword", ExpectedValuesContent, result.first);
+            CheckSignatureAdditionalContent(section,
+                                            cur,
+                                            parser.sourceData,
+                                            "'values:' keyword",
+                                            ExpectedValuesContent,
+                                            result.first);
 
             // Parse inner list of entities
-            BlockIterator sectionCur = SkipSignatureBlock(cur, bounds.second);
+            BlockIterator sectionCur = SkipSignatureBlock(cur, section.bounds.second);
             BlockIterator endCur = cur;
             if (endCur->type == ListBlockBeginType)
                 ++endCur;
-            endCur = SkipToSectionEnd(endCur, bounds.second, ListItemBlockBeginType, ListItemBlockEndType);
+            endCur = SkipToSectionEnd(endCur, section.bounds.second, ListItemBlockBeginType, ListItemBlockEndType);
             
             if (sectionCur != endCur) {
 
@@ -424,7 +428,7 @@ namespace snowcrash {
                             
                             // Try to parse some values
                             ParseSectionResult valuesResult = ParseValuesEntities(sectionCur,
-                                                                                  bounds,
+                                                                                  section.bounds,
                                                                                   parser,
                                                                                   parameter.values);
                             result.first += valuesResult.first;
@@ -446,7 +450,7 @@ namespace snowcrash {
                         ss << parameter.name << "' parameter";
                         ss << ", " << ExpectedValuesContent;
                         
-                        SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, bounds, cur, parser.sourceData);
+                        SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, section.bounds, cur, parser.sourceData);
                         result.first.warnings.push_back(Warning(ss.str(),
                                                                 IgnoringWarning,
                                                                 sourceBlock));
@@ -458,13 +462,13 @@ namespace snowcrash {
                 // WARN: empty definition
                 std::stringstream ss;
                 ss << "no possible values specified for parameter '" << parameter.name << "'";
-                SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, bounds, cur, parser.sourceData);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, section.bounds, cur, parser.sourceData);
                 result.first.warnings.push_back(Warning(ss.str(),
                                                         EmptyDefinitionWarning,
                                                         sourceBlock));
             }
             
-            endCur = CloseListItemBlock(sectionCur, bounds.second);
+            endCur = CloseListItemBlock(sectionCur, section.bounds.second);
             result.second = endCur;
             return result;
         }

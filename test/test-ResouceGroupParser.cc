@@ -73,7 +73,8 @@ TEST_CASE("rgparser/parse", "Parse canonical resource group")
     
     ResourceGroup resourceGroup;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), parser, resourceGroup);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, resourceGroup);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.empty());
@@ -97,7 +98,8 @@ TEST_CASE("rgparser/parse-empty-resource", "Parse resource group with empty reso
     
     ResourceGroup resourceGroup;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), parser, resourceGroup);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, resourceGroup);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.empty());
@@ -122,7 +124,8 @@ TEST_CASE("rgparser/parse-multiple-resource-description", "Parse multiple resour
     
     ResourceGroup resourceGroup;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), parser, resourceGroup);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, resourceGroup);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.empty());
@@ -170,7 +173,8 @@ TEST_CASE("rgparser/parse-multiple-resource", "Parse multiple resources with pay
     
     ResourceGroup resourceGroup;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), parser, resourceGroup);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, resourceGroup);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.size() == 4); // 2x no response specified + 2x empty body asset
@@ -216,7 +220,8 @@ TEST_CASE("rgparser/parse-multiple-same", "Parse multiple resources with the sam
     
     ResourceGroup resourceGroup;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), parser, resourceGroup);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, resourceGroup);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.size());
@@ -248,7 +253,8 @@ TEST_CASE("rgparser/parse-resource-description-list", "Parse resource with list 
     
     ResourceGroup resourceGroup;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), parser, resourceGroup);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, resourceGroup);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.size() == 3);   // preformatted asset & ignoring unrecognized body & no response
@@ -281,8 +287,9 @@ TEST_CASE("rgparser/parse-hr", "Parse resource groups with hr in description")
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "A", 0, MakeSourceDataBlock(2, 1)));
     
     ResourceGroup resourceGroup;
-    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());   
-    ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), parser, resourceGroup);
+    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, resourceGroup);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.empty());

@@ -94,12 +94,12 @@ namespace snowcrash {
         
     public:
         BlueprintSection(const SectionBounds& _bounds)
-        : type(UndefinedSectionType), bounds(_bounds), firstSection(_bounds.first), m_parent(NULL) {}
+        : type(UndefinedSectionType), bounds(_bounds), m_parent(NULL) {}
         
         BlueprintSection(const SectionType _type,
                          const SectionBounds& _bounds,
                          const BlueprintSection& _parent)
-        : type(_type), bounds(_bounds), firstSection(_bounds.first), m_parent(&_parent) {}
+        : type(_type), bounds(_bounds), m_parent(&_parent) {}
         
         /** Type of section */
         const SectionType type;
@@ -108,13 +108,6 @@ namespace snowcrash {
          *  Maximum boundaries of the section including any subsection.
          */
         const SectionBounds& bounds;
-        
-        /**
-         * Cursor of the first subsection
-         * within the boundaries of the section
-         * where bounds.first <= firstSection < bounds.second.
-         */
-        const BlockIterator& firstSection;
         
         /**
          *  \return True if section's parent is specified, false otherwise.
@@ -128,7 +121,7 @@ namespace snowcrash {
          */
         const BlueprintSection& parent() const {
             if (!hasParent())
-                throw "accessing parent of a parentless blueprint section";
+                throw "accessing parent of a root blueprint section";
             return *m_parent;
         }
 

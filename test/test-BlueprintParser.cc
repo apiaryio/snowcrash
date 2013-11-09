@@ -79,7 +79,8 @@ TEST_CASE("Parse canonical blueprint", "[blueprint]")
     
     Blueprint blueprint;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = BlueprintParserInner::Parse(markdown.begin(), markdown.end(), parser, blueprint);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = BlueprintParserInner::Parse(markdown.begin(), markdown.end(), rootSection, parser, blueprint);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.empty());
@@ -296,7 +297,8 @@ TEST_CASE("bpparser/parse-multi-groups", "Parse nameless group after defined res
     
     Blueprint blueprint;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = BlueprintParserInner::Parse(markdown.begin(), markdown.end(), parser, blueprint);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = BlueprintParserInner::Parse(markdown.begin(), markdown.end(), rootSection, parser, blueprint);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.size() == 1); // groups with same name & expected group name & no response
@@ -554,7 +556,8 @@ TEST_CASE("Fail to parse nested lists in description", "[blueprint][issue][#16]"
     
     Blueprint blueprint;
     BlueprintParserCore parser(0, source, Blueprint());
-    ParseSectionResult result = BlueprintParserInner::Parse(markdown.begin(), markdown.end(), parser, blueprint);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = BlueprintParserInner::Parse(markdown.begin(), markdown.end(), rootSection, parser, blueprint);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.empty());
@@ -589,7 +592,8 @@ TEST_CASE("Fail to parse paragraph without final newline", "[blueprint][issue][#
     
     Blueprint blueprint;
     BlueprintParserCore parser(0, source, Blueprint());
-    ParseSectionResult result = BlueprintParserInner::Parse(markdown.begin(), markdown.end(), parser, blueprint);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = BlueprintParserInner::Parse(markdown.begin(), markdown.end(), rootSection, parser, blueprint);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.empty());

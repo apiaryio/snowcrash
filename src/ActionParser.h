@@ -136,45 +136,47 @@ namespace snowcrash {
     template<>
     struct SectionParser<Action> {
         
-        static ParseSectionResult ParseSection(const SectionType& section,
+        static ParseSectionResult ParseSection(const BlueprintSection& section,
                                                const BlockIterator& cur,
-                                               const SectionBounds& bounds,
                                                BlueprintParserCore& parser,
                                                Action& action) {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
             
-            switch (section) {                    
+            switch (section.type) {
                 case ActionSectionType:
-                    result = HandleActionOverviewBlock(cur, bounds, parser, action);
+                    result = HandleActionOverviewBlock(section, cur, parser, action);
                     break;
 
                 case ParametersSectionType:
-                    result = HandleParameters(cur, bounds, parser, action);
+                    result = HandleParameters(section, cur, parser, action);
                     break;
 
                 case HeadersSectionType:
-                    result = HandleHeaders(cur, bounds, parser, action);
+                    result = HandleHeaders(section, cur, parser, action);
                     break;
                     
                 case RequestSectionType:
                 case ResponseSectionType:
-                    result = HandlePayload(section, cur, bounds, parser, action);
+                    result = HandlePayload(section, cur, parser, action);
                     break;
                     
                 case ForeignSectionType:
-                    result = HandleForeignSection(cur, bounds, parser.sourceData);
+                    result = HandleForeignSection(section, cur, parser.sourceData);
                     break;
                     
                 case UndefinedSectionType:
-                    result.second = CloseListItemBlock(cur, bounds.second);
+                    result.second = CloseListItemBlock(cur, section.bounds.second);
                     break;
                 
                 case ModelSectionType:
                 case ObjectSectionType:
                     {
                         // ERR: Unexpected model definition
-                        SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, bounds, bounds.second, parser.sourceData);
+                        SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur,
+                                                                                 section.bounds,
+                                                                                 section.bounds.second,
+                                                                                 parser.sourceData);
                         result.first.error = Error("unexpected model definiton, a model can be only defined in the resource section",
                                                    SymbolError,
                                                    sourceBlock);
@@ -189,27 +191,27 @@ namespace snowcrash {
             return result;
         }
         
-        static ParseSectionResult HandleActionOverviewBlock(const BlockIterator& cur,
-                                                            const SectionBounds& bounds,
+        static ParseSectionResult HandleActionOverviewBlock(const BlueprintSection& section,
+                                                            const BlockIterator& cur,
                                                             BlueprintParserCore& parser,
                                                             Action& action) {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
             BlockIterator sectionCur(cur);
             if (cur->type == HeaderBlockType &&
-                cur == bounds.first) {
+                cur == section.bounds.first) {
                 
                 GetActionSignature(*cur, action.name, action.method);
             }
             else {
                 
                 if (sectionCur->type == QuoteBlockBeginType) {
-                    sectionCur = SkipToSectionEnd(sectionCur, bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
+                    sectionCur = SkipToSectionEnd(sectionCur, section.bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
                 }
                 else if (sectionCur->type == ListBlockBeginType) {
                     
                     SourceDataBlock descriptionMap;
-                    sectionCur = SkipToDescriptionListEnd<Action>(sectionCur, bounds.second, descriptionMap);
+                    sectionCur = SkipToDescriptionListEnd<Action>(sectionCur, section.bounds.second, descriptionMap);
                     
                     if (sectionCur->type != ListBlockEndType) {
                         if (!descriptionMap.empty())
@@ -220,7 +222,7 @@ namespace snowcrash {
                     }
                 }
                 
-                if (!CheckCursor(sectionCur, bounds, parser.sourceData, cur, result.first))
+                if (!CheckCursor(section, sectionCur, parser.sourceData, result.first))
                     return result;
                 action.description += MapSourceData(parser.sourceData, sectionCur->sourceMap);
             }
@@ -230,18 +232,22 @@ namespace snowcrash {
         }
         
         /** Parse Parameters section */
-        static ParseSectionResult HandleParameters(const BlockIterator& cur,
-                                                   const SectionBounds& bounds,
+        static ParseSectionResult HandleParameters(const BlueprintSection& section,
+                                                   const BlockIterator& cur,
                                                    BlueprintParserCore& parser,
                                                    Action& action) {
             ParameterCollection parameters;
-            ParseSectionResult result = ParametersParser::Parse(cur, bounds.second, parser, parameters);
+            ParseSectionResult result = ParametersParser::Parse(cur,
+                                                                section.bounds.second,
+                                                                section,
+                                                                parser,
+                                                                parameters);
             if (result.first.error.code != Error::OK)
                 return result;
             
             if (parameters.empty()) {
-                BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
-                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, bounds, cur, parser.sourceData);
+                BlockIterator nameBlock = ListItemNameBlock(cur, section.bounds.second);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, section.bounds, cur, parser.sourceData);
                 result.first.warnings.push_back(Warning(NoParametersMessage,
                                                         FormattingWarning,
                                                         sourceBlock));
@@ -255,20 +261,23 @@ namespace snowcrash {
         
         /**
          *  \brief  Parse action payload
-         *  \param  begin   The begin of the block to be parsed.
-         *  \param  end     The end of the markdown block buffer.
+         *  \param  section Actual section being parsed.
+         *  \param  cur     Cursor withing the section boundaries.
          *  \param  parser  A parser's instance.
-         *  \param  method  An output buffer to store parsed payload into.
+         *  \param  action  An output buffer to store parsed payload into.
          *  \return A block parser section result.
          */
-        static ParseSectionResult HandlePayload(const SectionType &section,
+        static ParseSectionResult HandlePayload(const BlueprintSection& section,
                                                 const BlockIterator& cur,
-                                                const SectionBounds& bounds,
                                                 BlueprintParserCore& parser,
                                                 Action& action)
         {
             Payload payload;
-            ParseSectionResult result = PayloadParser::Parse(cur, bounds.second, parser, payload);
+            ParseSectionResult result = PayloadParser::Parse(cur,
+                                                             section.bounds.second,
+                                                             section,
+                                                             parser,
+                                                             payload);
             if (result.first.error.code != Error::OK)
                 return result;
             
@@ -277,29 +286,29 @@ namespace snowcrash {
                 action.examples.push_back(TransactionExample());
             }
             
-            BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
+            BlockIterator nameBlock = ListItemNameBlock(cur, section.bounds.second);
             
             // Check for duplicate
-            if (IsPayloadDuplicate(section, payload, action)) {
+            if (IsPayloadDuplicate(section.type, payload, action)) {
                 // WARN: duplicate payload
                 std::stringstream ss;
-                ss << SectionName(section) << " payload `" << payload.name << "`";
+                ss << SectionName(section.type) << " payload `" << payload.name << "`";
                 ss << " already defined for `" << action.method << "` method";
 
-                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, bounds, cur, parser.sourceData);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, section.bounds, cur, parser.sourceData);
                 result.first.warnings.push_back(Warning(ss.str(),
                                                         DuplicateWarning,
                                                         sourceBlock));
             }
 
             // Check payload integrity
-            CheckPayload(section, payload, nameBlock->sourceMap, parser.sourceData, result.first);
+            CheckPayload(section.type, payload, nameBlock->sourceMap, parser.sourceData, result.first);
             
             // Inject parsed payload into the action
-            if (section == RequestSectionType) {
+            if (section.type == RequestSectionType) {
                 action.examples.front().requests.push_back(payload);
             }
-            else if (section == ResponseSectionType) {
+            else if (section.type == ResponseSectionType) {
                 action.examples.front().responses.push_back(payload);
             }
             

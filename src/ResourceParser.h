@@ -161,46 +161,45 @@ namespace snowcrash {
     template<>
     struct SectionParser<Resource> {
         
-        static ParseSectionResult ParseSection(const SectionType& section,
+        static ParseSectionResult ParseSection(const BlueprintSection& section,
                                                const BlockIterator& cur,
-                                               const SectionBounds& bounds,
                                                BlueprintParserCore& parser,
                                                Resource& resource) {
 
             ParseSectionResult result = std::make_pair(Result(), cur);
-            switch (section) {                    
+            switch (section.type) {
                 case ResourceSectionType:
-                    result = HandleResourceOverviewBlock(cur, bounds, parser, resource);
+                    result = HandleResourceOverviewBlock(section, cur, parser, resource);
                     break;
                     
                 case ResourceMethodSectionType:
-                    result = HandleResourceMethod(cur, bounds, parser, resource);
+                    result = HandleResourceMethod(section, cur, parser, resource);
                     break;
                 
                 case ModelSectionType:
                 case ObjectSectionType:
-                    result = HandleModel(cur, bounds, parser, resource);
+                    result = HandleModel(section, cur, parser, resource);
                     break;
                     
                 case ParametersSectionType:
-                    result = HandleParameters(cur, bounds, parser, resource);
+                    result = HandleParameters(section, cur, parser, resource);
                     break;
                     
                 case HeadersSectionType:
-                    result = HandleHeaders(cur, bounds, parser, resource);
+                    result = HandleHeaders(section, cur, parser, resource);
                     break;
                     
                 case ActionSectionType:
-                    result = HandleAction(cur, bounds, parser, resource);
+                    result = HandleAction(section, cur, parser, resource);
                     break;
                     
                 case UndefinedSectionType:
-                    CheckAmbiguousMethod(cur, bounds, resource, parser.sourceData, result.first);
-                    result.second = CloseListItemBlock(cur, bounds.second);
+                    CheckAmbiguousMethod(section, cur, resource, parser.sourceData, result.first);
+                    result.second = CloseListItemBlock(cur, section.bounds.second);
                     break;
                     
                 case ForeignSectionType:
-                    result = HandleForeignSection(cur, bounds, parser.sourceData);
+                    result = HandleForeignSection(section, cur, parser.sourceData);
                     break;
                     
                 default:
@@ -211,15 +210,15 @@ namespace snowcrash {
             return result;
         }
         
-        static ParseSectionResult HandleResourceOverviewBlock(const BlockIterator& cur,
-                                                              const SectionBounds& bounds,
+        static ParseSectionResult HandleResourceOverviewBlock(const BlueprintSection& section,
+                                                              const BlockIterator& cur,
                                                               BlueprintParserCore& parser,
                                                               Resource& resource) {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
             BlockIterator sectionCur(cur);
             if (cur->type == HeaderBlockType &&
-                cur == bounds.first) {
+                cur == section.bounds.first) {
                 
                 // Retrieve URI
                 HTTPMethod method;
@@ -228,12 +227,12 @@ namespace snowcrash {
             else {
                 
                 if (cur->type == QuoteBlockBeginType) {
-                    sectionCur = SkipToSectionEnd(sectionCur, bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
+                    sectionCur = SkipToSectionEnd(sectionCur, section.bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
                 }
                 else if (cur->type == ListBlockBeginType) {
                     
                     SourceDataBlock descriptionMap;
-                    sectionCur = SkipToDescriptionListEnd<Resource>(sectionCur, bounds.second, descriptionMap);
+                    sectionCur = SkipToDescriptionListEnd<Resource>(sectionCur, section.bounds.second, descriptionMap);
                     
                     if (sectionCur->type != ListBlockEndType) {
                         if (!descriptionMap.empty())
@@ -244,7 +243,7 @@ namespace snowcrash {
                     }
                 }
                 
-                if (!CheckCursor(sectionCur, bounds, parser.sourceData, cur, result.first))
+                if (!CheckCursor(section, sectionCur, parser.sourceData, result.first))
                     return result;
                 resource.description += MapSourceData(parser.sourceData, sectionCur->sourceMap);
             }
@@ -253,13 +252,17 @@ namespace snowcrash {
             return result;
         }
         
-        static ParseSectionResult HandleModel(const BlockIterator& cur,
-                                              const SectionBounds& bounds,
+        static ParseSectionResult HandleModel(const BlueprintSection& section,
+                                              const BlockIterator& cur,
                                               BlueprintParserCore& parser,
                                               Resource& resource)
         {
             Payload payload;
-            ParseSectionResult result = PayloadParser::Parse(cur, bounds.second, parser, payload);
+            ParseSectionResult result = PayloadParser::Parse(cur,
+                                                             section.bounds.second,
+                                                             section,
+                                                             parser,
+                                                             payload);
             if (result.first.error.code != Error::OK)
                 return result;
             
@@ -277,8 +280,8 @@ namespace snowcrash {
 
                 ss << "' resource, a resource can be represented by a single model only";
                 
-                BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
-                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, bounds, cur, parser.sourceData);
+                BlockIterator nameBlock = ListItemNameBlock(cur, section.bounds.second);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, section.bounds, cur, parser.sourceData);
                 result.first.warnings.push_back(Warning(ss.str(),
                                                         DuplicateWarning,
                                                         sourceBlock));
@@ -298,8 +301,8 @@ namespace snowcrash {
                     ss << "resource model can be specified only for a named resource";
                     ss << ", name your resource, e.g. '# <resource name> [" << resource.uriTemplate << "]'";
 
-                    BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
-                    SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, bounds, cur, parser.sourceData);
+                    BlockIterator nameBlock = ListItemNameBlock(cur, section.bounds.second);
+                    SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, section.bounds, cur, parser.sourceData);
                     result.first.error = Error(ss.str(),
                                                SymbolError,
                                                sourceBlock);
@@ -317,8 +320,8 @@ namespace snowcrash {
                 std::stringstream ss;
                 ss << "symbol '" << payload.name << "' already defined";
 
-                BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
-                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, bounds, cur, parser.sourceData);
+                BlockIterator nameBlock = ListItemNameBlock(cur, section.bounds.second);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, section.bounds, cur, parser.sourceData);
                 result.first.error = Error(ss.str(),
                                            SymbolError,
                                            sourceBlock);
@@ -331,25 +334,29 @@ namespace snowcrash {
         }
         
         /** Parse Parameters section */
-        static ParseSectionResult HandleParameters(const BlockIterator& cur,
-                                                   const SectionBounds& bounds,
+        static ParseSectionResult HandleParameters(const BlueprintSection& section,
+                                                   const BlockIterator& cur,
                                                    BlueprintParserCore& parser,
                                                    Resource& resource) {
             ParameterCollection parameters;
-            ParseSectionResult result = ParametersParser::Parse(cur, bounds.second, parser, parameters);
+            ParseSectionResult result = ParametersParser::Parse(cur,
+                                                                section.bounds.second,
+                                                                section,
+                                                                parser,
+                                                                parameters);
             if (result.first.error.code != Error::OK)
                 return result;
             
             if (parameters.empty()) {
-                BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
-                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, bounds, cur, parser.sourceData);
+                BlockIterator nameBlock = ListItemNameBlock(cur, section.bounds.second);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, section.bounds, cur, parser.sourceData);
                 result.first.warnings.push_back(Warning(NoParametersMessage,
                                                         FormattingWarning,
                                                         sourceBlock));
             }
             else {
                 // Check Eligibility
-                BlockIterator nameBlock = ListItemNameBlock(cur, bounds.second);
+                BlockIterator nameBlock = ListItemNameBlock(cur, section.bounds.second);
                 CheckParametersEligibility(resource, parameters, nameBlock->sourceMap, parser.sourceData, result.first);
                 
                 // Insert
@@ -359,7 +366,7 @@ namespace snowcrash {
             return result;
         }
         
-        /** Check parameter eligibility - report if a parameter is not specified in URI template */
+        /** Check parameter eligibility, reporting if a parameter is not specified in URI template */
         static void CheckParametersEligibility(const Resource& resource,
                                                const ParameterCollection& parameters,
                                                const SourceDataBlock& location,
@@ -386,8 +393,8 @@ namespace snowcrash {
             }
         }
         
-        static ParseSectionResult HandleResourceMethod(const BlockIterator& cur,
-                                                       const SectionBounds& bounds,
+        static ParseSectionResult HandleResourceMethod(const BlueprintSection& section,
+                                                       const BlockIterator& cur,
                                                        BlueprintParserCore& parser,
                                                        Resource& resource) {
             
@@ -396,17 +403,21 @@ namespace snowcrash {
             GetResourceSignature(*cur, resource.name, resource.uriTemplate, method);
             
             // Parse as a resource action abbreviation
-            return HandleAction(cur, bounds, parser, resource, true);
+            return HandleAction(section, cur, parser, resource, true);
         }
         
-        static ParseSectionResult HandleAction(const BlockIterator& cur,
-                                               const SectionBounds& bounds,
+        static ParseSectionResult HandleAction(const BlueprintSection& section,
+                                               const BlockIterator& cur,
                                                BlueprintParserCore& parser,
                                                Resource& resource,
                                                bool abbrev = false)
         {
             Action action;
-            ParseSectionResult result = ActionParser::Parse(cur, bounds.second, parser, action);
+            ParseSectionResult result = ActionParser::Parse(cur,
+                                                            section.bounds.second,
+                                                            section,
+                                                            parser,
+                                                            action);
             if (result.first.error.code != Error::OK)
                 return result;
 
@@ -421,7 +432,7 @@ namespace snowcrash {
                     ss << "ignoring additional content in method header '" << cur->content << "'";
                     ss << ", expected method-only e.g. '# " << action.method << "'";
                     
-                    SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, bounds, bounds.second, parser.sourceData);
+                    SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, section.bounds, section.bounds.second, parser.sourceData);
                     result.first.warnings.push_back(Warning(ss.str(),
                                                             IgnoringWarning,
                                                             sourceBlock));
@@ -436,7 +447,7 @@ namespace snowcrash {
                 ss << "action with method '" << action.method << "' already defined for resource '";
                 ss << resource.uriTemplate << "'";
                 
-                SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, bounds, bounds.second, parser.sourceData);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, section.bounds, section.bounds.second, parser.sourceData);
                 result.first.warnings.push_back(Warning(ss.str(),
                                                         DuplicateWarning,
                                                         sourceBlock));
@@ -458,7 +469,7 @@ namespace snowcrash {
                 std::stringstream ss;
                 ss << "no response defined for '" << action.method << " " << resource.uriTemplate << "'";
                 
-                SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, bounds, bounds.second, parser.sourceData);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, section.bounds, section.bounds.second, parser.sourceData);
                 result.first.warnings.push_back(Warning(ss.str(),
                                                         EmptyDefinitionWarning,
                                                         sourceBlock));
@@ -493,14 +504,14 @@ namespace snowcrash {
         }
         
         // Check whether abbreviated resource action isn't followed by an
-        // action header -> implies possible additional method intended
-        static void CheckAmbiguousMethod(const BlockIterator& cur,
-                                         const SectionBounds& bounds,
+        // action header which would imply possible additional method intended.
+        static void CheckAmbiguousMethod(const BlueprintSection& section,
+                                         const BlockIterator& cur,
                                          const Resource& resource,
                                          const SourceData& sourceData,
                                          Result& result) {
             
-            if (cur == bounds.second ||
+            if (cur == section.bounds.second ||
                 cur->type != HeaderBlockType)
                 return;
             
@@ -515,7 +526,7 @@ namespace snowcrash {
                 ss << "to the define muliple actions for the '" << resource.uriTemplate << "' resource omit the HTTP method in its definition, ";
                 ss << "e.g. '# " << resource.uriTemplate << "'";
                 
-                SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, bounds, bounds.second, sourceData);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, section.bounds, section.bounds.second, sourceData);
                 result.warnings.push_back(Warning(ss.str(),
                                                   IgnoringWarning,
                                                   sourceBlock));

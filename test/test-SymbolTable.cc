@@ -20,7 +20,8 @@ TEST_CASE("symbol/resource-object", "Parse object resource symbol")
     MarkdownBlock::Stack markdown = CanonicalResourceFixture();
     Resource resource;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), parser, resource);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, resource);
     
     REQUIRE(result.first.error.code == Error::OK);
     
@@ -34,6 +35,6 @@ TEST_CASE("symbol/resource-object", "Parse object resource symbol")
     BlueprintParserCore parser2(0, SourceDataFixture, Blueprint());
     parser2.symbolTable = parser.symbolTable;
     Resource resource2;
-    ParseSectionResult result2 = ResourceParser::Parse(markdown.begin(), markdown.end(), parser2, resource2);
+    ParseSectionResult result2 = ResourceParser::Parse(markdown.begin(), markdown.end(), rootSection, parser2, resource2);
     REQUIRE(result2.first.error.code != Error::OK);
 }

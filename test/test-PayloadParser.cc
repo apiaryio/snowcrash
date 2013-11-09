@@ -132,7 +132,8 @@ TEST_CASE("Parse canonical payload", "[payload][block]")
     MarkdownBlock::Stack markdown = CanonicalPayloadFixture();    
     Payload payload;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), parser, payload);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, payload);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.empty());
@@ -181,7 +182,8 @@ TEST_CASE("Parse payload description with list", "[payload][block][#8]")
     
     Payload payload;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), parser, payload);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, payload);
     
     REQUIRE(result.first.error.code == Error::OK);
     
@@ -209,7 +211,8 @@ TEST_CASE("Parse just one payload in a list with multiple payloads", "[payload][
     
     Payload payload;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), parser, payload);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, payload);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.empty());
@@ -244,7 +247,8 @@ TEST_CASE("Parse just one payload in a list with multiple items", "[payload][blo
     
     Payload payload;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), parser, payload);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, payload);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.empty());
@@ -297,7 +301,8 @@ TEST_CASE("Parse payload with foreign list item", "[payload][foreign][block]")
     
     Payload payload;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), parser, payload);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, payload);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.size() == 1);
@@ -348,7 +353,8 @@ TEST_CASE("Parse payload with foreign block", "[payload][foreign][block]")
     
     Payload payload;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), parser, payload);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, payload);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.size() == 2); // preformatted body content & dangling body
@@ -384,7 +390,8 @@ TEST_CASE("Parse abbreviated payload body", "[payload][block]")
     
     Payload payload;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), parser, payload);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, payload);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.empty());
@@ -417,7 +424,8 @@ TEST_CASE("Parse abbreviated inline payload body", "[payload][block]")
     
     Payload payload;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), parser, payload);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, payload);
     
     REQUIRE(result.first.error.code == Error::OK);
     CHECK(result.first.warnings.size() == 1); // preformatted code block
@@ -457,7 +465,8 @@ TEST_CASE("Parse inline payload with symbol reference", "[payload][block]")
     model.body = "Bar";
     parser.symbolTable.resourceModels[model.name] = model;
     
-    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), parser, payload);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, payload);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.empty());
@@ -503,7 +512,8 @@ TEST_CASE("Parse payload with symbol reference", "[payload][block]")
     model.body = "Bar";
     parser.symbolTable.resourceModels[model.name] = model;
     
-    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), parser, payload);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, payload);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.size() == 1); // ignoring foreign entry
@@ -544,7 +554,8 @@ TEST_CASE("Missing 'expected pre-formatted code block' warning source map", "[pa
     
     Payload payload;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), parser, payload);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, payload);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.size() == 1); // ignoring unrecognized item
@@ -578,7 +589,8 @@ TEST_CASE("Test deprecated object payload", "[payload][object][block]")
     
     Payload payload;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), parser, payload);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, payload);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.size() == 1);
@@ -609,7 +621,8 @@ TEST_CASE("Parse named model", "[payload][model][block]")
     
     Payload payload;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), parser, payload);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, payload);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.empty());
@@ -646,7 +659,8 @@ TEST_CASE("Parse nameless model", "[payload][model][block]")
     
     Payload payload;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), parser, payload);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, payload);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.empty());
@@ -683,7 +697,8 @@ TEST_CASE("Warn on malformed payload signature", "[payload][block][#20]")
     
     Payload payload;
     BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), parser, payload);
+    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
+    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, payload);
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.size() == 1);
