@@ -37,6 +37,7 @@
         'src/Blueprint.h',
         'src/BlueprintParser.h',
         'src/BlueprintParserCore.h',
+        'src/BlueprintSection.h'
         'src/BlueprintUtility.h',
         'src/HeaderParser.h',
         'src/HTTP.h',
@@ -95,6 +96,7 @@
         'test/test-Blueprint.cc',
         'test/test-BlueprintParser.cc',
         'test/test-HeaderParser.cc',
+        'test/test-Indentation.cc',
         'test/test-ListUtility.cc ',
         'test/test-MarkdownBlock.cc',
         'test/test-MarkdownParser.cc',

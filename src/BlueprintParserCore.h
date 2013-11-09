@@ -81,8 +81,8 @@ namespace snowcrash {
         /**
          *  \brief  Parse section's blocks.
          *  \param  section     Actual section being parsed.
-         *  \param  cur         Cursor withing the section boundaries.
-         *  \param  parser      Parser innstance.
+         *  \param  cur         Cursor within the section boundaries.
+         *  \param  parser      Parser instance.
          *  \param  output      AST node parsed.
          *  \return %ParseSectionResult pointing to the last block parsed & including 
          *  any possible source annotiations in the form of results or warnigns.
@@ -142,10 +142,6 @@ namespace snowcrash {
             while (currentBlock != end) {
                 
                 currentSectionType = ClassifyBlock<T>(currentBlock, end, currentSectionType);
-                
-                // TODO:
-                // Bounds were: std::make_pair(begin, end)
-                // Changing bounds to start at current block and use parents bounds to judge first block is the way to go
                 BlueprintSection currentSection(currentSectionType, std::make_pair(begin, end), parentSection);
                 
                 ParseSectionResult sectionResult = P::ParseSection(currentSection,
