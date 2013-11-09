@@ -200,7 +200,7 @@ namespace snowcrash {
             if (!expected.empty())
                 ss << ", expected: " << expected;
             
-            SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, section.bounds, cur, sourceData);
+            SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, cur, section.bounds, sourceData);
             result.first.warnings.push_back(Warning(ss.str(),
                                                     IgnoringWarning,
                                                     sourceBlock));
@@ -213,7 +213,7 @@ namespace snowcrash {
             if (!expected.empty())
                 ss << ", expected: " << expected;
             
-            SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, section.bounds, cur, sourceData);
+            SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, cur, section.bounds, sourceData);
             result.first.warnings.push_back(Warning(ss.str(),
                                                     IgnoringWarning,
                                                     sourceBlock));
@@ -231,7 +231,7 @@ namespace snowcrash {
             if (!expected.empty())
                 ss << ", expected: " << expected;
 
-            SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, section.bounds, cur, sourceData);
+            SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, cur, section.bounds, sourceData);
             result.first.warnings.push_back(Warning(ss.str(),
                                                     IgnoringWarning,
                                                     sourceBlock));
@@ -388,7 +388,7 @@ namespace snowcrash {
                 ss << ", expected " << expectedHint;
             
             BlockIterator nameBlock = ListItemNameBlock(cur, section.bounds.second);
-            SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, section.bounds, cur, sourceData);
+            SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, cur, section.bounds, sourceData);
             result.warnings.push_back(Warning(ss.str(),
                                               IgnoringWarning,
                                               sourceBlock));
@@ -440,7 +440,7 @@ namespace snowcrash {
                 if (!expectedHint.empty())
                     ss << ", expected " << expectedHint;
                 
-                SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, bounds, cur, sourceData);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, cur, bounds, sourceData);
                 result.warnings.push_back(Warning(ss.str(),
                                                   IgnoringWarning,
                                                   sourceBlock));
@@ -474,7 +474,7 @@ namespace snowcrash {
 //                                                          SourceData& data,
 //                                                          SourceDataBlock& sourceMap) {
 //        
-//      TODO:
+//      TODO: Stand-alone pre-block parsing routine
 //    }
     
     // Parse preformatted source data from block(s) of a list item block
@@ -506,7 +506,7 @@ namespace snowcrash {
                 ss << SectionName(section.type) << " " << FormattingWarningMesssage;
 
                 BlockIterator nameBlock = ListItemNameBlock(sectionCur, section.bounds.second);
-                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, section.bounds, cur, parser.sourceData);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, cur, section.bounds, parser.sourceData);
                 result.first.warnings.push_back(Warning(ss.str(),
                                                         IndentationWarning,
                                                         sourceBlock));
@@ -538,7 +538,7 @@ namespace snowcrash {
             std::stringstream ss;
             ss << SectionName(section.type) << " " << FormattingWarningMesssage;
             
-            SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, section.bounds, cur, parser.sourceData);
+            SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, cur, section.bounds, parser.sourceData);
             result.first.warnings.push_back(Warning(ss.str(),
                                                     FormattingWarning,
                                                     sourceBlock));

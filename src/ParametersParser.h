@@ -180,7 +180,7 @@ namespace snowcrash {
             std::stringstream ss;
             ss << "ignoring additional content in the 'parameters' definition, expected " << ExpectedParametersContent;
             
-            SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, section.bounds, cur, parser.sourceData);
+            SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, cur, section.bounds, parser.sourceData);
             result.first.warnings.push_back(Warning(ss.str(),
                                                     IgnoringWarning,
                                                     sourceBlock));
@@ -215,7 +215,7 @@ namespace snowcrash {
                     ss << "overshadowing previous parameter '" << parameter.name << "' definition";
 
                     BlockIterator nameBlock = ListItemNameBlock(cur, section.bounds.second);
-                    SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, section.bounds, cur, parser.sourceData);
+                    SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, cur, section.bounds, parser.sourceData);
                     result.first.warnings.push_back(Warning(ss.str(),
                                                             RedefinitionWarning,
                                                             sourceBlock));

@@ -174,8 +174,8 @@ namespace snowcrash {
                     {
                         // ERR: Unexpected model definition
                         SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur,
-                                                                                 section.bounds,
                                                                                  section.bounds.second,
+                                                                                 section.bounds,                                                                                 
                                                                                  parser.sourceData);
                         result.first.error = Error("unexpected model definiton, a model can be only defined in the resource section",
                                                    SymbolError,
@@ -247,7 +247,7 @@ namespace snowcrash {
             
             if (parameters.empty()) {
                 BlockIterator nameBlock = ListItemNameBlock(cur, section.bounds.second);
-                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, section.bounds, cur, parser.sourceData);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, cur, section.bounds, parser.sourceData);
                 result.first.warnings.push_back(Warning(NoParametersMessage,
                                                         FormattingWarning,
                                                         sourceBlock));
@@ -295,7 +295,7 @@ namespace snowcrash {
                 ss << SectionName(section.type) << " payload `" << payload.name << "`";
                 ss << " already defined for `" << action.method << "` method";
 
-                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, section.bounds, cur, parser.sourceData);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, cur, section.bounds, parser.sourceData);
                 result.first.warnings.push_back(Warning(ss.str(),
                                                         DuplicateWarning,
                                                         sourceBlock));

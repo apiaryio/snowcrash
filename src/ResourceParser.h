@@ -281,7 +281,7 @@ namespace snowcrash {
                 ss << "' resource, a resource can be represented by a single model only";
                 
                 BlockIterator nameBlock = ListItemNameBlock(cur, section.bounds.second);
-                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, section.bounds, cur, parser.sourceData);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, cur, section.bounds, parser.sourceData);
                 result.first.warnings.push_back(Warning(ss.str(),
                                                         DuplicateWarning,
                                                         sourceBlock));
@@ -302,7 +302,7 @@ namespace snowcrash {
                     ss << ", name your resource, e.g. '# <resource name> [" << resource.uriTemplate << "]'";
 
                     BlockIterator nameBlock = ListItemNameBlock(cur, section.bounds.second);
-                    SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, section.bounds, cur, parser.sourceData);
+                    SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, cur, section.bounds, parser.sourceData);
                     result.first.error = Error(ss.str(),
                                                SymbolError,
                                                sourceBlock);
@@ -321,7 +321,7 @@ namespace snowcrash {
                 ss << "symbol '" << payload.name << "' already defined";
 
                 BlockIterator nameBlock = ListItemNameBlock(cur, section.bounds.second);
-                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, section.bounds, cur, parser.sourceData);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, cur, section.bounds, parser.sourceData);
                 result.first.error = Error(ss.str(),
                                            SymbolError,
                                            sourceBlock);
@@ -349,7 +349,7 @@ namespace snowcrash {
             
             if (parameters.empty()) {
                 BlockIterator nameBlock = ListItemNameBlock(cur, section.bounds.second);
-                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, section.bounds, cur, parser.sourceData);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, cur, section.bounds, parser.sourceData);
                 result.first.warnings.push_back(Warning(NoParametersMessage,
                                                         FormattingWarning,
                                                         sourceBlock));
@@ -432,7 +432,7 @@ namespace snowcrash {
                     ss << "ignoring additional content in method header '" << cur->content << "'";
                     ss << ", expected method-only e.g. '# " << action.method << "'";
                     
-                    SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, section.bounds, section.bounds.second, parser.sourceData);
+                    SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, section.bounds.second, section.bounds, parser.sourceData);
                     result.first.warnings.push_back(Warning(ss.str(),
                                                             IgnoringWarning,
                                                             sourceBlock));
@@ -447,13 +447,11 @@ namespace snowcrash {
                 ss << "action with method '" << action.method << "' already defined for resource '";
                 ss << resource.uriTemplate << "'";
                 
-                SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, section.bounds, section.bounds.second, parser.sourceData);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, section.bounds.second, section.bounds, parser.sourceData);
                 result.first.warnings.push_back(Warning(ss.str(),
                                                         DuplicateWarning,
                                                         sourceBlock));
             }
-            
-            // FIXME: Do we want to check heck for parameters duplicates at this level?
             
             // Check Eligibility
             if (!action.parameters.empty())
@@ -469,7 +467,7 @@ namespace snowcrash {
                 std::stringstream ss;
                 ss << "no response defined for '" << action.method << " " << resource.uriTemplate << "'";
                 
-                SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, section.bounds, section.bounds.second, parser.sourceData);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, section.bounds.second, section.bounds, parser.sourceData);
                 result.first.warnings.push_back(Warning(ss.str(),
                                                         EmptyDefinitionWarning,
                                                         sourceBlock));
@@ -526,7 +524,7 @@ namespace snowcrash {
                 ss << "to the define muliple actions for the '" << resource.uriTemplate << "' resource omit the HTTP method in its definition, ";
                 ss << "e.g. '# " << resource.uriTemplate << "'";
                 
-                SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, section.bounds, section.bounds.second, sourceData);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, section.bounds.second, section.bounds, sourceData);
                 result.warnings.push_back(Warning(ss.str(),
                                                   IgnoringWarning,
                                                   sourceBlock));

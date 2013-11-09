@@ -187,7 +187,7 @@ namespace snowcrash {
         
         if (t.headers.size() == headerCount) {
             BlockIterator nameBlock = ListItemNameBlock(cur, section.bounds.second);
-            SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, section.bounds, cur, parser.sourceData);
+            SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, cur, section.bounds, parser.sourceData);
             result.first.warnings.push_back(Warning("no headers specified",
                                                     FormattingWarning,
                                                     sourceBlock));

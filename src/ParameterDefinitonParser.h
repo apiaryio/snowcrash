@@ -290,7 +290,7 @@ namespace snowcrash {
                           ", declare the parameter as 'optional' to specify its default value";
                     
                     BlockIterator nameBlock = ListItemNameBlock(cur, section.bounds.second);
-                    SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, section.bounds, cur, sourceData);
+                    SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, cur, section.bounds, sourceData);
                     result.warnings.push_back(Warning(ss.str(),
                                                       LogicalErrorWarning,
                                                       sourceBlock));
@@ -300,7 +300,7 @@ namespace snowcrash {
             else {
                 // ERR: unable to parse 
                 BlockIterator nameBlock = ListItemNameBlock(cur, section.bounds.second);
-                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, section.bounds, cur, sourceData);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, cur, section.bounds, sourceData);
                 result.error = (Error("unable to parse parameter specification",
                                       BusinessError,
                                       sourceBlock));
@@ -363,7 +363,7 @@ namespace snowcrash {
                 ss << ", e.g. '(optional, string, `Hello World`)'";
 
                 BlockIterator nameBlock = ListItemNameBlock(cur, section.bounds.second);
-                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, section.bounds, cur, sourceData);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, cur, section.bounds, sourceData);
                 result.warnings.push_back(Warning(ss.str(),
                                                   FormattingWarning,
                                                   sourceBlock));
@@ -390,7 +390,7 @@ namespace snowcrash {
                 ss << " for parameter '" << parameter.name << "'";
                 
                 BlockIterator nameBlock = ListItemNameBlock(cur, section.bounds.second);
-                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, section.bounds, cur, parser.sourceData);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, cur, section.bounds, parser.sourceData);
                 result.first.warnings.push_back(Warning(ss.str(),
                                                         RedefinitionWarning,
                                                         sourceBlock));
@@ -450,7 +450,7 @@ namespace snowcrash {
                         ss << parameter.name << "' parameter";
                         ss << ", " << ExpectedValuesContent;
                         
-                        SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, section.bounds, cur, parser.sourceData);
+                        SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, cur, section.bounds, parser.sourceData);
                         result.first.warnings.push_back(Warning(ss.str(),
                                                                 IgnoringWarning,
                                                                 sourceBlock));
@@ -462,7 +462,7 @@ namespace snowcrash {
                 // WARN: empty definition
                 std::stringstream ss;
                 ss << "no possible values specified for parameter '" << parameter.name << "'";
-                SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, section.bounds, cur, parser.sourceData);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, cur, section.bounds, parser.sourceData);
                 result.first.warnings.push_back(Warning(ss.str(),
                                                         EmptyDefinitionWarning,
                                                         sourceBlock));
@@ -509,7 +509,7 @@ namespace snowcrash {
                     ss << "ignoring the '" << content << "' element";
                     ss << ", expected '`" << content << "`'";
                     
-                    SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, bounds, cur, parser.sourceData);
+                    SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, cur, bounds, parser.sourceData);
                     result.first.warnings.push_back(Warning(ss.str(),
                                                             IgnoringWarning,
                                                             sourceBlock));

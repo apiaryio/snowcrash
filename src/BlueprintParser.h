@@ -133,7 +133,7 @@ namespace snowcrash {
                     }
                     else {
                         // WARN: No API name specified
-                        SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, section.bounds, cur, parser.sourceData);
+                        SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, cur, section.bounds, parser.sourceData);
                         result.first.warnings.push_back(Warning(ExpectedAPINameMessage,
                                                                 APINameWarning,
                                                                 sourceBlock));
@@ -176,7 +176,7 @@ namespace snowcrash {
                 }
                 ss << " is already defined";
                 
-                SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, section.bounds, section.bounds.second, parser.sourceData);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, section.bounds.second, section.bounds, parser.sourceData);
                 result.first.warnings.push_back(Warning(ss.str(),
                                                         DuplicateWarning,
                                                         sourceBlock));
@@ -234,7 +234,7 @@ namespace snowcrash {
                         std::stringstream ss;
                         ss << "duplicate definition of '" << it->first << "'";
                         
-                        SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, bounds, bounds.second, parser.sourceData);
+                        SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, bounds.second, bounds, parser.sourceData);
                         result.first.warnings.push_back(Warning(ss.str(),
                                                                 DuplicateWarning,
                                                                 sourceBlock));
@@ -250,7 +250,7 @@ namespace snowcrash {
             }
             else if (!metadataCollection.empty()) {
                 // WARN: malformed metadata block
-                SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, bounds, bounds.second, parser.sourceData);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, bounds.second, bounds, parser.sourceData);
                 result.first.warnings.push_back(Warning("ignoring possible metadata, expected"
                                                         " '<key> : <value>', one one per line",
                                                         FormattingWarning,

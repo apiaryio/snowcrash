@@ -350,7 +350,7 @@ namespace snowcrash {
                 ss << "ignoring additional " << SectionName(section.type) << " content, content is already defined";
                 
                 BlockIterator nameBlock = ListItemNameBlock(cur, section.bounds.second);
-                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, section.bounds, cur, parser.sourceData);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, cur, section.bounds, parser.sourceData);
                 result.first.warnings.push_back(Warning(ss.str(),
                                                         RedefinitionWarning,
                                                         sourceBlock));
@@ -473,7 +473,7 @@ namespace snowcrash {
                     ss << "ignoring extraneous content after symbol reference";
                     ss << ", expected symbol reference only e.g. '[" << symbolName << "][]'";
                     
-                    SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, bounds, cur, parser.sourceData);
+                    SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, cur, bounds, parser.sourceData);
                     result.first.warnings.push_back(Warning(ss.str(),
                                                             IgnoringWarning,
                                                             sourceBlock));
@@ -522,7 +522,7 @@ namespace snowcrash {
                 (section.type == ResponseSectionType || section.type == ResponseBodySectionType)) {
                 
                 BlockIterator nameBlock = ListItemNameBlock(cur, section.bounds.second);
-                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, section.bounds, cur, sourceData);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, cur, section.bounds, sourceData);
                 result.warnings.push_back(Warning("missing response HTTP status code, assuming 'Response 200'",
                                                   EmptyDefinitionWarning,
                                                   sourceBlock));
@@ -537,7 +537,7 @@ namespace snowcrash {
                 ss << "the 'object' keyword is deprecated and as such it will be removed in a future release, please use the 'model' keyword instead";
                 
                 BlockIterator nameBlock = ListItemNameBlock(cur, section.bounds.second);
-                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, section.bounds, cur, sourceData);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, cur, section.bounds, sourceData);
                 result.warnings.push_back(Warning(ss.str(),
                                                   DeprecatedWarning,
                                                   sourceBlock));
@@ -619,7 +619,7 @@ namespace snowcrash {
                     }
                     
                     BlockIterator nameBlock = ListItemNameBlock(cur, section.bounds.second);
-                    SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, section.bounds, cur, sourceData);
+                    SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, cur, section.bounds, sourceData);
                     result.warnings.push_back(Warning(ss.str(),
                                                       FormattingWarning,
                                                       sourceBlock));

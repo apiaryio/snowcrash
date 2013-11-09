@@ -263,31 +263,29 @@ namespace snowcrash {
     
     
     /** 
-     *  \brief  Retrieves characters for a markdown block
-     *  \param  cur     A block to retrieve the map for.
-     *  \param  bounds  Boundaries of %cur contaier.
-     *  \param  parent  Alternative block if %cur map does not exists.
-     *  \param  sourceData Source data to map.
-     *  \returns Character map for given markdown block or its parent's map if exists.
-     *  Empty source character map otherwise.
+     *  \brief  Retrieves source code character map for a markdown block.
+     *  \param  cur         A block to retrieve the characters map for.
+     *  \param  fallback    Alternative block if %cur map source does not exists.
+     *  \param  bounds      Boundaries of the %cur and %fallback container.
+     *  \param  sourceData  Source data to map.
+     *  \returns            Character map for given markdown block or its alternative block, 
+     *                      if exists. Empty source character map otherwise.
      */
     FORCEINLINE SourceCharactersBlock CharacterMapForBlock(const BlockIterator& cur,
+                                                           const BlockIterator& fallback,
                                                            const SectionBounds& bounds,
-                                                           const BlockIterator& parent,
                                                            const SourceData& sourceData)
     {
-        // TODO: verify behavior in regards to the BlueprintSection revamp
-        
         // Try to use cursor's source map
         if (cur != bounds.second &&
             !cur->sourceMap.empty()) {
             return MapSourceDataBlock(cur->sourceMap, sourceData);
         }
         
-        // Fallback to parent (previous) block
-        if (parent != bounds.second &&
-            !parent->sourceMap.empty()) {
-            return MapSourceDataBlock(parent->sourceMap, sourceData);
+        // Fallback to alternative (previous) block
+        if (fallback != bounds.second &&
+            !fallback->sourceMap.empty()) {
+            return MapSourceDataBlock(fallback->sourceMap, sourceData);
         }
         
         return SourceCharactersBlock();
@@ -314,8 +312,8 @@ namespace snowcrash {
         
         // ERR: Sanity check
         SourceCharactersBlock sourceBlock = CharacterMapForBlock(section.parent().bounds.first,
-                                                                 section.parent().bounds,
                                                                  section.parent().bounds.second,
+                                                                 section.parent().bounds,
                                                                  sourceData);
         result.error = Error("unexpected markdown closure",
                              ApplicationError,

@@ -124,7 +124,7 @@ namespace snowcrash {
                 if (sectionCur == section.bounds.first) {
                     
                     // WARN: No Group name specified
-                    SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, section.bounds, section.bounds.second, parser.sourceData);
+                    SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, section.bounds.second, section.bounds, parser.sourceData);
                     result.first.warnings.push_back(Warning("expected resource group name, e.g. '# <Group Name>'",
                                                             EmptyDefinitionWarning,
                                                             sourceBlock));
@@ -170,7 +170,7 @@ namespace snowcrash {
                 globalDuplicate.first != parser.blueprint.resourceGroups.end()) {
                 
                 // WARN: Duplicate resource
-                SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, section.bounds, section.bounds.second, parser.sourceData);
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, section.bounds.second, section.bounds, parser.sourceData);
                 result.first.warnings.push_back(Warning("the resource '" +
                                                         resource.uriTemplate +
                                                         "' is already defined",
