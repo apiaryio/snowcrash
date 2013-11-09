@@ -474,7 +474,7 @@ namespace snowcrash {
 //                                                          SourceData& data,
 //                                                          SourceDataBlock& sourceMap) {
 //        
-//      TODO: Stand-alone pre-block parsing routine
+// TODO: Stand-alone pre-block parsing routine
 //    }
     
     // Parse preformatted source data from block(s) of a list item block

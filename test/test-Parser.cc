@@ -24,9 +24,9 @@ TEST_CASE("Parse empty blueprint", "[parser]")
     Result result;
     Blueprint blueprint;
     
-    const std::string bluerpintSource = "";
+    const std::string blueprintSource = "";
     
-    parser.parse(bluerpintSource, 0, result, blueprint);
+    parser.parse(blueprintSource, 0, result, blueprint);
     REQUIRE(result.error.code == Error::OK);
     REQUIRE(result.warnings.empty());
     REQUIRE(blueprint.metadata.empty());
@@ -41,7 +41,7 @@ TEST_CASE("Parse simple blueprint", "[parser]")
     Result result;
     Blueprint blueprint;
     
-    const std::string bluerpintSource = \
+    const std::string blueprintSource = \
 "# Snowcrash API \n\
 \n\
 # GET /resource\n\
@@ -55,7 +55,7 @@ Resource **description**\n\
             { ... }\n\
 ";
         
-    parser.parse(bluerpintSource, 0, result, blueprint);
+    parser.parse(blueprintSource, 0, result, blueprint);
     REQUIRE(result.error.code == Error::OK);
     REQUIRE(result.warnings.empty());
     REQUIRE(blueprint.name == "Snowcrash API");
@@ -116,7 +116,7 @@ TEST_CASE("Do not report duplicate response when media type differs", "[method][
     //
     //        Hello.
     //");
-    const std::string bluerpintSource = \
+    const std::string blueprintSource = \
 "\n\
 # GET /message\n\
 + Response 200 (application/json)\n\
@@ -131,7 +131,7 @@ TEST_CASE("Do not report duplicate response when media type differs", "[method][
     Parser parser;
     Result result;
     Blueprint blueprint;
-    parser.parse(bluerpintSource, 0, result, blueprint);
+    parser.parse(blueprintSource, 0, result, blueprint);
     REQUIRE(result.error.code == Error::OK);
     REQUIRE(result.warnings.empty());
 }
@@ -146,7 +146,7 @@ TEST_CASE("Support description ending with an list item", "[parser][issue][#8]")
     //
     //        ...
     //");
-    const std::string bluerpintSource = \
+    const std::string blueprintSource = \
     "# GET /1\n"\
     "+ a description item\n"\
     "+ Response 200\n"\
@@ -156,7 +156,7 @@ TEST_CASE("Support description ending with an list item", "[parser][issue][#8]")
     Parser parser;
     Result result;
     Blueprint blueprint;
-    parser.parse(bluerpintSource, 0, result, blueprint);
+    parser.parse(blueprintSource, 0, result, blueprint);
     REQUIRE(result.error.code == Error::OK);
     REQUIRE(result.warnings.empty());
     
@@ -177,14 +177,14 @@ TEST_CASE("Invalid ‘warning: empty body asset’ for certain status codes", "[
     //# GET /1
     //+ Response 304
     //");
-    const std::string bluerpintSource = \
+    const std::string blueprintSource = \
     "# GET /1\n"\
     "+ Response 304\n";
     
     Parser parser;
     Result result;
     Blueprint blueprint;
-    parser.parse(bluerpintSource, 0, result, blueprint);
+    parser.parse(blueprintSource, 0, result, blueprint);
     REQUIRE(result.error.code == Error::OK);
     REQUIRE(result.warnings.empty());
     
@@ -213,7 +213,7 @@ TEST_CASE("Parse adjacent asset blocks", "[parser][issue][#9]")
     //    Not found
     //
     //");
-    const std::string bluerpintSource = \
+    const std::string blueprintSource = \
     "# GET /1\n"\
     "+ response 200\n"\
     "\n"\
@@ -227,7 +227,7 @@ TEST_CASE("Parse adjacent asset blocks", "[parser][issue][#9]")
     Parser parser;
     Result result;
     Blueprint blueprint;
-    parser.parse(bluerpintSource, 0, result, blueprint);
+    parser.parse(blueprintSource, 0, result, blueprint);
     REQUIRE(result.error.code == Error::OK);
     REQUIRE(result.warnings.size() == 3);
     
@@ -256,7 +256,7 @@ TEST_CASE("Parse adjacent nested asset blocks", "[parser][issue][crash][#9]")
     //    B
     //C
     //");
-    const std::string bluerpintSource = \
+    const std::string blueprintSource = \
     "# GET /1\n"\
     "+ response 200\n"\
     "    + body\n"\
@@ -269,7 +269,7 @@ TEST_CASE("Parse adjacent nested asset blocks", "[parser][issue][crash][#9]")
     Parser parser;
     Result result;
     Blueprint blueprint;
-    parser.parse(bluerpintSource, 0, result, blueprint);
+    parser.parse(blueprintSource, 0, result, blueprint);
     REQUIRE(result.error.code == Error::OK);
     CHECK(result.warnings.size() == 3);
     
@@ -290,7 +290,7 @@ TEST_CASE("Parse adjacent asset list blocks", "[parser][issue][#9]")
     //+ response 200
     //+ list
     //");
-    const std::string bluerpintSource = \
+    const std::string blueprintSource = \
     "# GET /1\n"\
     "+ response 200\n"\
     "+ list\n";
@@ -298,7 +298,7 @@ TEST_CASE("Parse adjacent asset list blocks", "[parser][issue][#9]")
     Parser parser;
     Result result;
     Blueprint blueprint;
-    parser.parse(bluerpintSource, 0, result, blueprint);
+    parser.parse(blueprintSource, 0, result, blueprint);
     REQUIRE(result.error.code == Error::OK);
     REQUIRE(result.warnings.size() == 1);
     REQUIRE(result.warnings[0].code == IgnoringWarning);
@@ -315,12 +315,12 @@ TEST_CASE("Parse adjacent asset list blocks", "[parser][issue][#9]")
 TEST_CASE("SIGTERM parsing blueprint", "[parser][issue][#45]")
 {
     // Blueprint in question: See GH issue #45
-    const std::string bluerpintSource = "# A\n# B\nC\n\nD\n\nE\n\nF\n\nG\n\n# /1\n# GET\n+ Request\n+ Response 200\n    + Body\n\n            H\n\nI\n# J\n> K";
+    const std::string blueprintSource = "# A\n# B\nC\n\nD\n\nE\n\nF\n\nG\n\n# /1\n# GET\n+ Request\n+ Response 200\n    + Body\n\n            H\n\nI\n# J\n> K";
 
     Parser parser;
     Result result;
     Blueprint blueprint;
-    parser.parse(bluerpintSource, 0, result, blueprint);
+    parser.parse(blueprintSource, 0, result, blueprint);
     REQUIRE(result.error.code == 0);
     REQUIRE(result.warnings.size() == 5);
 }
