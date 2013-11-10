@@ -196,5 +196,5 @@ TEST_CASE("OK Indentation & No Newline", "[abbreviated][indentation][now]")
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body == "{ ... }\n");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body == "    { ... }\n");
 }
