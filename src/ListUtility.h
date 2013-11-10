@@ -452,74 +452,55 @@ namespace snowcrash {
     }
     
     /**
-     *  \brief Skips to the end of a signature-only list item ignoring and reporting any additional content.
-     *  \param cur          The begining of the list item to close.
-     *  \param bounds       Bounds within the block buffer.
-     *  \param  sourceData   Source data byte buffer.
-     *  \param placeHint    A string explaining the possible place of failure. Might be empty.
-     *  \param expectedHint A string defining expected content. Might be empty.
-     *  \param result       Result to append the possible warning into.
-     *  \return An iterator pointing AFTER the last closing list or list item block.
+     *  Compute expected indentation level of a code block.
+     *  \param  section A section to compute indentation level for
+     *  \return Indentation level (number of tabs) for a block to be
+     *  considered a pre-formatted code block in given section.
      */
-    
+    FORCEINLINE size_t CodeBlockIndentationLevel(const BlueprintSection& section)
+    {
+        if (!section.hasParent()) {
+            
+            return 1;
+        }
+        else if (section.parent().type == RequestBodySectionType ||
+                 section.parent().type == ResponseBodySectionType ||
+                 section.parent().type == ObjectBodySectionType ||
+                 section.parent().type == ModelBodySectionType) {
+            
+            return 2;
+        }
+        else {
 
+            return 3;
+        }
+    }
     
-//    /**
-//     *  \brief  Parses given block as a preformatted code block.
-//     *  \param  cur
-//     */
-//    FORCEINLINE ParseSectionResult ParsePreformattedBlock(const BlockIterator& cur,
-//                                                          const SectionBounds& bounds,
-//                                                          BlueprintParserCore& parser,
-//                                                          SourceData& data,
-//                                                          SourceDataBlock& sourceMap) {
-//        
-// TODO: Stand-alone pre-block parsing routine
-//    }
-    
-    // Parse preformatted source data from block(s) of a list item block
-    FORCEINLINE ParseSectionResult ParseListPreformattedBlock(const BlueprintSection& section,
-                                                              const BlockIterator& cur,
-                                                              BlueprintParserCore& parser,
-                                                              SourceData& data,
-                                                              SourceDataBlock& sourceMap) {
-        
-        
-        static const std::string FormattingWarningMesssage = "content is expected to be a pre-formatted code block, "\
-        "separate it by an empty line and indent every of its line by exactly 8 spaces or 2 tabs relative to its level";
+    /**
+     *  \brief  Parses given block as a preformatted code block.
+     *  \param  section     Actual section being parsed.
+     *  \param  cur         Cursor within the section boundaries.
+     *  \param  parser      Parser instance.
+     *  \param  action      An output data buffer.
+     *  \param  sourceMap   An output source map buffer.
+     *  \return A block parser section result, pointing at the last block parsed.
+     */
+    FORCEINLINE ParseSectionResult ParsePreformattedBlock(const BlueprintSection& section,
+                                                          const BlockIterator& cur,
+                                                          BlueprintParserCore& parser,
+                                                          SourceData& data,
+                                                          SourceDataBlock& sourceMap) {
         
         ParseSectionResult result = std::make_pair(Result(), cur);
         BlockIterator sectionCur = cur;
         std::stringstream dataStream;
         
-        if (sectionCur == section.bounds.first) {
-            // Process first block of list, throw away first line - signature
-            SourceData content;
-            SourceData signature = GetListItemSignature(cur, section.bounds.second, content);
-            
-            // Retrieve any extra lines after signature
-            if (!content.empty()) {
-                dataStream << content;
-                
-                // WARN: not a preformatted code block
-                std::stringstream ss;
-                ss << SectionName(section.type) << " " << FormattingWarningMesssage;
-
-                BlockIterator nameBlock = ListItemNameBlock(sectionCur, section.bounds.second);
-                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, cur, section.bounds, parser.sourceData);
-                result.first.warnings.push_back(Warning(ss.str(),
-                                                        IndentationWarning,
-                                                        sourceBlock));
-            }
-            
-            sectionCur = FirstContentBlock(cur, section.bounds.second);
-        }
-        else if (sectionCur->type == CodeBlockType) {
-
-            dataStream << sectionCur->content; // well formatted content, stream it up
+        if (sectionCur->type == CodeBlockType) {
+            // Well formatted content, stream it up
+            dataStream << sectionCur->content;
         }
         else {
-            // Other blocks, process them but warn
+            // Other blocks, process them & warn
             if (sectionCur->type == QuoteBlockBeginType) {
                 sectionCur = SkipToSectionEnd(sectionCur, section.bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
             }
@@ -534,17 +515,89 @@ namespace snowcrash {
                 return result;
             dataStream << MapSourceData(parser.sourceData, sectionCur->sourceMap);
             
-            // WARN: not a preformatted code block
+            // WARN: Not a preformatted code block
             std::stringstream ss;
-            ss << SectionName(section.type) << " " << FormattingWarningMesssage;
+
+            // Build the warning message
+            size_t level = CodeBlockIndentationLevel(section);
+            if (section.type == DanglingBodySectionType ||
+                section.type == DanglingSchemaSectionType) {
+                
+                ss << "dangling " << SectionName(section.type) << ", ";
+                ss << "expected a pre-formatted code block, indent every of its line by ";
+                ss << level * 4 << " spaces or " << level << " tabs";
+            }
+            else {
+
+                ss << SectionName(section.type) << " ";
+                ss << "is expected to be a pre-formatted code block, every of its line indented by exactly ";
+                ss << level * 4 << " spaces or " << level << " tabs";
+            }
             
             SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, cur, section.bounds, parser.sourceData);
             result.first.warnings.push_back(Warning(ss.str(),
-                                                    FormattingWarning,
+                                                    IndentationWarning,
                                                     sourceBlock));
         }
         
         data = dataStream.str();
+        sourceMap = sectionCur->sourceMap;
+        
+        if (sectionCur != section.bounds.second)
+            result.second = ++sectionCur;
+        
+        return result;
+    }
+    
+    /**
+     *  \brief  Parses list (item) block as a preformatted code block.
+     *  \param  section     Actual section being parsed.
+     *  \param  cur         Cursor within the section boundaries.
+     *  \param  parser      Parser instance.
+     *  \param  action      An output data buffer.
+     *  \param  sourceMap   An output source map buffer.
+     *  \return A block parser section result, pointing at the last block parsed.
+     */
+    FORCEINLINE ParseSectionResult ParseListPreformattedBlock(const BlueprintSection& section,
+                                                              const BlockIterator& cur,
+                                                              BlueprintParserCore& parser,
+                                                              SourceData& data,
+                                                              SourceDataBlock& sourceMap) {
+        
+        ParseSectionResult result = std::make_pair(Result(), cur);
+        BlockIterator sectionCur = cur;
+        
+        if (sectionCur != section.bounds.first) {
+            // Parse subsequent blocks as standalone pre blocks.
+            return ParsePreformattedBlock(section, sectionCur, parser, data, sourceMap);
+        }
+
+        // Parse first block of list, throwing away its first line (signature)
+        SourceData content;
+        SourceData signature = GetListItemSignature(cur, section.bounds.second, content);
+
+        // Retrieve any extra lines after signature & warn
+        if (!content.empty()) {
+
+            data = content;
+            
+            // WARN: not a preformatted code block
+            std::stringstream ss;
+            
+            size_t level = CodeBlockIndentationLevel(section);
+            ss << SectionName(section.type) << " ";
+            ss << "is expected to be a pre-formatted code block, separate it by a newline and ";
+            ss << "indent every of its line by ";
+            ss << level * 4 << " spaces or " << level << " tabs";
+            
+            BlockIterator nameBlock = ListItemNameBlock(sectionCur, section.bounds.second);
+            SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, cur, section.bounds, parser.sourceData);
+            result.first.warnings.push_back(Warning(ss.str(),
+                                                    IndentationWarning,
+                                                    sourceBlock));
+        }
+        
+        sectionCur = FirstContentBlock(cur, section.bounds.second);
         sourceMap = sectionCur->sourceMap;
         
         if (sectionCur != section.bounds.second)

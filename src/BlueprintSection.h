@@ -63,9 +63,11 @@ namespace snowcrash {
                 return "response";
                 
             case BodySectionType:
+            case DanglingBodySectionType:
                 return "message-body";
                 
             case SchemaSectionType:
+            case DanglingSchemaSectionType:
                 return "message-schema";
                 
             case HeadersSectionType:

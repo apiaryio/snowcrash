@@ -229,7 +229,7 @@ TEST_CASE("Parse adjacent asset blocks", "[parser][issue][#9]")
     Blueprint blueprint;
     parser.parse(blueprintSource, 0, result, blueprint);
     REQUIRE(result.error.code == Error::OK);
-    REQUIRE(result.warnings.size() == 3);
+    REQUIRE(result.warnings.size() == 1);
     
     REQUIRE(blueprint.resourceGroups.size() == 1);
     REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
@@ -271,7 +271,7 @@ TEST_CASE("Parse adjacent nested asset blocks", "[parser][issue][crash][#9]")
     Blueprint blueprint;
     parser.parse(blueprintSource, 0, result, blueprint);
     REQUIRE(result.error.code == Error::OK);
-    CHECK(result.warnings.size() == 3);
+    CHECK(result.warnings.size() == 2);
     
     REQUIRE(blueprint.resourceGroups.size() == 1);
     REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
@@ -322,6 +322,6 @@ TEST_CASE("SIGTERM parsing blueprint", "[parser][issue][#45]")
     Blueprint blueprint;
     parser.parse(blueprintSource, 0, result, blueprint);
     REQUIRE(result.error.code == 0);
-    REQUIRE(result.warnings.size() == 5);
+    REQUIRE(result.warnings.size() == 4);
 }
 

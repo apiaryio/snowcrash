@@ -357,7 +357,7 @@ TEST_CASE("Parse payload with foreign block", "[payload][foreign][block]")
     ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, payload);
     
     REQUIRE(result.first.error.code == Error::OK);
-    REQUIRE(result.first.warnings.size() == 2); // preformatted body content & dangling body
+    REQUIRE(result.first.warnings.size() == 1); // dangling body
     
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 12);

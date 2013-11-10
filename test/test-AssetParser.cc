@@ -236,7 +236,7 @@ TEST_CASE("Parse body asset followed by other blocks", "[asset][foreign][danglin
     ParseSectionResult result = AssetParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, asset);
     
     REQUIRE(result.first.error.code == Error::OK);
-    REQUIRE(result.first.warnings.size() == 2);
+    REQUIRE(result.first.warnings.size() == 1);
     
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 7);

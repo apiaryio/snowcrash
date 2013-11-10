@@ -196,29 +196,31 @@ namespace snowcrash {
             
             // Skip any closing list blocks
             BlockIterator sectionCur = CloseList(cur, section.bounds.second);
+            return HandleAssetSectionBlock(section, sectionCur, parser, asset);
             
-            SectionType originalSection = (section.type == DanglingSchemaSectionType) ? SchemaSectionType : BodySectionType;
-            SourceData data;
-            SourceDataBlock sourceMap;
-            ParseSectionResult result = ParseListPreformattedBlock(section,
-                                                                   sectionCur,
-                                                                   parser,
-                                                                   data,
-                                                                   sourceMap);
-            if (result.first.error.code != Error::OK ||
-                data.empty())
-                return result;
-            
-            asset += data;
-            
-            // WARN: Dangling block
-            std::stringstream ss;
-            ss << "dangling " << SectionName(originalSection);
-            ss << ", increase its indentation to nest it properly";
-            result.first.warnings.push_back(Warning(ss.str(),
-                                                    FormattingWarning,
-                                                    MapSourceDataBlock(sourceMap, parser.sourceData)));
-            return result;
+////            SectionType originalSection = (section.type == DanglingSchemaSectionType) ? SchemaSectionType : BodySectionType;
+//            SourceData data;
+//            SourceDataBlock sourceMap;
+//            ParseSectionResult result = ParseListPreformattedBlock(section,
+//                                                                   sectionCur,
+//                                                                   parser,
+//                                                                   data,
+//                                                                   sourceMap);
+//            if (result.first.error.code != Error::OK ||
+//                data.empty())
+//                return result;
+//            
+//            asset += data;
+
+// TODO: remove
+//            // WARN: Dangling block
+//            std::stringstream ss;
+//            ss << "dangling " << SectionName(originalSection);
+//            ss << ", increase its indentation to nest it properly";
+//            result.first.warnings.push_back(Warning(ss.str(),
+//                                                    FormattingWarning,
+//                                                    MapSourceDataBlock(sourceMap, parser.sourceData)));
+            //return result;
         }
 
     };
