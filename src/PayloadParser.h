@@ -18,6 +18,7 @@
 #include "ListUtility.h"
 #include "AssetParser.h"
 #include "HeaderParser.h"
+#include "DescriptionSectionUtility.h"
 
 /** Media type in brackets regex */
 #define MEDIA_TYPE "([[:blank:]]*\\(([^\\)]*)\\))"
@@ -238,7 +239,7 @@ namespace snowcrash {
                 case ResponseSectionType:
                 case ObjectSectionType:
                 case ModelSectionType:
-                    result = HandleOverviewSectionBlock(section, cur, parser, payload);
+                    result = HandleDescriptionSectionBlock(section, cur, parser, payload);
                     break;
                     
                 case RequestBodySectionType:
@@ -274,7 +275,7 @@ namespace snowcrash {
         }
         
         /**
-         *  \brief  Parse Payload's overview blocks.
+         *  \brief  Parse Payload's description blocks.
          *  \param  section The current section's signature.
          *  \param  cur     The actual position within Markdown block buffer.
          *  \param  bound   Boundaries of Markdown block buffer.
@@ -282,48 +283,32 @@ namespace snowcrash {
          *  \param  payload An output buffer to write overview description into.
          *  \return A block parser section result.
          */
-        static ParseSectionResult HandleOverviewSectionBlock(const BlueprintSection& section,
-                                                             const BlockIterator& cur,
-                                                             BlueprintParserCore& parser,
-                                                             Payload& payload) {
+        static ParseSectionResult HandleDescriptionSectionBlock(const BlueprintSection& section,
+                                                                const BlockIterator& cur,
+                                                                BlueprintParserCore& parser,
+                                                                Payload& payload) {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
             BlockIterator sectionCur = cur;
 
+            // Signature
             if (sectionCur == section.bounds.first) {
-                // Signature
+
                 ProcessSignature(section, sectionCur, parser.sourceData, result.first, payload);
                 sectionCur = FirstContentBlock(cur, section.bounds.second);
-            }
-            else {
-                // Description
-                if (sectionCur->type == QuoteBlockBeginType) {
-                    sectionCur = SkipToSectionEnd(sectionCur, section.bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
-                }
-                else if (sectionCur->type == ListBlockBeginType) {
 
-                    SourceDataBlock descriptionMap;
-                    sectionCur = SkipToDescriptionListEnd<Payload>(sectionCur, section.bounds.second, descriptionMap);
-                    
-                    if (sectionCur->type != ListBlockEndType) {
-                        // Found recognized section in description
-                        if (!descriptionMap.empty())
-                            payload.description += MapSourceData(parser.sourceData, descriptionMap);
-
-                        result.second = sectionCur;
-                        return result;
-                    }
-                }
-                
-                if (!CheckCursor(section, sectionCur, parser.sourceData, result.first))
-                    return result;
-                payload.description += MapSourceData(parser.sourceData, sectionCur->sourceMap);
-            }
-            
-            if (sectionCur != section.bounds.second)
                 result.second = ++sectionCur;
-            
+                return result;
+                
+            }
+
+            // Description
+            result = ParseDescriptionBlock<Payload>(section,
+                                                    sectionCur,
+                                                    parser.sourceData,
+                                                    payload);
             return result;
+
         }
         
         /**
@@ -504,7 +489,7 @@ namespace snowcrash {
             
             // Check signature
             if (!CheckSignature(section, cur, signature, sourceData, result)) {
-                // Clear and readouts
+                // Clear all readouts
                 payload.name.clear();
                 mediaType.clear();
                 remainingContent.clear();

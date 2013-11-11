@@ -23,10 +23,10 @@ namespace snowcrash {
      *  \return Standard parser section result poinitng at the last block parsed.
      */
     template <class T>
-    FORCEINLINE ParseSectionResult ParserDescriptionBlock(const BlueprintSection& section,
-                                                          const BlockIterator& cur,
-                                                          const SourceData& sourceData,
-                                                          T& output) {
+    FORCEINLINE ParseSectionResult ParseDescriptionBlock(const BlueprintSection& section,
+                                                         const BlockIterator& cur,
+                                                         const SourceData& sourceData,
+                                                         T& output) {
         
         ParseSectionResult result = std::make_pair(Result(), cur);
         BlockIterator sectionCur(cur);

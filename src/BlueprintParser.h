@@ -146,7 +146,7 @@ namespace snowcrash {
             }
             
             // Description
-            result = ParserDescriptionBlock<Blueprint>(section, sectionCur, parser.sourceData, output);
+            result = ParseDescriptionBlock<Blueprint>(section, sectionCur, parser.sourceData, output);
             
             // Check Name
             if (isFirstBlock)

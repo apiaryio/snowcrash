@@ -208,7 +208,7 @@ namespace snowcrash {
                 return result;
             }
             
-            result = ParserDescriptionBlock<Action>(section,
+            result = ParseDescriptionBlock<Action>(section,
                                                     sectionCur,
                                                     parser.sourceData,
                                                     action);

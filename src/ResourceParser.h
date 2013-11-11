@@ -16,6 +16,7 @@
 #include "RegexMatch.h"
 #include "StringUtility.h"
 #include "ParametersParser.h"
+#include "DescriptionSectionUtility.h"
 
 static const std::string ResourceHeaderRegex("^[ \\t]*((" HTTP_METHODS ")[ \\t]+)?(" URI_TEMPLATE ")$");
 static const std::string NamedResourceHeaderRegex("^[ \\t]*(" SYMBOL_IDENTIFIER ")[ \\t]+\\[(" URI_TEMPLATE ")]$");
@@ -169,7 +170,7 @@ namespace snowcrash {
             ParseSectionResult result = std::make_pair(Result(), cur);
             switch (section.type) {
                 case ResourceSectionType:
-                    result = HandleResourceOverviewBlock(section, cur, parser, resource);
+                    result = HandleResourceDescriptionBlock(section, cur, parser, resource);
                     break;
                     
                 case ResourceMethodSectionType:
@@ -210,45 +211,28 @@ namespace snowcrash {
             return result;
         }
         
-        static ParseSectionResult HandleResourceOverviewBlock(const BlueprintSection& section,
-                                                              const BlockIterator& cur,
-                                                              BlueprintParserCore& parser,
-                                                              Resource& resource) {
+        static ParseSectionResult HandleResourceDescriptionBlock(const BlueprintSection& section,
+                                                                 const BlockIterator& cur,
+                                                                 BlueprintParserCore& parser,
+                                                                 Resource& resource) {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
             BlockIterator sectionCur(cur);
+            
+            // Retrieve URI            
             if (cur->type == HeaderBlockType &&
                 cur == section.bounds.first) {
                 
-                // Retrieve URI
                 HTTPMethod method;
                 GetResourceSignature(*cur, resource.name, resource.uriTemplate, method);
+                result.second = ++sectionCur;
+                return result;
             }
-            else {
-                
-                if (cur->type == QuoteBlockBeginType) {
-                    sectionCur = SkipToSectionEnd(sectionCur, section.bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
-                }
-                else if (cur->type == ListBlockBeginType) {
-                    
-                    SourceDataBlock descriptionMap;
-                    sectionCur = SkipToDescriptionListEnd<Resource>(sectionCur, section.bounds.second, descriptionMap);
-                    
-                    if (sectionCur->type != ListBlockEndType) {
-                        if (!descriptionMap.empty())
-                            resource.description += MapSourceData(parser.sourceData, descriptionMap);
-                        
-                        result.second = sectionCur;
-                        return result;
-                    }
-                }
-                
-                if (!CheckCursor(section, sectionCur, parser.sourceData, result.first))
-                    return result;
-                resource.description += MapSourceData(parser.sourceData, sectionCur->sourceMap);
-            }
-            
-            result.second = ++sectionCur;
+
+            result = ParseDescriptionBlock<Resource>(section,
+                                                      sectionCur,
+                                                      parser.sourceData,
+                                                      resource);
             return result;
         }
         

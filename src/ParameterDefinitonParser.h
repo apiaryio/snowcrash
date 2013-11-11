@@ -15,6 +15,7 @@
 #include "ListUtility.h"
 #include "RegexMatch.h"
 #include "StringUtility.h"
+#include "DescriptionSectionUtility.h"
 
 /** Parameter Value regex */
 #define PARAMETER_VALUE "`([^`]+)`"
@@ -207,32 +208,12 @@ namespace snowcrash {
             }
 
             // Description
-            if (sectionCur->type == QuoteBlockBeginType) {
-                sectionCur = SkipToSectionEnd(sectionCur, section.bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
-            }
-            else if (sectionCur->type == ListBlockBeginType) {
-                
-                SourceDataBlock descriptionMap;
-                sectionCur = SkipToDescriptionListEnd<Parameter>(sectionCur, section.bounds.second, descriptionMap);
-                
-                if (sectionCur->type != ListBlockEndType) {
-                    if (!descriptionMap.empty())
-                        parameter.description += MapSourceData(parser.sourceData, descriptionMap);
-                    
-                    result.second = sectionCur;
-                    return result;
-                }
-            }
-            
-            if (!CheckCursor(section, sectionCur, parser.sourceData, result.first))
-                return result;
-
-            parameter.description += MapSourceData(parser.sourceData, sectionCur->sourceMap);
-            
-            if (sectionCur != section.bounds.second)
-                result.second = ++sectionCur;
-            
+            result = ParseDescriptionBlock<Parameter>(section,
+                                                       sectionCur,
+                                                       parser.sourceData,
+                                                       parameter);
             return result;
+            
         }
         
         /**
@@ -278,7 +259,6 @@ namespace snowcrash {
                     parameter.description += remainingContent;
                     parameter.description += "\n";
                 }
-                
                 
                 // Check possible required vs default clash
                 if (parameter.use != OptionalParameterUse &&

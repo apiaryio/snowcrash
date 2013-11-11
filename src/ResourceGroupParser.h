@@ -116,35 +116,22 @@ namespace snowcrash {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
             BlockIterator sectionCur(cur);
+
+            // Group Name
             if (sectionCur == section.bounds.first) {
                 
                 GetResourceGroupSignature(*cur, group.name);
-            }
-            else {
-                if (sectionCur == section.bounds.first) {
-                    
-                    // WARN: No Group name specified
-                    SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, section.bounds.second, section.bounds, parser.sourceData);
-                    result.first.warnings.push_back(Warning("expected resource group name, e.g. '# <Group Name>'",
-                                                            EmptyDefinitionWarning,
-                                                            sourceBlock));
-                }
-                
-                
-                if (sectionCur->type == QuoteBlockBeginType) {
-                    sectionCur = SkipToSectionEnd(cur, section.bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
-                }
-                else if (sectionCur->type == ListBlockBeginType) {
-                    sectionCur = SkipToSectionEnd(cur, section.bounds.second, ListBlockBeginType, ListBlockEndType);
-                }
-                
-                if (!CheckCursor(section, sectionCur, parser.sourceData, result.first))
-                    return result;
-                group.description += MapSourceData(parser.sourceData, sectionCur->sourceMap);
+                result.second = ++sectionCur;
+                return result;
             }
             
-            result.second = ++sectionCur;
+            // Group Description
+            result = ParseDescriptionBlock<ResourceGroup>(section,
+                                                           sectionCur,
+                                                           parser.sourceData,
+                                                           group);
             return result;
+            
         }
         
         static ParseSectionResult HandleResource(const BlueprintSection& section,
