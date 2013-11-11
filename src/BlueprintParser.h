@@ -49,14 +49,10 @@ namespace snowcrash {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
             
-            if ((section.type != BlueprintSectionType) &&
-                !CheckBlueprintName(*cur, parser, result.first))
-                return result;
-            
             switch (section.type) {
                     
                 case BlueprintSectionType:
-                    result = HandleBlueprintOverviewBlock(section, cur, parser, output);
+                    result = HandleBlueprintDescriptionBlock(section, cur, parser, output);
                     break;
                     
                 case ResourceGroupSectionType:
@@ -72,18 +68,38 @@ namespace snowcrash {
         }
         
         // Checks blueprint name. Returns true on success, false otherwise
-        static bool CheckBlueprintName(const MarkdownBlock& block, BlueprintParserCore& parser, Result& result) {
-            if (!(parser.options & RequireBlueprintNameOption))
+        
+        /**
+         *  \brief  Checks API Blueprint name issues warning or error if name does not exists.
+         *  \param  cur     Cursor to the expected name header block
+         *  \param  blueprint   Blueprint to check.
+         *  \param  parser  A parser's instance.
+         *  \param  result  Check result report.
+         *  \result Returns false if a name is missing AND RequireBlueprintNameOption is set. True otherwise.
+         */
+        static bool CheckBlueprintName(const BlockIterator& cur,
+                                       const Blueprint& blueprint,
+                                       BlueprintParserCore& parser,
+                                       Result& result) {
+
+            if (!blueprint.name.empty())
                 return true;
-            
-            if (!parser.blueprint.name.empty())
-                return true;
-            
-            // ERR: No API name specified
-            result.error = Error(ExpectedAPINameMessage,
-                                 BusinessError,
-                                 MapSourceDataBlock(block.sourceMap, parser.sourceData));
-            return false;
+
+            if (parser.options & RequireBlueprintNameOption) {
+                
+                // ERR: No API name specified
+                result.error = Error(ExpectedAPINameMessage,
+                                     BusinessError,
+                                     MapSourceDataBlock(cur->sourceMap, parser.sourceData));
+                return false;
+            }
+
+            // WARN: No API name specified
+            result.warnings.push_back(Warning(ExpectedAPINameMessage,
+                                              APINameWarning,
+                                              MapSourceDataBlock(cur->sourceMap, parser.sourceData)));
+
+            return true;
         }
         
         // Returns true if given block is first block in document
@@ -98,54 +114,44 @@ namespace snowcrash {
             return std::distance(bounds.first, cur) == 1;
         }
 
-        static ParseSectionResult HandleBlueprintOverviewBlock(const BlueprintSection& section,
-                                                               const BlockIterator& cur,
-                                                               BlueprintParserCore& parser,
-                                                               Blueprint& output) {
+        static ParseSectionResult HandleBlueprintDescriptionBlock(const BlueprintSection& section,
+                                                                  const BlockIterator& cur,
+                                                                  BlueprintParserCore& parser,
+                                                                  Blueprint& output) {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
             BlockIterator sectionCur(cur);
-            if (cur->type == HeaderBlockType &&
-                IsFirstBlock(cur, section.bounds, output)) {
+
+            // API Name
+            bool isFirstBlock = IsFirstBlock(cur, section.bounds, output);
+            if (isFirstBlock &&
+                sectionCur->type == HeaderBlockType) {
+                
                 output.name = cur->content;
-            }
-            else {
-                if (sectionCur == section.bounds.first &&
-                    sectionCur->type == ParagraphBlockType) {
-                    
-                    // Try to parse first paragraph as metadata
-                    result = ParseMetadataBlock(sectionCur, section.bounds, parser, output);
-                    if (result.second != sectionCur)
-                        return result;
-                }
-                
-                if (sectionCur->type == QuoteBlockBeginType) {
-                    sectionCur = SkipToSectionEnd(cur, section.bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
-                }
-                else if (sectionCur->type == ListBlockBeginType) {
-                    sectionCur = SkipToSectionEnd(cur, section.bounds.second, ListBlockBeginType, ListBlockEndType);
-                }
-                
-                if (IsFirstBlock(cur, section.bounds, output)) {
-                    if (parser.options & RequireBlueprintNameOption) {
-                        if (!CheckBlueprintName(*sectionCur, parser, result.first))
-                            return result;
-                    }
-                    else {
-                        // WARN: No API name specified
-                        SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, cur, section.bounds, parser.sourceData);
-                        result.first.warnings.push_back(Warning(ExpectedAPINameMessage,
-                                                                APINameWarning,
-                                                                sourceBlock));
-                    }
-                }
-                
-                if (!CheckCursor(section, sectionCur, parser.sourceData, result.first))
+                // Check Name
+                if (!CheckBlueprintName(sectionCur, output, parser, result.first))
                     return result;
-                output.description += MapSourceData(parser.sourceData, sectionCur->sourceMap);
+                
+                result.second = ++sectionCur;
+                return result;
             }
             
-            result.second = ++sectionCur;
+            // Metadata
+            if (isFirstBlock &&
+                sectionCur->type == ParagraphBlockType) {
+                
+                result = ParseMetadataBlock(sectionCur, section.bounds, parser, output);
+                if (result.second != sectionCur)
+                    return result;
+            }
+            
+            // Description
+            result = ParserDescriptionBlock<Blueprint>(section, sectionCur, parser.sourceData, output);
+            
+            // Check Name
+            if (isFirstBlock)
+                CheckBlueprintName(sectionCur, output, parser, result.first);
+            
             return result;
         }
         
@@ -154,12 +160,21 @@ namespace snowcrash {
                                                       BlueprintParserCore& parser,
                                                       Blueprint& output)
         {
+            
+            // Mandatory name check
+            ParseSectionResult result = std::make_pair(Result(), cur);
+            if (IsFirstBlock(cur, section.bounds, output) &&
+                !CheckBlueprintName(cur, output, parser, result.first))
+                return result;
+            
+            // Parser resource group
             ResourceGroup resourceGroup;
-            ParseSectionResult result = ResourceGroupParser::Parse(cur,
-                                                                   section.bounds.second,
-                                                                   section,
-                                                                   parser,
-                                                                   resourceGroup);
+            result = ResourceGroupParser::Parse(cur,
+                                                section.bounds.second,
+                                                section,
+                                                parser,
+                                                resourceGroup);
+
             if (result.first.error.code != Error::OK)
                 return result;
             
@@ -294,16 +309,22 @@ namespace snowcrash {
             PostParseCheck(sourceData, source, parser, result);
         }
         
-        // Perform additional post-parsing result checks
+        /** 
+         *  Perform additional post-parsing result checks.
+         *  Mainly to focused on running checking when top-level parser is not executed.
+         */
         static void PostParseCheck(const SourceData& sourceData,
                                    const MarkdownBlock::Stack& source,
                                    BlueprintParserCore& parser,
                                    Result& result) {
             
-            if (parser.options & RequireBlueprintNameOption) {
-                MarkdownBlock b;
-                b.sourceMap = MakeSourceDataBlock(0, 0);
-                BlueprintParserInner::CheckBlueprintName(b, parser, result);
+            if ((parser.options & RequireBlueprintNameOption) &&
+                parser.blueprint.name.empty()){
+                
+                // ERR: No API name specified
+                result.error = Error(ExpectedAPINameMessage,
+                                     BusinessError,
+                                     MapSourceDataBlock(MakeSourceDataBlock(0, 0), parser.sourceData));
             }
         }
     };

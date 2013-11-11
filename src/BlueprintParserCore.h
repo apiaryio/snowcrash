@@ -100,7 +100,9 @@ namespace snowcrash {
      */
     template <class T>
     SectionType ClassifyInternaListBlock(const BlockIterator& begin,
-                                         const BlockIterator& end);
+                                         const BlockIterator& end) {
+        return UndefinedSectionType;        
+    }
         
     /**
      *  \brief Block Classifier prototype.

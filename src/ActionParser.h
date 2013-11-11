@@ -16,6 +16,7 @@
 #include "HeaderParser.h"
 #include "ParametersParser.h"
 #include "HTTP.h"
+#include "DescriptionSectionUtility.h"
 
 static const std::string ActionHeaderRegex("^(" HTTP_METHODS ")[ \\t]*(" URI_TEMPLATE ")?$");
 static const std::string NamedActionHeaderRegex("^([^\\[]*)\\[(" HTTP_METHODS ")]$");
@@ -145,7 +146,7 @@ namespace snowcrash {
             
             switch (section.type) {
                 case ActionSectionType:
-                    result = HandleActionOverviewBlock(section, cur, parser, action);
+                    result = HandleActionDescriptionBlock(section, cur, parser, action);
                     break;
 
                 case ParametersSectionType:
@@ -191,43 +192,26 @@ namespace snowcrash {
             return result;
         }
         
-        static ParseSectionResult HandleActionOverviewBlock(const BlueprintSection& section,
-                                                            const BlockIterator& cur,
-                                                            BlueprintParserCore& parser,
-                                                            Action& action) {
+        static ParseSectionResult HandleActionDescriptionBlock(const BlueprintSection& section,
+                                                               const BlockIterator& cur,
+                                                               BlueprintParserCore& parser,
+                                                               Action& action) {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
             BlockIterator sectionCur(cur);
+            
             if (cur->type == HeaderBlockType &&
                 cur == section.bounds.first) {
                 
                 GetActionSignature(*cur, action.name, action.method);
-            }
-            else {
-                
-                if (sectionCur->type == QuoteBlockBeginType) {
-                    sectionCur = SkipToSectionEnd(sectionCur, section.bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
-                }
-                else if (sectionCur->type == ListBlockBeginType) {
-                    
-                    SourceDataBlock descriptionMap;
-                    sectionCur = SkipToDescriptionListEnd<Action>(sectionCur, section.bounds.second, descriptionMap);
-                    
-                    if (sectionCur->type != ListBlockEndType) {
-                        if (!descriptionMap.empty())
-                            action.description += MapSourceData(parser.sourceData, descriptionMap);
-                        
-                        result.second = sectionCur;
-                        return result;
-                    }
-                }
-                
-                if (!CheckCursor(section, sectionCur, parser.sourceData, result.first))
-                    return result;
-                action.description += MapSourceData(parser.sourceData, sectionCur->sourceMap);
+                result.second = ++sectionCur;
+                return result;
             }
             
-            result.second = ++sectionCur;
+            result = ParserDescriptionBlock<Action>(section,
+                                                    sectionCur,
+                                                    parser.sourceData,
+                                                    action);
             return result;
         }
         

@@ -51,6 +51,8 @@
 		BBA91DC2171D402600649B05 /* BlueprintParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA91DC0171D402600649B05 /* BlueprintParser.h */; };
 		BBB0F42A1731CE0D00C92465 /* RegexMatch.h in Headers */ = {isa = PBXBuildFile; fileRef = BBB0F4281731CE0D00C92465 /* RegexMatch.h */; };
 		BBB0F42C1731D04900C92465 /* test-RegexMatch.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB0F42B1731D04900C92465 /* test-RegexMatch.cc */; };
+		BBC2D85F18301FEC00FBCEA7 /* CodeBlockUtility.h in Headers */ = {isa = PBXBuildFile; fileRef = BBC2D85E18301FEC00FBCEA7 /* CodeBlockUtility.h */; };
+		BBC2D861183024C100FBCEA7 /* DescriptionSectionUtility.h in Headers */ = {isa = PBXBuildFile; fileRef = BBC2D860183024C100FBCEA7 /* DescriptionSectionUtility.h */; };
 		BBD5F9C917353C310049BBEE /* ResourceGroupParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD5F9C717353C300049BBEE /* ResourceGroupParser.h */; };
 		BBD5F9CE17353CE00049BBEE /* ResourceParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD5F9CC17353CE00049BBEE /* ResourceParser.h */; };
 		BBD5F9D21735439B0049BBEE /* ParserCore.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD5F9D11735439B0049BBEE /* ParserCore.cc */; };
@@ -180,6 +182,8 @@
 		BBB0F4281731CE0D00C92465 /* RegexMatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RegexMatch.h; path = src/RegexMatch.h; sourceTree = "<group>"; };
 		BBB0F42B1731D04900C92465 /* test-RegexMatch.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-RegexMatch.cc"; path = "test/test-RegexMatch.cc"; sourceTree = "<group>"; };
 		BBB2A226173EA77A0020C1CE /* StringUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = StringUtility.h; path = src/StringUtility.h; sourceTree = "<group>"; };
+		BBC2D85E18301FEC00FBCEA7 /* CodeBlockUtility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CodeBlockUtility.h; path = src/CodeBlockUtility.h; sourceTree = "<group>"; };
+		BBC2D860183024C100FBCEA7 /* DescriptionSectionUtility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DescriptionSectionUtility.h; path = src/DescriptionSectionUtility.h; sourceTree = "<group>"; };
 		BBD5F9C717353C300049BBEE /* ResourceGroupParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = ResourceGroupParser.h; path = src/ResourceGroupParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BBD5F9CC17353CE00049BBEE /* ResourceParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = ResourceParser.h; path = src/ResourceParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BBD5F9CF1735413A0049BBEE /* BlueprintParserCore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = BlueprintParserCore.h; path = src/BlueprintParserCore.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
@@ -320,6 +324,8 @@
 				BBA91DC0171D402600649B05 /* BlueprintParser.h */,
 				BBD5F9CF1735413A0049BBEE /* BlueprintParserCore.h */,
 				BBF46B911824554A009029DA /* BlueprintSection.h */,
+				BBC2D85E18301FEC00FBCEA7 /* CodeBlockUtility.h */,
+				BBC2D860183024C100FBCEA7 /* DescriptionSectionUtility.h */,
 				BB1D4D07174D0828009BCB1C /* HeaderParser.h */,
 				BB1EC203173FD06600CFB84A /* ListUtility.h */,
 				BB03DC6717D3721600C51E52 /* ParameterDefinitonParser.h */,
@@ -445,9 +451,11 @@
 				BB740998171C065C0023105F /* MarkdownBlock.h in Headers */,
 				BBA91DC2171D402600649B05 /* BlueprintParser.h in Headers */,
 				BB86DEC31723E3C600063644 /* src_map.h in Headers */,
+				BBC2D861183024C100FBCEA7 /* DescriptionSectionUtility.h in Headers */,
 				BBF46B921824554A009029DA /* BlueprintSection.h in Headers */,
 				BBB0F42A1731CE0D00C92465 /* RegexMatch.h in Headers */,
 				BBD5F9C917353C310049BBEE /* ResourceGroupParser.h in Headers */,
+				BBC2D85F18301FEC00FBCEA7 /* CodeBlockUtility.h in Headers */,
 				BBD5F9CE17353CE00049BBEE /* ResourceParser.h in Headers */,
 				BBE57061173927870086CE22 /* PayloadParser.h in Headers */,
 				BBE53561174132B100BCA7AD /* Serialize.h in Headers */,
@@ -708,11 +716,13 @@
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
 				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_SIGN_COMPARE = YES;
@@ -737,7 +747,9 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
 				GCC_OPTIMIZATION_LEVEL = 1;
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_SIGN_COMPARE = YES;

@@ -73,7 +73,7 @@ TEST_CASE("bpparser/init", "Blueprint parser construction")
     REQUIRE_NOTHROW(::delete parser);
 }
 
-TEST_CASE("Parse canonical blueprint", "[blueprint]")
+TEST_CASE("Parse canonical blueprint", "[blueprint][block]")
 {
     MarkdownBlock::Stack markdown = CanonicalBlueprintFixture();
     
@@ -214,7 +214,7 @@ TEST_CASE("bpparser/parse-name-resource", "Parse API with Name and resouce")
     REQUIRE(resource.description == "3");
 }
 
-TEST_CASE("bpparser/parse-nameless-description", "Parse nameless blueprint description")
+TEST_CASE("Parse nameless blueprint description", "[blueprint][blocks]")
 {
     // Blueprint in question:
     //R"(A
@@ -414,7 +414,7 @@ TEST_CASE("bpparser/parse-metadata", "Parse blueprint that starts with metadata"
     REQUIRE(blueprint.metadata[1].second == "bar");
 }
 
-TEST_CASE("bpparser/parser-options-name", "Test parser options - required blueprint name")
+TEST_CASE("Test parser options - required blueprint name", "[blueprint][block]")
 {
     // Blueprint in question:
     //R"(
@@ -436,7 +436,7 @@ TEST_CASE("bpparser/parser-options-name", "Test parser options - required bluepr
     REQUIRE(result.error.code != Error::OK);
 }
 
-TEST_CASE("bpparser/empty-blueprint-required-name", "Test required blueprint name on empty blueprint")
+TEST_CASE("Test required blueprint name on empty blueprint", "[blueprint][block]")
 {
     Result result;
     Blueprint blueprint;

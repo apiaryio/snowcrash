@@ -39,6 +39,8 @@
         'src/BlueprintParserCore.h',
         'src/BlueprintSection.h'
         'src/BlueprintUtility.h',
+        'src/CodeBlockUtility.h',
+        'src/DescriptionSectionUtility.h',
         'src/HeaderParser.h',
         'src/HTTP.h',
         'src/HTTP.cc',
