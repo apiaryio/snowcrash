@@ -9,8 +9,10 @@
 #ifndef SNOWCRASH_DESCRIPTIONSECTIONUTILITY_H
 #define SNOWCRASH_DESCRIPTIONSECTIONUTILITY_H
 
+#include <sstream>
 #include "MarkdownBlock.h"
 #include "BlueprintParserCore.h"
+#include "CodeBlockUtility.h"
 
 namespace snowcrash {
     
@@ -47,6 +49,10 @@ namespace snowcrash {
                 result.second = sectionCur;
                 return result;
             }
+        }
+        else if (sectionCur->type == CodeBlockType) {
+            // Check code block for potential excessive indentation of a list item
+            CheckCodeBlockListItem<T>(section, sectionCur, sourceData, result.first);
         }
         
         if (!CheckCursor(section, sectionCur, sourceData, result.first))

@@ -176,11 +176,12 @@ namespace snowcrash {
 
             SourceData data;
             SourceDataBlock sourceMap;
-            ParseSectionResult result = ParseListPreformattedBlock(section,
-                                                                   cur,
-                                                                   parser,
-                                                                   data,
-                                                                   sourceMap);
+            // NOTE: Use `Payload` traits for parsing pre-formatted list block.
+            ParseSectionResult result = ParseListPreformattedBlock<Payload>(section,
+                                                                            cur,
+                                                                            parser,
+                                                                            data,
+                                                                            sourceMap);
             if (result.first.error.code != Error::OK ||
                 parser.sourceData.empty())
                 return result;

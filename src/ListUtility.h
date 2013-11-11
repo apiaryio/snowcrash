@@ -461,6 +461,7 @@ namespace snowcrash {
      *  \param  sourceMap   An output source map buffer.
      *  \return A block parser section result, pointing at the last block parsed.
      */
+    template <class T>
     FORCEINLINE ParseSectionResult ParseListPreformattedBlock(const BlueprintSection& section,
                                                               const BlockIterator& cur,
                                                               BlueprintParserCore& parser,
@@ -472,7 +473,7 @@ namespace snowcrash {
         
         if (sectionCur != section.bounds.first) {
             // Parse subsequent blocks as standalone pre blocks.
-            return ParsePreformattedBlock(section, sectionCur, parser, data, sourceMap);
+            return ParsePreformattedBlock<T>(section, sectionCur, parser, data, sourceMap);
         }
 
         // Parse first block of list, throwing away its first line (signature)
@@ -488,7 +489,7 @@ namespace snowcrash {
             std::stringstream ss;
             
             size_t level = CodeBlockIndentationLevel(section);
-            ss << SectionName(section.type) << " ";
+            ss << SectionName(section.type) << " asset ";
             ss << "is expected to be a pre-formatted code block, separate it by a newline and ";
             ss << "indent every of its line by ";
             ss << level * 4 << " spaces or " << level << " tabs";

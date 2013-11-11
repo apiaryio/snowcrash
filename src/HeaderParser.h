@@ -121,11 +121,11 @@ namespace snowcrash {
 
             SourceData data;
             SourceDataBlock sourceMap;
-            ParseSectionResult result = ParseListPreformattedBlock(section,
-                                                                   cur,
-                                                                   parser,
-                                                                   data,
-                                                                   sourceMap);
+            ParseSectionResult result = ParseListPreformattedBlock<Header>(section,
+                                                                           cur,
+                                                                           parser,
+                                                                           data,
+                                                                           sourceMap);
             if (result.first.error.code != Error::OK ||
                 parser.sourceData.empty())
                 return result;
