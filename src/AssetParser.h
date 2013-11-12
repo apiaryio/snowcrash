@@ -12,9 +12,9 @@
 #include <sstream>
 #include "BlueprintParserCore.h"
 #include "Blueprint.h"
-#include "ListUtility.h"
 #include "RegexMatch.h"
 #include "StringUtility.h"
+#include "SectionUtility.h"
 
 // Body matching regex
 static const std::string BodyRegex("^[ \\t]*[Bb]ody[ \\t]*$");
@@ -102,7 +102,7 @@ namespace snowcrash {
                 begin->type == ListBlockEndType) {
 
                 // Look ahead for a dangling asset
-                BlockIterator cur = CloseList(begin, end);
+                BlockIterator cur = CloseNestedList(begin, end);
                 if (cur == end)
                     return UndefinedSectionType;
                 
@@ -158,7 +158,7 @@ namespace snowcrash {
                     break;
                     
                 case UndefinedSectionType:
-                    result.second = CloseListItemBlock(cur, section.bounds.second);
+                    result.second = CloseList(cur, section.bounds.second);
                     break;
                     
                 default:
@@ -196,7 +196,7 @@ namespace snowcrash {
                                                                   Asset& asset) {
             
             // Skip any closing list blocks
-            BlockIterator sectionCur = CloseList(cur, section.bounds.second);
+            BlockIterator sectionCur = CloseNestedList(cur, section.bounds.second);
             return HandleAssetSectionBlock(section, sectionCur, parser, asset);
         }
 

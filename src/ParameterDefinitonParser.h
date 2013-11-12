@@ -12,9 +12,10 @@
 #include <sstream>
 #include "BlueprintParserCore.h"
 #include "Blueprint.h"
-#include "ListUtility.h"
 #include "RegexMatch.h"
 #include "StringUtility.h"
+#include "ListBlockUtility.h"
+#include "SectionUtility.h"
 #include "DescriptionSectionUtility.h"
 
 /** Parameter Value regex */
@@ -180,7 +181,7 @@ namespace snowcrash {
                     break;
                     
                 case UndefinedSectionType:
-                    result.second = CloseListItemBlock(cur, section.bounds.second);
+                    result.second = CloseList(cur, section.bounds.second);
                     break;
                     
                 default:
@@ -392,7 +393,7 @@ namespace snowcrash {
             BlockIterator endCur = cur;
             if (endCur->type == ListBlockBeginType)
                 ++endCur;
-            endCur = SkipToSectionEnd(endCur, section.bounds.second, ListItemBlockBeginType, ListItemBlockEndType);
+            endCur = SkipToClosingBlock(endCur, section.bounds.second, ListItemBlockBeginType, ListItemBlockEndType);
             
             if (sectionCur != endCur) {
 
@@ -400,7 +401,7 @@ namespace snowcrash {
                 for (; sectionCur != endCur; ++sectionCur) {
                     
                     if (sectionCur->type == QuoteBlockBeginType)
-                        sectionCur = SkipToSectionEnd(sectionCur, endCur, QuoteBlockBeginType, QuoteBlockEndType);
+                        sectionCur = SkipToClosingBlock(sectionCur, endCur, QuoteBlockBeginType, QuoteBlockEndType);
                     
                     bool entitiesParsed = false;
                     if (sectionCur->type == ListBlockBeginType) {
@@ -419,7 +420,7 @@ namespace snowcrash {
                             entitiesParsed = true;
                         }
                         else {
-                            sectionCur = SkipToSectionEnd(sectionCur, endCur, ListBlockBeginType, ListBlockEndType);
+                            sectionCur = SkipToClosingBlock(sectionCur, endCur, ListBlockBeginType, ListBlockEndType);
                         }
                     }
                     
@@ -448,7 +449,7 @@ namespace snowcrash {
                                                         sourceBlock));
             }
             
-            endCur = CloseListItemBlock(sectionCur, section.bounds.second);
+            endCur = CloseList(sectionCur, section.bounds.second);
             result.second = endCur;
             return result;
         }
@@ -469,7 +470,7 @@ namespace snowcrash {
             while (sectionCur != bounds.second &&
                    sectionCur->type == ListItemBlockBeginType) {
                 
-                sectionCur = SkipToSectionEnd(sectionCur, bounds.second, ListItemBlockBeginType, ListItemBlockEndType);
+                sectionCur = SkipToClosingBlock(sectionCur, bounds.second, ListItemBlockBeginType, ListItemBlockEndType);
                 
                 CaptureGroups captureGroups;
                 std::string content = sectionCur->content;

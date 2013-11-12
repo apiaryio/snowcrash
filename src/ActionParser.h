@@ -167,7 +167,7 @@ namespace snowcrash {
                     break;
                     
                 case UndefinedSectionType:
-                    result.second = CloseListItemBlock(cur, section.bounds.second);
+                    result.second = CloseList(cur, section.bounds.second);
                     break;
                 
                 case ModelSectionType:

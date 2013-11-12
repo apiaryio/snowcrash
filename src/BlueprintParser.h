@@ -12,8 +12,8 @@
 #include <functional>
 #include <sstream>
 #include <iterator>
-#include "BlueprintParserCore.h"
 #include "Blueprint.h"
+#include "BlueprintParserCore.h"
 #include "ResourceParser.h"
 #include "ResourceGroupParser.h"
 

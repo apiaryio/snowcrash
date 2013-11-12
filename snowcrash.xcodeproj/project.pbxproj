@@ -53,6 +53,8 @@
 		BBB0F42C1731D04900C92465 /* test-RegexMatch.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB0F42B1731D04900C92465 /* test-RegexMatch.cc */; };
 		BBC2D85F18301FEC00FBCEA7 /* CodeBlockUtility.h in Headers */ = {isa = PBXBuildFile; fileRef = BBC2D85E18301FEC00FBCEA7 /* CodeBlockUtility.h */; };
 		BBC2D861183024C100FBCEA7 /* DescriptionSectionUtility.h in Headers */ = {isa = PBXBuildFile; fileRef = BBC2D860183024C100FBCEA7 /* DescriptionSectionUtility.h */; };
+		BBC2D86318316DC000FBCEA7 /* ListBlockUtility.h in Headers */ = {isa = PBXBuildFile; fileRef = BBC2D86218316DC000FBCEA7 /* ListBlockUtility.h */; };
+		BBC2D8661831A76100FBCEA7 /* SectionUtility.h in Headers */ = {isa = PBXBuildFile; fileRef = BBC2D8651831A76100FBCEA7 /* SectionUtility.h */; };
 		BBD5F9C917353C310049BBEE /* ResourceGroupParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD5F9C717353C300049BBEE /* ResourceGroupParser.h */; };
 		BBD5F9CE17353CE00049BBEE /* ResourceParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD5F9CC17353CE00049BBEE /* ResourceParser.h */; };
 		BBD5F9D21735439B0049BBEE /* ParserCore.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD5F9D11735439B0049BBEE /* ParserCore.cc */; };
@@ -184,6 +186,9 @@
 		BBB2A226173EA77A0020C1CE /* StringUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = StringUtility.h; path = src/StringUtility.h; sourceTree = "<group>"; };
 		BBC2D85E18301FEC00FBCEA7 /* CodeBlockUtility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CodeBlockUtility.h; path = src/CodeBlockUtility.h; sourceTree = "<group>"; };
 		BBC2D860183024C100FBCEA7 /* DescriptionSectionUtility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = DescriptionSectionUtility.h; path = src/DescriptionSectionUtility.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		BBC2D86218316DC000FBCEA7 /* ListBlockUtility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ListBlockUtility.h; path = src/ListBlockUtility.h; sourceTree = "<group>"; };
+		BBC2D8641831901400FBCEA7 /* BlockUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BlockUtility.h; path = src/BlockUtility.h; sourceTree = "<group>"; };
+		BBC2D8651831A76100FBCEA7 /* SectionUtility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SectionUtility.h; path = src/SectionUtility.h; sourceTree = "<group>"; };
 		BBD5F9C717353C300049BBEE /* ResourceGroupParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = ResourceGroupParser.h; path = src/ResourceGroupParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BBD5F9CC17353CE00049BBEE /* ResourceParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = ResourceParser.h; path = src/ResourceParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BBD5F9CF1735413A0049BBEE /* BlueprintParserCore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = BlueprintParserCore.h; path = src/BlueprintParserCore.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
@@ -321,18 +326,21 @@
 			children = (
 				BB50F0BB17D1DB4D0002C363 /* ActionParser.h */,
 				BB3DD973174654B8004C4077 /* AssetParser.h */,
+				BBC2D8641831901400FBCEA7 /* BlockUtility.h */,
 				BBA91DC0171D402600649B05 /* BlueprintParser.h */,
 				BBD5F9CF1735413A0049BBEE /* BlueprintParserCore.h */,
 				BBF46B911824554A009029DA /* BlueprintSection.h */,
 				BBC2D85E18301FEC00FBCEA7 /* CodeBlockUtility.h */,
 				BBC2D860183024C100FBCEA7 /* DescriptionSectionUtility.h */,
 				BB1D4D07174D0828009BCB1C /* HeaderParser.h */,
+				BBC2D86218316DC000FBCEA7 /* ListBlockUtility.h */,
 				BB1EC203173FD06600CFB84A /* ListUtility.h */,
 				BB03DC6717D3721600C51E52 /* ParameterDefinitonParser.h */,
 				BB03DC6417D3717B00C51E52 /* ParametersParser.h */,
 				BBE5705F173927870086CE22 /* PayloadParser.h */,
 				BBD5F9C717353C300049BBEE /* ResourceGroupParser.h */,
 				BBD5F9CC17353CE00049BBEE /* ResourceParser.h */,
+				BBC2D8651831A76100FBCEA7 /* SectionUtility.h */,
 				BB1865C71764D67B00756B18 /* SymbolTable.h */,
 			);
 			name = "blueprint parser";
@@ -444,6 +452,7 @@
 				BBA889B817131AFF005A9570 /* buffer.h in Headers */,
 				BBA889B917131AFF005A9570 /* html_blocks.h in Headers */,
 				BBA889BB17131AFF005A9570 /* markdown.h in Headers */,
+				BBC2D8661831A76100FBCEA7 /* SectionUtility.h in Headers */,
 				BBA889BD17131AFF005A9570 /* stack.h in Headers */,
 				BBA889C517131B19005A9570 /* houdini.h in Headers */,
 				BBA889C617131B19005A9570 /* html.h in Headers */,
@@ -460,6 +469,7 @@
 				BBE57061173927870086CE22 /* PayloadParser.h in Headers */,
 				BBE53561174132B100BCA7AD /* Serialize.h in Headers */,
 				BBE53562174132B100BCA7AD /* SerializeJSON.h in Headers */,
+				BBC2D86318316DC000FBCEA7 /* ListBlockUtility.h in Headers */,
 				BBE53563174132B100BCA7AD /* SerializeYAML.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

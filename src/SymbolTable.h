@@ -19,6 +19,7 @@
 #endif
 
 #include "Blueprint.h"
+#include "StringUtility.h"
 
 // Symbol identifier regex
 // TODO: Remove extraneous surounding group

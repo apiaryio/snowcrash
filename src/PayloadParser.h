@@ -14,11 +14,11 @@
 #include "BlueprintParserCore.h"
 #include "Blueprint.h"
 #include "RegexMatch.h"
-#include "StringUtility.h"
-#include "ListUtility.h"
 #include "AssetParser.h"
 #include "HeaderParser.h"
 #include "DescriptionSectionUtility.h"
+#include "StringUtility.h"
+#include "BlockUtility.h"
 
 /** Media type in brackets regex */
 #define MEDIA_TYPE "([[:blank:]]*\\(([^\\)]*)\\))"
@@ -259,7 +259,7 @@ namespace snowcrash {
                     break;
                     
                 case UndefinedSectionType:
-                    result.second = CloseListItemBlock(cur, section.bounds.second);
+                    result.second = CloseList(cur, section.bounds.second);
                     break;
                     
                 case ForeignSectionType:
@@ -440,7 +440,7 @@ namespace snowcrash {
             BlockIterator endCur = cur;
             if (endCur->type == ListBlockBeginType)
                 ++endCur;
-            endCur = SkipToSectionEnd(endCur, bounds.second, ListItemBlockBeginType, ListItemBlockEndType);
+            endCur = SkipToClosingBlock(endCur, bounds.second, ListItemBlockBeginType, ListItemBlockEndType);
             
             // Check extraneous content
             if (sectionCur != endCur) {
@@ -448,10 +448,10 @@ namespace snowcrash {
                 for (; sectionCur != endCur; ++sectionCur) {
 
                     if (sectionCur->type == QuoteBlockBeginType)
-                        sectionCur = SkipToSectionEnd(sectionCur, endCur, QuoteBlockBeginType, QuoteBlockEndType);
+                        sectionCur = SkipToClosingBlock(sectionCur, endCur, QuoteBlockBeginType, QuoteBlockEndType);
                     
                     if (sectionCur->type == ListBlockBeginType)
-                        sectionCur = SkipToSectionEnd(sectionCur, endCur, ListBlockBeginType, ListBlockEndType);
+                        sectionCur = SkipToClosingBlock(sectionCur, endCur, ListBlockBeginType, ListBlockEndType);
                     
                     // WARN: ignoring extraneous content after symbol reference
                     std::stringstream ss;
@@ -465,7 +465,7 @@ namespace snowcrash {
                 }
             }
             
-            endCur = CloseListItemBlock(sectionCur, bounds.second);
+            endCur = CloseList(sectionCur, bounds.second);
             result.second = endCur;
             
             return result;

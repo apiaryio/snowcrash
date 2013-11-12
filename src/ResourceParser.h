@@ -196,7 +196,7 @@ namespace snowcrash {
                     
                 case UndefinedSectionType:
                     CheckAmbiguousMethod(section, cur, resource, parser.sourceData, result.first);
-                    result.second = CloseListItemBlock(cur, section.bounds.second);
+                    result.second = CloseList(cur, section.bounds.second);
                     break;
                     
                 case ForeignSectionType:

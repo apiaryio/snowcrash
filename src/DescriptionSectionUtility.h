@@ -16,6 +16,90 @@
 
 namespace snowcrash {
     
+    
+    /**
+     *  \brief  Skips to the end of the description list.
+     *  \param  begin   Begin of the description list.
+     *  \param  end     End of the block buffer.
+     *  \param  descriptionMap  Output buffer containing skipped source map.
+     *  \return An iterator pointing to the last block of a description list.
+     *          Or, if one of description list items is recognized as a section, iterator
+     *          pointing to this section.
+     *
+     *  This functions checks any skipped list items for a section signature.
+     *  If a section signature is found this function returns the first block
+     *  of the recognized section. If no signature is found this function returns
+     *  the last (closing) block of the description list.
+     */
+    template <class T>
+    static BlockIterator SkipToDescriptionListEnd(const BlockIterator& begin,
+                                                  const BlockIterator& end,
+                                                  SourceDataBlock& descriptionMap) {
+        BlockIterator cur(begin);
+        if (++cur == end)   // Skip leading ListBlockBeginType
+            return cur;
+        
+        std::vector<SourceDataBlock> listItemMaps;
+        SectionType listItemSection = UndefinedSectionType;
+        BlockIterator recognizedCur = end;
+        
+        while (cur != end &&
+               cur->type == ListItemBlockBeginType) {
+            
+            // Classify list item
+            listItemSection = ClassifyInternaListBlock<T>(cur, end);
+            if (listItemSection != UndefinedSectionType) {
+                // Found a recognized section, record & skip to the end of the list.
+                recognizedCur = cur;
+                cur = SkipToClosingBlock(begin, end, ListBlockBeginType, ListBlockEndType);
+            }
+            else {
+                // Skip one list item & take note of its source map
+                cur = SkipToClosingBlock(cur, end, ListItemBlockBeginType, ListItemBlockEndType);
+                listItemMaps.push_back(cur->sourceMap);
+                
+                if (cur != end)
+                    ++cur;
+            }
+        }
+        
+        // Resolve
+        if (listItemSection == UndefinedSectionType) {
+            descriptionMap = cur->sourceMap;
+            return cur;
+        }
+        else {
+            // Resolve correct description source map
+            descriptionMap.clear();
+            if (!cur->sourceMap.empty() &&
+                !listItemMaps.empty() &&
+                !listItemMaps.front().empty()) {
+                
+                SourceDataRange r;
+                r.location = cur->sourceMap.front().location;
+                r.length = listItemMaps.front().front().location - r.location;
+                descriptionMap.push_back(r);
+                
+                for (std::vector<SourceDataBlock>::iterator it = listItemMaps.begin();
+                     it != listItemMaps.end();
+                     ++it) {
+                    
+                    SourceDataRange gap;
+                    gap.location = descriptionMap.back().location + descriptionMap.back().length;
+                    gap.length = it->front().location - gap.location;
+                    if (gap.length) {
+                        SourceDataBlock gapBlock(1, gap);
+                        AppendSourceDataBlock(descriptionMap, gapBlock);
+                    }
+                    
+                    AppendSourceDataBlock(descriptionMap, *it);
+                }
+            }
+            
+            return recognizedCur;
+        }
+    }
+    
     /**
      *  \brief  Process a description block retrieving its content.
      *  \param  section     A section its block is being processed.
@@ -34,7 +118,7 @@ namespace snowcrash {
         BlockIterator sectionCur(cur);
         
         if (sectionCur->type == QuoteBlockBeginType) {
-            sectionCur = SkipToSectionEnd(sectionCur, section.bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
+            sectionCur = SkipToClosingBlock(sectionCur, section.bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
         }
         else if (sectionCur->type == ListBlockBeginType) {
             

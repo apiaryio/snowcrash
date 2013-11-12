@@ -12,9 +12,9 @@
 #include <sstream>
 #include "BlueprintParserCore.h"
 #include "Blueprint.h"
-#include "ListUtility.h"
 #include "RegexMatch.h"
 #include "StringUtility.h"
+#include "ListBlockUtility.h"
 
 // Headers matching regex
 static const std::string HeadersRegex("^[ \\t]*[Hh]eaders?[ \\t]*$");
@@ -103,7 +103,7 @@ namespace snowcrash {
                     break;
                     
                 case UndefinedSectionType:
-                    result.second = CloseListItemBlock(cur, section.bounds.second);
+                    result.second = CloseList(cur, section.bounds.second);
                     break;
                     
                 default:

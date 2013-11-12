@@ -10,6 +10,7 @@
 #define SNOWCRASH_BLUEPRINTSECTION_H
 
 #include "MarkdownBlock.h"
+#include "Blueprint.h"
 
 namespace snowcrash {
     

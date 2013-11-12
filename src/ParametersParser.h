@@ -12,9 +12,9 @@
 #include <sstream>
 #include "BlueprintParserCore.h"
 #include "Blueprint.h"
-#include "ListUtility.h"
 #include "RegexMatch.h"
 #include "StringUtility.h"
+#include "BlockUtility.h"
 #include "ParameterDefinitonParser.h"
 
 /** Parameters matching regex */
@@ -125,7 +125,7 @@ namespace snowcrash {
                     break;
                     
                 case UndefinedSectionType:
-                    result.second = CloseListItemBlock(cur, section.bounds.second);
+                    result.second = CloseList(cur, section.bounds.second);
                     break;
                     
                 default:
@@ -167,10 +167,10 @@ namespace snowcrash {
             
             // Unexpected description
             if (sectionCur->type == QuoteBlockBeginType) {
-                sectionCur = SkipToSectionEnd(sectionCur, section.bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
+                sectionCur = SkipToClosingBlock(sectionCur, section.bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
             }
             else if (sectionCur->type == ListBlockBeginType) {
-                sectionCur = SkipToSectionEnd(sectionCur, section.bounds.second, ListBlockBeginType, ListItemBlockEndType);
+                sectionCur = SkipToClosingBlock(sectionCur, section.bounds.second, ListBlockBeginType, ListItemBlockEndType);
             }
             
             if (!CheckCursor(section, sectionCur, parser.sourceData, result.first))

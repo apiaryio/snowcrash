@@ -8,9 +8,8 @@
 
 #include <iterator>
 #include "catch.hpp"
-#include "ListUtility.h"
 #include "Fixture.h"
-
+#include "ListBlockUtility.h"
 
 using namespace snowcrash;
 using namespace snowcrashtest;

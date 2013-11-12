@@ -10,8 +10,7 @@
 #define SNOWCRASH_CODEBLOCKUTILITY_H
 
 #include <sstream>
-#include "MarkdownBlock.h"
-#include "BlueprintParserCore.h"
+#include "BlockUtility.h"
 
 namespace snowcrash {
     
@@ -140,13 +139,13 @@ namespace snowcrash {
         else {
             // Other blocks, process & warn
             if (sectionCur->type == QuoteBlockBeginType) {
-                sectionCur = SkipToSectionEnd(sectionCur, section.bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
+                sectionCur = SkipToClosingBlock(sectionCur, section.bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
             }
             else if (sectionCur->type == ListBlockBeginType) {
-                sectionCur = SkipToSectionEnd(sectionCur, section.bounds.second, ListBlockBeginType, ListBlockEndType);
+                sectionCur = SkipToClosingBlock(sectionCur, section.bounds.second, ListBlockBeginType, ListBlockEndType);
             }
             else if (sectionCur->type == ListItemBlockBeginType) {
-                sectionCur = SkipToSectionEnd(sectionCur, section.bounds.second, ListItemBlockBeginType, ListItemBlockEndType);
+                sectionCur = SkipToClosingBlock(sectionCur, section.bounds.second, ListItemBlockBeginType, ListItemBlockEndType);
             }
             
             if (!CheckCursor(section, sectionCur, parser.sourceData, result.first))

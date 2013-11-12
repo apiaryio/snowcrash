@@ -199,32 +199,67 @@ TEST_CASE("OK Indentation & No Newline", "[abbreviated][indentation]")
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body == "    { ... }\n");
 }
 
-TEST_CASE("Extra indentation", "[abbreviated][indentation][now]")
+TEST_CASE("Full syntax - correct", "[indentation]")
 {
     // Blueprint in question:
     //R"(
-    //# GET /1
-    //    + Response 200
+    //## GET /1
+    //+ Response 200
+    //    + Body
     //
     //            { ... }
     //");
     const std::string blueprintSource = \
-    "# GET /1\n"\
-    "    + Response 200\n"\
+    "## GET /1\n"\
+    "+ Response 200\n"\
+    "    + Body\n"\
     "\n"\
     "            { ... }\n";
-    
     Parser parser;
     Result result;
     Blueprint blueprint;
     parser.parse(blueprintSource, 0, result, blueprint);
     REQUIRE(result.error.code == Error::OK);
-    REQUIRE(result.warnings.size() == 2);
-    REQUIRE(result.warnings[0].code == IndentationWarning);
-    REQUIRE(result.warnings[1].code == EmptyDefinitionWarning);
+    REQUIRE(result.warnings.empty());
     
     REQUIRE(blueprint.resourceGroups.size() == 1);
     REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description == "    + Response 200\n\n            { ... }\n");
+    REQUIRE(!blueprint.resourceGroups[0].resources[0].actions[0].examples.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body == "{ ... }\n");
 }
+
+//TEST_CASE("Full syntax - Poor Body Indentation", "[indentation][now]")
+//{
+//    // Blueprint in question:
+//    //R"(
+//    //## GET /1
+//    //+ Response 200
+//    //+ Body
+//    //
+//    //        { ... }
+//    //");
+//    const std::string blueprintSource = \
+//    "## GET /1\n"\
+//    "+ Response 200\n"\
+//    "+ Body\n"\
+//    "\n"\
+//    "        { ... }\n";
+//    
+//    Parser parser;
+//    Result result;
+//    Blueprint blueprint;
+//    parser.parse(blueprintSource, 0, result, blueprint);
+//    REQUIRE(result.error.code == Error::OK);
+//    REQUIRE(result.warnings.empty());
+//    
+//    REQUIRE(blueprint.resourceGroups.size() == 1);
+//    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+//    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
+//    REQUIRE(!blueprint.resourceGroups[0].resources[0].actions[0].examples.empty());
+//    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
+//    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
+//    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body == "{ ... }\n");
+//}
