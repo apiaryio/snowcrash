@@ -99,9 +99,20 @@ namespace snowcrash {
      *  The classifier might look ahead.
      */
     template <class T>
-    SectionType ClassifyInternaListBlock(const BlockIterator& begin,
-                                         const BlockIterator& end) {
+    FORCEINLINE SectionType ClassifyInternaListBlock(const BlockIterator& begin,
+                                                     const BlockIterator& end) {
         return UndefinedSectionType;        
+    }
+    
+    /**
+     *  \brief Classify a block with children list items.
+     *
+     *  Classifes internal list block & descend to children list block classifiers.
+     */
+    template <class T>
+    FORCEINLINE SectionType ClassifyChildrenListBlock(const BlockIterator& begin,
+                                                      const BlockIterator& end){
+        return UndefinedSectionType;
     }
         
     /**
@@ -110,9 +121,9 @@ namespace snowcrash {
      *  The classifier might look ahead.
      */
     template <class T>
-    SectionType ClassifyBlock(const BlockIterator& begin,
-                              const BlockIterator& end,
-                              const SectionType& context);
+    FORCEINLINE SectionType ClassifyBlock(const BlockIterator& begin,
+                                          const BlockIterator& end,
+                                          const SectionType& context);
     
     // Forward declaration of classifier helpers
     extern bool HasResourceGroupSignature(const MarkdownBlock& block);

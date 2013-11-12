@@ -84,8 +84,8 @@ namespace snowcrash {
      */
     template <>
     FORCEINLINE SectionType ClassifyBlock<Asset>(const BlockIterator& begin,
-                                             const BlockIterator& end,
-                                             const SectionType& context) {
+                                                 const BlockIterator& end,
+                                                 const SectionType& context) {
         
         if (context == UndefinedSectionType) {
             AssetSignature asset = GetAssetSignature(begin, end);

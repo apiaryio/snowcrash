@@ -146,6 +146,22 @@ namespace snowcrash {
         return UndefinedSectionType;
     }
     
+    /** Children blocks classifier */
+    template <>
+    FORCEINLINE SectionType ClassifyChildrenListBlock<Payload>(const BlockIterator& begin,
+                                                              const BlockIterator& end) {
+        
+        SectionType type = ClassifyInternaListBlock<Payload>(begin, end);
+        if (type != UndefinedSectionType)
+            return type;
+        
+        type = ClassifyChildrenListBlock<Asset>(begin, end);
+        if (type != UndefinedSectionType)
+            return type;
+        
+        return UndefinedSectionType;
+    }
+    
     /**
      *  Block Classifier, payload context.
      */
@@ -263,7 +279,7 @@ namespace snowcrash {
                     break;
                     
                 case ForeignSectionType:
-                    result = HandleForeignSection(section, cur, parser.sourceData);
+                    result = HandleForeignSection<Payload>(section, cur, parser.sourceData);
                     break;
                                         
                 default:

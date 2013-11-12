@@ -59,13 +59,12 @@ namespace snowcrash {
         std::string line = GetFirstLine(cur->content);
         TrimStringStart(line);
         
-        if (line.empty() ||
-            (line[0] != '-' && line[0] != '+' && line[0] != '*'))
-            return true;
-        
         // If line appears to be a Markdown list construct a dummy list item
         // with the first line of code block as its content.
         // Check the list item with respective internal classifier.
+        if (line.empty() ||
+            (line[0] != '-' && line[0] != '+' && line[0] != '*'))
+            return true;
         
         // Skip leading Markdown list item mark
         std::string listItemContent = line.substr(1, std::string::npos);

@@ -11,8 +11,28 @@
 
 #include "BlockUtility.h"
 #include "ListBlockUtility.h"
+#include "CodeBlockUtility.h"
 
 namespace snowcrash {
+    
+    /**
+     *  Compute expected indentation of a section
+     */
+    FORCEINLINE size_t SectionIndentationLevel(const BlueprintSection& section)
+    {
+        switch (section.type) {
+            case ParameterValuesSectionType:
+                return 2;
+                
+            case BodySectionType:
+            case SchemaSectionType:
+            case HeadersSectionType:    // NOTE: Headers can be potentially both level 0 and 1
+                return 1;
+
+            default:
+                return 0;
+        }
+    }
     
     /**
      *  \brief  Report & skip blocks in a foreign section.
@@ -21,6 +41,7 @@ namespace snowcrash {
      *  \param  hint        An optional string containing expected hint.
      *  \return Standard section parse result pointing AFTER the last block parsed.
      */
+    template <class T>
     FORCEINLINE ParseSectionResult HandleForeignSection(const BlueprintSection& section,
                                                         const BlockIterator& cur,
                                                         const SourceData& sourceData,
@@ -36,14 +57,31 @@ namespace snowcrash {
         if (sectionCur->type == ListItemBlockBeginType ||
             sectionCur->type == ListBlockBeginType) {
             
-            // Form the messages and skip the list / list item
-            ss << "ignoring unrecognized list";
+            // Skip the list / list item
             if (sectionCur->type == ListBlockBeginType) {
                 sectionCur = SkipToClosingBlock(sectionCur, section.bounds.second, ListBlockBeginType, ListBlockEndType);
             }
             else {
-                ss << " item";
                 sectionCur = SkipToClosingBlock(sectionCur, section.bounds.second, ListItemBlockBeginType, ListItemBlockEndType);
+            }
+            SectionType type = ClassifyChildrenListBlock<T>(cur, sectionCur);
+            
+            // Assemble the message
+            ss << "ignoring ";
+            ss << ((type != UndefinedSectionType) ? SectionName(type) : "unrecognized");
+            ss << " list";
+            if (cur->type == ListItemBlockBeginType)
+                ss << " item";
+            
+            if (type != UndefinedSectionType &&
+                section.hasParent()) {
+                BlueprintSection recognizedSection(type, std::make_pair(cur, sectionCur), section.parent());
+                size_t level = SectionIndentationLevel(recognizedSection);
+                
+                if (level) {
+                    ss << ", " << SectionName(type) << " section is expected to be indented by ";
+                    ss << level * 4 << " spaces or " << level << " tab";
+                }
             }
             
             sourceBlock = CharacterMapForBlock(sectionCur, cur, section.bounds, sourceData);

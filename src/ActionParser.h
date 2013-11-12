@@ -83,7 +83,7 @@ namespace snowcrash {
     //
     template <>
     FORCEINLINE SectionType ClassifyInternaListBlock<Action>(const BlockIterator& begin,
-                                                         const BlockIterator& end) {        
+                                                             const BlockIterator& end) {
         if (HasHeaderSignature(begin, end))
             return HeadersSectionType;
         
@@ -104,7 +104,31 @@ namespace snowcrash {
         
         return UndefinedSectionType;
     }
+    
+    /** Children blocks classifier */
+    template <>
+    FORCEINLINE SectionType ClassifyChildrenListBlock<Action>(const BlockIterator& begin,
+                                                              const BlockIterator& end) {
         
+        SectionType type = ClassifyInternaListBlock<Action>(begin, end);
+        if (type != UndefinedSectionType)
+            return type;
+        
+        type = ClassifyChildrenListBlock<Header>(begin, end);
+        if (type != UndefinedSectionType)
+            return type;
+        
+        type = ClassifyChildrenListBlock<ParameterCollection>(begin, end);
+        if (type != UndefinedSectionType)
+            return type;
+
+        type = ClassifyChildrenListBlock<Payload>(begin, end);
+        if (type != UndefinedSectionType)
+            return type;
+        
+        return UndefinedSectionType;
+    }
+    
     //
     // Block Classifier, Method Context
     //
@@ -163,7 +187,7 @@ namespace snowcrash {
                     break;
                     
                 case ForeignSectionType:
-                    result = HandleForeignSection(section, cur, parser.sourceData);
+                    result = HandleForeignSection<Action>(section, cur, parser.sourceData);
                     break;
                     
                 case UndefinedSectionType:

@@ -83,6 +83,18 @@ namespace snowcrash {
         return UndefinedSectionType;
     }
     
+    /** Children blocks classifier */
+    template <>
+    FORCEINLINE SectionType ClassifyChildrenListBlock<Parameter>(const BlockIterator& begin,
+                                                                 const BlockIterator& end) {
+        
+        SectionType type = ClassifyInternaListBlock<Parameter>(begin, end);
+        if (type != UndefinedSectionType)
+            return type;
+                
+        return UndefinedSectionType;
+    }
+    
     /**
      *  Returns true if given block has a parameter definition signature, false otherwise.
      */
@@ -177,7 +189,7 @@ namespace snowcrash {
                     break;
                     
                 case ForeignSectionType:
-                    result = HandleForeignSection(section, cur, parser.sourceData, ExpectedTraitItems);
+                    result = HandleForeignSection<Parameter>(section, cur, parser.sourceData, ExpectedTraitItems);
                     break;
                     
                 case UndefinedSectionType:
