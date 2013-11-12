@@ -15,9 +15,7 @@
 
 namespace snowcrash {
     
-    //
-    // Markdown Block Type
-    //
+    /** Type of a Markdown Block */
     enum MarkdownBlockType {
         UndefinedBlockType = 0,
         CodeBlockType = 1,
@@ -35,10 +33,15 @@ namespace snowcrash {
         TableRowBlockType = 13,
         TableCellBlockType = 14
     };
+    
+    /**
+     *  \return Name of the markdown block.
+     */
+    std::string BlockName(const MarkdownBlockType& blockType);
 
-    //
-    // Markdown Block Element
-    //
+    /**
+     *  Markdown Block Element
+     */
     struct MarkdownBlock {
 
         typedef std::vector<MarkdownBlock> Stack;

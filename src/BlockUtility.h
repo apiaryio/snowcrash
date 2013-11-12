@@ -70,39 +70,42 @@ namespace snowcrash {
     }
     
     /**
-     *  \brief  Construct an Unexpected block error.
-     *  \param  block   A Markdown block that is unexpected.
-     *  \param  sourceData   Source data byte buffer.
+     *  \brief  Construct unexpected block error message for given block.
+     *  \param  section A section being parsed.
+     *  \param  cue     Cursor to the unexpected markdown block.
+     *  \param  sourceData  Source data byte buffer.
      *  \return An Error with description relevant to the type of the unexpected block.
+     *
+     *  This function 
      */
-    FORCEINLINE Error UnexpectedBlockError(const MarkdownBlock& block, const SourceData& sourceData) {
-        static const char *NotExpectedMessage = " is either not appropriate for the current context or its keyword has not been recognized, ";
+    FORCEINLINE Error UnexpectedBlockError(const BlueprintSection& section,
+                                           const BlockIterator& cur,
+                                           const SourceData& sourceData) {
+        
         
         std::stringstream ss;
-        ss << "unexpected block, ";
+        ss << "unexpected " << BlockName(cur->type) << " block";
         
-        switch (block.type) {
-            case HeaderBlockType:
-                ss << "this Markdown header" << NotExpectedMessage;
-                ss << "recognized keywords include: Group, <HTTP method>, <URI template>, Object ...";
-                break;
-                
-            case ListBlockBeginType:
-            case ListItemBlockBeginType:
-                
-                ss << "this Markdown list item"  << NotExpectedMessage;
-                ss << "recognized keywords include: Request, Response <HTTP status code>, Headers, Parameters ...";
-                break;
-                
-                
-            default:
-                ss << "a block of this type is not expected in the current context";
-                break;
+        if (section.hasParent()) {
+            
+            switch (section.parent().type) {
+
+                // Top-level section
+                case UndefinedSectionType:
+                    ss << ", expected a group, resource or an action definition, e.g. ";
+                    ss << "'# Group <name>', '# <resource name> [<URI>]' or '# <HTTP method> <URI>'";
+                    break;
+
+                // TODO: other sections
+                    
+                default:
+                    break;
+            }
         }
         
         return Error(ss.str(),
                      BusinessError,
-                     MapSourceDataBlock(block.sourceMap, sourceData));
+                     MapSourceDataBlock(cur->sourceMap, sourceData));
     }
     
     

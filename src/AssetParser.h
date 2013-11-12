@@ -22,8 +22,6 @@ static const std::string BodyRegex("^[ \\t]*[Bb]ody[ \\t]*$");
 // Schema matching regex
 static const std::string SchemaRegex("^[ \\t]*[Ss]chema[ \\t]*$");
 
-static const std::string AssetFormattingWarning = " asset is expected to be preformatted code block";
-
 namespace snowcrash {
     
     /// Asset signature
@@ -162,7 +160,7 @@ namespace snowcrash {
                     break;
                     
                 default:
-                    result.first.error = UnexpectedBlockError(*cur, parser.sourceData);
+                    result.first.error = UnexpectedBlockError(section, cur, parser.sourceData);
                     break;
             }
             

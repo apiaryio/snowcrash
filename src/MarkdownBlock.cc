@@ -10,10 +10,52 @@
 #include "MarkdownBlock.h"
 
 #ifdef DEBUG
-
 #include <iostream>
-
 #endif
+
+std::string snowcrash::BlockName(const MarkdownBlockType& blockType)
+{
+    switch (blockType) {
+        case UndefinedBlockType:
+            return "undefined";
+            
+        case CodeBlockType:
+            return "code";
+            
+        case QuoteBlockBeginType:
+        case QuoteBlockEndType:
+            return "quote";
+            
+        case HTMLBlockType:
+            return "html";
+            
+        case HeaderBlockType:
+            return "header";
+            
+        case ListBlockBeginType:
+        case ListBlockEndType:
+            return "list";
+            
+        case ListItemBlockBeginType:
+        case ListItemBlockEndType:
+            return "list item";
+            
+        case ParagraphBlockType:
+            return "paragraph";
+            
+        case TableBlockType:
+            return "table";
+            
+        case TableRowBlockType:
+            return "table row";
+            
+        case TableCellBlockType:
+            return "table cell";
+            
+        default:
+            return "markdown";
+    }
+}
 
 std::string snowcrash::MapSourceData(const SourceData& source, const SourceDataBlock& sourceMap)
 {

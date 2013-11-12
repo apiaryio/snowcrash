@@ -38,14 +38,12 @@ namespace snowcrash {
      *  \brief  Report & skip blocks in a foreign section.
      *  \param  section     Section including the foreign section.
      *  \param  cur         A cursor pointing to the beigin of the foreign section.
-     *  \param  hint        An optional string containing expected hint.
      *  \return Standard section parse result pointing AFTER the last block parsed.
      */
     template <class T>
     FORCEINLINE ParseSectionResult HandleForeignSection(const BlueprintSection& section,
                                                         const BlockIterator& cur,
-                                                        const SourceData& sourceData,
-                                                        const std::string& hint = std::string()) {
+                                                        const SourceData& sourceData) {
         
         ParseSectionResult result = std::make_pair(Result(), cur);
         BlockIterator sectionCur = cur;
@@ -64,7 +62,7 @@ namespace snowcrash {
             else {
                 sectionCur = SkipToClosingBlock(sectionCur, section.bounds.second, ListItemBlockBeginType, ListItemBlockEndType);
             }
-            SectionType type = ClassifyChildrenListBlock<T>(cur, sectionCur);
+            SectionType type = ClassifyChildrenListBlock<T>(cur, section.bounds.second);
             
             // Assemble the message
             ss << "ignoring ";
@@ -79,7 +77,10 @@ namespace snowcrash {
                 size_t level = SectionIndentationLevel(recognizedSection);
                 
                 if (level) {
-                    ss << ", " << SectionName(type) << " section is expected to be indented by ";
+                    ss << ", " << SectionName(type) << " list ";
+                    if (cur->type == ListItemBlockBeginType)
+                        ss << "item ";
+                    ss << "is expected to be indented by ";
                     ss << level * 4 << " spaces or " << level << " tab";
                 }
             }
@@ -106,13 +107,29 @@ namespace snowcrash {
             
             ++sectionCur;
         }
+
+        
+        if (section.hasParent()) {
+            // Additional hint for some sections
+            switch (section.parent().type) {
+                case ParametersSectionType:
+                    ss << ", expected parameter discussion, e.g. '<parameter name> ... lorem ipsum'";
+                    break;
+
+                case ParameterDefinitionSectionType:
+                    ss << ", expected enumeration of parameter values, e.g. 'Values' followed by a nested list of possbile values";
+                    break;
+                    
+                default:
+                    break;
+            }
+        }
         
         // WARN: Ignoring unrecognized block
-        if (!hint.empty())
-            ss << ", expected: " << hint;
         result.first.warnings.push_back(Warning(ss.str(),
                                                 IgnoringWarning,
                                                 sourceBlock));
+        
         result.second = sectionCur;
         return result;
     }

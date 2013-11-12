@@ -102,7 +102,7 @@ namespace snowcrash {
                     break;
                     
                 default:
-                    result.first.error = UnexpectedBlockError(*cur, parser.sourceData);
+                    result.first.error = UnexpectedBlockError(section, cur, parser.sourceData);
                     break;
             }
             

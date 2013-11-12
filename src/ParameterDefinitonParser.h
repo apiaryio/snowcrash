@@ -48,13 +48,6 @@ static const std::string AdditionalTraitsTypeRegex(CSV_LEADINOUT "([^,]*)" CSV_L
 /** Parameter Values matching regex */
 static const std::string ParameterValuesRegex("^[ \\t]*[Vv]alues[ \\t]*$");
 
-/** List of expected nested attributes */
-static const std::string ExpectedTraitItems = "'Values' followed by a nested list of possbile values";
-
-/** Expected parameter definiton */
-static const std::string ExpectedParameterDefinition = "'<parameter identifier>' or a full parameter specification"\
-                                                       " e.g. 'id (required, number, `42`) ... Id of the resource'";
-
 /** Values expected content */
 static const std::string ExpectedValuesContent = "nested list of possible parameter values, one element per list item e.g. '`value`'";
 
@@ -189,7 +182,7 @@ namespace snowcrash {
                     break;
                     
                 case ForeignSectionType:
-                    result = HandleForeignSection<Parameter>(section, cur, parser.sourceData, ExpectedTraitItems);
+                    result = HandleForeignSection<Parameter>(section, cur, parser.sourceData);
                     break;
                     
                 case UndefinedSectionType:
@@ -197,7 +190,7 @@ namespace snowcrash {
                     break;
                     
                 default:
-                    result.first.error = UnexpectedBlockError(*cur, parser.sourceData);
+                    result.first.error = UnexpectedBlockError(section, cur, parser.sourceData);
                     break;
             }
             
