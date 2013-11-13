@@ -419,7 +419,7 @@ TEST_CASE("Full syntax - No Indentation & No Newline", "[indentation]")
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body.empty());
 }
 
-TEST_CASE("Full syntax - Extra indentation", "[indentation][now]")
+TEST_CASE("Full syntax - Extra indentation", "[indentation]")
 {
     // Blueprint in question:
     //R"(

@@ -56,9 +56,15 @@ namespace snowcrash {
         return RegexMatch(content, ParametersRegex);
     }
     
-    /**
-     *  Block Classifier, ParameterCollection context.
-     */
+    /** Children List Block Classifier, ParameterCollection context. */
+    template <>
+    FORCEINLINE SectionType ClassifyChildrenListBlock<ParameterCollection>(const BlockIterator& begin,
+                                                                           const BlockIterator& end){
+        // TODO:
+        return UndefinedSectionType;
+    }
+    
+    /** Block Classifier, ParameterCollection context. */
     template <>
     FORCEINLINE SectionType ClassifyBlock<ParameterCollection>(const BlockIterator& begin,
                                                            const BlockIterator& end,

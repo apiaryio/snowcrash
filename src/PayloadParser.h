@@ -154,11 +154,7 @@ namespace snowcrash {
         SectionType type = ClassifyInternaListBlock<Payload>(begin, end);
         if (type != UndefinedSectionType)
             return type;
-        
-        type = ClassifyChildrenListBlock<Asset>(begin, end);
-        if (type != UndefinedSectionType)
-            return type;
-        
+                
         return UndefinedSectionType;
     }
     

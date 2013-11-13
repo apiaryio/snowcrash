@@ -29,6 +29,7 @@
 		BB86DEC31723E3C600063644 /* src_map.h in Headers */ = {isa = PBXBuildFile; fileRef = BB86DEC21723E3C600063644 /* src_map.h */; };
 		BB8AEFD817D899B900298807 /* test-ListUtility.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB8AEFD717D899B900298807 /* test-ListUtility.cc */; };
 		BB92D891178EF7C10098A63C /* HTTP.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB92D890178EF7C10098A63C /* HTTP.cc */; };
+		BB9E702A183342CB00ED5806 /* test-Warnings.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9E7029183342CB00ED5806 /* test-Warnings.cc */; };
 		BBA25671172BFEB800C1AD5E /* snowcrash.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA25670172BFEB800C1AD5E /* snowcrash.cc */; };
 		BBA889A71712FF37005A9570 /* Parser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA889A51712FF37005A9570 /* Parser.cc */; };
 		BBA889A81712FF37005A9570 /* Parser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA889A61712FF37005A9570 /* Parser.h */; };
@@ -158,6 +159,7 @@
 		BB92D88F178EF4160098A63C /* HTTP.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = HTTP.h; path = src/HTTP.h; sourceTree = "<group>"; };
 		BB92D890178EF7C10098A63C /* HTTP.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = HTTP.cc; path = src/HTTP.cc; sourceTree = "<group>"; };
 		BB92D892178EFA370098A63C /* BlueprintUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = BlueprintUtility.h; path = src/BlueprintUtility.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		BB9E7029183342CB00ED5806 /* test-Warnings.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-Warnings.cc"; path = "test/test-Warnings.cc"; sourceTree = "<group>"; };
 		BBA01FF817292F9C0050B603 /* test-BlueprintParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = "test-BlueprintParser.cc"; path = "test/test-BlueprintParser.cc"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		BBA25667172BFE4C00C1AD5E /* snowcrash */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = snowcrash; sourceTree = BUILT_PRODUCTS_DIR; };
 		BBA25670172BFEB800C1AD5E /* snowcrash.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = snowcrash.cc; path = src/snowcrash/snowcrash.cc; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
@@ -402,6 +404,7 @@
 				BBD5F9DD173578210049BBEE /* test-ResourceParser.cc */,
 				BBFF48C9170B3C49001E5FB2 /* test-snowcrash.cc */,
 				BB1865C81764DB8A00756B18 /* test-SymbolTable.cc */,
+				BB9E7029183342CB00ED5806 /* test-Warnings.cc */,
 			);
 			name = test;
 			sourceTree = "<group>";
@@ -638,6 +641,7 @@
 				BB03DC6617D3718D00C51E52 /* test-ParametersParser.cc in Sources */,
 				BB50F0BD17D1DCE00002C363 /* test-ActionParser.cc in Sources */,
 				BB3DD975174654FD004C4077 /* test-AssetParser.cc in Sources */,
+				BB9E702A183342CB00ED5806 /* test-Warnings.cc in Sources */,
 				BB1D4D0B174D0932009BCB1C /* test-HeaderParser.cc in Sources */,
 				BB03DC6917D3723300C51E52 /* test-ParameterDefinitonParser.cc in Sources */,
 				BB1865C91764DB8A00756B18 /* test-SymbolTable.cc in Sources */,

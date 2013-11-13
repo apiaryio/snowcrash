@@ -138,6 +138,10 @@ namespace snowcrash {
             // Check code block for potential excessive indentation of a list item
             CheckCodeBlockListItem<T>(section, sectionCur, sourceData, result.first);
         }
+        else if (sectionCur->type == HeaderBlockType) {
+            // Check headers for potential keywords
+            CheckHeaderBlock<T>(section, sectionCur, sourceData, result.first);
+        }
         
         if (!CheckCursor(section, sectionCur, sourceData, result.first))
             return result;

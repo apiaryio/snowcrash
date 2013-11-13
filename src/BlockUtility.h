@@ -167,6 +167,19 @@ namespace snowcrash {
                              sourceBlock);
         return false;
     }
+    
+    /**
+     *  \brief Check header block for an potential ambiguous signature
+     *  \return True if a headerdoes not contain potential ambiguous signature, false otherwise.
+     */
+    template <class T>
+    FORCEINLINE bool CheckHeaderBlock(const BlueprintSection& section,
+                                      const BlockIterator& cur,
+                                      const SourceData& sourceData,
+                                      Result& result) {
+        
+        return false;
+    }
 }
 
 

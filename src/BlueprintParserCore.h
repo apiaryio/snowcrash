@@ -97,23 +97,20 @@ namespace snowcrash {
      *  \brief Internal list items classifier prototype.
      *
      *  The classifier might look ahead.
+     *  DO NOT provide generic implementation.
      */
     template <class T>
     FORCEINLINE SectionType ClassifyInternaListBlock(const BlockIterator& begin,
-                                                     const BlockIterator& end) {
-        return UndefinedSectionType;        
-    }
-    
+                                                     const BlockIterator& end);
     /**
      *  \brief Classify a block with children list items.
      *
      *  Classifes internal list block & descend to children list block classifiers.
+     *  DO NOT provide generic implementation.
      */
     template <class T>
     FORCEINLINE SectionType ClassifyChildrenListBlock(const BlockIterator& begin,
-                                                      const BlockIterator& end){
-        return UndefinedSectionType;
-    }
+                                                      const BlockIterator& end);
         
     /**
      *  \brief Block Classifier prototype.

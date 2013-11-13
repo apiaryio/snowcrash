@@ -20,10 +20,15 @@
 static const std::string ExpectedAPINameMessage = "expected API name, e.g. '# <API Name>'";
 
 namespace snowcrash {
+
+    /** Internal list items classifier, Blueprint Context */
+    template <>
+    FORCEINLINE SectionType ClassifyInternaListBlock<Blueprint>(const BlockIterator& begin,
+                                                                    const BlockIterator& end) {
+        return UndefinedSectionType;
+    }
     
-    //
-    // Block Classifier, Resource Context
-    //
+    /** Block Classifier, Blueprint Context */
     template <>
     FORCEINLINE SectionType ClassifyBlock<Blueprint>(const BlockIterator& begin,
                                                      const BlockIterator& end,
@@ -36,9 +41,8 @@ namespace snowcrash {
         return (context == ResourceGroupSectionType) ? UndefinedSectionType : BlueprintSectionType;
     }
     
-    //
-    // Blueprint SectionType Parser
-    //
+
+    /** Blueprint SectionType Parser */
     template<>
     struct SectionParser<Blueprint> {
         
@@ -128,6 +132,10 @@ namespace snowcrash {
                 sectionCur->type == HeaderBlockType) {
                 
                 output.name = cur->content;
+                
+                // Check ambiguity
+                CheckHeaderBlock<Blueprint>(section, sectionCur, parser.sourceData, result.first);
+
                 // Check Name
                 if (!CheckBlueprintName(sectionCur, output, parser, result.first))
                     return result;

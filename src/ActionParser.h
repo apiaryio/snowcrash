@@ -114,7 +114,7 @@ namespace snowcrash {
         if (type != UndefinedSectionType)
             return type;
         
-        type = ClassifyChildrenListBlock<Header>(begin, end);
+        type = ClassifyChildrenListBlock<HeaderCollection>(begin, end);
         if (type != UndefinedSectionType)
             return type;
         

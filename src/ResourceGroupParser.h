@@ -63,11 +63,18 @@ namespace snowcrash {
         return GetResourceGroupSignature(block, name);
     }
     
+    /** Internal list items classifier, Resource Group Context */
+    template <>
+    FORCEINLINE SectionType ClassifyInternaListBlock<ResourceGroup>(const BlockIterator& begin,
+                                                                    const BlockIterator& end) {
+        return UndefinedSectionType;
+    }
+    
     /** Block Classifier, Resource Group Context */
     template <>
     FORCEINLINE SectionType ClassifyBlock<ResourceGroup>(const BlockIterator& begin,
-                                                     const BlockIterator& end,
-                                                     const SectionType& context) {
+                                                         const BlockIterator& end,
+                                                         const SectionType& context) {
         
         if (HasResourceGroupSignature(*begin))
             return (context == UndefinedSectionType) ? ResourceGroupSectionType : UndefinedSectionType;

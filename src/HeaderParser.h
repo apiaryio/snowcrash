@@ -57,10 +57,21 @@ namespace snowcrash {
                             std::bind2nd(MatchFirsts<Header>(), header));
     }
     
+    /** Internal list items classifier, Headers Context */
+    template <>
+    FORCEINLINE SectionType ClassifyInternaListBlock<HeaderCollection>(const BlockIterator& begin,
+                                                                       const BlockIterator& end) {
+        return UndefinedSectionType;
+    }
     
-    //
-    // Block Classifier, Headers Context
-    //
+    /** Children List Block Classifier, HeaderCollection context. */
+    template <>
+    FORCEINLINE SectionType ClassifyChildrenListBlock<HeaderCollection>(const BlockIterator& begin,
+                                                                        const BlockIterator& end){
+        return UndefinedSectionType;
+    }
+    
+    /** Block Classifier, Headers Context */
     template <>
     FORCEINLINE SectionType ClassifyBlock<HeaderCollection>(const BlockIterator& begin,
                                                         const BlockIterator& end,
@@ -121,11 +132,11 @@ namespace snowcrash {
 
             SourceData data;
             SourceDataBlock sourceMap;
-            ParseSectionResult result = ParseListPreformattedBlock<Header>(section,
-                                                                           cur,
-                                                                           parser,
-                                                                           data,
-                                                                           sourceMap);
+            ParseSectionResult result = ParseListPreformattedBlock<HeaderCollection>(section,
+                                                                                     cur,
+                                                                                     parser,
+                                                                                     data,
+                                                                                     sourceMap);
             if (result.first.error.code != Error::OK ||
                 parser.sourceData.empty())
                 return result;

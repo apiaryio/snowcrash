@@ -84,7 +84,8 @@
         'test/test-ResouceGroupParser.cc',
         'test/test-ResourceParser.cc',
         'test/test-SymbolTable.cc',
-        'test/test-snowcrash.cc'
+        'test/test-snowcrash.cc',
+        'test/test-Warnings.cc'
       ],
       'dependencies': [
         'libsnowcrash',
