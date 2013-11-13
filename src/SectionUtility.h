@@ -120,6 +120,10 @@ namespace snowcrash {
                     ss << ", expected enumeration of parameter values, e.g. 'Values' followed by a nested list of possbile values";
                     break;
                     
+                case ActionSectionType:
+                    ss << ", expected request, response, parameters, headers or a defintion of the next action, resource or a group";
+                    break;
+                    
                 default:
                     break;
             }
