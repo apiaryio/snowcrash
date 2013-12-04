@@ -1,15 +1,18 @@
+#
+# Common build configuration
+# ==========================
+#
+# GYP include file with common configuration settings.
+#
+# Attribution Notice:
+# This work might use parts of Node.js `common.gypi` (https://github.com/joyent/node).
+#
 {
-  # Attribution Notice
-  # ------------------
-  # This file uses parts of Node.js `common.gypi`.
-  # Please refer to https://github.com/joyent/node.
-  #
   'variables': {
     'target_arch%': 'ia32',
     'libsnowcrash_type%': 'static_library'
   },
   'target_defaults': {
-    'default_configuration': 'Release',
     'configurations': {
       'Debug': {
         'defines': [ 'DEBUG', '_DEBUG' ],
@@ -27,6 +30,8 @@
             'MinimalRebuild': 'false',
             'OmitFramePointers': 'false',
             'BasicRuntimeChecks': 3, # /RTC1
+            'RuntimeTypeInfo': 'false',
+            'ExceptionHandling': 1            
           },
           'VCLinkerTool': {
             'LinkIncremental': 2, # enable incremental linking
@@ -34,7 +39,7 @@
         },
         'xcode_settings': {
           'GCC_OPTIMIZATION_LEVEL': '0', # stop gyp from defaulting to -Os
-        },
+        }
       },
       'Release': {
         'conditions': [
@@ -53,10 +58,10 @@
             'EnableFunctionLevelLinking': 'true',
             'EnableIntrinsicFunctions': 'true',
             'RuntimeTypeInfo': 'false',
-            'ExceptionHandling': '0',
+            'ExceptionHandling': 1,
             'AdditionalOptions': [
               '/MP', # compile across multiple CPUs
-            ],
+            ]
           },
           'VCLibrarianTool': {
             'AdditionalOptions': [
@@ -68,39 +73,9 @@
             'OptimizeReferences': 2, # /OPT:REF
             'EnableCOMDATFolding': 2, # /OPT:ICF
             'LinkIncremental': 1, # disable incremental linking
-          },
-        },
+          }
+        }
       }
-    },
-    'msvs_settings': {
-      'VCCLCompilerTool': {
-        'StringPooling': 'true', # pool string literals
-        'DebugInformationFormat': 3, # Generate a PDB
-        'WarningLevel': 3,
-        'BufferSecurityCheck': 'true',
-        'ExceptionHandling': 1, # /EHsc
-        'SuppressStartupBanner': 'true',
-        'WarnAsError': 'false',
-      },
-      'VCLibrarianTool': {
-      },
-      'VCLinkerTool': {
-        'conditions': [
-          ['target_arch=="x64"', {
-            'TargetMachine' : 17 # /MACHINE:X64
-          }],
-        ],
-        'GenerateDebugInformation': 'true',
-        'RandomizedBaseAddress': 2, # enable ASLR
-        'DataExecutionPrevention': 2, # enable DEP
-        'AllowIsolation': 'true',
-        'SuppressStartupBanner': 'true',
-        'target_conditions': [
-          ['_type=="executable"', {
-            'SubSystem': 1, # console executable
-          }],
-        ],
-      },
     },
     'conditions': [
       ['OS == "win"', {
@@ -144,8 +119,7 @@
         'xcode_settings': {
           'ALWAYS_SEARCH_USER_PATHS': 'NO',
           'GCC_CW_ASM_SYNTAX': 'NO',                # No -fasm-blocks
-          'GCC_DYNAMIC_NO_PIC': 'NO',               # No -mdynamic-no-pic
-                                                    # (Equivalent to -fPIC)
+          'GCC_DYNAMIC_NO_PIC': 'NO',               # No -mdynamic-no-pic (Equivalent to -fPIC)
           'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',       # !-fno-exceptions
           'GCC_ENABLE_CPP_RTTI': 'YES',             # !-fno-rtti
           'GCC_ENABLE_PASCAL_STRINGS': 'NO',        # No -mpascal-strings

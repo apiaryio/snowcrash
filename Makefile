@@ -19,17 +19,17 @@ libsnowcrash: config.gypi $(BUILD_DIR)/Makefile
 test-snowcrash: config.gypi $(BUILD_DIR)/Makefile
 	$(MAKE) -C $(BUILD_DIR) V=$(V) test-snowcrash
 	mkdir -p ./bin
-	cp -f $(BUILD_DIR)/out/Release/test-snowcrash ./bin/test-snowcrash
+	cp -f $(BUILD_DIR)/out/$(BUILDTYPE)/test-snowcrash ./bin/test-snowcrash
 
 perf-snowcrash: config.gypi $(BUILD_DIR)/Makefile
 	$(MAKE) -C $(BUILD_DIR) V=$(V) perf-snowcrash
 	mkdir -p ./bin
-	cp -f $(BUILD_DIR)/out/Release/perf-snowcrash ./bin/perf-snowcrash
+	cp -f $(BUILD_DIR)/out/$(BUILDTYPE)/perf-snowcrash ./bin/perf-snowcrash
 
 snowcrash: config.gypi $(BUILD_DIR)/Makefile
 	$(MAKE) -C $(BUILD_DIR) V=$(V) snowcrash
 	mkdir -p ./bin
-	cp -f $(BUILD_DIR)/out/Release/snowcrash ./bin/snowcrash
+	cp -f $(BUILD_DIR)/out/$(BUILDTYPE)/snowcrash ./bin/snowcrash
 
 config.gypi: configure
 	$(PYTHON) ./configure
@@ -48,12 +48,12 @@ distclean:
 	rm -rf ./bin	
 
 test: test-snowcrash
-	$(BUILD_DIR)/out/Release/test-snowcrash
+	$(BUILD_DIR)/out/$(BUILDTYPE)/test-snowcrash
 
 perf: perf-snowcrash
-	$(BUILD_DIR)/out/Release/perf-snowcrash ./test/performance/fixtures/fixture-1.md
+	$(BUILD_DIR)/out/$(BUILDTYPE)/perf-snowcrash ./test/performance/fixtures/fixture-1.md
 
 install: snowcrash
-	cp -f $(BUILD_DIR)/out/Release/snowcrash /usr/local/bin/snowcrash
+	cp -f $(BUILD_DIR)/out/$(BUILDTYPE)/snowcrash /usr/local/bin/snowcrash
 
 .PHONY: libsnowcrash test-snowcrash perf-snowcrash snowcrash clean distclean test

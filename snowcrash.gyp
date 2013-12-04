@@ -23,7 +23,6 @@
         'sundown/src/src_map.c'
       ]
     },
-
     {
       'target_name': 'libsnowcrash',
       'type': '<(libsnowcrash_type)',
@@ -55,7 +54,6 @@
           'sundown'
       ]
     },
-
     {
       'target_name': 'test-snowcrash',
       'type': 'executable',
@@ -108,24 +106,29 @@
         'libsnowcrash',
         'sundown'
       ]
-    },
-
-    {
-      'target_name': 'perf-snowcrash',
-      'type': 'executable',
-      'include_dirs': [
-        'src',
-        'cmdline',
-        'test',
-        'test/performance',
-      ],
-      'sources': [
-        'test/performance/perf-snowcrash.cc'
-      ],
-      'dependencies': [
-        'libsnowcrash',
-        'sundown'
-      ]
     }
-  ]
+  ],
+  'conditions': [
+    ['OS in "mac linux"', {
+      'targets': [
+        {
+          'target_name': 'perf-snowcrash',
+          'type': 'executable',
+          'include_dirs': [
+            'src',
+            'cmdline',
+            'test',
+            'test/performance',
+          ],
+          'sources': [
+            'test/performance/perf-snowcrash.cc'
+          ],
+          'dependencies': [
+            'libsnowcrash',
+            'sundown'
+          ]
+        }
+      ]
+    }]
+  ]  
 }
