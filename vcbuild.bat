@@ -86,15 +86,16 @@ goto exit
 
 :msbuild-found
 @rem Build the sln with msbuild.
+@rem Refer to http://msdn.microsoft.com/en-us/library/ms164311.aspx
 echo Building Snow Crash...
-msbuild build/snowcrash.sln /m /clp:NoSummary;NoItemAndPropertyList;Verbosity=minimal /nologo
+msbuild build/snowcrash.sln /m /clp:NoSummary;NoItemAndPropertyList;Verbosity=normal /nologo /property:Configuration=%config%
 if errorlevel 1 goto exit
 
 :run
 @rem Run tests if requested.
 if "%test%"=="" goto exit
 echo Running tests...
-.\build\Debug\test-snowcrash.exe
+.\build\%config%\test-snowcrash.exe
 
 @rem All Done
 goto exit
