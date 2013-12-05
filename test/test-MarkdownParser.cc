@@ -833,3 +833,24 @@ TEST_CASE("Multi-byte characters in blockquote", "[markdown][sourcemap]")
     REQUIRE(characterBlock[0].location == 0);
     REQUIRE(characterBlock[0].length == 5);
 }
+
+TEST_CASE("Source map crash - assertion", "[markdown][issue][#62][sourcemap]")
+{
+    MarkdownParser parser;
+    Result result;
+    MarkdownBlock::Stack markdown;
+    
+    const std::string source = \
+    "* B\n"\
+    ">* CCC CC\n"\
+    ">* D\n"\
+    "\n"\
+    "* E\n";
+    
+    parser.parse(source, result, markdown);
+    
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.empty());
+    
+    REQUIRE(markdown.size() == 16);
+}

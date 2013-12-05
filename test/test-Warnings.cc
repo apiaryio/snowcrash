@@ -15,7 +15,7 @@
 using namespace snowcrash;
 using namespace snowcrashtest;
 
-TEST_CASE("Warn about keywords in API name", "[warnings][#31][now]")
+TEST_CASE("Warn about keywords in API name", "[warnings][#31]")
 {
     // Blueprint in question:
     //R"(
@@ -33,6 +33,7 @@ TEST_CASE("Warn about keywords in API name", "[warnings][#31][now]")
     Blueprint blueprint;
     parser.parse(blueprintSource, 0, result, blueprint);
     REQUIRE(result.error.code == Error::OK);
+    // TODO:
 //    REQUIRE(result.warnings.size() == 1);
 //    REQUIRE(result.warnings[0].code == AmbiguityWarning);
 //    
