@@ -17,7 +17,10 @@
 #include "ResourceParser.h"
 #include "ResourceGroupParser.h"
 
-static const std::string ExpectedAPINameMessage = "expected API name, e.g. '# <API Name>'";
+namespace snowcrashconst {
+    
+    const char* const ExpectedAPINameMessage = "expected API name, e.g. '# <API Name>'";
+}
 
 namespace snowcrash {
 
@@ -92,14 +95,14 @@ namespace snowcrash {
             if (parser.options & RequireBlueprintNameOption) {
                 
                 // ERR: No API name specified
-                result.error = Error(ExpectedAPINameMessage,
+                result.error = Error(snowcrashconst::ExpectedAPINameMessage,
                                      BusinessError,
                                      MapSourceDataBlock(cur->sourceMap, parser.sourceData));
                 return false;
             }
 
             // WARN: No API name specified
-            result.warnings.push_back(Warning(ExpectedAPINameMessage,
+            result.warnings.push_back(Warning(snowcrashconst::ExpectedAPINameMessage,
                                               APINameWarning,
                                               MapSourceDataBlock(cur->sourceMap, parser.sourceData)));
 
@@ -330,7 +333,7 @@ namespace snowcrash {
                 parser.blueprint.name.empty()){
                 
                 // ERR: No API name specified
-                result.error = Error(ExpectedAPINameMessage,
+                result.error = Error(snowcrashconst::ExpectedAPINameMessage,
                                      BusinessError,
                                      MapSourceDataBlock(MakeSourceDataBlock(0, 0), parser.sourceData));
             }

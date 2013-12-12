@@ -25,8 +25,11 @@
 // TODO: Remove extraneous surounding group
 #define SYMBOL_IDENTIFIER "([[:alnum:][:blank:]_-]+)"
 
-// Symbol reference regex
-static const std::string SymbolReferenceRegex("^[ \\t]*\\[(" SYMBOL_IDENTIFIER ")]\\[][ \\t]*$");
+namespace snowcrashconst {
+    
+    /** Symbol reference matching regex */
+    const char* const SymbolReferenceRegex("^[ \\t]*\\[(" SYMBOL_IDENTIFIER ")]\\[][ \\t]*$");
+}
 
 namespace snowcrash {
 
@@ -52,7 +55,7 @@ namespace snowcrash {
                                         SymbolName& referredSymbol) {
         
         CaptureGroups captureGroups;
-        if (RegexCapture(sourceData, SymbolReferenceRegex, captureGroups, 3)) {
+        if (RegexCapture(sourceData, snowcrashconst::SymbolReferenceRegex, captureGroups, 3)) {
             referredSymbol = captureGroups[1];
             TrimString(referredSymbol);
             return true;

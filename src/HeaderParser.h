@@ -16,8 +16,11 @@
 #include "StringUtility.h"
 #include "ListBlockUtility.h"
 
-// Headers matching regex
-static const std::string HeadersRegex("^[ \\t]*[Hh]eaders?[ \\t]*$");
+namespace snowcrashconst {
+    
+    /** Headers matching regex */
+    const char* const HeadersRegex = "^[ \\t]*[Hh]eaders?[ \\t]*$";
+}
 
 namespace snowcrash {
 
@@ -39,7 +42,7 @@ namespace snowcrash {
                 return false;
             
             std::string content = GetFirstLine(cur->content);
-            return RegexMatch(content, HeadersRegex);
+            return RegexMatch(content, snowcrashconst::HeadersRegex);
         }
         
         return false;

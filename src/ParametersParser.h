@@ -17,14 +17,17 @@
 #include "BlockUtility.h"
 #include "ParameterDefinitonParser.h"
 
-/** Parameters matching regex */
-static const std::string ParametersRegex("^[ \\t]*[Pp]arameters?[ \\t]*$");
+namespace snowcrashconst {
+    
+    /** Parameters matching regex */
+    const char* const ParametersRegex = "^[ \\t]*[Pp]arameters?[ \\t]*$";
 
-/** Expected parameters content */
-static const std::string ExpectedParametersContent = "a nested list of parameters, one parameter per list item";
+    /** Expected parameters content */
+    const char* const ExpectedParametersContent = "a nested list of parameters, one parameter per list item";
 
-/** No parameters specified message */
-static const std::string NoParametersMessage = "no parameters specified, expected a nested list of parameters, one parameter per list item";
+    /** No parameters specified message */
+    const char* const NoParametersMessage = "no parameters specified, expected a nested list of parameters, one parameter per list item";
+}
 
 namespace snowcrash {
     
@@ -53,7 +56,7 @@ namespace snowcrash {
         SourceData remainingContent;
         SourceData content = GetListItemSignature(begin, end, remainingContent);
         TrimString(content);
-        return RegexMatch(content, ParametersRegex);
+        return RegexMatch(content, snowcrashconst::ParametersRegex);
     }
     
     /** Children List Block Classifier, ParameterCollection context. */
@@ -165,7 +168,7 @@ namespace snowcrash {
                                                 sectionCur,
                                                 parser.sourceData,
                                                 "'parameters' keyword",
-                                                ExpectedParametersContent,
+                                                snowcrashconst::ExpectedParametersContent,
                                                 result.first);
                 result.second = SkipSignatureBlock(sectionCur, section.bounds.second);
                 return result;
@@ -184,7 +187,7 @@ namespace snowcrash {
             
             // WARN: on ignoring additional content
             std::stringstream ss;
-            ss << "ignoring additional content in the 'parameters' definition, expected " << ExpectedParametersContent;
+            ss << "ignoring additional content in the 'parameters' definition, expected " << snowcrashconst::ExpectedParametersContent;
             
             SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, cur, section.bounds, parser.sourceData);
             result.first.warnings.push_back(Warning(ss.str(),

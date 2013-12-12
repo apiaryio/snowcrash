@@ -23,17 +23,20 @@
 /** Media type in brackets regex */
 #define MEDIA_TYPE "([[:blank:]]*\\(([^\\)]*)\\))"
 
-/** Request matching regex */
-static const std::string RequestRegex("^[[:blank:]]*[Rr]equest" SYMBOL_IDENTIFIER "?" MEDIA_TYPE "?[[:blank:]]*");
-
-/** Response matching regex */
-static const std::string ResponseRegex("^[[:blank:]]*[Rr]esponse([[:blank:][:digit:]]+)?" MEDIA_TYPE "?[[:blank:]]*");
-
-/** Object matching regex */
-static const std::string ObjectRegex("^[ \\t]*(" SYMBOL_IDENTIFIER ")[ \\t][Oo]bject([ \\t]\\(([^\\)]*)\\))?[ \\t]*$");
-
-/** Model matching regex */
-static const std::string ModelRegex("^[[:blank:]]*" SYMBOL_IDENTIFIER "?[Mm]odel" MEDIA_TYPE "?[[:blank:]]*");
+namespace snowcrashconst {
+    
+    /** Request matching regex */
+    const char* const RequestRegex = "^[[:blank:]]*[Rr]equest" SYMBOL_IDENTIFIER "?" MEDIA_TYPE "?[[:blank:]]*";
+    
+    /** Response matching regex */
+    const char* const ResponseRegex = "^[[:blank:]]*[Rr]esponse([[:blank:][:digit:]]+)?" MEDIA_TYPE "?[[:blank:]]*";
+    
+    /** Object matching regex */
+    const char* const ObjectRegex = "^[ \\t]*(" SYMBOL_IDENTIFIER ")[ \\t][Oo]bject([ \\t]\\(([^\\)]*)\\))?[ \\t]*$";
+    
+    /** Model matching regex */
+    const char* const  ModelRegex = "^[[:blank:]]*" SYMBOL_IDENTIFIER "?[Mm]odel" MEDIA_TYPE "?[[:blank:]]*";
+}
 
 namespace snowcrash {
     
@@ -75,25 +78,25 @@ namespace snowcrash {
             std::string content = GetFirstLine(cur->content);
             
             CaptureGroups captureGroups;
-            if (RegexCapture(content, RequestRegex, captureGroups, 5)) {
+            if (RegexCapture(content, snowcrashconst::RequestRegex, captureGroups, 5)) {
                 name = captureGroups[1];
                 TrimString(name);
                 mediaType = captureGroups[3];
                 return RequestPayloadSignature;
             }
-            else if (RegexCapture(content, ResponseRegex, captureGroups, 5)) {
+            else if (RegexCapture(content, snowcrashconst::ResponseRegex, captureGroups, 5)) {
                 name = captureGroups[1];
                 TrimString(name);
                 mediaType = captureGroups[3];
                 return ResponsePayloadSignature;
             }
-            else if (RegexCapture(content, ObjectRegex, captureGroups, 5)) {
+            else if (RegexCapture(content, snowcrashconst::ObjectRegex, captureGroups, 5)) {
                 name = captureGroups[1];
                 TrimString(name);
                 mediaType = captureGroups[4];
                 return ObjectPayloadSignature;
             }
-            else if (RegexCapture(content, ModelRegex, captureGroups, 5)) {
+            else if (RegexCapture(content, snowcrashconst::ModelRegex, captureGroups, 5)) {
                 name = captureGroups[1];
                 TrimString(name);
                 mediaType = captureGroups[3];
@@ -562,17 +565,17 @@ namespace snowcrash {
                     
                 case RequestSectionType:
                 case RequestBodySectionType:
-                    regex = RequestRegex;
+                    regex = snowcrashconst::RequestRegex;
                     break;
                     
                 case ResponseBodySectionType:
                 case ResponseSectionType:
-                    regex = ResponseRegex;
+                    regex = snowcrashconst::ResponseRegex;
                     break;
                     
                 case ModelSectionType:
                 case ModelBodySectionType:
-                    regex = ModelRegex;
+                    regex = snowcrashconst::ModelRegex;
                     break;
                     
                 default:

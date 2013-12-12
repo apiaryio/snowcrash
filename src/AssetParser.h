@@ -16,11 +16,14 @@
 #include "StringUtility.h"
 #include "SectionUtility.h"
 
-// Body matching regex
-static const std::string BodyRegex("^[ \\t]*[Bb]ody[ \\t]*$");
+namespace snowcrashconst {
+    
+    /** Body matching regex */
+    const char* const BodyRegex("^[ \\t]*[Bb]ody[ \\t]*$");
 
-// Schema matching regex
-static const std::string SchemaRegex("^[ \\t]*[Ss]chema[ \\t]*$");
+    /** Schema matching regex */
+    const char* const SchemaRegex("^[ \\t]*[Ss]chema[ \\t]*$");
+}
 
 namespace snowcrash {
     
@@ -49,10 +52,10 @@ namespace snowcrash {
                 return NoAssetSignature;
             
             std::string content = GetFirstLine(cur->content);
-            if (RegexMatch(content, BodyRegex))
+            if (RegexMatch(content, snowcrashconst::BodyRegex))
                 return BodyAssetSignature;
 
-            if (RegexMatch(content, SchemaRegex))
+            if (RegexMatch(content, snowcrashconst::SchemaRegex))
                 return SchemaAssetSignature;
             
             if (HasPayloadAssetSignature(begin, end))

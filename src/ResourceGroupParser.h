@@ -13,7 +13,10 @@
 #include "Blueprint.h"
 #include "ResourceParser.h"
 
-static const std::string GroupHeaderRegex("^[ \\t]*[Gg]roup[ \\t]+(" SYMBOL_IDENTIFIER ")[ \\t]*$");
+namespace snowcrashconst {
+    
+    const char* const GroupHeaderRegex = "^[ \\t]*[Gg]roup[ \\t]+(" SYMBOL_IDENTIFIER ")[ \\t]*$";
+}
 
 namespace snowcrash {
     
@@ -44,7 +47,7 @@ namespace snowcrash {
             return false;
         
         CaptureGroups captureGroups;
-        if (RegexCapture(block.content, GroupHeaderRegex, captureGroups, 3)) {
+        if (RegexCapture(block.content, snowcrashconst::GroupHeaderRegex, captureGroups, 3)) {
             name = captureGroups[1];
             return true;
         }

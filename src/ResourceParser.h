@@ -18,8 +18,14 @@
 #include "ParametersParser.h"
 #include "DescriptionSectionUtility.h"
 
-static const std::string ResourceHeaderRegex("^[ \\t]*((" HTTP_METHODS ")[ \\t]+)?(" URI_TEMPLATE ")$");
-static const std::string NamedResourceHeaderRegex("^[ \\t]*(" SYMBOL_IDENTIFIER ")[ \\t]+\\[(" URI_TEMPLATE ")]$");
+namespace snowcrashconst {
+    
+    /** Nameless resource matching regex */
+    const char* const ResourceHeaderRegex = "^[ \\t]*((" HTTP_METHODS ")[ \\t]+)?(" URI_TEMPLATE ")$";
+    
+    /** Named resource matching regex */
+    const char* const NamedResourceHeaderRegex = "^[ \\t]*(" SYMBOL_IDENTIFIER ")[ \\t]+\\[(" URI_TEMPLATE ")]$";
+}
 
 namespace snowcrash {
     
@@ -43,12 +49,12 @@ namespace snowcrash {
         
         CaptureGroups captureGroups;
         // Nameless resource
-        if (RegexCapture(block.content, ResourceHeaderRegex, captureGroups, 4)) {
+        if (RegexCapture(block.content, snowcrashconst::ResourceHeaderRegex, captureGroups, 4)) {
             method = captureGroups[2];
             uri = captureGroups[3];
             return (method.empty()) ? URIResourceSignature : MethodURIResourceSignature;
         }
-        else if (RegexCapture(block.content, NamedResourceHeaderRegex, captureGroups, 4)) {
+        else if (RegexCapture(block.content, snowcrashconst::NamedResourceHeaderRegex, captureGroups, 4)) {
             method.clear();
             name = captureGroups[1];
             TrimString(name);
@@ -358,7 +364,7 @@ namespace snowcrash {
             if (parameters.empty()) {
                 BlockIterator nameBlock = ListItemNameBlock(cur, section.bounds.second);
                 SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, cur, section.bounds, parser.sourceData);
-                result.first.warnings.push_back(Warning(NoParametersMessage,
+                result.first.warnings.push_back(Warning(snowcrashconst::NoParametersMessage,
                                                         FormattingWarning,
                                                         sourceBlock));
             }

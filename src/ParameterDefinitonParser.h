@@ -24,32 +24,36 @@
 /** Parameter Identifier */
 #define PARAMETER_IDENTIFIER "([[:alnum:]_.-]+)"
 
-/** Parameter Abbreviated definition matching regex */
-static const std::string ParameterAbbrevDefinitionRegex("^" PARAMETER_IDENTIFIER "([[:blank:]]*=[[:blank:]]*`([^`]*)`[[:blank:]]*)?([[:blank:]]*\\(([^)]*)\\)[[:blank:]]*)?([[:blank:]]*\\.\\.\\.[[:blank:]]*(.*))?$");
-
-/** Parameter Required matching regex */
-static const std::string ParameterRequiredRegex("^[ \\t]*[Rr]equired[ \\t]*$");
-
-/** Parameter Optional matching regex */
-static const std::string ParameterOptionalRegex("^[ \\t]*[Oo]ptional[ \\t]*$");
-
 /** Lead in and out for comma separated values regex */
-# define CSV_LEADINOUT "[[:blank:]]*,?[[:blank:]]*"
+#define CSV_LEADINOUT "[[:blank:]]*,?[[:blank:]]*"
 
-/** Additonal Parameter Traits Example matching regex */
-static const std::string AdditionalTraitsExampleRegex(CSV_LEADINOUT "`([^`]*)`" CSV_LEADINOUT);
+namespace snowcrashconst {
 
-/** Additonal Parameter Traits Use matching regex */
-static const std::string AdditionalTraitsUseRegex(CSV_LEADINOUT "([Oo]ptional|[Rr]equired)" CSV_LEADINOUT);
+    /** Parameter Abbreviated definition matching regex */
+    const char* const ParameterAbbrevDefinitionRegex = "^" PARAMETER_IDENTIFIER \
+                                                        "([[:blank:]]*=[[:blank:]]*`([^`]*)`[[:blank:]]*)?([[:blank:]]*\\(([^)]*)\\)[[:blank:]]*)?([[:blank:]]*\\.\\.\\.[[:blank:]]*(.*))?$";
 
-/** Additonal Parameter Traits Type matching regex */
-static const std::string AdditionalTraitsTypeRegex(CSV_LEADINOUT "([^,]*)" CSV_LEADINOUT);
+    /** Parameter Required matching regex */
+    const char* const ParameterRequiredRegex = "^[ \\t]*[Rr]equired[ \\t]*$";
 
-/** Parameter Values matching regex */
-static const std::string ParameterValuesRegex("^[ \\t]*[Vv]alues[ \\t]*$");
+    /** Parameter Optional matching regex */
+    const char* const ParameterOptionalRegex = "^[ \\t]*[Oo]ptional[ \\t]*$";
 
-/** Values expected content */
-static const std::string ExpectedValuesContent = "nested list of possible parameter values, one element per list item e.g. '`value`'";
+    /** Additonal Parameter Traits Example matching regex */
+    const char* const AdditionalTraitsExampleRegex = CSV_LEADINOUT "`([^`]*)`" CSV_LEADINOUT;
+
+    /** Additonal Parameter Traits Use matching regex */
+    const char* const AdditionalTraitsUseRegex = CSV_LEADINOUT "([Oo]ptional|[Rr]equired)" CSV_LEADINOUT;
+
+    /** Additonal Parameter Traits Type matching regex */
+    const char* const AdditionalTraitsTypeRegex = CSV_LEADINOUT "([^,]*)" CSV_LEADINOUT;
+
+    /** Parameter Values matching regex */
+    const char* const ParameterValuesRegex = "^[ \\t]*[Vv]alues[ \\t]*$";
+
+    /** Values expected content */
+    const char* const ExpectedValuesContent = "nested list of possible parameter values, one element per list item e.g. '`value`'";
+}
 
 namespace snowcrash {
     
@@ -70,7 +74,7 @@ namespace snowcrash {
         
         content = TrimString(content);
         
-        if (RegexMatch(content, ParameterValuesRegex))
+        if (RegexMatch(content, snowcrashconst::ParameterValuesRegex))
             return ParameterValuesSectionType;
         
         return UndefinedSectionType;
@@ -110,7 +114,7 @@ namespace snowcrash {
         SourceData remainingContent;
         SourceData content = GetListItemSignature(begin, end, remainingContent);
         content = TrimString(content);
-        return RegexMatch(content, ParameterAbbrevDefinitionRegex);
+        return RegexMatch(content, snowcrashconst::ParameterAbbrevDefinitionRegex);
     }
     
     /**
@@ -241,7 +245,7 @@ namespace snowcrash {
 
             TrimString(signature);
             CaptureGroups captureGroups;
-            if (RegexCapture(signature, ParameterAbbrevDefinitionRegex, captureGroups) &&
+            if (RegexCapture(signature, snowcrashconst::ParameterAbbrevDefinitionRegex, captureGroups) &&
                 captureGroups.size() == 8) {
                 
                 // Name
@@ -306,7 +310,7 @@ namespace snowcrash {
             std::string source = additionalTraits;
             TrimString(source);
             CaptureGroups captureGroups;
-            if (RegexCapture(source, AdditionalTraitsExampleRegex, captureGroups) &&
+            if (RegexCapture(source, snowcrashconst::AdditionalTraitsExampleRegex, captureGroups) &&
                 captureGroups.size() > 1) {
                 
                 parameter.exampleValue = captureGroups[1];
@@ -317,10 +321,10 @@ namespace snowcrash {
             
             // Cherry pick use attribute, if any
             captureGroups.clear();
-            if (RegexCapture(source, AdditionalTraitsUseRegex, captureGroups) &&
+            if (RegexCapture(source, snowcrashconst::AdditionalTraitsUseRegex, captureGroups) &&
                 captureGroups.size() > 1) {
                 
-                parameter.use = (RegexMatch(captureGroups[1], ParameterOptionalRegex)) ? OptionalParameterUse : RequiredParameterUse;
+                parameter.use = (RegexMatch(captureGroups[1], snowcrashconst::ParameterOptionalRegex)) ? OptionalParameterUse : RequiredParameterUse;
 
                 std::string::size_type pos = source.find(captureGroups[0]);
                 if (pos != std::string::npos)
@@ -329,7 +333,7 @@ namespace snowcrash {
             
             // Finish with type
             captureGroups.clear();
-            if (RegexCapture(source, AdditionalTraitsTypeRegex, captureGroups) &&
+            if (RegexCapture(source, snowcrashconst::AdditionalTraitsTypeRegex, captureGroups) &&
                 captureGroups.size() > 1) {
                 
                 parameter.type = captureGroups[1];
@@ -390,7 +394,7 @@ namespace snowcrash {
                                             cur,
                                             parser.sourceData,
                                             "'values:' keyword",
-                                            ExpectedValuesContent,
+                                            snowcrashconst::ExpectedValuesContent,
                                             result.first);
 
             // Parse inner list of entities
@@ -434,7 +438,7 @@ namespace snowcrash {
                         std::stringstream ss;
                         ss << "ignoring additional content in the 'values' attribute of the '";
                         ss << parameter.name << "' parameter";
-                        ss << ", " << ExpectedValuesContent;
+                        ss << ", " << snowcrashconst::ExpectedValuesContent;
                         
                         SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, cur, section.bounds, parser.sourceData);
                         result.first.warnings.push_back(Warning(ss.str(),

@@ -18,8 +18,14 @@
 #include "HTTP.h"
 #include "DescriptionSectionUtility.h"
 
-static const std::string ActionHeaderRegex("^(" HTTP_METHODS ")[ \\t]*(" URI_TEMPLATE ")?$");
-static const std::string NamedActionHeaderRegex("^([^\\[]*)\\[(" HTTP_METHODS ")]$");
+namespace snowcrashconst {
+    
+    /** Nameless action matching regex */
+    const char* const ActionHeaderRegex = "^(" HTTP_METHODS ")[ \\t]*(" URI_TEMPLATE ")?$";
+    
+    /** Named action matching regex */
+    const char* const NamedActionHeaderRegex = "^([^\\[]*)\\[(" HTTP_METHODS ")]$";
+}
 
 namespace snowcrash {
     
@@ -41,13 +47,13 @@ namespace snowcrash {
             return NoActionSignature;
         
         CaptureGroups captureGroups;
-        if (RegexCapture(block.content, ActionHeaderRegex, captureGroups, 3)) {
+        if (RegexCapture(block.content, snowcrashconst::ActionHeaderRegex, captureGroups, 3)) {
             // Nameless action
             method = captureGroups[1];
             URITemplate uri = captureGroups[2];
             return (uri.empty()) ? MethodActionSignature : MethodURIActionSignature;
         }
-        else if (RegexCapture(block.content, NamedActionHeaderRegex, captureGroups, 3)) {
+        else if (RegexCapture(block.content, snowcrashconst::NamedActionHeaderRegex, captureGroups, 3)) {
             // Named action
             name = captureGroups[1];
             TrimString(name);
@@ -256,7 +262,7 @@ namespace snowcrash {
             if (parameters.empty()) {
                 BlockIterator nameBlock = ListItemNameBlock(cur, section.bounds.second);
                 SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, cur, section.bounds, parser.sourceData);
-                result.first.warnings.push_back(Warning(NoParametersMessage,
+                result.first.warnings.push_back(Warning(snowcrashconst::NoParametersMessage,
                                                         FormattingWarning,
                                                         sourceBlock));
             }
