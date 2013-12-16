@@ -68,7 +68,7 @@ static int testfunc(const std::string& input, double& total, double& mean, doubl
 int main(int argc, const char *argv[])
 {
     // FIXME: Intstrumetns helper
-    ::sleep(20);
+    //::sleep(20);
     
     // Setup commandline Argument Parser
     cmdline::parser argumentParser;
@@ -108,7 +108,7 @@ int main(int argc, const char *argv[])
     std::cout << "total: " << total << "s mean: " << mean << " +/- " << stddev << "s\n";
     
     // FIXME: Intstrumetns helper
-    ::sleep(20);
+    //::sleep(20);
 }
 
 
