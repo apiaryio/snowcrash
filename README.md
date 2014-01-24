@@ -28,9 +28,8 @@ Other systems refer to [build notes](#build).
 1. Clone the repo + fetch the submodules:
 
 	```sh
-	$ git clone git://github.com/apiaryio/snowcrash.git
+	$ git clone --recursive git://github.com/apiaryio/snowcrash.git
 	$ cd snowcrash
-	$ git submodule update --init --recursive
 	```
 
 2. Build & test Snow Crash:
