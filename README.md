@@ -1,3 +1,5 @@
+![logo](https://raw.github.com/apiaryio/api-blueprint/gh-pages/assets/logo_apiblueprint.png)
+
 # Snow Crash [![Build Status](https://travis-ci.org/apiaryio/snowcrash.png?branch=master)](https://travis-ci.org/apiaryio/snowcrash)
 
 ### API Blueprint Parser
@@ -6,7 +8,7 @@ Snow Crash is the reference [API Blueprint](http://apiblueprint.org) parser buil
 API Blueprint is Web API documentation language. You can find API Blueprint documentation on the [API Blueprint site](http://apiblueprint.org).
 
 ## Status
-Snow Crash is currently Work in Progress. See its [v1.0 Milestone](https://github.com/apiaryio/snowcrash/issues?milestone=1&state=open) for implementation status details.
+- [Format 1A](https://github.com/apiaryio/api-blueprint/tree/format-1A) fully implemented 
 
 ## Bindings
 Snow Crash bindings in other languages:
@@ -42,7 +44,6 @@ Other systems refer to [build notes](#build).
 We love **Windows** too! Please refer to [Building on Windows](https://github.com/apiaryio/snowcrash/wiki/Building-on-Windows).
 		
 ### Snow Crash command line tool
-
 1. Build `snowcrash`:
 	
 	```sh
@@ -56,12 +57,13 @@ We love **Windows** too! Please refer to [Building on Windows](https://github.co
 	$ snowcrash --help
 	```
 
+## AST
+Parsed API Blueprint is available in the form of AST as defined in [Blueprint.h](src/Blueprint.h). The `snowcrash` command line tool offers AST serialization as defined in [API Blueprint AST Serialization Media Types](https://github.com/apiaryio/api-blueprint-ast).
+
 ## Contribute
-Fork & Pull Request. 
+Fork & Pull Request
 
-Make sure to follow the [API Blueprint Developers discussion group](https://groups.google.com/forum/#!forum/apiblueprint-dev). Also check the Snow Crash [issues page](https://github.com/apiaryio/snowcrash/issues?state=open).
-
-If you want to create a binding for Snow Crash please refer to the [Writing a binding](https://github.com/apiaryio/snowcrash/wiki/Writing-a-binding) Wiki article.
+If you want to create a binding for Snow Crash please refer to the [Writing a Binding](https://github.com/apiaryio/snowcrash/wiki/Writing-a-binding) article.
 
 ## License
 MIT License. See the [LICENSE](https://github.com/apiaryio/snowcrash/blob/master/LICENSE) file.
