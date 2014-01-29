@@ -179,7 +179,7 @@ else:
 if os.path.exists(options_fn):
   gyp_args.extend(['-I', options_fn])
 
-subprocess.call([sys.executable, 'tools/gyp/gyp'] + gyp_args)
+subprocess.call([sys.executable, 'tools/gyp/gyp_main.py'] + gyp_args)
 
 # All done
 print "All OK."

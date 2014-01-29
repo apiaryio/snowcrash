@@ -39,7 +39,7 @@ generator_default_variables = {
   'RULE_INPUT_PATH': '$(RULE_SOURCES)',
   'RULE_INPUT_EXT': '$(suffix $<)',
   'RULE_INPUT_NAME': '$(notdir $<)',
-  'CONFIGURATION_NAME': '$(GYP_DEFAULT_CONFIGURATION)',
+  'CONFIGURATION_NAME': '$(GYP_CONFIGURATION)',
 }
 
 # Make supports multiple toolsets
@@ -145,7 +145,7 @@ class AndroidMkWriter(object):
       spec, configs: gyp info
       part_of_all: flag indicating this target is part of 'all'
     """
-    make.ensure_directory_exists(output_filename)
+    gyp.common.EnsureDirExists(output_filename)
 
     self.fp = open(output_filename, 'w')
 
@@ -452,7 +452,7 @@ class AndroidMkWriter(object):
                      (output, path))
         self.WriteLn('\t@echo Copying: $@')
         self.WriteLn('\t$(hide) mkdir -p $(dir $@)')
-        self.WriteLn('\t$(hide) $(ACP) -r $< $@')
+        self.WriteLn('\t$(hide) $(ACP) -rpf $< $@')
         self.WriteLn()
         outputs.append(output)
     self.WriteLn('%s = %s' % (variable,
@@ -468,42 +468,39 @@ class AndroidMkWriter(object):
     Args:
       spec, configs: input from gyp.
     """
-    config = configs[spec['default_configuration']]
-    extracted_includes = []
+    for configname, config in sorted(configs.iteritems()):
+      extracted_includes = []
 
-    self.WriteLn('\n# Flags passed to both C and C++ files.')
-    cflags, includes_from_cflags = self.ExtractIncludesFromCFlags(
-        config.get('cflags'))
-    extracted_includes.extend(includes_from_cflags)
-    self.WriteList(cflags, 'MY_CFLAGS')
+      self.WriteLn('\n# Flags passed to both C and C++ files.')
+      cflags, includes_from_cflags = self.ExtractIncludesFromCFlags(
+          config.get('cflags', []) + config.get('cflags_c', []))
+      extracted_includes.extend(includes_from_cflags)
+      self.WriteList(cflags, 'MY_CFLAGS_%s' % configname)
 
-    cflags_c, includes_from_cflags_c = self.ExtractIncludesFromCFlags(
-        config.get('cflags_c'))
-    extracted_includes.extend(includes_from_cflags_c)
-    self.WriteList(cflags_c, 'MY_CFLAGS_C')
+      self.WriteList(config.get('defines'), 'MY_DEFS_%s' % configname,
+                     prefix='-D', quoter=make.EscapeCppDefine)
 
-    self.WriteList(config.get('defines'), 'MY_DEFS', prefix='-D',
-                   quoter=make.EscapeCppDefine)
-    self.WriteLn('LOCAL_CFLAGS := $(MY_CFLAGS_C) $(MY_CFLAGS) $(MY_DEFS)')
+      self.WriteLn('\n# Include paths placed before CFLAGS/CPPFLAGS')
+      includes = list(config.get('include_dirs', []))
+      includes.extend(extracted_includes)
+      includes = map(Sourceify, map(self.LocalPathify, includes))
+      includes = self.NormalizeIncludePaths(includes)
+      self.WriteList(includes, 'LOCAL_C_INCLUDES_%s' % configname)
 
+      self.WriteLn('\n# Flags passed to only C++ (and not C) files.')
+      self.WriteList(config.get('cflags_cc'), 'LOCAL_CPPFLAGS_%s' % configname)
+
+    self.WriteLn('\nLOCAL_CFLAGS := $(MY_CFLAGS_$(GYP_CONFIGURATION)) '
+                 '$(MY_DEFS_$(GYP_CONFIGURATION))')
     # Undefine ANDROID for host modules
-    # TODO: the source code should not use macro ANDROID to tell if it's host or
-    # target module.
+    # TODO: the source code should not use macro ANDROID to tell if it's host
+    # or target module.
     if self.toolset == 'host':
       self.WriteLn('# Undefine ANDROID for host modules')
       self.WriteLn('LOCAL_CFLAGS += -UANDROID')
-
-    self.WriteLn('\n# Include paths placed before CFLAGS/CPPFLAGS')
-    includes = list(config.get('include_dirs', []))
-    includes.extend(extracted_includes)
-    includes = map(Sourceify, map(self.LocalPathify, includes))
-    includes = self.NormalizeIncludePaths(includes)
-    self.WriteList(includes, 'LOCAL_C_INCLUDES')
     self.WriteLn('LOCAL_C_INCLUDES := $(GYP_COPIED_SOURCE_ORIGIN_DIRS) '
-                                     '$(LOCAL_C_INCLUDES)')
-
-    self.WriteLn('\n# Flags passed to only C++ (and not C) files.')
-    self.WriteList(config.get('cflags_cc'), 'LOCAL_CPPFLAGS')
+                                     '$(LOCAL_C_INCLUDES_$(GYP_CONFIGURATION))')
+    self.WriteLn('LOCAL_CPPFLAGS := $(LOCAL_CPPFLAGS_$(GYP_CONFIGURATION))')
 
 
   def WriteSources(self, spec, configs, extra_sources):
@@ -727,12 +724,11 @@ class AndroidMkWriter(object):
     """
     clean_cflags = []
     include_paths = []
-    if cflags:
-      for flag in cflags:
-        if flag.startswith('-I'):
-          include_paths.append(flag[2:])
-        else:
-          clean_cflags.append(flag)
+    for flag in cflags:
+      if flag.startswith('-I'):
+        include_paths.append(flag[2:])
+      else:
+        clean_cflags.append(flag)
 
     return (clean_cflags, include_paths)
 
@@ -796,13 +792,11 @@ class AndroidMkWriter(object):
     spec, configs: input from gyp.
     link_deps: link dependency list; see ComputeDeps()
     """
-    config = configs[spec['default_configuration']]
-
-    # LDFLAGS
-    ldflags = list(config.get('ldflags', []))
-    if ldflags:
+    for configname, config in sorted(configs.iteritems()):
+      ldflags = list(config.get('ldflags', []))
       self.WriteLn('')
-      self.WriteList(ldflags, 'LOCAL_LDFLAGS')
+      self.WriteList(ldflags, 'LOCAL_LDFLAGS_%s' % configname)
+    self.WriteLn('\nLOCAL_LDFLAGS := $(LOCAL_LDFLAGS_$(GYP_CONFIGURATION))')
 
     # Libraries (i.e. -lfoo)
     libraries = gyp.common.uniquer(spec.get('libraries', []))
@@ -989,7 +983,7 @@ def GenerateOutput(target_list, target_dicts, data, params):
   makefile_path = os.path.join(options.toplevel_dir, makefile_name)
   assert not options.generator_output, (
       'The Android backend does not support options.generator_output.')
-  make.ensure_directory_exists(makefile_path)
+  gyp.common.EnsureDirExists(makefile_path)
   root_makefile = open(makefile_path, 'w')
 
   root_makefile.write(header)
@@ -1062,8 +1056,7 @@ def GenerateOutput(target_list, target_dicts, data, params):
                                               os.path.dirname(makefile_path))
     include_list.add(mkfile_rel_path)
 
-  root_makefile.write('GYP_DEFAULT_CONFIGURATION := %s\n' %
-                      default_configuration)
+  root_makefile.write('GYP_CONFIGURATION ?= %s\n' % default_configuration)
 
   # Write out the sorted list of includes.
   root_makefile.write('\n')

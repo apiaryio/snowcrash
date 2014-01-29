@@ -403,6 +403,9 @@ def ConvertVCMacrosToMSBuild(s):
   return s
 
 
+_EXCLUDED_SUFFIX_RE = re.compile('^(.*)_excluded$')
+
+
 def ConvertToMSBuildSettings(msvs_settings, stderr=sys.stderr):
   """Converts MSVS settings (VS2008 and earlier) to MSBuild settings (VS2010+).
 
@@ -429,10 +432,19 @@ def ConvertToMSBuildSettings(msvs_settings, stderr=sys.stderr):
             print >> stderr, ('Warning: while converting %s/%s to MSBuild, '
                               '%s' % (msvs_tool_name, msvs_setting, e))
         else:
-          # We don't know this setting.  Give a warning.
-          print >> stderr, ('Warning: unrecognized setting %s/%s '
-                            'while converting to MSBuild.' %
-                            (msvs_tool_name, msvs_setting))
+          # This may be unrecognized because it's an exclusion list. If the
+          # setting name has the _excluded suffix, then check the root name.
+          unrecognized = True
+          m = re.match(_EXCLUDED_SUFFIX_RE, msvs_setting)
+          if m:
+            root_msvs_setting = m.group(1)
+            unrecognized = root_msvs_setting not in msvs_tool
+
+          if unrecognized:
+            # We don't know this setting. Give a warning.
+            print >> stderr, ('Warning: unrecognized setting %s/%s '
+                              'while converting to MSBuild.' %
+                              (msvs_tool_name, msvs_setting))
     else:
       print >> stderr, ('Warning: unrecognized tool %s while converting to '
                         'MSBuild.' % msvs_tool_name)
@@ -812,6 +824,8 @@ _Same(_link, 'UACExecutionLevel',
       _Enumeration(['AsInvoker',  # /level='asInvoker'
                     'HighestAvailable',  # /level='highestAvailable'
                     'RequireAdministrator']))  # /level='requireAdministrator'
+_Same(_link, 'MinimumRequiredVersion', _string)
+_Same(_link, 'TreatLinkerWarningAsErrors', _boolean)  # /WX
 
 
 # Options found in MSVS that have been renamed in MSBuild.
@@ -850,8 +864,6 @@ _MSBuildOnly(_link, 'LinkStatus', _boolean)  # /LTCG:STATUS
 _MSBuildOnly(_link, 'PreventDllBinding', _boolean)  # /ALLOWBIND
 _MSBuildOnly(_link, 'SupportNobindOfDelayLoadedDLL', _boolean)  # /DELAY:NOBIND
 _MSBuildOnly(_link, 'TrackerLogDirectory', _folder_name)
-_MSBuildOnly(_link, 'TreatLinkerWarningAsErrors', _boolean)  # /WX
-_MSBuildOnly(_link, 'MinimumRequiredVersion', _string)
 _MSBuildOnly(_link, 'MSDOSStubFileName', _file_name)  # /STUB Visible='false'
 _MSBuildOnly(_link, 'SectionAlignment', _integer)  # /ALIGN
 _MSBuildOnly(_link, 'SpecifySectionAttributes', _string)  # /SECTION
@@ -985,6 +997,7 @@ _Same(_lib, 'OutputFile', _file_name)  # /OUT
 _Same(_lib, 'SuppressStartupBanner', _boolean)  # /NOLOGO
 _Same(_lib, 'UseUnicodeResponseFiles', _boolean)
 _Same(_lib, 'LinkTimeCodeGeneration', _boolean)  # /LTCG
+_Same(_lib, 'TargetMachine', _target_machine_enumeration)
 
 # TODO(jeanluc) _link defines the same value that gets moved to
 # ProjectReference.  We may want to validate that they are consistent.
@@ -1003,7 +1016,6 @@ _MSBuildOnly(_lib, 'MinimumRequiredVersion', _string)
 _MSBuildOnly(_lib, 'Name', _file_name)  # /NAME
 _MSBuildOnly(_lib, 'RemoveObjects', _file_list)  # /REMOVE
 _MSBuildOnly(_lib, 'SubSystem', _subsystem_enumeration)
-_MSBuildOnly(_lib, 'TargetMachine', _target_machine_enumeration)
 _MSBuildOnly(_lib, 'TrackerLogDirectory', _folder_name)
 _MSBuildOnly(_lib, 'TreatLibWarningAsErrors', _boolean)  # /WX
 _MSBuildOnly(_lib, 'Verbose', _boolean)
