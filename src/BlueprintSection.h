@@ -110,7 +110,7 @@ namespace snowcrash {
         /**
          *  Maximum boundaries of the section including any subsection.
          */
-        const SectionBounds& bounds;
+        const SectionBounds bounds;
         
         /**
          *  \return True if section's parent is specified, false otherwise.
