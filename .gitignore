@@ -36,3 +36,4 @@ config.mk
 config.gypi
 bin/
 vendor/
+.vagrant/
