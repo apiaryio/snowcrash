@@ -25,10 +25,13 @@
 // TODO: Remove extraneous surounding group
 #define SYMBOL_IDENTIFIER "([[:alnum:][:blank:]_-]+)"
 
+// New Symbol identifier
+//#define SYMBOL_IDENTIFIER "([^]^[^(^)]+)"
+
 namespace snowcrashconst {
     
     /** Symbol reference matching regex */
-    const char* const SymbolReferenceRegex("^[ \\t]*\\[(" SYMBOL_IDENTIFIER ")]\\[][ \\t]*$");
+    const char* const SymbolReferenceRegex("^[[:blank:]]*\\[" SYMBOL_IDENTIFIER "]\\[][[:blank:]]*$");
 }
 
 namespace snowcrash {

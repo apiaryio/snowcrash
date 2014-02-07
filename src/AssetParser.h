@@ -19,10 +19,10 @@
 namespace snowcrashconst {
     
     /** Body matching regex */
-    const char* const BodyRegex("^[ \\t]*[Bb]ody[ \\t]*$");
+    const char* const BodyRegex("^[[:blank:]]*[Bb]ody[[:blank:]]*$");
 
     /** Schema matching regex */
-    const char* const SchemaRegex("^[ \\t]*[Ss]chema[ \\t]*$");
+    const char* const SchemaRegex("^[[:blank:]]*[Ss]chema[[:blank:]]*$");
 }
 
 namespace snowcrash {

@@ -15,7 +15,7 @@
 
 namespace snowcrashconst {
     
-    const char* const GroupHeaderRegex = "^[ \\t]*[Gg]roup[ \\t]+(" SYMBOL_IDENTIFIER ")[ \\t]*$";
+    const char* const GroupHeaderRegex = "^[[:blank:]]*[Gg]roup[[:blank:]]+" SYMBOL_IDENTIFIER "[[:blank:]]*$";
 }
 
 namespace snowcrash {

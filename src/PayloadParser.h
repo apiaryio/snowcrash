@@ -32,7 +32,7 @@ namespace snowcrashconst {
     const char* const ResponseRegex = "^[[:blank:]]*[Rr]esponse([[:blank:][:digit:]]+)?" MEDIA_TYPE "?[[:blank:]]*";
     
     /** Object matching regex */
-    const char* const ObjectRegex = "^[ \\t]*(" SYMBOL_IDENTIFIER ")[ \\t][Oo]bject([ \\t]\\(([^\\)]*)\\))?[ \\t]*$";
+    const char* const ObjectRegex = "^[[:blank:]]*" SYMBOL_IDENTIFIER "[Oo]bject" MEDIA_TYPE "?[[:blank:]]*$";
     
     /** Model matching regex */
     const char* const  ModelRegex = "^[[:blank:]]*" SYMBOL_IDENTIFIER "?[Mm]odel" MEDIA_TYPE "?[[:blank:]]*";
@@ -93,7 +93,7 @@ namespace snowcrash {
             else if (RegexCapture(content, snowcrashconst::ObjectRegex, captureGroups, 5)) {
                 name = captureGroups[1];
                 TrimString(name);
-                mediaType = captureGroups[4];
+                mediaType = captureGroups[3];
                 return ObjectPayloadSignature;
             }
             else if (RegexCapture(content, snowcrashconst::ModelRegex, captureGroups, 5)) {
