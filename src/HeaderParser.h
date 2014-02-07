@@ -19,7 +19,7 @@
 namespace snowcrashconst {
     
     /** Headers matching regex */
-    const char* const HeadersRegex = "^[ \\t]*[Hh]eaders?[ \\t]*$";
+    const char* const HeadersRegex = "^[[:blank:]]*[Hh]eaders?[[:blank:]]*$";
 }
 
 namespace snowcrash {

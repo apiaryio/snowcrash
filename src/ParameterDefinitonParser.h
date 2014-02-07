@@ -34,10 +34,10 @@ namespace snowcrashconst {
                                                         "([[:blank:]]*=[[:blank:]]*`([^`]*)`[[:blank:]]*)?([[:blank:]]*\\(([^)]*)\\)[[:blank:]]*)?([[:blank:]]*\\.\\.\\.[[:blank:]]*(.*))?$";
 
     /** Parameter Required matching regex */
-    const char* const ParameterRequiredRegex = "^[ \\t]*[Rr]equired[ \\t]*$";
+    const char* const ParameterRequiredRegex = "^[[:blank:]]*[Rr]equired[[:blank:]]*$";
 
     /** Parameter Optional matching regex */
-    const char* const ParameterOptionalRegex = "^[ \\t]*[Oo]ptional[ \\t]*$";
+    const char* const ParameterOptionalRegex = "^[[:blank:]]*[Oo]ptional[[:blank:]]*$";
 
     /** Additonal Parameter Traits Example matching regex */
     const char* const AdditionalTraitsExampleRegex = CSV_LEADINOUT "`([^`]*)`" CSV_LEADINOUT;
@@ -49,7 +49,7 @@ namespace snowcrashconst {
     const char* const AdditionalTraitsTypeRegex = CSV_LEADINOUT "([^,]*)" CSV_LEADINOUT;
 
     /** Parameter Values matching regex */
-    const char* const ParameterValuesRegex = "^[ \\t]*[Vv]alues[ \\t]*$";
+    const char* const ParameterValuesRegex = "^[[:blank:]]*[Vv]alues[[:blank:]]*$";
 
     /** Values expected content */
     const char* const ExpectedValuesContent = "nested list of possible parameter values, one element per list item e.g. '`value`'";

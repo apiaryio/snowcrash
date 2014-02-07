@@ -20,7 +20,7 @@
 namespace snowcrashconst {
     
     /** Parameters matching regex */
-    const char* const ParametersRegex = "^[ \\t]*[Pp]arameters?[ \\t]*$";
+    const char* const ParametersRegex = "^[[:blank:]]*[Pp]arameters?[[:blank:]]*$";
 
     /** Expected parameters content */
     const char* const ExpectedParametersContent = "a nested list of parameters, one parameter per list item";
