@@ -56,6 +56,7 @@
 		BBC2D861183024C100FBCEA7 /* DescriptionSectionUtility.h in Headers */ = {isa = PBXBuildFile; fileRef = BBC2D860183024C100FBCEA7 /* DescriptionSectionUtility.h */; };
 		BBC2D86318316DC000FBCEA7 /* ListBlockUtility.h in Headers */ = {isa = PBXBuildFile; fileRef = BBC2D86218316DC000FBCEA7 /* ListBlockUtility.h */; };
 		BBC2D8661831A76100FBCEA7 /* SectionUtility.h in Headers */ = {isa = PBXBuildFile; fileRef = BBC2D8651831A76100FBCEA7 /* SectionUtility.h */; };
+		BBCC04E618A51AA800C65A08 /* test-SymbolIdentifier.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBCC04E518A51AA800C65A08 /* test-SymbolIdentifier.cc */; };
 		BBD5F9C917353C310049BBEE /* ResourceGroupParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD5F9C717353C300049BBEE /* ResourceGroupParser.h */; };
 		BBD5F9CE17353CE00049BBEE /* ResourceParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD5F9CC17353CE00049BBEE /* ResourceParser.h */; };
 		BBD5F9D21735439B0049BBEE /* ParserCore.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD5F9D11735439B0049BBEE /* ParserCore.cc */; };
@@ -191,6 +192,7 @@
 		BBC2D86218316DC000FBCEA7 /* ListBlockUtility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ListBlockUtility.h; path = src/ListBlockUtility.h; sourceTree = "<group>"; };
 		BBC2D8641831901400FBCEA7 /* BlockUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BlockUtility.h; path = src/BlockUtility.h; sourceTree = "<group>"; };
 		BBC2D8651831A76100FBCEA7 /* SectionUtility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SectionUtility.h; path = src/SectionUtility.h; sourceTree = "<group>"; };
+		BBCC04E518A51AA800C65A08 /* test-SymbolIdentifier.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-SymbolIdentifier.cc"; path = "test/test-SymbolIdentifier.cc"; sourceTree = "<group>"; };
 		BBD5F9C717353C300049BBEE /* ResourceGroupParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = ResourceGroupParser.h; path = src/ResourceGroupParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BBD5F9CC17353CE00049BBEE /* ResourceParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = ResourceParser.h; path = src/ResourceParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BBD5F9CF1735413A0049BBEE /* BlueprintParserCore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = BlueprintParserCore.h; path = src/BlueprintParserCore.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
@@ -403,6 +405,7 @@
 				BBD5F9DB173561DA0049BBEE /* test-ResouceGroupParser.cc */,
 				BBD5F9DD173578210049BBEE /* test-ResourceParser.cc */,
 				BBFF48C9170B3C49001E5FB2 /* test-snowcrash.cc */,
+				BBCC04E518A51AA800C65A08 /* test-SymbolIdentifier.cc */,
 				BB1865C81764DB8A00756B18 /* test-SymbolTable.cc */,
 				BB9E7029183342CB00ED5806 /* test-Warnings.cc */,
 			);
@@ -640,6 +643,7 @@
 				BBE5705D173922B70086CE22 /* test-PayloadParser.cc in Sources */,
 				BB03DC6617D3718D00C51E52 /* test-ParametersParser.cc in Sources */,
 				BB50F0BD17D1DCE00002C363 /* test-ActionParser.cc in Sources */,
+				BBCC04E618A51AA800C65A08 /* test-SymbolIdentifier.cc in Sources */,
 				BB3DD975174654FD004C4077 /* test-AssetParser.cc in Sources */,
 				BB9E702A183342CB00ED5806 /* test-Warnings.cc in Sources */,
 				BB1D4D0B174D0932009BCB1C /* test-HeaderParser.cc in Sources */,

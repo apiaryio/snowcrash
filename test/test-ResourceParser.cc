@@ -723,3 +723,5 @@ TEST_CASE("Parse root resource", "[resource][source][issue][#40]")
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions.empty());
 }
 
+
+

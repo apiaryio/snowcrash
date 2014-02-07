@@ -682,7 +682,7 @@ TEST_CASE("Warn on malformed payload signature", "[payload][block][#20]")
 {
     // Blueprint in question:
     //R"(
-    //+ Request This is FUN! (text/plain)
+    //+ Request This is FUN[ (text/plain)
     //
     //        Hello World!
     //");
@@ -690,7 +690,7 @@ TEST_CASE("Warn on malformed payload signature", "[payload][block][#20]")
     MarkdownBlock::Stack markdown;
     markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
     markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Request This is FUN! (text/plain)", 0, MakeSourceDataBlock(0, 1)));
+    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Request This is FUN[ (text/plain)", 0, MakeSourceDataBlock(0, 1)));
     markdown.push_back(MarkdownBlock(CodeBlockType, "Hello World!", 0, MakeSourceDataBlock(1, 1)));
     markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(2, 1)));
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(3, 1)));

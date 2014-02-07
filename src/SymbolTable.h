@@ -22,11 +22,7 @@
 #include "StringUtility.h"
 
 // Symbol identifier regex
-// TODO: Remove extraneous surounding group
-#define SYMBOL_IDENTIFIER "([[:alnum:][:blank:]_-]+)"
-
-// New Symbol identifier
-//#define SYMBOL_IDENTIFIER "([^]^[^(^)]+)"
+#define SYMBOL_IDENTIFIER "([^][()]+)"
 
 namespace snowcrashconst {
     
