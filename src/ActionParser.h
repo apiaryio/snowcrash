@@ -24,7 +24,7 @@ namespace snowcrashconst {
     const char* const ActionHeaderRegex = "^[[:blank:]]*" HTTP_REQUEST_METHOD "[[:blank:]]*" URI_TEMPLATE "?$";
     
     /** Named action matching regex */
-    const char* const NamedActionHeaderRegex = "^([^\\[]*)\\[" HTTP_REQUEST_METHOD "]$";
+    const char* const NamedActionHeaderRegex = "^[[:blank:]]*" SYMBOL_IDENTIFIER "\\[" HTTP_REQUEST_METHOD "]$";
 }
 
 namespace snowcrash {
