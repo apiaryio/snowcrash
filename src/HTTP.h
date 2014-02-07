@@ -18,14 +18,14 @@
  *  defined type due to C++98 string concatenation limitations.
  *  To be improved with migration to C++11.
  */
-#define HTTP_METHODS "GET|POST|PUT|DELETE|OPTIONS|PATCH|PROPPATCH|LOCK|UNLOCK|COPY|MOVE|MKCOL|HEAD|LINK|UNLINK"
+#define HTTP_REQUEST_METHOD "(GET|POST|PUT|DELETE|OPTIONS|PATCH|PROPPATCH|LOCK|UNLOCK|COPY|MOVE|MKCOL|HEAD|LINK|UNLINK)"
 
 /** 
  *  \brief URI Template.
  *
  *  See previous technical note (using macro).
  */
-#define URI_TEMPLATE "/[^]]*"
+#define URI_TEMPLATE "(/[^]]*)"
 
 namespace snowcrash {
     

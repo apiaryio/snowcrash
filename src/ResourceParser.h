@@ -21,10 +21,10 @@
 namespace snowcrashconst {
     
     /** Nameless resource matching regex */
-    const char* const ResourceHeaderRegex = "^[[:blank:]]*((" HTTP_METHODS ")[[:blank:]]+)?(" URI_TEMPLATE ")$";
+    const char* const ResourceHeaderRegex = "^[[:blank:]]*(" HTTP_REQUEST_METHOD "[[:blank:]]+)?" URI_TEMPLATE "$";
     
     /** Named resource matching regex */
-    const char* const NamedResourceHeaderRegex = "^[[:blank:]]*" SYMBOL_IDENTIFIER "[[:blank:]]+\\[(" URI_TEMPLATE ")]$";
+    const char* const NamedResourceHeaderRegex = "^[[:blank:]]*" SYMBOL_IDENTIFIER "[[:blank:]]+\\[" URI_TEMPLATE "]$";
 }
 
 namespace snowcrash {
