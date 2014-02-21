@@ -20,9 +20,6 @@
  *  Data types in this documents define the API Blueprint AST.
  */
 
-/** Version of API Blueprint AST */
-#define AST_VERSION "1.0"
-
 namespace snowcrash {
     
     /** Name of a an API Blueprint entity. */

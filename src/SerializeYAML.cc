@@ -311,7 +311,7 @@ static void serialize(const ResourceGroup& group, std::ostream &os)
 static void serialize(const Blueprint& blueprint, std::ostream &os)
 {
     // AST Version
-    serialize(SerializeKey::ASTVersion, AST_VERSION, 0, os);
+    serialize(SerializeKey::ASTVersion, AST_SERIALIZATION_VERSION, 0, os);
     
     // Metadata
     serialize(blueprint.metadata, os);

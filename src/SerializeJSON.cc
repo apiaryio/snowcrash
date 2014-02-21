@@ -591,7 +591,7 @@ static void serialize(const Blueprint& blueprint, std::ostream &os)
     os << "{\n";
     
     // AST Version
-    serialize(SerializeKey::ASTVersion, AST_VERSION, 1, false, os);
+    serialize(SerializeKey::ASTVersion, AST_SERIALIZATION_VERSION, 1, false, os);
     os << NewLineItemBlock;
     
     // Metadata
