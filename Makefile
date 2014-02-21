@@ -9,22 +9,22 @@ GYP ?= ./tools/gyp/gyp
 V ?= 1
 
 # Targets
-all: libsnowcrash test-snowcrash snowcrash
+all: libsnowcrash test-libsnowcrash snowcrash
 
-.PHONY: libsnowcrash test-snowcrash snowcrash
+.PHONY: libsnowcrash test-libsnowcrash snowcrash
 
 libsnowcrash: config.gypi $(BUILD_DIR)/Makefile
 	$(MAKE) -C $(BUILD_DIR) V=$(V) libsnowcrash
 
-test-snowcrash: config.gypi $(BUILD_DIR)/Makefile
-	$(MAKE) -C $(BUILD_DIR) V=$(V) test-snowcrash
+test-libsnowcrash: config.gypi $(BUILD_DIR)/Makefile
+	$(MAKE) -C $(BUILD_DIR) V=$(V) test-libsnowcrash
 	mkdir -p ./bin
-	cp -f $(BUILD_DIR)/out/$(BUILDTYPE)/test-snowcrash ./bin/test-snowcrash
+	cp -f $(BUILD_DIR)/out/$(BUILDTYPE)/test-libsnowcrash ./bin/test-libsnowcrash
 
-perf-snowcrash: config.gypi $(BUILD_DIR)/Makefile
-	$(MAKE) -C $(BUILD_DIR) V=$(V) perf-snowcrash
+perf-libsnowcrash: config.gypi $(BUILD_DIR)/Makefile
+	$(MAKE) -C $(BUILD_DIR) V=$(V) perf-libsnowcrash
 	mkdir -p ./bin
-	cp -f $(BUILD_DIR)/out/$(BUILDTYPE)/perf-snowcrash ./bin/perf-snowcrash
+	cp -f $(BUILD_DIR)/out/$(BUILDTYPE)/perf-libsnowcrash ./bin/perf-libsnowcrash
 
 snowcrash: config.gypi $(BUILD_DIR)/Makefile
 	$(MAKE) -C $(BUILD_DIR) V=$(V) snowcrash
@@ -47,17 +47,17 @@ distclean:
 	rm -f ./config.gypi
 	rm -rf ./bin	
 
-test: test-snowcrash snowcrash
-	$(BUILD_DIR)/out/$(BUILDTYPE)/test-snowcrash
-	
+test: test-libsnowcrash
+	$(BUILD_DIR)/out/$(BUILDTYPE)/test-libsnowcrash
+
 ifdef CUCUMBER
 	bundle exec $(CUCUMBER)
-endif
+endif	
 
-perf: perf-snowcrash
-	$(BUILD_DIR)/out/$(BUILDTYPE)/perf-snowcrash ./test/performance/fixtures/fixture-1.md
+perf: perf-libsnowcrash
+	$(BUILD_DIR)/out/$(BUILDTYPE)/perf-libsnowcrash ./test/performance/fixtures/fixture-1.md
 
 install: snowcrash
 	cp -f $(BUILD_DIR)/out/$(BUILDTYPE)/snowcrash /usr/local/bin/snowcrash
 
-.PHONY: libsnowcrash test-snowcrash perf-snowcrash snowcrash clean distclean test
+.PHONY: libsnowcrash test-libsnowcrash perf-libsnowcrash snowcrash clean distclean test
