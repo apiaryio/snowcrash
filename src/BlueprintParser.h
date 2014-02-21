@@ -27,7 +27,7 @@ namespace snowcrash {
     /** Internal list items classifier, Blueprint Context */
     template <>
     FORCEINLINE SectionType ClassifyInternaListBlock<Blueprint>(const BlockIterator& begin,
-                                                                    const BlockIterator& end) {
+                                                                const BlockIterator& end) {
         return UndefinedSectionType;
     }
     
