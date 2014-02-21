@@ -51,7 +51,7 @@ test: test-snowcrash snowcrash
 	$(BUILD_DIR)/out/$(BUILDTYPE)/test-snowcrash
 	
 ifdef CUCUMBER
-	$(CUCUMBER)
+	bundle exec $(CUCUMBER)
 endif
 
 perf: perf-snowcrash
