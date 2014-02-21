@@ -1,0 +1,72 @@
+_version: 1.0
+metadata:
+  Format:
+    value: 1A
+name: "<API name>"
+description: "<API description>\n\n"
+resourceGroups:
+- name: "<resource group name>"
+  description: "<resource group description>\n\n"
+  resources:
+  - name: "<resource name>"
+    description: "<resource description>\n\n"
+    uriTemplate: "/resource/{parameter}"
+    model:
+      name: "<resource name>"
+      description: "<resource model description>"
+      headers:
+        <header1>:
+          value: "<header value>"
+      body: "<resource model body>\n"
+      schema: "<resource model schema>\n"
+    parameters:
+      parameter:
+        description: "<description>"
+        type: "<type>"
+        required: false
+        default: "<default value>"
+        example: "<example value>"
+        values:
+        - "<element>"
+    headers:
+      <header2>:
+        value: "<header value>"
+    actions:
+    - name: "<action name>"
+      description: "<action description>\n\n"
+      method: POST
+      parameters:
+        parameter:
+          description: "<description>"
+          type: "<type>"
+          required: false
+          default: "<default value>"
+          example: "<example value>"
+          values:
+          - "<element>"
+      headers:
+        <header>:
+          value: "<header value>"
+      examples:
+      - name:
+        description:
+        requests:
+        - name: "<request name>"
+          description: "<request description>\n"
+          headers:
+            Content-Type:
+              value: text/plain
+            <header3>:
+              value: "<header value>"
+          body: "<request body>\n"
+          schema: "<request schema>\n"
+        responses:
+        - name: 200
+          description: "<response description>\n"
+          headers:
+            Content-Type:
+              value: text/plain
+            <header4>:
+              value: "<header value>"
+          body: "<response body>\n"
+          schema: "<response schema>\n"

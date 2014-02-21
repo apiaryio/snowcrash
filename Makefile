@@ -47,8 +47,12 @@ distclean:
 	rm -f ./config.gypi
 	rm -rf ./bin	
 
-test: test-snowcrash
+test: test-snowcrash snowcrash
 	$(BUILD_DIR)/out/$(BUILDTYPE)/test-snowcrash
+	
+ifdef CUCUMBER
+	bundle exec $(CUCUMBER)
+endif
 
 perf: perf-snowcrash
 	$(BUILD_DIR)/out/$(BUILDTYPE)/perf-snowcrash ./test/performance/fixtures/fixture-1.md

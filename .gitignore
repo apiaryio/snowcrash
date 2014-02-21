@@ -37,3 +37,7 @@ config.gypi
 bin/
 vendor/
 .vagrant/
+
+# Ruby
+.bundle/
+
