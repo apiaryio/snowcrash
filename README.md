@@ -16,6 +16,16 @@ Snow Crash bindings in other languages:
 - [Protagonist](https://github.com/apiaryio/protagonist) (Node.js)
 - [Snow Crash .NET](https://github.com/brutski/snowcrash-dot-net-wrapper) (.NET)
 
+## Use
+You can either use Snow Crash directly consuming its AST or using the `snowcrash` command line tool to parse a blueprint into YAML or JSON AST representation.
+
+### AST
+Parsed API Blueprint is available in the form of AST as defined in [Blueprint.h](src/Blueprint.h). The `snowcrash` command line tool 
+offers AST serialization as defined in [API Blueprint AST Serialization Media Types](https://github.com/apiaryio/api-blueprint-ast).
+
+### Command Line
+Refer to [parse feature](features/parse.feature) for details on using the `snowcrash` command line tool.
+
 ## Install
 OS X using Homebrew:
 
@@ -56,9 +66,6 @@ We love **Windows** too! Please refer to [Building on Windows](https://github.co
 	$ sudo make install
 	$ snowcrash --help
 	```
-
-## AST
-Parsed API Blueprint is available in the form of AST as defined in [Blueprint.h](src/Blueprint.h). The `snowcrash` command line tool offers AST serialization as defined in [API Blueprint AST Serialization Media Types](https://github.com/apiaryio/api-blueprint-ast).
 
 ## Contribute
 Fork & Pull Request
