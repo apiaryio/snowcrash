@@ -165,14 +165,14 @@ namespace snowcrash {
             if (duplicate == group.resources.end())
                 globalDuplicate = FindResource(parser.blueprint, resource);
 
-			URIResult uriresult;
-			uriParser.parse(resource.uriTemplate, uriresult);
+            URIResult uriresult;
+            uriParser.parse(resource.uriTemplate, uriresult);
 
-			if (!uriresult.isValid){
-				// WARN: Square brackets in URI path
-				SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, section.bounds.second, section.bounds, parser.sourceData);
-				result.first.warnings.push_back(Warning("the resource URI '" + resource.uriTemplate + "' contains square brackets outside of the host section", UriPathContainsBracketsWarning, sourceBlock));
-			}
+            if (!uriresult.isValid){
+                // WARN: Square brackets in URI path
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, section.bounds.second, section.bounds, parser.sourceData);
+                result.first.warnings.push_back(Warning("the resource URI '" + resource.uriTemplate + "' contains square brackets outside of the host section", UriPathContainsBracketsWarning, sourceBlock));
+            }
             
             if (duplicate != group.resources.end() ||
                 globalDuplicate.first != parser.blueprint.resourceGroups.end()) {
