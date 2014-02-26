@@ -7,34 +7,36 @@
 //
 
 #include "UriParser.h"
-#include <regex>
+#include "RegexMatch.h"
 
 using namespace snowcrash;
 
 
-struct DoesNotContainString{
-	std::string s;
-	DoesNotContainString(std::string  s) :s{ s }{}
-	bool operator()(const std::string &r){
-		return r.find(s) == std::string::npos;
-	};
-};
+
+
+ bool URIParser::ContainsString(std::string s,std::string in){
+     return in.find(s) != std::string::npos;
+}
 
 
 void URIParser::parse(const URI uri, URIResult& result)
 {
-	try {
-		std::smatch smatch;
-		std::regex pattern(URI_REGEX, std::regex_constants::icase);
-		std::regex_search(uri, smatch, pattern);
-		result.scheme = smatch[1];
-		result.host = smatch[3];
-		result.path = smatch[4];
-		result.isValid = DoesNotContainString{ "[" }(result.path) && DoesNotContainString{ "]" }(result.path);
-		
-	}
-	catch (const std::regex_error&) {
-	}
-	catch (...) {
-	}
+    CaptureGroups groups;
+    size_t gSize=5;
+
+    if (RegexCapture(uri, URI_REGEX, groups, gSize)){
+        result.scheme = groups[1];
+        result.host = groups[3];
+        result.path = groups[4];
+        result.isValid = true;
+
+        if (ContainsString("[", result.path) || ContainsString("]", result.path)){
+            result.isValid = false;
+            result.InvalidURIReason = InvalidURIReason::SquareBracketsInPath;
+        }
+    }
+    else{
+        result.isValid = false;
+        result.InvalidURIReason = InvalidURIReason::UnparsableURI;
+    }
 }

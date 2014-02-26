@@ -171,7 +171,7 @@ namespace snowcrash {
             if (!uriresult.isValid){
                 // WARN: Square brackets in URI path
                 SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, section.bounds.second, section.bounds, parser.sourceData);
-                result.first.warnings.push_back(Warning("the resource URI '" + resource.uriTemplate + "' contains square brackets outside of the host section", UriPathContainsBracketsWarning, sourceBlock));
+                result.first.warnings.push_back(Warning("the resource URI '" + resource.uriTemplate + "' contains square brackets outside of the host section", URIWarning, sourceBlock));
             }
             
             if (duplicate != group.resources.end() ||

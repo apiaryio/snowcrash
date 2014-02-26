@@ -24,7 +24,7 @@ TEST_CASE("Warn about keywords in API name", "[warnings][#31]")
     //# POST
     //");
     const std::string blueprintSource = \
-    "FORMAT: X-1A\n"\
+    "FORMAT: 1A\n"\
     "\n"\
     "## POST\n";
     
@@ -40,24 +40,25 @@ TEST_CASE("Warn about keywords in API name", "[warnings][#31]")
 //    REQUIRE(blueprint.resourceGroups.empty());
 }
 
-TEST_CASE("Warn about brackets in URI template", "[bracketwarnings]")
+TEST_CASE("Warn about brackets in URI template", "[bracketwarnings][issue][#79]")
 {
-	// Blueprint in question:
-	//R"(
-	//FORMAT: X-1A
-	//
-	//# GROUP test
-	//## GET /test/{id}[5]
-	//");
-	const std::string blueprintSource = \
-		"FORMAT: X-1A\n"\
-		"\n"\
-		"# GET /test/{id}[5]\n"\
-		"+ Response 200\n";
+    // Blueprint in question:
+    //R"(
+    //FORMAT: X-1A
+    //
+    //# GROUP test
+    //## GET /test/{id}[5]
+    //");
+    const std::string blueprintSource = \
+        "HOST http://test.test.com\n"\
+        "FORMAT: 1A\n"\
+        "\n"\
+        "# GET /test/{id}[5]\n"\
+        "+ Response 200\n";
 
-	Parser parser;
-	Result result;
-	Blueprint blueprint;
-	parser.parse(blueprintSource, 0, result, blueprint);
-	REQUIRE(result.warnings.size() == 1);
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(blueprintSource, 0, result, blueprint);
+    REQUIRE(result.warnings.size() == 1);
 }

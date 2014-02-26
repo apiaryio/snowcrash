@@ -22,19 +22,27 @@
 #define URI_REGEX "^(http|https|ftp|file)?(://)?([^/]*)?(.*)$"
 
 namespace snowcrash {
-	
+    
+    enum InvalidURIReason{
+        SquareBracketsInPath = 1,
+        UnparsableURI = 2
+    };
 	
 
 
-	struct URIResult{
-		std::string scheme;
-		std::string host;
-		std::string path;
-		bool isValid;
-	};
+    struct URIResult{
+        std::string scheme;
+        std::string host;
+        std::string path;
+        InvalidURIReason InvalidURIReason;
+        bool isValid;
+    };
+
+    
 
 
 	class URIParser{
+        static bool ContainsString(std::string s,std::string in);
 	public:
 		/**
 		*  \brief Parse the URI into scheme, host and path
