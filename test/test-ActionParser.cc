@@ -24,10 +24,6 @@ MarkdownBlock::Stack snowcrashtest::CanonicalActionFixture()
     //# My Method [GET]
     //Method Description
     //
-    //+ Headers
-    //
-    //        X-Method-Header: 0xdeadbeef
-    //
     // <see CanonicalPayloadFixture()>
     //
     //+ Response 200 (text/plain)
@@ -40,18 +36,7 @@ MarkdownBlock::Stack snowcrashtest::CanonicalActionFixture()
     markdown.push_back(MarkdownBlock(HeaderBlockType, "My Method [GET]", 1, MakeSourceDataBlock(0, 1)));
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "Method Description", 0, MakeSourceDataBlock(1, 1)));
     
-    MarkdownBlock::Stack headerList;
-    headerList.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-    headerList.push_back(MarkdownBlock(ParagraphBlockType, "Headers", 0, MakeSourceDataBlock(1, 1)));
-    headerList.push_back(MarkdownBlock(CodeBlockType, "X-Method-Header: 0xdeadbeef", 0, MakeSourceDataBlock(2, 1)));
-    headerList.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(3, 1)));
-    
     MarkdownBlock::Stack listBlock = CanonicalPayloadFixture();
-    
-    // inject headers into payload list
-    MarkdownBlock::Stack::iterator cur = listBlock.begin();
-    ++cur;
-    listBlock.insert(cur, headerList.begin(), headerList.end());
     
     // inject response into payload list
     MarkdownBlock::Stack responseList;
@@ -60,7 +45,7 @@ MarkdownBlock::Stack snowcrashtest::CanonicalActionFixture()
     responseList.push_back(MarkdownBlock(CodeBlockType, "OK.", 0, MakeSourceDataBlock(5, 1)));
     responseList.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(6, 1)));
     
-    cur = listBlock.begin();
+    MarkdownBlock::Stack::iterator cur = listBlock.begin();
     ++cur;
     listBlock.insert(cur, responseList.begin(), responseList.end());
     
@@ -101,10 +86,6 @@ TEST_CASE("Method block classifier", "[action][classifier][blocks]")
     ++cur; // ListItemBlockBeginType - "Response"
     REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSectionType) == ResponseSectionType);
     REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSectionType) == ResponseSectionType);
-    
-    std::advance(cur, 4); // ListItemBlockBeginType - "Headers"
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSectionType) == HeadersSectionType);
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSectionType) == HeadersSectionType);
     
     std::advance(cur, 4); // Request
     REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSectionType) == RequestSectionType);
@@ -166,15 +147,13 @@ TEST_CASE("Parse method", "[action][blocks]")
     CHECK(result.first.warnings.empty());
 
     const MarkdownBlock::Stack &blocks = markdown;
-    REQUIRE(std::distance(blocks.begin(), result.second) == 30);
+    REQUIRE(std::distance(blocks.begin(), result.second) == 26);
     
     REQUIRE(action.name == "My Method");
     REQUIRE(action.method == "GET");
     REQUIRE(action.description == "1");
 
-    REQUIRE(action.headers.size() == 1);
-    REQUIRE(action.headers[0].first == "X-Method-Header");
-    REQUIRE(action.headers[0].second == "0xdeadbeef");
+    REQUIRE(action.headers.size() == 0);
     REQUIRE(action.examples.front().requests.size() == 1);
     REQUIRE(action.examples.front().responses.size() == 1);
     
@@ -691,7 +670,7 @@ TEST_CASE("Check warnings on overshadowing a header", "[action][blocks]")
     REQUIRE(result.first.warnings.size() == 1);
     
     const MarkdownBlock::Stack &blocks = markdown;
-    REQUIRE(std::distance(blocks.begin(), result.second) == 30);
+    REQUIRE(std::distance(blocks.begin(), result.second) == 26);
 }
 
 TEST_CASE("Parse method without name", "[action][blocks]")

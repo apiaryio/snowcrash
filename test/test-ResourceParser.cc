@@ -29,9 +29,6 @@ MarkdownBlock::Stack snowcrashtest::CanonicalResourceFixture()
     //
     //  <see CanonicalParametersFixture()>
     //
-    //+ Headers
-    //
-    //        X-Resource-Header: Swordfighter XXII
     //
     // <see CanonicalActionFixture()>
     //
@@ -55,11 +52,6 @@ MarkdownBlock::Stack snowcrashtest::CanonicalResourceFixture()
     MarkdownBlock::Stack::iterator end = parameters.end();
     --end;
     markdown.insert(markdown.end(), begin, end);
-    
-    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Headers", 0, MakeSourceDataBlock(5, 1)));
-    markdown.push_back(MarkdownBlock(CodeBlockType, "X-Resource-Header: Swordfighter XXII", 0, MakeSourceDataBlock(6, 1)));
-    markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(7, 1)));
     
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(8, 1)));
     
@@ -94,11 +86,7 @@ TEST_CASE("Resource block classifier", "[resource][block]")
     REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSectionType) == ParametersSectionType);
     REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSectionType) == ParametersSectionType);
 
-    std::advance(cur, 39); // ListItemBlockBeginType - "Headers"
-    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSectionType) == HeadersSectionType);
-    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSectionType) == HeadersSectionType);
-    
-    std::advance(cur, 5); // Method
+    std::advance(cur, 40); // Method
     REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSectionType) == ActionSectionType);
     REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSectionType) == ActionSectionType);
     REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), HeadersSectionType) == ActionSectionType);
@@ -144,7 +132,7 @@ TEST_CASE("Parse resource", "[resource][block]")
     CHECK(result.first.warnings.empty());
     
     const MarkdownBlock::Stack &blocks = markdown;
-    REQUIRE(std::distance(blocks.begin(), result.second) == 42 + 39);
+    REQUIRE(std::distance(blocks.begin(), result.second) == 42 + 31);
     
     REQUIRE(resource.name == "My Resource");
     REQUIRE(resource.uriTemplate == "/resource/{id}{?limit}");
@@ -157,9 +145,7 @@ TEST_CASE("Parse resource", "[resource][block]")
     REQUIRE(resource.parameters.size() == 2);
     REQUIRE(resource.parameters[0].name == "id");
     REQUIRE(resource.parameters[1].name == "limit");
-    REQUIRE(resource.headers.size() == 1);
-    REQUIRE(resource.headers[0].first == "X-Resource-Header");
-    REQUIRE(resource.headers[0].second == "Swordfighter XXII");
+    REQUIRE(resource.headers.empty());
     REQUIRE(resource.actions.size() == 1);
     REQUIRE(resource.actions.front().method == "GET");
 }
@@ -415,27 +401,6 @@ TEST_CASE("Parse resource with a HR", "[resource][block]")
     REQUIRE(resource.model.name.empty());
     REQUIRE(resource.model.body.empty());
     REQUIRE(resource.actions.empty());
-}
-
-TEST_CASE("Check overshadowing header warning", "[resource][block]")
-{
-    MarkdownBlock::Stack markdown = CanonicalResourceFixture();
-    Resource resource;
-    resource.headers.push_back(std::make_pair("X-Header", "24"));
-    
-    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
-    ParseSectionResult result = ResourceParser::Parse(markdown.begin(),
-                                                      markdown.end(),
-                                                      rootSection,
-                                                      parser,
-                                                      resource);
-    
-    REQUIRE(result.first.error.code == Error::OK);
-    REQUIRE(result.first.warnings.size() == 1); // overshadowing header
-    
-    const MarkdownBlock::Stack &blocks = markdown;
-    REQUIRE(std::distance(blocks.begin(), result.second) == 42 + 39);
 }
 
 TEST_CASE("Parse resource method abbreviation", "[resource][block]")
@@ -723,5 +688,67 @@ TEST_CASE("Parse root resource", "[resource][source][issue][#40]")
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions.empty());
 }
 
-
-
+TEST_CASE("Deprecated resource headers", "[resource][source][deprecated]")
+{
+    // Blueprint in question:
+    //R"(
+    //# /
+    //+ Headers
+    //
+    //        header1: value1
+    //
+    //# GET
+    //+ Headers
+    //
+    //        header2: value2
+    //
+    //+ Response 200
+    //    + Headers
+    //
+    //            header3: value3
+    //
+    //
+    //");
+    
+    const std::string blueprintSource = \
+    "# /\n"\
+    "+ Headers\n"\
+    "\n"\
+    "        header1: value1\n"\
+    "\n"\
+    "# GET\n"\
+    "+ Headers\n"\
+    "\n"\
+    "        header2: value2\n"\
+    "\n"\
+    "+ Response 200\n"\
+    "    + Headers\n"\
+    "\n"\
+    "            header3: value3\n"\
+    "\n"\
+    "\n";
+    
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(blueprintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.size() == 2);
+    REQUIRE(result.warnings[0].code == DeprecatedWarning);
+    REQUIRE(result.warnings[1].code == DeprecatedWarning);
+    
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].headers.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].headers.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers.size() == 3);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[0].first == "header1");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[0].second == "value1");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[1].first == "header2");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[1].second == "value2");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[2].first == "header3");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[2].second == "value3");
+}

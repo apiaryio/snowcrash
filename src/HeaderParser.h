@@ -128,6 +128,9 @@ namespace snowcrash {
             return result;
         }
         
+        static void Finalize(BlueprintParserCore& parser,
+                             HeaderCollection& headers) {}
+        
         static ParseSectionResult HandleHeadersSectionBlock(const BlueprintSection& section,
                                                             const BlockIterator& cur,
                                                             BlueprintParserCore& parser,
@@ -181,9 +184,9 @@ namespace snowcrash {
 
     typedef BlockParser<HeaderCollection, SectionParser<HeaderCollection> > HeadersParser;
     
-    //
-    // Generic HeaderSection parser handler
-    //
+    /**
+     *  Generic HeaderSection parser handler
+     */
     template <class T>
     ParseSectionResult HandleHeaders(const BlueprintSection& section,
                                      const BlockIterator& cur,
@@ -207,6 +210,57 @@ namespace snowcrash {
                                                     sourceBlock));
         }
         return result;
+    }
+    
+    
+    /** Helper for handling parsing of deprecated header sections */
+    template <typename T>
+    ParseSectionResult HandleDeprecatedHeaders(const BlueprintSection& section,
+                                               const BlockIterator& cur,
+                                               BlueprintParserCore& parser,
+                                               T& t) {
+        
+        ParseSectionResult result = HandleHeaders<T>(section, cur, parser, t);
+        
+        // WARN: Deprecated header sections
+        std::stringstream ss;
+        ss << "the 'headers' section at this level is deprecated and will be removed in a future, use respective payload header section(s) instead";
+        BlockIterator nameBlock = ListItemNameBlock(cur, section.bounds.second);
+        SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, cur, section.bounds, parser.sourceData);
+        result.first.warnings.push_back(Warning(ss.str(),
+                                                DeprecatedWarning,
+                                                sourceBlock));
+        return result;
+    }
+    
+    /** \brief Copy headers into example paylods headers. */
+    FORCEINLINE void InjectDeprecatedHeaders(const Collection<Header>::type& headers,
+                                        Collection<TransactionExample>::type& examples)
+    {
+        for (Collection<TransactionExample>::iterator exampleIt = examples.begin();
+             exampleIt != examples.end();
+             ++exampleIt) {
+            
+            // Requests
+            for (Collection<Request>::iterator reqIt = exampleIt->requests.begin();
+                 reqIt != exampleIt->requests.end();
+                 ++reqIt) {
+                
+                reqIt->headers.insert(reqIt->headers.begin(),
+                                      headers.begin(),
+                                      headers.end());
+            }
+            
+            // Responses
+            for (Collection<Response>::iterator resIt = exampleIt->responses.begin();
+                 resIt != exampleIt->responses.end();
+                 ++resIt) {
+                
+                resIt->headers.insert(resIt->headers.begin(),
+                                      headers.begin(),
+                                      headers.end());
+            }
+        }
     }
     
     // Checks T's headers for occurence of R's headers, warns if a match is found.

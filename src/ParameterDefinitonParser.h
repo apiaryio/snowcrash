@@ -162,7 +162,6 @@ namespace snowcrash {
         return (context == ParameterDefinitionSectionType) ? context : UndefinedSectionType;
     }
     
-    
     /**
      *  Parameter section parser.
      */
@@ -200,6 +199,9 @@ namespace snowcrash {
             
             return result;
         }
+        
+        static void Finalize(BlueprintParserCore& parser,
+                             Parameter& parameter) {}
         
         /** Parse a parameter definition top-level section blocks. */
         static ParseSectionResult HandleParmeterDefinitionSection(const BlueprintSection& section,

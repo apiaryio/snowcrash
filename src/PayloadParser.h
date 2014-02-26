@@ -289,6 +289,9 @@ namespace snowcrash {
             return result;
         }
         
+        static void Finalize(BlueprintParserCore& parser,
+                             Payload& payload) {}
+        
         /**
          *  \brief  Parse Payload's description blocks.
          *  \param  section The current section's signature.
