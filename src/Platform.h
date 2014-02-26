@@ -9,18 +9,25 @@
 #ifndef SNOWCRASH_PLATFORM_H
 #define SNOWCRASH_PLATFORM_H
 
-// TODO:
-#define DEPRECATED
+#if defined(BUILDING_SNOWCRASH)
+#   define DEPRECATED
+#endif
 
 #if defined(_MSC_VER)
 #   define FORCEINLINE __forceinline
-//#   define DEPRECATED __declspec(deprecated)
+#   if !defined(DEPRECATED)
+#       define DEPRECATED __declspec(deprecated)
+#   endif
 #elif defined(__clang__) || defined(__GNUC__)
 #   define FORCEINLINE inline
-//#   define DEPRECATED __attribute__((deprecated))
+#   if !defined(DEPRECATED)
+#       define DEPRECATED __attribute__((deprecated))
+#   endif
 #else
 #   define FORCEINLINE inline
-//#   define DEPRECATED
+#   if !defined(DEPRECATED)
+#       define DEPRECATED
+#   endif
 #endif
 
 #endif

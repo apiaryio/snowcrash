@@ -13,6 +13,9 @@
     'libsnowcrash_type%': 'static_library'
   },
   'target_defaults': {
+    'defines': [ 
+      'BUILDING_SNOWCRASH=1'
+    ],
     'configurations': {
       'Debug': {
         'defines': [ 'DEBUG', '_DEBUG' ],

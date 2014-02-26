@@ -47,7 +47,7 @@ distclean:
 	rm -f ./config.gypi
 	rm -rf ./bin	
 
-test: test-libsnowcrash
+test: test-libsnowcrash snowcrash
 	$(BUILD_DIR)/out/$(BUILDTYPE)/test-libsnowcrash
 
 ifdef CUCUMBER
