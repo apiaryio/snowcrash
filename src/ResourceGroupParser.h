@@ -150,7 +150,7 @@ namespace snowcrash {
                                                  BlueprintParserCore& parser,
                                                  ResourceGroup& group)
         {
-			URIParser uriParser;
+            URIParser uriParser;
             Resource resource;
             ParseSectionResult result = ResourceParser::Parse(cur,
                                                               section.bounds.second,
