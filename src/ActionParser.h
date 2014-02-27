@@ -184,7 +184,7 @@ namespace snowcrash {
                     break;
 
                 case HeadersSectionType:
-                    result = HandleHeaders(section, cur, parser, action);
+                    result = HandleDeprecatedHeaders(section, cur, parser, action);
                     break;
                     
                 case RequestSectionType:
@@ -222,6 +222,16 @@ namespace snowcrash {
             return result;
         }
         
+        static void Finalize(BlueprintParserCore& parser,
+                             Action& action)
+        {
+            // Consolidate depraceted headers into subsequent payloads
+            if (!action.headers.empty()) {
+                InjectDeprecatedHeaders(action.headers, action.examples);
+                action.headers.clear();
+            }
+        }
+                
         static ParseSectionResult HandleActionDescriptionBlock(const BlueprintSection& section,
                                                                const BlockIterator& cur,
                                                                BlueprintParserCore& parser,

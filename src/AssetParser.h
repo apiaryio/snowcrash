@@ -170,6 +170,9 @@ namespace snowcrash {
             return result;
         }
         
+        static void Finalize(BlueprintParserCore& parser,
+                             Asset& asset) {}
+        
         static ParseSectionResult HandleAssetSectionBlock(const BlueprintSection& section,
                                                           const BlockIterator& cur,
                                                           BlueprintParserCore& parser,

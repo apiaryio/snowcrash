@@ -8,23 +8,7 @@ Snow Crash is the reference [API Blueprint](http://apiblueprint.org) parser buil
 API Blueprint is Web API documentation language. You can find API Blueprint documentation on the [API Blueprint site](http://apiblueprint.org).
 
 ## Status
-- [Format 1A2](https://github.com/apiaryio/api-blueprint/releases/tag/format-1A2) fully implemented 
-
-## Bindings
-Snow Crash bindings in other languages:
-
-- [Protagonist](https://github.com/apiaryio/protagonist) (Node.js)
-- [Snow Crash .NET](https://github.com/brutski/snowcrash-dot-net-wrapper) (.NET)
-
-## Use
-You can either use Snow Crash directly consuming its AST or using the `snowcrash` command line tool to parse a blueprint into YAML or JSON AST representation.
-
-### AST
-Parsed API Blueprint is available in the form of AST as defined in [Blueprint.h](src/Blueprint.h). The `snowcrash` command line tool 
-offers AST serialization as defined in [API Blueprint AST Serialization Media Types](https://github.com/apiaryio/api-blueprint-ast).
-
-### Command Line
-Refer to [parse feature](features/parse.feature) for details on using the `snowcrash` command line tool.
+- [Format 1A3](https://github.com/apiaryio/api-blueprint/releases/tag/format-1A3) fully implemented 
 
 ## Install
 OS X using Homebrew:
@@ -35,6 +19,49 @@ $ brew install --HEAD \
 ```
 
 Other systems refer to [build notes](#build).
+
+## Use
+
+### C++ library
+
+```c++
+#include "snowcrash.h"
+
+snowcrash::SourceData blueprint = R"(
+# My API
+## GET /message
++ Response 200 (text/plain)
+
+        Hello World!
+)";
+snowcrash::Result result;
+snowcrash::Blueprint ast;
+snowcrash::parse(blueprint, 0, result, ast);
+
+std::cout << "API Name: " << ast.name << std::endl;
+```
+
+Refer to [`Blueprint.h`](src/Blueprint.h) for the details about the Snow Crash AST. See [Snow Crash bindings](#bindings) for using the library in **other languages**. 
+
+### Command line tool
+
+```bash
+$ cat << 'EOF' > blueprint.apib
+# My API
+## GET /message
++ Response 200 (text/plain)
+
+        Hello World!
+EOF
+
+$ snowcrash blueprint.apib 
+_version: 2.0
+metadata:
+name: "My API"
+ ...
+```
+
+Refer to [AST Serialization Media Types](https://github.com/apiaryio/api-blueprint-ast) for the details on serialized media types. See [parse feature](features/parse.feature) for the details on using the `snowcrash` command line tool.
 
 ## Build
 1. Clone the repo + fetch the submodules:
@@ -66,6 +93,13 @@ We love **Windows** too! Please refer to [Building on Windows](https://github.co
 	$ sudo make install
 	$ snowcrash --help
 	```
+
+## Bindings
+Snow Crash bindings in other languages:
+
+- [Protagonist](https://github.com/apiaryio/protagonist) (Node.js)
+- [Snow Crash .NET](https://github.com/brutski/snowcrash-dot-net-wrapper) (.NET)
+
 
 ## Contribute
 Fork & Pull Request

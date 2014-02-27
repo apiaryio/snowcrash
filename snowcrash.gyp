@@ -56,7 +56,7 @@
       ]
     },
     {
-      'target_name': 'test-snowcrash',
+      'target_name': 'test-libsnowcrash',
       'type': 'executable',
       'include_dirs': [
         'src',
@@ -114,7 +114,7 @@
     ['OS in "mac linux"', {
       'targets': [
         {
-          'target_name': 'perf-snowcrash',
+          'target_name': 'perf-libsnowcrash',
           'type': 'executable',
           'include_dirs': [
             'src',

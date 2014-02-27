@@ -35,30 +35,21 @@ static std::string NormalizeStringValue(const std::string& value, bool& needsQuo
     return normalizedValue;
 }
 
-/** Serialize an array value */
-static void serialize(const std::string& value, size_t level, std::ostream &os)
+
+/** Insert array item mark */
+static void ArrayItemLeadIn(size_t level, std::ostream &os)
 {
-    if (value.empty())
+    if (level < 1)
         return;
     
     for (size_t i = 0; i < level - 1; ++i)
         os << "  ";
-    
+
     os << "- ";
-    
-    bool needsQuotation = false;
-    std::string normalizedValue = NormalizeStringValue(value, needsQuotation);
-    
-    if (needsQuotation)
-        os << "\"" << normalizedValue << "\"";
-    else
-        os << value;
-    
-    os << std::endl;
 }
 
 /** Serialize key value pair */
-static void serialize(const std::string& key, const std::string& value, size_t level, std::ostream &os)
+static void serialize(const std::string& key, const std::string& value, size_t level, std::ostream &os, bool implicitQuotation = true)
 {
     if (key.empty())
         return;
@@ -73,12 +64,18 @@ static void serialize(const std::string& key, const std::string& value, size_t l
         bool needsQuotation = false;
         std::string normalizedValue = NormalizeStringValue(value, needsQuotation);
         
-        if (needsQuotation)
+        if (implicitQuotation) {
+            // Always use quotation
             os << "\"" << normalizedValue << "\"";
-        else
-            os << value;
+        }
+        else {
+            if (needsQuotation)
+                os << "\"" << normalizedValue << "\"";
+            else
+                os << value;
+        }
         
-         os << std::endl;
+        os << std::endl;
     }
     else
         os << key << ":\n";
@@ -89,11 +86,14 @@ static void serializeKeyValueCollection(const Collection<KeyValuePair>::type& co
 {
     for (Collection<KeyValuePair>::const_iterator it = collection.begin(); it != collection.end(); ++it) {
 
-        // Key
-        serialize(it->first, std::string(), level + 1, os);
+        // Array item
+        ArrayItemLeadIn(level + 1, os);
+
+        // Name
+        serialize(SerializeKey::Name, it->first, 0, os);
 
         // Value
-        serialize(SerializeKey::Value, it->second, level + 2, os);
+        serialize(SerializeKey::Value, it->second, level + 1, os);
     }
 }
 
@@ -118,34 +118,39 @@ static void serialize(const Collection<Header>::type& headers, size_t level, std
 static void serialize(const Collection<Parameter>::type& parameters, size_t level, std::ostream &os)
 {
     for (Collection<Parameter>::const_iterator it = parameters.begin(); it != parameters.end(); ++it) {
-        
+
+        // Array item
+        ArrayItemLeadIn(level + 1, os);
+
         // Key / name
-        serialize(it->name, std::string(), level + 1, os);
+        serialize(SerializeKey::Name, it->name, 0, os);
 
         // Description
-        serialize(SerializeKey::Description, it->description, level + 2, os);
+        serialize(SerializeKey::Description, it->description, level + 1, os);
         
         // Type
-        serialize(SerializeKey::Type, it->type, level + 2, os);
+        serialize(SerializeKey::Type, it->type, level + 1, os);
         
         // Required
-        serialize(SerializeKey::Required, (it->use == OptionalParameterUse) ? "false" : "true", level + 2, os);
+        serialize(SerializeKey::Required, (it->use == OptionalParameterUse) ? "false" : "true", level + 1, os, false);
         
         // Default
-        serialize(SerializeKey::Default, it->defaultValue, level + 2, os);
+        serialize(SerializeKey::Default, it->defaultValue, level + 1, os);
         
         // Example
-        serialize(SerializeKey::Example, it->exampleValue, level + 2, os);
+        serialize(SerializeKey::Example, it->exampleValue, level + 1, os);
         
         // Values
-        serialize(SerializeKey::Values, std::string(), level + 2, os);
+        serialize(SerializeKey::Values, std::string(), level + 1, os);
         
         if (!it->values.empty()) {
             for (Collection<Value>::const_iterator val_it = it->values.begin();
                  val_it != it->values.end();
                  ++val_it) {
 
-                serialize(*val_it, level + 3, os);
+                ArrayItemLeadIn(level + 2, os);
+                
+                serialize(SerializeKey::Value, *val_it, 0, os);
             }
         }
     }
@@ -229,11 +234,6 @@ static void serialize(const Action& action, std::ostream &os)
     if (!action.parameters.empty())
         serialize(action.parameters, 3, os);
     
-    // Headers
-    serialize(SerializeKey::Headers, std::string(), 3, os);
-    if (!action.headers.empty())
-        serialize(action.headers, 3, os);
-
     // Examples
     serialize(SerializeKey::Examples, std::string(), 3, os);
     if (!action.examples.empty()) {
@@ -269,11 +269,6 @@ static void serialize(const Resource& resource, std::ostream &os)
     if (!resource.parameters.empty())
         serialize(resource.parameters, 2, os);
     
-    // Headers
-    serialize(SerializeKey::Headers, std::string(), 2, os);
-    if (!resource.headers.empty())
-        serialize(resource.headers, 2, os);
-
     // Actions
     serialize(SerializeKey::Actions, std::string(), 2, os);
     
@@ -311,7 +306,7 @@ static void serialize(const ResourceGroup& group, std::ostream &os)
 static void serialize(const Blueprint& blueprint, std::ostream &os)
 {
     // AST Version
-    serialize(SerializeKey::ASTVersion, AST_VERSION, 0, os);
+    serialize(SerializeKey::ASTVersion, AST_SERIALIZATION_VERSION, 0, os, false);
     
     // Metadata
     serialize(blueprint.metadata, os);

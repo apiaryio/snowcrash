@@ -145,6 +145,9 @@ namespace snowcrash {
             return result;
         }
         
+        static void Finalize(BlueprintParserCore& parser,
+                             ParameterCollection& parameters) {}
+        
         /**
          *  \brief  Parse Parameters top-level section blocks.
          *  \param  section Actual section being parsed.

@@ -94,23 +94,15 @@ static void serialize(const std::string& key, bool value, size_t level, std::ost
 static void serialize(const std::string& key, const std::string& value, size_t level, std::ostream &os)
 {
     indent(level, os);
-    
-    serialize(key, os);
-    os << ": ";
-    
+
     os << "{\n";
-    indent(level + 1, os);
     
-    serialize(SerializeKey::Value, os);
-    os << ": ";
+    serialize(SerializeKey::Name, key, level + 1, false, os);
+    os << NewLineItemBlock;
     
-    std::string normValue = EscapeDoubleQuotes(value);
-    if (normValue.find("\n") != std::string::npos)
-        serialize(EscapeNewlines(normValue), os);
-    else
-        serialize(normValue, os);
-    
+    serialize(SerializeKey::Value, value, level + 1, false, os);
     os << "\n";
+    
     indent(level, os);
     os << "}";
 }
@@ -123,7 +115,7 @@ static void serialize(const std::string& key, const std::string& value, size_t l
  */
 static void serializeKeyValueCollection(const Collection<KeyValuePair>::type& collection, size_t level, std::ostream &os)
 {
-    os << "{";
+    os << "[";
     
     if (!collection.empty()) {
         os << "\n";
@@ -141,7 +133,7 @@ static void serializeKeyValueCollection(const Collection<KeyValuePair>::type& co
         indent(level, os);
     }
 
-    os << "}";
+    os << "]";
 }
 /**
  * \brief Serialize Metadata into output stream.
@@ -169,7 +161,7 @@ static void serialize(const Collection<Parameter>::type& parameters, size_t leve
 {
     indent(level, os);
     serialize(SerializeKey::Parameters, os);
-    os << ": {";
+    os << ": [";
     
     if (!parameters.empty()) {
         os << "\n";
@@ -178,11 +170,13 @@ static void serialize(const Collection<Parameter>::type& parameters, size_t leve
             
             if (i > 0 && i < parameters.size())
                 os << NewLineItemBlock;
-            
-            // Key / name
+
             indent(level + 1, os);
-            serialize(it->name, os);
-            os << ": {\n";
+            os << "{\n";
+            
+            // Name
+            serialize(SerializeKey::Name, it->name, level + 2, false, os);
+            os << NewLineItemBlock;
             
             // Description
             serialize(SerializeKey::Description, it->description, level + 2, false, os);
@@ -217,9 +211,7 @@ static void serialize(const Collection<Parameter>::type& parameters, size_t leve
                     if (j > 0 && j < it->values.size())
                         os << NewLineItemBlock;
                     
-                    indent(level + 3, os);
-                    serialize(*val_it, os);
-                    
+                    serialize(SerializeKey::Value, *val_it, level + 3, true, os);
                 }
                 
                 os << "\n";
@@ -239,7 +231,7 @@ static void serialize(const Collection<Parameter>::type& parameters, size_t leve
         indent(level, os);
     }
     
-    os << "}";
+    os << "]";
 }
 
 /**
@@ -391,10 +383,6 @@ static void serialize(const Action& action, std::ostream &os)
     serialize(action.parameters, 7, os);
     os << NewLineItemBlock;
     
-    // Headers
-    serialize(action.headers, 7, os);
-    os << NewLineItemBlock;
-    
     // Transactions
     indent(7, os);
     serialize(SerializeKey::Examples, os);
@@ -457,16 +445,12 @@ static void serialize(const Resource& resource, std::ostream &os)
     else {
         os << ": ";
         
-        serialize(resource.model, 6, os);
+        serialize(resource.model, 5, os);
     }
     os << NewLineItemBlock;
     
     // Parameters
     serialize(resource.parameters, 5, os);
-    os << NewLineItemBlock;
-    
-    // Headers
-    serialize(resource.headers, 5, os);
     os << NewLineItemBlock;
     
     // Actions
@@ -591,7 +575,7 @@ static void serialize(const Blueprint& blueprint, std::ostream &os)
     os << "{\n";
     
     // AST Version
-    serialize(SerializeKey::ASTVersion, AST_VERSION, 1, false, os);
+    serialize(SerializeKey::ASTVersion, AST_SERIALIZATION_VERSION, 1, false, os);
     os << NewLineItemBlock;
     
     // Metadata
