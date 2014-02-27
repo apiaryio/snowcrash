@@ -23,7 +23,7 @@
 
 namespace snowcrash {
     
-    enum URIParsingResult{
+    typedef enum URIParsingResult{
         OK=0,
         SquareBracketsInPath = 1,
         UnparsableURI = 2
