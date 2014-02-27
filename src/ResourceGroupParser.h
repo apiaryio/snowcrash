@@ -168,7 +168,7 @@ namespace snowcrash {
             URIResult uriresult;
             uriParser.parse(resource.uriTemplate, uriresult);
 
-            if (uriresult.Result == SquareBracketsInPath){
+            if (uriresult.Result == snowcrash::URIParsingResult::SquareBracketsInPath){
                 // WARN: Square brackets in URI path
                 SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, section.bounds.second, section.bounds, parser.sourceData);
                 result.first.warnings.push_back(Warning("the resource URI '" + resource.uriTemplate + "' contains square brackets outside of the host section", URIWarning, sourceBlock));

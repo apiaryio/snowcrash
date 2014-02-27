@@ -28,14 +28,14 @@ void URIParser::parse(const URI uri, URIResult& result)
         result.scheme = groups[1];
         result.host = groups[3];
         result.path = groups[4];
-        result.Result = OK;
+        result.Result = URIParsingResult::OK;
 
         if (ContainsString("[", result.path) || ContainsString("]", result.path)){
             
-            result.Result = SquareBracketsInPath;
+            result.Result = URIParsingResult::SquareBracketsInPath;
         }
     }
     else{
-        result.Result = UnparsableURI;
+        result.Result = URIParsingResult::UnparsableURI;
     }
 }
