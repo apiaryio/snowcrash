@@ -12,6 +12,7 @@
 #include <vector>
 #include <string>
 #include <utility>
+#include "Platform.h"
 
 /**
  *  API Blueprint Abstract Syntaxt Tree
@@ -19,9 +20,6 @@
  *
  *  Data types in this documents define the API Blueprint AST.
  */
-
-/** Version of API Blueprint AST */
-#define AST_VERSION "1.0"
 
 namespace snowcrash {
     
@@ -189,8 +187,19 @@ namespace snowcrash {
         /** Action-specfic Parameters */
         Collection<Parameter>::type parameters;
         
-        /** Action-specific HTTP headers */
-        Collection<Header>::type headers;
+        /** 
+         *  \brief Action-specific HTTP headers
+         *
+         *  DEPRECATION WARNING:
+         *  --------------------
+         *
+         *  This AST node is build for deprecated API Bluprint syntax
+         *  and as such it will be removed in a future version of 
+         *  Snow Crash. 
+         *  
+         *  Use respective payload's header collection instead.
+         */
+        DEPRECATED Collection<Header>::type headers;
         
         /** Transactions examples */
         Collection<TransactionExample>::type examples;
@@ -216,8 +225,19 @@ namespace snowcrash {
         /** Parameters */
         Collection<Parameter>::type parameters;
         
-        /** Resource-specific HTTP Headers */
-        Collection<Header>::type headers;
+        /**
+         *  \brief Resource-specific HTTP Headers
+         *
+         *  DEPRECATION WARNING:
+         *  --------------------
+         *
+         *  This AST node is build for deprecated API Bluprint syntax
+         *  and as such it will be removed in a future version of
+         *  Snow Crash.
+         *
+         *  Use respective payload's header collection instead.
+         */
+        DEPRECATED Collection<Header>::type headers;
         
         /** A set of Actions specified for this Resource */
         Collection<Action>::type actions;

@@ -27,7 +27,7 @@ namespace snowcrash {
     /** Internal list items classifier, Blueprint Context */
     template <>
     FORCEINLINE SectionType ClassifyInternaListBlock<Blueprint>(const BlockIterator& begin,
-                                                                    const BlockIterator& end) {
+                                                                const BlockIterator& end) {
         return UndefinedSectionType;
     }
     
@@ -74,7 +74,8 @@ namespace snowcrash {
             return result;
         }
         
-        // Checks blueprint name. Returns true on success, false otherwise
+        static void Finalize(BlueprintParserCore& parser,
+                             Blueprint& blueprint) {}
         
         /**
          *  \brief  Checks API Blueprint name issues warning or error if name does not exists.

@@ -1,7 +1,7 @@
-_version: 1.0
+_version: 2.0
 metadata:
-  Format:
-    value: 1A
+- name: "Format"
+  value: "1A"
 name: "<API name>"
 description: "<API description>\n\n"
 resourceGroups:
@@ -15,38 +15,32 @@ resourceGroups:
       name: "<resource name>"
       description: "<resource model description>"
       headers:
-        <header1>:
-          value: "<header value>"
+      - name: "<header1>"
+        value: "<header1 value>"
       body: "<resource model body>\n"
       schema: "<resource model schema>\n"
     parameters:
-      parameter:
+    - name: "parameter"
+      description: "<description>"
+      type: "<type>"
+      required: false
+      default: "<default value>"
+      example: "<example value>"
+      values:
+      - value: "<element>"
+    actions:
+    - name: "<action name>"
+      description: "<action description>\n\n"
+      method: "POST"
+      parameters:
+      - name: "parameter"
         description: "<description>"
         type: "<type>"
         required: false
         default: "<default value>"
         example: "<example value>"
         values:
-        - "<element>"
-    headers:
-      <header2>:
-        value: "<header value>"
-    actions:
-    - name: "<action name>"
-      description: "<action description>\n\n"
-      method: POST
-      parameters:
-        parameter:
-          description: "<description>"
-          type: "<type>"
-          required: false
-          default: "<default value>"
-          example: "<example value>"
-          values:
-          - "<element>"
-      headers:
-        <header>:
-          value: "<header value>"
+        - value: "<element>"
       examples:
       - name:
         description:
@@ -54,19 +48,27 @@ resourceGroups:
         - name: "<request name>"
           description: "<request description>\n"
           headers:
-            Content-Type:
-              value: text/plain
-            <header3>:
-              value: "<header value>"
+          - name: "<header2>"
+            value: "<header2 value>"
+          - name: "<header3>"
+            value: "<header3 value>"
+          - name: "Content-Type"
+            value: "text/plain"
+          - name: "<header4>"
+            value: "<header4 value>"
           body: "<request body>\n"
           schema: "<request schema>\n"
         responses:
-        - name: 200
+        - name: "200"
           description: "<response description>\n"
           headers:
-            Content-Type:
-              value: text/plain
-            <header4>:
-              value: "<header value>"
+          - name: "<header2>"
+            value: "<header2 value>"
+          - name: "<header3>"
+            value: "<header3 value>"
+          - name: "Content-Type"
+            value: "text/plain"
+          - name: "<header5>"
+            value: "<header5 value>"
           body: "<response body>\n"
           schema: "<response schema>\n"

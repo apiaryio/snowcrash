@@ -91,6 +91,12 @@ namespace snowcrash {
                                                const BlockIterator& cur,
                                                BlueprintParserCore& parser,
                                                T& output);
+        
+        /**
+         *  \brief  Optional post-parse processing.
+         */
+        static void Finalize(BlueprintParserCore& parser,
+                             T& output);
     };
     
     /**
@@ -171,6 +177,8 @@ namespace snowcrash {
                 if (currentSectionType == UndefinedSectionType)
                     break;
             }
+            
+            P::Finalize(parser, output);
             
             return std::make_pair(result, currentBlock);
         }        

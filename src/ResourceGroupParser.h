@@ -119,6 +119,9 @@ namespace snowcrash {
             return result;
         }
         
+        static void Finalize(BlueprintParserCore& parser,
+                             ResourceGroup& group) {}
+        
         static ParseSectionResult HandleResourceGroupOverviewBlock(const BlueprintSection& section,
                                                                    const BlockIterator& cur,
                                                                    BlueprintParserCore& parser,

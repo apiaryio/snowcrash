@@ -11,6 +11,9 @@
 
 #include <string>
 
+/** Version of API Blueprint AST serialization */
+#define AST_SERIALIZATION_VERSION "2.0"
+
 namespace snowcrash {
     
     /**
