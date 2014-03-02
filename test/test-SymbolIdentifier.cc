@@ -38,7 +38,7 @@ TEST_CASE("Punctuation in identifiers", "[symbol][identifier][source]")
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions.empty());
 }
 
-TEST_CASE("Non ASCII characters in identifiers", "[symbol][identifier][issue][#66][source][bob]")
+TEST_CASE("Non ASCII characters in identifiers", "[symbol][identifier][issue][#66][source]")
 {
     // Blueprint in question:
     //R"(
