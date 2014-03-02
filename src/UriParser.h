@@ -23,10 +23,10 @@
 
 namespace snowcrash {
     
-    enum URIParsingResult{
+    enum URIParserResult{
         OK=0,
-        SquareBracketsInPath = 1,
-        UnparsableURI = 2
+        PathContainsSquareBrackets=1,
+        FailedRegexMatch=2
     };
 	
 
@@ -35,7 +35,7 @@ namespace snowcrash {
         std::string scheme;
         std::string host;
         std::string path;
-        URIParsingResult Result;
+        URIParserResult Result;
     };
 
     

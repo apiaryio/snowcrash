@@ -25,7 +25,7 @@ TEST_CASE("Parse a valid uri into seperate parts", "[validuriparser][issue][#79]
 	REQUIRE(result.scheme == "http");
 	REQUIRE(result.host == "www.test.com");
 	REQUIRE(result.path == "/other/{id}");
-	REQUIRE(result.Result == URIParsingResult::OK);
+	REQUIRE(result.Result == 0);
 }
 
 TEST_CASE("Parse an invalid uri into seperate parts", "[invaliduriparser][issue][#79]")
@@ -40,5 +40,5 @@ TEST_CASE("Parse an invalid uri into seperate parts", "[invaliduriparser][issue]
 	REQUIRE(result.scheme == "http");
 	REQUIRE(result.host == "www.test.com");
 	REQUIRE(result.path == "/other/{id}[2]");
-	REQUIRE(result.Result == URIParsingResult::SquareBracketsInPath);
+	REQUIRE(result.Result == 1);
 }

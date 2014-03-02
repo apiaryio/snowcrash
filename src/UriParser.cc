@@ -32,10 +32,10 @@ void URIParser::parse(const URI uri, URIResult& result)
 
         if (ContainsString("[", result.path) || ContainsString("]", result.path)){
             
-            result.Result = snowcrash::SquareBracketsInPath;
+            result.Result = snowcrash::PathContainsSquareBrackets;
         }
     }
     else{
-        result.Result = snowcrash::UnparsableURI;
+        result.Result = snowcrash::FailedRegexMatch;
     }
 }

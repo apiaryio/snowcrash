@@ -51,8 +51,8 @@ if defined noprojgen goto msbuild
 
 @rem Generate the VS project.
 SETLOCAL
-	if defined VS100COMNTOOLS call "%VS100COMNTOOLS%\VCVarsQueryRegistry.bat"
-  python configure %debug_arg% --dest-cpu=%target_arch%
+  if defined VS100COMNTOOLS call "%VS100COMNTOOLS%\VCVarsQueryRegistry.bat"
+  c:\python27\python configure %debug_arg% --dest-cpu=%target_arch%
   if errorlevel 1 goto create-msvs-files-failed
   if not exist build/snowcrash.sln goto create-msvs-files-failed
   echo Project files generated.
