@@ -136,7 +136,7 @@ namespace snowcrash {
     }
     
     //
-    // Block Classifier, Method Context
+    // Block Classifier, Action Context
     //
     template <>
     FORCEINLINE SectionType ClassifyBlock<Action>(const BlockIterator& begin,
@@ -162,7 +162,7 @@ namespace snowcrash {
     }
     
     //
-    // Method SectionType Parser
+    // Action SectionType Parser
     //
     template<>
     struct SectionParser<Action> {
@@ -222,13 +222,34 @@ namespace snowcrash {
             return result;
         }
         
-        static void Finalize(BlueprintParserCore& parser,
-                             Action& action)
+        static void Finalize(const SectionBounds& bounds,
+                             BlueprintParserCore& parser,
+                             Action& action,
+                             Result& result)
         {
             // Consolidate depraceted headers into subsequent payloads
             if (!action.headers.empty()) {
                 InjectDeprecatedHeaders(action.headers, action.examples);
                 action.headers.clear();
+            }
+            
+            // Check whether transaction example request is followed by a response
+            if (action.examples.size() > 1 &&
+                !action.examples.back().requests.empty() &&
+                action.examples.back().responses.empty()) {
+                // WARN: No response for request
+                
+                std::stringstream ss;
+                ss << "action is missing a response for ";
+                if (action.examples.back().requests.back().name.empty())
+                    ss << "a request";
+                else
+                    ss << "the '" << action.examples.back().requests.back().name << "' request";
+                
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(bounds.first, bounds.first, bounds, parser.sourceData);
+                result.warnings.push_back(Warning(ss.str(),
+                                                  EmptyDefinitionWarning,
+                                                  sourceBlock));
             }
         }
                 
@@ -305,15 +326,22 @@ namespace snowcrash {
             if (result.first.error.code != Error::OK)
                 return result;
             
-            // Make sure a transaction is defined for the Action
+            // Create transaction example if needed
             if (action.examples.empty()) {
                 action.examples.push_back(TransactionExample());
+            }
+            else if (section.type == RequestSectionType) {
+                // Automatic request response pairing:
+                // If a request follows a response create a new transaction example
+                if (!action.examples.back().responses.empty()) {
+                    action.examples.push_back(TransactionExample());
+                }
             }
             
             BlockIterator nameBlock = ListItemNameBlock(cur, section.bounds.second);
             
             // Check for duplicate
-            if (IsPayloadDuplicate(section.type, payload, action)) {
+            if (IsPayloadDuplicate(section.type, payload, action.examples.back())) {
                 // WARN: duplicate payload
                 std::stringstream ss;
                 ss << SectionName(section.type) << " payload `" << payload.name << "`";
@@ -330,10 +358,10 @@ namespace snowcrash {
             
             // Inject parsed payload into the action
             if (section.type == RequestSectionType) {
-                action.examples.front().requests.push_back(payload);
+                action.examples.back().requests.push_back(payload);
             }
             else if (section.type == ResponseSectionType) {
-                action.examples.front().responses.push_back(payload);
+                action.examples.back().responses.push_back(payload);
             }
             
             // Check header duplicates
@@ -426,21 +454,18 @@ namespace snowcrash {
         }
 
         /**
-         *  Checks whether given section payload has duplicate.
+         *  Checks whether given section payload has duplicate within its transaction examples
          *  \return True when a duplicate is found, false otherwise.
          */
-        static bool IsPayloadDuplicate(const SectionType& section, const Payload& payload, Action& action) {
-            
-            if (action.examples.empty())
-                return false;
+        static bool IsPayloadDuplicate(const SectionType& section, const Payload& payload, TransactionExample& example) {
             
             if (section == RequestSectionType) {
-                Collection<Request>::const_iterator duplicate = FindRequest(action.examples.front(), payload);
-                return duplicate != action.examples.front().requests.end();
+                Collection<Request>::const_iterator duplicate = FindRequest(example, payload);
+                return duplicate != example.requests.end();
             }
             else if (section == ResponseSectionType) {
-                Collection<Response>::const_iterator duplicate = FindResponse(action.examples.front(), payload);
-                return duplicate != action.examples.front().responses.end();
+                Collection<Response>::const_iterator duplicate = FindResponse(example, payload);
+                return duplicate != example.responses.end();
             }
 
             return false;

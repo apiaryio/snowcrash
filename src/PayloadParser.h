@@ -289,8 +289,10 @@ namespace snowcrash {
             return result;
         }
         
-        static void Finalize(BlueprintParserCore& parser,
-                             Payload& payload) {}
+        static void Finalize(const SectionBounds& bounds,
+                             BlueprintParserCore& parser,
+                             Payload& payload,
+                             Result& result) {}
         
         /**
          *  \brief  Parse Payload's description blocks.

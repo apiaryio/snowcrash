@@ -119,10 +119,12 @@ namespace snowcrash {
             
             return result;
         }
-        
-        static void Finalize(BlueprintParserCore& parser,
-                             ResourceGroup& group) {}
-        
+
+        static void Finalize(const SectionBounds& bounds,
+                             BlueprintParserCore& parser,
+                             ResourceGroup& group,
+                             Result& result) {}
+
         static ParseSectionResult HandleResourceGroupOverviewBlock(const BlueprintSection& section,
                                                                    const BlockIterator& cur,
                                                                    BlueprintParserCore& parser,

@@ -95,8 +95,10 @@ namespace snowcrash {
         /**
          *  \brief  Optional post-parse processing.
          */
-        static void Finalize(BlueprintParserCore& parser,
-                             T& output);
+        static void Finalize(const SectionBounds& bounds,
+                             BlueprintParserCore& parser,
+                             T& output,
+                             Result& result);
     };
     
     /**
@@ -178,7 +180,7 @@ namespace snowcrash {
                     break;
             }
             
-            P::Finalize(parser, output);
+            P::Finalize(std::make_pair(begin, currentBlock), parser, output, result);
             
             return std::make_pair(result, currentBlock);
         }        
