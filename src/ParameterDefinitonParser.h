@@ -459,7 +459,23 @@ namespace snowcrash {
                                                         EmptyDefinitionWarning,
                                                         sourceBlock));
             }
-            
+
+			bool b_isExampleFound = false;
+			for(int i = 0 ; i < parameter.values.size() ; i++)
+			{
+				if(parameter.exampleValue == parameter.values.at(i))
+					b_isExampleFound = true;
+			}
+            if(!b_isExampleFound)
+			{
+				std::stringstream ss;
+				ss << "your example value: '" << parameter.exampleValue << "' is missing in the values";
+				SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, cur, section.bounds, parser.sourceData);
+				result.first.warnings.push_back(Warning(ss.str(),
+				EmptyDefinitionWarning,
+				sourceBlock));
+			}
+
             endCur = CloseList(sectionCur, section.bounds.second);
             result.second = endCur;
             return result;
