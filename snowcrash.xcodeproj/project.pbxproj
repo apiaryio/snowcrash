@@ -70,6 +70,9 @@
 		BBE53566174132B100BCA7AD /* SerializeYAML.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBE53560174132B100BCA7AD /* SerializeYAML.cc */; };
 		BBE5705D173922B70086CE22 /* test-PayloadParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBE5705C173922B70086CE22 /* test-PayloadParser.cc */; };
 		BBE57061173927870086CE22 /* PayloadParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE5705F173927870086CE22 /* PayloadParser.h */; };
+		BBED046218C7D31700961A5C /* UriParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBED046018C7D31700961A5C /* UriParser.cc */; };
+		BBED046318C7D31700961A5C /* UriParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBED046118C7D31700961A5C /* UriParser.h */; };
+		BBED046618C7D35400961A5C /* test-UriParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBED046418C7D33200961A5C /* test-UriParser.cc */; };
 		BBF46B921824554A009029DA /* BlueprintSection.h in Headers */ = {isa = PBXBuildFile; fileRef = BBF46B911824554A009029DA /* BlueprintSection.h */; };
 		BBFF48CA170B3C49001E5FB2 /* test-snowcrash.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBFF48C9170B3C49001E5FB2 /* test-snowcrash.cc */; };
 		BBFF48CD170B3EDE001E5FB2 /* snowcrash.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBFF48CC170B3EDE001E5FB2 /* snowcrash.cc */; };
@@ -208,6 +211,9 @@
 		BBE53560174132B100BCA7AD /* SerializeYAML.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = SerializeYAML.cc; path = src/SerializeYAML.cc; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		BBE5705C173922B70086CE22 /* test-PayloadParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-PayloadParser.cc"; path = "test/test-PayloadParser.cc"; sourceTree = "<group>"; };
 		BBE5705F173927870086CE22 /* PayloadParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = PayloadParser.h; path = src/PayloadParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		BBED046018C7D31700961A5C /* UriParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UriParser.cc; path = src/UriParser.cc; sourceTree = "<group>"; };
+		BBED046118C7D31700961A5C /* UriParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UriParser.h; path = src/UriParser.h; sourceTree = "<group>"; };
+		BBED046418C7D33200961A5C /* test-UriParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-UriParser.cc"; path = "test/test-UriParser.cc"; sourceTree = "<group>"; };
 		BBF46B911824554A009029DA /* BlueprintSection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BlueprintSection.h; path = src/BlueprintSection.h; sourceTree = "<group>"; };
 		BBFF4898170B34E6001E5FB2 /* libsnowcrash.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libsnowcrash.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BBFF48C0170B3C30001E5FB2 /* test-libsnowcrash */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "test-libsnowcrash"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -364,6 +370,7 @@
 				BBFF48C9170B3C49001E5FB2 /* test-snowcrash.cc */,
 				BBCC04E518A51AA800C65A08 /* test-SymbolIdentifier.cc */,
 				BB1865C81764DB8A00756B18 /* test-SymbolTable.cc */,
+				BBED046418C7D33200961A5C /* test-UriParser.cc */,
 				BB9E7029183342CB00ED5806 /* test-Warnings.cc */,
 			);
 			name = "test-libsnowcrash";
@@ -415,6 +422,8 @@
 				BB6A9A7F17904C7300B2F283 /* SourceAnnotation.h */,
 				BBB2A226173EA77A0020C1CE /* StringUtility.h */,
 				BB1865C71764D67B00756B18 /* SymbolTable.h */,
+				BBED046018C7D31700961A5C /* UriParser.cc */,
+				BBED046118C7D31700961A5C /* UriParser.h */,
 				BB89458B17817B240079084F /* posix */,
 				BB89458E17817B720079084F /* win */,
 			);
@@ -447,6 +456,7 @@
 				BBF46B921824554A009029DA /* BlueprintSection.h in Headers */,
 				BBB0F42A1731CE0D00C92465 /* RegexMatch.h in Headers */,
 				BBD5F9C917353C310049BBEE /* ResourceGroupParser.h in Headers */,
+				BBED046318C7D31700961A5C /* UriParser.h in Headers */,
 				BBC2D85F18301FEC00FBCEA7 /* CodeBlockUtility.h in Headers */,
 				BBD5F9CE17353CE00049BBEE /* ResourceParser.h in Headers */,
 				BBE57061173927870086CE22 /* PayloadParser.h in Headers */,
@@ -593,6 +603,7 @@
 				BBA889CA17131B19005A9570 /* html.c in Sources */,
 				BB740993171C05B20023105F /* MarkdownParser.cc in Sources */,
 				BB740997171C065C0023105F /* MarkdownBlock.cc in Sources */,
+				BBED046218C7D31700961A5C /* UriParser.cc in Sources */,
 				BB86DEC11723E3A700063644 /* src_map.c in Sources */,
 				BBD5F9D21735439B0049BBEE /* ParserCore.cc in Sources */,
 				BBE53564174132B100BCA7AD /* Serialize.cc in Sources */,
@@ -622,6 +633,7 @@
 				BB50F0BD17D1DCE00002C363 /* test-ActionParser.cc in Sources */,
 				BBCC04E618A51AA800C65A08 /* test-SymbolIdentifier.cc in Sources */,
 				BB3DD975174654FD004C4077 /* test-AssetParser.cc in Sources */,
+				BBED046618C7D35400961A5C /* test-UriParser.cc in Sources */,
 				BB9E702A183342CB00ED5806 /* test-Warnings.cc in Sources */,
 				BB1D4D0B174D0932009BCB1C /* test-HeaderParser.cc in Sources */,
 				BB03DC6917D3723300C51E52 /* test-ParameterDefinitonParser.cc in Sources */,
