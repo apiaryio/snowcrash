@@ -129,8 +129,20 @@ def configure_snowcrash(o):
 #
 # TODO: use bundle check
 if not options.skip_integration_test:
-  print "Installing cucumber dependencies..."
-  subprocess.call(["bundle", "install"])
+    print "Installing cucumber dependencies..."
+    try:
+        subprocess.call(["bundle", "install"])
+    except OSError as e:
+        if e.errno == os.errno.ENOENT:
+            raise RuntimeError(
+                "Cucumber installation relies on bundler, "
+                "but it cannot find in the system $PATH. "
+                "Please make sure to install it, or/and to "
+                "add it's location to the $PATH."
+            )
+        else:
+            raise
+    
 
 #
 # config.gypi
