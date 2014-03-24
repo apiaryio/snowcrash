@@ -14,6 +14,7 @@ using namespace snowcrash;
 static bool HasMismatchedCurlyBrackets(const URITemplate& uriTemplate) {
     int openCount = 0;
     int closeCount = 0;
+
     for (unsigned int i = 0; i < uriTemplate.length(); i++) {
         if (uriTemplate[i] == '{') openCount++;
         if (uriTemplate[i] == '}') closeCount++;
@@ -24,6 +25,7 @@ static bool HasMismatchedCurlyBrackets(const URITemplate& uriTemplate) {
 static bool HasNestedCurlyBrackets(const URITemplate& uriTemplate) {
     char lastBracket = ' ';
     bool result = false;
+
     for (unsigned int i = 0; i < uriTemplate.length(); i++) {
         if (uriTemplate[i] == '{') {
             if (lastBracket == '{') {
@@ -147,7 +149,7 @@ void URITemplateParser::parse(const URITemplate uri, const SourceCharactersBlock
         while (currentExpression != expressions.end()) {
 
             ClassifiedExpression classifiedExpression = ClassifyExpression(*currentExpression);
-            
+
             if (classifiedExpression.IsSupportedExpressionType()) {
                 bool hasIllegalCharacters = false;
 
@@ -164,6 +166,7 @@ void URITemplateParser::parse(const URITemplate uri, const SourceCharactersBlock
                     result.result.warnings.push_back(Warning(ss.str(), URIWarning, sourceBlock));
                     hasIllegalCharacters = true;
                 }
+
 
                 if (classifiedExpression.ContainsAssignment()) {
                     std::stringstream ss;
@@ -189,4 +192,5 @@ void URITemplateParser::parse(const URITemplate uri, const SourceCharactersBlock
     else{
         result.result.error = Error("Failed to parse URI Template", URIWarning);
     }
+
 }

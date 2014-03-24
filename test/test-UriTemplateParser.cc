@@ -226,6 +226,7 @@ TEST_CASE("Parse uri template for supported level three form style query continu
 
     REQUIRE(result.result.warnings.size() == 0);
 
+
 }
 
 TEST_CASE("Parse uri template for invalid variable name, contains spaces", "[invalidvariablenamecontainingspaces][issue][#78]")

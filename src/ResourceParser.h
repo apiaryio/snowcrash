@@ -288,6 +288,13 @@ namespace snowcrash {
                 
                 HTTPMethod method;
                 GetResourceSignature(*cur, resource.name, resource.uriTemplate, method);
+
+                URITemplateParser uriTemplateParser;
+                ParsedURITemplate parsedResult;
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, cur, section.bounds, parser.sourceData);
+
+                uriTemplateParser.parse(resource.uriTemplate, sourceBlock, parsedResult);
+                result.first += parsedResult.result;
                 result.second = ++sectionCur;
                 return result;
             }
