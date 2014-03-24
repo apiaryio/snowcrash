@@ -85,6 +85,7 @@
         'test/test-SymbolIdentifier.cc',
         'test/test-SymbolTable.cc',
         'test/test-Warnings.cc',
+        'test/test-UriParser.cc',
         'test/test-snowcrash.cc'
       ],
       'dependencies': [

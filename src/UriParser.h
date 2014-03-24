@@ -13,45 +13,121 @@
 #include "Blueprint.h"
 #include "Parser.h"
 
-/**
- *  URI Parser Interface
- *  ------------------------------
- *
- */
+
 
 #define URI_REGEX "^(http|https|ftp|file)?(://)?([^/]*)?(.*)$"
 
 namespace snowcrash {
     
-    enum URIParserResult{
-        OK=0,
-        PathContainsSquareBrackets=1,
-        FailedRegexMatch=2
-    };
-	
-
-
-    struct URIResult{
+    /**
+    *  URI Template Parser Result
+    *  ------------------------------
+    *
+    */
+    struct ParsedURITemplate{
         std::string scheme;
         std::string host;
         std::string path;
-        URIParserResult Result;
+   
+        std::vector<Error> errors;
+        std::vector<Warning> warnings;
     };
 
-    
+    /**
+    *  URI Template Character Parser
+    *  ------------------------------
+    *
+    */
+    class URITemplateCharacterParser{
+    public:
+        /**
+        *  \brief Initialise the individual character parser
+        *
+        */
+        virtual void initialiseParsing()=0;
+
+        /**
+        *  \brief Parse the URI Template a character at a time
+        *
+        *  \param c character to be parsed
+        *  \param result result of the parsing
+        *  \location block containing uri template being parsed
+        *  \lastCharacter is this the last character in the uri being parsed
+        */
+        virtual void parse(const char c, ParsedURITemplate& result, const SourceCharactersBlock& location,bool lastCharacter) = 0;
+
+        /**
+        *  \brief destructor
+        *
+        */
+        virtual ~URITemplateCharacterParser()=0;
+    };
 
 
-	class URIParser{
-        static bool ContainsString(std::string s,std::string in);
+    /**
+    *  URI Template Expression Parser
+    *  ------------------------------
+    *
+    */
+    class URITemplateExpressionParser{
+    public:
+        /**
+        *  \brief Initialise the individual expression parser
+        *
+        */
+        virtual void initialiseParsing()=0;
+
+        /**
+        *  \brief Parse each expression in the uri template
+        *
+        *  \param expression the uri template expression being parsed
+        *  \param result result of the parsing
+        *  \location block containing uri template being parsed
+        */
+        virtual void parse(const std::string expression, ParsedURITemplate& result, const SourceCharactersBlock& location) = 0;
+        virtual ~URITemplateExpressionParser() = 0;
+    };
+
+
+
+    /**
+    *  URI Template Parser Interface
+    *  ------------------------------
+    *
+    */
+    class URITemplateParser{
+        static std::vector<URITemplateCharacterParser*> characterParsers;
+        static std::vector<URITemplateExpressionParser*> expressionParsers;
+        
+        
 	public:
+        URITemplateParser();
 		/**
-		*  \brief Parse the URI into scheme, host and path
+		*  \brief Parse the URI template into scheme, host and path
 		*
 		*  \param uri        A uri to be parsed.
 		*/
-		void parse(const URI uri,URIResult& result);
+        static void parse(const URI uri, ParsedURITemplate& result, const SourceCharactersBlock& location);
+        
 	};
 
+    class URITemplateCurlyBracketCharacterParser :public URITemplateCharacterParser{
+        char lastBracket;
+        bool alreadyWarned;
+    public:
+        void initialiseParsing();
+        void parse(const char c, ParsedURITemplate& result, const SourceCharactersBlock& location,bool lastCharacter);
+        ~URITemplateCurlyBracketCharacterParser();
+    };
+
+    class URITemplateSquareBracketCharacterParser :public URITemplateCharacterParser{
+        char lastBracket;
+        bool alreadyWarned;
+    public:
+        void initialiseParsing();
+        void parse(const char c, ParsedURITemplate& result, const SourceCharactersBlock& location, bool lastCharacter);
+        ~URITemplateSquareBracketCharacterParser();
+    };
 }
 
 #endif

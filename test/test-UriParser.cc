@@ -18,14 +18,16 @@ TEST_CASE("Parse a valid uri into seperate parts", "[validuriparser][issue][#79]
 	
 	const snowcrash::URI uri ="http://www.test.com/other/{id}";
 
-	URIParser parser;
-	URIResult result;
+	URITemplateParser parser;
+	ParsedURITemplate result;
+    SourceCharactersBlock source;
 
-	parser.parse(uri,result);
+	parser.parse(uri,result,source);
 	REQUIRE(result.scheme == "http");
 	REQUIRE(result.host == "www.test.com");
 	REQUIRE(result.path == "/other/{id}");
-	REQUIRE(result.Result == 0);
+	REQUIRE(result.errors.size() == 0);
+    REQUIRE(result.warnings.size() == 0);
 }
 
 TEST_CASE("Parse an invalid uri into seperate parts", "[invaliduriparser][issue][#79]")
@@ -33,12 +35,39 @@ TEST_CASE("Parse an invalid uri into seperate parts", "[invaliduriparser][issue]
 
 	const snowcrash::URI uri = "http://www.test.com/other/{id}[2]";
 
-	URIParser parser;
-	URIResult result;
+	URITemplateParser parser;
+	ParsedURITemplate result;
+    SourceCharactersBlock source;
 
-	parser.parse(uri, result);
+	parser.parse(uri, result,source);
 	REQUIRE(result.scheme == "http");
 	REQUIRE(result.host == "www.test.com");
 	REQUIRE(result.path == "/other/{id}[2]");
-	REQUIRE(result.Result == 1);
+	REQUIRE(result.warnings.size() == 1);
+}
+
+TEST_CASE("Parse uri template for invalid format curly brackets (nested brackets)", "[invalidcurlybracketparsingnested][issue][#61]")
+{
+    const snowcrash::URI uri = "http://www.test.com/{id{}";
+    
+    URITemplateParser parser;
+    ParsedURITemplate result;
+    SourceCharactersBlock source;
+
+    parser.parse(uri, result,source);
+  
+    REQUIRE(result.warnings.size() == 1);
+}
+
+TEST_CASE("Parse uri template for invalid format curly brackets (missing end bracket)", "[invalidcurlybracketparsingmissingendbracket][issue][#61]")
+{
+    const snowcrash::URI uri = "http://www.test.com/{id";
+
+    URITemplateParser parser;
+    ParsedURITemplate result;
+    SourceCharactersBlock source;
+
+    parser.parse(uri, result, source);
+
+    REQUIRE(result.warnings.size() == 1);
 }
