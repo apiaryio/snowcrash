@@ -12,17 +12,24 @@
 using namespace snowcrash;
 
 URITemplateCharacterParser::~URITemplateCharacterParser(){}
-
+URITemplateExpressionParser::~URITemplateExpressionParser(){}
 
 URITemplateCurlyBracketCharacterParser curlyBracketParser;
 URITemplateSquareBracketCharacterParser squareBracketParser;
+URITemplatePrefixSlashExpressionParser prefixSlashExpressionParser;
 
 std::vector<URITemplateCharacterParser*> URITemplateParser::characterParsers;
+std::vector<URITemplateExpressionParser*> URITemplateParser::expressionParsers;
+
 
 URITemplateParser::URITemplateParser(){
     if (characterParsers.size() == 0){
         characterParsers.push_back(&curlyBracketParser);
         characterParsers.push_back(&squareBracketParser);
+    }
+
+    if (expressionParsers.size() == 0){
+        expressionParsers.push_back(&prefixSlashExpressionParser);
     }
 }
 
@@ -31,7 +38,7 @@ URITemplateParser::URITemplateParser(){
 void URITemplateParser::parse(const URI uri, ParsedURITemplate& result, const SourceCharactersBlock& location)
 {
     CaptureGroups groups;
-    size_t gSize=5;
+    size_t gSize=0;
 
     
 
@@ -48,12 +55,24 @@ void URITemplateParser::parse(const URI uri, ParsedURITemplate& result, const So
         for (int c = 0; c < result.path.length(); c++){
             for (std::vector<URITemplateCharacterParser*>::iterator i = characterParsers.begin();
                 i != characterParsers.end(); ++i){
-                    (*i)->parse(result.path[c], result, location,c+1==result.path.length()); 
+                (*i)->parse(result.path[c], result, location, c + 1 == result.path.length());
             }
-            
-            
-            //TODO: parse out identifier groups
-            //TODO: loop through found id groups and pass through a list of functions to validate id
+        }
+
+        CaptureGroups expressions;
+        size_t eSize = 0;
+        if (RegexCapture(result.path, URI_TEMPLATE_EXPRESSION_REGEX, expressions, eSize)){
+            for (std::vector<URITemplateExpressionParser*>::iterator i = expressionParsers.begin();
+                i != expressionParsers.end(); ++i){
+                (*i)->initialiseParsing();
+            }
+
+            for (std::vector<URITemplateExpressionParser*>::iterator i = expressionParsers.begin();
+                i != expressionParsers.end(); ++i){
+                for (CaptureGroups::iterator e = expressions.begin()+1; e != expressions.end(); ++e){
+                    (*i)->parse(*e, result, location);
+                }
+            }
         }
     }
     else{
@@ -90,6 +109,7 @@ void URITemplateCurlyBracketCharacterParser::parse(const char c, ParsedURITempla
 URITemplateCurlyBracketCharacterParser::~URITemplateCurlyBracketCharacterParser(){}
 
 
+
 void URITemplateSquareBracketCharacterParser::initialiseParsing(){
     alreadyWarned = false;
 }
@@ -104,3 +124,17 @@ void URITemplateSquareBracketCharacterParser::parse(const char c, ParsedURITempl
 URITemplateSquareBracketCharacterParser::~URITemplateSquareBracketCharacterParser(){}
 
 
+
+
+void URITemplatePrefixSlashExpressionParser::initialiseParsing(){
+    alreadyWarned = false;
+}
+
+void URITemplatePrefixSlashExpressionParser::parse(const std::string expression, ParsedURITemplate& result, const SourceCharactersBlock& location){
+    if (expression[0] == '/' && !alreadyWarned){
+        result.warnings.push_back(Warning("URI Template Expression unsupported slash prefix path segments", URIWarning, location));
+        alreadyWarned = true;
+    }
+}
+
+URITemplatePrefixSlashExpressionParser::~URITemplatePrefixSlashExpressionParser(){}

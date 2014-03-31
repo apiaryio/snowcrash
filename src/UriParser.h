@@ -16,6 +16,7 @@
 
 
 #define URI_REGEX "^(http|https|ftp|file)?(://)?([^/]*)?(.*)$"
+#define URI_TEMPLATE_EXPRESSION_REGEX "\\{(.*)\\}"
 
 namespace snowcrash {
     
@@ -127,6 +128,14 @@ namespace snowcrash {
         void initialiseParsing();
         void parse(const char c, ParsedURITemplate& result, const SourceCharactersBlock& location, bool lastCharacter);
         ~URITemplateSquareBracketCharacterParser();
+    };
+
+    class URITemplatePrefixSlashExpressionParser :public URITemplateExpressionParser{
+        bool alreadyWarned;
+    public:
+        void initialiseParsing();
+        void parse(const std::string expression, ParsedURITemplate& result, const SourceCharactersBlock& location);
+        ~URITemplatePrefixSlashExpressionParser();
     };
 }
 

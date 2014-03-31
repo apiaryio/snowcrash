@@ -71,3 +71,17 @@ TEST_CASE("Parse uri template for invalid format curly brackets (missing end bra
 
     REQUIRE(result.warnings.size() == 1);
 }
+
+TEST_CASE("Parse uri template for invalid expression slash prefix path segments", "[invalidexpressionslashprefixpathsegment][issue][#61]")
+{
+    const snowcrash::URI uri = "http://www.test.com/{/id}{test}";
+
+    URITemplateParser parser;
+    ParsedURITemplate result;
+    SourceCharactersBlock source;
+
+    parser.parse(uri, result, source);
+
+    REQUIRE(result.warnings.size() == 1);
+    REQUIRE(result.warnings[0].code == (int)URIWarning);
+}
