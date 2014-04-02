@@ -77,6 +77,13 @@ Refer to [AST Serialization Media Types](https://github.com/apiaryio/api-bluepri
 	$ ./configure
 	$ make test
 	```
+
+	To include integration tests (using Cucumber) use the `--include-integration-tests` flag: 
+
+	```sh
+	$ ./configure --include-integration-tests
+	$ make test
+	```
 	
 We love **Windows** too! Please refer to [Building on Windows](https://github.com/apiaryio/snowcrash/wiki/Building-on-Windows).
 		

@@ -2,7 +2,9 @@ language: cpp
 compiler:
   - gcc
   - clang
-script: ./configure && make test
+script: 
+  - ./configure --include-integration-tests
+  - make test
 before_install:
   - git submodule update --init --recursive
   - rvm use $RVM --install --binary --fuzzy

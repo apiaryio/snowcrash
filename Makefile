@@ -50,8 +50,8 @@ distclean:
 test: test-libsnowcrash snowcrash
 	$(BUILD_DIR)/out/$(BUILDTYPE)/test-libsnowcrash
 
-ifdef CUCUMBER
-	bundle exec $(CUCUMBER)
+ifdef INTEGRATION_TESTS
+	bundle exec cucumber
 endif	
 
 perf: perf-libsnowcrash
