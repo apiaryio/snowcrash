@@ -462,11 +462,18 @@ namespace snowcrash {
 
 			bool isExampleFound = false;
 
-			for (Collection<Value>::iterator it = parameter.values.begin(); it != parameter.values.end(); ++it)
+			if(!parameter.exampleValue.size()) 
+				isExampleFound = true;
+			else
 			{
-				if(parameter.exampleValue == *it) 
-					isExampleFound = true;
+				for (Collection<Value>::iterator it = parameter.values.begin(); it != parameter.values.end(); ++it)
+					if(parameter.exampleValue == *it) 
+					{
+						isExampleFound = true;
+						break;
+					}
 			}
+
 
             if(!isExampleFound)
 			{
@@ -474,7 +481,7 @@ namespace snowcrash {
 				ss << "your example value: '" << parameter.exampleValue << "' is missing in the values";
 				SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, cur, section.bounds, parser.sourceData);
 				result.first.warnings.push_back(Warning(ss.str(),
-				EmptyDefinitionWarning,
+				MissingeExampleWarning,
 				sourceBlock));
 			}
 

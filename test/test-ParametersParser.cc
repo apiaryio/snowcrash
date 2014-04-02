@@ -487,7 +487,7 @@ TEST_CASE("warn missing example item in values", "[parameters][issue][#67]")
     parser.parse(blueprintSource, 0, result, blueprint);
     REQUIRE(result.error.code == Error::OK);
     REQUIRE(result.warnings.size() == 1);
-    REQUIRE(result.warnings[0].code == EmptyDefinitionWarning);
+    REQUIRE(result.warnings[0].code == MissingeExampleWarning);
     
     REQUIRE(blueprint.resourceGroups.size() == 1);
     REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
@@ -495,5 +495,5 @@ TEST_CASE("warn missing example item in values", "[parameters][issue][#67]")
     REQUIRE(blueprint.resourceGroups[0].resources[0].description.empty());
     REQUIRE(blueprint.resourceGroups[0].resources[0].parameters.size() == 1);
     REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].name == "id");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].exampleValue == "Value2");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].exampleValue == "Value1");
 }
