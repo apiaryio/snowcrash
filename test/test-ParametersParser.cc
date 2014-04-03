@@ -461,3 +461,38 @@ TEST_CASE("Parentheses in parameter description ", "[parameters][issue][#49][sou
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].type == "string");
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].description == "lorem (ipsum)");
 }
+
+TEST_CASE("warn missing example item in values", "[parameters][issue][#67]")
+{
+    // Blueprint in question:
+    //R"(
+    //# /1/{id}
+    //+ Parameters
+	//    + id (string, `Value1`);
+    //        + Values
+    //            + `Value2`
+    //");
+    const std::string blueprintSource = \
+    "# /1/{id}\n"\
+    "+ Parameters\n"\
+    "    + id (string, `Value1`)\n"\
+    "        + Values\n"\
+    "            + `Value2`\n"\
+    "\n";
+    
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(blueprintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.size() == 1);
+    REQUIRE(result.warnings[0].code == LogicalErrorWarning);
+    
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].description.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].name == "id");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].exampleValue == "Value1");
+}
