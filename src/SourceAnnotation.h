@@ -138,7 +138,6 @@ namespace snowcrash {
         DeprecatedWarning = 9,
         IndentationWarning = 10,
         AmbiguityWarning = 11,
-		MissingeExampleWarning = 12
     };
     
     /**

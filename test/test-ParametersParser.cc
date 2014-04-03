@@ -462,7 +462,6 @@ TEST_CASE("Parentheses in parameter description ", "[parameters][issue][#49][sou
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].description == "lorem (ipsum)");
 }
 
-
 TEST_CASE("warn missing example item in values", "[parameters][issue][#67]")
 {
     // Blueprint in question:
@@ -487,7 +486,7 @@ TEST_CASE("warn missing example item in values", "[parameters][issue][#67]")
     parser.parse(blueprintSource, 0, result, blueprint);
     REQUIRE(result.error.code == Error::OK);
     REQUIRE(result.warnings.size() == 1);
-    REQUIRE(result.warnings[0].code == MissingeExampleWarning);
+    REQUIRE(result.warnings[0].code == LogicalErrorWarning);
     
     REQUIRE(blueprint.resourceGroups.size() == 1);
     REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
