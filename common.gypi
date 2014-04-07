@@ -33,7 +33,7 @@
             'MinimalRebuild': 'false',
             'OmitFramePointers': 'false',
             'BasicRuntimeChecks': 3, # /RTC1
-            'RuntimeTypeInfo': 'false',
+            'RuntimeTypeInfo':  'true', # /GR, determine object type at runtime
             'ExceptionHandling': 1            
           },
           'VCLinkerTool': {
@@ -60,7 +60,7 @@
             'OmitFramePointers': 'true',
             'EnableFunctionLevelLinking': 'true',
             'EnableIntrinsicFunctions': 'true',
-            'RuntimeTypeInfo': 'false',
+            'RuntimeTypeInfo': 'true', # /GR, determine object type at runtime
             'ExceptionHandling': 1,
             'AdditionalOptions': [
               '/MP', # compile across multiple CPUs
