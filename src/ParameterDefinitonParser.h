@@ -460,18 +460,12 @@ namespace snowcrash {
                                                         sourceBlock));
             }
 
-            if(!parameter.exampleValue.empty() && !parameter.values.empty()) {
-                // WARN: missing example in values.
-                ParseSectionResult valuesResult = CheckExampleValue(section, cur, parser, parameter, sectionCur);
+            if((!parameter.exampleValue.empty()||!parameter.defaultValue.empty()) && !parameter.values.empty()) {
+                // WARN: missing example and/or default in values.
+                ParseSectionResult valuesResult = CheckExampleAndDefaultValue(section, cur, parser, parameter, sectionCur);
                 result.first += valuesResult.first;
             }
             
-            if(!parameter.defaultValue.empty() && !parameter.values.empty()) {
-                // WARN: missing default value in values.
-                ParseSectionResult valuesResult = CheckDefaultValue(section, cur, parser, parameter, sectionCur);
-                result.first += valuesResult.first;
-            }
-
             endCur = CloseList(sectionCur, section.bounds.second);
             result.second = endCur;
             return result;
@@ -526,25 +520,28 @@ namespace snowcrash {
             return result;
         }
 
-        /** WARN: missing example in values.*/
-        static ParseSectionResult CheckExampleValue(const BlueprintSection& section,
-                                                    const BlockIterator& cur,
-                                                    BlueprintParserCore& parser,
-                                                    Parameter& parameter,
-                                                    BlockIterator& sectionCur) {
+        /** WARN: missing example and/or default item in values.*/
+        static ParseSectionResult CheckExampleAndDefaultValue(const BlueprintSection& section,
+                                                              const BlockIterator& cur,
+                                                              BlueprintParserCore& parser,
+                                                              Parameter& parameter,
+                                                              BlockIterator& sectionCur) {
 
             ParseSectionResult result = std::make_pair(Result(), cur);
 
             bool isExampleFound = false;
+            bool isDefaultFound = false;
 
             for (Collection<Value>::iterator it = parameter.values.begin(); it != parameter.values.end(); ++it){
                 if(parameter.exampleValue == *it) {
                     isExampleFound = true;
-                    break;
+                }
+                if(parameter.defaultValue == *it) {
+                    isDefaultFound = true;
                 }
             }
 
-            if(!isExampleFound) {
+            if(!parameter.exampleValue.empty() && !isExampleFound) {
                 std::stringstream ss;
                 ss << "your example value: '" << parameter.exampleValue << "' is missing in the values";
                 SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, cur, section.bounds, parser.sourceData);
@@ -553,30 +550,9 @@ namespace snowcrash {
                                                 sourceBlock));
             }
 
-            return result;
-        }
-
-        /** WARN: missing default value in values.*/
-        static ParseSectionResult CheckDefaultValue(const BlueprintSection& section,
-                                                    const BlockIterator& cur,
-                                                    BlueprintParserCore& parser,
-                                                    Parameter& parameter,
-                                                    BlockIterator& sectionCur) {
-
-            ParseSectionResult result = std::make_pair(Result(), cur);
-
-            bool isDefaultFound = false;
-
-            for (Collection<Value>::iterator it = parameter.values.begin(); it != parameter.values.end(); ++it){
-                if(parameter.exampleValue == *it) {
-                    isDefaultFound = true;
-                    break;
-                }
-            }
-
-            if(!isDefaultFound) {
+            if(!parameter.defaultValue.empty() && !isDefaultFound) {
                 std::stringstream ss;
-                ss << "your default value: '" << parameter.exampleValue << "' is missing in the values";
+                ss << "your default value: '" << parameter.defaultValue << "' is missing in the values";
                 SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, cur, section.bounds, parser.sourceData);
                 result.first.warnings.push_back(Warning(ss.str(),
                                                 LogicalErrorWarning,
@@ -585,7 +561,6 @@ namespace snowcrash {
 
             return result;
         }
-
         
     };
     

@@ -468,14 +468,14 @@ TEST_CASE("warn missing example item in values", "[parameters][issue][#67]")
     //R"(
     //# /1/{id}
     //+ Parameters
-	//    + id (string, `Value1`);
+	//    + id  `Value2` (optional, string, `Value1`);
     //        + Values
     //            + `Value2`
     //");
     const std::string blueprintSource = \
     "# /1/{id}\n"\
     "+ Parameters\n"\
-    "    + id (string, `Value1`)\n"\
+    "    + id = `Value2` (optional, string, `Value1`)\n"\
     "        + Values\n"\
     "            + `Value2`\n"\
     "\n";
@@ -495,6 +495,7 @@ TEST_CASE("warn missing example item in values", "[parameters][issue][#67]")
     REQUIRE(blueprint.resourceGroups[0].resources[0].parameters.size() == 1);
     REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].name == "id");
     REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].exampleValue == "Value1");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].defaultValue == "Value2");
 }
 
 TEST_CASE("warn missing default value in values", "[parameters][issue][#67]")
@@ -503,14 +504,14 @@ TEST_CASE("warn missing default value in values", "[parameters][issue][#67]")
     //R"(
     //# /1/{id}
     //+ Parameters
-	//    + id = `Value1` (optional, string);
+    //    + id = `Value1` (optional, string, `Value2`);
     //        + Values
     //            + `Value2`
     //");
     const std::string blueprintSource = \
     "# /1/{id}\n"\
     "+ Parameters\n"\
-    "    + id = `Value1` (optional, string)\n"\
+    "    + id = `Value1` (optional, string, `Value2`)\n"\
     "        + Values\n"\
     "            + `Value2`\n"\
     "\n";
@@ -529,5 +530,6 @@ TEST_CASE("warn missing default value in values", "[parameters][issue][#67]")
     REQUIRE(blueprint.resourceGroups[0].resources[0].description.empty());
     REQUIRE(blueprint.resourceGroups[0].resources[0].parameters.size() == 1);
     REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].name == "id");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].exampleValue == "Value2");
     REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].defaultValue == "Value1");
 }
