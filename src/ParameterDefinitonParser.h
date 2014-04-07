@@ -460,10 +460,9 @@ namespace snowcrash {
                                                         sourceBlock));
             }
 
-            if((!parameter.exampleValue.empty()||!parameter.defaultValue.empty()) && !parameter.values.empty()) {
+            if((!parameter.exampleValue.empty() || !parameter.defaultValue.empty()) && !parameter.values.empty()) {
                 // WARN: missing example and/or default in values.
-                ParseSectionResult valuesResult = CheckExampleAndDefaultValue(section, cur, parser, parameter, sectionCur);
-                result.first += valuesResult.first;
+                CheckExampleAndDefaultValue(section, cur, parser, parameter, sectionCur,result);
             }
             
             endCur = CloseList(sectionCur, section.bounds.second);
@@ -521,13 +520,12 @@ namespace snowcrash {
         }
 
         /** WARN: missing example and/or default item in values.*/
-        static ParseSectionResult CheckExampleAndDefaultValue(const BlueprintSection& section,
+        static void CheckExampleAndDefaultValue(const BlueprintSection& section,
                                                               const BlockIterator& cur,
                                                               BlueprintParserCore& parser,
                                                               Parameter& parameter,
-                                                              BlockIterator& sectionCur) {
-
-            ParseSectionResult result = std::make_pair(Result(), cur);
+                                                              BlockIterator& sectionCur,
+                                                              ParseSectionResult& result) {
 
             bool isExampleFound = false;
             bool isDefaultFound = false;
@@ -559,7 +557,7 @@ namespace snowcrash {
                                                 sourceBlock));
             }
 
-            return result;
+            return;
         }
         
     };

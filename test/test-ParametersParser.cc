@@ -468,7 +468,7 @@ TEST_CASE("warn missing example item in values", "[parameters][issue][#67]")
     //R"(
     //# /1/{id}
     //+ Parameters
-	//    + id  `Value2` (optional, string, `Value1`);
+    //    + id = `Value2` (optional, string, `Value1`);
     //        + Values
     //            + `Value2`
     //");
