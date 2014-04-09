@@ -241,8 +241,10 @@ namespace snowcrash {
             return result;
         }
         
-        static void Finalize(BlueprintParserCore& parser,
-                             Resource& resource)
+        static void Finalize(const SectionBounds& bounds,
+                             BlueprintParserCore& parser,
+                             Resource& resource,
+                             Result& result)
         {
             // Consolidate depraceted headers into subsequent payloads
             if (!resource.headers.empty()) {

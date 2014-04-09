@@ -36,10 +36,10 @@ parser.add_option("--shared",
     dest="shared",
     help="Build and use shared libsnowcrash instead of static one.")
 
-parser.add_option("--skip-integration-test",
+parser.add_option("--include-integration-tests",
     action="store_true",
-    dest="skip_integration_test",
-    help="Skip integration testing using Cucumber")
+    dest="include_integration_tests",
+    help="Configure for integration testing using Cucumber")
 
 (options, args) = parser.parse_args()
 
@@ -128,9 +128,20 @@ def configure_snowcrash(o):
 # Cucumber testing environment
 #
 # TODO: use bundle check
-if not options.skip_integration_test:
-  print "Installing cucumber dependencies..."
-  subprocess.call(["bundle", "install"])
+if options.include_integration_tests:
+    print "Installing dependencies for integration tests..."
+    try:
+        subprocess.call(["bundle", "install"])
+    except OSError as e:
+        if e.errno == os.errno.ENOENT:
+            raise RuntimeError(
+                "Integration test dependecies rely on Ruby Bundler "
+                "but it cannot be find in the system $PATH. "
+                "Please make sure to install Bundler or/and to "
+                "add it to the $PATH."
+            )
+        else:
+            raise
 
 #
 # config.gypi
@@ -164,7 +175,7 @@ config = {
   'BUILDTYPE': 'Debug' if options.debug else 'Release',
   'PYTHON': sys.executable,
   'BUILD_DIR': build_dir,
-  'CUCUMBER': 'cucumber' if not options.skip_integration_test else ''
+  'INTEGRATION_TESTS': '1' if options.include_integration_tests else ''
 }
 config = '\n'.join(map('='.join, config.iteritems())) + '\n'
 

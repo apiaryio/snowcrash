@@ -45,8 +45,8 @@ MarkdownBlock::Stack snowcrashtest::CanonicalActionFixture()
     responseList.push_back(MarkdownBlock(CodeBlockType, "OK.", 0, MakeSourceDataBlock(5, 1)));
     responseList.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(6, 1)));
     
-    MarkdownBlock::Stack::iterator cur = listBlock.begin();
-    ++cur;
+    MarkdownBlock::Stack::iterator cur = listBlock.end();
+    --cur;
     listBlock.insert(cur, responseList.begin(), responseList.end());
     
     // inject complete list into final markdown
@@ -79,20 +79,20 @@ TEST_CASE("Method block classifier", "[action][classifier][blocks]")
     REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSectionType) == UndefinedSectionType);
     REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSectionType) == ActionSectionType);
 
-    ++cur; // ListBlockBeginType - "Response"
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSectionType) == ResponseSectionType);
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSectionType) == ResponseSectionType);
-    
-    ++cur; // ListItemBlockBeginType - "Response"
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSectionType) == ResponseSectionType);
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSectionType) == ResponseSectionType);
-    
-    std::advance(cur, 4); // Request
+    ++cur; // ListBlockBeginType
     REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSectionType) == RequestSectionType);
     REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSectionType) == RequestSectionType);
-    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), HeadersSectionType) == RequestSectionType);
     
-    std::advance(cur, 18); // Response
+    ++cur; // ListItemBlockBeginType
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSectionType) == RequestSectionType);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSectionType) == RequestSectionType);
+    
+    std::advance(cur, 18); // Canonnical response
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSectionType) == ResponseSectionType);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSectionType) == ResponseSectionType);
+    REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), HeadersSectionType) == ResponseSectionType);
+    
+    std::advance(cur, 4); // Additional Response
     REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), UndefinedSectionType) == ResponseSectionType);
     REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ActionSectionType) == ResponseSectionType);
     REQUIRE(ClassifyBlock<Action>(cur, markdown.end(), ResponseSectionType) == ResponseSectionType);
@@ -235,6 +235,7 @@ TEST_CASE("Parse description with list followed by a request", "[action][blocks]
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.size() == 1); // empty body asset
+    REQUIRE(result.first.warnings[0].code == EmptyDefinitionWarning);
     
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 10);
@@ -464,7 +465,9 @@ TEST_CASE("Parse method with multiple incomplete requests", "[action][blocks]")
     ParseSectionResult result = ActionParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, action);
     
     REQUIRE(result.first.error.code == Error::OK);
-    CHECK(result.first.warnings.size() == 2); // empty asset & preformatted asset
+    REQUIRE(result.first.warnings.size() == 2); // empty asset & preformatted asset
+    REQUIRE(result.first.warnings[0].code == EmptyDefinitionWarning);
+    REQUIRE(result.first.warnings[1].code == IndentationWarning);
     
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 9);
@@ -578,7 +581,8 @@ TEST_CASE("Parse method with inline payload", "[action][blocks]")
     ParseSectionResult result = ActionParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, action);
     
     REQUIRE(result.first.error.code == Error::OK);
-    CHECK(result.first.warnings.size() == 1); // empty asset
+    REQUIRE(result.first.warnings.size() == 1); // empty asset
+    REQUIRE(result.first.warnings[0].code == EmptyDefinitionWarning);
     
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 9);
@@ -855,5 +859,164 @@ TEST_CASE("Missing 'LINK' HTTP request method", "[action][issue][#46][source]")
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples.size() == 1);
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].requests.empty());
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
+}
+
+TEST_CASE("Automatic request response pairing", "[pairing][action][issue][#53][source]")
+{
+    // Blueprint in question:
+    //R"(
+    //# Resource [/]
+    //## Do Someting [POST]
+    //
+    //+ request A
+    //
+    //        A
+    //
+    //+ response 200
+    //
+    //        200
+    //
+    //+ request B
+    //
+    //        B
+    //
+    //+ response 400
+    //
+    //        400
+    //
+    //+ response 500
+    //
+    //        500
+    //
+    //+ request C
+    //    
+    //        C
+    //
+    //+ request D
+    //
+    //        D
+    //
+    //+ response 200
+    //
+    //        200
+    //
+    //");
+    const std::string blueprintSource = \
+    "# Resource [/]\n"\
+    "## Do Someting [POST]\n"\
+    "\n"\
+    "+ request A\n"\
+    "    \n"\
+    "        A\n"\
+    "\n"\
+    "+ response 200\n"\
+    "\n"\
+    "        200\n"\
+    "\n"\
+    "+ request B\n"\
+    "\n"\
+    "        B\n"\
+    "\n"\
+    "+ response 400\n"\
+    "\n"\
+    "        400\n"\
+    "\n"\
+    "+ response 500\n"\
+    "\n"\
+    "        500\n"\
+    "\n"\
+    "+ request C\n"\
+    "    \n"\
+    "        C\n"\
+    "\n"\
+    "+ request D\n"\
+    "\n"\
+    "        D\n"\
+    "\n"\
+    "+ response 200\n"\
+    "\n"\
+    "        200\n"\
+    "\n";
+    
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(blueprintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.empty());
+    
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples.size() == 3);
+
+    // Example 1
+    TransactionExample& example1 = blueprint.resourceGroups[0].resources[0].actions[0].examples[0];
+    REQUIRE(example1.requests.size() == 1);
+    REQUIRE(example1.requests[0].name == "A");
+    REQUIRE(example1.requests[0].body == "A\n");
+    REQUIRE(example1.responses.size() == 1);
+    REQUIRE(example1.responses[0].name == "200");
+    REQUIRE(example1.responses[0].body == "200\n");
+    
+    // Example 2
+    TransactionExample& example2 = blueprint.resourceGroups[0].resources[0].actions[0].examples[1];
+    REQUIRE(example2.requests.size() == 1);
+    REQUIRE(example2.requests[0].name == "B");
+    REQUIRE(example2.requests[0].body == "B\n");
+    REQUIRE(example2.responses.size() == 2);
+    REQUIRE(example2.responses[0].name == "400");
+    REQUIRE(example2.responses[0].body == "400\n");
+    REQUIRE(example2.responses[1].name == "500");
+    REQUIRE(example2.responses[1].body == "500\n");
+
+    // Example 3
+    TransactionExample& example3 = blueprint.resourceGroups[0].resources[0].actions[0].examples[2];
+    REQUIRE(example3.requests.size() == 2);
+    REQUIRE(example3.requests[0].name == "C");
+    REQUIRE(example3.requests[0].body == "C\n");
+    REQUIRE(example3.requests[1].name == "D");
+    REQUIRE(example3.requests[1].body == "D\n");
+    REQUIRE(example3.responses.size() == 1);
+    REQUIRE(example3.responses[0].name == "200");
+    REQUIRE(example3.responses[0].body == "200\n");
+}
+
+
+TEST_CASE("Warn when request is not followed by a response", "[pairing][action][issue][#53][source]")
+{
+    // Blueprint in question:
+    //R"(
+    //# GET /1
+    //+ response 200
+    //
+    //        200
+    //
+    //+ request A
+    //
+    //        A
+    //);
+    const std::string blueprintSource = \
+    "# GET /1\n"\
+    "+ response 200 \n"\
+    "\n"\
+    "        200\n"\
+    "\n"\
+    "+ request A\n"\
+    "\n"\
+    "        A\n";
+    
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(blueprintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.size() == 1);
+    REQUIRE(result.warnings[0].code == EmptyDefinitionWarning);
+    
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples.size() == 2);
 }
 
