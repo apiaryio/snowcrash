@@ -172,6 +172,8 @@ TEST_CASE("Parse partially defined resource", "[resource][block]")
     
     REQUIRE(result.first.error.code == Error::OK);
     REQUIRE(result.first.warnings.size() == 2); // no response & preformatted asset
+    REQUIRE(result.first.warnings[0].code == IndentationWarning);
+    REQUIRE(result.first.warnings[1].code == EmptyDefinitionWarning);
     
     const MarkdownBlock::Stack &blocks = markdown;
     REQUIRE(std::distance(blocks.begin(), result.second) == 8);
@@ -222,7 +224,7 @@ TEST_CASE("Parse multiple method descriptions", "[resource][block]")
     REQUIRE(resource.actions[1].description == "3");
 }
 
-TEST_CASE("Parse multiple method", "[resource][block]")
+TEST_CASE("Parse multiple methods", "[resource][block]")
 {    
     // Blueprint in question:
     //R"(
@@ -240,10 +242,10 @@ TEST_CASE("Parse multiple method", "[resource][block]")
     //## HEAD
     //C
     //
+    //+ Request D
     //+ Response 200
     //    + Body
     //
-    //+ Request D
     //
     //## PUT
     //E
@@ -271,14 +273,14 @@ TEST_CASE("Parse multiple method", "[resource][block]")
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "C", 0, MakeSourceDataBlock(12, 1)));
     markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
     markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
+    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "Request D", 0, MakeSourceDataBlock(17, 1)));
+    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
     markdown.push_back(MarkdownBlock(ParagraphBlockType, "Response 200", 0, MakeSourceDataBlock(13, 1)));
     markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
     markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
     markdown.push_back(MarkdownBlock(ListItemBlockEndType, "Body", 0, MakeSourceDataBlock(14, 1)));
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(15, 1)));
     markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(16, 1)));
-    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "Request D", 0, MakeSourceDataBlock(17, 1)));
     markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(18, 1)));
     
     markdown.push_back(MarkdownBlock(HeaderBlockType, "PUT", 2, MakeSourceDataBlock(19, 1)));

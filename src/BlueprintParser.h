@@ -74,8 +74,10 @@ namespace snowcrash {
             return result;
         }
         
-        static void Finalize(BlueprintParserCore& parser,
-                             Blueprint& blueprint) {}
+        static void Finalize(const SectionBounds& bounds,
+                             BlueprintParserCore& parser,
+                             Blueprint& blueprint,
+                             Result& result) {}
         
         /**
          *  \brief  Checks API Blueprint name issues warning or error if name does not exists.

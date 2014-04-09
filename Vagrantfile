@@ -1,5 +1,6 @@
 Vagrant.configure("2") do |config|
   config.vm.box = "precise64"
+  config.vm.box_url = "http://files.vagrantup.com/precise64.box"
 
   # VirtualBox
   config.vm.provider :virtualbox do |vb|
@@ -14,6 +15,6 @@ Vagrant.configure("2") do |config|
   end
 
   config.vm.network :private_network, ip: "10.3.3.3"
-  config.vm.synced_folder ".", "/vagrant", id: "vagrant-root"
+  config.vm.synced_folder ".", "/vagrant", id: "vagrant-root", type: "nfs"
   config.vm.provision :shell, :path => "./provisioning.sh"
 end

@@ -12,6 +12,7 @@
 #include "BlueprintParserCore.h"
 #include "Blueprint.h"
 #include "ResourceParser.h"
+#include "UriParser.h"
 
 namespace snowcrashconst {
     
@@ -118,10 +119,12 @@ namespace snowcrash {
             
             return result;
         }
-        
-        static void Finalize(BlueprintParserCore& parser,
-                             ResourceGroup& group) {}
-        
+
+        static void Finalize(const SectionBounds& bounds,
+                             BlueprintParserCore& parser,
+                             ResourceGroup& group,
+                             Result& result) {}
+
         static ParseSectionResult HandleResourceGroupOverviewBlock(const BlueprintSection& section,
                                                                    const BlockIterator& cur,
                                                                    BlueprintParserCore& parser,
@@ -152,6 +155,7 @@ namespace snowcrash {
                                                  BlueprintParserCore& parser,
                                                  ResourceGroup& group)
         {
+            URIParser uriParser;
             Resource resource;
             ParseSectionResult result = ResourceParser::Parse(cur,
                                                               section.bounds.second,
@@ -165,6 +169,15 @@ namespace snowcrash {
             ResourceIteratorPair globalDuplicate;
             if (duplicate == group.resources.end())
                 globalDuplicate = FindResource(parser.blueprint, resource);
+
+            URIResult uriresult;
+            uriParser.parse(resource.uriTemplate, uriresult);
+
+            if (uriresult.Result == snowcrash::PathContainsSquareBrackets){
+                // WARN: Square brackets in URI path
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, section.bounds.second, section.bounds, parser.sourceData);
+                result.first.warnings.push_back(Warning("the resource URI '" + resource.uriTemplate + "' contains square brackets outside of the host section", URIWarning, sourceBlock));
+            }
             
             if (duplicate != group.resources.end() ||
                 globalDuplicate.first != parser.blueprint.resourceGroups.end()) {
@@ -177,6 +190,8 @@ namespace snowcrash {
                                                         DuplicateWarning,
                                                         sourceBlock));
             }
+
+
             
             group.resources.push_back(resource); // FIXME: C++11 move
             return result;

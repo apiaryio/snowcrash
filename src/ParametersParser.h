@@ -145,8 +145,10 @@ namespace snowcrash {
             return result;
         }
         
-        static void Finalize(BlueprintParserCore& parser,
-                             ParameterCollection& parameters) {}
+        static void Finalize(const SectionBounds& bounds,
+                             BlueprintParserCore& parser,
+                             ParameterCollection& parameters,
+                             Result& result) {}
         
         /**
          *  \brief  Parse Parameters top-level section blocks.
