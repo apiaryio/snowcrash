@@ -834,6 +834,37 @@ TEST_CASE("Do not report empty message body for requests", "[action][#20][source
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
 }
 
+TEST_CASE("Give a warning when 100 response has a body", "[action][empty][response][source]")
+{
+    // Blueprint in question:
+    //R"(
+    //# GET /1
+    //+ Response 100
+    //
+    //       {}
+    //");
+    const std::string blueprintSource = \
+    "# GET /1\n"\
+    "+ Response 100\n\n"\
+    "        {}\n\n";
+
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(blueprintSource, 0, result, blueprint);
+
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.size() == 1);
+
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body == "{}\n");
+}
+
 TEST_CASE("Missing 'LINK' HTTP request method", "[action][issue][#46][source]")
 {
     // Blueprint in question:

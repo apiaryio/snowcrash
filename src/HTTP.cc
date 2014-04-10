@@ -19,7 +19,7 @@ StatusCodeTraits snowcrash::GetStatusCodeTrait(HTTPStatusCode code)
     traits.code = code;
 
     // Following status codes MUST NOT contain response body
-    if (code == 204 || code == 304) {
+    if (code == 204 || code == 304 || code/100 == 1) {
         traits.allowBody = false;
     }
     

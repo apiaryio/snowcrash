@@ -410,10 +410,13 @@ namespace snowcrash {
             else if (section == ResponseSectionType) {
                 // Check status code
                 HTTPStatusCode code = 0;
+
                 if (!payload.name.empty()) {
                     std::stringstream(payload.name) >> code;
                 }
+
                 StatusCodeTraits traits = GetStatusCodeTrait(code);
+
                 if (traits.allowBody) {
                     warnEmptyBody = payload.body.empty() & !contentType.empty();
                 }
