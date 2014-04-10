@@ -24,7 +24,7 @@ namespace snowcrash {
     /**
      *  \brief Find a group in the blueprint by the group name.
      *  \param blueprint A blueprint AST to be searched.
-     *  \param group A resrouce group to look for.
+     *  \param group A resource group to look for.
      *  \returns An iterator at matching group within blueprint's resource groups collection.
      */
     FORCEINLINE Collection<ResourceGroup>::const_iterator FindResourceGroup(const Blueprint& blueprint,

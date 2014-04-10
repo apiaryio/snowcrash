@@ -20,9 +20,9 @@ namespace snowcrash {
     enum SectionType {
         UndefinedSectionType,           /// < Undefined section
         BlueprintSectionType,           /// < Blueprint overview
-        ResourceGroupSectionType,       /// < Resoruce group
+        ResourceGroupSectionType,       /// < Resource group
         ResourceSectionType,            /// < Resource
-        ResourceMethodSectionType,      /// < Resoruce & Action combined (abbrev)
+        ResourceMethodSectionType,      /// < Resource & Action combined (abbrev)
         ActionSectionType,              /// < Action
         RequestSectionType,             /// < Request
         RequestBodySectionType,         /// < Request & Payload body combined (abbrev)
@@ -33,9 +33,9 @@ namespace snowcrash {
         ModelSectionType,               /// < Model
         ModelBodySectionType,           /// < Model & Body combined (abbrev)
         BodySectionType,                /// < Payload Body
-        DanglingBodySectionType,        /// < Dangling Body (unrecognized section considered to be Body)
+        DanglingBodySectionType,        /// < Dangling Body (unrecognised section considered to be Body)
         SchemaSectionType,              /// < Payload Schema
-        DanglingSchemaSectionType,      /// < Dangling Schema (unrecognized section considered to be Schema)
+        DanglingSchemaSectionType,      /// < Dangling Schema (unrecognised section considered to be Schema)
         HeadersSectionType,             /// < Headers
         ForeignSectionType,             /// < Foreign, unexpected section
         ParametersSectionType,          /// < Parameters

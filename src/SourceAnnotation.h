@@ -45,13 +45,13 @@ namespace snowcrash {
         /**
          *  \brief  %SourceAnnotation default constructor.
          *
-         *  Creates an empty anotation with the default annotation code.
+         *  Creates an empty annotation with the default annotation code.
          */
         SourceAnnotation() : code(OK) {}
         
         /**
          *  \brief  %SourceAnnotation copy constructor.
-         *  \param  rhs  An anotation to be copied.
+         *  \param  rhs  An annotation to be copied.
          */
         SourceAnnotation(const SourceAnnotation& rhs) {
             
@@ -83,7 +83,7 @@ namespace snowcrash {
         
         /**
          *  \brief  %SourceAnnotation assignment operator
-         *  \param  rhs  An anotation to be assigned to this annotation.
+         *  \param  rhs  An annotation to be assigned to this annotation.
          */
         SourceAnnotation& operator=(const SourceAnnotation& rhs) {
             this->message = rhs.message;
@@ -149,7 +149,7 @@ namespace snowcrash {
     /**
      *  \brief A parsing result Report.
      *
-     *  Resulte of a source data parsing operation.
+     *  Result of a source data parsing operation.
      *  Composed of ONE error source annotation
      *  and a set of warning source annotations.
      */

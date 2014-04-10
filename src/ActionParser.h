@@ -227,7 +227,7 @@ namespace snowcrash {
                              Action& action,
                              Result& result)
         {
-            // Consolidate depraceted headers into subsequent payloads
+            // Consolidate deprecated headers into subsequent payloads
             if (!action.headers.empty()) {
                 InjectDeprecatedHeaders(action.headers, action.examples);
                 action.headers.clear();
@@ -307,7 +307,7 @@ namespace snowcrash {
         /**
          *  \brief  Parse action payload
          *  \param  section Actual section being parsed.
-         *  \param  cur     Cursor withing the section boundaries.
+         *  \param  cur     Cursor within the section boundaries.
          *  \param  parser  A parser's instance.
          *  \param  action  An output buffer to store parsed payload into.
          *  \return A block parser section result.

@@ -16,7 +16,7 @@
  *
  *  Technical note: Using preprocessor macro instead of strict
  *  defined type due to C++98 string concatenation limitations.
- *  To be improved with migration to C++11.
+ *  FIXME: To be improved with migration to C++11.
  */
 #define HTTP_REQUEST_METHOD "(GET|POST|PUT|DELETE|OPTIONS|PATCH|PROPPATCH|LOCK|UNLOCK|COPY|MOVE|MKCOL|HEAD|LINK|UNLINK)"
 

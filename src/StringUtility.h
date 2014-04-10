@@ -64,7 +64,7 @@ namespace snowcrash {
         return elems;
     }
     
-    // Split string on the first occurence of delim
+    // Split string on the first occurrence of delim
     inline std::vector<std::string> SplitOnFirst(const std::string& s, char delim) {
         std::string::size_type pos = s.find(delim);
         std::vector<std::string> elems;
@@ -80,11 +80,11 @@ namespace snowcrash {
     
     
     /**
-     *  \brief  Replace all occurences of a string.
+     *  \brief  Replace all occurrences of a string.
      *  \param  s       A string to search in.
      *  \param  find    A string to look for.
      *  \param  replace A string to replace with.
-     *  \return A copy of %s with all occurences of %find replaced by %replace.
+     *  \return A copy of %s with all occurrences of %find replaced by %replace.
      */
     inline std::string ReplaceString(const std::string& s,
                                      const std::string& find,

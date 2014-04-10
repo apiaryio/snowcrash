@@ -18,7 +18,7 @@ StatusCodeTraits snowcrash::GetStatusCodeTrait(HTTPStatusCode code)
     StatusCodeTraits traits;
     traits.code = code;
 
-    // Following status codes MUST NOT containt response body
+    // Following status codes MUST NOT contain response body
     if (code == 204 || code == 304) {
         traits.allowBody = false;
     }
