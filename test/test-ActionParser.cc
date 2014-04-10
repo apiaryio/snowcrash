@@ -834,6 +834,46 @@ TEST_CASE("Do not report empty message body for requests", "[action][#20][source
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
 }
 
+TEST_CASE("Give a warning of empty message body for requests with certain headers", "[action][#77][source]")
+{
+    // Blueprint in question:
+    //R"(
+    //# POST /1
+    //+ Request
+    //    + Headers
+    //
+    //            Content-Length: 100
+    //
+    //+ Response 204
+    //");
+    const std::string blueprintSource = \
+    "# POST /1\n"\
+    "+ Request\n"\
+    "    + Headers \n"\
+    "\n"\
+    "            Content-Length: 100\n\n"\
+    "+ Response 204\n\n";
+
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(blueprintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.size() == 1);
+
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].requests.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].requests[0].headers.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].requests[0].headers[0].first == "Content-Length");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].requests[0].headers[0].second == "100");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].requests[0].body.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
+}
+
 TEST_CASE("Give a warning when 100 response has a body", "[action][empty][response][source]")
 {
     // Blueprint in question:

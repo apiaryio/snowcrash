@@ -11,7 +11,9 @@
 using namespace snowcrash;
 
 const std::string HTTPHeaderName::Accept = "Accept";
+const std::string HTTPHeaderName::ContentLength = "Content-Length";
 const std::string HTTPHeaderName::ContentType = "Content-Type";
+const std::string HTTPHeaderName::TransferEncoding = "Transfer-Encoding";
 
 StatusCodeTraits snowcrash::GetStatusCodeTrait(HTTPStatusCode code)
 {

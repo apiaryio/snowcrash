@@ -34,7 +34,9 @@ namespace snowcrash {
      */
     struct HTTPHeaderName {
         static const std::string Accept;
+        static const std::string ContentLength;
         static const std::string ContentType;
+        static const std::string TransferEncoding;
     };
     
     /**

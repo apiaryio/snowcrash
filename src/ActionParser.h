@@ -384,13 +384,25 @@ namespace snowcrash {
                                  Result& result) {
             
             bool warnEmptyBody = false;
+
             std::string contentType;
+            std::string contentLength;
+            std::string transferEncoding;
+
             for (Collection<Header>::const_iterator it = payload.headers.begin();
                  it != payload.headers.end();
                  ++it) {
                 
                 if (it->first == HTTPHeaderName::ContentType) {
                     contentType = it->second;
+                }
+
+                if (it->first == HTTPHeaderName::ContentLength) {
+                    contentLength = it->second;
+                }
+
+                if (it->first == HTTPHeaderName::TransferEncoding) {
+                    transferEncoding = it->second;
                 }
             }
             
@@ -403,7 +415,8 @@ namespace snowcrash {
                         warnEmptyBody = true;
                     }
                     else {
-                        warnEmptyBody = !contentType.empty();
+                        warnEmptyBody = !contentLength.empty() ||
+                                        !transferEncoding.empty();
                     }
                 }
             }
@@ -437,7 +450,7 @@ namespace snowcrash {
                                                       LogicalErrorWarning,
                                                       MapSourceDataBlock(sourceMap, sourceData)));
                     return;
-   
+
                 }
             }
             
@@ -446,10 +459,14 @@ namespace snowcrash {
                 // WARN: empty body
                 std::stringstream ss;
                 ss << "empty " << SectionName(section) << " " << SectionName(BodySectionType);
-                if (!contentType.empty()) {
-                    ss << ", expected " << SectionName(BodySectionType) << " for '" << contentType << "' Content-Type";
+
+                if (!contentLength.empty()) {
+                    ss << ", expected " << SectionName(BodySectionType) << " for '" << contentLength << "' Content-Length";
                 }
-                
+                else if (!transferEncoding.empty()) {
+                    ss << ", expected " << SectionName(BodySectionType) << " for '" << transferEncoding << "' Transfer-Encoding";
+                }
+
                 result.warnings.push_back(Warning(ss.str(),
                                                   EmptyDefinitionWarning,
                                                   MapSourceDataBlock(sourceMap, sourceData)));
