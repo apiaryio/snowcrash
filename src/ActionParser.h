@@ -354,7 +354,7 @@ namespace snowcrash {
             }
 
             // Check payload integrity
-            CheckPayload(section.type, payload, nameBlock->sourceMap, parser.sourceData, result.first);
+            CheckPayload(section.type, payload, action.method, nameBlock->sourceMap, parser.sourceData, result.first);
             
             // Inject parsed payload into the action
             if (section.type == RequestSectionType) {
@@ -379,6 +379,7 @@ namespace snowcrash {
          */
         static void CheckPayload(const SectionType& section,
                                  const Payload& payload,
+                                 const HTTPMethod method,
                                  const SourceDataBlock& sourceMap,
                                  const SourceData& sourceData,
                                  Result& result) {
@@ -428,18 +429,31 @@ namespace snowcrash {
                     std::stringstream(payload.name) >> code;
                 }
 
-                StatusCodeTraits traits = GetStatusCodeTrait(code);
+                StatusCodeTraits statusCodeTraits = GetStatusCodeTrait(code);
+                HTTPMethodTraits methodTraits = GetMethodTrait(method);
 
-                if (traits.allowBody) {
+                if (statusCodeTraits.allowBody && methodTraits.allowBody) {
                     warnEmptyBody = payload.body.empty() & !contentType.empty();
                 }
                 else if (!payload.body.empty()) {
                     // WARN: not empty body
-                    std::stringstream ss;
-                    ss << "the " << code << " response MUST NOT include a " << SectionName(BodySectionType);
-                    result.warnings.push_back(Warning(ss.str(),
-                                                      EmptyDefinitionWarning,
-                                                      MapSourceDataBlock(sourceMap, sourceData)));
+
+                    if (!statusCodeTraits.allowBody) {
+                        std::stringstream ss;
+                        ss << "the " << code << " response MUST NOT include a " << SectionName(BodySectionType);
+                        result.warnings.push_back(Warning(ss.str(),
+                                                          EmptyDefinitionWarning,
+                                                          MapSourceDataBlock(sourceMap, sourceData)));
+                    }
+
+                    if (!methodTraits.allowBody) {
+                        std::stringstream ss;
+                        ss << "the response for " << method << " request MUST NOT include a " << SectionName(BodySectionType);
+                        result.warnings.push_back(Warning(ss.str(),
+                                                          EmptyDefinitionWarning,
+                                                          MapSourceDataBlock(sourceMap, sourceData)));
+                    }
+
                     return;
                 }
                 else if (!contentType.empty()) {

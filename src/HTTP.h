@@ -45,6 +45,11 @@ namespace snowcrash {
     typedef unsigned int HTTPStatusCode;
     
     /**
+     *  A HTTP method
+     */
+    typedef std::string HTTPMethod;
+
+    /**
      *  Traits of a HTTP response.
      */
     struct HTTPResponseTraits {
@@ -52,6 +57,18 @@ namespace snowcrash {
         bool allowBody; /// < Response body is allowed.
         
         HTTPResponseTraits() : allowBody(true) {}
+    };
+
+    /**
+     *  Response traits for a HTTP method.
+     *
+     *  HTTP request method related response prescription
+     *  Ref: http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html
+     */
+    struct HTTPMethodTraits : HTTPResponseTraits
+    {
+        HTTPMethod method;
+        HTTPMethodTraits() : method("") {}
     };
 
     /**
@@ -66,6 +83,13 @@ namespace snowcrash {
         StatusCodeTraits() : code(0) {}
     };
     
+    /**
+     *  \brief  Retrieve response traits for given HTTP method.
+     *  \param  method  HTTP method to retrieve traits for.
+     *  \return A %HTTPMethodTraits for given method.
+     */
+    extern HTTPMethodTraits GetMethodTrait(HTTPMethod method);
+
     /**
      *  \brief  Retrieve response traits for given status code.
      *  \param  code    A HTTP status code to retrieve traits for.

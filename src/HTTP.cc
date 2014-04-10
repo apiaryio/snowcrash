@@ -27,3 +27,16 @@ StatusCodeTraits snowcrash::GetStatusCodeTrait(HTTPStatusCode code)
     
     return traits;
 }
+
+HTTPMethodTraits snowcrash::GetMethodTrait(HTTPMethod method)
+{
+    HTTPMethodTraits traits;
+    traits.method = method;
+
+    // Following HTTP methods MUST NOT contain response body
+    if (method == "HEAD") {
+        traits.allowBody = false;
+    }
+
+    return traits;
+}
