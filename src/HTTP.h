@@ -10,6 +10,7 @@
 #define SNOWCRASH_HTTP_H
 
 #include <string>
+#include "Blueprint.h"
 
 /**
  *  \brief HTTP Methods 
@@ -18,7 +19,7 @@
  *  defined type due to C++98 string concatenation limitations.
  *  FIXME: To be improved with migration to C++11.
  */
-#define HTTP_REQUEST_METHOD "(GET|POST|PUT|DELETE|OPTIONS|PATCH|PROPPATCH|LOCK|UNLOCK|COPY|MOVE|MKCOL|HEAD|LINK|UNLINK)"
+#define HTTP_REQUEST_METHOD "(GET|POST|PUT|DELETE|OPTIONS|PATCH|PROPPATCH|LOCK|UNLOCK|COPY|MOVE|MKCOL|HEAD|LINK|UNLINK|CONNECT)"
 
 /** 
  *  \brief URI Template.
@@ -38,16 +39,19 @@ namespace snowcrash {
         static const std::string ContentType;
         static const std::string TransferEncoding;
     };
-    
+
+    /**
+     * Selected HTTP Method names.
+     */
+    struct HTTPMethodName {
+        static const std::string Head;
+        static const std::string Connect;
+    };
+
     /**
      *  A HTTP Status code.
      */
     typedef unsigned int HTTPStatusCode;
-    
-    /**
-     *  A HTTP method
-     */
-    typedef std::string HTTPMethod;
 
     /**
      *  Traits of a HTTP response.

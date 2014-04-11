@@ -905,6 +905,38 @@ TEST_CASE("Give a warning when 100 response has a body", "[action][empty][respon
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body == "{}\n");
 }
 
+TEST_CASE("Give a warning when 2xx CONNECT has a body", "[action][#77][source]")
+{
+    // Blueprint in question:
+    //R"(
+    //# CONNECT /1
+    //+ Response 201
+    //
+    //       {}
+    //");
+    const std::string blueprintSource = \
+    "# CONNECT /1\n"\
+    "+ Response 201\n\n"\
+    "        {}\n\n";
+
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(blueprintSource, 0, result, blueprint);
+
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.size() == 1);
+
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].method == "CONNECT");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body == "{}\n");
+}
+
 TEST_CASE("Give a warning when response to HEAD has a body", "[action][head][method][source]")
 {
     // Blueprint in question:

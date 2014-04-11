@@ -446,7 +446,16 @@ namespace snowcrash {
                                                           MapSourceDataBlock(sourceMap, sourceData)));
                     }
 
-                    if (!methodTraits.allowBody) {
+                    // WARN: Edge case for 2xx CONNECT
+                    if (method == HTTPMethodName::Connect && code/100 == 2) {
+                        std::stringstream ss;
+                        ss << "the response for " << code << " " << method << " request MUST NOT include a " << SectionName(BodySectionType);
+                        result.warnings.push_back(Warning(ss.str(),
+                                                          EmptyDefinitionWarning,
+                                                          MapSourceDataBlock(sourceMap, sourceData)));
+
+                    }
+                    else if (method != HTTPMethodName::Connect && !methodTraits.allowBody) {
                         std::stringstream ss;
                         ss << "the response for " << method << " request MUST NOT include a " << SectionName(BodySectionType);
                         result.warnings.push_back(Warning(ss.str(),

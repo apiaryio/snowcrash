@@ -15,6 +15,9 @@ const std::string HTTPHeaderName::ContentLength = "Content-Length";
 const std::string HTTPHeaderName::ContentType = "Content-Type";
 const std::string HTTPHeaderName::TransferEncoding = "Transfer-Encoding";
 
+const std::string HTTPMethodName::Head = "HEAD";
+const std::string HTTPMethodName::Connect = "CONNECT";
+
 StatusCodeTraits snowcrash::GetStatusCodeTrait(HTTPStatusCode code)
 {
     StatusCodeTraits traits;
@@ -24,7 +27,7 @@ StatusCodeTraits snowcrash::GetStatusCodeTrait(HTTPStatusCode code)
     if (code == 204 || code == 304 || code/100 == 1) {
         traits.allowBody = false;
     }
-    
+
     return traits;
 }
 
@@ -34,7 +37,8 @@ HTTPMethodTraits snowcrash::GetMethodTrait(HTTPMethod method)
     traits.method = method;
 
     // Following HTTP methods MUST NOT contain response body
-    if (method == "HEAD") {
+    // FIXME: When refactoring traits don't forget that 'CONNECT' has no body only when 1xx-2xx
+    if (method == HTTPMethodName::Head || method == HTTPMethodName::Connect) {
         traits.allowBody = false;
     }
 
