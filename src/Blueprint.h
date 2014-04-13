@@ -15,7 +15,7 @@
 #include "Platform.h"
 
 /**
- *  API Blueprint Abstract Syntaxt Tree
+ *  API Blueprint Abstract Syntax Tree
  *  -----------------------------------
  *
  *  Data types in this documents define the API Blueprint AST.
@@ -184,7 +184,7 @@ namespace snowcrash {
         /** Description */
         Description description;
         
-        /** Action-specfic Parameters */
+        /** Action-specific Parameters */
         Collection<Parameter>::type parameters;
         
         /** 
@@ -193,7 +193,7 @@ namespace snowcrash {
          *  DEPRECATION WARNING:
          *  --------------------
          *
-         *  This AST node is build for deprecated API Bluprint syntax
+         *  This AST node is build for deprecated API Blueprint syntax
          *  and as such it will be removed in a future version of 
          *  Snow Crash. 
          *  
@@ -231,7 +231,7 @@ namespace snowcrash {
          *  DEPRECATION WARNING:
          *  --------------------
          *
-         *  This AST node is build for deprecated API Bluprint syntax
+         *  This AST node is build for deprecated API Blueprint syntax
          *  and as such it will be removed in a future version of
          *  Snow Crash.
          *

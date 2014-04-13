@@ -42,5 +42,7 @@ tmp/
 # Ruby
 .bundle/
 
-
-
+# Eclipse specific
+.cproject
+.project
+.settings

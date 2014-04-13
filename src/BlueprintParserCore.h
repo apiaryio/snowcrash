@@ -85,7 +85,7 @@ namespace snowcrash {
          *  \param  parser      Parser instance.
          *  \param  output      AST node parsed.
          *  \return %ParseSectionResult pointing to the last block parsed & including 
-         *  any possible source annotiations in the form of results or warnigns.
+         *  any possible source annotations in the form of results or warnings.
          */
         static ParseSectionResult ParseSection(const BlueprintSection& section,
                                                const BlockIterator& cur,
@@ -113,7 +113,7 @@ namespace snowcrash {
     /**
      *  \brief Classify a block with children list items.
      *
-     *  Classifes internal list block & descend to children list block classifiers.
+     *  Classifies internal list block & descend to children list block classifiers.
      *  DO NOT provide generic implementation.
      */
     template <class T>

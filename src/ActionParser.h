@@ -227,7 +227,7 @@ namespace snowcrash {
                              Action& action,
                              Result& result)
         {
-            // Consolidate depraceted headers into subsequent payloads
+            // Consolidate deprecated headers into subsequent payloads
             if (!action.headers.empty()) {
                 InjectDeprecatedHeaders(action.headers, action.examples);
                 action.headers.clear();
@@ -307,7 +307,7 @@ namespace snowcrash {
         /**
          *  \brief  Parse action payload
          *  \param  section Actual section being parsed.
-         *  \param  cur     Cursor withing the section boundaries.
+         *  \param  cur     Cursor within the section boundaries.
          *  \param  parser  A parser's instance.
          *  \param  action  An output buffer to store parsed payload into.
          *  \return A block parser section result.
@@ -354,7 +354,7 @@ namespace snowcrash {
             }
 
             // Check payload integrity
-            CheckPayload(section.type, payload, nameBlock->sourceMap, parser.sourceData, result.first);
+            CheckPayload(section.type, payload, action.method, nameBlock->sourceMap, parser.sourceData, result.first);
             
             // Inject parsed payload into the action
             if (section.type == RequestSectionType) {
@@ -379,18 +379,26 @@ namespace snowcrash {
          */
         static void CheckPayload(const SectionType& section,
                                  const Payload& payload,
+                                 const HTTPMethod method,
                                  const SourceDataBlock& sourceMap,
                                  const SourceData& sourceData,
                                  Result& result) {
             
             bool warnEmptyBody = false;
-            std::string contentType;
+
+            std::string contentLength;
+            std::string transferEncoding;
+
             for (Collection<Header>::const_iterator it = payload.headers.begin();
                  it != payload.headers.end();
                  ++it) {
-                
-                if (it->first == HTTPHeaderName::ContentType) {
-                    contentType = it->second;
+
+                if (it->first == HTTPHeaderName::ContentLength) {
+                    contentLength = it->second;
+                }
+
+                if (it->first == HTTPHeaderName::TransferEncoding) {
+                    transferEncoding = it->second;
                 }
             }
             
@@ -398,58 +406,75 @@ namespace snowcrash {
                 
                 if (payload.body.empty()) {
                     
-                    // Warn when content type is specified or both headers and body are empty
+                    // Warn when content-length or transfer-encoding is specified or both headers and body are empty
                     if (payload.headers.empty()) {
                         warnEmptyBody = true;
                     }
                     else {
-                        warnEmptyBody = !contentType.empty();
+                        warnEmptyBody = !contentLength.empty() ||
+                                        !transferEncoding.empty();
                     }
+
+                    if (warnEmptyBody) {
+                        // WARN: empty body
+                        std::stringstream ss;
+                        ss << "empty " << SectionName(section) << " " << SectionName(BodySectionType);
+
+                        if (!contentLength.empty()) {
+                            ss << ", expected " << SectionName(BodySectionType) << " for '" << contentLength << "' Content-Length";
+                        }
+                        else if (!transferEncoding.empty()) {
+                            ss << ", expected " << SectionName(BodySectionType) << " for '" << transferEncoding << "' Transfer-Encoding";
+                        }
+
+                        result.warnings.push_back(Warning(ss.str(),
+                                                          EmptyDefinitionWarning,
+                                                          MapSourceDataBlock(sourceMap, sourceData)));
+                    }
+
                 }
             }
             else if (section == ResponseSectionType) {
                 // Check status code
                 HTTPStatusCode code = 0;
+
                 if (!payload.name.empty()) {
                     std::stringstream(payload.name) >> code;
                 }
-                StatusCodeTraits traits = GetStatusCodeTrait(code);
-                if (traits.allowBody) {
-                    warnEmptyBody = payload.body.empty() & !contentType.empty();
-                }
-                else if (!payload.body.empty()) {
+
+                StatusCodeTraits statusCodeTraits = GetStatusCodeTrait(code);
+                HTTPMethodTraits methodTraits = GetMethodTrait(method);
+
+                if ((!statusCodeTraits.allowBody || !methodTraits.allowBody) && !payload.body.empty()) {
                     // WARN: not empty body
-                    std::stringstream ss;
-                    ss << "the " << code << " response MUST NOT include a " << SectionName(BodySectionType);
-                    result.warnings.push_back(Warning(ss.str(),
-                                                      EmptyDefinitionWarning,
-                                                      MapSourceDataBlock(sourceMap, sourceData)));
+
+                    if (!statusCodeTraits.allowBody) {
+                        std::stringstream ss;
+                        ss << "the " << code << " response MUST NOT include a " << SectionName(BodySectionType);
+                        result.warnings.push_back(Warning(ss.str(),
+                                                          EmptyDefinitionWarning,
+                                                          MapSourceDataBlock(sourceMap, sourceData)));
+                    }
+
+                    // WARN: Edge case for 2xx CONNECT
+                    if (method == HTTPMethodName::Connect && code/100 == 2) {
+                        std::stringstream ss;
+                        ss << "the response for " << code << " " << method << " request MUST NOT include a " << SectionName(BodySectionType);
+                        result.warnings.push_back(Warning(ss.str(),
+                                                          EmptyDefinitionWarning,
+                                                          MapSourceDataBlock(sourceMap, sourceData)));
+
+                    }
+                    else if (method != HTTPMethodName::Connect && !methodTraits.allowBody) {
+                        std::stringstream ss;
+                        ss << "the response for " << method << " request MUST NOT include a " << SectionName(BodySectionType);
+                        result.warnings.push_back(Warning(ss.str(),
+                                                          EmptyDefinitionWarning,
+                                                          MapSourceDataBlock(sourceMap, sourceData)));
+                    }
+
                     return;
                 }
-                else if (!contentType.empty()) {
-                    // WARN: unexpected content-type
-                    std::stringstream ss;
-                    ss << "the " << code << " response SHOULD NOT include the '" << contentType << "' Content-Type";
-                    result.warnings.push_back(Warning(ss.str(),
-                                                      LogicalErrorWarning,
-                                                      MapSourceDataBlock(sourceMap, sourceData)));
-                    return;
-   
-                }
-            }
-            
-            // Issue the warning
-            if (warnEmptyBody) {
-                // WARN: empty body
-                std::stringstream ss;
-                ss << "empty " << SectionName(section) << " " << SectionName(BodySectionType);
-                if (!contentType.empty()) {
-                    ss << ", expected " << SectionName(BodySectionType) << " for '" << contentType << "' Content-Type";
-                }
-                
-                result.warnings.push_back(Warning(ss.str(),
-                                                  EmptyDefinitionWarning,
-                                                  MapSourceDataBlock(sourceMap, sourceData)));
             }
         }
 

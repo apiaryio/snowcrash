@@ -24,7 +24,7 @@ namespace snowcrash {
     /**
      *  \brief  A byte range of data within the source data buffer.
      *
-     *  Improtant note: All ranges are in bytes not characters.
+     *  Important note: All ranges are in bytes not characters.
      */
     struct SourceDataRange {
         size_t location;
@@ -47,7 +47,7 @@ namespace snowcrash {
     SourceDataBlock MakeSourceDataBlock(size_t loc, size_t len);
     
     /**
-     *  \brief  Append %SourceDataBlock to existign block, merging continuous blocks.
+     *  \brief  Append %SourceDataBlock to existing block, merging continuous blocks.
      *  \param  destination A block to append to.
      *  \param  append      A block to be appended.
      */
