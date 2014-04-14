@@ -57,6 +57,7 @@
 		BBC2D86318316DC000FBCEA7 /* ListBlockUtility.h in Headers */ = {isa = PBXBuildFile; fileRef = BBC2D86218316DC000FBCEA7 /* ListBlockUtility.h */; };
 		BBC2D8661831A76100FBCEA7 /* SectionUtility.h in Headers */ = {isa = PBXBuildFile; fileRef = BBC2D8651831A76100FBCEA7 /* SectionUtility.h */; };
 		BBCC04E618A51AA800C65A08 /* test-SymbolIdentifier.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBCC04E518A51AA800C65A08 /* test-SymbolIdentifier.cc */; };
+		BBCEF19218FBF7B000A0FA24 /* Version.h in Headers */ = {isa = PBXBuildFile; fileRef = BBCEF19118FBF7B000A0FA24 /* Version.h */; };
 		BBD5F9C917353C310049BBEE /* ResourceGroupParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD5F9C717353C300049BBEE /* ResourceGroupParser.h */; };
 		BBD5F9CE17353CE00049BBEE /* ResourceParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD5F9CC17353CE00049BBEE /* ResourceParser.h */; };
 		BBD5F9D21735439B0049BBEE /* ParserCore.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD5F9D11735439B0049BBEE /* ParserCore.cc */; };
@@ -196,6 +197,7 @@
 		BBC2D8641831901400FBCEA7 /* BlockUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BlockUtility.h; path = src/BlockUtility.h; sourceTree = "<group>"; };
 		BBC2D8651831A76100FBCEA7 /* SectionUtility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SectionUtility.h; path = src/SectionUtility.h; sourceTree = "<group>"; };
 		BBCC04E518A51AA800C65A08 /* test-SymbolIdentifier.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-SymbolIdentifier.cc"; path = "test/test-SymbolIdentifier.cc"; sourceTree = "<group>"; };
+		BBCEF19118FBF7B000A0FA24 /* Version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Version.h; path = src/Version.h; sourceTree = "<group>"; };
 		BBD5F9C717353C300049BBEE /* ResourceGroupParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = ResourceGroupParser.h; path = src/ResourceGroupParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BBD5F9CC17353CE00049BBEE /* ResourceParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = ResourceParser.h; path = src/ResourceParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BBD5F9CF1735413A0049BBEE /* BlueprintParserCore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = BlueprintParserCore.h; path = src/BlueprintParserCore.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
@@ -324,6 +326,14 @@
 			name = html;
 			sourceTree = "<group>";
 		};
+		BBCEF19318FBF7E200A0FA24 /* snowcrash */ = {
+			isa = PBXGroup;
+			children = (
+				BBA25670172BFEB800C1AD5E /* snowcrash.cc */,
+			);
+			name = snowcrash;
+			sourceTree = "<group>";
+		};
 		BBFF488F170B34E6001E5FB2 = {
 			isa = PBXGroup;
 			children = (
@@ -416,7 +426,6 @@
 				BBE5355C174132B100BCA7AD /* SerializeJSON.h */,
 				BBE53560174132B100BCA7AD /* SerializeYAML.cc */,
 				BBE5355D174132B100BCA7AD /* SerializeYAML.h */,
-				BBA25670172BFEB800C1AD5E /* snowcrash.cc */,
 				BBFF48CC170B3EDE001E5FB2 /* snowcrash.cc */,
 				BBFF48D1170B4224001E5FB2 /* snowcrash.h */,
 				BB6A9A7F17904C7300B2F283 /* SourceAnnotation.h */,
@@ -424,8 +433,10 @@
 				BB1865C71764D67B00756B18 /* SymbolTable.h */,
 				BBED046018C7D31700961A5C /* UriParser.cc */,
 				BBED046118C7D31700961A5C /* UriParser.h */,
+				BBCEF19118FBF7B000A0FA24 /* Version.h */,
 				BB89458B17817B240079084F /* posix */,
 				BB89458E17817B720079084F /* win */,
+				BBCEF19318FBF7E200A0FA24 /* snowcrash */,
 			);
 			name = src;
 			sourceTree = "<group>";
@@ -454,6 +465,7 @@
 				BB86DEC31723E3C600063644 /* src_map.h in Headers */,
 				BBC2D861183024C100FBCEA7 /* DescriptionSectionUtility.h in Headers */,
 				BBF46B921824554A009029DA /* BlueprintSection.h in Headers */,
+				BBCEF19218FBF7B000A0FA24 /* Version.h in Headers */,
 				BBB0F42A1731CE0D00C92465 /* RegexMatch.h in Headers */,
 				BBD5F9C917353C310049BBEE /* ResourceGroupParser.h in Headers */,
 				BBED046318C7D31700961A5C /* UriParser.h in Headers */,

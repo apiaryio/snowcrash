@@ -13,6 +13,7 @@
 #include "SerializeJSON.h"
 #include "SerializeYAML.h"
 #include "cmdline.h"
+#include "Version.h"
 
 using snowcrash::SourceAnnotation;
 using snowcrash::Error;
@@ -21,6 +22,7 @@ static const std::string OutputArgument = "output";
 static const std::string FormatArgument = "format";
 static const std::string RenderArgument = "render";
 static const std::string ValidateArgument = "validate";
+static const std::string VersionArgument = "version";
 
 /// \enum Snow Crash AST output format.
 enum SerializationFormat {
@@ -88,12 +90,21 @@ int main(int argc, const char *argv[])
     argumentParser.add<std::string>(FormatArgument, 'f', "output AST format", false, "yaml", cmdline::oneof<std::string>("yaml", "json"));
     // TODO: argumentParser.add("render", 'r', "render markdown descriptions");
     argumentParser.add("help", 'h', "display this help message");
-    argumentParser.add(ValidateArgument, 'v', "validate input only, do not print AST");
+    argumentParser.add(VersionArgument, 'v', "print Snow Crash version");
+    argumentParser.add(ValidateArgument, 'l', "validate input only, do not print AST");
     
     argumentParser.parse_check(argc, argv);
+    
+    // Check arguments
     if (argumentParser.rest().size() > 1) {
         std::cerr << "one input file expected, got " << argumentParser.rest().size() << std::endl;
         exit(EXIT_FAILURE);
+    }
+    
+    // Version query
+    if (argumentParser.exist(VersionArgument)) {
+        std::cout << SNOWCRASH_VERSION_STRING << std::endl;
+        exit(EXIT_SUCCESS);
     }
 
     // Input
