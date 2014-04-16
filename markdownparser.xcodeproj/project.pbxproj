@@ -1,0 +1,306 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		BBAE52B018FEC16B00D98223 /* autolink.c in Sources */ = {isa = PBXBuildFile; fileRef = BBAE52A518FEC16B00D98223 /* autolink.c */; };
+		BBAE52B118FEC16B00D98223 /* autolink.h in Headers */ = {isa = PBXBuildFile; fileRef = BBAE52A618FEC16B00D98223 /* autolink.h */; };
+		BBAE52B218FEC16B00D98223 /* buffer.c in Sources */ = {isa = PBXBuildFile; fileRef = BBAE52A718FEC16B00D98223 /* buffer.c */; };
+		BBAE52B318FEC16B00D98223 /* buffer.h in Headers */ = {isa = PBXBuildFile; fileRef = BBAE52A818FEC16B00D98223 /* buffer.h */; };
+		BBAE52B418FEC16B00D98223 /* html_blocks.h in Headers */ = {isa = PBXBuildFile; fileRef = BBAE52A918FEC16B00D98223 /* html_blocks.h */; };
+		BBAE52B518FEC16B00D98223 /* markdown.c in Sources */ = {isa = PBXBuildFile; fileRef = BBAE52AA18FEC16B00D98223 /* markdown.c */; };
+		BBAE52B618FEC16B00D98223 /* markdown.h in Headers */ = {isa = PBXBuildFile; fileRef = BBAE52AB18FEC16B00D98223 /* markdown.h */; };
+		BBAE52B718FEC16B00D98223 /* src_map.c in Sources */ = {isa = PBXBuildFile; fileRef = BBAE52AC18FEC16B00D98223 /* src_map.c */; };
+		BBAE52B818FEC16B00D98223 /* src_map.h in Headers */ = {isa = PBXBuildFile; fileRef = BBAE52AD18FEC16B00D98223 /* src_map.h */; };
+		BBAE52B918FEC16B00D98223 /* stack.c in Sources */ = {isa = PBXBuildFile; fileRef = BBAE52AE18FEC16B00D98223 /* stack.c */; };
+		BBAE52BA18FEC16B00D98223 /* stack.h in Headers */ = {isa = PBXBuildFile; fileRef = BBAE52AF18FEC16B00D98223 /* stack.h */; };
+		BBAE52C118FEC1D100D98223 /* houdini_href_e.c in Sources */ = {isa = PBXBuildFile; fileRef = BBAE52BB18FEC1D100D98223 /* houdini_href_e.c */; };
+		BBAE52C218FEC1D100D98223 /* houdini_html_e.c in Sources */ = {isa = PBXBuildFile; fileRef = BBAE52BC18FEC1D100D98223 /* houdini_html_e.c */; };
+		BBAE52C318FEC1D100D98223 /* houdini.h in Headers */ = {isa = PBXBuildFile; fileRef = BBAE52BD18FEC1D100D98223 /* houdini.h */; };
+		BBAE52C418FEC1D100D98223 /* html_smartypants.c in Sources */ = {isa = PBXBuildFile; fileRef = BBAE52BE18FEC1D100D98223 /* html_smartypants.c */; };
+		BBAE52C518FEC1D100D98223 /* html.c in Sources */ = {isa = PBXBuildFile; fileRef = BBAE52BF18FEC1D100D98223 /* html.c */; };
+		BBAE52C618FEC1D100D98223 /* html.h in Headers */ = {isa = PBXBuildFile; fileRef = BBAE52C018FEC1D100D98223 /* html.h */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		BBAE529B18FEBFAE00D98223 /* libmarkdownparser.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libmarkdownparser.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		BBAE52A518FEC16B00D98223 /* autolink.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = autolink.c; sourceTree = "<group>"; };
+		BBAE52A618FEC16B00D98223 /* autolink.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = autolink.h; sourceTree = "<group>"; };
+		BBAE52A718FEC16B00D98223 /* buffer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = buffer.c; sourceTree = "<group>"; };
+		BBAE52A818FEC16B00D98223 /* buffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = buffer.h; sourceTree = "<group>"; };
+		BBAE52A918FEC16B00D98223 /* html_blocks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = html_blocks.h; sourceTree = "<group>"; };
+		BBAE52AA18FEC16B00D98223 /* markdown.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = markdown.c; sourceTree = "<group>"; };
+		BBAE52AB18FEC16B00D98223 /* markdown.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = markdown.h; sourceTree = "<group>"; };
+		BBAE52AC18FEC16B00D98223 /* src_map.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = src_map.c; sourceTree = "<group>"; };
+		BBAE52AD18FEC16B00D98223 /* src_map.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = src_map.h; sourceTree = "<group>"; };
+		BBAE52AE18FEC16B00D98223 /* stack.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stack.c; sourceTree = "<group>"; };
+		BBAE52AF18FEC16B00D98223 /* stack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stack.h; sourceTree = "<group>"; };
+		BBAE52BB18FEC1D100D98223 /* houdini_href_e.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = houdini_href_e.c; sourceTree = "<group>"; };
+		BBAE52BC18FEC1D100D98223 /* houdini_html_e.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = houdini_html_e.c; sourceTree = "<group>"; };
+		BBAE52BD18FEC1D100D98223 /* houdini.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = houdini.h; sourceTree = "<group>"; };
+		BBAE52BE18FEC1D100D98223 /* html_smartypants.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = html_smartypants.c; sourceTree = "<group>"; };
+		BBAE52BF18FEC1D100D98223 /* html.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = html.c; sourceTree = "<group>"; };
+		BBAE52C018FEC1D100D98223 /* html.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = html.h; sourceTree = "<group>"; };
+		BBAE52C718FEC43A00D98223 /* ASTNode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ASTNode.h; path = src/ASTNode.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		BBAE529818FEBFAE00D98223 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		BBAE529218FEBFAE00D98223 = {
+			isa = PBXGroup;
+			children = (
+				BBAE52A218FEC10400D98223 /* src */,
+				BBAE529C18FEBFAE00D98223 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		BBAE529C18FEBFAE00D98223 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				BBAE529B18FEBFAE00D98223 /* libmarkdownparser.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		BBAE52A218FEC10400D98223 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				BBAE52A418FEC16B00D98223 /* sundown */,
+				BBAE52C718FEC43A00D98223 /* ASTNode.h */,
+			);
+			name = src;
+			sourceTree = "<group>";
+		};
+		BBAE52A418FEC16B00D98223 /* sundown */ = {
+			isa = PBXGroup;
+			children = (
+				BBAE52A518FEC16B00D98223 /* autolink.c */,
+				BBAE52A618FEC16B00D98223 /* autolink.h */,
+				BBAE52A718FEC16B00D98223 /* buffer.c */,
+				BBAE52A818FEC16B00D98223 /* buffer.h */,
+				BBAE52BD18FEC1D100D98223 /* houdini.h */,
+				BBAE52BB18FEC1D100D98223 /* houdini_href_e.c */,
+				BBAE52BC18FEC1D100D98223 /* houdini_html_e.c */,
+				BBAE52BF18FEC1D100D98223 /* html.c */,
+				BBAE52C018FEC1D100D98223 /* html.h */,
+				BBAE52A918FEC16B00D98223 /* html_blocks.h */,
+				BBAE52BE18FEC1D100D98223 /* html_smartypants.c */,
+				BBAE52AA18FEC16B00D98223 /* markdown.c */,
+				BBAE52AB18FEC16B00D98223 /* markdown.h */,
+				BBAE52AC18FEC16B00D98223 /* src_map.c */,
+				BBAE52AD18FEC16B00D98223 /* src_map.h */,
+				BBAE52AE18FEC16B00D98223 /* stack.c */,
+				BBAE52AF18FEC16B00D98223 /* stack.h */,
+			);
+			name = sundown;
+			path = ext/sundown/src;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		BBAE529918FEBFAE00D98223 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BBAE52B418FEC16B00D98223 /* html_blocks.h in Headers */,
+				BBAE52C618FEC1D100D98223 /* html.h in Headers */,
+				BBAE52B318FEC16B00D98223 /* buffer.h in Headers */,
+				BBAE52B118FEC16B00D98223 /* autolink.h in Headers */,
+				BBAE52BA18FEC16B00D98223 /* stack.h in Headers */,
+				BBAE52B618FEC16B00D98223 /* markdown.h in Headers */,
+				BBAE52B818FEC16B00D98223 /* src_map.h in Headers */,
+				BBAE52C318FEC1D100D98223 /* houdini.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		BBAE529A18FEBFAE00D98223 /* libmarkdownparser */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BBAE529F18FEBFAE00D98223 /* Build configuration list for PBXNativeTarget "libmarkdownparser" */;
+			buildPhases = (
+				BBAE529718FEBFAE00D98223 /* Sources */,
+				BBAE529818FEBFAE00D98223 /* Frameworks */,
+				BBAE529918FEBFAE00D98223 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = libmarkdownparser;
+			productName = markdownparser;
+			productReference = BBAE529B18FEBFAE00D98223 /* libmarkdownparser.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		BBAE529318FEBFAE00D98223 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0510;
+				ORGANIZATIONNAME = "Apiary Inc.";
+			};
+			buildConfigurationList = BBAE529618FEBFAE00D98223 /* Build configuration list for PBXProject "markdownparser" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = BBAE529218FEBFAE00D98223;
+			productRefGroup = BBAE529C18FEBFAE00D98223 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				BBAE529A18FEBFAE00D98223 /* libmarkdownparser */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		BBAE529718FEBFAE00D98223 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BBAE52B918FEC16B00D98223 /* stack.c in Sources */,
+				BBAE52C218FEC1D100D98223 /* houdini_html_e.c in Sources */,
+				BBAE52C518FEC1D100D98223 /* html.c in Sources */,
+				BBAE52B018FEC16B00D98223 /* autolink.c in Sources */,
+				BBAE52B518FEC16B00D98223 /* markdown.c in Sources */,
+				BBAE52B218FEC16B00D98223 /* buffer.c in Sources */,
+				BBAE52C418FEC1D100D98223 /* html_smartypants.c in Sources */,
+				BBAE52B718FEC16B00D98223 /* src_map.c in Sources */,
+				BBAE52C118FEC1D100D98223 /* houdini_href_e.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		BBAE529D18FEBFAE00D98223 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		BBAE529E18FEBFAE00D98223 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		BBAE52A018FEBFAE00D98223 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		BBAE52A118FEBFAE00D98223 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		BBAE529618FEBFAE00D98223 /* Build configuration list for PBXProject "markdownparser" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BBAE529D18FEBFAE00D98223 /* Debug */,
+				BBAE529E18FEBFAE00D98223 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BBAE529F18FEBFAE00D98223 /* Build configuration list for PBXNativeTarget "libmarkdownparser" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BBAE52A018FEBFAE00D98223 /* Debug */,
+				BBAE52A118FEBFAE00D98223 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = BBAE529318FEBFAE00D98223 /* Project object */;
+}
