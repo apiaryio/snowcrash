@@ -521,7 +521,6 @@ namespace snowcrash {
             return result;
         }
         
-        /** WARN: missing example and/or default item in values.*/
         static void CheckExampleAndDefaultValue(const BlueprintSection& section,
                                                 const BlockIterator& cur,
                                                 const BlueprintParserCore& parser,
@@ -543,7 +542,7 @@ namespace snowcrash {
             if(!parameter.exampleValue.empty() && !isExampleFound) {
                 // WARN: missing example in values.
                 std::stringstream ss;
-                ss << "your example value: '" << parameter.exampleValue << "' is missing in the values";
+                ss << "the example value '" << parameter.exampleValue << "' of parameter '"<< parameter.name <<"' is not in its list of expected values";
                 SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, section.bounds.second, section.bounds, parser.sourceData);
                 result.first.warnings.push_back(Warning(ss.str(),
                                                 LogicalErrorWarning,
@@ -553,7 +552,7 @@ namespace snowcrash {
             if(!parameter.defaultValue.empty() && !isDefaultFound) {
                 // WARN: missing default in values.
                 std::stringstream ss;
-                ss << "your default value: '" << parameter.defaultValue << "' is missing in the values";
+                ss << "the default value '" << parameter.defaultValue << "' of parameter '"<< parameter.name <<"' is not in its list of expected values";
                 SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, section.bounds.second, section.bounds, parser.sourceData);
                 result.first.warnings.push_back(Warning(ss.str(),
                                                 LogicalErrorWarning,
