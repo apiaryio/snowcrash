@@ -10,11 +10,11 @@ INCLUDES = -I $(SRC_PATH)
 TEST_INCLUDES = $(INCLUDES) -I $(TEST_SRC_PATH) -I test/ext/Catch/single_include
 
 LIB_SRC = $(shell find $(SRC_PATH)/ -name '*.$(CXX_SRC_EXT)')
-LIB_OBJ = $(LIB_SRC:$(SRC_PATH)/%.$(CXX_SRC_EXT)=$(BUILD_PATH)%.o)
+LIB_OBJ = $(LIB_SRC:$(SRC_PATH)/%.$(CXX_SRC_EXT)=$(BUILD_PATH)/%.o)
 LIB_DEPS = $(LIB_OBJ:.o=.d)
 
 TEST_SRC = $(shell find $(TEST_SRC_PATH)/ -name '*.$(CXX_SRC_EXT)')
-TEST_OBJ = $(TEST_SRC:$(TEST_SRC_PATH)/%.$(CXX_SRC_EXT)=$(BUILD_PATH)%.o)
+TEST_OBJ = $(TEST_SRC:$(TEST_SRC_PATH)/%.$(CXX_SRC_EXT)=$(BUILD_PATH)/%.o)
 TEST_DEPS = $(TEST_OBJ:.o=.d)
 
 .PHONY: all
