@@ -73,7 +73,7 @@ namespace mdp {
         }
         
         ASTNode()
-        : type(UndefinedASTNodeType), m_parent(nullptr) {}
+        : type(UndefinedASTNodeType), m_parent(NULL) {}
         
     private:
         ASTNode* m_parent;
