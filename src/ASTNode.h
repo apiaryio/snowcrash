@@ -10,6 +10,7 @@
 #define MARKDOWNPARSER_NODE_H
 
 #include <vector>
+#include "ByteBuffer.h"
 
 namespace mdp {
     
@@ -31,54 +32,14 @@ namespace mdp {
         UndefinedASTNodeType = -1
     };
     
-    /** Generic container for collections */
-    template<typename T>
-    struct Collection {
-        typedef T value_type;
-        typedef std::vector<T> type;
-        typedef typename std::vector<T>::iterator iterator;
-        typedef typename std::vector<T>::const_iterator const_iterator;
-    };
-    
-    /** 
-     *  \brief Source data byte buffer
-     *  
-     *  Note this is a byte buffer, a sequence of
-     *  UTF8 bytes note necessarily characters.
-     */
-    typedef std::string ByteBuffer;
-    
-    /** A generic continuous range */
-    struct Range {
-        size_t location;
-        size_t length;
-        
-        Range(size_t loc = 0, size_t len = 0)
-        : location(loc), length(len) {}
-    };
-    
-    /** Range of bytes */
-    typedef BytesRange Range;
-    
-    /** Range of characters */
-    typedef CharactersRange Range;
-    
-    /** A generic set of non-continuous of ranges */
-    template<typename T>
-    class RangeSet : public std::vector<T> {
-    public:
-        // TODO:
-        // void append(const value_type& val);
-    };
-    
-    /** Set of non-continuous byte ranges */
-    typedef BytesRangeSet : RangeSet<BytesRange>;
-    
-    /** Set of non-continuous character ranges */
-    typedef CharactersRangeSet : RangeSet<CharactersRange>;
-    
-    /** Map Ranges of bytes to ranges of characters */
-    CharactersRangeSet MapBytesToCharacters(const BytesRangeSet& rangeSet, const ByteBuffer& byteBuffer);
+//    /** Generic container for collections */
+//    template<typename T>
+//    struct Collection {
+//        typedef T value_type;
+//        typedef std::vector<T> type;
+//        typedef typename std::vector<T>::iterator iterator;
+//        typedef typename std::vector<T>::const_iterator const_iterator;
+//    };
     
     /** 
      *  AST node
