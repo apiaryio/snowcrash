@@ -195,3 +195,30 @@ TEST_CASE("Parse code block", "[parser][code]")
     REQUIRE(node.sourceMap[0].location == 0);
     REQUIRE(node.sourceMap[0].length == 20);
 }
+
+TEST_CASE("Parse HTML block tag", "[parser][html]")
+{
+    MarkdownParser parser;
+    ASTNode ast;
+    
+    ByteBuffer src = "<div>some</div>\n";
+    
+    parser.parse(src, ast);
+    
+    REQUIRE(ast.type == RootASTNode);
+    REQUIRE(ast.text.empty());
+    REQUIRE(ast.data == 0);
+    REQUIRE(ast.children.size() == 1);
+    REQUIRE(ast.sourceMap.size() == 1);
+    REQUIRE(ast.sourceMap[0].location == 0);
+    REQUIRE(ast.sourceMap[0].length == 16);
+    
+    ASTNode& node = ast.children.front();
+    REQUIRE(node.type == HTMLASTNodeType);
+    REQUIRE(node.text == "<div>some</div>\n");
+    REQUIRE(node.data == 0);
+    REQUIRE(node.children.empty());
+    REQUIRE(node.sourceMap.size() == 1);
+    REQUIRE(node.sourceMap[0].location == 0);
+    REQUIRE(node.sourceMap[0].length == 16);
+}

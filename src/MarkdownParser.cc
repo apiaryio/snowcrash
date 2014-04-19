@@ -225,7 +225,11 @@ void MarkdownParser::renderHTML(struct buf *ob, const struct buf *text, void *op
 
 void MarkdownParser::renderHTML(const ByteBuffer& text)
 {
-    //m_renderStack.push_back(MarkdownBlock(HTMLBlockType, text));
+    if (!m_workingNode)
+        throw NO_WORKING_NODE_ERR;
+    
+    ASTNode node(HTMLASTNodeType, m_workingNode, text);
+    m_workingNode->children.push_back(node);
 }
 
 void MarkdownParser::beginQuote(void *opaque)
