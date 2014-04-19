@@ -57,7 +57,7 @@ namespace mdp {
         BytesRangeSet sourceMap;
         
         /** Parent node, throws exception if no parent is defined */
-        const ASTNode& parent() const
+        ASTNode& parent() const
         {
             if (!hasParent())
                 throw "no parent set";
@@ -81,6 +81,25 @@ namespace mdp {
                 const ByteBuffer& text_ = ByteBuffer(),
                 const Data& data_ = Data())
         : type(type_), m_parent(parent_), text(text_), data(data_) {}
+        
+        ASTNode(const ASTNode& rhs)
+        {
+            this->type = rhs.type;
+            this->text = rhs.text;
+            this->data = rhs.data;
+            this->sourceMap = rhs.sourceMap;
+            this->children = rhs.children;
+        }
+        
+        ASTNode& operator=(const ASTNode& rhs)
+        {
+            this->type = rhs.type;
+            this->text = rhs.text;
+            this->data = rhs.data;
+            this->sourceMap = rhs.sourceMap;
+            this->children = rhs.children;
+            return *this;
+        }
 
     private:
         ASTNode* m_parent;

@@ -17,6 +17,7 @@ const size_t MarkdownParser::MaxNesting = 16;
 const int MarkdownParser::ParserExtensions = MKDEXT_FENCED_CODE | MKDEXT_NO_INTRA_EMPHASIS | MKDEXT_LAX_SPACING /*| MKDEXT_TABLES */;
 
 #define NO_WORKING_NODE_ERR std::logic_error("no working node")
+#define WORKING_NODE_MISMATCH_ERR std::logic_error("working node mismatch")
 
 /**
  *  \brief  Create a byte buffer from a sundown buffer
@@ -115,7 +116,14 @@ void MarkdownParser::beginList(int flags, void *opaque)
 
 void MarkdownParser::beginList(int flags)
 {
-    //m_renderStack.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), flags));
+    if (!m_workingNode)
+        throw NO_WORKING_NODE_ERR;
+    
+    ASTNode node(ListASTNodeType, m_workingNode, ByteBuffer(), flags);
+    m_workingNode->children.push_back(node);
+    
+    // Push context
+    m_workingNode = &m_workingNode->children.back();
 }
 
 void MarkdownParser::renderList(struct buf *ob, const struct buf *text, int flags, void *opaque)
@@ -129,7 +137,17 @@ void MarkdownParser::renderList(struct buf *ob, const struct buf *text, int flag
 
 void MarkdownParser::renderList(const ByteBuffer& text, int flags)
 {
-   //m_renderStack.push_back(MarkdownBlock(ListBlockEndType, text, flags));
+    if (!m_workingNode)
+        throw NO_WORKING_NODE_ERR;
+    
+    if (m_workingNode->type != ListASTNodeType)
+        throw WORKING_NODE_MISMATCH_ERR;
+    
+    m_workingNode->text = text;
+    m_workingNode->data = flags;
+    
+    // Pop context
+    m_workingNode = &m_workingNode->parent();
 }
 
 void MarkdownParser::beginListItem(int flags, void *opaque)
@@ -143,7 +161,14 @@ void MarkdownParser::beginListItem(int flags, void *opaque)
 
 void MarkdownParser::beginListItem(int flags)
 {
-    //m_renderStack.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), flags));
+    if (!m_workingNode)
+        throw NO_WORKING_NODE_ERR;
+    
+    ASTNode node(ListItemASTNodeType, m_workingNode, ByteBuffer(), flags);
+    m_workingNode->children.push_back(node);
+    
+    // Push context
+    m_workingNode = &m_workingNode->children.back();
 }
 
 void MarkdownParser::renderListItem(struct buf *ob, const struct buf *text, int flags, void *opaque)
@@ -157,7 +182,17 @@ void MarkdownParser::renderListItem(struct buf *ob, const struct buf *text, int 
 
 void MarkdownParser::renderListItem(const ByteBuffer& text, int flags)
 {
-    //m_renderStack.push_back(MarkdownBlock(ListItemBlockEndType, text, flags));
+    if (!m_workingNode)
+        throw NO_WORKING_NODE_ERR;
+
+    if (m_workingNode->type != ListItemASTNodeType)
+        throw WORKING_NODE_MISMATCH_ERR;
+    
+    m_workingNode->text = text;
+    m_workingNode->data = flags;
+    
+    // Pop context
+    m_workingNode = &m_workingNode->parent();
 }
 
 void MarkdownParser::renderBlockCode(struct buf *ob, const struct buf *text, const struct buf *lang, void *opaque)
@@ -284,8 +319,6 @@ void MarkdownParser::blockDidParse(const BytesRangeSet& sourceMap)
         throw std::logic_error("no working node children");
     
     ASTNode &lastNode = m_workingNode->children.back();
+    //BytesRangeSetUtil::append(lastNode.sourceMap, sourceMap);
     lastNode.sourceMap.append(sourceMap);
-    
-//    MarkdownBlock& lastBlock = m_renderStack.back();
-//    AppendSourceDataBlock(lastBlock.sourceMap, sourceMap);
 }

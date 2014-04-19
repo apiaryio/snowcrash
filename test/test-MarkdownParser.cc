@@ -123,7 +123,7 @@ TEST_CASE("Parse multiple headers", "[parser][header]")
     REQUIRE(ast.sourceMap[0].location == 0);
     REQUIRE(ast.sourceMap[0].length == 23);
     
-    ASTNode& node = ast.children[0];
+    ASTNode node = ast.children[0];
     REQUIRE(node.type == HeaderASTNodeType);
     REQUIRE(node.text == "Header 1");
     REQUIRE(node.data == 1);
@@ -159,7 +159,7 @@ TEST_CASE("Parse horizontal rule", "[parser][hrule]")
     REQUIRE(ast.sourceMap[0].location == 0);
     REQUIRE(ast.sourceMap[0].length == 4);
     
-    ASTNode& node = ast.children.front();
+    ASTNode node = ast.children.front();
     REQUIRE(node.type == HRuleASTNodeType);
     REQUIRE(node.text.empty());
     REQUIRE(node.data == 0);
@@ -186,7 +186,7 @@ TEST_CASE("Parse code block", "[parser][code]")
     REQUIRE(ast.sourceMap[0].location == 0);
     REQUIRE(ast.sourceMap[0].length == 20);
     
-    ASTNode& node = ast.children.front();
+    ASTNode node = ast.children.front();
     REQUIRE(node.type == CodeASTNodeType);
     REQUIRE(node.text == "<code>42</code>\n");
     REQUIRE(node.data == 0);
@@ -213,7 +213,7 @@ TEST_CASE("Parse HTML block tag", "[parser][html]")
     REQUIRE(ast.sourceMap[0].location == 0);
     REQUIRE(ast.sourceMap[0].length == 16);
     
-    ASTNode& node = ast.children.front();
+    ASTNode node = ast.children.front();
     REQUIRE(node.type == HTMLASTNodeType);
     REQUIRE(node.text == "<div>some</div>\n");
     REQUIRE(node.data == 0);
@@ -221,4 +221,40 @@ TEST_CASE("Parse HTML block tag", "[parser][html]")
     REQUIRE(node.sourceMap.size() == 1);
     REQUIRE(node.sourceMap[0].location == 0);
     REQUIRE(node.sourceMap[0].length == 16);
+}
+
+TEST_CASE("Parse single list item", "[parser][list][now]")
+{
+    MarkdownParser parser;
+    ASTNode ast;
+    
+    ByteBuffer src = "- list item\n";
+    
+    parser.parse(src, ast);
+    
+    REQUIRE(ast.type == RootASTNode);
+    REQUIRE(ast.text.empty());
+    REQUIRE(ast.data == 0);
+    REQUIRE(ast.children.size() == 1);
+    REQUIRE(ast.sourceMap.size() == 1);
+    REQUIRE(ast.sourceMap[0].location == 0);
+    REQUIRE(ast.sourceMap[0].length == 12);
+    
+    ASTNode node = ast.children[0];
+    REQUIRE(node.type == ListASTNodeType);
+    REQUIRE(node.text.empty());
+    REQUIRE(node.data == 0);
+    REQUIRE(node.children.size() == 1);
+    REQUIRE(node.sourceMap.size() == 1);
+    REQUIRE(node.sourceMap[0].location == 0);
+    REQUIRE(node.sourceMap[0].length == 12);
+    
+    node = node.children[0];
+    REQUIRE(node.type == ListItemASTNodeType);
+    REQUIRE(node.text == "list item\n");
+    REQUIRE(node.data == 0);
+    REQUIRE(node.children.empty());
+    REQUIRE(node.sourceMap.size() == 1);
+    REQUIRE(node.sourceMap[0].location == 2);
+    REQUIRE(node.sourceMap[0].length == 10);
 }
