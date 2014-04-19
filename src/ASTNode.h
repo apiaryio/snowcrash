@@ -89,6 +89,7 @@ namespace mdp {
             this->data = rhs.data;
             this->sourceMap = rhs.sourceMap;
             this->children = rhs.children;
+            this->m_parent = rhs.m_parent;
         }
         
         ASTNode& operator=(const ASTNode& rhs)
@@ -98,6 +99,7 @@ namespace mdp {
             this->data = rhs.data;
             this->sourceMap = rhs.sourceMap;
             this->children = rhs.children;
+            this->m_parent = rhs.m_parent;
             return *this;
         }
 

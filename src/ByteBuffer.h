@@ -62,35 +62,11 @@ namespace mdp {
         }
     };
     
-    
     /** Set of non-continuous byte ranges */
     typedef RangeSet<BytesRange> BytesRangeSet;
     
     /** Set of non-continuous character ranges */
     typedef RangeSet<CharactersRange> CharactersRangeSet;
-    
-//    struct BytesRangeSetUtil {
-//        
-//        /** Append another range set to this one, merging continuous blocks */
-//        static void append(BytesRangeSet& target, const BytesRangeSet& source)
-//        {
-//            if (source.empty())
-//                return;
-//            if (target.empty() ||
-//                source.front().location != target.back().location + target.back().length) {
-//                target.insert(target.end(), source.begin(), source.end());
-//            }
-//            else {
-//                // merge
-//                target.back().length += source.front().length;
-//                
-//                if (source.size() > 1) {
-//                    target.insert(target.end(), ++source.begin(), source.end());
-//                }
-//            }
-//        }
-//    };
-
     
     /** Map Ranges of bytes to ranges of characters */
     CharactersRangeSet MapBytesToCharacters(const BytesRangeSet& rangeSet, const ByteBuffer& byteBuffer);
