@@ -33,29 +33,25 @@ namespace mdp {
         UndefinedASTNodeType = -1
     };
     
-    // TODO: Remove
-//    /** Generic container for collections */
-//    template<typename T>
-//    struct Collection {
-//        typedef T value_type;
-//        typedef std::vector<T> type;
-//        typedef typename std::vector<T>::iterator iterator;
-//        typedef typename std::vector<T>::const_iterator const_iterator;
-//    };
-    
     /** 
      *  AST node
      */
     class ASTNode {
     public:
+        typedef std::vector<ASTNode> ChildrenNodes;
+        typedef int Data;
+        
         /** Node type */
         ASTNodeType type;
         
         /** Textual content, where applicable */
         ByteBuffer text;
         
+        /** Additinonal data, if applicable */
+        Data data;
+        
         /** Children nodes */
-        std::vector<ASTNode> children;
+        ChildrenNodes children;
         
         /** Source map of the node including any and all children */
         BytesRangeSet sourceMap;
@@ -79,12 +75,12 @@ namespace mdp {
         {
             return (m_parent != NULL);
         }
-        
-        ASTNode()
-        : type(UndefinedASTNodeType), m_parent(NULL) {}
 
-        ASTNode(ASTNodeType t, ASTNode *p, const ByteBuffer& txt = ByteBuffer())
-        : type(t), m_parent(p), text(txt) {}
+        ASTNode(ASTNodeType type_ = UndefinedASTNodeType,
+                ASTNode *parent_ = NULL,
+                const ByteBuffer& text_ = ByteBuffer(),
+                const Data& data_ = Data())
+        : type(type_), m_parent(parent_), text(text_), data(data_) {}
 
     private:
         ASTNode* m_parent;

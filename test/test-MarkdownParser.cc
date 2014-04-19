@@ -11,7 +11,7 @@
 
 using namespace mdp;
 
-TEST_CASE("Parse one paragaraph", "[parser]")
+TEST_CASE("Parse one paragaraph", "[parser][paragraph]")
 {
     MarkdownParser parser;
     ASTNode ast;
@@ -36,4 +36,108 @@ TEST_CASE("Parse one paragaraph", "[parser]")
     REQUIRE(node.sourceMap.size() == 1);
     REQUIRE(node.sourceMap[0].location == 0);
     REQUIRE(node.sourceMap[0].length == 13);
+}
+
+TEST_CASE("Parse multiple paragaraphs", "[parser][paragraph]")
+{
+    MarkdownParser parser;
+    ASTNode ast;
+    
+    ByteBuffer src =\
+    "Lorem\n"\
+    "\n"\
+    "Ipsum\n";
+    
+    parser.parse(src, ast);
+    
+    REQUIRE(ast.type == RootASTNode);
+    REQUIRE(ast.text.empty());
+    REQUIRE(ast.data == 0);
+    REQUIRE(ast.children.size() == 2);
+    REQUIRE(ast.sourceMap.size() == 1);
+    REQUIRE(ast.sourceMap[0].location == 0);
+    REQUIRE(ast.sourceMap[0].length == 13);
+    
+    ASTNode& node = ast.children[0];
+    REQUIRE(node.type == ParagraphASTNodeType);
+    REQUIRE(node.text == "Lorem");
+    REQUIRE(node.data == 0);
+    REQUIRE(node.children.empty());
+    REQUIRE(node.sourceMap.size() == 1);
+    REQUIRE(node.sourceMap[0].location == 0);
+    REQUIRE(node.sourceMap[0].length == 7);
+    
+    node = ast.children[1];
+    REQUIRE(node.type == ParagraphASTNodeType);
+    REQUIRE(node.text == "Ipsum");
+    REQUIRE(node.data == 0);
+    REQUIRE(node.children.empty());
+    REQUIRE(node.sourceMap.size() == 1);
+    REQUIRE(node.sourceMap[0].location == 7);
+    REQUIRE(node.sourceMap[0].length == 6);
+}
+
+TEST_CASE("Parse header", "[parser][header]")
+{
+    MarkdownParser parser;
+    ASTNode ast;
+    
+    ByteBuffer src = "# Header\n";
+    
+    parser.parse(src, ast);
+    
+    REQUIRE(ast.type == RootASTNode);
+    REQUIRE(ast.text.empty());
+    REQUIRE(ast.data == 0);
+    REQUIRE(ast.children.size() == 1);
+    REQUIRE(ast.sourceMap.size() == 1);
+    REQUIRE(ast.sourceMap[0].location == 0);
+    REQUIRE(ast.sourceMap[0].length == 9);
+    
+    ASTNode& node = ast.children.front();
+    REQUIRE(node.type == HeaderASTNodeType);
+    REQUIRE(node.text == "Header");
+    REQUIRE(node.data == 1);
+    REQUIRE(node.children.empty());
+    REQUIRE(node.sourceMap.size() == 1);
+    REQUIRE(node.sourceMap[0].location == 0);
+    REQUIRE(node.sourceMap[0].length == 9);
+}
+
+TEST_CASE("Parse multiple headers", "[parser][header]")
+{
+    MarkdownParser parser;
+    ASTNode ast;
+    
+    ByteBuffer src =\
+    "# Header 1\n"\
+    "## Header 2\n";
+    
+    parser.parse(src, ast);
+    
+    REQUIRE(ast.type == RootASTNode);
+    REQUIRE(ast.text.empty());
+    REQUIRE(ast.data == 0);
+    REQUIRE(ast.children.size() == 2);
+    REQUIRE(ast.sourceMap.size() == 1);
+    REQUIRE(ast.sourceMap[0].location == 0);
+    REQUIRE(ast.sourceMap[0].length == 23);
+    
+    ASTNode& node = ast.children[0];
+    REQUIRE(node.type == HeaderASTNodeType);
+    REQUIRE(node.text == "Header 1");
+    REQUIRE(node.data == 1);
+    REQUIRE(node.children.empty());
+    REQUIRE(node.sourceMap.size() == 1);
+    REQUIRE(node.sourceMap[0].location == 0);
+    REQUIRE(node.sourceMap[0].length == 11);
+    
+    node = ast.children[1];
+    REQUIRE(node.type == HeaderASTNodeType);
+    REQUIRE(node.text == "Header 2");
+    REQUIRE(node.data == 2);
+    REQUIRE(node.children.empty());
+    REQUIRE(node.sourceMap.size() == 1);
+    REQUIRE(node.sourceMap[0].location == 11);
+    REQUIRE(node.sourceMap[0].length == 12);
 }

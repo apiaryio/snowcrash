@@ -15,10 +15,12 @@ const size_t MarkdownParser::OutputUnitSize = 64;
 const size_t MarkdownParser::MaxNesting = 16;
 const int MarkdownParser::ParserExtensions = MKDEXT_FENCED_CODE | MKDEXT_NO_INTRA_EMPHASIS | MKDEXT_LAX_SPACING /*| MKDEXT_TABLES */;
 
+#define NO_WORKING_NODE_ERR std::logic_error("no working node")
+
 /**
  *  \brief  Create a byte buffer from a sundown buffer
  */
-static ByteBuffer ByteBufferFromSunndown(const struct buf *text)
+static ByteBuffer ByteBufferFromSundown(const struct buf *text)
 {
     if (!text || !text->data || !text->size)
         return ByteBuffer();
@@ -47,6 +49,8 @@ void MarkdownParser::parse(const ByteBuffer& source, ASTNode& ast)
     
     ::bufrelease(output);
     ::sd_markdown_free(sundown);
+    
+    m_workingNode = NULL;
 }
 
 MarkdownParser::RenderCallbacks MarkdownParser::renderCallbacks()
@@ -87,12 +91,16 @@ void MarkdownParser::renderHeader(struct buf *ob, const struct buf *text, int le
         return;
     
     MarkdownParser *p = static_cast<MarkdownParser *>(opaque);
-    p->renderHeader(ByteBufferFromSunndown(text), level);
+    p->renderHeader(ByteBufferFromSundown(text), level);
 }
 
 void MarkdownParser::renderHeader(const ByteBuffer& text, int level)
 {
-    //m_renderStack.push_back(MarkdownBlock(HeaderBlockType, text, level));
+    if (!m_workingNode)
+        throw NO_WORKING_NODE_ERR;
+    
+    ASTNode node(HeaderASTNodeType, m_workingNode, text, level);
+    m_workingNode->children.push_back(node);
 }
 
 void MarkdownParser::beginList(int flags, void *opaque)
@@ -115,7 +123,7 @@ void MarkdownParser::renderList(struct buf *ob, const struct buf *text, int flag
         return;
     
     MarkdownParser *p = static_cast<MarkdownParser *>(opaque);
-    p->renderList(ByteBufferFromSunndown(text), flags);
+    p->renderList(ByteBufferFromSundown(text), flags);
 }
 
 void MarkdownParser::renderList(const ByteBuffer& text, int flags)
@@ -143,7 +151,7 @@ void MarkdownParser::renderListItem(struct buf *ob, const struct buf *text, int 
         return;
     
     MarkdownParser *p = static_cast<MarkdownParser *>(opaque);
-    p->renderListItem(ByteBufferFromSunndown(text), flags);
+    p->renderListItem(ByteBufferFromSundown(text), flags);
 }
 
 void MarkdownParser::renderListItem(const ByteBuffer& text, int flags)
@@ -157,7 +165,7 @@ void MarkdownParser::renderBlockCode(struct buf *ob, const struct buf *text, con
         return;
     
     MarkdownParser *p = static_cast<MarkdownParser *>(opaque);
-    p->renderBlockCode(ByteBufferFromSunndown(text), ByteBufferFromSunndown(lang));
+    p->renderBlockCode(ByteBufferFromSundown(text), ByteBufferFromSundown(lang));
 }
 
 void MarkdownParser::renderBlockCode(const ByteBuffer& text, const ByteBuffer& language)
@@ -171,11 +179,14 @@ void MarkdownParser::renderParagraph(struct buf *ob, const struct buf *text, voi
         return;
     
     MarkdownParser *p = static_cast<MarkdownParser *>(opaque);
-    p->renderParagraph(ByteBufferFromSunndown(text));
+    p->renderParagraph(ByteBufferFromSundown(text));
 }
 
 void MarkdownParser::renderParagraph(const ByteBuffer& text)
 {
+    if (!m_workingNode)
+        throw NO_WORKING_NODE_ERR;
+    
     ASTNode node(ParagraphASTNodeType, m_workingNode, text);
     m_workingNode->children.push_back(node);
 }
@@ -200,7 +211,7 @@ void MarkdownParser::renderHTML(struct buf *ob, const struct buf *text, void *op
         return;
     
     MarkdownParser *p = static_cast<MarkdownParser *>(opaque);
-    p->renderHTML(ByteBufferFromSunndown(text));
+    p->renderHTML(ByteBufferFromSundown(text));
 }
 
 void MarkdownParser::renderHTML(const ByteBuffer& text)
@@ -228,7 +239,7 @@ void MarkdownParser::renderQuote(struct buf *ob, const struct buf *text, void *o
         return;
     
     MarkdownParser *p = static_cast<MarkdownParser *>(opaque);
-    p->renderQuote(ByteBufferFromSunndown(text));
+    p->renderQuote(ByteBufferFromSundown(text));
 }
 
 void MarkdownParser::renderQuote(const ByteBuffer& text)
@@ -253,6 +264,12 @@ void MarkdownParser::blockDidParse(const src_map* map, const uint8_t *txt_data, 
 
 void MarkdownParser::blockDidParse(const BytesRangeSet& sourceMap)
 {
+    if (!m_workingNode)
+        throw NO_WORKING_NODE_ERR;
+    
+    if (m_workingNode->children.empty())
+        throw std::logic_error("no working node children");
+    
     ASTNode &lastNode = m_workingNode->children.back();
     lastNode.sourceMap.append(sourceMap);
     
