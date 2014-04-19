@@ -6,6 +6,7 @@
 //  Copyright (c) 2014 Apiary Inc. All rights reserved.
 //
 
+#include <cstring>
 #include "MarkdownParser.h"
 
 using namespace mdp;
