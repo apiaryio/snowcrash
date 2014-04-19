@@ -171,7 +171,11 @@ void MarkdownParser::renderBlockCode(struct buf *ob, const struct buf *text, con
 
 void MarkdownParser::renderBlockCode(const ByteBuffer& text, const ByteBuffer& language)
 {
-    //m_renderStack.push_back(MarkdownBlock(CodeBlockType, text));
+    if (!m_workingNode)
+        throw NO_WORKING_NODE_ERR;
+    
+    ASTNode node(CodeASTNodeType, m_workingNode, text);
+    m_workingNode->children.push_back(node);
 }
 
 void MarkdownParser::renderParagraph(struct buf *ob, const struct buf *text, void *opaque)

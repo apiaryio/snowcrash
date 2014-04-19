@@ -168,3 +168,30 @@ TEST_CASE("Parse horizontal rule", "[parser][hrule]")
     REQUIRE(node.sourceMap[0].location == 0);
     REQUIRE(node.sourceMap[0].length == 4);
 }
+
+TEST_CASE("Parse code block", "[parser][code]")
+{
+    MarkdownParser parser;
+    ASTNode ast;
+    
+    ByteBuffer src = "    <code>42</code>\n";
+    
+    parser.parse(src, ast);
+    
+    REQUIRE(ast.type == RootASTNode);
+    REQUIRE(ast.text.empty());
+    REQUIRE(ast.data == 0);
+    REQUIRE(ast.children.size() == 1);
+    REQUIRE(ast.sourceMap.size() == 1);
+    REQUIRE(ast.sourceMap[0].location == 0);
+    REQUIRE(ast.sourceMap[0].length == 20);
+    
+    ASTNode& node = ast.children.front();
+    REQUIRE(node.type == CodeASTNodeType);
+    REQUIRE(node.text == "<code>42</code>\n");
+    REQUIRE(node.data == 0);
+    REQUIRE(node.children.empty());
+    REQUIRE(node.sourceMap.size() == 1);
+    REQUIRE(node.sourceMap[0].location == 0);
+    REQUIRE(node.sourceMap[0].length == 20);
+}
