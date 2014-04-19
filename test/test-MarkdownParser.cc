@@ -141,3 +141,30 @@ TEST_CASE("Parse multiple headers", "[parser][header]")
     REQUIRE(node.sourceMap[0].location == 11);
     REQUIRE(node.sourceMap[0].length == 12);
 }
+
+TEST_CASE("Parse horizontal rule", "[parser][hrule]")
+{
+    MarkdownParser parser;
+    ASTNode ast;
+    
+    ByteBuffer src = "---\n";
+    
+    parser.parse(src, ast);
+    
+    REQUIRE(ast.type == RootASTNode);
+    REQUIRE(ast.text.empty());
+    REQUIRE(ast.data == 0);
+    REQUIRE(ast.children.size() == 1);
+    REQUIRE(ast.sourceMap.size() == 1);
+    REQUIRE(ast.sourceMap[0].location == 0);
+    REQUIRE(ast.sourceMap[0].length == 4);
+    
+    ASTNode& node = ast.children.front();
+    REQUIRE(node.type == HRuleASTNodeType);
+    REQUIRE(node.text.empty());
+    REQUIRE(node.data == 0);
+    REQUIRE(node.children.empty());
+    REQUIRE(node.sourceMap.size() == 1);
+    REQUIRE(node.sourceMap[0].location == 0);
+    REQUIRE(node.sourceMap[0].length == 4);
+}

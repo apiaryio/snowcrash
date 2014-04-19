@@ -7,6 +7,7 @@
 //
 
 #include <cstring>
+#include <stdexcept>
 #include "MarkdownParser.h"
 
 using namespace mdp;
@@ -202,7 +203,11 @@ void MarkdownParser::renderHorizontalRule(struct buf *ob, void *opaque)
 
 void MarkdownParser::renderHorizontalRule()
 {
-    //m_renderStack.push_back(MarkdownBlock(HRuleBlockType));
+    if (!m_workingNode)
+        throw NO_WORKING_NODE_ERR;
+    
+    ASTNode node(HRuleASTNodeType, m_workingNode, ByteBuffer(), ASTNode::Data());
+    m_workingNode->children.push_back(node);
 }
 
 void MarkdownParser::renderHTML(struct buf *ob, const struct buf *text, void *opaque)
