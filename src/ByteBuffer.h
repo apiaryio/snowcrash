@@ -41,8 +41,25 @@ namespace mdp {
     template<typename T>
     class RangeSet : public std::vector<T> {
     public:
-        // TODO:
-        // void append(const value_type& val);
+        
+        /** Append another range set to this one, merging continuous blocks */
+        inline void append(const RangeSet& val)
+        {
+            if (val.empty())
+                return;
+            if (this->empty() ||
+                val.front().location != this->back().location + this->back().length) {
+                this->insert(this->end(), val.begin(), val.end());
+            }
+            else {
+                // merge
+                this->back().length += val.front().length;
+                
+                if (val.size() > 1) {
+                    this->insert(this->end(), ++val.begin(), val.end());
+                }
+            }
+        }
     };
     
     /** Set of non-continuous byte ranges */
@@ -53,7 +70,6 @@ namespace mdp {
     
     /** Map Ranges of bytes to ranges of characters */
     CharactersRangeSet MapBytesToCharacters(const BytesRangeSet& rangeSet, const ByteBuffer& byteBuffer);
-    
 }
 
 #endif

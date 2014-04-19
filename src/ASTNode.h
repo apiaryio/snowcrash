@@ -18,7 +18,8 @@ namespace mdp {
      *  AST block node types 
      */
     enum ASTNodeType {
-        CodeASTNodeType = 0,
+        RootASTNode = 0,
+        CodeASTNodeType,
         QuoteASTNodeType,
         HTMLASTNodeType,
         HeaderASTNodeType,
@@ -32,6 +33,7 @@ namespace mdp {
         UndefinedASTNodeType = -1
     };
     
+    // TODO: Remove
 //    /** Generic container for collections */
 //    template<typename T>
 //    struct Collection {
@@ -66,6 +68,12 @@ namespace mdp {
             return *m_parent;
         }
         
+        /** Sets parent node */
+        void setParent(ASTNode *parent)
+        {
+            m_parent = parent;
+        }
+        
         /** True if section's parent is specified, false otherwise */
         bool hasParent() const
         {
@@ -74,7 +82,10 @@ namespace mdp {
         
         ASTNode()
         : type(UndefinedASTNodeType), m_parent(NULL) {}
-        
+
+        ASTNode(ASTNodeType t, ASTNode *p, const ByteBuffer& txt = ByteBuffer())
+        : type(t), m_parent(p), text(txt) {}
+
     private:
         ASTNode* m_parent;
     };
