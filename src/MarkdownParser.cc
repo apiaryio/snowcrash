@@ -102,7 +102,7 @@ void MarkdownParser::renderHeader(const ByteBuffer& text, int level)
         throw NO_WORKING_NODE_ERR;
     
     ASTNode node(HeaderASTNodeType, m_workingNode, text, level);
-    m_workingNode->children.push_back(node);
+    m_workingNode->children().push_back(node);
 }
 
 void MarkdownParser::beginList(int flags, void *opaque)
@@ -120,10 +120,10 @@ void MarkdownParser::beginList(int flags)
         throw NO_WORKING_NODE_ERR;
     
     ASTNode node(ListASTNodeType, m_workingNode, ByteBuffer(), flags);
-    m_workingNode->children.push_back(node);
+    m_workingNode->children().push_back(node);
     
     // Push context
-    m_workingNode = &m_workingNode->children.back();
+    m_workingNode = &m_workingNode->children().back();
 }
 
 void MarkdownParser::renderList(struct buf *ob, const struct buf *text, int flags, void *opaque)
@@ -165,10 +165,10 @@ void MarkdownParser::beginListItem(int flags)
         throw NO_WORKING_NODE_ERR;
     
     ASTNode node(ListItemASTNodeType, m_workingNode, ByteBuffer(), flags);
-    m_workingNode->children.push_back(node);
+    m_workingNode->children().push_back(node);
     
     // Push context
-    m_workingNode = &m_workingNode->children.back();
+    m_workingNode = &m_workingNode->children().back();
 }
 
 void MarkdownParser::renderListItem(struct buf *ob, const struct buf *text, int flags, void *opaque)
@@ -188,7 +188,14 @@ void MarkdownParser::renderListItem(const ByteBuffer& text, int flags)
     if (m_workingNode->type != ListItemASTNodeType)
         throw WORKING_NODE_MISMATCH_ERR;
     
-    m_workingNode->text = text;
+    // No "inline" list items:
+    // Instead of storing the text on the list item
+    // create the artificial paragraph node to store the text.
+    if (m_workingNode->children().empty()) {
+        ASTNode textNode(ParagraphASTNodeType, m_workingNode, text);
+        m_workingNode->children().push_front(textNode);
+    }
+    
     m_workingNode->data = flags;
     
     // Pop context
@@ -210,7 +217,7 @@ void MarkdownParser::renderBlockCode(const ByteBuffer& text, const ByteBuffer& l
         throw NO_WORKING_NODE_ERR;
     
     ASTNode node(CodeASTNodeType, m_workingNode, text);
-    m_workingNode->children.push_back(node);
+    m_workingNode->children().push_back(node);
 }
 
 void MarkdownParser::renderParagraph(struct buf *ob, const struct buf *text, void *opaque)
@@ -228,7 +235,7 @@ void MarkdownParser::renderParagraph(const ByteBuffer& text)
         throw NO_WORKING_NODE_ERR;
     
     ASTNode node(ParagraphASTNodeType, m_workingNode, text);
-    m_workingNode->children.push_back(node);
+    m_workingNode->children().push_back(node);
 }
 
 void MarkdownParser::renderHorizontalRule(struct buf *ob, void *opaque)
@@ -246,7 +253,7 @@ void MarkdownParser::renderHorizontalRule()
         throw NO_WORKING_NODE_ERR;
     
     ASTNode node(HRuleASTNodeType, m_workingNode, ByteBuffer(), ASTNode::Data());
-    m_workingNode->children.push_back(node);
+    m_workingNode->children().push_back(node);
 }
 
 void MarkdownParser::renderHTML(struct buf *ob, const struct buf *text, void *opaque)
@@ -264,7 +271,7 @@ void MarkdownParser::renderHTML(const ByteBuffer& text)
         throw NO_WORKING_NODE_ERR;
     
     ASTNode node(HTMLASTNodeType, m_workingNode, text);
-    m_workingNode->children.push_back(node);
+    m_workingNode->children().push_back(node);
 }
 
 void MarkdownParser::beginQuote(void *opaque)
@@ -315,10 +322,16 @@ void MarkdownParser::blockDidParse(const BytesRangeSet& sourceMap)
     if (!m_workingNode)
         throw NO_WORKING_NODE_ERR;
     
-    if (m_workingNode->children.empty())
+    if (m_workingNode->children().empty())
         throw std::logic_error("no working node children");
     
-    ASTNode &lastNode = m_workingNode->children.back();
-    //BytesRangeSetUtil::append(lastNode.sourceMap, sourceMap);
+    ASTNode &lastNode = m_workingNode->children().back();
     lastNode.sourceMap.append(sourceMap);
+    
+    // No "inline" list items:
+    // Share the list item source map with its artifical node, if exists.
+    if (lastNode.type == ListItemASTNodeType &&
+        !lastNode.children().empty() &&
+        lastNode.children().front().sourceMap.empty())
+        lastNode.children().front().sourceMap.append(sourceMap);
 }

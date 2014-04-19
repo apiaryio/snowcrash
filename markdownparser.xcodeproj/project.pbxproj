@@ -30,6 +30,7 @@
 		BBAE52D218FEDF5200D98223 /* html_smartypants.c in Sources */ = {isa = PBXBuildFile; fileRef = BBAE52CC18FEDF5200D98223 /* html_smartypants.c */; };
 		BBAE52D318FEDF5200D98223 /* html.c in Sources */ = {isa = PBXBuildFile; fileRef = BBAE52CD18FEDF5200D98223 /* html.c */; };
 		BBAE52D418FEDF5200D98223 /* html.h in Headers */ = {isa = PBXBuildFile; fileRef = BBAE52CE18FEDF5200D98223 /* html.h */; };
+		BBC22B191902BB480067AE88 /* ASTNode.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBC22B181902BB480067AE88 /* ASTNode.cc */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -80,6 +81,7 @@
 		BBAE52CC18FEDF5200D98223 /* html_smartypants.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = html_smartypants.c; path = ext/sundown/html/html_smartypants.c; sourceTree = SOURCE_ROOT; };
 		BBAE52CD18FEDF5200D98223 /* html.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = html.c; path = ext/sundown/html/html.c; sourceTree = SOURCE_ROOT; };
 		BBAE52CE18FEDF5200D98223 /* html.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = html.h; path = ext/sundown/html/html.h; sourceTree = SOURCE_ROOT; };
+		BBC22B181902BB480067AE88 /* ASTNode.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ASTNode.cc; path = src/ASTNode.cc; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -133,6 +135,7 @@
 			isa = PBXGroup;
 			children = (
 				BBAE52C718FEC43A00D98223 /* ASTNode.h */,
+				BBC22B181902BB480067AE88 /* ASTNode.cc */,
 				BB955A43190119CE006684B8 /* ByteBuffer.h */,
 				BB955A4719011A71006684B8 /* MarkdownParser.h */,
 				BB955A4519011A5F006684B8 /* MarkdownParser.cc */,
@@ -272,6 +275,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BBC22B191902BB480067AE88 /* ASTNode.cc in Sources */,
 				BBAE52B918FEC16B00D98223 /* stack.c in Sources */,
 				BBAE52D018FEDF5200D98223 /* houdini_html_e.c in Sources */,
 				BBAE52D318FEDF5200D98223 /* html.c in Sources */,
@@ -413,6 +417,7 @@
 				BB955A5519011E85006684B8 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		BBAE529618FEBFAE00D98223 /* Build configuration list for PBXProject "markdownparser" */ = {
 			isa = XCConfigurationList;
