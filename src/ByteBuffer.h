@@ -68,8 +68,13 @@ namespace mdp {
     /** Set of non-continuous character ranges */
     typedef RangeSet<CharactersRange> CharactersRangeSet;
     
-    /** Map Ranges of bytes to ranges of characters */
-    CharactersRangeSet MapBytesToCharacters(const BytesRangeSet& rangeSet, const ByteBuffer& byteBuffer);
+    /** Convert ranges of bytes to ranges of characters */
+    // TODO:
+    CharactersRangeSet BytesToCharactersSet(const BytesRangeSet& rangeSet, const ByteBuffer& byteBuffer);
+    
+    /** Maps bytes range set to byte buffer */
+    // TODO:
+    ByteBuffer MapBytesRangeSet(const BytesRangeSet& rangeSet, const ByteBuffer& byteBuffer);
 }
 
 #endif
