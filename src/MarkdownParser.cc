@@ -191,7 +191,8 @@ void MarkdownParser::renderListItem(const ByteBuffer& text, int flags)
     // No "inline" list items:
     // Instead of storing the text on the list item
     // create the artificial paragraph node to store the text.
-    if (m_workingNode->children().empty()) {
+    if (m_workingNode->children().empty() ||
+        m_workingNode->children().front().type != ParagraphASTNodeType) {
         ASTNode textNode(ParagraphASTNodeType, m_workingNode, text);
         m_workingNode->children().push_front(textNode);
     }
@@ -285,6 +286,7 @@ void MarkdownParser::beginQuote(void *opaque)
 
 void MarkdownParser::beginQuote()
 {
+    // TODO:
     //m_renderStack.push_back(MarkdownBlock(QuoteBlockBeginType, SourceData(), 0));
 }
 
@@ -299,6 +301,7 @@ void MarkdownParser::renderQuote(struct buf *ob, const struct buf *text, void *o
 
 void MarkdownParser::renderQuote(const ByteBuffer& text)
 {
+    // TODO:
     //m_renderStack.push_back(MarkdownBlock(QuoteBlockEndType, text, 0));
 }
 
