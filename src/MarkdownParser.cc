@@ -286,8 +286,14 @@ void MarkdownParser::beginQuote(void *opaque)
 
 void MarkdownParser::beginQuote()
 {
-    // TODO:
-    //m_renderStack.push_back(MarkdownBlock(QuoteBlockBeginType, SourceData(), 0));
+    if (!m_workingNode)
+        throw NO_WORKING_NODE_ERR;
+    
+    ASTNode node(QuoteASTNodeType, m_workingNode);
+    m_workingNode->children().push_back(node);
+    
+    // Push context
+    m_workingNode = &m_workingNode->children().back();
 }
 
 void MarkdownParser::renderQuote(struct buf *ob, const struct buf *text, void *opaque)
@@ -301,8 +307,16 @@ void MarkdownParser::renderQuote(struct buf *ob, const struct buf *text, void *o
 
 void MarkdownParser::renderQuote(const ByteBuffer& text)
 {
-    // TODO:
-    //m_renderStack.push_back(MarkdownBlock(QuoteBlockEndType, text, 0));
+    if (!m_workingNode)
+        throw NO_WORKING_NODE_ERR;
+    
+    if (m_workingNode->type != QuoteASTNodeType)
+        throw WORKING_NODE_MISMATCH_ERR;
+    
+    m_workingNode->text = text;
+
+    // Pop context
+    m_workingNode = &m_workingNode->parent();
 }
 
 void MarkdownParser::blockDidParse(const src_map* map, const uint8_t *txt_data, size_t size, void *opaque)

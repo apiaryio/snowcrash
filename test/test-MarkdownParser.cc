@@ -523,3 +523,39 @@ TEST_CASE("Parse list item with multiple paragraphs", "[parser][list]")
     REQUIRE(p3.sourceMap[0].location == 22);
     REQUIRE(p3.sourceMap[0].length == 2);
 }
+
+TEST_CASE("Parse a simple quote", "[parser][quote]")
+{
+    MarkdownParser parser;
+    ASTNode ast;
+    
+    ByteBuffer src = "> quote\n";
+    
+    parser.parse(src, ast);
+    
+    REQUIRE(ast.type == RootASTNode);
+    REQUIRE(ast.text.empty());
+    REQUIRE(ast.data == 0);
+    REQUIRE(ast.children().size() == 1);
+    REQUIRE(ast.sourceMap.size() == 1);
+    REQUIRE(ast.sourceMap[0].location == 0);
+    REQUIRE(ast.sourceMap[0].length == 8);
+    
+    ASTNode& quote = ast.children()[0];
+    REQUIRE(quote.type == QuoteASTNodeType);
+    REQUIRE(quote.text.empty());
+    REQUIRE(quote.data == 0);
+    REQUIRE(quote.children().size() == 1);
+    REQUIRE(quote.sourceMap.size() == 1);
+    REQUIRE(quote.sourceMap[0].location == 0);
+    REQUIRE(quote.sourceMap[0].length == 8);
+    
+    ASTNode& para = quote.children()[0];
+    REQUIRE(para.type == ParagraphASTNodeType);
+    REQUIRE(para.text == "quote");
+    REQUIRE(para.data == 0);
+    REQUIRE(para.children().empty());
+    REQUIRE(para.sourceMap.size() == 1);
+    REQUIRE(para.sourceMap[0].location == 2);
+    REQUIRE(para.sourceMap[0].length == 6);
+}
