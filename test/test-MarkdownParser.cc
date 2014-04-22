@@ -560,30 +560,22 @@ TEST_CASE("Parse a simple quote", "[parser][quote]")
     REQUIRE(para.sourceMap[0].length == 6);
 }
 
-// TODO:
-// Move to separate test file
-//TEST_CASE("Multi-byte characters Czech", "[parser][sourcemap][bytbuffer]")
-//{
-//    MarkdownParser parser;
-//    ASTNode ast;
-//    
-//    ByteBuffer src = "\x50\xC5\x99\xC3\xAD\xC5\xA1\x65\x72\x6E\xC4\x9B\x20\xC5\xBE\x6C\x75\xC5\xA5\x6F\x75\xC4\x8D\x6B\xC3\xBD\x20\x6B\xC5\xAF\xC5\x88\x20\xC3\xBA\x70\xC4\x9B\x6C\x20\xC4\x8F\xC3\xA1\x62\x65\x6C\x73\x6B\xC3\xA9\x20\xC3\xB3\x64\x79\n";
-//
-//    parser.parse(src, ast);
-//    
-//    REQUIRE(ast.type == RootASTNode);
-//    REQUIRE(ast.text.empty());
-//    REQUIRE(ast.data == 0);
-//    REQUIRE(ast.children().size() == 1);
-//    REQUIRE(ast.sourceMap.size() == 1);
-//    REQUIRE(ast.sourceMap[0].location == 0);
-//    REQUIRE(ast.sourceMap[0].length == 57);
-//    
-//    CharactersRangeSet charMap = BytesToCharactersSet(ast.sourceMap, src);
-//    REQUIRE(charMap.size() == 1);
-//    REQUIRE(charMap[0].location == 0);
-//    REQUIRE(charMap[0].length == 41);
-//    
-//    ByteBuffer mappedBuffer = MapBytesRangeSet(ast.sourceMap, src);
-//    REQUIRE(mappedBuffer == src);
-//}
+TEST_CASE("Source map crash", "[parser][sourcemap][issue][snowcrash][62]")
+{
+    MarkdownParser parser;
+    ASTNode ast;
+    
+    ByteBuffer src = \
+    "* B\n"\
+    ">* CCC CC\n"\
+    ">* D\n"\
+    "\n"\
+    "* E\n";
+    
+    parser.parse(src, ast);
+    
+    REQUIRE(ast.type == RootASTNode);
+    REQUIRE(ast.text.empty());
+    REQUIRE(ast.data == 0);
+    REQUIRE(ast.children().size() == 1);
+}

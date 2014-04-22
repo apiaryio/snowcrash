@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BB2672EE19067E6A0053EEFA /* ByteBuffer.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB2672ED19067E6A0053EEFA /* ByteBuffer.cc */; };
+		BB2672F019067EA90053EEFA /* test-ByteBuffer.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB2672EF19067EA90053EEFA /* test-ByteBuffer.cc */; };
 		BB955A44190119CE006684B8 /* ByteBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = BB955A43190119CE006684B8 /* ByteBuffer.h */; };
 		BB955A4619011A5F006684B8 /* MarkdownParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB955A4519011A5F006684B8 /* MarkdownParser.cc */; };
 		BB955A4819011A71006684B8 /* MarkdownParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BB955A4719011A71006684B8 /* MarkdownParser.h */; };
@@ -56,6 +58,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		BB2672ED19067E6A0053EEFA /* ByteBuffer.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ByteBuffer.cc; path = src/ByteBuffer.cc; sourceTree = "<group>"; };
+		BB2672EF19067EA90053EEFA /* test-ByteBuffer.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-ByteBuffer.cc"; path = "test/test-ByteBuffer.cc"; sourceTree = SOURCE_ROOT; };
 		BB955A43190119CE006684B8 /* ByteBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ByteBuffer.h; path = src/ByteBuffer.h; sourceTree = "<group>"; };
 		BB955A4519011A5F006684B8 /* MarkdownParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MarkdownParser.cc; path = src/MarkdownParser.cc; sourceTree = "<group>"; };
 		BB955A4719011A71006684B8 /* MarkdownParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MarkdownParser.h; path = src/MarkdownParser.h; sourceTree = "<group>"; };
@@ -106,6 +110,7 @@
 		BB955A4E19011E85006684B8 /* test-libmarkdownparser */ = {
 			isa = PBXGroup;
 			children = (
+				BB2672EF19067EA90053EEFA /* test-ByteBuffer.cc */,
 				BB955A5B190125CF006684B8 /* test-libmarkdownparser.cc */,
 				BB955A5C190125CF006684B8 /* test-MarkdownParser.cc */,
 			);
@@ -137,6 +142,7 @@
 				BBAE52C718FEC43A00D98223 /* ASTNode.h */,
 				BBC22B181902BB480067AE88 /* ASTNode.cc */,
 				BB955A43190119CE006684B8 /* ByteBuffer.h */,
+				BB2672ED19067E6A0053EEFA /* ByteBuffer.cc */,
 				BB955A4719011A71006684B8 /* MarkdownParser.h */,
 				BB955A4519011A5F006684B8 /* MarkdownParser.cc */,
 			);
@@ -267,6 +273,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BB955A5D190125CF006684B8 /* test-libmarkdownparser.cc in Sources */,
+				BB2672F019067EA90053EEFA /* test-ByteBuffer.cc in Sources */,
 				BB955A5E190125CF006684B8 /* test-MarkdownParser.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -278,6 +285,7 @@
 				BBC22B191902BB480067AE88 /* ASTNode.cc in Sources */,
 				BBAE52B918FEC16B00D98223 /* stack.c in Sources */,
 				BBAE52D018FEDF5200D98223 /* houdini_html_e.c in Sources */,
+				BB2672EE19067E6A0053EEFA /* ByteBuffer.cc in Sources */,
 				BBAE52D318FEDF5200D98223 /* html.c in Sources */,
 				BBAE52B018FEC16B00D98223 /* autolink.c in Sources */,
 				BBAE52B518FEC16B00D98223 /* markdown.c in Sources */,

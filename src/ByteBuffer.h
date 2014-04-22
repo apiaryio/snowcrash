@@ -11,6 +11,7 @@
 
 #include <string>
 #include <vector>
+#include <sstream>
 
 namespace mdp {
     
@@ -21,6 +22,9 @@ namespace mdp {
      *  UTF8 bytes note necessarily characters.
      */
     typedef std::string ByteBuffer;
+    
+    /** Byte buffer stream */
+    typedef std::stringstream ByteBufferStream;
     
     /** A generic continuous range */
     struct Range {
@@ -69,11 +73,9 @@ namespace mdp {
     typedef RangeSet<CharactersRange> CharactersRangeSet;
     
     /** Convert ranges of bytes to ranges of characters */
-    // TODO:
-    CharactersRangeSet BytesToCharactersSet(const BytesRangeSet& rangeSet, const ByteBuffer& byteBuffer);
+    CharactersRangeSet BytesRangeSetToCharactersRangeSet(const BytesRangeSet& rangeSet, const ByteBuffer& byteBuffer);
     
     /** Maps bytes range set to byte buffer */
-    // TODO:
     ByteBuffer MapBytesRangeSet(const BytesRangeSet& rangeSet, const ByteBuffer& byteBuffer);
 }
 
