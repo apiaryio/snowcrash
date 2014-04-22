@@ -41,15 +41,14 @@ ASTNode::~ASTNode()
 {
 }
 
-ChildrenNodes& ASTNode::children()
+ASTNode& ASTNode::parent()
 {
-    if (!m_children.get())
-        throw "no children set";
-    
-    return *m_children;
+    if (!hasParent())
+        throw "no parent set";
+    return *m_parent;
 }
 
-ASTNode& ASTNode::parent()
+const ASTNode& ASTNode::parent() const
 {
     if (!hasParent())
         throw "no parent set";
@@ -64,4 +63,20 @@ void ASTNode::setParent(ASTNode *parent)
 bool ASTNode::hasParent() const
 {
     return (m_parent != NULL);
+}
+
+ChildrenNodes& ASTNode::children()
+{
+    if (!m_children.get())
+        throw "no children set";
+    
+    return *m_children;
+}
+
+const ChildrenNodes& ASTNode::children() const
+{
+    if (!m_children.get())
+        throw "no children set";
+    
+    return *m_children;
 }

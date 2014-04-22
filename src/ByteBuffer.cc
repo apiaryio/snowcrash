@@ -41,7 +41,7 @@ static CharactersRange BytesRangeToCharactersRange(const BytesRange& bytesRange,
     if (bytesRange.length > 0)
         charLength = strnlen_utf8(byteBuffer.c_str() + bytesRange.location, bytesRange.length);
     
-    CharactersRange characterRange = {charLocation, charLength};
+    CharactersRange characterRange = CharactersRange(charLocation, charLength);
     return characterRange;
 }
 
