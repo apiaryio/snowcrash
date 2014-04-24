@@ -38,6 +38,8 @@
           },
           'VCLinkerTool': {
             'LinkIncremental': 2, # enable incremental linking
+            'GenerateDebugInformation': 'true', # /DEBUG enable line by line debugging
+            'SubSystem': 1 # /SUBSYSTEM:CONSOLE use console as native environment
           },
         },
         'xcode_settings': {
@@ -76,6 +78,7 @@
             'OptimizeReferences': 2, # /OPT:REF
             'EnableCOMDATFolding': 2, # /OPT:ICF
             'LinkIncremental': 1, # disable incremental linking
+            'SubSystem': 1 # /SUBSYSTEM:CONSOLE use console as native environment
           }
         }
       }
