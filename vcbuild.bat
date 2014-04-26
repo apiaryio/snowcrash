@@ -35,6 +35,7 @@ if /i "%1"=="x64"           set target_arch=x64&goto arg-ok
 if /i "%1"=="noprojgen"     set noprojgen=1&goto arg-ok
 if /i "%1"=="nobuild"       set nobuild=1&goto arg-ok
 if /i "%1"=="test"          set test=test&goto arg-ok
+if /i "%1"=="inttest"       set inttest=1&goto arg-ok
 
 echo Warning: ignoring invalid command line option `%1`.
 
@@ -52,7 +53,8 @@ if defined noprojgen goto msbuild
 @rem Generate the VS project.
 SETLOCAL
   if defined VS100COMNTOOLS call "%VS100COMNTOOLS%\VCVarsQueryRegistry.bat"
-  python configure %debug_arg% --dest-cpu=%target_arch%
+  if defined inttest python configure %debug_arg% --dest-cpu=%target_arch% --include-integration-tests
+  if not defined inttest python configure %debug_arg% --dest-cpu=%target_arch%
   if errorlevel 1 goto create-msvs-files-failed
   if not exist build/snowcrash.sln goto create-msvs-files-failed
   echo Project files generated.
@@ -105,12 +107,13 @@ echo Failed to create vc project files.
 goto exit
 
 :help
-echo vcbuild.bat [debug/release] [test] [clean] [noprojgen] [nobuild] [x86/x64]
+echo vcbuild.bat [debug/release] [test] [clean] [noprojgen] [nobuild] [x86/x64] [inttest]
 echo Examples:
 echo   vcbuild.bat                : builds release build
 echo   vcbuild.bat nobuild        : generate MSVS project files only
 echo   vcbuild.bat debug          : builds debug build
 echo   vcbuild.bat test           : builds debug build and runs tests
+echo   vcbuild.bat inttest        : include integration tests
 goto exit
 
 :exit
