@@ -34,6 +34,7 @@
             'OmitFramePointers': 'false',
             'BasicRuntimeChecks': 3, # /RTC1
             'RuntimeTypeInfo':  'true', # /GR, determine object type at runtime
+            'DebugInformationFormat': 3, # /Zi, use program database as debugging information
             'ExceptionHandling': 1            
           },
           'VCLinkerTool': {
