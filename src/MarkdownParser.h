@@ -34,6 +34,8 @@ namespace mdp {
         
     private:
         ASTNode* m_workingNode;
+        bool m_listBlockContext;
+        const ByteBuffer* m_source;
         
         static const size_t OutputUnitSize;
         static const size_t MaxNesting;

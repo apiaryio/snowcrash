@@ -25,7 +25,6 @@ namespace mdp {
         HTMLASTNodeType,
         HeaderASTNodeType,
         HRuleASTNodeType,
-        ListASTNodeType,
         ListItemASTNodeType,
         ParagraphASTNodeType,
         TableASTNodeType,

@@ -31,7 +31,7 @@ static ByteBuffer ByteBufferFromSundown(const struct buf *text)
 }
 
 MarkdownParser::MarkdownParser()
-: m_workingNode(NULL)
+: m_workingNode(NULL), m_listBlockContext(false), m_source(NULL)
 {
 }
 
@@ -41,6 +41,8 @@ void MarkdownParser::parse(const ByteBuffer& source, ASTNode& ast)
     m_workingNode = &ast;
     m_workingNode->type = RootASTNode;
     m_workingNode->sourceMap.push_back(BytesRange(0, source.length()));
+    m_source = &source;
+    m_listBlockContext = false;    
     
     RenderCallbacks callbacks = renderCallbacks();
 
@@ -53,6 +55,8 @@ void MarkdownParser::parse(const ByteBuffer& source, ASTNode& ast)
     ::sd_markdown_free(sundown);
     
     m_workingNode = NULL;
+    m_source = NULL;
+    m_listBlockContext = false;
 }
 
 MarkdownParser::RenderCallbacks MarkdownParser::renderCallbacks()
@@ -119,11 +123,11 @@ void MarkdownParser::beginList(int flags)
     if (!m_workingNode)
         throw NO_WORKING_NODE_ERR;
     
-    ASTNode node(ListASTNodeType, m_workingNode, ByteBuffer(), flags);
-    m_workingNode->children().push_back(node);
-    
-    // Push context
-    m_workingNode = &m_workingNode->children().back();
+//    ASTNode node(ListASTNodeType, m_workingNode, ByteBuffer(), flags);
+//    m_workingNode->children().push_back(node);
+//    
+//    // Push context
+//    m_workingNode = &m_workingNode->children().back();
 }
 
 void MarkdownParser::renderList(struct buf *ob, const struct buf *text, int flags, void *opaque)
@@ -137,17 +141,18 @@ void MarkdownParser::renderList(struct buf *ob, const struct buf *text, int flag
 
 void MarkdownParser::renderList(const ByteBuffer& text, int flags)
 {
-    if (!m_workingNode)
-        throw NO_WORKING_NODE_ERR;
-    
-    if (m_workingNode->type != ListASTNodeType)
-        throw WORKING_NODE_MISMATCH_ERR;
-    
-    m_workingNode->text = text;
-    m_workingNode->data = flags;
-    
-    // Pop context
-    m_workingNode = &m_workingNode->parent();
+//    if (!m_workingNode)
+//        throw NO_WORKING_NODE_ERR;
+//    
+//    if (m_workingNode->type != ListASTNodeType)
+//        throw WORKING_NODE_MISMATCH_ERR;
+//    
+//    m_workingNode->text = text;
+//    m_workingNode->data = flags;
+//    
+//    // Pop context
+//    m_workingNode = &m_workingNode->parent();
+    m_listBlockContext = true;
 }
 
 void MarkdownParser::beginListItem(int flags, void *opaque)
@@ -336,6 +341,11 @@ void MarkdownParser::blockDidParse(const src_map* map, const uint8_t *txt_data, 
 
 void MarkdownParser::blockDidParse(const BytesRangeSet& sourceMap)
 {
+    if (m_listBlockContext) {
+        m_listBlockContext = false; // Ingore list blocks events
+        return;
+    }
+    
     if (!m_workingNode)
         throw NO_WORKING_NODE_ERR;
     
@@ -349,6 +359,22 @@ void MarkdownParser::blockDidParse(const BytesRangeSet& sourceMap)
     // Share the list item source map with its artifical node, if exists.
     if (lastNode.type == ListItemASTNodeType &&
         !lastNode.children().empty() &&
-        lastNode.children().front().sourceMap.empty())
-        lastNode.children().front().sourceMap.append(sourceMap);
+        lastNode.children().front().sourceMap.empty()) {
+        
+        ByteBuffer& buffer = lastNode.children().front().text;
+        ByteBuffer mapped = MapBytesRangeSet(sourceMap, *m_source);
+        size_t pos = mapped.find(buffer);
+
+        if (pos != mapped.npos) {
+            BytesRange range = sourceMap.front();
+            range.location += pos;
+            range.length = buffer.length();
+            BytesRangeSet newMap;
+            newMap.push_back(range);
+            lastNode.children().front().sourceMap.append(newMap);
+        }
+        else {
+            lastNode.children().front().sourceMap.append(sourceMap);
+        }
+    }
 }
