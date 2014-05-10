@@ -131,7 +131,10 @@ def configure_snowcrash(o):
 if options.include_integration_tests:
     print "Installing dependencies for integration tests..."
     try:
-        subprocess.call(["bundle", "install"])
+        if sys.platform == 'win32':
+            subprocess.call(["bundle.bat", "install"])
+        else:
+            subprocess.call(["bundle", "install"])
     except OSError as e:
         if e.errno == os.errno.ENOENT:
             raise RuntimeError(
