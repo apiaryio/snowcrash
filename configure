@@ -193,7 +193,7 @@ print "creating makefiles"
 gyp_args = ['--generator-output', build_dir, '--depth', '.']
 if sys.platform == 'win32':
   # Windows
-  gyp_args.extend(['-f', 'msvs', '-G', 'msvs_version=2012'])
+  gyp_args.extend(['-f', 'msvs'])
 else:
   # Posix systems
   gyp_args.extend(['-f', 'make'])
