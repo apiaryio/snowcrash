@@ -36,6 +36,9 @@ if /i "%1"=="noprojgen"     set noprojgen=1&goto arg-ok
 if /i "%1"=="nobuild"       set nobuild=1&goto arg-ok
 if /i "%1"=="test"          set test=test&goto arg-ok
 if /i "%1"=="inttest"       set inttest=1&goto arg-ok
+if /i "%1"=="MSVC2012"      set GYP_MSVS_VERSION=2012&goto arg-ok
+if /i "%1"=="MSVC2010"      set GYP_MSVS_VERSION=2010&goto arg-ok
+if /i "%1"=="MSVC2008"      set GYP_MSVS_VERSION=2008&goto arg-ok
 
 echo Warning: ignoring invalid command line option `%1`.
 
@@ -49,6 +52,7 @@ if "%config%"=="Debug" set debug_arg=--debug
 :project-gen
 @rem Skip project generation if requested.
 if defined noprojgen goto msbuild
+if "%GYP_MSVS_VERSION%"=="" set GYP_MSVS_VERSION=2012
 
 @rem Generate the VS project.
 SETLOCAL
@@ -66,19 +70,27 @@ ENDLOCAL
 :msbuild
 @rem Skip project generation if requested.
 if defined nobuild goto exit
+if "%GYP_MSVS_VERSION%"=="2010" goto vc-set-2010
+if "%GYP_MSVS_VERSION%"=="2008" goto vc-set-2008
 
 @rem Look for Visual Studio 2012
 if not defined VS110COMNTOOLS goto vc-set-2010
 if not exist "%VS110COMNTOOLS%\..\..\vc\vcvarsall.bat" goto vc-set-2010
 call "%VS110COMNTOOLS%\..\..\vc\vcvarsall.bat"
 if not defined VCINSTALLDIR goto msbuild-not-found
-set GYP_MSVS_VERSION=2012
 goto msbuild-found
 
 :vc-set-2010
-if not defined VS100COMNTOOLS goto msbuild-not-found
-if not exist "%VS100COMNTOOLS%\..\..\vc\vcvarsall.bat" goto msbuild-not-found
+if not defined VS100COMNTOOLS goto vc-set-2008
+if not exist "%VS100COMNTOOLS%\..\..\vc\vcvarsall.bat" goto vc-set-2008
 call "%VS100COMNTOOLS%\..\..\vc\vcvarsall.bat"
+if not defined VCINSTALLDIR goto msbuild-not-found
+goto msbuild-found
+
+:vc-set-2008
+if not defined VS90COMNTOOLS goto msbuild-not-found
+if not exist "%VS90COMNTOOLS%\..\..\vc\vcvarsall.bat" goto msbuild-not-found
+call "%VS90COMNTOOLS%\..\..\vc\vcvarsall.bat"
 if not defined VCINSTALLDIR goto msbuild-not-found
 goto msbuild-found
 
@@ -158,13 +170,14 @@ echo Failed to create vc project files.
 goto exit
 
 :help
-echo vcbuild.bat [debug/release] [test] [clean] [noprojgen] [nobuild] [x86/x64] [inttest]
+echo vcbuild.bat [debug/release] [test] [clean] [noprojgen] [nobuild] [x86/x64] [inttest] [MSVC2008/MSVC2010/MSVC2012]
 echo Examples:
 echo   vcbuild.bat                : builds release build
 echo   vcbuild.bat nobuild        : generate MSVS project files only
 echo   vcbuild.bat debug          : builds debug build
 echo   vcbuild.bat test           : builds debug build and runs tests
 echo   vcbuild.bat inttest        : include integration tests
+echo   vcbuild.bat MSVC2012       : indicate target solution's version, could also define as MSVC2008 , MSVC2010 , MSVC2012
 goto exit
 
 :exit
