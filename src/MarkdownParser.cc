@@ -39,7 +39,7 @@ void MarkdownParser::parse(const ByteBuffer& source, ASTNode& ast)
 {
     ast = ASTNode();
     m_workingNode = &ast;
-    m_workingNode->type = RootASTNode;
+    m_workingNode->type = RootASTNodeType;
     m_workingNode->sourceMap.push_back(BytesRange(0, source.length()));
     m_source = &source;
     m_listBlockContext = false;    

@@ -19,7 +19,7 @@ namespace mdp {
      *  AST block node types 
      */
     enum ASTNodeType {
-        RootASTNode = 0,
+        RootASTNodeType = 0,
         CodeASTNodeType,
         QuoteASTNodeType,
         HTMLASTNodeType,

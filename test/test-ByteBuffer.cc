@@ -20,7 +20,7 @@ TEST_CASE("Multi-byte characters Czech", "[bytebuffer][sourcemap]")
 
     parser.parse(src, ast);
 
-    REQUIRE(ast.type == RootASTNode);
+    REQUIRE(ast.type == RootASTNodeType);
     REQUIRE(ast.text.empty());
     REQUIRE(ast.data == 0);
     REQUIRE(ast.children().size() == 1);
@@ -47,7 +47,7 @@ TEST_CASE("Multi-byte characters in blockquote", "[bytebuffer][sourcemap]")
     
     parser.parse(src, ast);
     
-    REQUIRE(ast.type == RootASTNode);
+    REQUIRE(ast.type == RootASTNodeType);
     REQUIRE(ast.text.empty());
     REQUIRE(ast.data == 0);
     REQUIRE(ast.children().size() == 1);

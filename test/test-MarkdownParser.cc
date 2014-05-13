@@ -22,7 +22,7 @@ TEST_CASE("Parse one paragaraph", "[parser][paragraph]")
     
     parser.parse("Hello World!\n", ast);
     
-    REQUIRE(ast.type == RootASTNode);
+    REQUIRE(ast.type == RootASTNodeType);
     REQUIRE(ast.text.empty());
     REQUIRE(ast.children().size() == 1);
     REQUIRE(ast.sourceMap.size() == 1);
@@ -50,7 +50,7 @@ TEST_CASE("Parse multiple paragaraphs", "[parser][paragraph]")
     
     parser.parse(src, ast);
     
-    REQUIRE(ast.type == RootASTNode);
+    REQUIRE(ast.type == RootASTNodeType);
     REQUIRE(ast.text.empty());
     REQUIRE(ast.data == 0);
     REQUIRE(ast.children().size() == 2);
@@ -86,7 +86,7 @@ TEST_CASE("Parse header", "[parser][header]")
     
     parser.parse(src, ast);
     
-    REQUIRE(ast.type == RootASTNode);
+    REQUIRE(ast.type == RootASTNodeType);
     REQUIRE(ast.text.empty());
     REQUIRE(ast.data == 0);
     REQUIRE(ast.children().size() == 1);
@@ -115,7 +115,7 @@ TEST_CASE("Parse multiple headers", "[parser][header]")
     
     parser.parse(src, ast);
     
-    REQUIRE(ast.type == RootASTNode);
+    REQUIRE(ast.type == RootASTNodeType);
     REQUIRE(ast.text.empty());
     REQUIRE(ast.data == 0);
     REQUIRE(ast.children().size() == 2);
@@ -151,7 +151,7 @@ TEST_CASE("Parse horizontal rule", "[parser][hrule]")
     
     parser.parse(src, ast);
     
-    REQUIRE(ast.type == RootASTNode);
+    REQUIRE(ast.type == RootASTNodeType);
     REQUIRE(ast.text.empty());
     REQUIRE(ast.data == 0);
     REQUIRE(ast.children().size() == 1);
@@ -178,7 +178,7 @@ TEST_CASE("Parse code block", "[parser][code]")
     
     parser.parse(src, ast);
     
-    REQUIRE(ast.type == RootASTNode);
+    REQUIRE(ast.type == RootASTNodeType);
     REQUIRE(ast.text.empty());
     REQUIRE(ast.data == 0);
     REQUIRE(ast.children().size() == 1);
@@ -205,7 +205,7 @@ TEST_CASE("Parse HTML block tag", "[parser][html]")
     
     parser.parse(src, ast);
     
-    REQUIRE(ast.type == RootASTNode);
+    REQUIRE(ast.type == RootASTNodeType);
     REQUIRE(ast.text.empty());
     REQUIRE(ast.data == 0);
     REQUIRE(ast.children().size() == 1);
@@ -232,7 +232,7 @@ TEST_CASE("Parse single list item", "[parser][list]")
     
     parser.parse(src, ast);
     
-    REQUIRE(ast.type == RootASTNode);
+    REQUIRE(ast.type == RootASTNodeType);
     REQUIRE(ast.text.empty());
     REQUIRE(ast.data == 0);
     REQUIRE(ast.children().size() == 1);
@@ -288,7 +288,7 @@ TEST_CASE("Parse nested list items", "[parser][list][now]")
     
     parser.parse(src, ast);
     
-    REQUIRE(ast.type == RootASTNode);
+    REQUIRE(ast.type == RootASTNodeType);
     REQUIRE(ast.text.empty());
     REQUIRE(ast.data == 0);
     REQUIRE(ast.children().size() == 2);
@@ -405,7 +405,7 @@ TEST_CASE("Parse list item with multiple paragraphs", "[parser][list]")
     
     parser.parse(src, ast);
     
-    REQUIRE(ast.type == RootASTNode);
+    REQUIRE(ast.type == RootASTNodeType);
     REQUIRE(ast.text.empty());
     REQUIRE(ast.data == 0);
     REQUIRE(ast.children().size() == 1);
@@ -461,7 +461,7 @@ TEST_CASE("Parse a simple quote", "[parser][quote]")
     
     parser.parse(src, ast);
     
-    REQUIRE(ast.type == RootASTNode);
+    REQUIRE(ast.type == RootASTNodeType);
     REQUIRE(ast.text.empty());
     REQUIRE(ast.data == 0);
     REQUIRE(ast.children().size() == 1);
@@ -502,7 +502,7 @@ TEST_CASE("Source map crash", "[parser][sourcemap][issue][snowcrash][62]")
     
     parser.parse(src, ast);
     
-    REQUIRE(ast.type == RootASTNode);
+    REQUIRE(ast.type == RootASTNodeType);
     REQUIRE(ast.text.empty());
     REQUIRE(ast.data == 0);
     REQUIRE(ast.children().size() == 2);
