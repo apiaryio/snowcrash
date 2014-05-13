@@ -17,6 +17,7 @@
 #include "StringUtility.h"
 #include "ParametersParser.h"
 #include "DescriptionSectionUtility.h"
+#include "UriTemplateParser.h"
 
 namespace snowcrashconst {
     
@@ -196,8 +197,8 @@ namespace snowcrash {
                                                const BlockIterator& cur,
                                                BlueprintParserCore& parser,
                                                Resource& resource) {
-
             ParseSectionResult result = std::make_pair(Result(), cur);
+           
             switch (section.type) {
                 case ResourceSectionType:
                     result = HandleResourceDescriptionBlock(section, cur, parser, resource);
@@ -237,6 +238,7 @@ namespace snowcrash {
                     result.first.error = UnexpectedBlockError(section, cur, parser.sourceData);
                     break;
             }
+
             
             return result;
         }
@@ -267,12 +269,19 @@ namespace snowcrash {
             ParseSectionResult result = std::make_pair(Result(), cur);
             BlockIterator sectionCur(cur);
             
+            
             // Retrieve URI            
             if (cur->type == HeaderBlockType &&
                 cur == section.bounds.first) {
                 
                 HTTPMethod method;
                 GetResourceSignature(*cur, resource.name, resource.uriTemplate, method);
+
+                URITemplateParser uriTemplateParser;
+                ParsedURITemplate parsedResult;
+                uriTemplateParser.parse(resource.uriTemplate, parsedResult);
+                result.first.warnings.insert(result.first.warnings.end(), parsedResult.warnings.begin(), parsedResult.warnings.end());
+                
                 result.second = ++sectionCur;
                 return result;
             }

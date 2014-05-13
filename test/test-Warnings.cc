@@ -50,11 +50,14 @@ TEST_CASE("Warn about brackets in URI template", "[bracketwarnings][issue][#79]"
     //## GET /test/{id}[5]
     //");
     const std::string blueprintSource = \
-        "HOST http://test.test.com\n"\
         "FORMAT: 1A\n"\
         "\n"\
-        "# GET /test/{id}[5]\n"\
-        "+ Response 200\n";
+        "# test api\n"\
+        "this is a description of the test api\n"\
+        "# Group test\n"\
+        "A test group\n"\
+        "## test [/test/{id}[2]]\n"\
+        "A test uri template\n";
 
     Parser parser;
     Result result;

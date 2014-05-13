@@ -252,18 +252,18 @@ TEST_CASE("Parse ilegal parameter among legal ones", "[parameters]")
 {
     // Blueprint in question:
     //R"(
-    //# /1/{OK-1}/{OK-2}
+    //# /1/{OK_1}/{OK_2}
     //+ Parameters
-    //    + OK-1
+    //    + OK_1
     //    + i:legal
-    //    + OK-2
+    //    + OK_2
     //");
     const std::string blueprintSource = \
-    "# /1/{OK-1}/{OK-2}\n"\
+    "# /1/{OK_1}/{OK_2}\n"\
     "+ Parameters\n"\
-    "    + OK-1\n"\
+    "    + OK_1\n"\
     "    + i:legal\n"\
-    "    + OK-2\n"\
+    "    + OK_2\n"\
     "\n";
     
     Parser parser;
@@ -279,9 +279,9 @@ TEST_CASE("Parse ilegal parameter among legal ones", "[parameters]")
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions.empty());
     REQUIRE(blueprint.resourceGroups[0].resources[0].description.empty());
     REQUIRE(blueprint.resourceGroups[0].resources[0].parameters.size() == 2);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].name == "OK-1");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].name == "OK_1");
     REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].description.empty());
-    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[1].name == "OK-2");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[1].name == "OK_2");
     REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[1].description.empty());
 }
 
