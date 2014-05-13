@@ -42,7 +42,7 @@
         'src/Serialize.h',
         'src/SerializeJSON.cc',
         'src/SerializeYAML.cc',
-	'src/UriParser.cc',
+	'src/UriTemplateParser.cc',
         'src/snowcrash.cc',
       ],
       'conditions': [
@@ -85,7 +85,7 @@
         'test/test-SymbolIdentifier.cc',
         'test/test-SymbolTable.cc',
         'test/test-Warnings.cc',
-        'test/test-UriParser.cc',
+        'test/test-UriTemplateParser.cc',
         'test/test-snowcrash.cc'
       ],
       'dependencies': [

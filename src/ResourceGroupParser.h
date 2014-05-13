@@ -12,7 +12,7 @@
 #include "BlueprintParserCore.h"
 #include "Blueprint.h"
 #include "ResourceParser.h"
-#include "UriParser.h"
+#include "UriTemplateParser.h"
 
 namespace snowcrashconst {
     
@@ -155,7 +155,6 @@ namespace snowcrash {
                                                  BlueprintParserCore& parser,
                                                  ResourceGroup& group)
         {
-            URITemplateParser uriTemplateParser;
             Resource resource;
             ParseSectionResult result = ResourceParser::Parse(cur,
                                                               section.bounds.second,
@@ -170,23 +169,7 @@ namespace snowcrash {
             if (duplicate == group.resources.end())
                 globalDuplicate = FindResource(parser.blueprint, resource);
 
-            ParsedURITemplate uriParseResult;
-            SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, section.bounds.second, section.bounds, parser.sourceData);
-
-            uriTemplateParser.parse(resource.uriTemplate, uriParseResult,sourceBlock);
-
-            if (sizeof(uriParseResult.warnings) > 0){
-                for (std::vector<Warning>::iterator i = uriParseResult.warnings.begin(); i != uriParseResult.warnings.end(); i++){
-                    result.first.warnings.push_back(*i);
-                }
-            }
-
-            if (sizeof(uriParseResult.errors) > 0){
-                for (std::vector<Error>::iterator i = uriParseResult.errors.begin(); i != uriParseResult.errors.end(); i++){
-                    result.first.warnings.push_back(*i);
-                }
-            }
-
+         
             
             if (duplicate != group.resources.end() ||
                 globalDuplicate.first != parser.blueprint.resourceGroups.end()) {
