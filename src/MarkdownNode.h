@@ -36,10 +36,9 @@ namespace mdp {
     /* Forward declaration of AST Node */
     class MarkdownNode;
     
-    /** Collection of children nodes */
-    typedef std::deque<MarkdownNode> ChildrenNodes;
+    typedef std::deque<MarkdownNode> MarkdownNodes;
     
-    /** 
+    /**
      *  AST node
      */
     class MarkdownNode {
@@ -69,8 +68,8 @@ namespace mdp {
         bool hasParent() const;
 
         /** Children nodes */
-        ChildrenNodes& children();
-        const ChildrenNodes& children() const;
+        MarkdownNodes& children();
+        const MarkdownNodes& children() const;
 
         /** Constructor */
         MarkdownNode(MarkdownNodeType type_ = UndefinedMarkdownNodeType,
@@ -89,7 +88,7 @@ namespace mdp {
         
     private:
         MarkdownNode* m_parent;
-        std::auto_ptr<ChildrenNodes> m_children;
+        std::auto_ptr<MarkdownNodes> m_children;
     };
 }
 

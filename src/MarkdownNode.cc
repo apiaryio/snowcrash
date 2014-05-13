@@ -13,7 +13,7 @@ using namespace mdp;
 MarkdownNode::MarkdownNode(MarkdownNodeType type_, MarkdownNode *parent_, const ByteBuffer& text_, const Data& data_)
 : type(type_), m_parent(parent_), text(text_), data(data_)
 {
-    m_children.reset(::new ChildrenNodes);
+    m_children.reset(::new MarkdownNodes);
 }
                      
 MarkdownNode::MarkdownNode(const MarkdownNode& rhs)
@@ -22,7 +22,7 @@ MarkdownNode::MarkdownNode(const MarkdownNode& rhs)
     this->text = rhs.text;
     this->data = rhs.data;
     this->sourceMap = rhs.sourceMap;
-    this->m_children.reset(::new ChildrenNodes(*rhs.m_children.get()));
+    this->m_children.reset(::new MarkdownNodes(*rhs.m_children.get()));
     this->m_parent = rhs.m_parent;
 }
 
@@ -32,7 +32,7 @@ MarkdownNode& MarkdownNode::operator=(const MarkdownNode& rhs)
     this->text = rhs.text;
     this->data = rhs.data;
     this->sourceMap = rhs.sourceMap;
-    this->m_children.reset(::new ChildrenNodes(*rhs.m_children.get()));
+    this->m_children.reset(::new MarkdownNodes(*rhs.m_children.get()));
     this->m_parent = rhs.m_parent;
     return *this;
 }
@@ -65,7 +65,7 @@ bool MarkdownNode::hasParent() const
     return (m_parent != NULL);
 }
 
-ChildrenNodes& MarkdownNode::children()
+MarkdownNodes& MarkdownNode::children()
 {
     if (!m_children.get())
         throw "no children set";
@@ -73,7 +73,7 @@ ChildrenNodes& MarkdownNode::children()
     return *m_children;
 }
 
-const ChildrenNodes& MarkdownNode::children() const
+const MarkdownNodes& MarkdownNode::children() const
 {
     if (!m_children.get())
         throw "no children set";
