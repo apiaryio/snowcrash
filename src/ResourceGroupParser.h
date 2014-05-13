@@ -12,7 +12,6 @@
 #include "BlueprintParserCore.h"
 #include "Blueprint.h"
 #include "ResourceParser.h"
-#include "UriTemplateParser.h"
 
 namespace snowcrashconst {
     
