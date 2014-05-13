@@ -1,22 +1,22 @@
 //
-//  ASTNode.cc
+//  MarkdownNode.cc
 //  markdownparser
 //
 //  Created by Zdenek Nemec on 4/19/14.
 //  Copyright (c) 2014 Apiary Inc. All rights reserved.
 //
 
-#include "ASTNode.h"
+#include "MarkdownNode.h"
 
 using namespace mdp;
 
-ASTNode::ASTNode(ASTNodeType type_, ASTNode *parent_, const ByteBuffer& text_, const Data& data_)
+MarkdownNode::MarkdownNode(MarkdownNodeType type_, MarkdownNode *parent_, const ByteBuffer& text_, const Data& data_)
 : type(type_), m_parent(parent_), text(text_), data(data_)
 {
     m_children.reset(::new ChildrenNodes);
 }
                      
-ASTNode::ASTNode(const ASTNode& rhs)
+MarkdownNode::MarkdownNode(const MarkdownNode& rhs)
 {
     this->type = rhs.type;
     this->text = rhs.text;
@@ -26,7 +26,7 @@ ASTNode::ASTNode(const ASTNode& rhs)
     this->m_parent = rhs.m_parent;
 }
 
-ASTNode& ASTNode::operator=(const ASTNode& rhs)
+MarkdownNode& MarkdownNode::operator=(const MarkdownNode& rhs)
 {
     this->type = rhs.type;
     this->text = rhs.text;
@@ -37,35 +37,35 @@ ASTNode& ASTNode::operator=(const ASTNode& rhs)
     return *this;
 }
 
-ASTNode::~ASTNode()
+MarkdownNode::~MarkdownNode()
 {
 }
 
-ASTNode& ASTNode::parent()
-{
-    if (!hasParent())
-        throw "no parent set";
-    return *m_parent;
-}
-
-const ASTNode& ASTNode::parent() const
+MarkdownNode& MarkdownNode::parent()
 {
     if (!hasParent())
         throw "no parent set";
     return *m_parent;
 }
 
-void ASTNode::setParent(ASTNode *parent)
+const MarkdownNode& MarkdownNode::parent() const
+{
+    if (!hasParent())
+        throw "no parent set";
+    return *m_parent;
+}
+
+void MarkdownNode::setParent(MarkdownNode *parent)
 {
     m_parent = parent;
 }
 
-bool ASTNode::hasParent() const
+bool MarkdownNode::hasParent() const
 {
     return (m_parent != NULL);
 }
 
-ChildrenNodes& ASTNode::children()
+ChildrenNodes& MarkdownNode::children()
 {
     if (!m_children.get())
         throw "no children set";
@@ -73,7 +73,7 @@ ChildrenNodes& ASTNode::children()
     return *m_children;
 }
 
-const ChildrenNodes& ASTNode::children() const
+const ChildrenNodes& MarkdownNode::children() const
 {
     if (!m_children.get())
         throw "no children set";

@@ -1,5 +1,5 @@
 //
-//  ASTNode.h
+//  MarkdownNode.h
 //  markdownparser
 //
 //  Created by Zdenek Nemec on 4/16/14.
@@ -18,36 +18,36 @@ namespace mdp {
     /** 
      *  AST block node types 
      */
-    enum ASTNodeType {
-        RootASTNodeType = 0,
-        CodeASTNodeType,
-        QuoteASTNodeType,
-        HTMLASTNodeType,
-        HeaderASTNodeType,
-        HRuleASTNodeType,
-        ListItemASTNodeType,
-        ParagraphASTNodeType,
-        TableASTNodeType,
-        TableRowASTNodeType,
-        TableCellASTNodeType,
-        UndefinedASTNodeType = -1
+    enum MarkdownNodeType {
+        RootMarkdownNodeType = 0,
+        CodeMarkdownNodeType,
+        QuoteMarkdownNodeType,
+        HTMLMarkdownNodeType,
+        HeaderMarkdownNodeType,
+        HRuleMarkdownNodeType,
+        ListItemMarkdownNodeType,
+        ParagraphMarkdownNodeType,
+        TableMarkdownNodeType,
+        TableRowMarkdownNodeType,
+        TableCellMarkdownNodeType,
+        UndefinedMarkdownNodeType = -1
     };
 
     /* Forward declaration of AST Node */
-    class ASTNode;
+    class MarkdownNode;
     
     /** Collection of children nodes */
-    typedef std::deque<ASTNode> ChildrenNodes;
+    typedef std::deque<MarkdownNode> ChildrenNodes;
     
     /** 
      *  AST node
      */
-    class ASTNode {
+    class MarkdownNode {
     public:
         typedef int Data;
         
         /** Node type */
-        ASTNodeType type;
+        MarkdownNodeType type;
         
         /** Textual content, where applicable */
         ByteBuffer text;
@@ -59,11 +59,11 @@ namespace mdp {
         BytesRangeSet sourceMap;
         
         /** Parent node, throws exception if no parent is defined */
-        ASTNode& parent();
-        const ASTNode& parent() const;
+        MarkdownNode& parent();
+        const MarkdownNode& parent() const;
         
         /** Sets parent node */
-        void setParent(ASTNode *parent);
+        void setParent(MarkdownNode *parent);
         
         /** True if section's parent is specified, false otherwise */
         bool hasParent() const;
@@ -73,22 +73,22 @@ namespace mdp {
         const ChildrenNodes& children() const;
 
         /** Constructor */
-        ASTNode(ASTNodeType type_ = UndefinedASTNodeType,
-                ASTNode *parent_ = NULL,
+        MarkdownNode(MarkdownNodeType type_ = UndefinedMarkdownNodeType,
+                MarkdownNode *parent_ = NULL,
                 const ByteBuffer& text_ = ByteBuffer(),
                 const Data& data_ = Data());
 
         /** Copy constructor */
-        ASTNode(const ASTNode& rhs);
+        MarkdownNode(const MarkdownNode& rhs);
         
         /** Assignment operator */
-        ASTNode& operator=(const ASTNode& rhs);
+        MarkdownNode& operator=(const MarkdownNode& rhs);
         
         /** Destructor */
-        ~ASTNode();
+        ~MarkdownNode();
         
     private:
-        ASTNode* m_parent;
+        MarkdownNode* m_parent;
         std::auto_ptr<ChildrenNodes> m_children;
     };
 }

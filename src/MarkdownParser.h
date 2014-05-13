@@ -10,7 +10,7 @@
 #define MARKDOWNPARSER_MARKDOWNPARSER_H
 
 #include "ByteBuffer.h"
-#include "ASTNode.h"
+#include "MarkdownNode.h"
 #include "markdown.h"
 
 namespace mdp {
@@ -30,10 +30,10 @@ namespace mdp {
          *  \param source   Markdown source data to be parsed
          *  \param ast      Parsed AST (root node)
          */
-        void parse(const ByteBuffer& source, ASTNode& ast);
+        void parse(const ByteBuffer& source, MarkdownNode& ast);
         
     private:
-        ASTNode* m_workingNode;
+        MarkdownNode* m_workingNode;
         bool m_listBlockContext;
         const ByteBuffer* m_source;
         

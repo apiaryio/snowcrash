@@ -35,11 +35,11 @@ MarkdownParser::MarkdownParser()
 {
 }
 
-void MarkdownParser::parse(const ByteBuffer& source, ASTNode& ast)
+void MarkdownParser::parse(const ByteBuffer& source, MarkdownNode& ast)
 {
-    ast = ASTNode();
+    ast = MarkdownNode();
     m_workingNode = &ast;
-    m_workingNode->type = RootASTNodeType;
+    m_workingNode->type = RootMarkdownNodeType;
     m_workingNode->sourceMap.push_back(BytesRange(0, source.length()));
     m_source = &source;
     m_listBlockContext = false;    
@@ -105,7 +105,7 @@ void MarkdownParser::renderHeader(const ByteBuffer& text, int level)
     if (!m_workingNode)
         throw NO_WORKING_NODE_ERR;
     
-    ASTNode node(HeaderASTNodeType, m_workingNode, text, level);
+    MarkdownNode node(HeaderMarkdownNodeType, m_workingNode, text, level);
     m_workingNode->children().push_back(node);
 }
 
@@ -123,7 +123,7 @@ void MarkdownParser::beginList(int flags)
     if (!m_workingNode)
         throw NO_WORKING_NODE_ERR;
     
-//    ASTNode node(ListASTNodeType, m_workingNode, ByteBuffer(), flags);
+//    MarkdownNode node(ListMarkdownNodeType, m_workingNode, ByteBuffer(), flags);
 //    m_workingNode->children().push_back(node);
 //    
 //    // Push context
@@ -144,7 +144,7 @@ void MarkdownParser::renderList(const ByteBuffer& text, int flags)
 //    if (!m_workingNode)
 //        throw NO_WORKING_NODE_ERR;
 //    
-//    if (m_workingNode->type != ListASTNodeType)
+//    if (m_workingNode->type != ListMarkdownNodeType)
 //        throw WORKING_NODE_MISMATCH_ERR;
 //    
 //    m_workingNode->text = text;
@@ -169,7 +169,7 @@ void MarkdownParser::beginListItem(int flags)
     if (!m_workingNode)
         throw NO_WORKING_NODE_ERR;
     
-    ASTNode node(ListItemASTNodeType, m_workingNode, ByteBuffer(), flags);
+    MarkdownNode node(ListItemMarkdownNodeType, m_workingNode, ByteBuffer(), flags);
     m_workingNode->children().push_back(node);
     
     // Push context
@@ -190,15 +190,15 @@ void MarkdownParser::renderListItem(const ByteBuffer& text, int flags)
     if (!m_workingNode)
         throw NO_WORKING_NODE_ERR;
 
-    if (m_workingNode->type != ListItemASTNodeType)
+    if (m_workingNode->type != ListItemMarkdownNodeType)
         throw WORKING_NODE_MISMATCH_ERR;
     
     // No "inline" list items:
     // Instead of storing the text on the list item
     // create the artificial paragraph node to store the text.
     if (m_workingNode->children().empty() ||
-        m_workingNode->children().front().type != ParagraphASTNodeType) {
-        ASTNode textNode(ParagraphASTNodeType, m_workingNode, text);
+        m_workingNode->children().front().type != ParagraphMarkdownNodeType) {
+        MarkdownNode textNode(ParagraphMarkdownNodeType, m_workingNode, text);
         m_workingNode->children().push_front(textNode);
     }
     
@@ -222,7 +222,7 @@ void MarkdownParser::renderBlockCode(const ByteBuffer& text, const ByteBuffer& l
     if (!m_workingNode)
         throw NO_WORKING_NODE_ERR;
     
-    ASTNode node(CodeASTNodeType, m_workingNode, text);
+    MarkdownNode node(CodeMarkdownNodeType, m_workingNode, text);
     m_workingNode->children().push_back(node);
 }
 
@@ -240,7 +240,7 @@ void MarkdownParser::renderParagraph(const ByteBuffer& text)
     if (!m_workingNode)
         throw NO_WORKING_NODE_ERR;
     
-    ASTNode node(ParagraphASTNodeType, m_workingNode, text);
+    MarkdownNode node(ParagraphMarkdownNodeType, m_workingNode, text);
     m_workingNode->children().push_back(node);
 }
 
@@ -258,7 +258,7 @@ void MarkdownParser::renderHorizontalRule()
     if (!m_workingNode)
         throw NO_WORKING_NODE_ERR;
     
-    ASTNode node(HRuleASTNodeType, m_workingNode, ByteBuffer(), ASTNode::Data());
+    MarkdownNode node(HRuleMarkdownNodeType, m_workingNode, ByteBuffer(), MarkdownNode::Data());
     m_workingNode->children().push_back(node);
 }
 
@@ -276,7 +276,7 @@ void MarkdownParser::renderHTML(const ByteBuffer& text)
     if (!m_workingNode)
         throw NO_WORKING_NODE_ERR;
     
-    ASTNode node(HTMLASTNodeType, m_workingNode, text);
+    MarkdownNode node(HTMLMarkdownNodeType, m_workingNode, text);
     m_workingNode->children().push_back(node);
 }
 
@@ -294,7 +294,7 @@ void MarkdownParser::beginQuote()
     if (!m_workingNode)
         throw NO_WORKING_NODE_ERR;
     
-    ASTNode node(QuoteASTNodeType, m_workingNode);
+    MarkdownNode node(QuoteMarkdownNodeType, m_workingNode);
     m_workingNode->children().push_back(node);
     
     // Push context
@@ -315,7 +315,7 @@ void MarkdownParser::renderQuote(const ByteBuffer& text)
     if (!m_workingNode)
         throw NO_WORKING_NODE_ERR;
     
-    if (m_workingNode->type != QuoteASTNodeType)
+    if (m_workingNode->type != QuoteMarkdownNodeType)
         throw WORKING_NODE_MISMATCH_ERR;
     
     m_workingNode->text = text;
@@ -352,16 +352,16 @@ void MarkdownParser::blockDidParse(const BytesRangeSet& sourceMap)
     if (m_workingNode->children().empty())
         throw std::logic_error("no working node children");
     
-    ASTNode &lastNode = m_workingNode->children().back();
-    lastNode.sourceMap.append(sourceMap);
+    MarkdownNode &lMarkdownNode = m_workingNode->children().back();
+    lMarkdownNode.sourceMap.append(sourceMap);
     
     // No "inline" list items:
     // Share the list item source map with its artifical node, if exists.
-    if (lastNode.type == ListItemASTNodeType &&
-        !lastNode.children().empty() &&
-        lastNode.children().front().sourceMap.empty()) {
+    if (lMarkdownNode.type == ListItemMarkdownNodeType &&
+        !lMarkdownNode.children().empty() &&
+        lMarkdownNode.children().front().sourceMap.empty()) {
         
-        ByteBuffer& buffer = lastNode.children().front().text;
+        ByteBuffer& buffer = lMarkdownNode.children().front().text;
         ByteBuffer mapped = MapBytesRangeSet(sourceMap, *m_source);
         size_t pos = mapped.find(buffer);
 
@@ -371,10 +371,10 @@ void MarkdownParser::blockDidParse(const BytesRangeSet& sourceMap)
             range.length = buffer.length();
             BytesRangeSet newMap;
             newMap.push_back(range);
-            lastNode.children().front().sourceMap.append(newMap);
+            lMarkdownNode.children().front().sourceMap.append(newMap);
         }
         else {
-            lastNode.children().front().sourceMap.append(sourceMap);
+            lMarkdownNode.children().front().sourceMap.append(sourceMap);
         }
     }
 }

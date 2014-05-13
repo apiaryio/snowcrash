@@ -14,13 +14,13 @@ using namespace mdp;
 TEST_CASE("Multi-byte characters Czech", "[bytebuffer][sourcemap]")
 {
     MarkdownParser parser;
-    ASTNode ast;
+    MarkdownNode ast;
 
     ByteBuffer src = "\x50\xC5\x99\xC3\xAD\xC5\xA1\x65\x72\x6E\xC4\x9B\x20\xC5\xBE\x6C\x75\xC5\xA5\x6F\x75\xC4\x8D\x6B\xC3\xBD\x20\x6B\xC5\xAF\xC5\x88\x20\xC3\xBA\x70\xC4\x9B\x6C\x20\xC4\x8F\xC3\xA1\x62\x65\x6C\x73\x6B\xC3\xA9\x20\xC3\xB3\x64\x79\n";
 
     parser.parse(src, ast);
 
-    REQUIRE(ast.type == RootASTNodeType);
+    REQUIRE(ast.type == RootMarkdownNodeType);
     REQUIRE(ast.text.empty());
     REQUIRE(ast.data == 0);
     REQUIRE(ast.children().size() == 1);
@@ -40,14 +40,14 @@ TEST_CASE("Multi-byte characters Czech", "[bytebuffer][sourcemap]")
 TEST_CASE("Multi-byte characters in blockquote", "[bytebuffer][sourcemap]")
 {
     MarkdownParser parser;
-    ASTNode ast;
+    MarkdownNode ast;
 
     // "> Ni Hao"
     ByteBuffer src = "> \xE4\xBD\xA0\xE5\xA5\xBD\n";
     
     parser.parse(src, ast);
     
-    REQUIRE(ast.type == RootASTNodeType);
+    REQUIRE(ast.type == RootMarkdownNodeType);
     REQUIRE(ast.text.empty());
     REQUIRE(ast.data == 0);
     REQUIRE(ast.children().size() == 1);
@@ -55,15 +55,15 @@ TEST_CASE("Multi-byte characters in blockquote", "[bytebuffer][sourcemap]")
     REQUIRE(ast.sourceMap[0].location == 0);
     REQUIRE(ast.sourceMap[0].length == 9);
     
-    ASTNode& quote = ast.children()[0];
-    REQUIRE(quote.type == QuoteASTNodeType);
+    MarkdownNode& quote = ast.children()[0];
+    REQUIRE(quote.type == QuoteMarkdownNodeType);
     REQUIRE(quote.children().size() == 1);
     REQUIRE(quote.sourceMap.size() == 1);
     REQUIRE(quote.sourceMap[0].location == 0);
     REQUIRE(quote.sourceMap[0].length == 9);
     
-    ASTNode& para = quote.children()[0];
-    REQUIRE(para.type == ParagraphASTNodeType);
+    MarkdownNode& para = quote.children()[0];
+    REQUIRE(para.type == ParagraphMarkdownNodeType);
     REQUIRE(para.sourceMap.size() == 1);
     REQUIRE(para.sourceMap[0].location == 2);
     REQUIRE(para.sourceMap[0].length == 7);

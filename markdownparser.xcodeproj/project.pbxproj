@@ -32,7 +32,8 @@
 		BBAE52D218FEDF5200D98223 /* html_smartypants.c in Sources */ = {isa = PBXBuildFile; fileRef = BBAE52CC18FEDF5200D98223 /* html_smartypants.c */; };
 		BBAE52D318FEDF5200D98223 /* html.c in Sources */ = {isa = PBXBuildFile; fileRef = BBAE52CD18FEDF5200D98223 /* html.c */; };
 		BBAE52D418FEDF5200D98223 /* html.h in Headers */ = {isa = PBXBuildFile; fileRef = BBAE52CE18FEDF5200D98223 /* html.h */; };
-		BBC22B191902BB480067AE88 /* ASTNode.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBC22B181902BB480067AE88 /* ASTNode.cc */; };
+		BBE7FEC21922E27300A1649E /* MarkdownNode.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBE7FEC01922E27300A1649E /* MarkdownNode.cc */; };
+		BBE7FEC31922E27300A1649E /* MarkdownNode.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE7FEC11922E27300A1649E /* MarkdownNode.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -61,11 +62,11 @@
 		BB2672ED19067E6A0053EEFA /* ByteBuffer.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ByteBuffer.cc; path = src/ByteBuffer.cc; sourceTree = "<group>"; };
 		BB2672EF19067EA90053EEFA /* test-ByteBuffer.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-ByteBuffer.cc"; path = "test/test-ByteBuffer.cc"; sourceTree = SOURCE_ROOT; };
 		BB955A43190119CE006684B8 /* ByteBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ByteBuffer.h; path = src/ByteBuffer.h; sourceTree = "<group>"; };
-		BB955A4519011A5F006684B8 /* MarkdownParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MarkdownParser.cc; path = src/MarkdownParser.cc; sourceTree = "<group>"; };
+		BB955A4519011A5F006684B8 /* MarkdownParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = MarkdownParser.cc; path = src/MarkdownParser.cc; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		BB955A4719011A71006684B8 /* MarkdownParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MarkdownParser.h; path = src/MarkdownParser.h; sourceTree = "<group>"; };
 		BB955A4D19011E85006684B8 /* test-libmarkdownparser */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "test-libmarkdownparser"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB955A5B190125CF006684B8 /* test-libmarkdownparser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-libmarkdownparser.cc"; path = "test/test-libmarkdownparser.cc"; sourceTree = SOURCE_ROOT; };
-		BB955A5C190125CF006684B8 /* test-MarkdownParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-MarkdownParser.cc"; path = "test/test-MarkdownParser.cc"; sourceTree = SOURCE_ROOT; };
+		BB955A5C190125CF006684B8 /* test-MarkdownParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = "test-MarkdownParser.cc"; path = "test/test-MarkdownParser.cc"; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		BBAE529B18FEBFAE00D98223 /* liblibmarkdownparser.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liblibmarkdownparser.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BBAE52A518FEC16B00D98223 /* autolink.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = autolink.c; sourceTree = "<group>"; };
 		BBAE52A618FEC16B00D98223 /* autolink.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = autolink.h; sourceTree = "<group>"; };
@@ -78,14 +79,14 @@
 		BBAE52AD18FEC16B00D98223 /* src_map.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = src_map.h; sourceTree = "<group>"; };
 		BBAE52AE18FEC16B00D98223 /* stack.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stack.c; sourceTree = "<group>"; };
 		BBAE52AF18FEC16B00D98223 /* stack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stack.h; sourceTree = "<group>"; };
-		BBAE52C718FEC43A00D98223 /* ASTNode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ASTNode.h; path = src/ASTNode.h; sourceTree = "<group>"; };
 		BBAE52C918FEDF5200D98223 /* houdini_href_e.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = houdini_href_e.c; path = ext/sundown/html/houdini_href_e.c; sourceTree = SOURCE_ROOT; };
 		BBAE52CA18FEDF5200D98223 /* houdini_html_e.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = houdini_html_e.c; path = ext/sundown/html/houdini_html_e.c; sourceTree = SOURCE_ROOT; };
 		BBAE52CB18FEDF5200D98223 /* houdini.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = houdini.h; path = ext/sundown/html/houdini.h; sourceTree = SOURCE_ROOT; };
 		BBAE52CC18FEDF5200D98223 /* html_smartypants.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = html_smartypants.c; path = ext/sundown/html/html_smartypants.c; sourceTree = SOURCE_ROOT; };
 		BBAE52CD18FEDF5200D98223 /* html.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = html.c; path = ext/sundown/html/html.c; sourceTree = SOURCE_ROOT; };
 		BBAE52CE18FEDF5200D98223 /* html.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = html.h; path = ext/sundown/html/html.h; sourceTree = SOURCE_ROOT; };
-		BBC22B181902BB480067AE88 /* ASTNode.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ASTNode.cc; path = src/ASTNode.cc; sourceTree = "<group>"; };
+		BBE7FEC01922E27300A1649E /* MarkdownNode.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MarkdownNode.cc; path = src/MarkdownNode.cc; sourceTree = "<group>"; };
+		BBE7FEC11922E27300A1649E /* MarkdownNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MarkdownNode.h; path = src/MarkdownNode.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -139,12 +140,12 @@
 		BBAE52A218FEC10400D98223 /* src */ = {
 			isa = PBXGroup;
 			children = (
-				BBAE52C718FEC43A00D98223 /* ASTNode.h */,
-				BBC22B181902BB480067AE88 /* ASTNode.cc */,
-				BB955A43190119CE006684B8 /* ByteBuffer.h */,
 				BB2672ED19067E6A0053EEFA /* ByteBuffer.cc */,
-				BB955A4719011A71006684B8 /* MarkdownParser.h */,
+				BB955A43190119CE006684B8 /* ByteBuffer.h */,
+				BBE7FEC01922E27300A1649E /* MarkdownNode.cc */,
+				BBE7FEC11922E27300A1649E /* MarkdownNode.h */,
 				BB955A4519011A5F006684B8 /* MarkdownParser.cc */,
+				BB955A4719011A71006684B8 /* MarkdownParser.h */,
 			);
 			name = src;
 			sourceTree = "<group>";
@@ -199,6 +200,7 @@
 				BBAE52B818FEC16B00D98223 /* src_map.h in Headers */,
 				BB955A4819011A71006684B8 /* MarkdownParser.h in Headers */,
 				BBAE52D118FEDF5200D98223 /* houdini.h in Headers */,
+				BBE7FEC31922E27300A1649E /* MarkdownNode.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -282,11 +284,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BBC22B191902BB480067AE88 /* ASTNode.cc in Sources */,
 				BBAE52B918FEC16B00D98223 /* stack.c in Sources */,
 				BBAE52D018FEDF5200D98223 /* houdini_html_e.c in Sources */,
 				BB2672EE19067E6A0053EEFA /* ByteBuffer.cc in Sources */,
 				BBAE52D318FEDF5200D98223 /* html.c in Sources */,
+				BBE7FEC21922E27300A1649E /* MarkdownNode.cc in Sources */,
 				BBAE52B018FEC16B00D98223 /* autolink.c in Sources */,
 				BBAE52B518FEC16B00D98223 /* markdown.c in Sources */,
 				BBAE52B218FEC16B00D98223 /* buffer.c in Sources */,
