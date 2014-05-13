@@ -83,6 +83,45 @@ TEST_CASE("Parse uri template for supported level one variable expansion", "[sup
     
 }
 
+TEST_CASE("Parse uri template for supported variables with % encoding and explode modifier", "[supportedpercentencodedvariablesandexplodemodifier][issue][#78]")
+{
+    const snowcrash::URI uri = "http://www.test.com/{id}/{?test%20one,test%20two*}";
+
+    URITemplateParser parser;
+    ParsedURITemplate result;
+
+    parser.parse(uri, result);
+
+    REQUIRE(result.warnings.size() == 0);
+
+}
+
+TEST_CASE("Parse uri template for invalid % encoding", "[invalidpercentencoding][issue][#78]")
+{
+    const snowcrash::URI uri = "http://www.test.com/{id}/{?test%20one,test%2Ztwo}";
+
+    URITemplateParser parser;
+    ParsedURITemplate result;
+
+    parser.parse(uri, result);
+
+    REQUIRE(result.warnings.size() == 1);
+
+}
+
+TEST_CASE("Parse uri template for invalid expansion", "[invalidexpression][issue][#78]")
+{
+    const snowcrash::URI uri = "http://www.test.com/{@id}/{|test}";
+
+    URITemplateParser parser;
+    ParsedURITemplate result;
+
+    parser.parse(uri, result);
+
+    REQUIRE(result.warnings.size() == 2);
+
+}
+
 
 TEST_CASE("Parse uri template for supported level two fragment expansion", "[supportedleveltwofragmentexpansionexpression][issue][#78]")
 {
@@ -205,7 +244,7 @@ TEST_CASE("Parse uri template for invalid variable name, contains hyphens", "[in
 
 TEST_CASE("Parse uri template for invalid variable name, contains assignment", "[invalidvariablenamecontainingsassignment][issue][#78]")
 {
-    const snowcrash::URI uri = "http://www.test.com/{id}{?varone=vartwo}";
+    const snowcrash::URITemplate uri = "http://www.test.com/{id}{?varone=vartwo}";
 
     URITemplateParser parser;
     ParsedURITemplate result;
@@ -214,5 +253,19 @@ TEST_CASE("Parse uri template for invalid variable name, contains assignment", "
 
     REQUIRE(result.warnings.size() == 1);
     REQUIRE(result.warnings[0].message == "URI template expression \"?varone=vartwo\" contains assignment.");
+
+}
+
+TEST_CASE("Parse uri template for invalid variable name, invalid % encoded", "[invalidvariablenamecontainingsbadpctencoding][issue][#78]")
+{
+    const snowcrash::URITemplate uri = "http://www.test.com/{id}{?varone%2z}";
+
+    URITemplateParser parser;
+    ParsedURITemplate result;
+
+    parser.parse(uri, result);
+
+    REQUIRE(result.warnings.size() == 1);
+    REQUIRE(result.warnings[0].message == "URI template expression \"?varone%2z\" contains invalid characters. Only A-Z a-z 0-9 _ and % encoded characters are allowed.");
 
 }

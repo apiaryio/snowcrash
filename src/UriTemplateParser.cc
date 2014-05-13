@@ -164,14 +164,9 @@ FORCEINLINE bool ExpressionContainsHyphens(const ClassifiedExpression& expressio
 FORCEINLINE bool ExpressionContainsAssignment(const ClassifiedExpression& expression){
     return expression.Expression.find("=") != std::string::npos;
 }
-
-/*
-template <class T>
-static Warnings ParseExpression(T expression){
-    ExpressionParser<T> parser;
-    return parser.ParseExpression(expression);
+bool IsInvalidExpressionName(const ClassifiedExpression& expression){
+    return !RegexMatch(expression.Expression,URI_TEMPLATE_EXPRESSION_REGEX);
 }
-*/
 
 void URITemplateParser::parse(const URITemplate uri, ParsedURITemplate& result)
 {
@@ -188,10 +183,12 @@ void URITemplateParser::parse(const URITemplate uri, ParsedURITemplate& result)
         
         if (HasMismatchedCurlyBrackets(result.path)){
             result.warnings.push_back(Warning("The URI template contains mismatched expression brackets.", URIWarning));
+            return;
         }
        
         if (HasNestedCurlyBrackets(result.path)){
             result.warnings.push_back(Warning("The URI template contains nested expression brackets.", URIWarning));
+            return;
         }
 
         if (PathContainsSquareBrackets(result.path)){
@@ -227,9 +224,16 @@ void URITemplateParser::parse(const URITemplate uri, ParsedURITemplate& result)
                     std::stringstream ss;
                     ss << "URI template expression \"" << classifiedExpression.Expression << "\" contains assignment.";
                     result.warnings.push_back(Warning(ss.str(), URIWarning));
+                    hasIllegalCharacters = true;
                 }
                
-                //Warnings warnings = ParseExpression(classifiedExpression);
+                if (!hasIllegalCharacters){
+                    if (IsInvalidExpressionName(classifiedExpression)){
+                        std::stringstream ss;
+                        ss << "URI template expression \"" << classifiedExpression.Expression << "\" contains invalid characters. Only A-Z a-z 0-9 _ and % encoded characters are allowed.";
+                        result.warnings.push_back(Warning(ss.str(), URIWarning));
+                    }
+                }
             }
             else{
                 result.warnings.push_back(Warning(classifiedExpression.UnsupportedWarningText, URIWarning));
