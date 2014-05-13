@@ -99,7 +99,7 @@ namespace snowcrash {
     };
     
     /**
-     *  \brief  Find a request withing given action.
+     *  \brief  Find a request within given action.
      *  \param  transaction  A transaction to check.
      *  \param  request A request to look for.
      *  \return Iterator pointing to the matching request within given method requests.
@@ -111,7 +111,7 @@ namespace snowcrash {
     }
 
     /**
-     *  \brief  Find a response withing responses of a given action.
+     *  \brief  Find a response within responses of a given action.
      *  \param  transaction  A transaction to check.
      *  \param  response A response to look for.
      *  \return Iterator pointing to the matching response within given method requests.

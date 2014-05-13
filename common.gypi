@@ -33,11 +33,14 @@
             'MinimalRebuild': 'false',
             'OmitFramePointers': 'false',
             'BasicRuntimeChecks': 3, # /RTC1
-            'RuntimeTypeInfo': 'false',
+            'RuntimeTypeInfo':  'true', # /GR, determine object type at runtime
+            'DebugInformationFormat': 3, # /Zi, use program database as debugging information
             'ExceptionHandling': 1            
           },
           'VCLinkerTool': {
             'LinkIncremental': 2, # enable incremental linking
+            'GenerateDebugInformation': 'true', # /DEBUG enable line by line debugging
+            'SubSystem': 1 # /SUBSYSTEM:CONSOLE use console as native environment
           },
         },
         'xcode_settings': {
@@ -60,7 +63,7 @@
             'OmitFramePointers': 'true',
             'EnableFunctionLevelLinking': 'true',
             'EnableIntrinsicFunctions': 'true',
-            'RuntimeTypeInfo': 'false',
+            'RuntimeTypeInfo': 'true', # /GR, determine object type at runtime
             'ExceptionHandling': 1,
             'AdditionalOptions': [
               '/MP', # compile across multiple CPUs
@@ -76,6 +79,7 @@
             'OptimizeReferences': 2, # /OPT:REF
             'EnableCOMDATFolding': 2, # /OPT:ICF
             'LinkIncremental': 1, # disable incremental linking
+            'SubSystem': 1 # /SUBSYSTEM:CONSOLE use console as native environment
           }
         }
       }

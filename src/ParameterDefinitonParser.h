@@ -462,6 +462,10 @@ namespace snowcrash {
                                                         EmptyDefinitionWarning,
                                                         sourceBlock));
             }
+
+            if((!parameter.exampleValue.empty() || !parameter.defaultValue.empty()) && !parameter.values.empty()) {
+                CheckExampleAndDefaultValue(section, sectionCur, parser, parameter, result);
+            }
             
             endCur = CloseList(sectionCur, section.bounds.second);
             result.second = endCur;
@@ -515,6 +519,47 @@ namespace snowcrash {
             
             result.second = sectionCur;
             return result;
+        }
+        
+        static void CheckExampleAndDefaultValue(const BlueprintSection& section,
+                                                const BlockIterator& cur,
+                                                const BlueprintParserCore& parser,
+                                                const Parameter& parameter,
+                                                ParseSectionResult& result) {
+
+            bool isExampleFound = false;
+            bool isDefaultFound = false;
+
+            for (Collection<Value>::const_iterator it = parameter.values.begin(); it != parameter.values.end(); ++it){
+                if(parameter.exampleValue == *it) {
+                    isExampleFound = true;
+                }
+                if(parameter.defaultValue == *it) {
+                    isDefaultFound = true;
+                }
+            }
+
+            if(!parameter.exampleValue.empty() && !isExampleFound) {
+                // WARN: missing example in values.
+                std::stringstream ss;
+                ss << "the example value '" << parameter.exampleValue << "' of parameter '"<< parameter.name <<"' is not in its list of expected values";
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, section.bounds.second, section.bounds, parser.sourceData);
+                result.first.warnings.push_back(Warning(ss.str(),
+                                                LogicalErrorWarning,
+                                                sourceBlock));
+            }
+
+            if(!parameter.defaultValue.empty() && !isDefaultFound) {
+                // WARN: missing default in values.
+                std::stringstream ss;
+                ss << "the default value '" << parameter.defaultValue << "' of parameter '"<< parameter.name <<"' is not in its list of expected values";
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, section.bounds.second, section.bounds, parser.sourceData);
+                result.first.warnings.push_back(Warning(ss.str(),
+                                                LogicalErrorWarning,
+                                                sourceBlock));
+            }
+
+            return;
         }
 
     };

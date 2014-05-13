@@ -48,7 +48,7 @@ namespace snowcrash {
     };
     
     
-    // Checks wheter given source data represents reference to a symbol returning true if so,
+    // Checks whether given source data represents reference to a symbol returning true if so,
     // false otherwise. If source data is represent reference referred symbol name is filled in.
     FORCEINLINE bool GetSymbolReference(const SourceData& sourceData,
                                         SymbolName& referredSymbol) {

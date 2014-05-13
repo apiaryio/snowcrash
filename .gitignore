@@ -41,6 +41,9 @@ tmp/
 
 # Ruby
 .bundle/
+features/support/env-win.rb
 
-
-
+# Eclipse specific
+.cproject
+.project
+.settings
