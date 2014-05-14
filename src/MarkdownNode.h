@@ -11,6 +11,7 @@
 
 #include <deque>
 #include <memory>
+#include <iostream>
 #include "ByteBuffer.h"
 
 namespace mdp {
@@ -35,7 +36,8 @@ namespace mdp {
 
     /* Forward declaration of AST Node */
     class MarkdownNode;
-    
+
+    /** Markdown AST nodes collection */
     typedef std::deque<MarkdownNode> MarkdownNodes;
     
     /**
@@ -86,10 +88,16 @@ namespace mdp {
         /** Destructor */
         ~MarkdownNode();
         
+        /** Prints the node to the stdout */
+        void printNode(size_t level = 0) const;
+        
     private:
         MarkdownNode* m_parent;
         std::auto_ptr<MarkdownNodes> m_children;
     };
+    
+    /** Markdown AST nodes collection iterator */
+    typedef MarkdownNodes::iterator MarkdownNodeIterator;
 }
 
 #endif

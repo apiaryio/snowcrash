@@ -9,10 +9,10 @@
 /* Begin PBXBuildFile section */
 		BB2672EE19067E6A0053EEFA /* ByteBuffer.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB2672ED19067E6A0053EEFA /* ByteBuffer.cc */; };
 		BB2672F019067EA90053EEFA /* test-ByteBuffer.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB2672EF19067EA90053EEFA /* test-ByteBuffer.cc */; };
+		BB8C3E6C1923F04E00EF36FA /* libmarkdownparser.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBAE529B18FEBFAE00D98223 /* libmarkdownparser.a */; };
 		BB955A44190119CE006684B8 /* ByteBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = BB955A43190119CE006684B8 /* ByteBuffer.h */; };
 		BB955A4619011A5F006684B8 /* MarkdownParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB955A4519011A5F006684B8 /* MarkdownParser.cc */; };
 		BB955A4819011A71006684B8 /* MarkdownParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BB955A4719011A71006684B8 /* MarkdownParser.h */; };
-		BB955A5A19012535006684B8 /* liblibmarkdownparser.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBAE529B18FEBFAE00D98223 /* liblibmarkdownparser.a */; };
 		BB955A5D190125CF006684B8 /* test-libmarkdownparser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB955A5B190125CF006684B8 /* test-libmarkdownparser.cc */; };
 		BB955A5E190125CF006684B8 /* test-MarkdownParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB955A5C190125CF006684B8 /* test-MarkdownParser.cc */; };
 		BBAE52B018FEC16B00D98223 /* autolink.c in Sources */ = {isa = PBXBuildFile; fileRef = BBAE52A518FEC16B00D98223 /* autolink.c */; };
@@ -37,7 +37,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		BB955A581901252D006684B8 /* PBXContainerItemProxy */ = {
+		BB8C3E6A1923F04100EF36FA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = BBAE529318FEBFAE00D98223 /* Project object */;
 			proxyType = 1;
@@ -67,7 +67,7 @@
 		BB955A4D19011E85006684B8 /* test-libmarkdownparser */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "test-libmarkdownparser"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB955A5B190125CF006684B8 /* test-libmarkdownparser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-libmarkdownparser.cc"; path = "test/test-libmarkdownparser.cc"; sourceTree = SOURCE_ROOT; };
 		BB955A5C190125CF006684B8 /* test-MarkdownParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = "test-MarkdownParser.cc"; path = "test/test-MarkdownParser.cc"; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
-		BBAE529B18FEBFAE00D98223 /* liblibmarkdownparser.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liblibmarkdownparser.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		BBAE529B18FEBFAE00D98223 /* libmarkdownparser.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libmarkdownparser.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BBAE52A518FEC16B00D98223 /* autolink.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = autolink.c; sourceTree = "<group>"; };
 		BBAE52A618FEC16B00D98223 /* autolink.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = autolink.h; sourceTree = "<group>"; };
 		BBAE52A718FEC16B00D98223 /* buffer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = buffer.c; sourceTree = "<group>"; };
@@ -94,7 +94,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BB955A5A19012535006684B8 /* liblibmarkdownparser.a in Frameworks */,
+				BB8C3E6C1923F04E00EF36FA /* libmarkdownparser.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -131,7 +131,7 @@
 		BBAE529C18FEBFAE00D98223 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				BBAE529B18FEBFAE00D98223 /* liblibmarkdownparser.a */,
+				BBAE529B18FEBFAE00D98223 /* libmarkdownparser.a */,
 				BB955A4D19011E85006684B8 /* test-libmarkdownparser */,
 			);
 			name = Products;
@@ -218,7 +218,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				BB955A591901252D006684B8 /* PBXTargetDependency */,
+				BB8C3E6B1923F04100EF36FA /* PBXTargetDependency */,
 			);
 			name = "test-libmarkdownparser";
 			productName = "test-libmarkdownparser";
@@ -239,7 +239,7 @@
 			);
 			name = libmarkdownparser;
 			productName = markdownparser;
-			productReference = BBAE529B18FEBFAE00D98223 /* liblibmarkdownparser.a */;
+			productReference = BBAE529B18FEBFAE00D98223 /* libmarkdownparser.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
@@ -302,10 +302,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		BB955A591901252D006684B8 /* PBXTargetDependency */ = {
+		BB8C3E6B1923F04100EF36FA /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = BBAE529A18FEBFAE00D98223 /* libmarkdownparser */;
-			targetProxy = BB955A581901252D006684B8 /* PBXContainerItemProxy */;
+			targetProxy = BB8C3E6A1923F04100EF36FA /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -313,6 +313,7 @@
 		BB955A5419011E85006684B8 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					CATCH_NO_EXCEPT,
@@ -325,6 +326,7 @@
 		BB955A5519011E85006684B8 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				GCC_PREPROCESSOR_DEFINITIONS = CATCH_NO_EXCEPT;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				USER_HEADER_SEARCH_PATHS = "./test/**";
@@ -335,8 +337,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
@@ -348,7 +348,6 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -356,7 +355,6 @@
 					"DEBUG=1",
 					"$(inherited)",
 				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -364,8 +362,6 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -373,8 +369,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
@@ -388,7 +382,6 @@
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -397,14 +390,13 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				SDKROOT = macosx;
 			};
 			name = Release;
 		};
 		BBAE52A018FEBFAE00D98223 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				EXECUTABLE_PREFIX = lib;
+				EXECUTABLE_PREFIX = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -412,7 +404,7 @@
 		BBAE52A118FEBFAE00D98223 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				EXECUTABLE_PREFIX = lib;
+				EXECUTABLE_PREFIX = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

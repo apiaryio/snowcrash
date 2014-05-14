@@ -80,3 +80,63 @@ const MarkdownNodes& MarkdownNode::children() const
     
     return *m_children;
 }
+
+void MarkdownNode::printNode(size_t level) const
+{
+    using std::cout;
+    for (size_t i = 0; i < level; ++i)
+        std::cout << "  ";
+    
+    cout << "+ ";
+    switch (type) {
+        case RootMarkdownNodeType:
+            cout << "root";
+            break;
+
+        case CodeMarkdownNodeType:
+            cout << "code";
+            break;
+            
+        case QuoteMarkdownNodeType:
+            cout << "quote";
+            break;
+
+        case HTMLMarkdownNodeType:
+            cout << "HTML";
+            break;
+
+        case HeaderMarkdownNodeType:
+            cout << "header";
+            break;
+
+        case HRuleMarkdownNodeType:
+            cout << "hrul";
+            break;
+
+        case ListItemMarkdownNodeType:
+            cout << "list item";
+            break;
+
+        case ParagraphMarkdownNodeType:
+            cout << "paragraph";
+            break;
+            
+        default:
+            cout << "undefined";
+            break;
+    }
+    
+    cout << " (type " << type << ", data " << data << ") - ";
+    cout << "`" << text << "` ";
+    cout << std::endl;
+    
+    for (MarkdownNodeIterator it = m_children->begin();
+         it != m_children->end();
+         ++it) {
+        it->printNode(level + 1);
+    }
+    
+    if (level == 0)
+        cout << std::endl << std::endl;
+}
+

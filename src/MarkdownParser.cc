@@ -57,6 +57,10 @@ void MarkdownParser::parse(const ByteBuffer& source, MarkdownNode& ast)
     m_workingNode = NULL;
     m_source = NULL;
     m_listBlockContext = false;
+    
+//#ifdef DEBUG
+    ast.printNode();
+//#endif
 }
 
 MarkdownParser::RenderCallbacks MarkdownParser::renderCallbacks()
@@ -122,12 +126,6 @@ void MarkdownParser::beginList(int flags)
 {
     if (!m_workingNode)
         throw NO_WORKING_NODE_ERR;
-    
-//    MarkdownNode node(ListMarkdownNodeType, m_workingNode, ByteBuffer(), flags);
-//    m_workingNode->children().push_back(node);
-//    
-//    // Push context
-//    m_workingNode = &m_workingNode->children().back();
 }
 
 void MarkdownParser::renderList(struct buf *ob, const struct buf *text, int flags, void *opaque)
@@ -141,17 +139,6 @@ void MarkdownParser::renderList(struct buf *ob, const struct buf *text, int flag
 
 void MarkdownParser::renderList(const ByteBuffer& text, int flags)
 {
-//    if (!m_workingNode)
-//        throw NO_WORKING_NODE_ERR;
-//    
-//    if (m_workingNode->type != ListMarkdownNodeType)
-//        throw WORKING_NODE_MISMATCH_ERR;
-//    
-//    m_workingNode->text = text;
-//    m_workingNode->data = flags;
-//    
-//    // Pop context
-//    m_workingNode = &m_workingNode->parent();
     m_listBlockContext = true;
 }
 
