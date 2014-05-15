@@ -5,45 +5,58 @@
   
   'targets' : [
     {
-      'target_name': 'sundown',
+      'target_name': 'libsundown',
       'type': 'static_library',
       'include_dirs': [
-        'sundown/src',
-        'sundown/html',
+        'ext/markdown-parser/ext/sundown/src',
+        'ext/markdown-parser/ext/sundown/html'
       ],
       'sources': [
-        'sundown/src/autolink.c',
-        'sundown/src/buffer.c',
-        'sundown/html/houdini_href_e.c',
-        'sundown/html/houdini_html_e.c',
-        'sundown/html/html.c',
-        'sundown/html/html_smartypants.c',
-        'sundown/src/markdown.c',
-        'sundown/src/stack.c',
-        'sundown/src/src_map.c'
+        'ext/markdown-parser/ext/sundown/src/autolink.c',
+        'ext/markdown-parser/ext/sundown/src/buffer.c',
+        'ext/markdown-parser/ext/sundown/src/markdown.c',
+        'ext/markdown-parser/ext/sundown/src/src_map.c',
+        'ext/markdown-parser/ext/sundown/src/stack.c',
+        'ext/markdown-parser/ext/sundown/html/houdini_href_e.c',
+        'ext/markdown-parser/ext/sundown/html/houdini_html_e.c',
+        'ext/markdown-parser/ext/sundown/html/html.c',
+        'ext/markdown-parser/ext/sundown/html/html_smartypants.c'
       ]
     },
+    {
+      'target_name': 'libmarkdownparser',
+      'type': 'static_library',
+      'include_dirs': [
+        'ext/markdown-parser/ext/sundown/src',
+        'ext/markdown-parser/ext/sundown/html'
+        'ext/markdown-parser/src',
+      ],
+      'sources': [
+        'ext/markdown-parser/src/ByteBuffer.cc',
+        'ext/markdown-parser/src/MarkdownNode.cc',
+        'ext/markdown-parser/src/MarkdownParser.cc'
+      ],
+      'dependencies': [
+          'libsundown'
+      ]      
+    },    
     {
       'target_name': 'libsnowcrash',
       'type': '<(libsnowcrash_type)',
       'include_dirs': [
         'src',
-        'sundown/src',
-        'sundown/src/html'
+        'ext/markdown-parser/src',
+        'ext/markdown-parser/ext/sundown/src',
+        'ext/markdown-parser/ext/sundown/html'
       ],
       'sources': [
         'src/HTTP.cc',
-        'src/MarkdownBlock.cc',
-        'src/MarkdownParser.cc',
-        'src/Parser.cc',
-        'src/ParserCore.cc',
-        'src/RegexMatch.h',
+        'src/Section.cc',
         'src/Serialize.cc',
-        'src/Serialize.h',
         'src/SerializeJSON.cc',
         'src/SerializeYAML.cc',
-	'src/UriParser.cc',
-        'src/snowcrash.cc',
+        'src/UriParser.cc',
+        'src/snowcrash.cc'
       ],
       'conditions': [
         [ 'OS=="win"', 
@@ -52,7 +65,7 @@
         ]
       ],
       'dependencies': [
-          'sundown'
+          'libmarkdownparser'
       ]
     },
     {
@@ -62,34 +75,18 @@
         'src',
         'test',
         'test/vendor/Catch/include',
-        'sundown/src',
-        'sundown/src/html'
+        'ext/markdown-parser/src',
+        'ext/markdown-parser/ext/sundown/src',
+        'ext/markdown-parser/ext/sundown/html'
       ],
       'sources': [
-        'test/test-ActionParser.cc',
         'test/test-AssetParser.cc',
         'test/test-Blueprint.cc',
-        'test/test-BlueprintParser.cc',
-        'test/test-HeaderParser.cc',
-        'test/test-Indentation.cc',
-        'test/test-ListUtility.cc',
-        'test/test-MarkdownBlock.cc',
-        'test/test-MarkdownParser.cc',
-        'test/test-ParameterDefinitonParser.cc',
-        'test/test-ParametersParser.cc',
-        'test/test-Parser.cc',
-        'test/test-PayloadParser.cc',
-        'test/test-RegexMatch.cc',
-        'test/test-ResouceGroupParser.cc',
-        'test/test-ResourceParser.cc',
-        'test/test-SymbolIdentifier.cc',
-        'test/test-SymbolTable.cc',
-        'test/test-Warnings.cc',
         'test/test-snowcrash.cc'
       ],
       'dependencies': [
         'libsnowcrash',
-        'sundown'
+        'libmarkdownparser'
       ]
     },
 
@@ -106,7 +103,7 @@
       ],
       'dependencies': [
         'libsnowcrash',
-        'sundown'
+        'libmarkdownparser'
       ]
     }
   ],
@@ -127,7 +124,7 @@
           ],
           'dependencies': [
             'libsnowcrash',
-            'sundown'
+            'libmarkdownparser'
           ]
         }
       ]

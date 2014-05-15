@@ -47,12 +47,14 @@ distclean:
 	rm -f ./config.gypi
 	rm -rf ./bin	
 
-test: test-libsnowcrash snowcrash
+# TODO: snowcrash temporary commented out
+# test: test-libsnowcrash snowcrash
+test: test-libsnowcrash
 	$(BUILD_DIR)/out/$(BUILDTYPE)/test-libsnowcrash
 
-ifdef INTEGRATION_TESTS
-	bundle exec cucumber
-endif	
+# ifdef INTEGRATION_TESTS
+# 	bundle exec cucumber
+# endif
 
 perf: perf-libsnowcrash
 	$(BUILD_DIR)/out/$(BUILDTYPE)/perf-libsnowcrash ./test/performance/fixtures/fixture-1.md

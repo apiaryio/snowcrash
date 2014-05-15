@@ -11,7 +11,7 @@
 
 #include<string>
 #include "Blueprint.h"
-#include "Parser.h"
+//#include "Parser.h"
 
 /**
  *  URI Parser Interface
