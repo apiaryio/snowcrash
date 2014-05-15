@@ -4,3 +4,6 @@
 [submodule "cmdline"]
 	path = cmdline
 	url = https://github.com/apiaryio/cmdline.git
+[submodule "ext/markdown-parser"]
+	path = ext/markdown-parser
+	url = https://github.com/apiaryio/markdown-parser.git

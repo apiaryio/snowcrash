@@ -48,7 +48,9 @@ distclean:
 	rm -f ./config.gypi
 	rm -rf ./bin
 
-test: test-libsnowcrash snowcrash
+# TODO: snowcrash temporary commented out
+# test: test-libsnowcrash snowcrash
+test: test-libsnowcrash
 	$(BUILD_DIR)/out/$(BUILDTYPE)/test-libsnowcrash
 
 ifdef INTEGRATION_TESTS
