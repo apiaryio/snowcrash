@@ -11,7 +11,7 @@
 using namespace mdp;
 
 MarkdownNode::MarkdownNode(MarkdownNodeType type_, MarkdownNode *parent_, const ByteBuffer& text_, const Data& data_)
-: type(type_), m_parent(parent_), text(text_), data(data_)
+: type(type_), text(text_), data(data_), m_parent(parent_)
 {
     m_children.reset(::new MarkdownNodes);
 }
