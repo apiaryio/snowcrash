@@ -8,6 +8,6 @@
 
 #define CATCH_CONFIG_MAIN // Let catch generate the main() for us.
 #include "catch.hpp"
-#include "Fixture.h"
+//#include "Fixture.h"
 
-const snowcrash::SourceData snowcrashtest::SourceDataFixture = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+//const snowcrash::SourceData snowcrashtest::SourceDataFixture = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
