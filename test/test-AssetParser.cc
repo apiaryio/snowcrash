@@ -92,8 +92,7 @@ TEST_CASE("Parse body asset followed by other blocks", "[payload][dangling]")
 }
  */
 
-
-TEST_CASE("Parse asset with a foreign block inside", "[asset][now]")
+TEST_CASE("Foreign block inside", "[asset]")
 {
     mdp::ByteBuffer source = BodyAssetFixture;
     source += \
@@ -110,123 +109,95 @@ TEST_CASE("Parse asset with a foreign block inside", "[asset][now]")
     REQUIRE(asset == "Lorem Ipsum\nHello World!\n");
 }
 
-//TEST_CASE("Parse body asset with foreign list item inside", "[asset][foreign]")
-//{
-//    MarkdownBlock::Stack markdown = CanonicalBodyAssetFixture();
-//    
-//    MarkdownBlock::Stack foreign;
-//    foreign.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-//    foreign.push_back(MarkdownBlock(ListItemBlockEndType, "Foreign", 0, MakeSourceDataBlock(5, 1)));
-//    
-//    MarkdownBlock::Stack::iterator pos = markdown.begin();
-//    std::advance(pos, 5);
-//    markdown.insert(pos, foreign.begin(), foreign.end());
-//    
-//    CHECK(markdown.size() == 8);
-//    
-//    Asset asset;
-//    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-//    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
-//    ParseSectionResult result = AssetParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, asset);
-//    
-//    REQUIRE(result.first.error.code == Error::OK);
-//    REQUIRE(result.first.warnings.empty());
-//    
-//    const MarkdownBlock::Stack &blocks = markdown;
-//    REQUIRE(std::distance(blocks.begin(), result.second) == 5);
-//    REQUIRE(asset == "Lorem Ipsum");
-//}
-//
-//TEST_CASE("aparser/parse-multiline-signature", "Parse body asset with multiple lines in its signagure")
-//{
-//    // Blueprint in question:
-//    //R"(
-//    //+ Body
-//    //  A
-//    //
-//    //          Lorem Ipsum
-//    //)";
-//    
-//    MarkdownBlock::Stack markdown = CanonicalBodyAssetFixture();
-//    
-//    REQUIRE(markdown.size() == 6);
-//    
-//    markdown[2].content = "Body\n  A\n";
-//    
-//    Asset asset;
-//    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-//    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
-//    ParseSectionResult result = AssetParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, asset);
-//    
-//    REQUIRE(result.first.error.code == Error::OK);
-//    CHECK(result.first.warnings.size() == 1); // expected code block
-//    
-//    const MarkdownBlock::Stack &blocks = markdown;
-//    REQUIRE(std::distance(blocks.begin(), result.second) == 6);
-//    REQUIRE(asset == "  A\nLorem Ipsum");
-//}
-//
-//TEST_CASE("aparser/parse-multipart", "Parse body asset composed from multiple blocks")
-//{
-//    // Blueprint in question:
-//    //R"(
-//    //+ Body
-//    //  A
-//    //
-//    //  B
-//    //
-//    //          Lorem Ipsum
-//    //)";
-//    
-//    MarkdownBlock::Stack markdown = CanonicalBodyAssetFixture();
-//    
-//    REQUIRE(markdown.size() == 6);
-//    
-//    markdown[2].content = "Body\n  A\n";
-//    
-//    MarkdownBlock foreign(ParagraphBlockType, "B", 0, MakeSourceDataBlock(4, 1));
-//    MarkdownBlock::Stack::iterator pos = markdown.begin();
-//    std::advance(pos, 3);
-//    markdown.insert(pos, 1, foreign);
-//    
-//    Asset asset;
-//    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-//    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
-//    ParseSectionResult result = AssetParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, asset);
-//    
-//    REQUIRE(result.first.error.code == Error::OK);
-//    CHECK(result.first.warnings.size() == 2); // expected code block
-//    
-//    const MarkdownBlock::Stack &blocks = markdown;
-//    REQUIRE(std::distance(blocks.begin(), result.second) == 7);
-//    REQUIRE(asset == "  A\n4Lorem Ipsum");
-//}
-//
-//TEST_CASE("aparser/fix-body-not-parsed", "Issue: Object payload body isn't parsed")
-//{
-//    // http://github.com/apiaryio/snowcrash/issues/6
-//    // NOTE: caused by extra spaces before the body
-//    //
-//    // Blueprint in question:
-//    //R"(
-//    //+    Body
-//    //
-//    //          Lorem Ipsum
-//    //");
-//    
-//    MarkdownBlock::Stack markdown = CanonicalBodyAssetFixture();
-//    markdown[2].content = "   Body";
-//    
-//    Asset asset;
-//    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-//    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
-//    ParseSectionResult result = AssetParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, asset);
-//    
-//    REQUIRE(result.first.error.code == Error::OK);
-//    CHECK(result.first.warnings.empty());
-//    
-//    const MarkdownBlock::Stack &blocks = markdown;
-//    REQUIRE(std::distance(blocks.begin(), result.second) == 6);
-//    REQUIRE(asset == "Lorem Ipsum");
-//}
-//
+TEST_CASE("Nested list block inside", "[asset]")
+{
+    mdp::ByteBuffer source = BodyAssetFixture;
+    source += \
+    "\n"\
+    "    + Hello World!\n";
+    
+    Asset asset;
+    Report report;
+    SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, report, asset);
+    
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(report.warnings[0].code == IndentationWarning);
+    REQUIRE(asset == "Lorem Ipsum\n+ Hello World!\n");
+}
+
+TEST_CASE("Multiline signature", "[asset]")
+{
+    mdp::ByteBuffer source = \
+    "+ Body\n"
+    "  Multiline Signature Content\n"\
+    "\n"\
+    "        Hello World!\n";
+    
+    Asset asset;
+    Report report;
+    SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, report, asset);
+    
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(report.warnings[0].code == IndentationWarning);
+    REQUIRE(asset == "Multiline Signature Content\nHello World!\n");
+}
+
+TEST_CASE("Multiple blocks", "[asset]")
+{
+    mdp::ByteBuffer source = \
+    "+ Body\n"\
+    "\n"\
+    "    Block 1\n"\
+    "\n"\
+    "        Block 2\n"\
+    "\n"\
+    "    Block 3\n";
+    
+    Asset asset;
+    Report report;
+    SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, report, asset);
+    
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 2);
+    REQUIRE(report.warnings[0].code == IndentationWarning);
+    REQUIRE(report.warnings[1].code == IndentationWarning);
+    REQUIRE(asset == "Block 1\n\nBlock 2\nBlock 3\n");
+}
+
+TEST_CASE("Extra spaces before signature", "[asset]")
+{
+    mdp::ByteBuffer source = \
+    "+   Body\n"\
+    "\n"\
+    "        Lorem Ipsum\n";
+    
+    Asset asset;
+    Report report;
+    SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, report, asset);
+    
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.empty());
+    REQUIRE(asset == "Lorem Ipsum\n");
+}
+
+TEST_CASE("Asset parser greediness", "[asset]")
+{
+    mdp::ByteBuffer source = BodyAssetFixture;
+    source +=\
+    "\n"\
+    "+ Another Block\n";
+    
+    Asset asset;
+    Report report;
+    SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, report, asset);
+    
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.empty());
+    REQUIRE(asset == "Lorem Ipsum\n");
+}
+
+// TODO: Superfluous indentation check
+
+

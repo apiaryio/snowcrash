@@ -11,6 +11,7 @@
 
 #include <sstream>
 #include "Section.h"
+#include "StringUtility.h"
 
 namespace snowcrash {
     
@@ -23,7 +24,7 @@ namespace snowcrash {
          *  \return Indentation level (number of tabs) for a block to be
          *          considered a pre-formatted code block in given section.
          */
-        static size_t CodeBlockIndentationLevel(const SectionType& type)
+        static size_t codeBlockIndentationLevel(const SectionType& type)
         {
             if (type == BlueprintSectionType ||
                 type == ResourceGroupSectionType ||
@@ -47,27 +48,28 @@ namespace snowcrash {
         }
         
         /**
-         *  Retrieves the textual content of a Markdown node as if it was a code block.
-         *
-         *  
+         *  \brief  Retrieve the textual content of a Markdown node as if it was a code block.
+         *  \param  pd      Parser status
+         *  \param  report  Report log
+         *  \param  conten  The content retrieved
          */
-        static void ContentAsCodeBlock(const MarkdownNodeIterator& node,
+        static void contentAsCodeBlock(const MarkdownNodeIterator& node,
                                        SectionParserData& pd,
                                        Report& report,
                                        mdp::ByteBuffer& content) {
             
             if (node->type == mdp::CodeMarkdownNodeType) {
-                content = node->text;
+                content += node->text;
 
                 // TODO: Check for excessive indentation
                 return;
             }
             
             // Other blocks, process & warn
-            content = mdp::MapBytesRangeSet(node->sourceMap, pd.sourceData);
-            size_t level = CodeBlockIndentationLevel(pd.parentSectionContext());
-            
+            content += mdp::MapBytesRangeSet(node->sourceMap, pd.sourceData);
+
             // WARN: Not a preformatted code block
+            size_t level = codeBlockIndentationLevel(pd.parentSectionContext());
             std::stringstream ss;
             ss << SectionName(pd.sectionContext());
             ss << " is expected to be a pre-formatted code block, every of its line indented by exactly ";
@@ -79,84 +81,39 @@ namespace snowcrash {
                                               sourceMap));
         }
         
-        /**
-         *  \brief  Parses given block as a preformatted code block.
-         *  \param  section     Actual section being parsed.
-         *  \param  cur         Cursor within the section boundaries.
-         *  \param  parser      Parser instance.
-         *  \param  action      An output data buffer.
-         *  \param  sourceMap   An output source map buffer.
-         *  \return A block parser section result, pointing at the last block parsed.
-         */
-//        template <class T>
-//        ParseSectionResult ProcessAsCodeBlock(const BlueprintSection& section,
-//                                            const BlockIterator& cur,
-//                                            BlueprintParserCore& parser,
-//                                            SourceData& data,
-//                                            SourceDataBlock& sourceMap) {
-//            
-//            ParseSectionResult result = std::make_pair(Result(), cur);
-//            BlockIterator sectionCur = cur;
-//            std::stringstream dataStream;
-//            
-//            if (sectionCur->type == CodeBlockType) {
-//                // Well formatted content, stream it up
-//                dataStream << sectionCur->content;
-//                
-//                // Check for excessive indentation
-//                CheckCodeBlockListItem<T>(section, sectionCur, parser.sourceData, result.first);
-//            }
-//            else {
-//                // Other blocks, process & warn
-//                if (sectionCur->type == QuoteBlockBeginType) {
-//                    sectionCur = SkipToClosingBlock(sectionCur, section.bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
-//                }
-//                else if (sectionCur->type == ListBlockBeginType) {
-//                    sectionCur = SkipToClosingBlock(sectionCur, section.bounds.second, ListBlockBeginType, ListBlockEndType);
-//                }
-//                else if (sectionCur->type == ListItemBlockBeginType) {
-//                    sectionCur = SkipToClosingBlock(sectionCur, section.bounds.second, ListItemBlockBeginType, ListItemBlockEndType);
-//                }
-//                
-//                if (!CheckCursor(section, sectionCur, parser.sourceData, result.first))
-//                    return result;
-//                dataStream << MapSourceData(parser.sourceData, sectionCur->sourceMap);
-//                
-//                // WARN: Not a preformatted code block
-//                std::stringstream ss;
-//                
-//                // Build the warning message
-//                size_t level = CodeBlockIndentationLevel(section);
-//                if (section.type == DanglingBodySectionType ||
-//                    section.type == DanglingSchemaSectionType) {
-//                    
-//                    ss << "dangling " << SectionName(section.type) << " asset, ";
-//                    ss << "expected a pre-formatted code block, indent every of its line by ";
-//                    ss << level * 4 << " spaces or " << level << " tabs";
-//                }
-//                else {
-//                    
-//                    ss << SectionName(section.type) << " asset ";
-//                    ss << "is expected to be a pre-formatted code block, every of its line indented by exactly ";
-//                    ss << level * 4 << " spaces or " << level << " tabs";
-//                }
-//                
-//                SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, cur, section.bounds, parser.sourceData);
-//                result.first.warnings.push_back(Warning(ss.str(),
-//                                                        IndentationWarning,
-//                                                        sourceBlock));
-//            }
-//            
-//            data = dataStream.str();
-//            sourceMap = sectionCur->sourceMap;
-//            
-//            if (sectionCur != section.bounds.second)
-//                result.second = ++sectionCur;
-//            
-//            return result;
-//        }
+        /** \brief  Retrieve the textual content of a signature markdown */
+        static void signatureContentAsCodeBlock(const MarkdownNodeIterator& node,
+                                                SectionParserData& pd,
+                                                Report& report,
+                                                mdp::ByteBuffer& content) {
+            
+            //std::string content;
+            mdp::ByteBuffer remainingContent;
+            GetFirstLine(node->text, remainingContent);
+            
+            if (remainingContent.empty())
+                return;
+            
+            content += remainingContent;
+            content += "\n";
+            
+            // WARN: Not a preformatted code block but multiline signature
+            size_t level = codeBlockIndentationLevel(pd.parentSectionContext());
+            std::stringstream ss;
+            ss << SectionName(pd.sectionContext());
+            ss << " is expected to be a pre-formatted code block, separate it by a newline and ";
+            ss << "indent every of its line by ";
+            ss << level * 4 << " spaces or " << level << " tabs";
+            
+            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+            report.warnings.push_back(Warning(ss.str(),
+                                              IndentationWarning,
+                                              sourceMap));
+        }
     };
-    
+}
+
+
 //    /**
 //     *  \brief Check code block for potential excessive indentation of a list item.
 //     *  \return True if code block does not contain potential recognized list, false otherwise.
@@ -220,8 +177,6 @@ namespace snowcrash {
 //        
 //        return true;
 //    }
-    
 
-}
 
 #endif
