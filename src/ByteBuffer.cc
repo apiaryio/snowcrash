@@ -30,7 +30,8 @@ static size_t strnlen_utf8(const char* s, size_t len)
 /* Convert range of bytes to a range of characters */
 static CharactersRange BytesRangeToCharactersRange(const BytesRange& bytesRange, const ByteBuffer& byteBuffer)
 {
-    if (byteBuffer.empty())
+    if (byteBuffer.empty() ||
+        bytesRange.location + bytesRange.length > byteBuffer.length())
         return CharactersRange();
     
     size_t charLocation = 0;
@@ -68,7 +69,7 @@ ByteBuffer mdp::MapBytesRangeSet(const BytesRangeSet& rangeSet, const ByteBuffer
         
         if (it->location + it->length > length) {
             // Sundown adds an extra newline on the source input if needed.
-            if (it->location + it->length - length) {
+            if (it->location + it->length - length == 1) {
                 s << byteBuffer.substr(it->location, length - it->location);
                 return s.str();
             }
