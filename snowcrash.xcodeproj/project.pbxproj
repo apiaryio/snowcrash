@@ -10,6 +10,7 @@
 		BB05B9D81804493500243E1B /* perf-snowcrash.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB05B9D71804493500243E1B /* perf-snowcrash.cc */; };
 		BB05B9D918044C8200243E1B /* libsnowcrash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBFF4898170B34E6001E5FB2 /* libsnowcrash.a */; };
 <<<<<<< HEAD
+<<<<<<< HEAD
 		BB1112C7196A8882000F5224 /* test-UriTemplateParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB1112C5196A8870000F5224 /* test-UriTemplateParser.cc */; };
 		BB1112CA196A8892000F5224 /* UriTemplateParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB1112C8196A8892000F5224 /* UriTemplateParser.cc */; };
 		BB1112CB196A8892000F5224 /* UriTemplateParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BB1112C9196A8892000F5224 /* UriTemplateParser.h */; };
@@ -20,6 +21,9 @@
 		BB45781E182326EE00D0293A /* test-Indentation.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB45781D182326EE00D0293A /* test-Indentation.cc */; };
 =======
 >>>>>>> c3bc7b3... Parser refactor orgin
+=======
+		BB088F78192D7901003AA95C /* SectionParserData.h in Headers */ = {isa = PBXBuildFile; fileRef = BB088F77192D7901003AA95C /* SectionParserData.h */; };
+>>>>>>> ae317d7... Reporting & section context parser data origin
 		BB4D8E57172D15CA0024EB04 /* libsnowcrash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBFF4898170B34E6001E5FB2 /* libsnowcrash.a */; };
 		BB65939117845C2D00321230 /* RegexMatch.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB0F4271731CE0D00C92465 /* RegexMatch.cc */; };
 <<<<<<< HEAD
@@ -140,9 +144,14 @@
 		BB05B9CE180448E300243E1B /* perf-libsnowcrash */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "perf-libsnowcrash"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB05B9D71804493500243E1B /* perf-snowcrash.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "perf-snowcrash.cc"; path = "test/performance/perf-snowcrash.cc"; sourceTree = SOURCE_ROOT; };
 		BB0793BE1782C773005BB7CC /* Platform.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Platform.h; path = src/Platform.h; sourceTree = "<group>"; };
+<<<<<<< HEAD
 		BB1112C5196A8870000F5224 /* test-UriTemplateParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-UriTemplateParser.cc"; path = "test/test-UriTemplateParser.cc"; sourceTree = "<group>"; };
 		BB1112C8196A8892000F5224 /* UriTemplateParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UriTemplateParser.cc; path = src/UriTemplateParser.cc; sourceTree = "<group>"; };
 		BB1112C9196A8892000F5224 /* UriTemplateParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UriTemplateParser.h; path = src/UriTemplateParser.h; sourceTree = "<group>"; };
+=======
+		BB088F76192D289C003AA95C /* snowcrashtest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = snowcrashtest.h; path = test/snowcrashtest.h; sourceTree = "<group>"; };
+		BB088F77192D7901003AA95C /* SectionParserData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SectionParserData.h; path = src/SectionParserData.h; sourceTree = "<group>"; };
+>>>>>>> ae317d7... Reporting & section context parser data origin
 		BB1865C71764D67B00756B18 /* SymbolTable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = SymbolTable.h; path = src/SymbolTable.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BB1865C81764DB8A00756B18 /* test-SymbolTable.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-SymbolTable.cc"; path = "test/test-SymbolTable.cc"; sourceTree = "<group>"; };
 		BB1D4D07174D0828009BCB1C /* HeaderParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = HeaderParser.h; path = src/HeaderParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
@@ -323,6 +332,7 @@
 			isa = PBXGroup;
 			children = (
 				BB4843D4174E30CF00F61291 /* Fixture.h */,
+				BB088F76192D289C003AA95C /* snowcrashtest.h */,
 				BB50F0BC17D1DC9B0002C363 /* test-ActionParser.cc */,
 				BB3DD974174654FD004C4077 /* test-AssetParser.cc */,
 				BBFF48D7170C57F1001E5FB2 /* test-Blueprint.cc */,
@@ -380,6 +390,7 @@
 				BB8C3E7319241C1600EF36FA /* Section.cc */,
 				BB8C3E641923D83C00EF36FA /* Section.h */,
 				BB8C3E621923D6FE00EF36FA /* SectionParser.h */,
+				BB088F77192D7901003AA95C /* SectionParserData.h */,
 				BB8C3E611923D45700EF36FA /* SectionProcessor.h */,
 				BBC2D8651831A76100FBCEA7 /* SectionUtility.h */,
 				BBE5355E174132B100BCA7AD /* Serialize.cc */,
@@ -392,7 +403,11 @@
 				BBCEF19318FBF7E200A0FA24 /* snowcrash */,
 =======
 				BB8C3E721924192600EF36FA /* Signature.h */,
+<<<<<<< HEAD
 >>>>>>> c3bc7b3... Parser refactor orgin
+=======
+				BBCEF19318FBF7E200A0FA24 /* snowcrash */,
+>>>>>>> ae317d7... Reporting & section context parser data origin
 				BBFF48CC170B3EDE001E5FB2 /* snowcrash.cc */,
 				BBFF48D1170B4224001E5FB2 /* snowcrash.h */,
 				BB6A9A7F17904C7300B2F283 /* SourceAnnotation.h */,
@@ -402,10 +417,13 @@
 				BB1112C9196A8892000F5224 /* UriTemplateParser.h */,
 				BBCEF19118FBF7B000A0FA24 /* Version.h */,
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 				BB89458B17817B240079084F /* posix */,
 				BBCEF19318FBF7E200A0FA24 /* snowcrash */,
 >>>>>>> c3bc7b3... Parser refactor orgin
+=======
+>>>>>>> ae317d7... Reporting & section context parser data origin
 				BB89458E17817B720079084F /* win */,
 			);
 			name = src;
@@ -440,7 +458,11 @@
 				BB8C3E651923D83C00EF36FA /* Section.h in Headers */,
 				BBE53561174132B100BCA7AD /* Serialize.h in Headers */,
 				BBE53562174132B100BCA7AD /* SerializeJSON.h in Headers */,
+<<<<<<< HEAD
 				BB6902A6196AAB1200B7DF76 /* CBlueprint.h in Headers */,
+=======
+				BB088F78192D7901003AA95C /* SectionParserData.h in Headers */,
+>>>>>>> ae317d7... Reporting & section context parser data origin
 				BBC2D86318316DC000FBCEA7 /* ListBlockUtility.h in Headers */,
 				BBE53563174132B100BCA7AD /* SerializeYAML.h in Headers */,
 			);
