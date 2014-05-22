@@ -45,15 +45,6 @@ namespace snowcrash {
         return TrimStringStart(TrimStringEnd(s));
     }
     
-    // Retrieve first line of given string
-    inline std::string GetFirstLine(const std::string& s) {
-        std::string::size_type pos = s.find("\n");
-        if (pos == std::string::npos)
-            return s;
-        else
-            return s.substr(0, pos);
-    }
-    
     // Split string by delim
     inline std::vector<std::string>& Split(const std::string& s, char delim, std::vector<std::string>& elems) {
         std::stringstream ss(s);
@@ -85,7 +76,6 @@ namespace snowcrash {
         return elems;
     }
     
-    
     /**
      *  \brief  Replace all occurrences of a string.
      *  \param  s       A string to search in.
@@ -103,6 +93,22 @@ namespace snowcrash {
             pos += replace.length();
         }
         return target;
+    }
+    
+    /**
+     *  \brief  Extract the first line from a string.
+     *  
+     *  \param  s   Subject of the extraction
+     *  \param  r   Remaining content aftert the extraction
+     *  \return First line from the subject string
+     */
+    inline std::string GetFirstLine(const std::string& s, std::string& r){
+        std::vector<std::string> elem = SplitOnFirst(s, '\n');
+        if (elem.empty())
+            return std::string();
+        if (elem.size() > 1)
+            r = elem.back();
+        return elem.front();
     }
 }
 
