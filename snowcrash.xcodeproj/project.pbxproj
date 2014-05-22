@@ -122,7 +122,6 @@
 		BB50F0BC17D1DC9B0002C363 /* test-ActionParser.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = "test-ActionParser.cc"; path = "test/test-ActionParser.cc"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		BB6A9A7F17904C7300B2F283 /* SourceAnnotation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = SourceAnnotation.h; path = src/SourceAnnotation.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BB810F771779AB2F00B89CD8 /* cmdline.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = cmdline.h; path = cmdline/cmdline.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
-		BB89458C17817B5B0079084F /* RegexMatch.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RegexMatch.cc; path = src/win/RegexMatch.cc; sourceTree = "<group>"; };
 		BB8AEFD717D899B900298807 /* test-ListUtility.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-ListUtility.cc"; path = "test/test-ListUtility.cc"; sourceTree = "<group>"; };
 		BB8C3E611923D45700EF36FA /* SectionProcessor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SectionProcessor.h; path = src/SectionProcessor.h; sourceTree = "<group>"; };
 		BB8C3E621923D6FE00EF36FA /* SectionParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SectionParser.h; path = src/SectionParser.h; sourceTree = "<group>"; };
@@ -219,6 +218,14 @@
 			path = "perf-snowcrash";
 			sourceTree = "<group>";
 		};
+		BB088F7B192EABEA003AA95C /* snowcrash */ = {
+			isa = PBXGroup;
+			children = (
+				BBA25670172BFEB800C1AD5E /* snowcrash.cc */,
+			);
+			name = snowcrash;
+			sourceTree = "<group>";
+		};
 		BB810F781779AB5400B89CD8 /* cmdline */ = {
 			isa = PBXGroup;
 			children = (
@@ -227,36 +234,13 @@
 			name = cmdline;
 			sourceTree = "<group>";
 		};
-		BB89458B17817B240079084F /* posix */ = {
-			isa = PBXGroup;
-			children = (
-				BBB0F4271731CE0D00C92465 /* RegexMatch.cc */,
-			);
-			name = posix;
-			sourceTree = "<group>";
-		};
-		BB89458E17817B720079084F /* win */ = {
-			isa = PBXGroup;
-			children = (
-				BB89458C17817B5B0079084F /* RegexMatch.cc */,
-			);
-			name = win;
-			sourceTree = "<group>";
-		};
-		BBCEF19318FBF7E200A0FA24 /* snowcrash */ = {
-			isa = PBXGroup;
-			children = (
-				BBA25670172BFEB800C1AD5E /* snowcrash.cc */,
-			);
-			name = snowcrash;
-			sourceTree = "<group>";
-		};
 		BBFF488F170B34E6001E5FB2 = {
 			isa = PBXGroup;
 			children = (
 				BB8C3E701923F09900EF36FA /* libmarkdownparser.a */,
 				BB810F781779AB5400B89CD8 /* cmdline */,
-				BBFF48CB170B3ECB001E5FB2 /* src */,
+				BBFF48CB170B3ECB001E5FB2 /* libsnowcrash */,
+				BB088F7B192EABEA003AA95C /* snowcrash */,
 				BBFF48B9170B3AF6001E5FB2 /* test-libsnowcrash */,
 				BB05B9CF180448E300243E1B /* perf-libsnowcrash */,
 				BBFF4899170B34E6001E5FB2 /* Products */,
@@ -302,7 +286,7 @@
 			name = "test-libsnowcrash";
 			sourceTree = "<group>";
 		};
-		BBFF48CB170B3ECB001E5FB2 /* src */ = {
+		BBFF48CB170B3ECB001E5FB2 /* libsnowcrash */ = {
 			isa = PBXGroup;
 			children = (
 				BB50F0BB17D1DB4D0002C363 /* ActionParser.h */,
@@ -322,7 +306,7 @@
 				BB03DC6417D3717B00C51E52 /* ParametersParser.h */,
 				BBE5705F173927870086CE22 /* PayloadParser.h */,
 				BB0793BE1782C773005BB7CC /* Platform.h */,
-				BB89458B17817B240079084F /* posix */,
+				BBB0F4271731CE0D00C92465 /* RegexMatch.cc */,
 				BBB0F4281731CE0D00C92465 /* RegexMatch.h */,
 				BBD5F9C717353C300049BBEE /* ResourceGroupParser.h */,
 				BBD5F9CC17353CE00049BBEE /* ResourceParser.h */,
@@ -339,7 +323,6 @@
 				BBE53560174132B100BCA7AD /* SerializeYAML.cc */,
 				BBE5355D174132B100BCA7AD /* SerializeYAML.h */,
 				BB8C3E721924192600EF36FA /* Signature.h */,
-				BBCEF19318FBF7E200A0FA24 /* snowcrash */,
 				BBFF48CC170B3EDE001E5FB2 /* snowcrash.cc */,
 				BBFF48D1170B4224001E5FB2 /* snowcrash.h */,
 				BB6A9A7F17904C7300B2F283 /* SourceAnnotation.h */,
@@ -348,9 +331,8 @@
 				BBED046018C7D31700961A5C /* UriParser.cc */,
 				BBED046118C7D31700961A5C /* UriParser.h */,
 				BBCEF19118FBF7B000A0FA24 /* Version.h */,
-				BB89458E17817B720079084F /* win */,
 			);
-			name = src;
+			name = libsnowcrash;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

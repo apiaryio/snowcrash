@@ -9,7 +9,6 @@
 #ifndef SNOWCRASH_SECTIONPARSERDATA_H
 #define SNOWCRASH_SECTIONPARSERDATA_H
 
-#include "MarkdownNode.h"
 #include "Blueprint.h"
 #include "Section.h"
 //#include "SymbolTable.h"
