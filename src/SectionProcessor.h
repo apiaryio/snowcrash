@@ -9,9 +9,7 @@
 #ifndef SNOWCRASH_SECTIONPROCESSOR_H
 #define SNOWCRASH_SECTIONPROCESSOR_H
 
-#include "MarkdownNode.h"
-#include "Section.h"
-#include "Signature.h"
+#include "SectionParserData.h"
 #include "SourceAnnotation.h"
 
 namespace snowcrash {
@@ -38,24 +36,32 @@ namespace snowcrash {
         /**
          *  \brief Process section signature Markdown node
          *  \param node     Node to process
+         *  \param pd       Section parser state
+         *  \param report   Process log report
          *  \param out      Processed output
          *  \return Result of the process operation
          */
         static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
-                                       T& out) {
+                                                     SectionParserData& pd,
+                                                     Report& report,
+                                                     T& out) {
             return ++MarkdownNodeIterator(node);
         }
 
         /** Process section description Markdown node */
         static MarkdownNodeIterator processDescription(const MarkdownNodeIterator& node,
-                                         T& out) {
+                                                       SectionParserData& pd,
+                                                       Report& report,
+                                                       T& out) {
             out.description += node->text;
             return ++MarkdownNodeIterator(node);
         }
         
         /** Process section-specific content Markdown node */
         static MarkdownNodeIterator processContent(const MarkdownNodeIterator& node,
-                                     T& out) {
+                                                   SectionParserData& pd,
+                                                   Report& report,
+                                                   T& out) {
             return ++MarkdownNodeIterator(node);
         }
         
@@ -63,20 +69,24 @@ namespace snowcrash {
          *  \brief Process nested sections Markdown node(s)
          *  \param node     Node to process
          *  \param siblings Siblings of the node being processed
-         *  \param SectionType  Type of the nested section to process
+         *  \param pd       Section parser state
+         *  \param report   Process log report
          *  \param out      Processed output
          */
         static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
-                                           const MarkdownNodes& siblings,
-                                           SectionType& type,
-                                           T& out) {
+                                                         const MarkdownNodes& siblings,
+                                                         SectionParserData& pd,
+                                                         Report& report,
+                                                         T& out) {
             return node;
         }
         
         /** Process unexpected Markdown node */
         static MarkdownNodeIterator processUnexpectedNode(const MarkdownNodeIterator& node,
-                                            const MarkdownNodes& siblings,
-                                            T& out) {
+                                                          const MarkdownNodes& siblings,
+                                                          SectionParserData& pd,
+                                                          Report& report,
+                                                          T& out) {
             return ++MarkdownNodeIterator(node);
         }
         

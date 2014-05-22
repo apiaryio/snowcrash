@@ -9,54 +9,10 @@
 #ifndef SNOWCRASH_SECTIONPARSER_H
 #define SNOWCRASH_SECTIONPARSER_H
 
-//#include <algorithm>
-//#include <sstream>
-
-#include "Blueprint.h"
 #include "SectionProcessor.h"
-//#include "SymbolTable.h"
 
 namespace snowcrash {
 
-    /**
-     *  \brief Blueprint Parser Options.
-     *
-     *  Controls blueprint parser behavior.
-     */
-    enum BlueprintParserOption {
-        RenderDescriptionsOption = (1 << 0),    /// < Render Markdown in description.
-        RequireBlueprintNameOption = (1 << 1)   /// < Treat missing blueprint name as error
-    };
-    
-    typedef unsigned int BlueprintParserOptions;
-    
-    /**
-     *  Parser Data
-     */
-    struct ParserData {
-        ParserData(BlueprintParserOptions opts,
-                   const mdp::ByteBuffer& src,
-                   const Blueprint& bp)
-        : options(opts), sourceData(src), blueprint(bp) {}
-
-        /** Parser Options */
-        BlueprintParserOptions options;
-
-        /** Symbol Table */
-        //SymbolTable symbolTable;
-
-        /** Source Data */
-        const mdp::ByteBuffer& sourceData;
-
-        /** AST being parsed **/
-        const Blueprint& blueprint;
-
-    private:
-        ParserData();
-        ParserData(const ParserData&);
-        ParserData& operator=(const ParserData&);
-    };
-    
     /**
      *  Blueprint section parser
      */
@@ -73,7 +29,7 @@ namespace snowcrash {
          */
         static MarkdownNodeIterator parse(const MarkdownNodeIterator& node,
                                           const MarkdownNodes& siblings,
-                                          const ParserData& pd,
+                                          SectionParserData& pd,
                                           Report& report,
                                           T& out) {
             
@@ -82,7 +38,7 @@ namespace snowcrash {
             
             // Signature node
             MarkdownNodeIterator lastCur = cur;
-            cur = SectionProcessor<T>::processSignature(cur, out);
+            cur = SectionProcessor<T>::processSignature(cur, pd, report, out);
             if (lastCur == cur)
                 return Adapter::nextStartingNode(node, siblings, cur);
             
@@ -91,7 +47,7 @@ namespace snowcrash {
                   SectionProcessor<T>::isDescriptionNode(cur)) {
                 
                 lastCur = cur;
-                cur = SectionProcessor<T>::processDescription(cur, out);
+                cur = SectionProcessor<T>::processDescription(cur, pd, report, out);
                 if (lastCur == cur)
                     return Adapter::nextStartingNode(node, siblings, cur);
             }
@@ -101,7 +57,7 @@ namespace snowcrash {
                   SectionProcessor<T>::isContentNode(cur)) {
                 
                 lastCur = cur;
-                cur = SectionProcessor<T>::processContent(cur, out);
+                cur = SectionProcessor<T>::processContent(cur, pd, report, out);
                 if (lastCur == cur)
                     return Adapter::nextStartingNode(node, siblings, cur);
             }
@@ -111,12 +67,17 @@ namespace snowcrash {
                 
                 lastCur = cur;
                 SectionType nested_type = SectionProcessor<T>::nestedSectionType(cur);
+                
+                pd.sectionsContext.push_back(nested_type);
+                
                 if (nested_type != UndefinedSectionType) {
-                    cur = SectionProcessor<T>::processNestedSection(cur, collection, nested_type, out);
+                    cur = SectionProcessor<T>::processNestedSection(cur, collection, pd, report, out);
                 }
                 else if (SectionProcessor<T>::isUnexpectedNode(cur)) {
-                    cur = SectionProcessor<T>::processUnexpectedNode(cur, collection, out);
+                    cur = SectionProcessor<T>::processUnexpectedNode(cur, collection, pd, report, out);
                 }
+                
+                pd.sectionsContext.pop_back();
                 
                 if (lastCur == cur)
                     break;
