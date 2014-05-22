@@ -11,6 +11,7 @@
 
 #include "SectionParser.h"
 #include "RegexMatch.h"
+#include "CodeBlockUtility.h"
 
 namespace snowcrash {
     
@@ -30,15 +31,22 @@ namespace snowcrash {
     struct SectionProcessor<Asset> : public SectionProcessorBase<Asset> {
         
         static MarkdownNodeIterator processDescription(const MarkdownNodeIterator& node,
+                                                       SectionParserData& pd,
+                                                       Report& report,
                                                        Asset& out) {
-            out += node->text;
-            return ++MarkdownNodeIterator(node);
+            return node;
         }
         
         static MarkdownNodeIterator processContent(const MarkdownNodeIterator& node,
+                                                   SectionParserData& pd,
+                                                   Report& report,
                                                    Asset& out) {
             
-            out += node->text;
+            
+            mdp::ByteBuffer content;
+            CodeBlockUtility::ContentAsCodeBlock(node, pd, report, content);
+            
+            out += content;
             return ++MarkdownNodeIterator(node);
         }
         

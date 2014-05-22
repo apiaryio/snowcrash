@@ -7,11 +7,11 @@
 //
 
 #include <iterator>
-#include "catch.hpp"
+#include "snowcrashtest.h"
 #include "AssetParser.h"
-#include "MarkdownParser.h"
 
 using namespace snowcrash;
+using namespace snowcrashtest;
 
 const mdp::ByteBuffer BodyAssetFixture = \
 "+ Body\n"\
@@ -21,7 +21,7 @@ const mdp::ByteBuffer BodyAssetFixture = \
 const mdp::ByteBuffer SchemaAssetFixture = \
 "+ Schema\n"\
 "\n"\
-"        Lorem Ipsum\n";
+"        Dolor Sit Amet\n";
 
 TEST_CASE("recognize explicit body signature", "[asset]")
 {
@@ -45,36 +45,37 @@ TEST_CASE("recognize schema signature", "[asset]")
 
 TEST_CASE("parse body asset", "[asset]")
 {
-    mdp::MarkdownParser markdownParser;
-    mdp::MarkdownNode markdownAST;
-    markdownParser.parse(BodyAssetFixture, markdownAST);
-    
-    REQUIRE(!markdownAST.children().empty());
-
-    Blueprint bp;
-    ParserData pd(0, mdp::ByteBuffer(), bp);
     Asset asset;
     Report report;
-    MarkdownNodeIterator cur = AssetParser::parse(markdownAST.children().begin(),
-                                                  markdownAST.children(),
-                                                  pd,
-                                                  report,
-                                                  asset);
-
-    REQUIRE(std::distance(markdownAST.children().begin(), cur) == 1);
+    SectionParserHelper<Asset, AssetParser>::parse(BodyAssetFixture, BodySectionType, report, asset);
     REQUIRE(asset == "Lorem Ipsum\n");
 }
 
 TEST_CASE("parse schema asset", "[asset]")
 {
+    Asset asset;
+    Report report;
+    SectionParserHelper<Asset, AssetParser>::parse(SchemaAssetFixture, SchemaSectionType, report, asset);
+    REQUIRE(asset == "Dolor Sit Amet\n");
+}
+
+// TODO: This test is for the payload parser instead.
+/*
+TEST_CASE("Parse body asset followed by other blocks", "[payload][dangling]")
+{
+    mdp::ByteBuffer source = BodyAssetFixture;
+    source += \
+    "\n"\
+    "Hello World!\n";
+    
     mdp::MarkdownParser markdownParser;
     mdp::MarkdownNode markdownAST;
-    markdownParser.parse(SchemaAssetFixture, markdownAST);
+    markdownParser.parse(source, markdownAST);
     
     REQUIRE(!markdownAST.children().empty());
     
     Blueprint bp;
-    ParserData pd(0, mdp::ByteBuffer(), bp);
+    ParserData pd(0, source, bp);
     Asset asset;
     Report report;
     MarkdownNodeIterator cur = AssetParser::parse(markdownAST.children().begin(),
@@ -83,55 +84,32 @@ TEST_CASE("parse schema asset", "[asset]")
                                                   report,
                                                   asset);
     
-    REQUIRE(std::distance(markdownAST.children().begin(), cur) == 1);
-    REQUIRE(asset == "Lorem Ipsum\n");
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 1);
+    // TODO: Test warning code
+    
+    REQUIRE(asset == "Lorem Ipsum\n\nHello World!\n");
+}
+ */
+
+
+TEST_CASE("Parse asset with a foreign block inside", "[asset][now]")
+{
+    mdp::ByteBuffer source = BodyAssetFixture;
+    source += \
+    "\n"\
+    "    Hello World!\n";
+    
+    Asset asset;
+    Report report;
+    SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, report, asset);
+    
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(report.warnings[0].code == IndentationWarning);
+    REQUIRE(asset == "Lorem Ipsum\nHello World!\n");
 }
 
-//TEST_CASE("Parse body asset followed by other blocks", "[asset][foreign][dangling]")
-//{
-//    MarkdownBlock::Stack markdown = CanonicalBodyAssetFixture();
-//    
-//    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Hello World", 0, MakeSourceDataBlock(4, 1)));
-//    
-//    CHECK(markdown.size() == 7);
-//    
-//    Asset asset;
-//    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-//    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
-//    ParseSectionResult result = AssetParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, asset);
-//    
-//    REQUIRE(result.first.error.code == Error::OK);
-//    REQUIRE(result.first.warnings.size() == 1);
-//    
-//    const MarkdownBlock::Stack &blocks = markdown;
-//    REQUIRE(std::distance(blocks.begin(), result.second) == 7);
-//    REQUIRE(asset == "Lorem Ipsum4");
-//}
-//
-//TEST_CASE("aparser/parse-foreign", "Parse body asset with foreign block inside")
-//{
-//    MarkdownBlock::Stack markdown = CanonicalBodyAssetFixture();
-//    
-//    MarkdownBlock foreign(ParagraphBlockType, "Hello World", 0, MakeSourceDataBlock(4, 1));
-//    MarkdownBlock::Stack::iterator pos = markdown.begin();
-//    std::advance(pos, 4);
-//    markdown.insert(pos, 1, foreign);
-//    
-//    CHECK(markdown.size() == 7);
-//    
-//    Asset asset;
-//    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-//    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
-//    ParseSectionResult result = AssetParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, asset);
-//    
-//    REQUIRE(result.first.error.code == Error::OK);
-//    CHECK(result.first.warnings.size() == 1);
-//    
-//    const MarkdownBlock::Stack &blocks = markdown;
-//    REQUIRE(std::distance(blocks.begin(), result.second) == 7);
-//    REQUIRE(asset == "Lorem Ipsum4");
-//}
-//
 //TEST_CASE("Parse body asset with foreign list item inside", "[asset][foreign]")
 //{
 //    MarkdownBlock::Stack markdown = CanonicalBodyAssetFixture();

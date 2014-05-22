@@ -9,8 +9,6 @@
 #ifndef SNOWCRASH_FIXTURES_H
 #define SNOWCRASH_FIXTURES_H
 
-#include "MarkdownBlock.h"
-
 namespace snowcrashtest {
 
 //    extern const snowcrash::SourceData SourceDataFixture;
