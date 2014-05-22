@@ -6,8 +6,8 @@
 //  Copyright (c) 2013 Apiary Inc. All rights reserved.
 //
 
-#ifndef SNOWCRASH_BLUEPRINTSECTION_H
-#define SNOWCRASH_BLUEPRINTSECTION_H
+#ifndef SNOWCRASH_SECTION_H
+#define SNOWCRASH_SECTION_H
 
 #include <string>
 #include "MarkdownNode.h"
@@ -47,8 +47,7 @@ namespace snowcrash {
     extern std::string SectionName(const SectionType& section);
     
     /** \return True if the node has recognized %SectionType */
-     extern bool RecognizeSection(const mdp::MarkdownNodeIterator& node);
-    
+    extern bool RecognizeSection(const mdp::MarkdownNodeIterator& node);
 }
 
 #endif
