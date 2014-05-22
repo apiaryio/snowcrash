@@ -30,6 +30,15 @@ namespace snowcrash {
     template<>
     struct SectionProcessor<Asset> : public SectionProcessorBase<Asset> {
         
+        static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
+                                                     SectionParserData& pd,
+                                                     Report& report,
+                                                     Asset& out) {
+            
+            CodeBlockUtility::signatureContentAsCodeBlock(node, pd, report, out);
+            return ++MarkdownNodeIterator(node);
+        }
+
         static MarkdownNodeIterator processDescription(const MarkdownNodeIterator& node,
                                                        SectionParserData& pd,
                                                        Report& report,
@@ -44,8 +53,7 @@ namespace snowcrash {
             
             
             mdp::ByteBuffer content;
-            CodeBlockUtility::ContentAsCodeBlock(node, pd, report, content);
-            
+            CodeBlockUtility::contentAsCodeBlock(node, pd, report, content);
             out += content;
             return ++MarkdownNodeIterator(node);
         }
