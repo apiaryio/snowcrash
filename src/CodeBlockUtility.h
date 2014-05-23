@@ -54,14 +54,14 @@ namespace snowcrash {
          *  \param  conten  The content retrieved
          */
         static void contentAsCodeBlock(const MarkdownNodeIterator& node,
-                                       SectionParserData& pd,
+                                       const SectionParserData& pd,
                                        Report& report,
                                        mdp::ByteBuffer& content) {
             
             if (node->type == mdp::CodeMarkdownNodeType) {
                 content += node->text;
 
-                // TODO: Check for excessive indentation
+                checkExcessiveIndentation(node, pd, report);
                 return;
             }
             
@@ -83,11 +83,10 @@ namespace snowcrash {
         
         /** \brief  Retrieve the textual content of a signature markdown */
         static void signatureContentAsCodeBlock(const MarkdownNodeIterator& node,
-                                                SectionParserData& pd,
+                                                const SectionParserData& pd,
                                                 Report& report,
                                                 mdp::ByteBuffer& content) {
             
-            //std::string content;
             mdp::ByteBuffer remainingContent;
             GetFirstLine(node->text, remainingContent);
             
@@ -110,43 +109,30 @@ namespace snowcrash {
                                               IndentationWarning,
                                               sourceMap));
         }
-    };
-}
+        
+        /**
+         *  \brief Check for potential excessive indentation of a list section
+         *  \return True if code block contains a recognized list section, false otherwise.
+         */
+        static bool checkExcessiveIndentation(const MarkdownNodeIterator& node,
+                                              const SectionParserData& pd,
+                                              Report& report) {
+            
+            // Check for possible superfluous indentation of a recognized list items.
+            mdp::ByteBuffer r;
+            mdp::ByteBuffer line = GetFirstLine(node->text, r);
+            TrimStringStart(line);
 
-
-//    /**
-//     *  \brief Check code block for potential excessive indentation of a list item.
-//     *  \return True if code block does not contain potential recognized list, false otherwise.
-//     */
-//    template <class T>
-//    FORCEINLINE bool CheckCodeBlockListItem(const BlueprintSection& section,
-//                                            const BlockIterator& cur,
-//                                            const SourceData& sourceData,
-//                                            Result& result)
-//    {
-//        
-//        // Check for possible superfluous indentation of a recognized list items.
-//        std::string line = GetFirstLine(cur->content);
-//        TrimStringStart(line);
-//        
-//        // If line appears to be a Markdown list construct a dummy list item
-//        // with the first line of code block as its content.
-//        // Check the list item with respective internal classifier.
-//        if (line.empty() ||
-//            (line[0] != '-' && line[0] != '+' && line[0] != '*'))
-//            return true;
-//        
-//        // Skip leading Markdown list item mark
-//        std::string listItemContent = line.substr(1, std::string::npos);
-//        TrimStringStart(listItemContent);
-//        MarkdownBlock::Stack dummyList;
-//        
-//        dummyList.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-//        dummyList.push_back(MarkdownBlock(ListItemBlockEndType, listItemContent, 0, MakeSourceDataBlock(0, 0)));
-//        
-//        SectionType type = ClassifyInternaListBlock<T>(dummyList.begin(), dummyList.end());
-//        if (type != UndefinedSectionType) {
-//            
+            // If line appears to be a Markdown list.
+            if (line.empty() ||
+                (line[0] != '-' && line[0] != '+' && line[0] != '*'))
+                return false;
+            
+            // Skip leading Markdown list item mark
+            std::string signature = line.substr(1, std::string::npos);
+            TrimStringStart(signature);
+            
+            // TODO: Check signature.
 //            size_t level = CodeBlockIndentationLevel(section);
 //            --level;
 //            
@@ -171,12 +157,10 @@ namespace snowcrash {
 //            result.warnings.push_back(Warning(ss.str(),
 //                                              IndentationWarning,
 //                                              sourceBlock));
-//            
-//            return false;
-//        }
-//        
-//        return true;
-//    }
-
+            
+            return false;
+        }
+    };
+}
 
 #endif
