@@ -199,5 +199,3 @@ TEST_CASE("Asset parser greediness", "[asset]")
 }
 
 // TODO: Superfluous indentation check
-
-
