@@ -6,7 +6,6 @@
 //  Copyright (c) 2013 Apiary Inc. All rights reserved.
 //
 
-#include <iterator>
 #include "snowcrashtest.h"
 #include "AssetParser.h"
 
@@ -48,6 +47,9 @@ TEST_CASE("parse body asset", "[asset]")
     Asset asset;
     Report report;
     SectionParserHelper<Asset, AssetParser>::parse(BodyAssetFixture, BodySectionType, report, asset);
+    
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.empty());
     REQUIRE(asset == "Lorem Ipsum\n");
 }
 
@@ -56,6 +58,9 @@ TEST_CASE("parse schema asset", "[asset]")
     Asset asset;
     Report report;
     SectionParserHelper<Asset, AssetParser>::parse(SchemaAssetFixture, SchemaSectionType, report, asset);
+    
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.empty());
     REQUIRE(asset == "Dolor Sit Amet\n");
 }
 
@@ -90,7 +95,7 @@ TEST_CASE("Parse body asset followed by other blocks", "[payload][dangling]")
     
     REQUIRE(asset == "Lorem Ipsum\n\nHello World!\n");
 }
- */
+*/
 
 TEST_CASE("Foreign block inside", "[asset]")
 {
@@ -197,5 +202,3 @@ TEST_CASE("Asset parser greediness", "[asset]")
     REQUIRE(report.warnings.empty());
     REQUIRE(asset == "Lorem Ipsum\n");
 }
-
-// TODO: Superfluous indentation check
