@@ -160,6 +160,26 @@ namespace snowcrash {
             
             return false;
         }
+        
+        /**
+         *  \brief  Parse one line of raw `key:value` data.
+         *  \param  line            A line to parse
+         *  \param  keyValuePair    The output buffer to place the parsed data into
+         *  \return True on success, false otherwise
+         */
+        static bool keyValueFromLine(const mdp::ByteBuffer& line,
+                                    KeyValuePair& keyValuePair) {
+            
+            std::vector<std::string> rawMetadata = SplitOnFirst(line, ':');
+            if (rawMetadata.size() != 2)
+                return false;
+            
+            keyValuePair = std::make_pair(rawMetadata[0], rawMetadata[1]);
+            TrimString(keyValuePair.first);
+            TrimString(keyValuePair.second);
+            
+            return (!keyValuePair.first.empty() && !keyValuePair.second.empty());
+        }
     };
 }
 
