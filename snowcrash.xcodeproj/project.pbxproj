@@ -29,6 +29,8 @@
 		BBCEF19218FBF7B000A0FA24 /* Version.h in Headers */ = {isa = PBXBuildFile; fileRef = BBCEF19118FBF7B000A0FA24 /* Version.h */; };
 		BBD5F9C917353C310049BBEE /* ResourceGroupParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD5F9C717353C300049BBEE /* ResourceGroupParser.h */; };
 		BBD5F9CE17353CE00049BBEE /* ResourceParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD5F9CC17353CE00049BBEE /* ResourceParser.h */; };
+		BBD73564192ED417009FE09E /* HeadersParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD73563192ED417009FE09E /* HeadersParser.h */; };
+		BBD73566192ED45D009FE09E /* test-HeadersParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD73565192ED45D009FE09E /* test-HeadersParser.cc */; };
 		BBE53561174132B100BCA7AD /* Serialize.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE5355B174132B100BCA7AD /* Serialize.h */; };
 		BBE53562174132B100BCA7AD /* SerializeJSON.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE5355C174132B100BCA7AD /* SerializeJSON.h */; };
 		BBE53563174132B100BCA7AD /* SerializeYAML.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE5355D174132B100BCA7AD /* SerializeYAML.h */; };
@@ -111,8 +113,6 @@
 		BB088F77192D7901003AA95C /* SectionParserData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SectionParserData.h; path = src/SectionParserData.h; sourceTree = "<group>"; };
 		BB1865C71764D67B00756B18 /* SymbolTable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = SymbolTable.h; path = src/SymbolTable.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BB1865C81764DB8A00756B18 /* test-SymbolTable.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-SymbolTable.cc"; path = "test/test-SymbolTable.cc"; sourceTree = "<group>"; };
-		BB1D4D07174D0828009BCB1C /* HeaderParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = HeaderParser.h; path = src/HeaderParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
-		BB1D4D08174D08C3009BCB1C /* test-HeaderParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-HeaderParser.cc"; path = "test/test-HeaderParser.cc"; sourceTree = "<group>"; };
 		BB1EC203173FD06600CFB84A /* ListUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = ListUtility.h; path = src/ListUtility.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BB3DD973174654B8004C4077 /* AssetParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = AssetParser.h; path = src/AssetParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BB3DD974174654FD004C4077 /* test-AssetParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-AssetParser.cc"; path = "test/test-AssetParser.cc"; sourceTree = "<group>"; };
@@ -153,6 +153,8 @@
 		BBD5F9CC17353CE00049BBEE /* ResourceParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = ResourceParser.h; path = src/ResourceParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BBD5F9DB173561DA0049BBEE /* test-ResouceGroupParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = "test-ResouceGroupParser.cc"; path = "test/test-ResouceGroupParser.cc"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		BBD5F9DD173578210049BBEE /* test-ResourceParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = "test-ResourceParser.cc"; path = "test/test-ResourceParser.cc"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
+		BBD73563192ED417009FE09E /* HeadersParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HeadersParser.h; path = src/HeadersParser.h; sourceTree = "<group>"; };
+		BBD73565192ED45D009FE09E /* test-HeadersParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-HeadersParser.cc"; path = "test/test-HeadersParser.cc"; sourceTree = "<group>"; };
 		BBE5355B174132B100BCA7AD /* Serialize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Serialize.h; path = src/Serialize.h; sourceTree = "<group>"; };
 		BBE5355C174132B100BCA7AD /* SerializeJSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SerializeJSON.h; path = src/SerializeJSON.h; sourceTree = "<group>"; };
 		BBE5355D174132B100BCA7AD /* SerializeYAML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SerializeYAML.h; path = src/SerializeYAML.h; sourceTree = "<group>"; };
@@ -267,7 +269,7 @@
 				BB3DD974174654FD004C4077 /* test-AssetParser.cc */,
 				BBFF48D7170C57F1001E5FB2 /* test-Blueprint.cc */,
 				BBA01FF817292F9C0050B603 /* test-BlueprintParser.cc */,
-				BB1D4D08174D08C3009BCB1C /* test-HeaderParser.cc */,
+				BBD73565192ED45D009FE09E /* test-HeadersParser.cc */,
 				BB45781D182326EE00D0293A /* test-Indentation.cc */,
 				BB8AEFD717D899B900298807 /* test-ListUtility.cc */,
 				BB03DC6817D3723300C51E52 /* test-ParameterDefinitonParser.cc */,
@@ -297,7 +299,7 @@
 				BB92D892178EFA370098A63C /* BlueprintUtility.h */,
 				BBC2D85E18301FEC00FBCEA7 /* CodeBlockUtility.h */,
 				BBC2D860183024C100FBCEA7 /* DescriptionSectionUtility.h */,
-				BB1D4D07174D0828009BCB1C /* HeaderParser.h */,
+				BBD73563192ED417009FE09E /* HeadersParser.h */,
 				BB92D890178EF7C10098A63C /* HTTP.cc */,
 				BB92D88F178EF4160098A63C /* HTTP.h */,
 				BBC2D86218316DC000FBCEA7 /* ListBlockUtility.h */,
@@ -344,6 +346,7 @@
 			files = (
 				BBFF48D2170B4224001E5FB2 /* snowcrash.h in Headers */,
 				BBFF48D6170C4F30001E5FB2 /* Blueprint.h in Headers */,
+				BBD73564192ED417009FE09E /* HeadersParser.h in Headers */,
 				BBC2D8661831A76100FBCEA7 /* SectionUtility.h in Headers */,
 				BBA91DC2171D402600649B05 /* BlueprintParser.h in Headers */,
 				BBC2D861183024C100FBCEA7 /* DescriptionSectionUtility.h in Headers */,
@@ -506,6 +509,7 @@
 				BBFF48CA170B3C49001E5FB2 /* test-snowcrash.cc in Sources */,
 				BB8C3E661923EB3F00EF36FA /* test-AssetParser.cc in Sources */,
 				BBE7FEBE1922CAF300A1649E /* test-Blueprint.cc in Sources */,
+				BBD73566192ED45D009FE09E /* test-HeadersParser.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

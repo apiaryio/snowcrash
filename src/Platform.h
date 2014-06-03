@@ -14,17 +14,14 @@
 #endif
 
 #if defined(_MSC_VER)
-#   define FORCEINLINE __forceinline
 #   if !defined(DEPRECATED)
 #       define DEPRECATED __declspec(deprecated)
 #   endif
 #elif defined(__clang__) || defined(__GNUC__)
-#   define FORCEINLINE inline
 #   if !defined(DEPRECATED)
 #       define DEPRECATED __attribute__((deprecated))
 #   endif
 #else
-#   define FORCEINLINE inline
 #   if !defined(DEPRECATED)
 #       define DEPRECATED
 #   endif
