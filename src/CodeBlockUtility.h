@@ -36,7 +36,6 @@ namespace snowcrash {
             }
             else if (type == RequestBodySectionType ||
                      type == ResponseBodySectionType ||
-                     type == ObjectBodySectionType ||
                      type == ModelBodySectionType) {
                 
                 return 2;
