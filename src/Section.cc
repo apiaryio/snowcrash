@@ -7,6 +7,9 @@
 //
 
 #include "Section.h"
+#include "SectionParser.h"
+#include "AssetParser.h"
+#include "HeadersParser.h"
 
 using namespace snowcrash;
 
@@ -16,10 +19,6 @@ std::string snowcrash::SectionName(const SectionType& section) {
         case ModelSectionType:
         case ModelBodySectionType:
             return "model";
-            
-        case ObjectSectionType:
-        case ObjectBodySectionType:
-            return "object";
             
         case RequestSectionType:
         case RequestBodySectionType:
@@ -46,5 +45,6 @@ std::string snowcrash::SectionName(const SectionType& section) {
 }
 
 bool snowcrash::RecognizeSection(const mdp::MarkdownNodeIterator& node){
-    return false;
+    return (SectionProcessor<Headers>::sectionType(node) != UndefinedSectionType ||
+            SectionProcessor<Asset>::sectionType(node) != UndefinedSectionType);
 }
