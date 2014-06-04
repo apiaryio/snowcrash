@@ -28,8 +28,6 @@ namespace snowcrash {
         RequestBodySectionType,         /// < Request & Payload body combined (abbrev)
         ResponseSectionType,            /// < Response
         ResponseBodySectionType,        /// < Response & Body combined (abbrev)
-        ObjectSectionType,              /// < Object (deprecated)
-        ObjectBodySectionType,          /// < Object & Body combined (abbrev, deprecated)
         ModelSectionType,               /// < Model
         ModelBodySectionType,           /// < Model & Body combined (abbrev)
         BodySectionType,                /// < Payload Body
