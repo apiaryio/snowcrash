@@ -11,7 +11,7 @@
 
 #include "Blueprint.h"
 #include "Section.h"
-//#include "SymbolTable.h"
+#include "SymbolTable.h"
 
 namespace snowcrash {
 
@@ -42,7 +42,7 @@ namespace snowcrash {
         BlueprintParserOptions options;
         
         /** Symbol Table */
-        //SymbolTable symbolTable;
+        SymbolTable symbolTable;
         
         /** Source Data */
         const mdp::ByteBuffer& sourceData;
