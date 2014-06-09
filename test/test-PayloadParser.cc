@@ -24,11 +24,11 @@ const mdp::ByteBuffer RequestFixture = \
 
 const mdp::ByteBuffer RequestBodyFixture = \
 "+ Request A\n\n"\
-"          Hello World!\n";
+"        Hello World!\n";
 
 const mdp::ByteBuffer ResponseBodyFixture = \
 "+ Response 200 (text/plain)\n\n"\
-"          Hello World!\n";
+"        Hello World!\n";
 
 TEST_CASE("recognize request signature", "[payload]")
 {
@@ -94,7 +94,7 @@ TEST_CASE("Parse abbreviated payload body", "[payload]")
     REQUIRE(payload.description.empty());
     REQUIRE(payload.parameters.empty());
     REQUIRE(payload.headers.size() == 1);
-    REQUIRE(payload.body == "  Hello World!\n");
+    REQUIRE(payload.body == "Hello World!\n");
     REQUIRE(payload.schema.empty());
 }
 
@@ -114,7 +114,7 @@ TEST_CASE("Parse abbreviated inline payload body", "[payload]")
     REQUIRE(payload.description.empty());
     REQUIRE(payload.parameters.empty());
     REQUIRE(payload.headers.empty());
-    REQUIRE(payload.body == "  Hello World!\nB\n");
+    REQUIRE(payload.body == "Hello World!\nB\n");
     REQUIRE(payload.schema.empty());
 }
 
