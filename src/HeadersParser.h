@@ -46,9 +46,9 @@ namespace snowcrash {
                                                        SectionParserData& pd,
                                                        Report& report,
                                                        Headers& out) {
-            return ++MarkdownNodeIterator(node);
+            return node;
         }
-        
+
         static MarkdownNodeIterator processContent(const MarkdownNodeIterator& node,
                                                    SectionParserData& pd,
                                                    Report& report,
