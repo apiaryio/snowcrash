@@ -39,14 +39,14 @@ namespace snowcrash {
             CodeBlockUtility::signatureContentAsCodeBlock(node, pd, report, out);
             return ++MarkdownNodeIterator(node);
         }
-
+        
         static MarkdownNodeIterator processDescription(const MarkdownNodeIterator& node,
                                                        SectionParserData& pd,
                                                        Report& report,
                                                        Asset& out) {
             return node;
         }
-        
+
         static MarkdownNodeIterator processContent(const MarkdownNodeIterator& node,
                                                    SectionParserData& pd,
                                                    Report& report,

@@ -75,15 +75,6 @@ namespace snowcrash {
             return ++MarkdownNodeIterator(node);
         }
 
-        static MarkdownNodeIterator processDescription(const MarkdownNodeIterator& node,
-                                                       SectionParserData& pd,
-                                                       Report& report,
-                                                       Payload& out) {
-
-            out.description += (out.description.empty() ? "" : "\n\n") + mdp::MapBytesRangeSet(node->sourceMap, pd.sourceData);
-            return ++MarkdownNodeIterator(node);
-        }
-
         static MarkdownNodeIterator processContent(const MarkdownNodeIterator& node,
                                                    SectionParserData& pd,
                                                    Report& report,
@@ -132,7 +123,7 @@ namespace snowcrash {
                     break;
             }
 
-            return ++MarkdownNodeIterator(node);
+            return node;
         }
 
         static MarkdownNodeIterator processUnexpectedNode(const MarkdownNodeIterator& node,
@@ -142,6 +133,7 @@ namespace snowcrash {
                                                           Report& report,
                                                           Payload& out) {
 
+            // WARN: Dangling blocks found
             std::stringstream ss;
 
             ss << "found dangling " << SectionName(sectionType) << " block";
