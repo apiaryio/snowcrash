@@ -53,7 +53,13 @@ namespace snowcrash {
                                                        SectionParserData& pd,
                                                        Report& report,
                                                        T& out) {
-            out.description += node->text;
+
+            if (!out.description.empty()) {
+                out.description += "\n\n";
+            }
+
+            out.description += mdp::MapBytesRangeSet(node->sourceMap, pd.sourceData);
+
             return ++MarkdownNodeIterator(node);
         }
         
@@ -78,7 +84,7 @@ namespace snowcrash {
                                                          SectionParserData& pd,
                                                          Report& report,
                                                          T& out) {
-            return ++MarkdownNodeIterator(node);
+            return node;
         }
         
         /** Process unexpected Markdown node */
