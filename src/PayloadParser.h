@@ -69,6 +69,7 @@ namespace snowcrash {
                     out.description = remainingContent;
                 } else {
                     CodeBlockUtility::signatureContentAsCodeBlock(node, pd, report, out.body);
+                    parseSymbolReference(pd, report, out);
                 }
             }
 
@@ -83,7 +84,23 @@ namespace snowcrash {
             mdp::ByteBuffer content;
             CodeBlockUtility::contentAsCodeBlock(node, pd, report, content);
 
-            out.body += content;
+            if (!out.symbol.empty()) {
+                //WARN: ignoring extraneous content after symbol reference
+                std::stringstream ss;
+
+                ss << "ignoring extraneous content after symbol reference";
+                ss << ", expected symbol reference only e.g. '[" << out.symbol << "][]'";
+
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                report.warnings.push_back(Warning(ss.str(),
+                                                  IgnoringWarning,
+                                                  sourceMap));
+            } else {
+                out.body += content;
+
+                parseSymbolReference(pd, report, out);
+            }
+
             return ++MarkdownNodeIterator(node);
         }
 
@@ -352,6 +369,30 @@ namespace snowcrash {
             }
 
             return true;
+        }
+
+        static void parseSymbolReference(SectionParserData& pd,
+                                         Report& report,
+                                         Payload& out) {
+
+            mdp::ByteBuffer source = out.body;
+            SymbolName symbol;
+            ResourceModel model;
+
+            TrimString(source);
+
+            if (GetSymbolReference(source, symbol)) {
+                out.symbol = symbol;
+
+                model = pd.symbolTable.resourceModels.at(symbol);
+
+                out.name = model.name;
+                out.description = model.description;
+                out.parameters = model.parameters;
+                out.headers = model.headers;
+                out.body = model.body;
+                out.schema = model.schema;
+            }
         }
     };
 
