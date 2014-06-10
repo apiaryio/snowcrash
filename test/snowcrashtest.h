@@ -39,6 +39,31 @@ namespace snowcrashtest {
                           report,
                           output);
         }
+
+        static void symbolAndParse(const mdp::ByteBuffer& source,
+                                   const snowcrash::ResourceModelSymbol& symbol,
+                                   snowcrash::SectionType type,
+                                   snowcrash::Report& report,
+                                   T& output) {
+
+            mdp::MarkdownParser markdownParser;
+            mdp::MarkdownNode markdownAST;
+            markdownParser.parse(source, markdownAST);
+
+            REQUIRE(!markdownAST.children().empty());
+
+            snowcrash::Blueprint bp;
+            snowcrash::SectionParserData pd(0, source, bp);
+
+            pd.symbolTable.resourceModels.insert(symbol);
+            pd.sectionsContext.push_back(type);
+
+            PARSER::parse(markdownAST.children().begin(),
+                          markdownAST.children(),
+                          pd,
+                          report,
+                          output);
+        }
     };
 }
 
