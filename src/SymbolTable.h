@@ -32,13 +32,10 @@ namespace snowcrashconst {
 }
 
 namespace snowcrash {
-
-    // Name of a symbol
-    typedef mdp::ByteBuffer SymbolName;
     
     // Resource Object Symbol
     typedef std::pair<SymbolName, ResourceModel> ResourceModelSymbol;
-    
+
     // Resource Object Symbol Table
     typedef std::map<SymbolName, ResourceModel> ResourceModelSymbolTable;
     
@@ -55,11 +52,13 @@ namespace snowcrash {
                                         SymbolName& referredSymbol) {
         
         CaptureGroups captureGroups;
+
         if (RegexCapture(sourceData, snowcrashconst::SymbolReferenceRegex, captureGroups, 3)) {
             referredSymbol = captureGroups[1];
             TrimString(referredSymbol);
             return true;
         }
+
         return false;
     }
     
