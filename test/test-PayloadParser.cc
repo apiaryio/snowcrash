@@ -223,52 +223,56 @@ TEST_CASE("Parse payload with dangling body", "[payload]")
     REQUIRE(payload.schema.empty());
 }
 
-//TEST_CASE("Parse inline payload with symbol reference", "[payload]")
-//{
-//    ResourceModel model;
-//
-//    model.description = "Foo";
-//    model.body = "Bar";
-//
-//    Payload payload;
-//    Report report;
-//    SectionParserHelper<Payload, PayloadParser>::symbolAndParse(SymbolFixture, ResourceModelSymbol("Symbol", model), RequestSectionType, report, payload);
-//
-//    REQUIRE(report.error.code == Error::OK);
-//    REQUIRE(report.warnings.empty());
-//
-//    REQUIRE(payload.name.empty());
-//    REQUIRE(payload.description == "Foo");
-//    REQUIRE(payload.parameters.empty());
-//    REQUIRE(payload.headers.empty());
-//    REQUIRE(payload.body == "Bar");
-//    REQUIRE(payload.schema.empty());
-//}
-//
-//TEST_CASE("Parse payload with symbol reference", "[payload]")
-//{
-//    mdp::ByteBuffer source = SymbolFixture;
-//    source += "\n    Foreign\n";
-//
-//    ResourceModel model;
-//
-//    model.description = "Foo";
-//    model.body = "Bar";
-//
-//    Payload payload;
-//    Report report;
-//    SectionParserHelper<Payload, PayloadParser>::symbolAndParse(source, ResourceModelSymbol("Symbol", model), RequestSectionType, report, payload);
-//
-//    REQUIRE(report.error.code == Error::OK);
-//    REQUIRE(report.warnings.size() == 1); // ignoring foreign entry
-//
-//    REQUIRE(payload.name.empty());
-//    REQUIRE(payload.description == "Foo");
-//    REQUIRE(payload.parameters.empty());
-//    REQUIRE(payload.headers.empty());
-//    REQUIRE(payload.body == "Bar");
-//    REQUIRE(payload.schema.empty());
-//}
+TEST_CASE("Parse inline payload with symbol reference", "[payload]")
+{
+    ResourceModel model;
+    Symbols symbols;
+
+    model.description = "Foo";
+    model.body = "Bar";
+    symbols.push_back(ResourceModelSymbol("Symbol", model));
+
+    Payload payload;
+    Report report;
+    SectionParserHelper<Payload, PayloadParser>::parse(SymbolFixture, RequestBodySectionType, report, payload, symbols);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 1);
+
+    REQUIRE(payload.name.empty());
+    REQUIRE(payload.description == "Foo");
+    REQUIRE(payload.parameters.empty());
+    REQUIRE(payload.headers.empty());
+    REQUIRE(payload.body == "Bar");
+    REQUIRE(payload.schema.empty());
+}
+
+TEST_CASE("Parse inline payload with symbol reference with foreign content", "[payload]")
+{
+    mdp::ByteBuffer source = SymbolFixture;
+    source += "\n    Foreign\n";
+
+    ResourceModel model;
+    Symbols symbols;
+
+    model.description = "Foo";
+    model.body = "Bar";
+    symbols.push_back(ResourceModelSymbol("Symbol", model));
+
+    Payload payload;
+    Report report;
+    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestBodySectionType, report, payload, symbols);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 3); // ignoring foreign entry
+
+    REQUIRE(payload.name.empty());
+    REQUIRE(payload.description == "Foo");
+    REQUIRE(payload.parameters.empty());
+    REQUIRE(payload.headers.empty());
+    REQUIRE(payload.body == "Bar");
+    REQUIRE(payload.schema.empty());
+}
 
 TEST_CASE("Parse named model", "[payload]")
 {
