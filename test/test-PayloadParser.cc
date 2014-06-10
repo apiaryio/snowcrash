@@ -30,6 +30,10 @@ const mdp::ByteBuffer ResponseBodyFixture = \
 "+ Response 200 (text/plain)\n\n"\
 "        Hello World!\n";
 
+const mdp::ByteBuffer SymbolFixture = \
+"+ Request\n\n"\
+"    [Symbol][]\n";
+
 TEST_CASE("recognize request signature", "[payload]")
 {
     mdp::MarkdownParser markdownParser;
@@ -118,113 +122,73 @@ TEST_CASE("Parse abbreviated inline payload body", "[payload]")
     REQUIRE(payload.schema.empty());
 }
 
-//TEST_CASE("Parse payload description with list", "[payload][block][#8]")
-//{
-//    // Blueprint in question:
-//    //R"(
-//    //+ Request
-//    //  + B
-//    //  + Body
-//    //");
-//
-//    Payload payload;
-//    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-//    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
-//    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, payload);
-//
-//    REQUIRE(result.first.error.code == Error::OK);
-//
-//    REQUIRE(payload.name.empty());
-//    REQUIRE(payload.description == "1234");
-//    REQUIRE(payload.body.empty());
-//}
-//
-//TEST_CASE("Parse just one payload in a list with multiple payloads", "[payload][block]")
-//{
-//    // Blueprint in question:
-//    //R"(
-//    //+ Request A
-//    //+ Request B
-//    //)";
-//
-//    Payload payload;
-//    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-//    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
-//    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, payload);
-//
-//    REQUIRE(result.first.error.code == Error::OK);
-//    REQUIRE(result.first.warnings.empty());
-//
-//    const MarkdownBlock::Stack &blocks = markdown;
-//    REQUIRE(std::distance(blocks.begin(), result.second) == 3);
-//
-//    REQUIRE(payload.name == "A");
-//    REQUIRE(payload.description.empty());
-//    REQUIRE(payload.parameters.empty());
-//    REQUIRE(payload.headers.empty());
-//    REQUIRE(payload.body.empty());
-//    REQUIRE(payload.schema.empty());
-//}
-//
-//TEST_CASE("Parse just one payload in a list with multiple items", "[payload][block]")
-//{
-//    // Blueprint in question:
-//    //R"(
-//    //+ Request A
-//    //+ Foo
-//    //)";
-//
-//    Payload payload;
-//    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-//    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
-//    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, payload);
-//
-//    REQUIRE(result.first.error.code == Error::OK);
-//    REQUIRE(result.first.warnings.empty());
-//
-//    const MarkdownBlock::Stack &blocks = markdown;
-//    REQUIRE(std::distance(blocks.begin(), result.second) == 3);
-//
-//    REQUIRE(payload.name == "A");
-//    REQUIRE(payload.description.empty());
-//    REQUIRE(payload.parameters.empty());
-//    REQUIRE(payload.headers.empty());
-//    REQUIRE(payload.body.empty());
-//    REQUIRE(payload.schema.empty());
-//}
-//
-//TEST_CASE("Parse payload with foreign list item", "[payload][foreign][block]")
-//{
-//    // Blueprint in question:
-//    //R"(
-//    //# /1
-//    //## MKCOL
-//    //+ Request
-//    //  + Body
-//    //
-//    //              Foo
-//    //
-//    //  + Bar
-//    //");
-//
-//    Payload payload;
-//    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-//    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
-//    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, payload);
-//
-//    REQUIRE(result.first.error.code == Error::OK);
-//    REQUIRE(result.first.warnings.size() == 1);
-//    REQUIRE(result.first.warnings[0].code == IgnoringWarning);
-//
-//    const MarkdownBlock::Stack &blocks = markdown;
-//    REQUIRE(std::distance(blocks.begin(), result.second) == 14);
-//    REQUIRE(payload.name.empty());
-//    REQUIRE(payload.description.empty());
-//    REQUIRE(payload.parameters.empty());
-//    REQUIRE(payload.headers.empty());
-//    REQUIRE(payload.body == "Foo");
-//    REQUIRE(payload.schema.empty());
-//}
+TEST_CASE("Parse payload description with list", "[payload]")
+{
+    // Blueprint in question:
+    //R"(
+    //+ Request
+    //
+    //    + B
+    //
+    //    + Body
+    //
+    //            {}
+    //");
+
+    mdp::ByteBuffer source = \
+    "+ Request\n\n"\
+    "    + B\n\n"\
+    "    + Body\n\n"\
+    "            {}\n";
+
+    Payload payload;
+    Report report;
+    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, report, payload);
+
+    REQUIRE(report.error.code == Error::OK);
+    CHECK(report.warnings.empty());
+
+    REQUIRE(payload.name.empty());
+    REQUIRE(payload.description == "+ B\n");
+    REQUIRE(payload.parameters.empty());
+    REQUIRE(payload.headers.empty());
+    REQUIRE(payload.body == "{}\n");
+    REQUIRE(payload.schema.empty());
+}
+
+TEST_CASE("Parse payload with foreign list item", "[payload]")
+{
+    // Blueprint in question:
+    //R"(
+    //+ Request
+    //
+    //    + Body
+    //
+    //            {}
+    //
+    //    + Bar
+    //");
+
+    mdp::ByteBuffer source = \
+    "+ Request\n\n"\
+    "    + Body\n\n"\
+    "            {}\n\n"\
+    "    + Bar\n";
+
+    Payload payload;
+    Report report;
+    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, report, payload);
+
+    REQUIRE(report.error.code == Error::OK);
+    CHECK(report.warnings.size() == 1); // dangling block
+
+    REQUIRE(payload.name.empty());
+    REQUIRE(payload.description.empty());
+    REQUIRE(payload.parameters.empty());
+    REQUIRE(payload.headers.empty());
+    REQUIRE(payload.body == "{}\n");
+    REQUIRE(payload.schema.empty());
+}
 
 TEST_CASE("Parse payload with dangling body", "[payload]")
 {
@@ -248,7 +212,7 @@ TEST_CASE("Parse payload with dangling body", "[payload]")
     SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, report, payload);
 
     REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(report.warnings.size() == 1); // dangling block
     REQUIRE(report.warnings[0].code == IndentationWarning);
 
     REQUIRE(payload.name.empty());
@@ -259,31 +223,19 @@ TEST_CASE("Parse payload with dangling body", "[payload]")
     REQUIRE(payload.schema.empty());
 }
 
-//TEST_CASE("Parse inline payload with symbol reference", "[payload][block]")
+//TEST_CASE("Parse inline payload with symbol reference", "[payload]")
 //{
-//    // Blueprint in question:
-//    //R"(
-//    //+ Request
-//    //     [Symbol][]
-//    //");
-//
-//    Payload payload;
-//
-//    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
 //    ResourceModel model;
-//    model.name = "Symbol";
+//
 //    model.description = "Foo";
 //    model.body = "Bar";
-//    parser.symbolTable.resourceModels[model.name] = model;
 //
-//    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
-//    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, payload);
+//    Payload payload;
+//    Report report;
+//    SectionParserHelper<Payload, PayloadParser>::symbolAndParse(SymbolFixture, ResourceModelSymbol("Symbol", model), RequestSectionType, report, payload);
 //
-//    REQUIRE(result.first.error.code == Error::OK);
-//    REQUIRE(result.first.warnings.empty());
-//
-//    const MarkdownBlock::Stack &blocks = markdown;
-//    REQUIRE(std::distance(blocks.begin(), result.second) == 4);
+//    REQUIRE(report.error.code == Error::OK);
+//    REQUIRE(report.warnings.empty());
 //
 //    REQUIRE(payload.name.empty());
 //    REQUIRE(payload.description == "Foo");
@@ -293,94 +245,31 @@ TEST_CASE("Parse payload with dangling body", "[payload]")
 //    REQUIRE(payload.schema.empty());
 //}
 //
-//TEST_CASE("Parse payload with symbol reference", "[payload][block]")
+//TEST_CASE("Parse payload with symbol reference", "[payload]")
 //{
-//    // Blueprint in question:
-//    //R"(
-//    //+ Request
-//    //
-//    //     [Symbol][]
-//    //
-//    //     Foreign
-//    //");
+//    mdp::ByteBuffer source = SymbolFixture;
+//    source += "\n    Foreign\n";
 //
-//    Payload payload;
-//
-//    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
 //    ResourceModel model;
-//    model.name = "Symbol";
+//
 //    model.description = "Foo";
 //    model.body = "Bar";
-//    parser.symbolTable.resourceModels[model.name] = model;
 //
-//    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
-//    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, payload);
+//    Payload payload;
+//    Report report;
+//    SectionParserHelper<Payload, PayloadParser>::symbolAndParse(source, ResourceModelSymbol("Symbol", model), RequestSectionType, report, payload);
 //
-//    REQUIRE(result.first.error.code == Error::OK);
-//    REQUIRE(result.first.warnings.size() == 1); // ignoring foreign entry
+//    REQUIRE(report.error.code == Error::OK);
+//    REQUIRE(report.warnings.size() == 1); // ignoring foreign entry
 //
-//    const MarkdownBlock::Stack &blocks = markdown;
-//    REQUIRE(std::distance(blocks.begin(), result.second) == 7);
-//
-//    REQUIRE(payload.name == "A");
+//    REQUIRE(payload.name.empty());
 //    REQUIRE(payload.description == "Foo");
 //    REQUIRE(payload.parameters.empty());
 //    REQUIRE(payload.headers.empty());
 //    REQUIRE(payload.body == "Bar");
 //    REQUIRE(payload.schema.empty());
 //}
-//
-//TEST_CASE("Missing 'expected pre-formatted code block' warning source map", "[payload][issue][#2][block]")
-//{
-//    // Blueprint in question:
-//    //R"(
-//    //# GET /res
-//    //
-//    //+ Response 200 (text/plain)
-//    //    + Body
-//    //            something
-//    //");
-//
-//    Payload payload;
-//    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-//    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
-//    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, payload);
-//
-//    REQUIRE(result.first.error.code == Error::OK);
-//    REQUIRE(result.first.warnings.size() == 1); // ignoring unrecognized item
-//
-//    const MarkdownBlock::Stack &blocks = markdown;
-//    REQUIRE(std::distance(blocks.begin(), result.second) == 8);
-//
-//    REQUIRE(result.first.warnings[0].location.size() == 1);
-//}
-//
-//TEST_CASE("Test deprecated object payload", "[payload][object][block]")
-//{
-//    // Blueprint in question:
-//    //R"(
-//    //# /message
-//    //    + Message Object
-//    //
-//    //    AAA
-//    //
-//    //");
-//
-//    Payload payload;
-//    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-//    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
-//    ParseSectionResult result = PayloadParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, payload);
-//
-//    REQUIRE(result.first.error.code == Error::OK);
-//    REQUIRE(result.first.warnings.size() == 1);
-//    REQUIRE(result.first.warnings[0].code == DeprecatedWarning);
-//
-//    const MarkdownBlock::Stack &blocks = markdown;
-//    REQUIRE(std::distance(blocks.begin(), result.second) == 6);
-//    REQUIRE(payload.name == "Message");
-//    REQUIRE(payload.body == "AAA");
-//}
-//
+
 TEST_CASE("Parse named model", "[payload]")
 {
     // Blueprint in question:
