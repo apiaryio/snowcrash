@@ -41,10 +41,10 @@ namespace snowcrash {
             cur = SectionProcessor<T>::processSignature(cur, pd, report, out);
             if (lastCur == cur)
                 return Adapter::nextStartingNode(node, siblings, cur);
-            
+
             // Description nodes
             while(cur != collection.end() &&
-                  SectionProcessor<T>::isDescriptionNode(cur)) {
+                  SectionProcessor<T>::isDescriptionNode(cur, pd.sectionContext())) {
                 
                 lastCur = cur;
                 cur = SectionProcessor<T>::processDescription(cur, pd, report, out);
@@ -54,7 +54,7 @@ namespace snowcrash {
             
             // Content nodes
             while(cur != collection.end() &&
-                  SectionProcessor<T>::isContentNode(cur)) {
+                  SectionProcessor<T>::isContentNode(cur, pd.sectionContext())) {
                 
                 lastCur = cur;
                 cur = SectionProcessor<T>::processContent(cur, pd, report, out);
@@ -62,21 +62,24 @@ namespace snowcrash {
                     return Adapter::nextStartingNode(node, siblings, cur);
             }
             
+            SectionType lastSectionType = UndefinedSectionType;
+
             // Nested sections
             while(cur != collection.end()) {
                 
                 lastCur = cur;
-                SectionType nested_type = SectionProcessor<T>::nestedSectionType(cur);
+                SectionType nestedType = SectionProcessor<T>::nestedSectionType(cur);
                 
-                pd.sectionsContext.push_back(nested_type);
+                pd.sectionsContext.push_back(nestedType);
                 
-                if (nested_type != UndefinedSectionType) {
+                if (nestedType != UndefinedSectionType) {
                     cur = SectionProcessor<T>::processNestedSection(cur, collection, pd, report, out);
                 }
-                else if (SectionProcessor<T>::isUnexpectedNode(cur)) {
-                    cur = SectionProcessor<T>::processUnexpectedNode(cur, collection, pd, report, out);
+                else if (SectionProcessor<T>::isUnexpectedNode(cur, pd.sectionContext())) {
+                    cur = SectionProcessor<T>::processUnexpectedNode(cur, collection, pd, lastSectionType, report, out);
                 }
                 
+                lastSectionType = pd.sectionContext();
                 pd.sectionsContext.pop_back();
                 
                 if (lastCur == cur)

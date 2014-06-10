@@ -53,7 +53,13 @@ namespace snowcrash {
                                                        SectionParserData& pd,
                                                        Report& report,
                                                        T& out) {
-            out.description += node->text;
+
+            if (!out.description.empty()) {
+                out.description += "\n\n";
+            }
+
+            out.description += mdp::MapBytesRangeSet(node->sourceMap, pd.sourceData);
+
             return ++MarkdownNodeIterator(node);
         }
         
@@ -85,25 +91,30 @@ namespace snowcrash {
         static MarkdownNodeIterator processUnexpectedNode(const MarkdownNodeIterator& node,
                                                           const MarkdownNodes& siblings,
                                                           SectionParserData& pd,
+                                                          SectionType& lastSectionType,
                                                           Report& report,
                                                           T& out) {
             return ++MarkdownNodeIterator(node);
         }
         
         /** \return True if the node is a section description node */
-        static bool isDescriptionNode(const MarkdownNodeIterator& node) {
-            return  !SectionProcessor<T>::isContentNode(node) &&
+        static bool isDescriptionNode(const MarkdownNodeIterator& node,
+                                      SectionType sectionType) {
+
+            return  !SectionProcessor<T>::isContentNode(node, sectionType) &&
                     SectionProcessor<T>::nestedSectionType(node) == UndefinedSectionType &&
                     !RecognizeSection(node);
         }
 
         /** \return True if the node is a section-specific content node */
-        static bool isContentNode(const MarkdownNodeIterator& node) {
+        static bool isContentNode(const MarkdownNodeIterator& node,
+                                  SectionType sectionType) {
             return false;
         }
 
         /** \return True if the node is unexpected in the current context */
-        static bool isUnexpectedNode(const MarkdownNodeIterator& node) {
+        static bool isUnexpectedNode(const MarkdownNodeIterator& node,
+                                     SectionType sectionType) {
             return !RecognizeSection(node);
         }
 

@@ -82,6 +82,7 @@
       'sources': [
         'test/test-AssetParser.cc',
         'test/test-HeadersParser.cc',
+        'test/test-PayloadParser.cc',
         'test/test-Blueprint.cc',
         'test/test-snowcrash.cc'
       ],

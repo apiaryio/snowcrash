@@ -33,6 +33,7 @@ namespace snowcrash {
                                                      SectionParserData& pd,
                                                      Report& report,
                                                      Headers& out) {
+
             mdp::ByteBuffer content;
             CodeBlockUtility::signatureContentAsCodeBlock(node, pd, report, content);
 
@@ -47,11 +48,12 @@ namespace snowcrash {
                                                        Headers& out) {
             return node;
         }
-        
+
         static MarkdownNodeIterator processContent(const MarkdownNodeIterator& node,
                                                    SectionParserData& pd,
                                                    Report& report,
                                                    Headers& out) {
+
             mdp::ByteBuffer content;
             CodeBlockUtility::contentAsCodeBlock(node, pd, report, content);
 
@@ -60,15 +62,18 @@ namespace snowcrash {
             return ++MarkdownNodeIterator(node);
         }
         
-        static bool isDescriptionNode(const MarkdownNodeIterator& node) {
+        static bool isDescriptionNode(const MarkdownNodeIterator& node,
+                                      SectionType sectionType) {
             return false;
         }
         
-        static bool isContentNode(const MarkdownNodeIterator& node) {
+        static bool isContentNode(const MarkdownNodeIterator& node,
+                                  SectionType sectionType) {
             return !RecognizeSection(node);
         }
         
         static SectionType sectionType(const MarkdownNodeIterator& node) {
+
             if (node->type == mdp::ListItemMarkdownNodeType
                 && !node->children().empty()) {
                 mdp::ByteBuffer subject = node->children().front().text;

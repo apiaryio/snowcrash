@@ -35,17 +35,18 @@ namespace snowcrash {
                                                      Report& report,
                                                      Asset& out) {
             
+            out = "";
             CodeBlockUtility::signatureContentAsCodeBlock(node, pd, report, out);
             return ++MarkdownNodeIterator(node);
         }
-
+        
         static MarkdownNodeIterator processDescription(const MarkdownNodeIterator& node,
                                                        SectionParserData& pd,
                                                        Report& report,
                                                        Asset& out) {
             return node;
         }
-        
+
         static MarkdownNodeIterator processContent(const MarkdownNodeIterator& node,
                                                    SectionParserData& pd,
                                                    Report& report,
@@ -58,11 +59,13 @@ namespace snowcrash {
             return ++MarkdownNodeIterator(node);
         }
         
-        static bool isDescriptionNode(const MarkdownNodeIterator& node) {
+        static bool isDescriptionNode(const MarkdownNodeIterator& node,
+                                      SectionType sectionType) {
             return false;
         }
         
-        static bool isContentNode(const MarkdownNodeIterator& node) {
+        static bool isContentNode(const MarkdownNodeIterator& node,
+                                  SectionType sectionType) {
             return !RecognizeSection(node);
         }
         

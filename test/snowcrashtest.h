@@ -14,25 +14,32 @@
 #include "SectionParser.h"
 
 namespace snowcrashtest {
-    
+
+    typedef std::vector<snowcrash::ResourceModelSymbol> Symbols;
+
     template <typename T, typename PARSER>
     struct SectionParserHelper {
         
         static void parse(const mdp::ByteBuffer& source,
                           snowcrash::SectionType type,
                           snowcrash::Report& report,
-                          T& output) {
-            
+                          T& output,
+                          const Symbols& symbols = Symbols()) {
+
             mdp::MarkdownParser markdownParser;
             mdp::MarkdownNode markdownAST;
+
             markdownParser.parse(source, markdownAST);
             
             REQUIRE(!markdownAST.children().empty());
             
             snowcrash::Blueprint bp;
             snowcrash::SectionParserData pd(0, source, bp);
+
             pd.sectionsContext.push_back(type);
-            
+
+            pd.symbolTable.resourceModels.insert(symbols.begin(), symbols.end());
+
             PARSER::parse(markdownAST.children().begin(),
                           markdownAST.children(),
                           pd,
