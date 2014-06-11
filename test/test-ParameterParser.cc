@@ -7,14 +7,11 @@
 //
 
 #include "snowcrashtest.h"
-#include "AssetParser.h"
+#include "ParameterParser.h"
 
 using namespace snowcrash;
 using namespace snowcrashtest;
 
-//MarkdownBlock::Stack snowcrashtest::CanonicalParameterDefinitionFixture()
-//{
-//    //R"(
 //    //+ id = `1234` (optional, number, `0000`)
 //    //
 //    //    Lorem ipsum.
@@ -25,87 +22,35 @@ using namespace snowcrashtest;
 //    //        + `beef`
 //    //)";
 //
-//    MarkdownBlock::Stack markdown;
-//
-//    // id BEGIN
-//    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
-//    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-//    markdown.push_back(MarkdownBlock(ParagraphBlockType, "id = `1234` (optional, number, `0000`)", 0, MakeSourceDataBlock(1, 1)));
-//    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Lorem ipsum.", 0, MakeSourceDataBlock(2, 1)));
-//
-//    // traits BEGIN
-//    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
-//
-//    // Values BEGIN
-//    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-//    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
-//
-//    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-//    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "`1234`\n", 0, MakeSourceDataBlock(7, 1)));
-//
-//    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-//    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "`0000`\n", 0, MakeSourceDataBlock(8, 1)));
-//
-//    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-//    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "`beef`\n", 0, MakeSourceDataBlock(9, 1)));
-//
-//    // Values END
-//    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0,MakeSourceDataBlock(10, 1)));
-//    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "Values\n", 0, MakeSourceDataBlock(11, 1)));
-//
-//    // traits END
-//    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0,MakeSourceDataBlock(12, 1)));
-//
-//    // id END
-//    markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(13, 1)));
-//    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0,MakeSourceDataBlock(14, 1)));
-//
-//    return markdown;
-//}
-//
-//TEST_CASE("Parameter definition block classifier", "[parameter_definition][classifier][block]")
+
+const mdp::ByteBuffer ParameterFixture = \
+"+ id = `1234` (optional, number, `0000`)\n\n"\
+"    Lorem ipsum\n\n"\
+"    + Values\n"\
+"        + `1234`\n"\
+"        + `0000`\n"\
+"        + `beef`\n"\
+"";
+
+TEST_CASE("Recognize parameter definition signature", "[parameter]")
+{
+    mdp::MarkdownParser markdownParser;
+    mdp::MarkdownNode markdownAST;
+    markdownParser.parse(ParameterFixture, markdownAST);
+
+    REQUIRE(!markdownAST.children().empty());
+    REQUIRE(SectionProcessor<Parameter>::sectionType(markdownAST.children().begin()) == ParameterDefinitionSectionType);
+    REQUIRE(SectionProcessor<Parameter>::nestedSectionType(markdownAST.children().front().children().begin() + 2) == ParameterValuesSectionType);
+}
+
+//TEST_CASE("Parse canonical parameter definition", "[parameter][block]")
 //{
-//    MarkdownBlock::Stack markdown = CanonicalParameterDefinitionFixture();
-//
-//    REQUIRE(markdown.size() == 18);
-//
-//    BlockIterator cur = markdown.begin();
-//
-//    // ListBlockBeginType
-//    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), UndefinedSectionType) == ParameterDefinitionSectionType);
-//    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterDefinitionSectionType) == ForeignSectionType);
-//
-//    ++cur; // ListItemBlockBeginType
-//    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), UndefinedSectionType) == ParameterDefinitionSectionType);
-//    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterDefinitionSectionType) == UndefinedSectionType);
-//
-//    ++cur; // ParagraphBlockType
-//    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), UndefinedSectionType) == UndefinedSectionType);
-//    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterDefinitionSectionType) == ParameterDefinitionSectionType);
-//
-//    ++cur; // ParagraphBlockType
-//    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), UndefinedSectionType) == UndefinedSectionType);
-//    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterDefinitionSectionType) == ParameterDefinitionSectionType);
-//
-//    ++cur; // type trait BEGIN
-//    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), UndefinedSectionType) == UndefinedSectionType);
-//    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterDefinitionSectionType) == ParameterValuesSectionType);
-//    REQUIRE(ClassifyBlock<Parameter>(cur, markdown.end(), ParameterValuesSectionType) == ParameterValuesSectionType);
-//}
-//
-//TEST_CASE("Parse canonical parameter definition", "[parameter_definition][block]")
-//{
-//    MarkdownBlock::Stack markdown = CanonicalParameterDefinitionFixture();
 //    Parameter parameter;
-//    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-//    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
-//    ParseSectionResult result = ParameterDefinitionParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, parameter);
+//    Report report;
+//    SectionParserHelper<Parameter, ParameterParser>::parse(ParameterFixture, ParameterDefinitionSectionType, report, parameter);
 //
-//    REQUIRE(result.first.error.code == Error::OK);
-//    REQUIRE(result.first.warnings.empty());
-//
-//    const MarkdownBlock::Stack &blocks = markdown;
-//    CHECK(std::distance(blocks.begin(), result.second) == 18);
+//    REQUIRE(report.error.code == Error::OK);
+//    CHECK(report.warnings.empty());
 //
 //    REQUIRE(parameter.name == "id");
 //    REQUIRE(parameter.description == "2");
@@ -118,7 +63,7 @@ using namespace snowcrashtest;
 //    REQUIRE(parameter.values[1] == "0000");
 //    REQUIRE(parameter.values[2] == "beef");
 //}
-//
+
 //TEST_CASE("Parse canonical definition followed by another definition", "[parameter_definition][block]")
 //{
 //    MarkdownBlock::Stack markdown = CanonicalParameterDefinitionFixture();
