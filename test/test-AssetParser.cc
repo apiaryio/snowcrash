@@ -64,39 +64,6 @@ TEST_CASE("parse schema asset", "[asset]")
     REQUIRE(asset == "Dolor Sit Amet\n");
 }
 
-// TODO: This test is for the payload parser instead.
-/*
-TEST_CASE("Parse body asset followed by other blocks", "[payload][dangling]")
-{
-    mdp::ByteBuffer source = BodyAssetFixture;
-    source += \
-    "\n"\
-    "Hello World!\n";
-    
-    mdp::MarkdownParser markdownParser;
-    mdp::MarkdownNode markdownAST;
-    markdownParser.parse(source, markdownAST);
-    
-    REQUIRE(!markdownAST.children().empty());
-    
-    Blueprint bp;
-    ParserData pd(0, source, bp);
-    Asset asset;
-    Report report;
-    MarkdownNodeIterator cur = AssetParser::parse(markdownAST.children().begin(),
-                                                  markdownAST.children(),
-                                                  pd,
-                                                  report,
-                                                  asset);
-    
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
-    // TODO: Test warning code
-    
-    REQUIRE(asset == "Lorem Ipsum\n\nHello World!\n");
-}
-*/
-
 TEST_CASE("Foreign block inside", "[asset]")
 {
     mdp::ByteBuffer source = BodyAssetFixture;
