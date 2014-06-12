@@ -37,8 +37,9 @@ namespace snowcrash {
         HeadersSectionType,             /// < Headers
         ForeignSectionType,             /// < Foreign, unexpected section
         ParametersSectionType,          /// < Parameters
-        ParameterDefinitionSectionType, /// < One Parameter definition
-        ParameterValuesSectionType      /// < Parameter value enumeration
+        ParameterSectionType,           /// < One Parameter definition
+        ValuesSectionType,              /// < Value enumeration
+        ValueSectionType                /// < One Value
     };
     
     /** \return Human readable name for given %SectionType */
