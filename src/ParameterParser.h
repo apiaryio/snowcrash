@@ -10,11 +10,9 @@
 #define SNOWCRASH_PARAMETERPARSER_H
 
 #include "SectionParser.h"
+#include "ValuesParser.h"
 #include "RegexMatch.h"
 #include "StringUtility.h"
-
-/** Parameter Value regex */
-#define PARAMETER_VALUE "`([^`]+)`"
 
 /** Parameter Identifier */
 #define PARAMETER_IDENTIFIER "([[:alnum:]_.-]+)"
@@ -42,9 +40,6 @@ namespace snowcrash {
 
     /** Additonal Parameter Traits Type matching regex */
     const char* const AdditionalTraitsTypeRegex = CSV_LEADINOUT "([^,]*)" CSV_LEADINOUT;
-
-    /** Parameter Values matching regex */
-    const char* const ParameterValuesRegex = "^[[:blank:]]*[Vv]alues[[:blank:]]*$";
 
     /** Values expected content */
     const char* const ExpectedValuesContent = "nested list of possible parameter values, one element per list item e.g. '`value`'";
@@ -79,7 +74,7 @@ namespace snowcrash {
                                                          Report& report,
                                                          Parameter& out) {
 
-            if (pd.sectionContext() == ParameterValuesSectionType) {
+            if (pd.sectionContext() == ValuesSectionType) {
                 // Check redefintion
                 if (!out.values.empty()) {
                     // WARN: parameter values are already defined
@@ -96,7 +91,7 @@ namespace snowcrash {
                 // Clear any previous values
                 out.values.clear();
 
-                // TODO: Iterate over values and add them to "out"
+                ValuesParser::parse(node, siblings, pd, report, out.values);
 
                 if (out.values.empty()) {
                     // WARN: empty definition
@@ -121,12 +116,6 @@ namespace snowcrash {
             return node;
         }
 
-        static bool isDescriptionNode(const MarkdownNodeIterator& node,
-                                      SectionType sectionType) {
-
-            return (node->type == mdp::ListItemMarkdownNodeType && node->children().size() > 1);
-        }
-
         static SectionType sectionType(const MarkdownNodeIterator& node) {
 
             if (node->type == mdp::ListItemMarkdownNodeType
@@ -135,7 +124,7 @@ namespace snowcrash {
                 mdp::ByteBuffer subject = node->children().front().text;
 
                 if (RegexMatch(subject, ParameterAbbrevDefinitionRegex)) {
-                    return ParameterDefinitionSectionType;
+                    return ParameterSectionType;
                 }
             }
 
@@ -144,15 +133,13 @@ namespace snowcrash {
 
         static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
 
-            SectionType nestedType = UndefinedSectionType;
-
             // Check if parameter values section
             mdp::ByteBuffer subject = node->children().front().text;
 
             TrimString(subject);
 
-            if (RegexMatch(subject, ParameterValuesRegex)) {
-                return ParameterValuesSectionType;
+            if (RegexMatch(subject, ValuesRegex)) {
+                return ValuesSectionType;
             }
 
             return UndefinedSectionType;
