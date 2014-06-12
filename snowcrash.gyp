@@ -84,6 +84,7 @@
         'test/test-HeadersParser.cc',
         'test/test-ParameterParser.cc',
         'test/test-PayloadParser.cc',
+        'test/test-ValuesParser.cc',
         'test/test-Blueprint.cc',
         'test/test-snowcrash.cc'
       ],

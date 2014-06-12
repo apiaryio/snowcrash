@@ -12,17 +12,6 @@
 using namespace snowcrash;
 using namespace snowcrashtest;
 
-//    //+ id = `1234` (optional, number, `0000`)
-//    //
-//    //    Lorem ipsum.
-//    //
-//    //    + Values
-//    //        + `1234`
-//    //        + `0000`
-//    //        + `beef`
-//    //)";
-//
-
 const mdp::ByteBuffer ParameterFixture = \
 "+ id = `1234` (optional, number, `0000`)\n\n"\
 "    Lorem ipsum\n\n"\
@@ -39,8 +28,7 @@ TEST_CASE("Recognize parameter definition signature", "[parameter]")
     markdownParser.parse(ParameterFixture, markdownAST);
 
     REQUIRE(!markdownAST.children().empty());
-    REQUIRE(SectionProcessor<Parameter>::sectionType(markdownAST.children().begin()) == ParameterDefinitionSectionType);
-    REQUIRE(SectionProcessor<Parameter>::nestedSectionType(markdownAST.children().front().children().begin() + 2) == ParameterValuesSectionType);
+    REQUIRE(SectionProcessor<Parameter>::sectionType(markdownAST.children().begin()) == ParameterSectionType);
 }
 
 //TEST_CASE("Parse canonical parameter definition", "[parameter][block]")
@@ -150,87 +138,6 @@ TEST_CASE("Recognize parameter definition signature", "[parameter]")
 //    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
 //    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.empty());
 //    REQUIRE(blueprint.resourceGroups[0].resources[0].description.empty());
-//}
-//
-//TEST_CASE("Warn superfluous content in values attribute", "[parameter_definition][source]")
-//{
-//    // Blueprint in question:
-//    //R"(
-//    //# /1
-//    //+ Parameters
-//    //    + id
-//    //        + Values
-//    //         xx
-//    //
-//    //            + `Hello`
-//    //");
-//    const std::string blueprintSource = \
-//    "# /1/{id}\n"\
-//    "+ Parameters\n"\
-//    "    + id\n"\
-//    "        + Values\n"\
-//    "          extra-1\n"\
-//    "\n"\
-//    "            + `Hello`\n"\
-//    "\n";
-//
-//    Parser parser;
-//    Result result;
-//    Blueprint blueprint;
-//    parser.parse(blueprintSource, 0, result, blueprint);
-//    REQUIRE(result.error.code == Error::OK);
-//    REQUIRE(result.warnings.size() == 1);
-//    REQUIRE(result.warnings[0].code == IgnoringWarning);
-//
-//    REQUIRE(blueprint.resourceGroups.size() == 1);
-//    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.empty());
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].description.empty());
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters.size() == 1);
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].name == "id");
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].values.size() == 1);
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].values[0] == "Hello");
-//}
-//
-//TEST_CASE("Warn about illegal entities in values attribute", "[parameter_definition][source]")
-//{
-//    // Blueprint in question:
-//    //R"(
-//    //# /1/{id}
-//    //+ Parameters
-//    //    + id
-//    //        + Values
-//    //            + `Hello`
-//    //            + ilegal
-//    //            + `Ahoy`
-//    //");
-//    const std::string blueprintSource = \
-//    "# /1/{id}\n"\
-//    "+ Parameters\n"\
-//    "    + id\n"\
-//    "        + Values\n"\
-//    "            + `Hello`\n"\
-//    "            + ilegal\n"\
-//    "            + `Ahoy`\n"\
-//    "\n";
-//
-//    Parser parser;
-//    Result result;
-//    Blueprint blueprint;
-//    parser.parse(blueprintSource, 0, result, blueprint);
-//    REQUIRE(result.error.code == Error::OK);
-//    REQUIRE(result.warnings.size() == 1);
-//    REQUIRE(result.warnings[0].code == IgnoringWarning);
-//
-//    REQUIRE(blueprint.resourceGroups.size() == 1);
-//    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.empty());
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].description.empty());
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters.size() == 1);
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].name == "id");
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].values.size() == 2);
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].values[0] == "Hello");
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].values[1] == "Ahoy");
 //}
 //
 //TEST_CASE("Warn when re-setting the values attribute", "[parameter_definition][source]")
