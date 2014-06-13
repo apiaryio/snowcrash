@@ -116,6 +116,16 @@ namespace snowcrash {
             return node;
         }
 
+        static bool isDescriptionNode(const MarkdownNodeIterator& node,
+                                      SectionType sectionType) {
+
+            if (node->type == mdp::ParagraphMarkdownNodeType) {
+                return true;
+            }
+
+            return false;
+        }
+
         static SectionType sectionType(const MarkdownNodeIterator& node) {
 
             if (node->type == mdp::ListItemMarkdownNodeType
