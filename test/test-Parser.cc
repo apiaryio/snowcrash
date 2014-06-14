@@ -8,6 +8,7 @@
 
 #include "catch.hpp"
 #include "Parser.h"
+#include "csnowcrash.h"
 
 using namespace snowcrash;
 
@@ -79,6 +80,53 @@ Resource **description**\n\
     REQUIRE(action.examples.front().responses.size() == 1);
     
     Response& response = action.examples.front().responses[0];
+    REQUIRE(response.name == "200");
+    REQUIRE(response.body == "Text\n\n{ ... }\n");
+}
+
+TEST_CASE("Parse simple blueprint with C interface", "[parser]")
+{
+    C_Result result;
+    C_Blueprint blueprint;
+
+    const std::string blueprintSource = \
+"# Snowcrash API \n\
+\n\
+# GET /resource\n\
+Resource **description**\n\
+\n\
++ Response 200\n\
+    + Body\n\
+\n\
+            Text\n\
+\n\
+            { ... }\n\
+";
+
+    C_parse(blueprintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.empty());
+    REQUIRE(blueprint.name == "Snowcrash API");
+    REQUIRE(blueprint.description.empty());
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+
+    C_BluePrint_ResourceGroup& resourceGroup = blueprint.resourceGroups.front();
+    REQUIRE(resourceGroup.name.empty());
+    REQUIRE(resourceGroup.description.empty());
+    REQUIRE(resourceGroup.resources.size() == 1);
+
+    C_BluePrint_Resource& resource = resourceGroup.resources.front();
+    REQUIRE(resource.uriTemplate == "/resource");
+    REQUIRE(resource.actions.size() == 1);
+
+    C_BluePrint_Action& action = resource.actions[0];
+    REQUIRE(action.method == "GET");
+    REQUIRE(action.description == "Resource **description**\n\n");
+    REQUIRE(!action.examples.empty());
+    REQUIRE(action.examples.front().requests.empty());
+    REQUIRE(action.examples.front().responses.size() == 1);
+
+    C_BluePrint_Response& response = action.examples.front().responses[0];
     REQUIRE(response.name == "200");
     REQUIRE(response.body == "Text\n\n{ ... }\n");
 }
