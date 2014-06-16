@@ -28,12 +28,9 @@
 #  endif
 #endif
 
-#include "SourceAnnotation.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 
 struct C_SourceCharactersRange {
     size_t location;
@@ -49,22 +46,10 @@ struct C_SourceAnnotation {
     
     int code;
     
-    std::string message;
+    char* message;
 };
 
 typedef struct C_SourceAnnotation C_SourceAnnotation_t;
-
-C_SourceAnnotation_t *C_SourceAnnotation_new()
-{
-    return reinterpret_cast<C_SourceAnnotation_t*>(new snowcrash::SourceAnnotation());
-}
-
-void C_SourceAnnotation_free(C_SourceAnnotation_t *SourseAnnotation)
-{
-    if(!SourseAnnotation)
-        return;
-    delete reinterpret_cast<snowcrash::SourceAnnotation*>(SourseAnnotation);
-}
 
 CSNOWCRASH typedef C_SourceAnnotation C_Error;
 
@@ -93,7 +78,11 @@ enum C_WarningCode {
     C_URIWarning = 12
 };
 
-CSNOWCRASH typedef std::vector<C_Warning> C_Warnings;
+struct C_Warnings
+{
+    C_Warning* warnings_array;
+    int size;
+};
 
 struct C_Result {
 
