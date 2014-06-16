@@ -67,9 +67,6 @@ namespace snowcrash {
     /** An asset data */
     typedef std::string Asset;
 
-    /** Parameter Values */
-    typedef Collection<Value>::type Values;
-
     /** 
      *  \brief Metadata key-value pair,
      *
@@ -113,7 +110,7 @@ namespace snowcrash {
         Value exampleValue;
         
         /** Enumeration of possible values */
-        Values values;
+        Collection<Value>::type values;
     };
 
     /** Name of a symbol */
