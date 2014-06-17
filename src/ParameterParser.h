@@ -116,16 +116,6 @@ namespace snowcrash {
             return node;
         }
 
-        static bool isDescriptionNode(const MarkdownNodeIterator& node,
-                                      SectionType sectionType) {
-
-            if (node->type == mdp::ParagraphMarkdownNodeType) {
-                return true;
-            }
-
-            return false;
-        }
-
         static SectionType sectionType(const MarkdownNodeIterator& node) {
 
             if (node->type == mdp::ListItemMarkdownNodeType
@@ -143,13 +133,17 @@ namespace snowcrash {
 
         static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
 
-            // Check if parameter values section
-            mdp::ByteBuffer subject = node->children().front().text;
+            if (node->type == mdp::ListItemMarkdownNodeType
+                && !node->children().empty()) {
 
-            TrimString(subject);
+                // Check if parameter values section
+                mdp::ByteBuffer subject = node->children().front().text;
 
-            if (RegexMatch(subject, ValuesRegex)) {
-                return ValuesSectionType;
+                TrimString(subject);
+
+                if (RegexMatch(subject, ValuesRegex)) {
+                    return ValuesSectionType;
+                }
             }
 
             return UndefinedSectionType;
