@@ -10,7 +10,6 @@
 #ifndef C_SNOWCRASH_H
 #define C_SNOWCRASH_H
 
-#include "Parser.h"
 #include "CSourceAnnotation.h"
 #include "CBlueprint.h"
 

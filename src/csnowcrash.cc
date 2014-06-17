@@ -5,8 +5,8 @@
 //  Created by Ali Khoramshahi on 13/6/14.
 //  Copyright (c) 2013 Apiary Inc. All rights reserved.
 //
-
 #include "csnowcrash.h"
+#include "Parser.h"
 
 int C_parse(const C_SourceData& i_source, C_BlueprintParserOptions i_options, C_Result& i_result, C_Blueprint& i_blueprint)
 {
@@ -32,7 +32,14 @@ int C_parse(const C_SourceData& i_source, C_BlueprintParserOptions i_options, C_
         i_result.warnings.warnings_array = new C_Warning[result.warnings.size()];
         for (std::vector<snowcrash::Warning>::const_iterator it = result.warnings.begin(); it != result.warnings.end(); ++it){
             i_result.warnings.warnings_array[count].code = it->code;
-            i_result.warnings.warnings_array[count].location = *reinterpret_cast<const C_SourceCharactersBlock*>(&it->location);
+            i_result.warnings.warnings_array[count].location.size = it->location.size();
+            i_result.warnings.warnings_array[count].location.SourceCharactersRange_array = new C_SourceCharactersRange[it->location.size()];
+            int count_l2 = 0;
+            for (std::vector<snowcrash::SourceCharactersRange>::const_iterator itsc = it->location.begin(); itsc != it->location.end(); ++itsc){
+                i_result.warnings.warnings_array[count].location.SourceCharactersRange_array[count_l2].length = itsc->length;
+                i_result.warnings.warnings_array[count].location.SourceCharactersRange_array[count_l2].location = itsc->location;
+                count_l2++;
+            }
             if(it->message.size()){
                 i_result.warnings.warnings_array[count].message = new char[it->message.size() + 1];
                 std::copy(it->message.begin(), it->message.end(), i_result.warnings.warnings_array[count].message);
@@ -58,6 +65,8 @@ int C_parse(const C_SourceData& i_source, C_BlueprintParserOptions i_options, C_
     else{
         i_result.error.message = NULL;
     }
+
+    C_Warning* temp = i_result.warnings.warnings_array;
 
     //////////////////////////////////////////////////////////////////////////
     return result.error.code;

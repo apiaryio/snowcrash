@@ -21,7 +21,7 @@
 #     endif
 #  else
 #     if __GNUC__ >= 4
-#         define CSNOWCRASH __attribute__((visibility("default")))
+#         define CSNOWCRASH /*__attribute__((visibility("default")))*/
 #     else
 #         define CSNOWCRASH
 #     endif

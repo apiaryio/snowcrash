@@ -21,7 +21,7 @@
 #     endif
 #  else
 #     if __GNUC__ >= 4
-#         define CSNOWCRASH __attribute__((visibility("default")))
+#         define CSNOWCRASH /*__attribute__((visibility("default")))*/
 #     else
 #         define CSNOWCRASH
 #     endif
@@ -33,11 +33,15 @@ extern "C" {
 #endif
 
 struct C_SourceCharactersRange {
-    size_t location;
-    size_t length;
+    unsigned int location;
+    unsigned int length;
 };
 
-CSNOWCRASH typedef std::vector<C_SourceCharactersRange> C_SourceCharactersBlock;
+struct C_SourceCharactersBlock{
+    C_SourceCharactersRange* SourceCharactersRange_array;
+    int size;
+};
+
 struct C_SourceAnnotation {
     
     static const int OK;
