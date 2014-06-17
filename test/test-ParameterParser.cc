@@ -51,30 +51,6 @@ TEST_CASE("Parse canonical parameter definition", "[parameter]")
     REQUIRE(parameter.values[2] == "beef");
 }
 
-// TODO: Move to test-ParametersParser.cc
-//TEST_CASE("Parse ilegal parameter trait at the begining", "[parameter_definition][source]")
-//{
-//    const std::string blueprintSource = \
-//    "# /1/{4}\n"\
-//    "+ Parameters\n"\
-//    "    + 4\n"\
-//    "        + ilegal\n"\
-//    "\n";
-//
-//    Parser parser;
-//    Result result;
-//    Blueprint blueprint;
-//    parser.parse(blueprintSource, 0, result, blueprint);
-//    REQUIRE(result.error.code == Error::OK);
-//    REQUIRE(result.warnings.size() == 1);
-//    REQUIRE(result.warnings[0].code == IgnoringWarning);
-//
-//    REQUIRE(blueprint.resourceGroups.size() == 1);
-//    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.empty());
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].description.empty());
-//}
-
 TEST_CASE("Warn when re-setting the values attribute", "[parameter]")
 {
     mdp::ByteBuffer source = \
@@ -173,32 +149,22 @@ TEST_CASE("Warn about required vs default clash", "[parameter]")
     REQUIRE(parameter.defaultValue == "42");
 }
 
-// TODO: Move to uri parser?
-//TEST_CASE("Warn about implicit required vs default clash", "[parameter_definition][source]")
-//{
-//    const std::string blueprintSource = \
-//    "# /1/{id}\n"\
-//    "+ Parameters\n"\
-//    "    + id = `42`\n"\
-//    "\n";
-//
-//    Parser parser;
-//    Result result;
-//    Blueprint blueprint;
-//    parser.parse(blueprintSource, 0, result, blueprint);
-//    REQUIRE(result.error.code == Error::OK);
-//    REQUIRE(result.warnings.size() == 1);
-//    REQUIRE(result.warnings[0].code == LogicalErrorWarning);
-//
-//    REQUIRE(blueprint.resourceGroups.size() == 1);
-//    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.empty());
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].description.empty());
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters.size() == 1);
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].name == "id");
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].use == UndefinedParameterUse);
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].defaultValue == "42");
-//}
+TEST_CASE("Warn about implicit required vs default clash", "[parameter_definition][source]")
+{
+    mdp::ByteBuffer source = "+ id = `42`\n";
+
+    Parameter parameter;
+    Report report;
+    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(report.warnings[0].code == LogicalErrorWarning);
+
+    REQUIRE(parameter.name == "id");
+    REQUIRE(parameter.use == UndefinedParameterUse);
+    REQUIRE(parameter.defaultValue == "42");
+}
 
 // TODO: How to warn for this?
 //TEST_CASE("Unrecognized 'values' keyword", "[parameter]")
@@ -259,4 +225,35 @@ TEST_CASE("warn missing default value in values", "[parameter]")
     REQUIRE(parameter.name == "id");
     REQUIRE(parameter.exampleValue == "Value2");
     REQUIRE(parameter.defaultValue == "Value1");
+}
+
+TEST_CASE("Parse parameters with dot in its name", "[parameter]")
+{
+    mdp::ByteBuffer source = "+ product.id ... Hello\n";
+
+    Parameter parameter;
+    Report report;
+    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.empty());
+
+    REQUIRE(parameter.name == "product.id");
+    REQUIRE(parameter.description == "Hello");
+}
+
+TEST_CASE("Parentheses in parameter description ", "[parameter]")
+{
+    mdp::ByteBuffer source = "+ id (string) ... lorem (ipsum)\n";
+
+    Parameter parameter;
+    Report report;
+    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.empty());
+
+    REQUIRE(parameter.name == "id");
+    REQUIRE(parameter.type == "string");
+    REQUIRE(parameter.description == "lorem (ipsum)");
 }
