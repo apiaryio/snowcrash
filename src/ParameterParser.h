@@ -74,46 +74,46 @@ namespace snowcrash {
                                                          Report& report,
                                                          Parameter& out) {
 
-            if (pd.sectionContext() == ValuesSectionType) {
-                // Check redefintion
-                if (!out.values.empty()) {
-                    // WARN: parameter values are already defined
-                    std::stringstream ss;
-                    ss << "overshadowing previous 'values' definition";
-                    ss << " for parameter '" << out.name << "'";
-
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                    report.warnings.push_back(Warning(ss.str(),
-                                                      RedefinitionWarning,
-                                                      sourceMap));
-                }
-
-                // Clear any previous values
-                out.values.clear();
-
-                ValuesParser::parse(node, siblings, pd, report, out.values);
-
-                if (out.values.empty()) {
-                    // WARN: empty definition
-                    std::stringstream ss;
-                    ss << "no possible values specified for parameter '" << out.name << "'";
-
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                    report.warnings.push_back(Warning(ss.str(),
-                                                      EmptyDefinitionWarning,
-                                                      sourceMap));
-                }
-
-                if ((!out.exampleValue.empty() || !out.defaultValue.empty()) &&
-                     !out.values.empty()) {
-
-                    checkExampleAndDefaultValue(node, pd, report, out);
-                }
-
-                return ++MarkdownNodeIterator(node);
+            if (pd.sectionContext() != ValuesSectionType) {
+                return node;
             }
 
-            return node;
+            // Check redefinition
+            if (!out.values.empty()) {
+                // WARN: parameter values are already defined
+                std::stringstream ss;
+                ss << "overshadowing previous 'values' definition";
+                ss << " for parameter '" << out.name << "'";
+
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                report.warnings.push_back(Warning(ss.str(),
+                                                  RedefinitionWarning,
+                                                  sourceMap));
+            }
+
+            // Clear any previous values
+            out.values.clear();
+
+            ValuesParser::parse(node, siblings, pd, report, out.values);
+
+            if (out.values.empty()) {
+                // WARN: empty definition
+                std::stringstream ss;
+                ss << "no possible values specified for parameter '" << out.name << "'";
+
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                report.warnings.push_back(Warning(ss.str(),
+                                                  EmptyDefinitionWarning,
+                                                  sourceMap));
+            }
+
+            if ((!out.exampleValue.empty() || !out.defaultValue.empty()) &&
+                 !out.values.empty()) {
+
+                checkExampleAndDefaultValue(node, pd, report, out);
+            }
+
+            return ++MarkdownNodeIterator(node);
         }
 
         static SectionType sectionType(const MarkdownNodeIterator& node) {
@@ -122,6 +122,8 @@ namespace snowcrash {
                 && !node->children().empty()) {
 
                 mdp::ByteBuffer subject = node->children().front().text;
+
+                TrimString(subject);
 
                 if (RegexMatch(subject, ParameterAbbrevDefinitionRegex)) {
                     return ParameterSectionType;
@@ -133,20 +135,7 @@ namespace snowcrash {
 
         static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
 
-            if (node->type == mdp::ListItemMarkdownNodeType
-                && !node->children().empty()) {
-
-                // Check if parameter values section
-                mdp::ByteBuffer subject = node->children().front().text;
-
-                TrimString(subject);
-
-                if (RegexMatch(subject, ValuesRegex)) {
-                    return ValuesSectionType;
-                }
-            }
-
-            return UndefinedSectionType;
+            return SectionProcessor<Values>::sectionType(node);
         }
 
         static void parseSignature(const mdp::MarkdownNodeIterator& node,
