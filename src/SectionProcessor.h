@@ -94,6 +94,17 @@ namespace snowcrash {
                                                           SectionType& lastSectionType,
                                                           Report& report,
                                                           T& out) {
+
+            // WARN: Ignoring unexpected node
+            std::stringstream ss;
+
+            ss << "ignoring unrecognized block";
+
+            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+            report.warnings.push_back(Warning(ss.str(),
+                                              IgnoringWarning,
+                                              sourceMap));
+
             return ++MarkdownNodeIterator(node);
         }
         
@@ -115,6 +126,7 @@ namespace snowcrash {
         /** \return True if the node is unexpected in the current context */
         static bool isUnexpectedNode(const MarkdownNodeIterator& node,
                                      SectionType sectionType) {
+
             return !RecognizeSection(node);
         }
 

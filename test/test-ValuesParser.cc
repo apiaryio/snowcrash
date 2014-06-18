@@ -44,24 +44,24 @@ TEST_CASE("Parse canonical values", "[values]")
     REQUIRE(values[2] == "beef");
 }
 
-//TEST_CASE("Warn superfluous content in values attribute", "[values]")
-//{
-//    mdp::ByteBuffer source = \
-//    "+ Values\n\n"\
-//    " extra\n\n"\
-//    "    + `Hello`\n";
-//
-//    Values values;
-//    Report report;
-//    SectionParserHelper<Values, ValuesParser>::parse(source, ValuesSectionType, report, values);
-//
-//    REQUIRE(report.error.code == Error::OK);
-//    REQUIRE(report.warnings.size() == 1);
-//    REQUIRE(report.warnings[0].code == IgnoringWarning);
-//
-//    REQUIRE(values.size() == 1);
-//    REQUIRE(values[0] == "Hello");
-//}
+TEST_CASE("Warn superfluous content in values attribute", "[values]")
+{
+    mdp::ByteBuffer source = \
+    "+ Values\n\n"\
+    " extra\n\n"\
+    "    + `Hello`\n";
+
+    Values values;
+    Report report;
+    SectionParserHelper<Values, ValuesParser>::parse(source, ValuesSectionType, report, values);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(report.warnings[0].code == IgnoringWarning);
+
+    REQUIRE(values.size() == 1);
+    REQUIRE(values[0] == "Hello");
+}
 
 TEST_CASE("Warn about illegal entities in values attribute", "[values]")
 {
