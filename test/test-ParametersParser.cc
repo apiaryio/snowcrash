@@ -61,7 +61,8 @@ TEST_CASE("Parse ilegal parameter", "[parameters]")
     SectionParserHelper<Parameters, ParametersParser>::parse(source, ParametersSectionType, report, parameters);
 
     REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(report.warnings[0].code == IgnoringWarning);
 
     REQUIRE(parameters.empty());
 }
@@ -79,7 +80,8 @@ TEST_CASE("Parse illegal parameter among legal ones", "[parameters]")
     SectionParserHelper<Parameters, ParametersParser>::parse(source, ParametersSectionType, report, parameters);
 
     REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(report.warnings[0].code == IgnoringWarning);
 
     REQUIRE(parameters.size() == 2);
     REQUIRE(parameters[0].name == "OK-1");
@@ -120,7 +122,8 @@ TEST_CASE("Warn about additional content block in parameters section", "[paramet
     SectionParserHelper<Parameters, ParametersParser>::parse(source, ParametersSectionType, report, parameters);
 
     REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(report.warnings[0].code == IgnoringWarning);
 
     REQUIRE(parameters.size() == 1);
     REQUIRE(parameters[0].name == "id");
