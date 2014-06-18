@@ -69,36 +69,35 @@ namespace snowcrash {
                                                          Report& report,
                                                          Parameters& out) {
 
-            if (pd.sectionContext() == ParameterSectionType) {
-
-                Parameter parameter;
-                ParameterParser::parse(node, siblings, pd, report, parameter);
-
-                if (!out.empty()) {
-
-                    ParameterIterator duplicate = FindParameter(out, parameter);
-
-                    if (duplicate != out.end()) {
-
-                        // WARN: Parameter already defined
-                        std::stringstream ss;
-                        ss << "overshadowing previous parameter '" << parameter.name << "' definition";
-
-                        mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                        report.warnings.push_back(Warning(ss.str(),
-                                                          RedefinitionWarning,
-                                                          sourceMap));
-
-                        out.erase(duplicate);
-                    }
-                }
-
-                out.push_back(parameter);
-
-                return ++MarkdownNodeIterator(node);
+            if (pd.sectionContext() != ParameterSectionType) {
+                return node;
             }
 
-            return node;
+            Parameter parameter;
+            ParameterParser::parse(node, siblings, pd, report, parameter);
+
+            if (!out.empty()) {
+
+                ParameterIterator duplicate = FindParameter(out, parameter);
+
+                if (duplicate != out.end()) {
+
+                    // WARN: Parameter already defined
+                    std::stringstream ss;
+                    ss << "overshadowing previous parameter '" << parameter.name << "' definition";
+
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                    report.warnings.push_back(Warning(ss.str(),
+                                                      RedefinitionWarning,
+                                                      sourceMap));
+
+                    out.erase(duplicate);
+                }
+            }
+
+            out.push_back(parameter);
+
+            return ++MarkdownNodeIterator(node);
         }
 
         static bool isDescriptionNode(const MarkdownNodeIterator& node,
@@ -124,20 +123,7 @@ namespace snowcrash {
 
         static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
 
-            if (node->type == mdp::ListItemMarkdownNodeType
-                && !node->children().empty()) {
-
-                // Check if parameter section
-                mdp::ByteBuffer subject = node->children().front().text;
-
-                TrimString(subject);
-
-                if (RegexMatch(subject, ParameterAbbrevDefinitionRegex)) {
-                    return ParameterSectionType;
-                }
-            }
-
-            return UndefinedSectionType;
+            return SectionProcessor<Parameter>::sectionType(node);
         }
 
         /** Finds a parameter inside a parameters collection */
