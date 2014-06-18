@@ -19,7 +19,7 @@
 #define EXTERNC
 #endif
 
-EXTERNC typedef std::string C_SourceData;
+EXTERNC typedef char* C_SourceData;
 EXTERNC typedef unsigned int C_BlueprintParserOptions;
 
 /**

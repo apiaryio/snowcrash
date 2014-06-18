@@ -9,6 +9,7 @@
 #include "catch.hpp"
 #include "Parser.h"
 #include "csnowcrash.h"
+#include <cstring>
 
 using namespace snowcrash;
 
@@ -103,32 +104,32 @@ Resource **description**\n\
             { ... }\n\
 ";
 
-    C_parse(blueprintSource, 0, result, blueprint);
+    C_parse((C_SourceData)blueprintSource.c_str(), 0, result, blueprint);
     REQUIRE(result.error.code == Error::OK);
     REQUIRE(result.warnings.size == 0);
-    //REQUIRE(blueprint.name == "Snowcrash API");
-    //REQUIRE(blueprint.description == "");
-    //REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(strcmp(blueprint.name,"Snowcrash API") == 0);
+    REQUIRE(strcmp(blueprint.description,"") == 0);
+    REQUIRE(blueprint.resourceGroups.size == 1);
 
-    /*C_BluePrint_ResourceGroup& resourceGroup = blueprint.resourceGroups.front();
-    REQUIRE(resourceGroup.name == "");
-    REQUIRE(resourceGroup.description == "");
-    REQUIRE(resourceGroup.resources.size() == 1);
+    C_BluePrint_ResourceGroup resourceGroup = blueprint.resourceGroups.Blueprint_ResourceGroup_Array[0];
+    REQUIRE(strcmp(resourceGroup.name, "") == 0);
+    REQUIRE(strcmp(resourceGroup.description, "") == 0);
+    REQUIRE(resourceGroup.resources.size == 1);
 
-    C_BluePrint_Resource& resource = resourceGroup.resources.front();
-    REQUIRE(resource.uriTemplate == "/resource");
-    REQUIRE(resource.actions.size() == 1);
+    C_BluePrint_Resource& resource = resourceGroup.resources.Blueprint_Resource_Array[0];
+    REQUIRE(strcmp(resource.uriTemplate, "/resource") == 0);
+    REQUIRE(resource.actions.size == 1);
 
-    C_BluePrint_Action& action = resource.actions[0];
-    REQUIRE(action.method == "GET");
-    REQUIRE(action.description == "Resource **description**\n\n");
-    REQUIRE(!action.examples == "");
-    REQUIRE(action.examples.front().requests == "");
-    REQUIRE(action.examples.front().responses.size() == 1);
+    C_BluePrint_Action& action = resource.actions.Blueprint_Action_Array[0];
+    REQUIRE(strcmp(action.method,"GET") == 0);
+    REQUIRE(strcmp(action.description, "Resource **description**\n\n") == 0);
+    REQUIRE(action.examples.size);
+    REQUIRE(action.examples.Blueprint_TransactionExample_Array[0].requests.size == 0);
+    REQUIRE(action.examples.Blueprint_TransactionExample_Array[0].responses.size == 1);
 
-    C_BluePrint_Response& response = action.examples.front().responses[0];
-    REQUIRE(response.name == "200");
-    REQUIRE(response.body == "Text\n\n{ ... }\n");*/
+    C_BluePrint_Response& response = action.examples.Blueprint_TransactionExample_Array[0].responses.Blueprint_Response_Array[0];
+    REQUIRE(strcmp(response.name, "200") == 0);
+    REQUIRE(strcmp(response.body, "Text\n\n{ ... }\n") == 0 );
 }
 
 TEST_CASE("Parse bluprint with unsupported characters", "[parser]")
