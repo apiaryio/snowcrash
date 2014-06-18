@@ -166,26 +166,25 @@ TEST_CASE("Warn about implicit required vs default clash", "[parameter_definitio
     REQUIRE(parameter.defaultValue == "42");
 }
 
-// TODO: How to warn for this?
-//TEST_CASE("Unrecognized 'values' keyword", "[parameter]")
-//{
-//    mdp::ByteBuffer source = \
-//    "+ param\n"\
-//    "    + Values:\n"\
-//    "        + `lorem`\n";
-//
-//    Parameter parameter;
-//    Report report;
-//    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
-//
-//    REQUIRE(report.error.code == Error::OK);
-//    REQUIRE(report.warnings.size() == 1);
-//    REQUIRE(report.warnings[0].code == IgnoringWarning);
-//
-//    REQUIRE(parameter.name == "param");
-//    REQUIRE(parameter.use == UndefinedParameterUse);
-//    REQUIRE(parameter.values.empty());
-//}
+TEST_CASE("Unrecognized 'values' keyword", "[parameter]")
+{
+    mdp::ByteBuffer source = \
+    "+ param\n"\
+    "    + Values:\n"\
+    "        + `lorem`\n";
+
+    Parameter parameter;
+    Report report;
+    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.empty());
+
+    REQUIRE(parameter.name == "param");
+    REQUIRE(parameter.description == "+ Values:\n    + `lorem`\n");
+    REQUIRE(parameter.use == UndefinedParameterUse);
+    REQUIRE(parameter.values.empty());
+}
 
 TEST_CASE("warn missing example item in values", "[parameter]")
 {
