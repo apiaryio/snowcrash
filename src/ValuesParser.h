@@ -97,13 +97,17 @@ namespace snowcrash {
 
         static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
 
-            mdp::ByteBuffer subject = node->children().front().text;
-            TrimString(subject);
+            if (node->type == mdp::ListItemMarkdownNodeType
+                && !node->children().empty()) {
 
-            if (node->children().size() == 1 &&
-                !subject.empty()) {
+                mdp::ByteBuffer subject = node->children().front().text;
+                TrimString(subject);
 
-                return ValueSectionType;
+                if (node->children().size() == 1 &&
+                        !subject.empty()) {
+
+                    return ValueSectionType;
+                }
             }
 
             return UndefinedSectionType;
