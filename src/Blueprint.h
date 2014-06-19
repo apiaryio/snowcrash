@@ -48,7 +48,7 @@ namespace snowcrash {
     
     /** Parameter Value */
     typedef std::string Value;
-     
+
     /** A generic key - value pair */
     typedef std::pair<std::string, std::string> KeyValuePair;
     
