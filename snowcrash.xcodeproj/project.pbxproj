@@ -59,6 +59,12 @@
 		BBC2D861183024C100FBCEA7 /* DescriptionSectionUtility.h in Headers */ = {isa = PBXBuildFile; fileRef = BBC2D860183024C100FBCEA7 /* DescriptionSectionUtility.h */; };
 		BBC2D86318316DC000FBCEA7 /* ListBlockUtility.h in Headers */ = {isa = PBXBuildFile; fileRef = BBC2D86218316DC000FBCEA7 /* ListBlockUtility.h */; };
 		BBC2D8661831A76100FBCEA7 /* SectionUtility.h in Headers */ = {isa = PBXBuildFile; fileRef = BBC2D8651831A76100FBCEA7 /* SectionUtility.h */; };
+		BBCC855E19542DA100B99E90 /* ParameterParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBCC855C19542DA100B99E90 /* ParameterParser.h */; };
+		BBCC855F19542DA100B99E90 /* ValuesParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBCC855D19542DA100B99E90 /* ValuesParser.h */; };
+		BBCC856219542DB300B99E90 /* test-ParameterParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBCC856019542DB300B99E90 /* test-ParameterParser.cc */; };
+		BBCC856319542DB300B99E90 /* test-ValuesParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBCC856119542DB300B99E90 /* test-ValuesParser.cc */; };
+		BBCC856419542E5100B99E90 /* test-ParametersParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB03DC6517D3718D00C51E52 /* test-ParametersParser.cc */; };
+		BBCC856519542E5600B99E90 /* test-PayloadParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBE5705C173922B70086CE22 /* test-PayloadParser.cc */; };
 		BBCEF19218FBF7B000A0FA24 /* Version.h in Headers */ = {isa = PBXBuildFile; fileRef = BBCEF19118FBF7B000A0FA24 /* Version.h */; };
 		BBD5F9C917353C310049BBEE /* ResourceGroupParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD5F9C717353C300049BBEE /* ResourceGroupParser.h */; };
 		BBD5F9CE17353CE00049BBEE /* ResourceParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD5F9CC17353CE00049BBEE /* ResourceParser.h */; };
@@ -141,8 +147,6 @@
 /* Begin PBXFileReference section */
 		BB03DC6417D3717B00C51E52 /* ParametersParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = ParametersParser.h; path = src/ParametersParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BB03DC6517D3718D00C51E52 /* test-ParametersParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-ParametersParser.cc"; path = "test/test-ParametersParser.cc"; sourceTree = "<group>"; };
-		BB03DC6717D3721600C51E52 /* ParameterDefinitonParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = ParameterDefinitonParser.h; path = src/ParameterDefinitonParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
-		BB03DC6817D3723300C51E52 /* test-ParameterDefinitonParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = "test-ParameterDefinitonParser.cc"; path = "test/test-ParameterDefinitonParser.cc"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		BB05B9CE180448E300243E1B /* perf-libsnowcrash */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "perf-libsnowcrash"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB05B9D71804493500243E1B /* perf-snowcrash.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "perf-snowcrash.cc"; path = "test/performance/perf-snowcrash.cc"; sourceTree = SOURCE_ROOT; };
 		BB0793BE1782C773005BB7CC /* Platform.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Platform.h; path = src/Platform.h; sourceTree = "<group>"; };
@@ -198,6 +202,10 @@
 		BBC2D8641831901400FBCEA7 /* BlockUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BlockUtility.h; path = src/BlockUtility.h; sourceTree = "<group>"; };
 		BBC2D8651831A76100FBCEA7 /* SectionUtility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SectionUtility.h; path = src/SectionUtility.h; sourceTree = "<group>"; };
 		BBCC04E518A51AA800C65A08 /* test-SymbolIdentifier.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-SymbolIdentifier.cc"; path = "test/test-SymbolIdentifier.cc"; sourceTree = "<group>"; };
+		BBCC855C19542DA100B99E90 /* ParameterParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ParameterParser.h; path = src/ParameterParser.h; sourceTree = "<group>"; };
+		BBCC855D19542DA100B99E90 /* ValuesParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ValuesParser.h; path = src/ValuesParser.h; sourceTree = "<group>"; };
+		BBCC856019542DB300B99E90 /* test-ParameterParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-ParameterParser.cc"; path = "test/test-ParameterParser.cc"; sourceTree = "<group>"; };
+		BBCC856119542DB300B99E90 /* test-ValuesParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-ValuesParser.cc"; path = "test/test-ValuesParser.cc"; sourceTree = "<group>"; };
 		BBCEF19118FBF7B000A0FA24 /* Version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Version.h; path = src/Version.h; sourceTree = "<group>"; };
 		BBD5F9C717353C300049BBEE /* ResourceGroupParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = ResourceGroupParser.h; path = src/ResourceGroupParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BBD5F9CC17353CE00049BBEE /* ResourceParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = ResourceParser.h; path = src/ResourceParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
@@ -331,7 +339,7 @@
 >>>>>>> fff71c2... WIP: Header parser refactor in progress
 				BB45781D182326EE00D0293A /* test-Indentation.cc */,
 				BB8AEFD717D899B900298807 /* test-ListUtility.cc */,
-				BB03DC6817D3723300C51E52 /* test-ParameterDefinitonParser.cc */,
+				BBCC856019542DB300B99E90 /* test-ParameterParser.cc */,
 				BB03DC6517D3718D00C51E52 /* test-ParametersParser.cc */,
 				BBA889A917130239005A9570 /* test-Parser.cc */,
 				BBE5705C173922B70086CE22 /* test-PayloadParser.cc */,
@@ -341,7 +349,12 @@
 				BBFF48C9170B3C49001E5FB2 /* test-snowcrash.cc */,
 				BBCC04E518A51AA800C65A08 /* test-SymbolIdentifier.cc */,
 				BB1865C81764DB8A00756B18 /* test-SymbolTable.cc */,
+<<<<<<< HEAD
 				BB1112C5196A8870000F5224 /* test-UriTemplateParser.cc */,
+=======
+				BBED046418C7D33200961A5C /* test-UriParser.cc */,
+				BBCC856119542DB300B99E90 /* test-ValuesParser.cc */,
+>>>>>>> 89ca21b... Update Xcode project files for Xcode6
 				BB9E7029183342CB00ED5806 /* test-Warnings.cc */,
 			);
 			name = "test-libsnowcrash";
@@ -369,7 +382,7 @@
 				BB92D88F178EF4160098A63C /* HTTP.h */,
 				BBC2D86218316DC000FBCEA7 /* ListBlockUtility.h */,
 				BB1EC203173FD06600CFB84A /* ListUtility.h */,
-				BB03DC6717D3721600C51E52 /* ParameterDefinitonParser.h */,
+				BBCC855C19542DA100B99E90 /* ParameterParser.h */,
 				BB03DC6417D3717B00C51E52 /* ParametersParser.h */,
 				BBE5705F173927870086CE22 /* PayloadParser.h */,
 				BB0793BE1782C773005BB7CC /* Platform.h */,
@@ -406,8 +419,14 @@
 				BB6A9A7F17904C7300B2F283 /* SourceAnnotation.h */,
 				BBB2A226173EA77A0020C1CE /* StringUtility.h */,
 				BB1865C71764D67B00756B18 /* SymbolTable.h */,
+<<<<<<< HEAD
 				BB1112C8196A8892000F5224 /* UriTemplateParser.cc */,
 				BB1112C9196A8892000F5224 /* UriTemplateParser.h */,
+=======
+				BBED046018C7D31700961A5C /* UriParser.cc */,
+				BBED046118C7D31700961A5C /* UriParser.h */,
+				BBCC855D19542DA100B99E90 /* ValuesParser.h */,
+>>>>>>> 89ca21b... Update Xcode project files for Xcode6
 				BBCEF19118FBF7B000A0FA24 /* Version.h */,
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -436,6 +455,7 @@
 				BB6902AA196AAB1200B7DF76 /* CSourceAnnotation.h in Headers */,
 				BBFF48D6170C4F30001E5FB2 /* Blueprint.h in Headers */,
 				BBD73564192ED417009FE09E /* HeadersParser.h in Headers */,
+				BBCC855F19542DA100B99E90 /* ValuesParser.h in Headers */,
 				BBC2D8661831A76100FBCEA7 /* SectionUtility.h in Headers */,
 				BBA91DC2171D402600649B05 /* BlueprintParser.h in Headers */,
 <<<<<<< HEAD
@@ -454,6 +474,7 @@
 				BBE57061173927870086CE22 /* PayloadParser.h in Headers */,
 				BB8C3E651923D83C00EF36FA /* Section.h in Headers */,
 				BBE53561174132B100BCA7AD /* Serialize.h in Headers */,
+				BBCC855E19542DA100B99E90 /* ParameterParser.h in Headers */,
 				BBE53562174132B100BCA7AD /* SerializeJSON.h in Headers */,
 <<<<<<< HEAD
 				BB6902A6196AAB1200B7DF76 /* CBlueprint.h in Headers */,
@@ -625,7 +646,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BBCC856319542DB300B99E90 /* test-ValuesParser.cc in Sources */,
 				BBFF48CA170B3C49001E5FB2 /* test-snowcrash.cc in Sources */,
+<<<<<<< HEAD
 <<<<<<< HEAD
 				BBFF48D9170C57F1001E5FB2 /* test-Blueprint.cc in Sources */,
 				BBA889AA17130239005A9570 /* test-Parser.cc in Sources */,
@@ -654,6 +677,13 @@
 <<<<<<< HEAD
 >>>>>>> c3bc7b3... Parser refactor orgin
 =======
+=======
+				BBCC856219542DB300B99E90 /* test-ParameterParser.cc in Sources */,
+				BB8C3E661923EB3F00EF36FA /* test-AssetParser.cc in Sources */,
+				BBE7FEBE1922CAF300A1649E /* test-Blueprint.cc in Sources */,
+				BBCC856519542E5600B99E90 /* test-PayloadParser.cc in Sources */,
+				BBCC856419542E5100B99E90 /* test-ParametersParser.cc in Sources */,
+>>>>>>> 89ca21b... Update Xcode project files for Xcode6
 				BBD73566192ED45D009FE09E /* test-HeadersParser.cc in Sources */,
 >>>>>>> fff71c2... WIP: Header parser refactor in progress
 			);
@@ -759,6 +789,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_PROFILING_CODE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				USER_HEADER_SEARCH_PATHS = "./ext/markdown-parser/src/** ./ext/markdown-parser/ext/sundown/**";
 			};
 			name = Debug;
@@ -787,6 +818,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_PROFILING_CODE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				USER_HEADER_SEARCH_PATHS = "./ext/markdown-parser/src/** ./ext/markdown-parser/ext/sundown/**";
 			};
 			name = Release;
