@@ -29,6 +29,7 @@ EXTERNC typedef unsigned int C_BlueprintParserOptions;
  *  \param i_blueprint     Parsed blueprint AST.
  *  \return Error status code. Zero represents success, non-zero a failure.
  */
-EXTERNC int C_parse(const C_SourceData& i_source, C_BlueprintParserOptions i_options, C_Result& i_result, C_Blueprint& i_blueprint);
+
+EXTERNC C_Blueprint* C_parse(const char* i_source, C_BlueprintParserOptions i_options );
 
 #endif

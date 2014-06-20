@@ -195,8 +195,11 @@ void cast_resource_group(snowcrash::Collection<snowcrash::ResourceGroup>::const_
     }
 }
 
-int C_parse(const C_SourceData& i_source, C_BlueprintParserOptions i_options, C_Result& i_result, C_Blueprint& i_blueprint)
+C_Blueprint i_blueprint;
+
+C_Blueprint* C_parse(const char* i_source, C_BlueprintParserOptions i_options)
 {
+    C_Result i_result;
     snowcrash::BlueprintParserOptions options = i_options;
     snowcrash::Result result;
     snowcrash::Blueprint blueprint;
@@ -305,5 +308,6 @@ int C_parse(const C_SourceData& i_source, C_BlueprintParserOptions i_options, C_
     Copy_String_CharS(result.error.message , &i_result.error.message);
 
     //////////////////////////////////////////////////////////////////////////
-    return result.error.code;
+
+    return &i_blueprint;
 };
