@@ -65,6 +65,7 @@
 		BBCC856319542DB300B99E90 /* test-ValuesParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBCC856119542DB300B99E90 /* test-ValuesParser.cc */; };
 		BBCC856419542E5100B99E90 /* test-ParametersParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB03DC6517D3718D00C51E52 /* test-ParametersParser.cc */; };
 		BBCC856519542E5600B99E90 /* test-PayloadParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBE5705C173922B70086CE22 /* test-PayloadParser.cc */; };
+		BBCC856719543A4D00B99E90 /* test-SectionParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBCC856619543A4D00B99E90 /* test-SectionParser.cc */; };
 		BBCEF19218FBF7B000A0FA24 /* Version.h in Headers */ = {isa = PBXBuildFile; fileRef = BBCEF19118FBF7B000A0FA24 /* Version.h */; };
 		BBD5F9C917353C310049BBEE /* ResourceGroupParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD5F9C717353C300049BBEE /* ResourceGroupParser.h */; };
 		BBD5F9CE17353CE00049BBEE /* ResourceParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD5F9CC17353CE00049BBEE /* ResourceParser.h */; };
@@ -206,6 +207,7 @@
 		BBCC855D19542DA100B99E90 /* ValuesParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ValuesParser.h; path = src/ValuesParser.h; sourceTree = "<group>"; };
 		BBCC856019542DB300B99E90 /* test-ParameterParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-ParameterParser.cc"; path = "test/test-ParameterParser.cc"; sourceTree = "<group>"; };
 		BBCC856119542DB300B99E90 /* test-ValuesParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-ValuesParser.cc"; path = "test/test-ValuesParser.cc"; sourceTree = "<group>"; };
+		BBCC856619543A4D00B99E90 /* test-SectionParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-SectionParser.cc"; path = "test/test-SectionParser.cc"; sourceTree = "<group>"; };
 		BBCEF19118FBF7B000A0FA24 /* Version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Version.h; path = src/Version.h; sourceTree = "<group>"; };
 		BBD5F9C717353C300049BBEE /* ResourceGroupParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = ResourceGroupParser.h; path = src/ResourceGroupParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BBD5F9CC17353CE00049BBEE /* ResourceParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = ResourceParser.h; path = src/ResourceParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
@@ -346,6 +348,7 @@
 				BBB0F42B1731D04900C92465 /* test-RegexMatch.cc */,
 				BBD5F9DB173561DA0049BBEE /* test-ResouceGroupParser.cc */,
 				BBD5F9DD173578210049BBEE /* test-ResourceParser.cc */,
+				BBCC856619543A4D00B99E90 /* test-SectionParser.cc */,
 				BBFF48C9170B3C49001E5FB2 /* test-snowcrash.cc */,
 				BBCC04E518A51AA800C65A08 /* test-SymbolIdentifier.cc */,
 				BB1865C81764DB8A00756B18 /* test-SymbolTable.cc */,
@@ -681,6 +684,7 @@
 				BBCC856219542DB300B99E90 /* test-ParameterParser.cc in Sources */,
 				BB8C3E661923EB3F00EF36FA /* test-AssetParser.cc in Sources */,
 				BBE7FEBE1922CAF300A1649E /* test-Blueprint.cc in Sources */,
+				BBCC856719543A4D00B99E90 /* test-SectionParser.cc in Sources */,
 				BBCC856519542E5600B99E90 /* test-PayloadParser.cc in Sources */,
 				BBCC856419542E5100B99E90 /* test-ParametersParser.cc in Sources */,
 >>>>>>> 89ca21b... Update Xcode project files for Xcode6
