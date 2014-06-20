@@ -56,7 +56,7 @@ namespace snowcrash {
                                                        T& out) {
 
             if (!out.description.empty()) {
-                out.description += "\n\n";
+                out.description += "\n";
             }
 
             out.description += mdp::MapBytesRangeSet(node->sourceMap, pd.sourceData);
