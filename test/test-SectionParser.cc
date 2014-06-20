@@ -69,7 +69,7 @@ TEST_CASE("List adapter with List section", "[adapter]")
     REQUIRE(ListSectionAdapter::nextStartingNode(markdownAST.children().begin(), markdownAST.children(), it) == markdownAST.children().end());
 }
 
-TEST_CASE("List adapter with Header section", "[adapter][now]")
+TEST_CASE("List adapter with Header section", "[adapter]")
 {
     mdp::MarkdownParser markdownParser;
     mdp::MarkdownNode markdownAST;
