@@ -361,7 +361,7 @@ TEST_CASE("Warn on malformed payload signature", "[payload]")
     REQUIRE(report.warnings[0].code == FormattingWarning);
 
     REQUIRE(payload.name.empty());
-    REQUIRE(payload.description == "Description\n\nLine 2\n");
+    REQUIRE(payload.description == "Description\nLine 2\n");
     REQUIRE(payload.parameters.empty());
     REQUIRE(payload.headers.empty());
     REQUIRE(payload.body == "Hello World!\n");
