@@ -87,6 +87,7 @@
         'test/test-PayloadParser.cc',
         'test/test-ValuesParser.cc',
         'test/test-Blueprint.cc',
+        'test/test-SectionParser',
         'test/test-snowcrash.cc'
       ],
       'dependencies': [
