@@ -11,7 +11,6 @@
 #include "AssetParser.h"
 #include "HeadersParser.h"
 #include "PayloadParser.h"
-#include "ParameterParser.h"
 #include "ParametersParser.h"
 
 using namespace snowcrash;
