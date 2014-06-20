@@ -200,6 +200,7 @@ namespace snowcrash {
                 for (MarkdownNodeIterator child = node->children().begin();
                      child != node->children().end();
                      ++child) {
+
                     nestedType = nestedSectionType(child);
 
                     if (nestedType != UndefinedSectionType) {
@@ -225,7 +226,7 @@ namespace snowcrash {
                 return nestedType;
             }
 
-            // Check if headers section
+            // Check if asset section
             nestedType = SectionProcessor<Asset>::sectionType(node);
 
             if (nestedType != UndefinedSectionType) {
