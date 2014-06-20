@@ -10,7 +10,6 @@
 #define SNOWCRASH_SECTION_H
 
 #include <string>
-#include "MarkdownNode.h"
 
 namespace snowcrash {
     
@@ -44,9 +43,6 @@ namespace snowcrash {
     
     /** \return Human readable name for given %SectionType */
     extern std::string SectionName(const SectionType& section);
-    
-    /** \return True if the node has recognized %SectionType */
-    extern bool RecognizeSection(const mdp::MarkdownNodeIterator& node);
 }
 
 #endif

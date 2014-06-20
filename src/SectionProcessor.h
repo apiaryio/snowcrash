@@ -11,6 +11,7 @@
 
 #include "SectionParserData.h"
 #include "SourceAnnotation.h"
+#include "Signature.h"
 
 namespace snowcrash {
     
@@ -114,7 +115,7 @@ namespace snowcrash {
 
             return  !SectionProcessor<T>::isContentNode(node, sectionType) &&
                     SectionProcessor<T>::nestedSectionType(node) == UndefinedSectionType &&
-                    !RecognizeSection(node);
+                    !HasSectionKeywordSignature(node);
         }
 
         /** \return True if the node is a section-specific content node */
@@ -127,7 +128,7 @@ namespace snowcrash {
         static bool isUnexpectedNode(const MarkdownNodeIterator& node,
                                      SectionType sectionType) {
 
-            return !RecognizeSection(node);
+            return !HasSectionKeywordSignature(node);
         }
 
         /** \return %SectionType of the node */
