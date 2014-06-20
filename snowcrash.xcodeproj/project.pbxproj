@@ -33,6 +33,7 @@
 		BBCC856419542E5100B99E90 /* test-ParametersParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB03DC6517D3718D00C51E52 /* test-ParametersParser.cc */; };
 		BBCC856519542E5600B99E90 /* test-PayloadParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBE5705C173922B70086CE22 /* test-PayloadParser.cc */; };
 		BBCC856719543A4D00B99E90 /* test-SectionParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBCC856619543A4D00B99E90 /* test-SectionParser.cc */; };
+		BBCC856919545FCE00B99E90 /* Signature.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBCC856819545FCE00B99E90 /* Signature.cc */; };
 		BBCEF19218FBF7B000A0FA24 /* Version.h in Headers */ = {isa = PBXBuildFile; fileRef = BBCEF19118FBF7B000A0FA24 /* Version.h */; };
 		BBD5F9C917353C310049BBEE /* ResourceGroupParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD5F9C717353C300049BBEE /* ResourceGroupParser.h */; };
 		BBD5F9CE17353CE00049BBEE /* ResourceParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD5F9CC17353CE00049BBEE /* ResourceParser.h */; };
@@ -158,6 +159,7 @@
 		BBCC856019542DB300B99E90 /* test-ParameterParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-ParameterParser.cc"; path = "test/test-ParameterParser.cc"; sourceTree = "<group>"; };
 		BBCC856119542DB300B99E90 /* test-ValuesParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-ValuesParser.cc"; path = "test/test-ValuesParser.cc"; sourceTree = "<group>"; };
 		BBCC856619543A4D00B99E90 /* test-SectionParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-SectionParser.cc"; path = "test/test-SectionParser.cc"; sourceTree = "<group>"; };
+		BBCC856819545FCE00B99E90 /* Signature.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Signature.cc; path = src/Signature.cc; sourceTree = "<group>"; };
 		BBCEF19118FBF7B000A0FA24 /* Version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Version.h; path = src/Version.h; sourceTree = "<group>"; };
 		BBD5F9C717353C300049BBEE /* ResourceGroupParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = ResourceGroupParser.h; path = src/ResourceGroupParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BBD5F9CC17353CE00049BBEE /* ResourceParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = ResourceParser.h; path = src/ResourceParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
@@ -336,6 +338,7 @@
 				BBE5355C174132B100BCA7AD /* SerializeJSON.h */,
 				BBE53560174132B100BCA7AD /* SerializeYAML.cc */,
 				BBE5355D174132B100BCA7AD /* SerializeYAML.h */,
+				BBCC856819545FCE00B99E90 /* Signature.cc */,
 				BB8C3E721924192600EF36FA /* Signature.h */,
 				BBFF48CC170B3EDE001E5FB2 /* snowcrash.cc */,
 				BBFF48D1170B4224001E5FB2 /* snowcrash.h */,
@@ -511,6 +514,7 @@
 				BB8C3E7419241C1600EF36FA /* Section.cc in Sources */,
 				BBED046218C7D31700961A5C /* UriParser.cc in Sources */,
 				BBE53564174132B100BCA7AD /* Serialize.cc in Sources */,
+				BBCC856919545FCE00B99E90 /* Signature.cc in Sources */,
 				BBE53565174132B100BCA7AD /* SerializeJSON.cc in Sources */,
 				BB65939117845C2D00321230 /* RegexMatch.cc in Sources */,
 				BBE53566174132B100BCA7AD /* SerializeYAML.cc in Sources */,

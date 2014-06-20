@@ -55,6 +55,7 @@
         'src/Serialize.cc',
         'src/SerializeJSON.cc',
         'src/SerializeYAML.cc',
+        'src/Signature.cc',
         'src/UriParser.cc',
         'src/snowcrash.cc'
       ],
