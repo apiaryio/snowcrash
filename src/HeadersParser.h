@@ -69,7 +69,7 @@ namespace snowcrash {
         
         static bool isContentNode(const MarkdownNodeIterator& node,
                                   SectionType sectionType) {
-            return !RecognizeSection(node);
+            return !HasSectionKeywordSignature(node);
         }
         
         static SectionType sectionType(const MarkdownNodeIterator& node) {

@@ -166,7 +166,7 @@ namespace snowcrash {
         static bool isDescriptionNode(const MarkdownNodeIterator& node,
                                       SectionType sectionType) {
 
-            if (!RecognizeSection(node) &&
+            if (!HasSectionKeywordSignature(node) &&
                 !isAbbreviated(sectionType)) {
                 return true;
             }
@@ -177,7 +177,7 @@ namespace snowcrash {
         static bool isContentNode(const MarkdownNodeIterator& node,
                                   SectionType sectionType) {
 
-            if (!RecognizeSection(node) &&
+            if (!HasSectionKeywordSignature(node) &&
                 isAbbreviated(sectionType)) {
                 return true;
             }

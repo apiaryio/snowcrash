@@ -50,16 +50,18 @@
         'ext/markdown-parser/ext/sundown/html'
       ],
       'sources': [
+        'src/CBlueprint.cc',
+        'src/CSourceAnnotation.cc',      
         'src/HTTP.cc',
         'src/Section.cc',
         'src/Serialize.cc',
         'src/SerializeJSON.cc',
         'src/SerializeYAML.cc',
-        'src/UriTemplateParser.cc',
+        'src/Signature.cc',
+        'src/UriParser.cc',
         'src/snowcrash.cc',
         'src/csnowcrash.cc',
-        'src/CBlueprint.cc',
-        'src/CSourceAnnotation.cc'
+        'src/UriTemplateParser.cc'        
       ],
       'conditions': [
         [ 'OS=="win"', 
