@@ -9,7 +9,10 @@
 #ifndef SNOWCRASH_SECTIONPARSER_H
 #define SNOWCRASH_SECTIONPARSER_H
 
+#include <stdexcept>
 #include "SectionProcessor.h"
+
+#define ADAPTER_MISMATCH_ERR std::logic_error("mismatched adapter and node type")
 
 namespace snowcrash {
 
@@ -95,6 +98,9 @@ namespace snowcrash {
         
         /** \return Node to start parsing with */
         static const MarkdownNodeIterator startingNode(const MarkdownNodeIterator& seed) {
+            if (seed->type != mdp::HeaderMarkdownNodeType)
+                throw ADAPTER_MISMATCH_ERR;
+            
             return seed;
         }
         
@@ -116,6 +122,9 @@ namespace snowcrash {
     struct ListSectionAdapter {
         
         static const MarkdownNodeIterator startingNode(const MarkdownNodeIterator& seed) {
+            if (seed->type != mdp::ListItemMarkdownNodeType)
+                throw ADAPTER_MISMATCH_ERR;
+            
             return seed->children().begin();
         }
         
