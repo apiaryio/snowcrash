@@ -149,3 +149,25 @@ TEST_CASE("Warn about multiple parameters with the same name", "[parameters]")
     REQUIRE(parameters[0].name == "id");
     REQUIRE(parameters[0].exampleValue == "43");
 }
+
+TEST_CASE("Parse multiple parameters", "[parameters]")
+{
+    mdp::ByteBuffer source = \
+    "+ Parameters\n"\
+    "    + id (`42`)\n"\
+    "    + id2 (`43`)\n";
+    
+    Parameters parameters;
+    Report report;
+    SectionParserHelper<Parameters, ParametersParser>::parse(source, ParametersSectionType, report, parameters);
+    
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.empty());
+    
+    REQUIRE(parameters.size() == 2);
+    REQUIRE(parameters[0].name == "id");
+    REQUIRE(parameters[0].exampleValue == "42");
+    
+    REQUIRE(parameters[1].name == "id2");
+    REQUIRE(parameters[1].exampleValue == "43");
+}
