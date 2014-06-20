@@ -248,7 +248,7 @@
 		BBAE529318FEBFAE00D98223 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0510;
+				LastUpgradeCheck = 0600;
 				ORGANIZATIONNAME = "Apiary Inc.";
 			};
 			buildConfigurationList = BBAE529618FEBFAE00D98223 /* Build configuration list for PBXProject "markdownparser" */;
@@ -397,6 +397,7 @@
 		BBAE52A018FEBFAE00D98223 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				EXECUTABLE_PREFIX = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -405,6 +406,7 @@
 		BBAE52A118FEBFAE00D98223 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				EXECUTABLE_PREFIX = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
