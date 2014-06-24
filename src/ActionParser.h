@@ -74,6 +74,8 @@ namespace snowcrash {
             MarkdownNodeIterator cur = node;
             Payload payload;
 
+            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+
             switch (sectionType) {
                 case ParametersSectionType:
                     return ParametersParser::parse(node, siblings, pd, report, out.parameters);
@@ -87,7 +89,7 @@ namespace snowcrash {
                         out.examples.push_back(transaction);
                     }
 
-                    checkPayload(node, pd, sectionType, payload, out, report);
+                    checkPayload(sectionType, sourceMap, payload, out, report);
 
                     out.examples.back().requests.push_back(payload);
                     break;
@@ -101,7 +103,7 @@ namespace snowcrash {
                         out.examples.push_back(transaction);
                     }
 
-                    checkPayload(node, pd, sectionType, payload, out, report);
+                    checkPayload(sectionType, sourceMap, payload, out, report);
 
                     out.examples.back().responses.push_back(payload);
                     break;
@@ -120,11 +122,9 @@ namespace snowcrash {
 
                 mdp::ByteBuffer subject = node->text;
 
-                if (RegexMatch(subject, ActionHeaderRegex)) {
-                    return ActionSectionType;
-                }
+                if (RegexMatch(subject, ActionHeaderRegex) ||
+                    RegexMatch(subject, NamedActionHeaderRegex)) {
 
-                if (RegexMatch(subject, NamedActionHeaderRegex)) {
                     return ActionSectionType;
                 }
             }
@@ -153,16 +153,21 @@ namespace snowcrash {
             return UndefinedSectionType;
         }
 
-        static void checkPayload(const MarkdownNodeIterator& node,
-                                 SectionParserData& pd,
-                                 SectionType sectionType,
-                                 Payload& payload,
-                                 Action& action,
+        /**
+         *  \brief  Check & report payload validity.
+         *  \param  sectionType A section of the payload.
+         *  \param  sourceMap   Payload signature source map.
+         *  \param  payload     The payload to be checked.
+         *  \param  action      The Action to which payload belongs to.
+         *  \param  report      Parser report.
+         */
+        static void checkPayload(SectionType sectionType,
+                                 const mdp::CharactersRangeSet sourceMap,
+                                 const Payload& payload,
+                                 const Action& action,
                                  Report& report) {
 
             bool warnEmptyBody = false;
-
-            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
 
             mdp::ByteBuffer contentLength;
             mdp::ByteBuffer transferEncoding;
@@ -268,9 +273,9 @@ namespace snowcrash {
          *  Checks whether given section payload has duplicate within its transaction examples
          *  \return True when a duplicate is found, false otherwise.
          */
-        static bool isPayloadDuplicate(const SectionType& sectionType,
-                                       Payload& payload,
-                                       TransactionExample& example) {
+        static bool isPayloadDuplicate(SectionType& sectionType,
+                                       const Payload& payload,
+                                       const TransactionExample& example) {
 
             if (sectionType == RequestSectionType) {
 
