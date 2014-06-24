@@ -56,6 +56,11 @@ namespace snowcrash {
                                                        T& out) {
 
             if (!out.description.empty()) {
+
+                if (out.description[out.description.length() - 1] != '\n') {
+                    out.description += "\n";
+                }
+
                 out.description += "\n";
             }
 
