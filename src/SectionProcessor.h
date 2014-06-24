@@ -113,6 +113,13 @@ namespace snowcrash {
 
             return ++MarkdownNodeIterator(node);
         }
+
+        /** Final validation after processing */
+        static void finalize(const MarkdownNodeIterator& node,
+                             SectionParserData& pd,
+                             Report& report,
+                             T& out) {
+        }
         
         /** \return True if the node is a section description node */
         static bool isDescriptionNode(const MarkdownNodeIterator& node,
