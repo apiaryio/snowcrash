@@ -82,7 +82,7 @@ namespace snowcrash {
             
             // WARN: Superfluous indentation
             std::stringstream ss;
-            ss << "excessive indentation, ";
+            ss << "you have seem to have indented too far, ";
             ss << SectionName(type) << " ";
             if (level) {
                 ss << "section is expected to be indented by just ";
@@ -91,7 +91,7 @@ namespace snowcrash {
                     ss << "s";
             }
             else {
-                ss << "section is not expected to be indented";
+                ss << "section isn't expected to be indented";
             }
             
             SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur,
@@ -159,14 +159,14 @@ namespace snowcrash {
             if (section.type == DanglingBodySectionType ||
                 section.type == DanglingSchemaSectionType) {
                 
-                ss << "dangling " << SectionName(section.type) << " asset, ";
-                ss << "expected a pre-formatted code block, indent every of its line by ";
+                ss << "your " << SectionName(section.type) << " asset is dangling, ";
+                ss << "this entry is expected to be a pre-formatted code block, with each line indented by ";
                 ss << level * 4 << " spaces or " << level << " tabs";
             }
             else {
                 
                 ss << SectionName(section.type) << " asset ";
-                ss << "is expected to be a pre-formatted code block, every of its line indented by exactly ";
+                ss << "this entry is expected to be a pre-formatted code block, with each line indented by ";
                 ss << level * 4 << " spaces or " << level << " tabs";
             }
             
