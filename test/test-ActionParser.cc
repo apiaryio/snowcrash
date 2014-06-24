@@ -244,9 +244,10 @@ TEST_CASE("Parse method with foreign item", "[action]")
 TEST_CASE("Parse method with a HR", "[action]")
 {
     mdp::ByteBuffer source = \
-    "# PATCH /1\n"\
+    "# PATCH /1\n\n"\
+    "A\n"\
     "---\n"\
-    "A\n";
+    "B\n";
 
     Action action;
     Report report;
@@ -257,7 +258,7 @@ TEST_CASE("Parse method with a HR", "[action]")
 
     REQUIRE(action.name.empty());
     REQUIRE(action.method == "PATCH");
-    REQUIRE(action.description == "---\n\nA\n");
+    REQUIRE(action.description == "A\n---\n\nB\n");
     REQUIRE(action.examples.empty());
 }
 
@@ -321,7 +322,6 @@ TEST_CASE("Make sure method followed by a group does not eat the group", "[actio
 
     REQUIRE(action.method == "POST");
     REQUIRE(action.description == "# Group Two\n");
-
 }
 
 TEST_CASE("Parse action with parameters", "[action]")
