@@ -368,3 +368,62 @@ TEST_CASE("Warn on malformed payload signature", "[payload]")
     REQUIRE(payload.schema.empty());
 }
 
+TEST_CASE("Give a warning of empty message body for requests with certain headers", "[action]")
+{
+    mdp::ByteBuffer source = \
+    "+ Request\n"\
+    "    + Headers \n"\
+    "\n"\
+    "            Content-Length: 100\n";
+
+    Payload payload;
+    Report report;
+    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, report, payload);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(report.warnings[0].code == EmptyDefinitionWarning);
+
+    REQUIRE(payload.headers.size() == 1);
+    REQUIRE(payload.headers[0].first == "Content-Length");
+    REQUIRE(payload.headers[0].second == "100");
+    REQUIRE(payload.body.empty());
+}
+
+TEST_CASE("Do not report empty message body for requests", "[action]")
+{
+    mdp::ByteBuffer source = \
+    "+ Request\n"\
+    "    + Headers \n"\
+    "\n"\
+    "            Accept: application/json, application/javascript\n";
+
+    Payload payload;
+    Report report;
+    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, report, payload);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.empty());
+
+    REQUIRE(payload.headers.size() == 1);
+    REQUIRE(payload.headers[0].first == "Accept");
+    REQUIRE(payload.headers[0].second == "application/json, application/javascript");
+    REQUIRE(payload.body.empty());
+}
+
+TEST_CASE("Give a warning when 100 response has a body", "[action]")
+{
+    mdp::ByteBuffer source = \
+    "+ Response 100\n\n"\
+    "        {}\n";
+
+    Payload payload;
+    Report report;
+    SectionParserHelper<Payload, PayloadParser>::parse(source, ResponseBodySectionType, report, payload);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(report.warnings[0].code == EmptyDefinitionWarning);
+
+    REQUIRE(payload.body == "{}\n");
+}

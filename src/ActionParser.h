@@ -153,6 +153,32 @@ namespace snowcrash {
             return UndefinedSectionType;
         }
 
+        static void finalize(const MarkdownNodeIterator& node,
+                             SectionParserData& pd,
+                             Report& report,
+                             Action& out) {
+
+            if (!out.examples.empty() &&
+                !out.examples.back().requests.empty() &&
+                out.examples.back().responses.empty()) {
+
+                // WARN: No response for request
+                std::stringstream ss;
+                ss << "action is missing a response for ";
+
+                if (out.examples.back().requests.back().name.empty()) {
+                    ss << "a request";
+                } else {
+                    ss << "the '" << out.examples.back().requests.back().name << "' request";
+                }
+
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                report.warnings.push_back(Warning(ss.str(),
+                                                  EmptyDefinitionWarning,
+                                                  sourceMap));
+            }
+        }
+
         /**
          *  \brief  Check & report payload validity.
          *  \param  sectionType A section of the payload.
@@ -167,11 +193,6 @@ namespace snowcrash {
                                  const Action& action,
                                  Report& report) {
 
-            bool warnEmptyBody = false;
-
-            mdp::ByteBuffer contentLength;
-            mdp::ByteBuffer transferEncoding;
-
             if (isPayloadDuplicate(sectionType, payload, action.examples.back())) {
 
                 // WARN: Duplicate payload
@@ -184,44 +205,7 @@ namespace snowcrash {
                                                   sourceMap));
             }
 
-            for (Collection<Header>::const_iterator it = payload.headers.begin();
-                 it != payload.headers.end();
-                 ++it) {
-
-                if (it->first == HTTPHeaderName::ContentLength) {
-                    contentLength = it->second;
-                }
-
-                if (it->first == HTTPHeaderName::TransferEncoding) {
-                    transferEncoding = it->second;
-                }
-            }
-
-            if ((sectionType == RequestSectionType || sectionType == RequestBodySectionType) && payload.body.empty()) {
-
-                // Warn when content-length or transfer-encoding is specified or both headers and body are empty
-                if (payload.headers.empty()) {
-                    warnEmptyBody = true;
-                } else {
-                    warnEmptyBody = !contentLength.empty() || !transferEncoding.empty();
-                }
-
-                if (warnEmptyBody) {
-                    // WARN: empty body
-                    std::stringstream ss;
-                    ss << "empty " << SectionName(sectionType) << " " << SectionName(BodySectionType);
-
-                    if (!contentLength.empty()) {
-                        ss << ", expected " << SectionName(BodySectionType) << " for '" << contentLength << "' Content-Length";
-                    } else if (!transferEncoding.empty()) {
-                        ss << ", expected " << SectionName(BodySectionType) << " for '" << transferEncoding << "' Transfer-Encoding";
-                    }
-
-                    report.warnings.push_back(Warning(ss.str(),
-                                                      EmptyDefinitionWarning,
-                                                      sourceMap));
-                }
-            } else if (sectionType == ResponseSectionType || sectionType == ResponseBodySectionType) {
+            if (sectionType == ResponseSectionType || sectionType == ResponseBodySectionType) {
 
                 HTTPStatusCode code;
 
@@ -229,20 +213,9 @@ namespace snowcrash {
                     std::stringstream(payload.name) >> code;
                 }
 
-                StatusCodeTraits statusCodeTraits = GetStatusCodeTrait(code);
                 HTTPMethodTraits methodTraits = GetMethodTrait(action.method);
 
-                if ((!statusCodeTraits.allowBody || !methodTraits.allowBody) && !payload.body.empty()) {
-
-                    if (!statusCodeTraits.allowBody) {
-                        // WARN: not empty body
-                        std::stringstream ss;
-                        ss << "the " << code << " response MUST NOT include a " << SectionName(BodySectionType);
-
-                        report.warnings.push_back(Warning(ss.str(),
-                                                          EmptyDefinitionWarning,
-                                                          sourceMap));
-                    }
+                if (!methodTraits.allowBody && !payload.body.empty()) {
 
                     // WARN: Edge case for 2xx CONNECT
                     if (action.method == HTTPMethodName::Connect && code/100 == 2) {
@@ -267,7 +240,6 @@ namespace snowcrash {
                 }
             }
         }
-
 
         /**
          *  Checks whether given section payload has duplicate within its transaction examples
