@@ -61,8 +61,9 @@ TEST_CASE("Parse ilegal parameter", "[parameters]")
     SectionParserHelper<Parameters, ParametersParser>::parse(source, ParametersSectionType, report, parameters);
 
     REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(report.warnings.size() == 2);
     REQUIRE(report.warnings[0].code == IgnoringWarning);
+    REQUIRE(report.warnings[1].code == EmptyDefinitionWarning);
 
     REQUIRE(parameters.empty());
 }

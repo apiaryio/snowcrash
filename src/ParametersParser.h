@@ -126,6 +126,21 @@ namespace snowcrash {
             return SectionProcessor<Parameter>::sectionType(node);
         }
 
+        static void finalize(const MarkdownNodeIterator& node,
+                             SectionParserData& pd,
+                             Report& report,
+                             Parameters& out) {
+
+            if (out.empty()) {
+
+                // WARN: No parameters defined
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                report.warnings.push_back(Warning("No parameters defined in parameters section",
+                                                  EmptyDefinitionWarning,
+                                                  sourceMap));
+            }
+        }
+
         /** Finds a parameter inside a parameters collection */
         static ParameterIterator FindParameter(Parameters& parameters,
                                                const Parameter& parameter) {
