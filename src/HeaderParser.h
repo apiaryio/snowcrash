@@ -226,7 +226,7 @@ namespace snowcrash {
         
         // WARN: Deprecated header sections
         std::stringstream ss;
-        ss << "the 'headers' section at this level is deprecated and will be removed in a future, use respective payload header section(s) instead";
+        ss << "headers at this level will be inherited by all resources. Note that header inheritance will be replaced with a more useful mechanism in a future release. You should consider this feature deprecated.";
         BlockIterator nameBlock = ListItemNameBlock(cur, section.bounds.second);
         SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, cur, section.bounds, parser.sourceData);
         result.first.warnings.push_back(Warning(ss.str(),
