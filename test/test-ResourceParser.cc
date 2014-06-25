@@ -13,8 +13,9 @@ using namespace snowcrash;
 using namespace snowcrashtest;
 
 mdp::ByteBuffer ResourceFixture = \
-"# My Resource [/resource/{id}]\n\n"\
-"+ Model (text/plain)\n\n"\
+"# My Resource [/resource/{id}{?limit}]\n\n"\
+"Awesome description\n\n"\
+"+ Resource Model (text/plain)\n\n"\
 "        X.O.\n\n"\
 "+ Parameters\n"\
 "    + id = `1234` (optional, number, `0000`)\n\n"\
@@ -23,7 +24,7 @@ mdp::ByteBuffer ResourceFixture = \
 "            + `1234`\n"\
 "            + `0000`\n"\
 "            + `beef`\n"\
-"    + name\n\n"\
+"    + limit\n\n"\
 "## My Method [GET]\n\n"\
 "Method Description\n\n"\
 "+ Response 200 (text/plain)\n\n"\
@@ -40,473 +41,309 @@ TEST_CASE("Resource block classifier", "[resource]")
 
     // Nameless resource: "/resource"
     markdownAST.children().front().text = "/resource";
-    REQUIRE(!markdownAST.children().empty());
     REQUIRE(SectionProcessor<Resource>::sectionType(markdownAST.children().begin()) == ResourceSectionType);
 
     // Keyword "group"
     markdownAST.children().front().text = "Group A";
-    REQUIRE(!markdownAST.children().empty());
     REQUIRE(SectionProcessor<Resource>::sectionType(markdownAST.children().begin()) == UndefinedSectionType);
+
+    // Resource Method
+    markdownAST.children().front().text = "GET /resource";
+    REQUIRE(SectionProcessor<Resource>::sectionType(markdownAST.children().begin()) == ResourceMethodSectionType);
 }
 
-//TEST_CASE("Abbreviated Resource Method block classifier", "[resource][block]")
+//TEST_CASE("Abbreviated Resource Method block classifier", "[resource]")
 //{
-//    MarkdownBlock::Stack markdown;
-//    markdown.push_back(MarkdownBlock(HeaderBlockType, "GET /resource", 1, MakeSourceDataBlock(0, 1)));
-//    markdown.push_back(MarkdownBlock(HeaderBlockType, "POST", 1, MakeSourceDataBlock(1, 1)));
+//    mdp::ByteBuffer source = \
+//    "# GET /resource"\
+//    "# POST";
 //
-//    BlockIterator cur = markdown.begin();
-//    // "GET /resource"
-//    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), UndefinedSectionType) == ResourceMethodSectionType);
-//    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceMethodSectionType) == UndefinedSectionType);
+//    mdp::MarkdownParser markdownParser;
+//    mdp::MarkdownNode markdownAST;
+//    markdownParser.parse(source, markdownAST);
 //
-//    ++cur; // "POST"
 //    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSectionType) == ActionSectionType);
 //    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceMethodSectionType) == UndefinedSectionType);
 //}
-//
-//TEST_CASE("Parse resource", "[resource][block]")
+
+TEST_CASE("Parse resource", "[resource]")
+{
+    Resource resource;
+    Report report;
+    SectionParserHelper<Resource, ResourceParser>::parse(ResourceFixture, ResourceSectionType, report, resource);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.empty());
+
+    REQUIRE(resource.name == "My Resource");
+    REQUIRE(resource.uriTemplate == "/resource/{id}{?limit}");
+    REQUIRE(resource.description == "Awesome description\n\n");
+    REQUIRE(resource.headers.empty());
+
+    REQUIRE(resource.model.name == "Resource");
+    REQUIRE(resource.model.body == "X.O.\n");
+
+    REQUIRE(resource.parameters.size() == 2);
+    REQUIRE(resource.parameters[0].name == "id");
+    REQUIRE(resource.parameters[1].name == "limit");
+
+    REQUIRE(resource.actions.size() == 1);
+    REQUIRE(resource.actions.front().method == "GET");
+}
+
+TEST_CASE("Parse partially defined resource", "[resource]")
+{
+    mdp::ByteBuffer source = \
+    "# /1\n"\
+    "## GET\n"\
+    "+ Request\n"\
+    "p1\n";
+
+    Resource resource;
+    Report report;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 2); // no response & preformatted asset
+    REQUIRE(report.warnings[0].code == IndentationWarning);
+    REQUIRE(report.warnings[1].code == EmptyDefinitionWarning);
+
+    REQUIRE(resource.name.empty());
+    REQUIRE(resource.uriTemplate == "/1");
+    REQUIRE(resource.description.empty());
+    REQUIRE(resource.model.name.empty());
+    REQUIRE(resource.model.body.empty());
+    REQUIRE(resource.actions.size() == 1);
+    REQUIRE(resource.actions.front().method == "GET");
+    REQUIRE(resource.actions.front().description.empty());
+    REQUIRE(!resource.actions.front().examples.empty());
+    REQUIRE(resource.actions.front().examples.front().requests.size() == 1);
+    REQUIRE(resource.actions.front().examples.front().requests.front().name.empty());
+    REQUIRE(resource.actions.front().examples.front().requests.front().description.empty());
+    REQUIRE(resource.actions.front().examples.front().requests.front().body == "p1\n\n");
+}
+
+TEST_CASE("Parse multiple method descriptions", "[resource]")
+{
+    mdp::ByteBuffer source = \
+    "# /1\n"\
+    "# GET\n"\
+    "p1\n"\
+    "# POST\n"\
+    "p2\n";
+
+    Resource resource;
+    Report report;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 2); // 2x no response
+
+    REQUIRE(resource.uriTemplate == "/1");
+    REQUIRE(resource.description.empty());
+    REQUIRE(resource.model.name.empty());
+    REQUIRE(resource.model.body.empty());
+    REQUIRE(resource.actions.size() == 2);
+    REQUIRE(resource.actions[0].method == "GET");
+    REQUIRE(resource.actions[0].description == "p1\n");
+    REQUIRE(resource.actions[1].method == "POST");
+    REQUIRE(resource.actions[1].description == "p2\n");
+}
+
+//TEST_CASE("Parse multiple methods", "[resource]")
 //{
-//    MarkdownBlock::Stack markdown = CanonicalResourceFixture();
-//    Resource resource;
-//    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-//    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
-//    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, resource);
-//
-//    REQUIRE(result.first.error.code == Error::OK);
-//    CHECK(result.first.warnings.empty());
-//
-//    const MarkdownBlock::Stack &blocks = markdown;
-//    REQUIRE(std::distance(blocks.begin(), result.second) == 42 + 31);
-//
-//    REQUIRE(resource.name == "My Resource");
-//    REQUIRE(resource.uriTemplate == "/resource/{id}{?limit}");
-//    REQUIRE(resource.model.name == "My Resource");
-//    REQUIRE(resource.model.body == "X.O.");
-//    REQUIRE(resource.model.headers.size() == 1);
-//    REQUIRE(resource.model.headers[0].first == "Content-Type");
-//    REQUIRE(resource.model.headers[0].second == "text/plain");
-//    REQUIRE(resource.description == "1");
-//    REQUIRE(resource.parameters.size() == 2);
-//    REQUIRE(resource.parameters[0].name == "id");
-//    REQUIRE(resource.parameters[1].name == "limit");
-//    REQUIRE(resource.headers.empty());
-//    REQUIRE(resource.actions.size() == 1);
-//    REQUIRE(resource.actions.front().method == "GET");
-//}
-//
-//TEST_CASE("Parse partially defined resource", "[resource][block]")
-//{
-//    MarkdownBlock::Stack markdown;
-//    markdown.push_back(MarkdownBlock(HeaderBlockType, "/1", 1, MakeSourceDataBlock(0, 1)));
-//    markdown.push_back(MarkdownBlock(HeaderBlockType, "GET", 1, MakeSourceDataBlock(1, 1)));
-//
-//    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
-//    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-//
-//    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Request", 0, MakeSourceDataBlock(2, 1)));
-//    markdown.push_back(MarkdownBlock(ParagraphBlockType, "p1", 0, MakeSourceDataBlock(3, 1)));
-//
-//    markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(4, 1)));
-//    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(5, 1)));
-//
-//    Resource resource;
-//    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-//    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
-//    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, resource);
-//
-//    REQUIRE(result.first.error.code == Error::OK);
-//    REQUIRE(result.first.warnings.size() == 2); // no response & preformatted asset
-//    REQUIRE(result.first.warnings[0].code == IndentationWarning);
-//    REQUIRE(result.first.warnings[1].code == EmptyDefinitionWarning);
-//
-//    const MarkdownBlock::Stack &blocks = markdown;
-//    REQUIRE(std::distance(blocks.begin(), result.second) == 8);
-//
-//    REQUIRE(resource.name.empty());
-//    REQUIRE(resource.uriTemplate == "/1");
-//    REQUIRE(resource.description.empty());
-//    REQUIRE(resource.model.name.empty());
-//    REQUIRE(resource.model.body.empty());
-//    REQUIRE(resource.actions.size() == 1);
-//    REQUIRE(resource.actions.front().method == "GET");
-//    REQUIRE(resource.actions.front().description.empty());
-//    REQUIRE(!resource.actions.front().examples.empty());
-//    REQUIRE(resource.actions.front().examples.front().requests.size() == 1);
-//    REQUIRE(resource.actions.front().examples.front().requests.front().name.empty());
-//    REQUIRE(resource.actions.front().examples.front().requests.front().description.empty());
-//    REQUIRE(resource.actions.front().examples.front().requests.front().body == "3");
-//}
-//
-//TEST_CASE("Parse multiple method descriptions", "[resource][block]")
-//{
-//    MarkdownBlock::Stack markdown;
-//    markdown.push_back(MarkdownBlock(HeaderBlockType, "/1", 1, MakeSourceDataBlock(0, 1)));
-//    markdown.push_back(MarkdownBlock(HeaderBlockType, "GET", 1, MakeSourceDataBlock(0, 1)));
-//    markdown.push_back(MarkdownBlock(ParagraphBlockType, "p1", 0, MakeSourceDataBlock(1, 1)));
-//    markdown.push_back(MarkdownBlock(HeaderBlockType, "POST", 1, MakeSourceDataBlock(2, 1)));
-//    markdown.push_back(MarkdownBlock(ParagraphBlockType, "p2", 0, MakeSourceDataBlock(3, 1)));
-//
-//    Resource resource;
-//    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-//    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
-//    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, resource);
-//
-//    REQUIRE(result.first.error.code == Error::OK);
-//    REQUIRE(result.first.warnings.size() == 2); // 2x no response
-//
-//    const MarkdownBlock::Stack &blocks = markdown;
-//    REQUIRE(std::distance(blocks.begin(), result.second) == 5);
-//
-//    REQUIRE(resource.uriTemplate == "/1");
-//    REQUIRE(resource.description.empty());
-//    REQUIRE(resource.model.name.empty());
-//    REQUIRE(resource.model.body.empty());
-//    REQUIRE(resource.actions.size() == 2);
-//    REQUIRE(resource.actions[0].method == "GET");
-//    REQUIRE(resource.actions[0].description == "1");
-//    REQUIRE(resource.actions[1].method == "POST");
-//    REQUIRE(resource.actions[1].description == "3");
-//}
-//
-//TEST_CASE("Parse multiple methods", "[resource][block]")
-//{
-//    // Blueprint in question:
-//    //R"(
-//    //# /1
-//    //A
-//    //
-//    //## GET
-//    //B
-//    //
-//    //+ Response 200
-//    //    + Body
-//    //
-//    //            Code 1
-//    //
-//    //## HEAD
-//    //C
-//    //
-//    //+ Request D
-//    //+ Response 200
-//    //    + Body
-//    //
-//    //
-//    //## PUT
-//    //E
-//    //");
-//
-//    MarkdownBlock::Stack markdown;
-//    markdown.push_back(MarkdownBlock(HeaderBlockType, "/1", 1, MakeSourceDataBlock(0, 1)));
-//    markdown.push_back(MarkdownBlock(ParagraphBlockType, "A", 0, MakeSourceDataBlock(1, 1)));
-//
-//    markdown.push_back(MarkdownBlock(HeaderBlockType, "GET", 2, MakeSourceDataBlock(2, 1)));
-//    markdown.push_back(MarkdownBlock(ParagraphBlockType, "B", 0, MakeSourceDataBlock(3, 1)));
-//    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
-//    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-//    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Response 200", 0, MakeSourceDataBlock(4, 1)));
-//    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
-//    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-//    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Body", 0, MakeSourceDataBlock(5, 1)));
-//    markdown.push_back(MarkdownBlock(CodeBlockType, "Code 1", 0, MakeSourceDataBlock(6, 1)));
-//    markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(7, 1)));
-//    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(8, 1)));
-//    markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(9, 1)));
-//    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(10, 1)));
-//
-//    markdown.push_back(MarkdownBlock(HeaderBlockType, "HEAD", 2, MakeSourceDataBlock(11, 1)));
-//    markdown.push_back(MarkdownBlock(ParagraphBlockType, "C", 0, MakeSourceDataBlock(12, 1)));
-//    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
-//    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-//    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "Request D", 0, MakeSourceDataBlock(17, 1)));
-//    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-//    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Response 200", 0, MakeSourceDataBlock(13, 1)));
-//    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
-//    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-//    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "Body", 0, MakeSourceDataBlock(14, 1)));
-//    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(15, 1)));
-//    markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(16, 1)));
-//    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(18, 1)));
-//
-//    markdown.push_back(MarkdownBlock(HeaderBlockType, "PUT", 2, MakeSourceDataBlock(19, 1)));
-//    markdown.push_back(MarkdownBlock(ParagraphBlockType, "E", 0, MakeSourceDataBlock(20, 1)));
+//    mdp::ByteBuffer source = \
+//    "# /1\n"\
+//    "A\n"\
+//    "## GET\n"\
+//    "B\n"\
+//    "+ Response 200\n"\
+//    "    + Body\n\n"\
+//    "            Code 1\n\n"\
+//    "## HEAD\n"\
+//    "C\n"\
+//    "+ Request D\n"\
+//    "+ Response 200\n"\
+//    "    + Body\n\n\n"\
+//    "## PUT\n"\
+//    "E\n";
 //
 //    Resource resource;
-//    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-//    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
-//    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, resource);
+//    Report report;
+//    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
 //
-//    REQUIRE(result.first.error.code == Error::OK);
-//    CHECK(result.first.warnings.size() == 2); // empty body asset & no response
-//
-//    const MarkdownBlock::Stack &blocks = markdown;
-//    REQUIRE(std::distance(blocks.begin(), result.second) == 30);
+//    REQUIRE(report.error.code == Error::OK);
+//    REQUIRE(report.warnings.size() == 2); // empty body asset & no response
 //
 //    REQUIRE(resource.uriTemplate == "/1");
-//    REQUIRE(resource.description == "1");
+//    REQUIRE(resource.description == "A\n");
 //    REQUIRE(resource.model.name.empty());
 //    REQUIRE(resource.model.body.empty());
 //    REQUIRE(resource.actions.size() == 3);
+//
 //    REQUIRE(resource.actions[0].method == "GET");
-//    REQUIRE(resource.actions[0].description == "3");
-//    REQUIRE(!resource.actions[0].examples.empty());
+//    REQUIRE(resource.actions[0].description == "B\n");
+//    REQUIRE(resource.actions[0].examples.size() == 1);
 //    REQUIRE(resource.actions[0].examples[0].requests.empty());
 //    REQUIRE(resource.actions[0].examples[0].responses.size() == 1);
 //    REQUIRE(resource.actions[0].examples[0].responses[0].name == "200");
 //    REQUIRE(resource.actions[0].examples[0].responses[0].description.empty());
-//    REQUIRE(resource.actions[0].examples[0].responses[0].body == "Code 1");
+//    REQUIRE(resource.actions[0].examples[0].responses[0].body == "Code 1\n");
 //
 //    REQUIRE(resource.actions[1].method == "HEAD");
-//    REQUIRE(resource.actions[1].description == "C");
-//    REQUIRE(!resource.actions[1].examples.empty());
+//    REQUIRE(resource.actions[1].description == "C\n");
+//    REQUIRE(resource.actions[1].examples.size() == 1);
 //    REQUIRE(resource.actions[1].examples[0].requests.size() == 1);
 //    REQUIRE(resource.actions[1].examples[0].requests[0].name == "D");
 //    REQUIRE(resource.actions[1].examples[0].requests[0].description.empty());
 //    REQUIRE(resource.actions[1].examples[0].requests[0].description.empty());
-//
 //    REQUIRE(resource.actions[1].examples[0].responses.size() == 1);
 //    REQUIRE(resource.actions[1].examples[0].responses[0].name == "200");
 //    REQUIRE(resource.actions[1].examples[0].responses[0].description.empty());
-//    REQUIRE(resource.actions[1].examples[0].responses[0].body.empty());
+//    REQUIRE(resource.actions[1].examples[0].responses[0].body == "");
 //
 //    REQUIRE(resource.actions[2].method == "PUT");
-//    REQUIRE(resource.actions[2].description == "K");
+//    REQUIRE(resource.actions[2].description == "E\n");
 //    REQUIRE(resource.actions[2].examples.empty());
 //}
-//
-//TEST_CASE("Parse description with list", "[resource][block]")
-//{
-//    // Blueprint in question:
-//    //R"(
-//    //# /1
-//    //+ A
-//    //+ B
-//    //
-//    //p1
-//    //");
-//
-//    MarkdownBlock::Stack markdown;
-//    markdown.push_back(MarkdownBlock(HeaderBlockType, "/1", 1, MakeSourceDataBlock(0, 1)));
-//
-//    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
-//
-//    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-//    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "A", 0, MakeSourceDataBlock(1, 1)));
-//
-//    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-//    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "B", 0, MakeSourceDataBlock(2, 1)));
-//
-//    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(3, 1)));
-//
-//    markdown.push_back(MarkdownBlock(ParagraphBlockType, "p1", 0, MakeSourceDataBlock(4, 1)));
-//
-//    Resource resource;
-//    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-//    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
-//    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, resource);
-//
-//    REQUIRE(result.first.error.code == Error::OK);
-//    REQUIRE(result.first.warnings.empty());
-//
-//    const MarkdownBlock::Stack &blocks = markdown;
-//    REQUIRE(std::distance(blocks.begin(), result.second) == 8);
-//
-//    REQUIRE(resource.uriTemplate == "/1");
-//    REQUIRE(resource.description == "34");
-//    REQUIRE(resource.model.name.empty());
-//    REQUIRE(resource.model.body.empty());
-//    REQUIRE(resource.actions.empty());
-//}
-//
-//TEST_CASE("Parse resource with a HR", "[resource][block]")
-//{
-//
-//    // Blueprint in question:
-//    //R"(
-//    //# /1
-//    //---
-//    //A
-//
-//    MarkdownBlock::Stack markdown;
-//    markdown.push_back(MarkdownBlock(HeaderBlockType, "/1", 1, MakeSourceDataBlock(0, 1)));
-//    markdown.push_back(MarkdownBlock(HRuleBlockType, SourceData(), 0, MakeSourceDataBlock(1, 1)));
-//    markdown.push_back(MarkdownBlock(ParagraphBlockType, "A", 0, MakeSourceDataBlock(2, 1)));
-//
-//    Resource resource;
-//    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-//    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
-//    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, resource);
-//
-//    REQUIRE(result.first.error.code == Error::OK);
-//    CHECK(result.first.warnings.empty());
-//
-//    const MarkdownBlock::Stack &blocks = markdown;
-//    REQUIRE(std::distance(blocks.begin(), result.second) == 3);
-//
-//    REQUIRE(resource.uriTemplate == "/1");
-//    REQUIRE(resource.description == "12");
-//    REQUIRE(resource.model.name.empty());
-//    REQUIRE(resource.model.body.empty());
-//    REQUIRE(resource.actions.empty());
-//}
-//
-//TEST_CASE("Parse resource method abbreviation", "[resource][block]")
-//{
-//    // Blueprint in question:
-//    //R"(
-//    //# GET /resource
-//    //Description
-//    //
-//    //+ Response 200
-//    //    + Body
-//    //
-//    //            { ... }
-//    //");
-//
-//    MarkdownBlock::Stack markdown;
-//    markdown.push_back(MarkdownBlock(HeaderBlockType, "GET /resource", 1, MakeSourceDataBlock(0, 1)));
-//    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Description", 1, MakeSourceDataBlock(1, 1)));
-//
-//    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
-//    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-//
-//    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Response 200", 0, MakeSourceDataBlock(2, 1)));
-//
-//    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
-//    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-//    markdown.push_back(MarkdownBlock(ParagraphBlockType, "Body", 0, MakeSourceDataBlock(3, 1)));
-//    markdown.push_back(MarkdownBlock(CodeBlockType, "{ ... }", 0, MakeSourceDataBlock(4, 1)));
-//    markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(5, 1)));
-//    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(6, 1)));
-//
-//    markdown.push_back(MarkdownBlock(ListItemBlockEndType, SourceData(), 0, MakeSourceDataBlock(7, 1)));
-//    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(8, 1)));
-//
-//    Resource resource;
-//    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-//    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
-//    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, resource);
-//
-//    REQUIRE(result.first.error.code == Error::OK);
-//    REQUIRE(result.first.warnings.empty());
-//
-//    const MarkdownBlock::Stack &blocks = markdown;
-//    REQUIRE(std::distance(blocks.begin(), result.second) == 13);
-//
-//    REQUIRE(resource.name.empty());
-//    REQUIRE(resource.model.name.empty());
-//    REQUIRE(resource.model.body.empty());
-//    REQUIRE(resource.actions.size() == 1);
-//    REQUIRE(resource.actions[0].method == "GET");
-//    REQUIRE(resource.actions[0].description == "1");
-//    REQUIRE(resource.actions[0].examples[0].responses.size() == 1);
-//}
-//
-//TEST_CASE("Parse resource method abbreviation followed by a foreign method", "[resource][block]")
-//{
-//    // Blueprint in question:
-//    //R"(
-//    //# GET /resource
-//    //# POST
-//    //");
-//
-//    MarkdownBlock::Stack markdown;
-//    markdown.push_back(MarkdownBlock(HeaderBlockType, "GET /resource", 1, MakeSourceDataBlock(0, 1)));
-//    markdown.push_back(MarkdownBlock(HeaderBlockType, "POST", 1, MakeSourceDataBlock(1, 1)));
-//
-//    Resource resource;
-//    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-//    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
-//    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, resource);
-//
-//    REQUIRE(result.first.error.code == Error::OK);
-//    REQUIRE(result.first.warnings.size() == 2); // no response & ignoring possible resource method
-//
-//    const MarkdownBlock::Stack &blocks = markdown;
-//    REQUIRE(std::distance(blocks.begin(), result.second) == 1);
-//
-//    REQUIRE(resource.name.empty());
-//    REQUIRE(resource.model.name.empty());
-//    REQUIRE(resource.model.body.empty());
-//    REQUIRE(resource.actions.size() == 1);
-//    REQUIRE(resource.actions[0].method == "GET");
-//}
-//
-//TEST_CASE("Parse resource without name", "[resource][block]")
-//{
-//    // Blueprint in question:
-//    //R"(
-//    //# /resource
-//    //");
-//
-//    MarkdownBlock::Stack markdown;
-//    markdown.push_back(MarkdownBlock(HeaderBlockType, "/resource", 1, MakeSourceDataBlock(0, 1)));
-//
-//    Resource resource;
-//    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-//    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
-//    ParseSectionResult result = ResourceParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, resource);
-//
-//    REQUIRE(result.first.error.code == Error::OK);
-//    CHECK(result.first.warnings.size() == 0);
-//
-//    const MarkdownBlock::Stack &blocks = markdown;
-//    REQUIRE(std::distance(blocks.begin(), result.second) == 1);
-//
-//    REQUIRE(resource.uriTemplate == "/resource");
-//    REQUIRE(resource.name.empty());
-//    REQUIRE(resource.model.name.empty());
-//    REQUIRE(resource.model.body.empty());
-//    REQUIRE(resource.actions.size() == 0);
-//}
-//
+
+TEST_CASE("Parse description with list", "[resource]")
+{
+    mdp::ByteBuffer source = \
+    "# /1\n"\
+    "+ A\n"\
+    "+ B\n\n"\
+    "p1\n";
+
+    Resource resource;
+    Report report;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.empty());
+
+    REQUIRE(resource.uriTemplate == "/1");
+    REQUIRE(resource.description == "+ A\n\n+ B\n\np1\n");
+    REQUIRE(resource.model.name.empty());
+    REQUIRE(resource.model.body.empty());
+    REQUIRE(resource.actions.empty());
+}
+
+TEST_CASE("Parse resource with a HR", "[resource][block]")
+{
+    mdp::ByteBuffer source = \
+    "# /1\n"\
+    "A\n"\
+    "---\n"\
+    "B\n";
+
+    Resource resource;
+    Report report;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.empty());
+
+    REQUIRE(resource.uriTemplate == "/1");
+    REQUIRE(resource.description == "A\n---\n\nB\n");
+    REQUIRE(resource.model.name.empty());
+    REQUIRE(resource.model.body.empty());
+    REQUIRE(resource.actions.empty());
+}
+
+TEST_CASE("Parse resource method abbreviation", "[resource]")
+{
+    mdp::ByteBuffer source = \
+    "# GET /resource\n"\
+    "Description\n"\
+    "+ Response 200\n"\
+    "    + Body\n\n"\
+    "            {}\n";
+
+    Resource resource;
+    Report report;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.empty());
+
+    REQUIRE(resource.name.empty());
+    REQUIRE(resource.uriTemplate == "/resource");
+    REQUIRE(resource.actions.size() == 1);
+    REQUIRE(resource.actions[0].method == "GET");
+    REQUIRE(resource.actions[0].description == "Description\n");
+
+    REQUIRE(resource.actions[0].examples[0].responses.size() == 1);
+    REQUIRE(resource.actions[0].examples[0].responses[0].description.empty());
+    REQUIRE(resource.actions[0].examples[0].responses[0].body == "{}\n");
+}
+
+TEST_CASE("Parse resource method abbreviation followed by a foreign method", "[resource]")
+{
+    mdp::ByteBuffer source = \
+    "# GET /resource\n"\
+    "# POST\n";
+
+    Resource resource;
+    Report report;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 1);
+
+    REQUIRE(resource.name.empty());
+    REQUIRE(resource.model.name.empty());
+    REQUIRE(resource.model.body.empty());
+    REQUIRE(resource.actions.size() == 1);
+    REQUIRE(resource.actions[0].method == "GET");
+}
+
+TEST_CASE("Parse resource without name", "[resource]")
+{
+    mdp::ByteBuffer source = "# /resource\n";
+
+    Resource resource;
+    Report report;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.empty());
+
+    REQUIRE(resource.uriTemplate == "/resource");
+    REQUIRE(resource.name.empty());
+    REQUIRE(resource.model.name.empty());
+    REQUIRE(resource.model.body.empty());
+    REQUIRE(resource.actions.size() == 0);
+}
+
 //TEST_CASE("Warn about parameters not in URI template", "[resource][source]")
 //{
-//    // Blueprint in question:
-//    //R"(
-//    //# GET /1
-//    //# /resource/{id}
-//    //+ Parameters
-//    //    + olive
-//    //
-//    //## GET
-//    //+ Parameters
-//    //    + cheese
-//    //    + id
-//    //
-//    //+ Response 204
-//    //");
-//    const std::string blueprintSource = \
+//    mdp::ByteBuffer source = \
 //    "# /resource/{id}\n"\
 //    "+ Parameters\n"\
-//    "    + olive\n"\
-//    "\n"\
+//    "    + olive\n\n"\
 //    "## GET\n"\
 //    "+ Parameters\n"\
 //    "    + cheese\n"\
-//    "    + id\n"\
-//    "\n"\
+//    "    + id\n\n"\
 //    "+ Response 204\n\n";
 //
-//    Parser parser;
-//    Result result;
-//    Blueprint blueprint;
-//    parser.parse(blueprintSource, 0, result, blueprint);
-//    REQUIRE(result.error.code == Error::OK);
-//    REQUIRE(result.warnings.size() == 2);
-//    REQUIRE(result.warnings[0].code == LogicalErrorWarning);
-//    REQUIRE(result.warnings[1].code == LogicalErrorWarning);
+//    Resource resource;
+//    Report report;
+//    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
 //
-//    REQUIRE(blueprint.resourceGroups.size() == 1);
-//    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters.size() == 1);
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].parameters[0].name == "olive");
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters.size() == 2);
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].name == "cheese");
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[1].name == "id");
+//    REQUIRE(report.error.code == Error::OK);
+//    REQUIRE(report.warnings.size() == 2);
+//    REQUIRE(report.warnings[0].code == LogicalErrorWarning);
+//    REQUIRE(report.warnings[1].code == LogicalErrorWarning);
+//
+//    REQUIRE(resource.parameters.size() == 1);
+//    REQUIRE(resource.parameters[0].name == "olive");
+//    REQUIRE(resource.actions.size() == 1);
+//    REQUIRE(resource.actions[0].examples.size() == 1);
+//    REQUIRE(resource.actions[0].examples[0].responses.size() == 1);
 //}
-//
+
 //TEST_CASE("Parse nameless resource with named model", "[resource][model][source]")
 //{
 //    // Blueprint in question:
@@ -610,92 +447,19 @@ TEST_CASE("Resource block classifier", "[resource]")
 //    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
 //    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body == "AAA\n");
 //}
-//
-//TEST_CASE("Parse root resource", "[resource][source][issue][#40]")
-//{
-//    // Blueprint in question:
-//    //R"(
-//    //# API Root [/]
-//    //");
-//
-//    const std::string blueprintSource = \
-//    "# API Root [/]\n";
-//
-//    Parser parser;
-//    Result result;
-//    Blueprint blueprint;
-//    parser.parse(blueprintSource, 0, result, blueprint);
-//    REQUIRE(result.error.code == Error::OK);
-//    REQUIRE(result.warnings.empty());
-//
-//    REQUIRE(blueprint.resourceGroups.size() == 1);
-//    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].name == "API Root");
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].uriTemplate == "/");
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.empty());
-//}
-//
-//TEST_CASE("Deprecated resource headers", "[resource][source][deprecated]")
-//{
-//    // Blueprint in question:
-//    //R"(
-//    //# /
-//    //+ Headers
-//    //
-//    //        header1: value1
-//    //
-//    //# GET
-//    //+ Headers
-//    //
-//    //        header2: value2
-//    //
-//    //+ Response 200
-//    //    + Headers
-//    //
-//    //            header3: value3
-//    //
-//    //
-//    //");
-//
-//    const std::string blueprintSource = \
-//    "# /\n"\
-//    "+ Headers\n"\
-//    "\n"\
-//    "        header1: value1\n"\
-//    "\n"\
-//    "# GET\n"\
-//    "+ Headers\n"\
-//    "\n"\
-//    "        header2: value2\n"\
-//    "\n"\
-//    "+ Response 200\n"\
-//    "    + Headers\n"\
-//    "\n"\
-//    "            header3: value3\n"\
-//    "\n"\
-//    "\n";
-//
-//    Parser parser;
-//    Result result;
-//    Blueprint blueprint;
-//    parser.parse(blueprintSource, 0, result, blueprint);
-//    REQUIRE(result.error.code == Error::OK);
-//    REQUIRE(result.warnings.size() == 2);
-//    REQUIRE(result.warnings[0].code == DeprecatedWarning);
-//    REQUIRE(result.warnings[1].code == DeprecatedWarning);
-//
-//    REQUIRE(blueprint.resourceGroups.size() == 1);
-//    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].headers.empty());
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].headers.empty());
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples.size() == 1);
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers.size() == 3);
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[0].first == "header1");
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[0].second == "value1");
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[1].first == "header2");
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[1].second == "value2");
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[2].first == "header3");
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[2].second == "value3");
-//}
+
+TEST_CASE("Parse root resource", "[resource]")
+{
+    mdp::ByteBuffer source = "# API Root [/]\n";
+
+    Resource resource;
+    Report report;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.empty());
+
+    REQUIRE(resource.name == "API Root");
+    REQUIRE(resource.uriTemplate == "/");
+    REQUIRE(resource.actions.empty());
+}

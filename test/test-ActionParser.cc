@@ -233,7 +233,7 @@ TEST_CASE("Parse method with a HR", "[action]")
     SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, report, action);
 
     REQUIRE(report.error.code == Error::OK);
-    CHECK(report.warnings.empty());
+    REQUIRE(report.warnings.size() == 1); // no response
 
     REQUIRE(action.name.empty());
     REQUIRE(action.method == "PATCH");
@@ -279,7 +279,7 @@ TEST_CASE("Parse method without name", "[action]")
     SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, report, action);
 
     REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(report.warnings.size() == 1); // no response
 
     REQUIRE(action.name.empty());
     REQUIRE(action.method == "GET");
