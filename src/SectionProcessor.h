@@ -56,7 +56,12 @@ namespace snowcrash {
                                                        T& out) {
 
             if (!out.description.empty()) {
-                out.description += "\n\n";
+
+                if (out.description[out.description.length() - 1] != '\n') {
+                    out.description += "\n";
+                }
+
+                out.description += "\n";
             }
 
             out.description += mdp::MapBytesRangeSet(node->sourceMap, pd.sourceData);
@@ -107,6 +112,13 @@ namespace snowcrash {
                                               sourceMap));
 
             return ++MarkdownNodeIterator(node);
+        }
+
+        /** Final validation after processing */
+        static void finalize(const MarkdownNodeIterator& node,
+                             SectionParserData& pd,
+                             Report& report,
+                             T& out) {
         }
         
         /** \return True if the node is a section description node */

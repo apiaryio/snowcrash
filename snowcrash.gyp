@@ -81,6 +81,7 @@
         'ext/markdown-parser/ext/sundown/html'
       ],
       'sources': [
+        'test/test-ActionParser.cc',
         'test/test-AssetParser.cc',
         'test/test-HeadersParser.cc',
         'test/test-ParameterParser.cc',

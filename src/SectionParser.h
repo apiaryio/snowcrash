@@ -88,7 +88,9 @@ namespace snowcrash {
                 if (lastCur == cur)
                     break;
             }
-            
+
+            SectionProcessor<T>::finalize(node, pd, report, out);
+
             return Adapter::nextStartingNode(node, siblings, cur);
         }
     };
