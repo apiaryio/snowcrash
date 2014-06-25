@@ -8,6 +8,7 @@
 
 #include "Signature.h"
 #include "SectionParser.h"
+#include "ActionParser.h"
 #include "AssetParser.h"
 #include "HeadersParser.h"
 #include "PayloadParser.h"
@@ -22,5 +23,6 @@ bool snowcrash::HasSectionKeywordSignature(const mdp::MarkdownNodeIterator& node
             SectionProcessor<Asset>::sectionType(node) != UndefinedSectionType ||
             SectionProcessor<Payload>::sectionType(node) != UndefinedSectionType ||
             SectionProcessor<Values>::sectionType(node) != UndefinedSectionType ||
-            SectionProcessor<Parameters>::sectionType(node) != UndefinedSectionType);
+            SectionProcessor<Parameters>::sectionType(node) != UndefinedSectionType ||
+            SectionProcessor<Action>::sectionType(node) != UndefinedSectionType);
 }

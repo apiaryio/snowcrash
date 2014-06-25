@@ -158,7 +158,14 @@ namespace snowcrash {
                              Report& report,
                              Action& out) {
 
-            if (!out.examples.empty() &&
+            if (out.examples.empty()) {
+
+                // WARN: No response for action
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                report.warnings.push_back(Warning("action is missing a response",
+                                                  EmptyDefinitionWarning,
+                                                  sourceMap));
+            } else if (!out.examples.empty() &&
                 !out.examples.back().requests.empty() &&
                 out.examples.back().responses.empty()) {
 

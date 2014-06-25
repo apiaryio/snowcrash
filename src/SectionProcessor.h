@@ -61,7 +61,9 @@ namespace snowcrash {
                     out.description += "\n";
                 }
 
-                out.description += "\n";
+                if (out.description[out.description.length() - 2] != '\n') {
+                    out.description += "\n";
+                }
             }
 
             out.description += mdp::MapBytesRangeSet(node->sourceMap, pd.sourceData);
