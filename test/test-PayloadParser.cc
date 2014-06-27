@@ -442,7 +442,7 @@ TEST_CASE("Give a warning when 100 response has a body", "[payload]")
     REQUIRE(payload.body == "{}\n");
 }
 
-TEST_CASE("Empty body with `Body` should be parsed correctly", "[payload]")
+TEST_CASE("Empty body section should shouldn't be parsed as description", "[payload]")
 {
     Payload payload;
     Report report;
