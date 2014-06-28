@@ -14,7 +14,7 @@ using namespace snowcrash;
 static bool HasMismatchedCurlyBrackets(const URITemplate& uriTemplate) {
     int openCount = 0;
     int closeCount = 0;
-    for (int i = 0; i < uriTemplate.length(); i++) {
+    for (unsigned int i = 0; i < uriTemplate.length(); i++) {
         if (uriTemplate[i] == '{') openCount++;
         if (uriTemplate[i] == '}') closeCount++;
     }
@@ -24,7 +24,7 @@ static bool HasMismatchedCurlyBrackets(const URITemplate& uriTemplate) {
 static bool HasNestedCurlyBrackets(const URITemplate& uriTemplate) {
     char lastBracket = ' ';
     bool result = false;
-    for (int i = 0; i < uriTemplate.length(); i++) {
+    for (unsigned int i = 0; i < uriTemplate.length(); i++) {
         if (uriTemplate[i] == '{') {
             if (lastBracket == '{') {
                 result = true;
@@ -49,10 +49,10 @@ static bool PathContainsSquareBrackets(const URITemplate& uriTemplate) {
 
 static Expressions GetUriTemplateExpressions(const URITemplate& uriTemplate) {
     Expressions expressions;
-    int expressionStartPos = 0;
-    int expressionEndPos = 0;
+    size_t expressionStartPos = 0;
+    size_t expressionEndPos = 0;
     
-    while (expressionStartPos != std::string::npos && expressionEndPos!=std::string::npos && expressionStartPos<uriTemplate.length()) {
+    while (expressionStartPos != std::string::npos && expressionEndPos != std::string::npos && expressionStartPos < uriTemplate.length()) {
         expressionStartPos = uriTemplate.find("{", expressionStartPos);
         expressionEndPos = uriTemplate.find("}", expressionStartPos);
         if (expressionStartPos != std::string::npos && expressionEndPos > expressionStartPos) {
@@ -63,109 +63,54 @@ static Expressions GetUriTemplateExpressions(const URITemplate& uriTemplate) {
     return expressions;
 }
 
-FORCEINLINE bool IsAVariableExpression(const Expression& expression) {
-    return !RegexMatch(expression.substr(0, 1), URI_TEMPLATE_OPERATOR_REGEX);
-}
 
-FORCEINLINE bool IsAQueryStringExpression(const Expression& expression) {
-    return expression.substr(0, 1) == "?";
-}
-
-FORCEINLINE bool IsAFragmentExpression(const Expression& expression) {
-    return expression.substr(0, 1) == "#";
-}
-
-FORCEINLINE bool IsAReservedExpansionExpression(const Expression& expression) {
-    return expression.substr(0, 1) == "+";
-}
-
-FORCEINLINE bool IsALabelExpansionExpression(const Expression& expression) {
-    return expression.substr(0, 1) == ".";
-}
-
-FORCEINLINE bool IsAPathSegmentExpansionExpression(const Expression& expression) {
-    return expression.substr(0, 1) == "/";
-}
-
-FORCEINLINE bool IsAPathStyleParameterExpansionExpression(const Expression& expression) {
-    return expression.substr(0, 1) == ";";
-}
-
-FORCEINLINE bool IsAFormStyleQueryContinuationExpansionExpression(const Expression& expression) {
-    return expression.substr(0, 1) == "&";
-}
 
 static ClassifiedExpression ClassifyExpression(const Expression expression) {
-    if (IsAVariableExpression(expression)) {
-        VariableExpression classifiedExpression;
-        classifiedExpression.expression = expression;
-        return classifiedExpression;
+
+    VariableExpression variableExpression(expression);
+
+    if (variableExpression.IsExpressionType()) {
+        return variableExpression;
     }
 
-    if (IsAQueryStringExpression(expression)) {
-        QueryStringExpression classifiedExpression;
-        classifiedExpression.expression = expression;
-        return classifiedExpression;
+    QueryStringExpression queryStringExpression(expression);
+    if (queryStringExpression.IsExpressionType()) {
+        return queryStringExpression;
     }
 
-    if (IsAFragmentExpression(expression)) {
-        FragmentExpression classifiedExpression;
-        classifiedExpression.expression = expression;
-        return classifiedExpression;
+    FragmentExpression fragmentExpression(expression);
+    if (fragmentExpression.IsExpressionType()) {
+        return fragmentExpression;
     }
 
-    if (IsAReservedExpansionExpression(expression)) {
-        ReservedExpansionExpression classifiedExpression;
-        classifiedExpression.expression = expression;
-        return classifiedExpression;
+    ReservedExpansionExpression reservedExpansionExpression(expression);
+    if (reservedExpansionExpression.IsExpressionType()) {
+        return reservedExpansionExpression;
     }
 
-    if (IsALabelExpansionExpression(expression)) {
-        LabelExpansionExpression classifiedExpression;
-        classifiedExpression.expression = expression;
-        return classifiedExpression;
+    LabelExpansionExpression labelExpansionExpression(expression);
+    if (labelExpansionExpression.IsExpressionType()) {
+        return labelExpansionExpression;
     }
 
-    if (IsAPathSegmentExpansionExpression(expression)) {
-        PathSegmentExpansionExpression classifiedExpression;
-        classifiedExpression.expression = expression;
-        return classifiedExpression;
+    PathSegmentExpansionExpression pathSegmentExpansionExpression(expression);
+    if (pathSegmentExpansionExpression.IsExpressionType()) {
+        return pathSegmentExpansionExpression;
     }
 
-    if (IsAPathStyleParameterExpansionExpression(expression)) {
-        PathStyleParameterExpansionExpression classifiedExpression;
-        classifiedExpression.expression = expression;
-        return classifiedExpression;
+    PathStyleParameterExpansionExpression pathStyleParameterExpansionExpression(expression);
+    if (pathStyleParameterExpansionExpression.IsExpressionType()) {
+        return pathSegmentExpansionExpression;
     }
 
-    if (IsAFormStyleQueryContinuationExpansionExpression(expression)) {
-        FormStyleQueryContinuationExpression classifiedExpression;
-        classifiedExpression.expression = expression;
-        return classifiedExpression;
+    FormStyleQueryContinuationExpression formStyleQueryContinuationExpression(expression);
+    if (formStyleQueryContinuationExpression.IsExpressionType()) { 
+        return formStyleQueryContinuationExpression;
     }
 
-    UndefinedExpression classifiedExpression;
-    classifiedExpression.expression = expression;
-    return classifiedExpression;
-}
-
-FORCEINLINE bool IsSupportedExpressionType(const ClassifiedExpression& expression) {
-    return expression.isSupported;
-}
-
-FORCEINLINE bool ExpressionContainsSpaces(const ClassifiedExpression& expression) {
-    return expression.expression.find(" ") != std::string::npos;
-}
-
-FORCEINLINE bool ExpressionContainsHyphens(const ClassifiedExpression& expression) {
-    return expression.expression.find("-") != std::string::npos;
-}
-
-FORCEINLINE bool ExpressionContainsAssignment(const ClassifiedExpression& expression) {
-    return expression.expression.find("=") != std::string::npos;
-}
-bool IsInvalidExpressionName(const ClassifiedExpression& expression) {
-    return !RegexMatch(expression.expression,URI_TEMPLATE_EXPRESSION_REGEX);
+    UndefinedExpression undefinedExpression(expression);
+    
+    return undefinedExpression;
 }
 
 void URITemplateParser::parse(const URITemplate uri, const SourceCharactersBlock& sourceBlock, ParsedURITemplate& result)
@@ -203,34 +148,34 @@ void URITemplateParser::parse(const URITemplate uri, const SourceCharactersBlock
 
             ClassifiedExpression classifiedExpression = ClassifyExpression(*currentExpression);
             
-            if (IsSupportedExpressionType(classifiedExpression)) {
+            if (classifiedExpression.IsSupportedExpressionType()) {
                 bool hasIllegalCharacters = false;
 
-                if (ExpressionContainsSpaces(classifiedExpression)) {
+                if (classifiedExpression.ContainsSpaces()) {
                     std::stringstream ss;
-                    ss << "URI template expression \"" << classifiedExpression.expression << "\" contains spaces. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters.";
+                    ss << "URI template expression \"" << classifiedExpression.innerExpression << "\" contains spaces. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters.";
                     result.result.warnings.push_back(Warning(ss.str(), URIWarning, sourceBlock));
                     hasIllegalCharacters = true;
                 }
 
-                if (ExpressionContainsHyphens(classifiedExpression)) {
+                if (classifiedExpression.ContainsHyphens()) {
                     std::stringstream ss;
-                    ss << "URI template expression \"" << classifiedExpression.expression << "\" contains hyphens. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters.";
+                    ss << "URI template expression \"" << classifiedExpression.innerExpression << "\" contains hyphens. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters.";
                     result.result.warnings.push_back(Warning(ss.str(), URIWarning, sourceBlock));
                     hasIllegalCharacters = true;
                 }
 
-                if (ExpressionContainsAssignment(classifiedExpression)) {
+                if (classifiedExpression.ContainsAssignment()) {
                     std::stringstream ss;
-                    ss << "URI template expression \"" << classifiedExpression.expression << "\" contains assignment. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters.";
+                    ss << "URI template expression \"" << classifiedExpression.innerExpression << "\" contains assignment. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters.";
                     result.result.warnings.push_back(Warning(ss.str(), URIWarning, sourceBlock));
                     hasIllegalCharacters = true;
                 }
                
                 if (!hasIllegalCharacters) {
-                    if (IsInvalidExpressionName(classifiedExpression)) {
+                    if (classifiedExpression.IsInvalidExpressionName()) {
                         std::stringstream ss;
-                        ss << "URI template expression \"" << classifiedExpression.expression << "\" contains invalid characters. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters.";
+                        ss << "URI template expression \"" << classifiedExpression.innerExpression << "\" contains invalid characters. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters.";
                         result.result.warnings.push_back(Warning(ss.str(), URIWarning, sourceBlock));
                     }
                 }
@@ -245,11 +190,3 @@ void URITemplateParser::parse(const URITemplate uri, const SourceCharactersBlock
         result.result.error = Error("Failed to parse URI Template", URIWarning);
     }
 }
-
-
-
-
-
-
-
-
