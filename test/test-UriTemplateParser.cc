@@ -214,7 +214,7 @@ TEST_CASE("Parse uri template for unsupported level three path style parameter e
 
 }
 
-TEST_CASE("Parse uri template for unsupported level three form style query continuation expansion", "[unsupportedlevelthreeformstylequerycontinuationexpression][issue][#78]")
+TEST_CASE("Parse uri template for supported level three form style query continuation expansion", "[supportedlevelthreeformstylequerycontinuationexpression][issue][#78]")
 {
     const snowcrash::URI uri = "http://www.test.com/{id}?path=test{&varone,vartwo}";
 
@@ -224,7 +224,7 @@ TEST_CASE("Parse uri template for unsupported level three form style query conti
 
     parser.parse(uri, sourceBlock, result);
 
-    REQUIRE(result.result.warnings.size() == 1);
+    REQUIRE(result.result.warnings.size() == 0);
 
 }
 

@@ -99,3 +99,18 @@ TEST_CASE("Warn about unsupported uri template label expansion", "[unsupportedla
     parser.parse(blueprintSource, 0, result, blueprint);
     REQUIRE(result.warnings.size() == 1);
 }
+
+TEST_CASE("Warn about unsupported uri template in abbreviated blueprint","[abbreviatedblueprint][issue][#78]")
+{
+    const std::string blueprintSource = \
+        "FORMAT: 1A\n"\
+        "\n"\
+        "# GET /res/{id}{?a,    b}\n"\
+        "+ Response 200";
+
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(blueprintSource, 0, result, blueprint);
+    REQUIRE(result.warnings.size() == 1);
+}
