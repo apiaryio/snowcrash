@@ -248,6 +248,18 @@ namespace snowcrash {
                              Resource& resource,
                              Result& result)
         {
+
+            if (!resource.uriTemplate.empty()) {
+                URITemplateParser uriTemplateParser;
+                ParsedURITemplate parsedResult;
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(bounds.first, bounds.first, bounds, parser.sourceData);
+
+                uriTemplateParser.parse(resource.uriTemplate, sourceBlock, parsedResult);
+                if (parsedResult.result.warnings.size() > 0) {
+                    result += parsedResult.result;
+                }
+            }
+
             // Consolidate depraceted headers into subsequent payloads
             if (!resource.headers.empty()) {
                 for (Collection<Action>::iterator it = resource.actions.begin();
@@ -276,13 +288,6 @@ namespace snowcrash {
                 
                 HTTPMethod method;
                 GetResourceSignature(*cur, resource.name, resource.uriTemplate, method);
-
-                URITemplateParser uriTemplateParser;
-                ParsedURITemplate parsedResult;
-                SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, cur, section.bounds, parser.sourceData);
-
-                uriTemplateParser.parse(resource.uriTemplate, sourceBlock, parsedResult);
-                result.first += parsedResult.result;
                 result.second = ++sectionCur;
                 return result;
             }
