@@ -66,8 +66,7 @@ static Expressions GetUriTemplateExpressions(const URITemplate& uriTemplate) {
 }
 
 
-
-static ClassifiedExpression ClassifyExpression(const Expression expression) {
+static ClassifiedExpression ClassifyExpression(const Expression& expression) {
 
     VariableExpression variableExpression(expression);
 
@@ -167,7 +166,6 @@ void URITemplateParser::parse(const URITemplate uri, const SourceCharactersBlock
                     hasIllegalCharacters = true;
                 }
 
-
                 if (classifiedExpression.ContainsAssignment()) {
                     std::stringstream ss;
                     ss << "URI template expression \"" << classifiedExpression.innerExpression << "\" contains assignment. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters.";
@@ -194,3 +192,4 @@ void URITemplateParser::parse(const URITemplate uri, const SourceCharactersBlock
     }
 
 }
+

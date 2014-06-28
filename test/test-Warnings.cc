@@ -114,3 +114,4 @@ TEST_CASE("Warn about unsupported uri template in abbreviated blueprint","[abbre
     parser.parse(blueprintSource, 0, result, blueprint);
     REQUIRE(result.warnings.size() == 1);
 }
+
