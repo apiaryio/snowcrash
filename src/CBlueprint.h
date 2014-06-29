@@ -7,23 +7,23 @@
 //  Copyright (c) 2013 Apiary Inc. All rights reserved.
 //
 
-#ifndef SNOWCRASH_C_BLUEPRINT_H
-#define SNOWCRASH_C_BLUEPRINT_H
+#ifndef SC_C_BLUEPRINT_H
+#define SC_C_BLUEPRINT_H
 
-#ifndef CSNOWCRASH
+#ifndef SC_API
 #  ifdef _WIN32
 #     if defined(CSNOWCRASH_BUILD_SHARED) /* build dll */
-#         define CSNOWCRASH __declspec(dllexport)
+#         define SC_API __declspec(dllimport)
 #     elif !defined(CSNOWCRASH_BUILD_STATIC) /* use dll */
-#         define CSNOWCRASH __declspec(dllimport)
+#         define SC_API __declspec(dllexport)
 #     else /* static library */
-#         define CSNOWCRASH
+#         define SC_API
 #     endif
 #  else
 #     if __GNUC__ >= 4
-#         define CSNOWCRASH /*__attribute__((visibility("default")))*/
+#         define SC_API /*__attribute__((visibility("default")))*/
 #     else
-#         define CSNOWCRASH
+#         define SC_API
 #     endif
 #  endif
 #endif
@@ -32,203 +32,316 @@
 extern "C" {
 #endif
 
-CSNOWCRASH typedef char* CHARS;
-    
-CSNOWCRASH typedef CHARS C_BluePrint_Name;
+    /** Class Blueprint wrapper */
+    struct sc_blueprint_s;
+    typedef struct sc_blueprint_s sc_blueprint_t;
 
-CSNOWCRASH typedef CHARS C_BluePrint_Description;
+    /** Array Metadata wrapper */
+    struct sc_metadata_collection_s;
+    typedef struct sc_metadata_collection_s sc_metadata_collection_t;
 
-CSNOWCRASH typedef CHARS C_BluePrint_URI;
+    /** Class Metadata wrapper */
+    struct sc_metadata_s;
+    typedef struct sc_metadata_s sc_metadata_t;
 
-CSNOWCRASH typedef CHARS C_BluePrint_URITemplate;
+    /** Array Resource Groups wrapper */
+    struct sc_resource_groups_collection_s;
+    typedef struct sc_resource_groups_collection_s sc_resource_groups_collection_t;
 
-CSNOWCRASH typedef CHARS C_BluePrint_HTTPMethod;
+    /** Class Resource Group wrapper */
+    struct sc_resource_groups_s;
+    typedef struct sc_resource_groups_s sc_resource_groups_t;
 
-CSNOWCRASH typedef CHARS C_BluePrint_Type;
+    /** Array Resources Collection wrapper */
+    struct sc_resource_collection_s;
+    typedef struct sc_resource_collection_s sc_resource_collection_t;
 
-CSNOWCRASH typedef CHARS C_BluePrint_Value;
- 
-//CSNOWCRASH typedef std::pair<CHARS, CHARS> C_BluePrint_KeyValuePair;
-struct C_BluePrint_KeyValuePair 
-{
-    CHARS key;
-    CHARS value;
-};
+    /** Class Resources wrapper */
+    struct sc_resource_s;
+    typedef struct sc_resource_s sc_resource_t;
 
-/**
- * Default Container for collections.
- *
- *  FIXME: Use C++11 template aliases when migrating to C++11.
- */
-//template<typename T>
-//struct Collection {
-//    typedef std::vector<T> type;
-//    typedef typename std::vector<T>::iterator iterator;
-//    typedef typename std::vector<T>::const_iterator const_iterator;
-//};
+    /** Class Resource Model wrapper */
+    struct sc_resource_model_s;
+    typedef struct sc_resource_model_s sc_resource_model_t;
 
-struct C_BluePrint_Value_Collection {
-    C_BluePrint_Value* Blueprint_Value_Array;
-    unsigned int size;
-};
+    /** Array Payload Collection wrapper */
+    struct sc_payload_collection_s;
+    typedef struct sc_payload_collection_s sc_payload_collection_t;
 
-CSNOWCRASH typedef CHARS C_BluePrint_Asset;
+    /** Class Payload wrapper */
+    struct sc_payload_s;
+    typedef struct sc_payload_s sc_payload_t;
 
-CSNOWCRASH typedef C_BluePrint_KeyValuePair C_BluePrint_Metadata;
+    /** Array Parameter wrapper */
+    struct sc_parameter_collection_s;
+    typedef struct sc_parameter_collection_s sc_parameter_collection_t;
 
-CSNOWCRASH typedef C_BluePrint_KeyValuePair C_BluePrint_Header;
+    /** class Parameter wrapper */
+    struct sc_parameter_s;
+    typedef struct sc_parameter_s sc_parameter_t;
 
-enum C_BluePrint_ParameterUse {
-    C_UndefinedParameterUse,
-    C_OptionalParameterUse,
-    C_RequiredParameterUse
-};
+    /** Array Header wrapper */
+    struct sc_header_collection_s;
+    typedef struct sc_header_collection_s sc_header_collection_t;
 
-struct C_BluePrint_Parameter {
-    
-    C_BluePrint_Name name;
-    
-    C_BluePrint_Description description;
-    
-    C_BluePrint_Type type;
-    
-    C_BluePrint_ParameterUse use;
-    
-    C_BluePrint_Value defaultValue;
-    
-    C_BluePrint_Value exampleValue;
-    
-    C_BluePrint_Value_Collection values;
-};
+    /** class Header wrapper */
+    struct sc_header_s;
+    typedef struct sc_header_s sc_header_t;
 
-struct C_BluePrint_Parameter_Collection {
-    C_BluePrint_Parameter* Blueprint_Parameter_Array;
-    unsigned int size;
-};
+    /** Array Value wrapper */
+    struct sc_value_collection_s;
+    typedef struct sc_value_collection_s sc_value_collection_t;
 
-struct C_BluePrint_Header_Collection {
-    C_BluePrint_Header* Blueprint_Header_array;
-    unsigned int size;
-};
+    /** class Value wrapper */
+    struct sc_value_s;
+    typedef struct sc_value_s sc_value_t;
 
-struct C_BluePrint_Payload {
-    
-    C_BluePrint_Name name;
-    
-    C_BluePrint_Description description;
-    
-    C_BluePrint_Parameter_Collection parameters;
-    
-    C_BluePrint_Header_Collection headers;
-    
-    C_BluePrint_Asset body;
-    
-    C_BluePrint_Asset schema;
-};
+    /** Array Header wrapper */
+    struct sc_header_collection_s;
+    typedef struct sc_header_collection_s sc_header_collection_t;
 
-CSNOWCRASH typedef C_BluePrint_Payload C_BluePrint_ResourceModel;
+    /** class Header wrapper */
+    struct sc_header_s;
+    typedef struct sc_header_s sc_header_t;
 
-CSNOWCRASH typedef C_BluePrint_Payload C_BluePrint_Request;
+    /** Array Action wrapper */
+    struct sc_action_collection_s;
+    typedef struct sc_action_collection_s sc_action_collection_t;
 
-CSNOWCRASH typedef C_BluePrint_Payload C_BluePrint_Response;
+    /** class Action wrapper */
+    struct sc_action_s;
+    typedef struct sc_action_s sc_action_t;
 
-struct C_BluePrint_Request_Collection {
-    C_BluePrint_Request* Blueprint_Request_Array;
-    unsigned int size;
-};
+    /** Array Transaction Example wrapper */
+    struct sc_transaction_example_collection_s;
+    typedef struct sc_transaction_example_collection_s sc_transaction_example_collection_t;
 
-struct C_BluePrint_Response_Collection {
-    C_BluePrint_Response* Blueprint_Response_Array;
-    unsigned int size;
-};
+    /** class Transaction Example wrapper */
+    struct sc_transaction_example_s;
+    typedef struct sc_transaction_example_s sc_transaction_example_t;
 
-struct C_BluePrint_TransactionExample {
-    
-    C_BluePrint_Name name;
-    
-    C_BluePrint_Description description;
-    
-    C_BluePrint_Request_Collection requests;
-    
-    C_BluePrint_Response_Collection responses;
-};
+    //////////////////////////////////////////////////////////////////////////
 
-struct C_BluePrint_TransactionExample_Collection {
-    C_BluePrint_TransactionExample* Blueprint_TransactionExample_Array;
-    unsigned int size;
-};
+    SC_API sc_blueprint_t* sc_blueprint_new();
+    SC_API void sc_blueprint_free(sc_blueprint_t* blueprint);
 
-struct C_BluePrint_Action {
-    
-    C_BluePrint_HTTPMethod method;
-    
-    C_BluePrint_Name name;
-    
-    C_BluePrint_Description description;
-    
-    C_BluePrint_Parameter_Collection parameters;
-    
-    C_BluePrint_Header_Collection headers;
-    
-    C_BluePrint_TransactionExample_Collection examples;
-};
+    /** \returns Blueprint name */
+    SC_API const char* sc_blueprint_name(const sc_blueprint_t* blueprint);
 
-struct C_BluePrint_Action_Collection {
-    C_BluePrint_Action* Blueprint_Action_Array;
-    unsigned int size;
-};
+    /** \returns Blueprint description */
+    SC_API const char* sc_blueprint_description(const sc_blueprint_t* blueprint);
 
-struct C_BluePrint_Resource {
-    
-    C_BluePrint_URITemplate uriTemplate;
-    
-    C_BluePrint_Name name;
-    
-    C_BluePrint_Description description;
-    
-    C_BluePrint_ResourceModel model;
-    
-    C_BluePrint_Parameter_Collection parameters;
-    
-    C_BluePrint_Header_Collection headers;
-    
-    C_BluePrint_Action_Collection actions;
-};
+    //////////////////////////////////////////////////////////////////////////
 
-struct C_BluePrint_Resource_Collection {
-    C_BluePrint_Resource* Blueprint_Resource_Array;
-    unsigned int size;
-};
+    /** \returns Metadata Handle */
+    SC_API const sc_metadata_collection_t* sc_metadata_collection_handle(const sc_blueprint_t* blueprint);
 
-struct C_BluePrint_ResourceGroup {
-    
-    C_BluePrint_Name name;
-    
-    C_BluePrint_Description description;
-    
-    C_BluePrint_Resource_Collection resources;
-};
+    /** \returns size of Metadata array */
+    SC_API const int sc_metadata_collection_size(const sc_metadata_collection_t* metadata);
 
-struct C_BluePrint_Metadata_Collection {
-    C_BluePrint_Metadata* Blueprint_Metadata_Array;
-    unsigned int size;
-};
+    //////////////////////////////////////////////////////////////////////////
 
-struct C_BluePrint_ResourceGroup_Collection {
-    C_BluePrint_ResourceGroup* Blueprint_ResourceGroup_Array;
-    unsigned int size;
-};
+    /** \returns Metadata at `i` handle */
+    SC_API const sc_metadata_t* cs_metadata_handle(const sc_metadata_collection_t* metadata_col, int i);
 
-struct C_Blueprint {
-    
-    C_BluePrint_Metadata_Collection metadata;
-    
-    C_BluePrint_Name name;
+    /** \returns Metadata key */
+    SC_API const char* cs_metadata_key(const sc_metadata_t* metadata);
 
-    C_BluePrint_Description description;
-    
-    C_BluePrint_ResourceGroup_Collection resourceGroups;
-};
+    /** \returns Metadata value */
+    SC_API const char* cs_metadata_value(const sc_metadata_t* metadata);
+
+    //////////////////////////////////////////////////////////////////////////
+
+    /** \returns Resource Groups Array Handle */
+    SC_API const sc_resource_groups_collection_t* sc_resource_groups_collection_handle(const sc_blueprint_t* blueprint);
+
+    /** \returns size of Resource Groups array */
+    SC_API const int sc_resource_groups_collection_size(const sc_resource_groups_collection_t* resource);
+
+    //////////////////////////////////////////////////////////////////////////
+
+    /** \returns Resource Groups Handle */
+    SC_API const sc_resource_groups_t* sc_resource_groups_handle(const sc_resource_groups_collection_t* resource, int i);
+
+    /** \returns Resource Groups name */
+    SC_API const char* sc_resource_groups_name(const sc_resource_groups_t* handle);
+
+    /** \returns Resource Groups Description */
+    SC_API const char* sc_resource_groups_description(const sc_resource_groups_t* handle);
+
+    //////////////////////////////////////////////////////////////////////////
+
+    /** \returns Resource Array Handle */
+    SC_API const sc_resource_collection_t* sc_resource_collection_handle(const sc_resource_groups_t* handle);
+
+    /** \returns Resource array size*/
+    SC_API const int sc_resource_collection_size(const sc_resource_collection_t* resource);
+
+    //////////////////////////////////////////////////////////////////////////
+
+    /** \returns Resource Handle */
+    SC_API const sc_resource_t* sc_resource_handle(const sc_resource_collection_t* resource , int i);
+
+    /** \returns Resource URITemplate */
+    SC_API const char* sc_resource_uritemplate(const sc_resource_t* handle);
+
+    /** \returns Resource name */
+    SC_API const char* sc_resource_name(const sc_resource_t* handle);
+
+    /** \returns Resource description */
+    SC_API const char* sc_resource_description(const sc_resource_t* handle);
+
+    //////////////////////////////////////////////////////////////////////////
+
+    /** \returns Payload Collection handle from TransactionExample for requests*/
+    SC_API const sc_payload_collection_t* sc_payload_collection_handle_requests(const sc_transaction_example_t* handle);
+
+    /** \returns Payload Collection handle from TransactionExample for responses*/
+    SC_API const sc_payload_collection_t* sc_payload_collection_handle_responses(const sc_transaction_example_t* handle);
+
+    /** \returns Payload Collection size */
+    SC_API const int sc_payload_collection_size(const sc_payload_collection_t* handle);
+
+    //////////////////////////////////////////////////////////////////////////
+
+    /** \returns Payload at `i` Handle*/
+    SC_API const sc_payload_t* sc_payload_handle(const sc_payload_collection_t* handle , int i);
+
+    /** \returns Payload Handle from resource*/
+    SC_API const sc_payload_t* sc_payload_handle_resource(const sc_resource_t* handle);
+
+    /** \returns Payload name */
+    SC_API const char* sc_payload_name(const sc_payload_t* handle);
+
+    /** \returns Payload description */
+    SC_API const char* sc_payload_description(const sc_payload_t* handle);
+
+    /** \returns Payload body */
+    SC_API const char* sc_payload_body(const sc_payload_t* handle);
+
+    /** \returns Payload schema */
+    SC_API const char* sc_payload_schema(const sc_payload_t* handle);
+
+    //////////////////////////////////////////////////////////////////////////
+
+    /** \returns Parameter Collection handle from Payload*/
+    SC_API const sc_parameter_collection_t* sc_parameter_collection_handle_payload(const sc_payload_t* handle);
+
+    /** \returns Parameter Collection handle from Resource*/
+    SC_API const sc_parameter_collection_t* sc_parameter_collection_handle_resource(const sc_resource_t* handle);
+
+    /** \returns Parameter Collection handle from Action*/
+    SC_API const sc_parameter_collection_t* sc_parameter_collection_handle_action(const sc_action_t* handle);
+
+    /** \returns Parameter Collection size */
+    SC_API const int sc_parameter_collection_size(const sc_parameter_collection_t* handle);
+
+    //////////////////////////////////////////////////////////////////////////
+
+    /** \returns Parameter handle */
+    SC_API const sc_parameter_t* sc_parameter_handle(const sc_parameter_collection_t* handle , int i);
+
+    /** \returns Parameter name */
+    SC_API const char* sc_parameter_name(const sc_parameter_t* handle);
+
+    /** \returns Parameter description */
+    SC_API const char* sc_parameter_description(const sc_parameter_t* handle);
+
+    /** \returns Parameter Type */
+    SC_API const char* sc_parameter_type(const sc_parameter_t* handle);
+
+    /** \returns Parameter Parameter Use */
+    SC_API const int sc_parameter_parameter_use(const sc_parameter_t* handle);
+
+    /** \returns Parameter Default Value */
+    SC_API const char* sc_parameter_default_value(const sc_parameter_t* handle);
+
+    /** \returns Parameter Example Value */
+    SC_API const char* sc_parameter_example_value(const sc_parameter_t* handle);
+
+    //////////////////////////////////////////////////////////////////////////
+
+    /** \returns Value Collection handle */
+    SC_API const sc_value_collection_t* sc_value_collection_handle(const sc_parameter_t* handle);
+
+    /** \returns Value Collection size */
+    SC_API const int sc_value_collection_size(const sc_value_collection_t* handle);
+
+    //////////////////////////////////////////////////////////////////////////
+
+    /** \returns Value handle */
+    SC_API const sc_value_t* sc_value_handle(const sc_value_collection_t* handle , int i);
+
+    /** \returns Value string */
+    SC_API const char* sc_value_string(const sc_value_t* handle);
+
+    //////////////////////////////////////////////////////////////////////////
+
+    /** \returns Header Collection handle from Payload*/
+    SC_API const sc_header_collection_t* sc_header_collection_handle_payload(const sc_payload_t* handle);
+
+    /** \returns Header Collection handle from Resource*/
+    SC_API const sc_header_collection_t* sc_header_collection_handle_resource(const sc_resource_t* handle);
+
+    /** \returns Header Collection handle from Action*/
+    SC_API const sc_header_collection_t* sc_header_collection_handle_action(const sc_action_t* handle);
+
+    /** \returns Header Collection size */
+    SC_API const int sc_header_collection_size(const sc_header_collection_t* handle);
+
+    //////////////////////////////////////////////////////////////////////////
+
+    /** \returns Header handle */
+    SC_API const sc_header_t* sc_header_handle(const sc_header_collection_t* handle , int i);
+
+    /** \returns Header Key */
+    SC_API const char* sc_header_key(const sc_header_t* handle);
+
+    /** \returns Header Value */
+    SC_API const char* sc_header_value(const sc_header_t* handle);
+
+    //////////////////////////////////////////////////////////////////////////
+
+    /** \returns Action Collection handle */
+    SC_API const sc_action_collection_t* sc_action_collection_handle(const sc_resource_t* handle);
+
+    /** \returns Action Collection size */
+    SC_API const int sc_action_collection_size(const sc_action_collection_t* handle);
+
+    //////////////////////////////////////////////////////////////////////////
+
+    /** \returns Action handle */
+    SC_API const sc_action_t* sc_action_handle(const sc_action_collection_t* handle , int i);
+
+    /** \returns Action HTTPMethod */
+    SC_API const char* sc_action_httpmethod(const sc_action_t* handle);
+
+    /** \returns Action name */
+    SC_API const char* sc_action_name(const sc_action_t* handle);
+
+    /** \returns Action Description */
+    SC_API const char* sc_action_description(const sc_action_t* handle);
+
+    //////////////////////////////////////////////////////////////////////////
+
+    /** \returns Transaction Example Collection handle */
+    SC_API const sc_transaction_example_collection_t* sc_transaction_example_collection_handle(const sc_action_t* handle);
+
+    /** \returns Transaction Example Collection size */
+    SC_API const int sc_transaction_example_collection_size(const sc_transaction_example_collection_t* handle);
+
+    //////////////////////////////////////////////////////////////////////////
+
+    /** \returns Transaction Example handle */
+    SC_API const sc_transaction_example_t* sc_transaction_example_handle(const sc_transaction_example_collection_t* handle , int i);
+
+    /** \returns Transaction Example name */
+    SC_API const char* sc_transaction_example_name(const sc_transaction_example_t* handle);
+
+    /** \returns Transaction Example Description */
+    SC_API const char* sc_transaction_example_description(const sc_transaction_example_t* handle);
+
+    //////////////////////////////////////////////////////////////////////////
 
 #ifdef __cplusplus
 }

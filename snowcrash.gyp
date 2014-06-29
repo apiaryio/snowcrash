@@ -45,6 +45,8 @@
         'src/UriParser.cc',
         'src/snowcrash.cc',
         'src/csnowcrash.cc',
+        'src/CBlueprint.cc',
+        'src/CSourceAnnotation.cc'
       ],
       'conditions': [
         [ 'OS=="win"', 

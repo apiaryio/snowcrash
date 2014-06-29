@@ -7,29 +7,45 @@
 //  Copyright (c) 2013 Apiary Inc. All rights reserved.
 //
 
-#ifndef C_SNOWCRASH_H
-#define C_SNOWCRASH_H
+#ifndef CS_C_SNOWCRASH_H
+#define CS_C_SNOWCRASH_H
+
+#ifndef SC_API
+#  ifdef _WIN32
+#     if defined(CSNOWCRASH_BUILD_SHARED) /* build dll */
+#         define SC_API __declspec(dllimport)
+#     elif !defined(CSNOWCRASH_BUILD_STATIC) /* use dll */
+#         define SC_API __declspec(dllexport)
+#     else /* static library */
+#         define SC_API
+#     endif
+#  else
+#     if __GNUC__ >= 4
+#         define SC_API /*__attribute__((visibility("default")))*/
+#     else
+#         define SC_API
+#     endif
+#  endif
+#endif
 
 #include "CSourceAnnotation.h"
 #include "CBlueprint.h"
 
 #ifdef __cplusplus
-#define EXTERNC extern "C"
-#else
-#define EXTERNC
+extern "C" {
 #endif
 
-EXTERNC typedef char* C_SourceData;
-EXTERNC typedef unsigned int C_BlueprintParserOptions;
+    struct sc_return_value
+    {
+        sc_blueprint_t* blueprint;
+        sc_result_s* result;
+    };
 
-/**
- *  \param i_source        A textual source data to be parsed.
- *  \param i_options       Parser options. Use 0 for no addtional options.
- *  \param i_result        Parsing result report.
- *  \param i_blueprint     Parsed blueprint AST.
- *  \return Error status code. Zero represents success, non-zero a failure.
- */
+    /** Parser */
+    SC_API sc_return_value* cs_c_parse(const char* source);
 
-EXTERNC C_Blueprint* C_parse(const char* i_source, C_BlueprintParserOptions i_options );
+#ifdef __cplusplus
+}
+#endif
 
 #endif
