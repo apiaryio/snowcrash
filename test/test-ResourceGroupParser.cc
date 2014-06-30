@@ -28,15 +28,16 @@ mdp::ByteBuffer ResourceGroupFixture = \
 "# Group Second\n\n"\
 "Assembly language\n";
 
-//TEST_CASE("Resource group block classifier", "[resource_group]")
-//{
-//    mdp::MarkdownParser markdownParser;
-//    mdp::MarkdownNode markdownAST;
-//    markdownParser.parse(ResourceGroupFixture, markdownAST);
-//
-//    REQUIRE(!markdownAST.children().empty());
-//    REQUIRE(SectionProcessor<ResourceGroup>::sectionType(markdownAST.children().begin()) == ResourceGroupSectionType);
-//}
+TEST_CASE("Resource group block classifier", "[resource_group]")
+{
+    mdp::MarkdownParser markdownParser;
+    mdp::MarkdownNode markdownAST;
+    markdownParser.parse(ResourceGroupFixture, markdownAST);
+
+    REQUIRE(!markdownAST.children().empty());
+    REQUIRE(SectionProcessor<ResourceGroup>::sectionType(markdownAST.children().begin()) == ResourceGroupSectionType);
+    REQUIRE(SectionProcessor<ResourceGroup>::sectionType(markdownAST.children().begin() + 8) == ResourceGroupSectionType);
+}
 
 //TEST_CASE("rgparser/parse", "Parse canonical resource group")
 //{
