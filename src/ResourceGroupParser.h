@@ -28,13 +28,71 @@ namespace snowcrash {
                                                      Report& report,
                                                      ResourceGroup& out) {
 
+            CaptureGroups captureGroups;
+
+            if (RegexCapture(node->text, GroupHeaderRegex, captureGroups, 3)) {
+                out.name = captureGroups[1];
+                TrimString(out.name);
+            }
+
             return ++MarkdownNodeIterator(node);
+        }
+
+        static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
+                                                         const MarkdownNodes& siblings,
+                                                         SectionParserData& pd,
+                                                         Report& report,
+                                                         ResourceGroup& out) {
+
+            if (pd.sectionContext() == ResourceSectionType) {
+
+                Resource resource;
+                MarkdownNodeIterator cur = ResourceParser::parse(node, siblings, pd, report, resource);
+
+                ResourceIterator duplicate = findResource(out.resources, resource);
+
+                // TODO: Global duplicate?
+                // TODO: warning
+
+                out.resources.push_back(resource);
+
+                return cur;
+            }
+
+            return node;
         }
 
         static SectionType sectionType(const MarkdownNodeIterator& node) {
 
+            if (node->type == mdp::HeaderMarkdownNodeType
+                && !node->text.empty()) {
+
+                mdp::ByteBuffer subject = node->text;
+                TrimString(subject);
+
+                if (RegexMatch(subject, GroupHeaderRegex)) {
+                    return ResourceGroupSectionType;
+                }
+            }
+
             return UndefinedSectionType;
         }
+
+        static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
+
+            // Return ResourceSectionType or UndefinedSectionType
+            return SectionProcessor<Resource>::sectionType(node);
+        }
+
+        /** Finds a resource inside an resources collection */
+        static ResourceIterator findResource(Resources& resources,
+                                             const Resource& resource) {
+
+            return std::find_if(resources.begin(),
+                                resources.end(),
+                                std::bind2nd(MatchResource(), resource));
+        }
+
     };
 
     /** ResourceGroup Section Parser */
