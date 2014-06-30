@@ -63,10 +63,7 @@ static Expressions GetUriTemplateExpressions(const URITemplate& uriTemplate) {
     return expressions;
 }
 
-
-
 static ClassifiedExpression ClassifyExpression(const Expression& expression) {
-
     VariableExpression variableExpression(expression);
 
     if (variableExpression.IsExpressionType()) {
