@@ -82,7 +82,16 @@ namespace snowcrash {
         }
 
         FORCEINLINE bool IsInvalidExpressionName() {
-            return !RegexMatch(innerExpression, URI_TEMPLATE_EXPRESSION_REGEX);
+            std::string tmpExpression = innerExpression;
+            if (tmpExpression.find("..") != std::string::npos) return true;
+            
+            size_t start_pos = 0;
+            while ((start_pos = tmpExpression.find(".", start_pos)) != std::string::npos) {
+                tmpExpression.replace(start_pos, 1, "_");
+                start_pos++; 
+            }
+
+            return !RegexMatch(tmpExpression, URI_TEMPLATE_EXPRESSION_REGEX);
         }
 
         FORCEINLINE bool IsSupportedExpressionType() {
