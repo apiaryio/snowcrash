@@ -48,7 +48,7 @@ namespace snowcrash {
     
     /** Parameter Value */
     typedef std::string Value;
-     
+
     /** A generic key - value pair */
     typedef std::pair<std::string, std::string> KeyValuePair;
     
@@ -113,6 +113,8 @@ namespace snowcrash {
         Collection<Value>::type values;
     };
 
+    /** Name of a symbol */
+    typedef std::string SymbolName;
     
     /**
      *  Payload
@@ -136,6 +138,9 @@ namespace snowcrash {
         
         /** Schema */
         Asset schema;
+
+        /** Symbol */
+        SymbolName symbol;
     };
     
     /** Resource Model */

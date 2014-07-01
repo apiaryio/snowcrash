@@ -11,6 +11,7 @@
 
 #include <string>
 #include <map>
+#include "ByteBuffer.h"
 #include "RegexMatch.h"
 
 #ifdef DEBUG
@@ -31,13 +32,10 @@ namespace snowcrashconst {
 }
 
 namespace snowcrash {
-
-    // Name of a symbol
-    typedef SourceData SymbolName;
     
     // Resource Object Symbol
     typedef std::pair<SymbolName, ResourceModel> ResourceModelSymbol;
-    
+
     // Resource Object Symbol Table
     typedef std::map<SymbolName, ResourceModel> ResourceModelSymbolTable;
     
@@ -50,21 +48,23 @@ namespace snowcrash {
     
     // Checks whether given source data represents reference to a symbol returning true if so,
     // false otherwise. If source data is represent reference referred symbol name is filled in.
-    FORCEINLINE bool GetSymbolReference(const SourceData& sourceData,
+    inline bool GetSymbolReference(const mdp::ByteBuffer& sourceData,
                                         SymbolName& referredSymbol) {
         
         CaptureGroups captureGroups;
+
         if (RegexCapture(sourceData, snowcrashconst::SymbolReferenceRegex, captureGroups, 3)) {
             referredSymbol = captureGroups[1];
             TrimString(referredSymbol);
             return true;
         }
+
         return false;
     }
     
 #ifdef DEBUG
     // Prints markdown block recursively to stdout
-    FORCEINLINE void PrintSymbolTable(const SymbolTable& symbolTable) {
+    inline void PrintSymbolTable(const SymbolTable& symbolTable) {
 
         std::cout << "Resource Model Symbols:\n";
         for (ResourceModelSymbolTable::const_iterator it = symbolTable.resourceModels.begin();
