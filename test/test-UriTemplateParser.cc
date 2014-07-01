@@ -287,3 +287,29 @@ TEST_CASE("Parse uri template for invalid variable name, invalid % encoded", "[i
     REQUIRE(result.result.warnings[0].message == "URI template expression \"?varone%2z\" contains invalid characters. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters.");
 
 }
+
+TEST_CASE("Parse uri template for variable name containing dot", "[validvariablenamecontainingdot][issue][#78]")
+{
+    const snowcrash::URITemplate uri = "http://www.test.com/{id}{?varone.data}";
+
+    URITemplateParser parser;
+    ParsedURITemplate result;
+    SourceCharactersBlock sourceBlock;
+
+    parser.parse(uri, sourceBlock, result);
+
+    REQUIRE(result.result.warnings.size() == 0);
+}
+
+TEST_CASE("Parse uri template for invalid variable name containing multple contiguous dots", "[invalidvariablenamecontiguousdots][issue][#78]")
+{
+    const snowcrash::URITemplate uri = "http://www.test.com/{id}{?varone..data}";
+
+    URITemplateParser parser;
+    ParsedURITemplate result;
+    SourceCharactersBlock sourceBlock;
+
+    parser.parse(uri, sourceBlock, result);
+
+    REQUIRE(result.result.warnings.size() == 1);
+}
