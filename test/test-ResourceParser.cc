@@ -52,6 +52,7 @@ TEST_CASE("Resource block classifier", "[resource]")
     REQUIRE(SectionProcessor<Resource>::sectionType(markdownAST.children().begin()) == ResourceMethodSectionType);
 }
 
+// TODO: ResourceGroupParser
 //TEST_CASE("Abbreviated Resource Method block classifier", "[resource]")
 //{
 //    mdp::ByteBuffer source = \
@@ -85,6 +86,7 @@ TEST_CASE("Parse resource", "[resource]")
 
     REQUIRE(resource.parameters.size() == 2);
     REQUIRE(resource.parameters[0].name == "id");
+    REQUIRE(resource.parameters[0].description == "Lorem ipsum\n");
     REQUIRE(resource.parameters[1].name == "limit");
 
     REQUIRE(resource.actions.size() == 1);
@@ -316,137 +318,104 @@ TEST_CASE("Parse resource without name", "[resource]")
     REQUIRE(resource.actions.size() == 0);
 }
 
-//TEST_CASE("Warn about parameters not in URI template", "[resource][source]")
-//{
-//    mdp::ByteBuffer source = \
-//    "# /resource/{id}\n"\
-//    "+ Parameters\n"\
-//    "    + olive\n\n"\
-//    "## GET\n"\
-//    "+ Parameters\n"\
-//    "    + cheese\n"\
-//    "    + id\n\n"\
-//    "+ Response 204\n\n";
-//
-//    Resource resource;
-//    Report report;
-//    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
-//
-//    REQUIRE(report.error.code == Error::OK);
-//    REQUIRE(report.warnings.size() == 2);
-//    REQUIRE(report.warnings[0].code == LogicalErrorWarning);
-//    REQUIRE(report.warnings[1].code == LogicalErrorWarning);
-//
-//    REQUIRE(resource.parameters.size() == 1);
-//    REQUIRE(resource.parameters[0].name == "olive");
-//    REQUIRE(resource.actions.size() == 1);
-//    REQUIRE(resource.actions[0].examples.size() == 1);
-//    REQUIRE(resource.actions[0].examples[0].responses.size() == 1);
-//}
+TEST_CASE("Warn about parameters not in URI template", "[resource][source]")
+{
+    mdp::ByteBuffer source = \
+    "# /resource/{id}\n"\
+    "+ Parameters\n"\
+    "    + olive\n\n"\
+    "## GET\n"\
+    "+ Parameters\n"\
+    "    + cheese\n"\
+    "    + id\n\n"\
+    "+ Response 204\n\n";
 
-//TEST_CASE("Parse nameless resource with named model", "[resource][model][source]")
-//{
-//    // Blueprint in question:
-//    //R"(
-//    //# /message
-//    //+ Super Model
-//    //
-//    //        AAA
-//    //
-//    //");
-//    const std::string blueprintSource = \
-//    "# /message\n"\
-//    "+ Super Model\n"\
-//    "\n"\
-//    "        AAA\n"\
-//    "\n";
-//
-//    Parser parser;
-//    Result result;
-//    Blueprint blueprint;
-//    parser.parse(blueprintSource, 0, result, blueprint);
-//    REQUIRE(result.error.code == Error::OK);
-//    REQUIRE(result.warnings.empty());
-//
-//    REQUIRE(blueprint.resourceGroups.size() == 1);
-//    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].model.name == "Super");
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].model.body == "AAA\n");
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.empty());
-//}
-//
-//TEST_CASE("Parse nameless resource with nameless model", "[resource][model][source]")
-//{
-//    // Blueprint in question:
-//    //R"(
-//    //# /message
-//    //+ Model
-//    //
-//    //        AAA
-//    //
-//    //");
-//    const std::string blueprintSource = \
-//    "# /message\n"\
-//    "+ Model\n"\
-//    "\n"\
-//    "        AAA\n"\
-//    "\n";
-//
-//    Parser parser;
-//    Result result;
-//    Blueprint blueprint;
-//    parser.parse(blueprintSource, 0, result, blueprint);
-//    REQUIRE(result.error.code == SymbolError);
-//    REQUIRE(result.warnings.empty());
-//
-//    REQUIRE(blueprint.resourceGroups.empty());
-//}
-//
-//TEST_CASE("Parse named resource with nameless model", "[resource][model][source]")
-//{
-//    // Blueprint in question:
-//    //R"(
-//    //# Message [/message]
-//    //+ Model
-//    //
-//    //        AAA
-//    //
-//    //## Retrieve a message [GET]
-//    //+ Response 200
-//    //
-//    //    [Message][]
-//    //");
-//
-//    const std::string blueprintSource = \
-//    "# Message [/message]\n"\
-//    "+ Model\n"\
-//    "  \n"\
-//    "        AAA\n"\
-//    "\n"\
-//    "## Retrieve a message [GET]\n"\
-//    "+ Response 200\n"\
-//    "    \n"\
-//    "    [Message][]\n\n";
-//
-//    Parser parser;
-//    Result result;
-//    Blueprint blueprint;
-//    parser.parse(blueprintSource, 0, result, blueprint);
-//    REQUIRE(result.error.code == Error::OK);
-//    REQUIRE(result.warnings.empty());
-//
-//    REQUIRE(blueprint.resourceGroups.size() == 1);
-//    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].model.name == "Message");
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].model.body == "AAA\n");
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].name == "Retrieve a message");
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].method == "GET");
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples.size() == 1);
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body == "AAA\n");
-//}
+    Resource resource;
+    Report report;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 2);
+    REQUIRE(report.warnings[0].code == LogicalErrorWarning);
+    REQUIRE(report.warnings[1].code == LogicalErrorWarning);
+
+    REQUIRE(resource.parameters.size() == 1);
+    REQUIRE(resource.parameters[0].name == "olive");
+    REQUIRE(resource.actions.size() == 1);
+    REQUIRE(resource.actions[0].examples.size() == 1);
+    REQUIRE(resource.actions[0].examples[0].responses.size() == 1);
+}
+
+TEST_CASE("Parse nameless resource with named model", "[resource][model][source]")
+{
+    mdp::ByteBuffer source = \
+    "# /message\n"\
+    "+ Super Model\n"\
+    "\n"\
+    "        AAA\n"\
+    "\n";
+
+    Resource resource;
+    Report report;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.empty());
+
+    REQUIRE(resource.model.name == "Super");
+    REQUIRE(resource.model.body == "AAA\n");
+    REQUIRE(resource.actions.empty());
+}
+
+TEST_CASE("Parse nameless resource with nameless model", "[resource][model][source]")
+{
+    mdp::ByteBuffer source = \
+    "# /message\n"\
+    "+ Model\n"\
+    "\n"\
+    "        AAA\n"\
+    "\n";
+
+    Resource resource;
+    Report report;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+
+    REQUIRE(report.error.code == SymbolError);
+    REQUIRE(report.warnings.empty());
+
+    REQUIRE(resource.model.name.empty());
+}
+
+TEST_CASE("Parse named resource with nameless model", "[resource][model][source]")
+{
+    mdp::ByteBuffer source = \
+    "# Message [/message]\n"\
+    "+ Model\n"\
+    "  \n"\
+    "        AAA\n"\
+    "\n"\
+    "## Retrieve a message [GET]\n"\
+    "+ Response 200\n"\
+    "    \n"\
+    "        [Message][]\n\n";
+
+    Resource resource;
+    Report report;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.empty());
+
+    REQUIRE(resource.model.name == "Message");
+    REQUIRE(resource.model.body == "AAA\n");
+    REQUIRE(resource.actions.size() == 1);
+    REQUIRE(resource.actions[0].name == "Retrieve a message");
+    REQUIRE(resource.actions[0].method == "GET");
+    REQUIRE(resource.actions[0].examples.size() == 1);
+    REQUIRE(resource.actions[0].examples[0].responses.size() == 1);
+    REQUIRE(resource.actions[0].examples[0].responses[0].name == "Message");
+    REQUIRE(resource.actions[0].examples[0].responses[0].body == "AAA\n");
+}
 
 TEST_CASE("Parse root resource", "[resource]")
 {
