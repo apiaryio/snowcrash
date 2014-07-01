@@ -23,6 +23,11 @@ namespace snowcrash {
     /** Named action matching regex */
     const char* const NamedActionHeaderRegex = "^[[:blank:]]*" SYMBOL_IDENTIFIER "\\[" HTTP_REQUEST_METHOD "]$";
 
+    /** Internal type alias for Collection of Action */
+    typedef Collection<Action>::type Actions;
+
+    typedef Collection<Action>::iterator ActionIterator;
+
     // Method signature
     enum ActionSignature {
         NoActionSignature = 0,
