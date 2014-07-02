@@ -19,140 +19,106 @@ mdp::ByteBuffer ResourceGroupFixture = \
 "+ Model (text/plain)\n\n"\
 "        X.O.\n\n"\
 "+ Parameters\n"\
-"    + id = `1234` (optional, number, `0000`)\n"\
-"    + name\n\n"\
+"    + id = `1234` (optional, number, `0000`)\n\n"\
 "## My Method [GET]\n\n"\
 "Method Description\n\n"\
 "+ Response 200 (text/plain)\n\n"\
-"        OK.\n\n"\
-"# Group Second\n\n"\
-"Assembly language\n";
+"        OK.\n\n";
 
 TEST_CASE("Resource group block classifier", "[resource_group]")
 {
+    mdp::ByteBuffer source = ResourceGroupFixture;
+
+    source += "# Group Second\n\n"\
+    "Assembly language\n";
+
     mdp::MarkdownParser markdownParser;
     mdp::MarkdownNode markdownAST;
-    markdownParser.parse(ResourceGroupFixture, markdownAST);
+    markdownParser.parse(source, markdownAST);
 
     REQUIRE(!markdownAST.children().empty());
     REQUIRE(SectionProcessor<ResourceGroup>::sectionType(markdownAST.children().begin()) == ResourceGroupSectionType);
     REQUIRE(SectionProcessor<ResourceGroup>::sectionType(markdownAST.children().begin() + 8) == ResourceGroupSectionType);
 }
 
-//TEST_CASE("rgparser/parse", "Parse canonical resource group")
+TEST_CASE("Parse canonical resource group", "[resource_group]")
+{
+    ResourceGroup resourceGroup;
+    Report report;
+    SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(ResourceGroupFixture, ResourceGroupSectionType, report, resourceGroup);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.empty());
+
+    REQUIRE(resourceGroup.name == "First");
+    REQUIRE(resourceGroup.description == "Fiber Optics\n\n");
+    REQUIRE(resourceGroup.resources.size() == 1);
+    REQUIRE(resourceGroup.resources.front().uriTemplate == "/resource/{id}");
+    REQUIRE(resourceGroup.resources.front().name == "My Resource");
+}
+
+TEST_CASE("Parse resource group with empty resource", "[resource_group]")
+{
+    mdp::ByteBuffer source = \
+    "# Group Name\n"\
+    "p1\n"\
+    "## /resource";
+
+    ResourceGroup resourceGroup;
+    Report report;
+    SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source, ResourceGroupSectionType, report, resourceGroup);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.empty());
+
+    REQUIRE(resourceGroup.name == "Name");
+    REQUIRE(resourceGroup.description == "p1\n");
+    REQUIRE(resourceGroup.resources.size() == 1);
+    REQUIRE(resourceGroup.resources.front().uriTemplate == "/resource");
+}
+
+//TEST_CASE("Parse multiple resource in anonymous group", "[resource_group]")
 //{
-//    MarkdownBlock::Stack markdown = CanonicalResourceGroupFixture();
+//    mdp::ByteBuffer source = \
+//    "# Group\n"\
+//    "## /r1\n"\
+//    "p1\n"\
+//    "## /r2\n"\
+//    "p2\n";
 //
 //    ResourceGroup resourceGroup;
-//    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-//    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
-//    ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, resourceGroup);
+//    Report report;
+//    SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source, ResourceGroupSectionType, report, resourceGroup);
 //
-//    REQUIRE(result.first.error.code == Error::OK);
-//    REQUIRE(result.first.warnings.empty());
-//
-//    const MarkdownBlock::Stack &blocks = markdown;
-//    REQUIRE(std::distance(blocks.begin(), result.second) == 44 + 31);
-//
-//    REQUIRE(resourceGroup.name == "First");
-//    REQUIRE(resourceGroup.description == "1");
-//    REQUIRE(resourceGroup.resources.size() == 1);
-//    REQUIRE(resourceGroup.resources.front().uriTemplate == "/resource/{id}{?limit}");
-//    REQUIRE(resourceGroup.resources.front().name == "My Resource");
-//}
-//
-//TEST_CASE("rgparser/parse-empty-resource", "Parse resource group with empty resource")
-//{
-//    MarkdownBlock::Stack markdown;
-//    markdown.push_back(MarkdownBlock(HeaderBlockType, "Group Name", 1, MakeSourceDataBlock(0, 1)));
-//    markdown.push_back(MarkdownBlock(ParagraphBlockType, "p1", 0, MakeSourceDataBlock(1, 1)));
-//    markdown.push_back(MarkdownBlock(HeaderBlockType, "/resource", 1, MakeSourceDataBlock(2, 1)));
-//
-//    ResourceGroup resourceGroup;
-//    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-//    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
-//    ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, resourceGroup);
-//
-//    REQUIRE(result.first.error.code == Error::OK);
-//    REQUIRE(result.first.warnings.empty());
-//
-//    const MarkdownBlock::Stack &blocks = markdown;
-//    REQUIRE(std::distance(blocks.begin(), result.second) == 3);
-//
-//    REQUIRE(resourceGroup.name == "Name");
-//    REQUIRE(resourceGroup.description == "1");
-//    REQUIRE(resourceGroup.resources.size() == 1);
-//    REQUIRE(resourceGroup.resources.front().uriTemplate == "/resource");
-//}
-//
-//TEST_CASE("rgparser/parse-multiple-resource-description", "Parse multiple resource in anonymous group")
-//{
-//    SourceData source = "0123";
-//    MarkdownBlock::Stack markdown;
-//    markdown.push_back(MarkdownBlock(HeaderBlockType, "/r1", 1, MakeSourceDataBlock(0, 1)));
-//    markdown.push_back(MarkdownBlock(ParagraphBlockType, "p1", 0, MakeSourceDataBlock(1, 1)));
-//    markdown.push_back(MarkdownBlock(HeaderBlockType, "/r2", 1, MakeSourceDataBlock(2, 1)));
-//    markdown.push_back(MarkdownBlock(ParagraphBlockType, "p2", 0, MakeSourceDataBlock(3, 1)));
-//
-//    ResourceGroup resourceGroup;
-//    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-//    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
-//    ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, resourceGroup);
-//
-//    REQUIRE(result.first.error.code == Error::OK);
-//    REQUIRE(result.first.warnings.empty());
-//
-//    const MarkdownBlock::Stack &blocks = markdown;
-//    REQUIRE(std::distance(blocks.begin(), result.second) == 4);
+//    REQUIRE(report.error.code == Error::OK);
+//    REQUIRE(report.warnings.empty());
 //
 //    REQUIRE(resourceGroup.name.empty());
 //    REQUIRE(resourceGroup.description.empty());
 //    REQUIRE(resourceGroup.resources.size() == 2);
 //    REQUIRE(resourceGroup.resources[0].uriTemplate == "/r1");
-//    REQUIRE(resourceGroup.resources[0].description == "1");
+//    REQUIRE(resourceGroup.resources[0].description == "p1\n");
 //    REQUIRE(resourceGroup.resources[1].uriTemplate == "/r2");
-//    REQUIRE(resourceGroup.resources[1].description == "3");
+//    REQUIRE(resourceGroup.resources[1].description == "p2\n");
 //}
-//
-//TEST_CASE("rgparser/parse-multiple-resource", "Parse multiple resources with payloads")
+
+//TEST_CASE("Parse multiple resources with payloads", "[resource_group]")
 //{
-//    // Blueprint in question:
-//    //R"(
-//    //# /1
-//    //## GET
-//    //+ request
-//    //
-//    //# /2
-//    //## GET
-//    //+ request
-//    //");
-//
-//    SourceData source = "01234567";
-//    MarkdownBlock::Stack markdown;
-//    markdown.push_back(MarkdownBlock(HeaderBlockType, "/1", 1, MakeSourceDataBlock(0, 1)));
-//    markdown.push_back(MarkdownBlock(HeaderBlockType, "GET", 2, MakeSourceDataBlock(1, 1)));
-//    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
-//    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-//    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "request", 0, MakeSourceDataBlock(2, 1)));
-//    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(3, 1)));
-//
-//    markdown.push_back(MarkdownBlock(HeaderBlockType, "/2", 1, MakeSourceDataBlock(4, 1)));
-//    markdown.push_back(MarkdownBlock(HeaderBlockType, "GET", 2, MakeSourceDataBlock(5, 1)));
-//    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
-//    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-//    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "request", 0, MakeSourceDataBlock(6, 1)));
-//    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(7, 1)));
+//    mdp::ByteBuffer source = \
+//    "# Group\n"\
+//    "## /1\n"\
+//    "### GET\n"\
+//    "+ Request\n\n"\
+//    "## /2\n"\
+//    "### GET\n"\
+//    "+ Request\n\n";
 //
 //    ResourceGroup resourceGroup;
-//    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-//    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
-//    ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, resourceGroup);
+//    Report report;
+//    SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source, ResourceGroupSectionType, report, resourceGroup);
 //
-//    REQUIRE(result.first.error.code == Error::OK);
-//    CHECK(result.first.warnings.size() == 4); // 2x no response specified + 2x empty body asset
-//
-//    const MarkdownBlock::Stack &blocks = markdown;
-//    REQUIRE(std::distance(blocks.begin(), result.second) == 12);
+//    REQUIRE(report.error.code == Error::OK);
+//    REQUIRE(report.warnings.size() == 4);
 //
 //    REQUIRE(resourceGroup.name.empty());
 //    REQUIRE(resourceGroup.description.empty());
@@ -183,93 +149,70 @@ TEST_CASE("Resource group block classifier", "[resource_group]")
 //    REQUIRE(resource2.actions[0].examples[0].requests[0].body.empty());
 //    REQUIRE(resource2.actions[0].examples[0].responses.empty());
 //}
-//
-//TEST_CASE("rgparser/parse-multiple-same", "Parse multiple resources with the same name")
+
+//TEST_CASE("Parse multiple resources with the same name", "[resource_group]")
 //{
-//    MarkdownBlock::Stack markdown;
-//    markdown.push_back(MarkdownBlock(HeaderBlockType, "/r1", 1, MakeSourceDataBlock(0, 1)));
-//    markdown.push_back(MarkdownBlock(HeaderBlockType, "/r1", 1, MakeSourceDataBlock(1, 1)));
+//    mdp::ByteBuffer source = \
+//    "# Group\n"\
+//    "## /r1\n"\
+//    "## /r1\n";
 //
 //    ResourceGroup resourceGroup;
-//    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-//    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
-//    ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, resourceGroup);
+//    Report report;
+//    SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source, ResourceGroupSectionType, report, resourceGroup);
 //
-//    REQUIRE(result.first.error.code == Error::OK);
-//    REQUIRE(result.first.warnings.size());
-//
-//    const MarkdownBlock::Stack &blocks = markdown;
-//    REQUIRE(std::distance(blocks.begin(), result.second) == 2);
-//}
-//
-//TEST_CASE("rgparser/parse-resource-description-list", "Parse resource with list in its description")
-//{
-//
-//    // Blueprint in question:
-//    //R"(
-//    //# /1
-//    //# GET
-//    //+ Request
-//    //   Hello
-//    //+ Body
-//
-//    MarkdownBlock::Stack markdown;
-//    markdown.push_back(MarkdownBlock(HeaderBlockType, "/1", 1, MakeSourceDataBlock(0, 1)));
-//    markdown.push_back(MarkdownBlock(HeaderBlockType, "GET", 1, MakeSourceDataBlock(1, 1)));
-//    markdown.push_back(MarkdownBlock(ListBlockBeginType, SourceData(), 0, SourceDataBlock()));
-//    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-//    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "Request\nHello\n", 0, MakeSourceDataBlock(2, 1)));
-//    markdown.push_back(MarkdownBlock(ListItemBlockBeginType, SourceData(), 0, SourceDataBlock()));
-//    markdown.push_back(MarkdownBlock(ListItemBlockEndType, "Body\n", 0, MakeSourceDataBlock(3, 1)));
-//    markdown.push_back(MarkdownBlock(ListBlockEndType, SourceData(), 0, MakeSourceDataBlock(4, 1)));
-//
-//    ResourceGroup resourceGroup;
-//    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-//    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
-//    ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, resourceGroup);
-//
-//    REQUIRE(result.first.error.code == Error::OK);
-//    CHECK(result.first.warnings.size() == 3);   // preformatted asset & ignoring unrecognized body & no response
-//
-//    const MarkdownBlock::Stack &blocks = markdown;
-//    REQUIRE(std::distance(blocks.begin(), result.second) == 8);
+//    REQUIRE(report.error.code == Error::OK);
+//    REQUIRE(report.warnings.size() == 1);
+//    REQUIRE(report.warnings[0].code == DuplicateWarning);
 //
 //    REQUIRE(resourceGroup.name.empty());
 //    REQUIRE(resourceGroup.description.empty());
-//    REQUIRE(resourceGroup.resources.size() == 1);
-//    REQUIRE(resourceGroup.resources[0].uriTemplate == "/1");
-//    REQUIRE(resourceGroup.resources[0].description.empty());
-//    REQUIRE(resourceGroup.resources[0].actions.size() == 1);
-//    REQUIRE(resourceGroup.resources[0].actions[0].method == "GET");
-//    REQUIRE(resourceGroup.resources[0].actions[0].description == "");
+//    REQUIRE(resourceGroup.resources.size() == 2);
 //}
-//
-//TEST_CASE("rgparser/parse-hr", "Parse resource groups with hr in description")
-//{
-//
-//    // Blueprint in question:
-//    //R"(
-//    //# Group 1
-//    //---
-//    //A
-//
-//    MarkdownBlock::Stack markdown;
-//    markdown.push_back(MarkdownBlock(HeaderBlockType, "Group 1", 1, MakeSourceDataBlock(0, 1)));
-//    markdown.push_back(MarkdownBlock(HRuleBlockType, SourceData(), 0, MakeSourceDataBlock(1, 1)));
-//    markdown.push_back(MarkdownBlock(ParagraphBlockType, "A", 0, MakeSourceDataBlock(2, 1)));
-//
-//    ResourceGroup resourceGroup;
-//    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-//    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
-//    ParseSectionResult result = ResourceGroupParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, resourceGroup);
-//
-//    REQUIRE(result.first.error.code == Error::OK);
-//    CHECK(result.first.warnings.empty());
-//
-//    const MarkdownBlock::Stack &blocks = markdown;
-//    REQUIRE(std::distance(blocks.begin(), result.second) == 3);
-//
-//    REQUIRE(resourceGroup.name == "1");
-//    REQUIRE(resourceGroup.description == "12");
-//    REQUIRE(resourceGroup.resources.empty());
-//}
+
+TEST_CASE("Parse resource with list in its description", "[resource_group]")
+{
+    mdp::ByteBuffer source = \
+    "# Group\n"\
+    "## /1\n"\
+    "### GET\n"\
+    "+ Request\n"\
+    "    Hello\n"\
+    "+ Lorem Ipsum\n";
+
+    ResourceGroup resourceGroup;
+    Report report;
+    SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source, ResourceGroupSectionType, report, resourceGroup);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 3);   // preformatted asset & ignoring unrecognized node & no response
+
+    REQUIRE(resourceGroup.name.empty());
+    REQUIRE(resourceGroup.description.empty());
+    REQUIRE(resourceGroup.resources.size() == 1);
+    REQUIRE(resourceGroup.resources[0].uriTemplate == "/1");
+    REQUIRE(resourceGroup.resources[0].description.empty());
+    REQUIRE(resourceGroup.resources[0].actions.size() == 1);
+    REQUIRE(resourceGroup.resources[0].actions[0].method == "GET");
+    REQUIRE(resourceGroup.resources[0].actions[0].description == "");
+    REQUIRE(resourceGroup.resources[0].actions[0].examples.size() == 1);
+}
+
+TEST_CASE("Parse resource groups with hr in description", "[resource_group]")
+{
+    mdp::ByteBuffer source = \
+    "# Group 1\n"\
+    "---\n"\
+    "A\n";
+
+    ResourceGroup resourceGroup;
+    Report report;
+    SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source, ResourceGroupSectionType, report, resourceGroup);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.empty());
+
+    REQUIRE(resourceGroup.name == "1");
+    REQUIRE(resourceGroup.description == "---\n\nA\n");
+    REQUIRE(resourceGroup.resources.empty());
+}
