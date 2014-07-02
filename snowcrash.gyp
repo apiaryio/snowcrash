@@ -42,8 +42,11 @@
         'src/Serialize.h',
         'src/SerializeJSON.cc',
         'src/SerializeYAML.cc',
-	'src/UriParser.cc',
+        'src/UriParser.cc',
         'src/snowcrash.cc',
+        'src/csnowcrash.cc',
+        'src/CBlueprint.cc',
+        'src/CSourceAnnotation.cc'
       ],
       'conditions': [
         [ 'OS=="win"', 
