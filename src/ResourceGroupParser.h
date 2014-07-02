@@ -52,7 +52,16 @@ namespace snowcrash {
                 ResourceIterator duplicate = findResource(out.resources, resource);
 
                 // TODO: Global duplicate?
-                // TODO: warning
+                // TODO: Some URIParser logic
+
+                if (duplicate != out.resources.end()) {
+
+                    // WARN: Duplicate resource
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                    report.warnings.push_back(Warning("the resource '" + resource.uriTemplate + "' is already defined",
+                                                      DuplicateWarning,
+                                                      sourceMap));
+                }
 
                 out.resources.push_back(resource);
 
