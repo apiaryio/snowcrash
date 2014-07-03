@@ -17,6 +17,7 @@
 #include "StringUtility.h"
 #include "ParametersParser.h"
 #include "DescriptionSectionUtility.h"
+#include "UriTemplateParser.h"
 
 namespace snowcrashconst {
     
@@ -196,8 +197,8 @@ namespace snowcrash {
                                                const BlockIterator& cur,
                                                BlueprintParserCore& parser,
                                                Resource& resource) {
-
             ParseSectionResult result = std::make_pair(Result(), cur);
+           
             switch (section.type) {
                 case ResourceSectionType:
                     result = HandleResourceDescriptionBlock(section, cur, parser, resource);
@@ -237,6 +238,7 @@ namespace snowcrash {
                     result.first.error = UnexpectedBlockError(section, cur, parser.sourceData);
                     break;
             }
+
             
             return result;
         }
@@ -246,6 +248,18 @@ namespace snowcrash {
                              Resource& resource,
                              Result& result)
         {
+
+            if (!resource.uriTemplate.empty()) {
+                URITemplateParser uriTemplateParser;
+                ParsedURITemplate parsedResult;
+                SourceCharactersBlock sourceBlock = CharacterMapForBlock(bounds.first, bounds.first, bounds, parser.sourceData);
+
+                uriTemplateParser.parse(resource.uriTemplate, sourceBlock, parsedResult);
+                if (parsedResult.result.warnings.size() > 0) {
+                    result += parsedResult.result;
+                }
+            }
+
             // Consolidate depraceted headers into subsequent payloads
             if (!resource.headers.empty()) {
                 for (Collection<Action>::iterator it = resource.actions.begin();
@@ -266,6 +280,7 @@ namespace snowcrash {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
             BlockIterator sectionCur(cur);
+            
             
             // Retrieve URI            
             if (cur->type == HeaderBlockType &&
