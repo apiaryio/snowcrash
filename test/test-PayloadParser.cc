@@ -34,6 +34,10 @@ const mdp::ByteBuffer SymbolFixture = \
 "+ Request\n\n"\
 "    [Symbol][]\n";
 
+const mdp::ByteBuffer EmptyBodyFixture = \
+"+ Response 200\n\n"\
+"    + Body\n\n\n\n";
+
 TEST_CASE("recognize request signature", "[payload]")
 {
     mdp::MarkdownParser markdownParser;
@@ -62,6 +66,16 @@ TEST_CASE("recognize abbreviated response signature", "[payload]")
 
     REQUIRE(!markdownAST.children().empty());
     REQUIRE(SectionProcessor<Payload>::sectionType(markdownAST.children().begin()) == ResponseBodySectionType);
+}
+
+TEST_CASE("recognize empty body response signature as non-abbreviated", "[payload]")
+{
+    mdp::MarkdownParser markdownParser;
+    mdp::MarkdownNode markdownAST;
+    markdownParser.parse(EmptyBodyFixture, markdownAST);
+
+    REQUIRE(!markdownAST.children().empty());
+    REQUIRE(SectionProcessor<Payload>::sectionType(markdownAST.children().begin()) == ResponseSectionType);
 }
 
 TEST_CASE("Parse request payload", "[payload]")
@@ -368,7 +382,7 @@ TEST_CASE("Warn on malformed payload signature", "[payload]")
     REQUIRE(payload.schema.empty());
 }
 
-TEST_CASE("Give a warning of empty message body for requests with certain headers", "[action]")
+TEST_CASE("Give a warning of empty message body for requests with certain headers", "[payload]")
 {
     mdp::ByteBuffer source = \
     "+ Request\n"\
@@ -390,7 +404,7 @@ TEST_CASE("Give a warning of empty message body for requests with certain header
     REQUIRE(payload.body.empty());
 }
 
-TEST_CASE("Do not report empty message body for requests", "[action]")
+TEST_CASE("Do not report empty message body for requests", "[payload]")
 {
     mdp::ByteBuffer source = \
     "+ Request\n"\
@@ -411,7 +425,7 @@ TEST_CASE("Do not report empty message body for requests", "[action]")
     REQUIRE(payload.body.empty());
 }
 
-TEST_CASE("Give a warning when 100 response has a body", "[action]")
+TEST_CASE("Give a warning when 100 response has a body", "[payload]")
 {
     mdp::ByteBuffer source = \
     "+ Response 100\n\n"\
@@ -426,4 +440,16 @@ TEST_CASE("Give a warning when 100 response has a body", "[action]")
     REQUIRE(report.warnings[0].code == EmptyDefinitionWarning);
 
     REQUIRE(payload.body == "{}\n");
+}
+
+TEST_CASE("Empty body with `Body` should be parsed correctly", "[payload]")
+{
+    Payload payload;
+    Report report;
+    SectionParserHelper<Payload, PayloadParser>::parse(EmptyBodyFixture, ResponseSectionType, report, payload);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.empty());
+
+    REQUIRE(payload.body == "");
 }
