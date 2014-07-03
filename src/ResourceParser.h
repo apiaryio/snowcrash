@@ -128,10 +128,12 @@ namespace snowcrash {
 
             CaptureGroups captureGroups;
 
+            // If Abbreviated resource section
             if (RegexCapture(node->text, ResourceHeaderRegex, captureGroups, 4)) {
 
                 out.uriTemplate = captureGroups[3];
 
+                // Make this section an action
                 if (!captureGroups[2].empty()) {
 
                     Action action;
@@ -257,7 +259,7 @@ namespace snowcrash {
             Action action;
             MarkdownNodeIterator cur = ActionParser::parse(node, siblings, pd, report, action);
 
-            ActionIterator duplicate = FindAction(out.actions, action);
+            ActionIterator duplicate = findAction(out.actions, action);
 
             if (duplicate != out.actions.end()) {
 
@@ -405,7 +407,7 @@ namespace snowcrash {
         }
 
         /** Finds an action inside an actions collection */
-        static ActionIterator FindAction(Actions& actions,
+        static ActionIterator findAction(Actions& actions,
                                             const Action& action) {
 
             return std::find_if(actions.begin(),
