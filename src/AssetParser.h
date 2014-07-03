@@ -94,6 +94,7 @@ namespace snowcrash {
         /** Resolve asset signature */
         static AssetSignature assetSignature(const MarkdownNodeIterator& node) {
             mdp::ByteBuffer subject = node->children().front().text;
+            TrimString(subject);
             
             /** Body matching regex */
             static const char* const BodyRegex = "^[[:blank:]]*[Bb]ody[[:blank:]]*$";
