@@ -72,8 +72,9 @@ namespace snowcrash {
         static SectionType sectionType(const MarkdownNodeIterator& node) {
             if (node->type == mdp::ListItemMarkdownNodeType
                 && !node->children().empty()) {
-                
+
                 AssetSignature signature = assetSignature(node);
+
                 switch (signature) {
                     case BodyAssetSignature:
                     case ImplicitBodyAssetSignature:
@@ -86,6 +87,7 @@ namespace snowcrash {
                         return UndefinedSectionType;
                 }
             }
+
             return UndefinedSectionType;
         }
         
