@@ -19,7 +19,7 @@
 
 namespace snowcrashconst {
     
-    const char* const ExpectedAPINameMessage = "expected API name, e.g. '# <API Name>'";
+    const char* const ExpectedAPINameMessage = "expected API name, for example '# <API Name>'";
 }
 
 namespace snowcrash {

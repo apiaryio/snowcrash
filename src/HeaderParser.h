@@ -161,7 +161,7 @@ namespace snowcrash {
                     if (FindHeader(headers, header) != headers.end()) {
                         // WARN: duplicate header on this level
                         std::stringstream ss;
-                        ss << "duplicate definition of '" << header.first << "' header";
+                        ss << "this seems to be a duplicate definition of '" << header.first << "' header";
                         
                         result.first.warnings.push_back(Warning(ss.str(),
                                                                 DuplicateWarning,
@@ -226,7 +226,7 @@ namespace snowcrash {
         
         // WARN: Deprecated header sections
         std::stringstream ss;
-        ss << "the 'headers' section at this level is deprecated and will be removed in a future, use respective payload header section(s) instead";
+        ss << "headers at this level will be inherited by all resources. note that header inheritance will be replaced with a more useful mechanism in a future release. you should consider this feature deprecated and place headers at the resource level for now. contact support@api.io for more info.";
         BlockIterator nameBlock = ListItemNameBlock(cur, section.bounds.second);
         SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, cur, section.bounds, parser.sourceData);
         result.first.warnings.push_back(Warning(ss.str(),
