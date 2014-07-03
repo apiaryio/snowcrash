@@ -207,6 +207,8 @@ namespace snowcrash {
                 CaptureGroups captureGroups;
                 mdp::ByteBuffer subject = node->text;
 
+                TrimString(subject);
+
                 if (RegexMatch(subject, NamedResourceHeaderRegex)) {
                     return ResourceSectionType;
                 }

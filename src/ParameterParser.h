@@ -122,7 +122,6 @@ namespace snowcrash {
                 && !node->children().empty()) {
 
                 mdp::ByteBuffer subject = node->children().front().text;
-
                 TrimString(subject);
 
                 if (RegexMatch(subject, ParameterAbbrevDefinitionRegex)) {
