@@ -76,7 +76,9 @@ namespace snowcrash {
 
             if (node->type == mdp::ListItemMarkdownNodeType
                 && !node->children().empty()) {
+
                 mdp::ByteBuffer subject = node->children().front().text;
+                TrimString(subject);
                 
                 /** Headers matching regex */
                 static const char* const HeadersRegex = "^[[:blank:]]*[Hh]eaders?[[:blank:]]*$";

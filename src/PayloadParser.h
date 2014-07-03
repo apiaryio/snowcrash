@@ -288,7 +288,7 @@ namespace snowcrash {
                 }
             } else if ((sectionType == ResponseSectionType || sectionType == ResponseBodySectionType)) {
 
-                HTTPStatusCode code;
+                HTTPStatusCode code = 200;
 
                 if (!out.name.empty()) {
                     std::stringstream(out.name) >> code;
@@ -313,6 +313,7 @@ namespace snowcrash {
         static PayloadSignature payloadSignature(const MarkdownNodeIterator& node) {
 
             mdp::ByteBuffer subject = node->children().front().text;
+            TrimString(subject);
 
             if (RegexMatch(subject, RequestRegex))
                 return RequestPayloadSignature;
