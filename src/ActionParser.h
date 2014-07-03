@@ -23,6 +23,11 @@ namespace snowcrash {
     /** Named action matching regex */
     const char* const NamedActionHeaderRegex = "^[[:blank:]]*" SYMBOL_IDENTIFIER "\\[" HTTP_REQUEST_METHOD "]$";
 
+    /** Internal type alias for Collection of Action */
+    typedef Collection<Action>::type Actions;
+
+    typedef Collection<Action>::iterator ActionIterator;
+
     // Method signature
     enum ActionSignature {
         NoActionSignature = 0,
@@ -158,7 +163,14 @@ namespace snowcrash {
                              Report& report,
                              Action& out) {
 
-            if (!out.examples.empty() &&
+            if (out.examples.empty()) {
+
+                // WARN: No response for action
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                report.warnings.push_back(Warning("action is missing a response",
+                                                  EmptyDefinitionWarning,
+                                                  sourceMap));
+            } else if (!out.examples.empty() &&
                 !out.examples.back().requests.empty() &&
                 out.examples.back().responses.empty()) {
 

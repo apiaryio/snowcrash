@@ -233,42 +233,13 @@ TEST_CASE("Parse method with a HR", "[action]")
     SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, report, action);
 
     REQUIRE(report.error.code == Error::OK);
-    CHECK(report.warnings.empty());
+    REQUIRE(report.warnings.size() == 1); // no response
 
     REQUIRE(action.name.empty());
     REQUIRE(action.method == "PATCH");
     REQUIRE(action.description == "A\n---\n\nB\n");
     REQUIRE(action.examples.empty());
 }
-
-// TODO: ResourceParser
-//TEST_CASE( "Parse incomplete method followed by another resource", "[action][blocks]")
-//{
-//    // Blueprint in question:
-//    //R"(
-//    //# /1
-//    //## GET
-//    //# /2
-//
-//    MarkdownBlock::Stack markdown;
-//    markdown.push_back(MarkdownBlock(HeaderBlockType, "GET", 2, MakeSourceDataBlock(0, 1)));
-//    markdown.push_back(MarkdownBlock(HeaderBlockType, "/2", 1, MakeSourceDataBlock(1, 1)));
-//
-//    Action action;
-//    BlueprintParserCore parser(0, SourceDataFixture, Blueprint());
-//    BlueprintSection rootSection(std::make_pair(markdown.begin(), markdown.end()));
-//    ParseSectionResult result = ActionParser::Parse(markdown.begin(), markdown.end(), rootSection, parser, action);
-//
-//    REQUIRE(result.first.error.code == Error::OK);
-//    CHECK(result.first.warnings.empty());
-//
-//    const MarkdownBlock::Stack &blocks = markdown;
-//    REQUIRE(std::distance(blocks.begin(), result.second) == 1);
-//
-//    REQUIRE(action.name.empty());
-//    REQUIRE(action.method == "GET");
-//    REQUIRE(action.description.empty());
-//}
 
 TEST_CASE("Parse method without name", "[action]")
 {
@@ -279,7 +250,7 @@ TEST_CASE("Parse method without name", "[action]")
     SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, report, action);
 
     REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(report.warnings.size() == 1); // no response
 
     REQUIRE(action.name.empty());
     REQUIRE(action.method == "GET");

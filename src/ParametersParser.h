@@ -23,7 +23,7 @@ namespace snowcrash {
     /** No parameters specified message */
     const char* const NoParametersMessage = "no parameters specified, expected a nested list of parameters, one parameter per list item";
 
-    /** Internal type alias for Collection of Paramaeter */
+    /** Internal type alias for Collection of Parameter */
     typedef Collection<Parameter>::type Parameters;
 
     typedef Collection<Parameter>::iterator ParameterIterator;
@@ -78,7 +78,7 @@ namespace snowcrash {
 
             if (!out.empty()) {
 
-                ParameterIterator duplicate = FindParameter(out, parameter);
+                ParameterIterator duplicate = findParameter(out, parameter);
 
                 if (duplicate != out.end()) {
 
@@ -112,6 +112,7 @@ namespace snowcrash {
                 && !node->children().empty()) {
 
                 mdp::ByteBuffer subject = node->children().front().text;
+                TrimString(subject);
 
                 if (RegexMatch(subject, ParametersRegex)) {
                     return ParametersSectionType;
@@ -142,7 +143,7 @@ namespace snowcrash {
         }
 
         /** Finds a parameter inside a parameters collection */
-        static ParameterIterator FindParameter(Parameters& parameters,
+        static ParameterIterator findParameter(Parameters& parameters,
                                                const Parameter& parameter) {
 
             return std::find_if(parameters.begin(),
