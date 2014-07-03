@@ -78,7 +78,7 @@ namespace snowcrash {
 
             if (!out.empty()) {
 
-                ParameterIterator duplicate = FindParameter(out, parameter);
+                ParameterIterator duplicate = findParameter(out, parameter);
 
                 if (duplicate != out.end()) {
 
@@ -143,7 +143,7 @@ namespace snowcrash {
         }
 
         /** Finds a parameter inside a parameters collection */
-        static ParameterIterator FindParameter(Parameters& parameters,
+        static ParameterIterator findParameter(Parameters& parameters,
                                                const Parameter& parameter) {
 
             return std::find_if(parameters.begin(),

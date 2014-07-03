@@ -52,21 +52,6 @@ TEST_CASE("Resource block classifier", "[resource]")
     REQUIRE(SectionProcessor<Resource>::sectionType(markdownAST.children().begin()) == ResourceMethodSectionType);
 }
 
-// TODO: ResourceGroupParser
-//TEST_CASE("Abbreviated Resource Method block classifier", "[resource]")
-//{
-//    mdp::ByteBuffer source = \
-//    "# GET /resource"\
-//    "# POST";
-//
-//    mdp::MarkdownParser markdownParser;
-//    mdp::MarkdownNode markdownAST;
-//    markdownParser.parse(source, markdownAST);
-//
-//    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceSectionType) == ActionSectionType);
-//    REQUIRE(ClassifyBlock<Resource>(cur, markdown.end(), ResourceMethodSectionType) == UndefinedSectionType);
-//}
-
 TEST_CASE("Parse resource", "[resource]")
 {
     Resource resource;
@@ -152,62 +137,63 @@ TEST_CASE("Parse multiple method descriptions", "[resource]")
     REQUIRE(resource.actions[1].description == "p2\n");
 }
 
-//TEST_CASE("Parse multiple methods", "[resource]")
-//{
-//    mdp::ByteBuffer source = \
-//    "# /1\n"\
-//    "A\n"\
-//    "## GET\n"\
-//    "B\n"\
-//    "+ Response 200\n"\
-//    "    + Body\n\n"\
-//    "            Code 1\n\n"\
-//    "## HEAD\n"\
-//    "C\n"\
-//    "+ Request D\n"\
-//    "+ Response 200\n"\
-//    "    + Body\n\n\n"\
-//    "## PUT\n"\
-//    "E\n";
-//
-//    Resource resource;
-//    Report report;
-//    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
-//
-//    REQUIRE(report.error.code == Error::OK);
-//    REQUIRE(report.warnings.size() == 2); // empty body asset & no response
-//
-//    REQUIRE(resource.uriTemplate == "/1");
-//    REQUIRE(resource.description == "A\n");
-//    REQUIRE(resource.model.name.empty());
-//    REQUIRE(resource.model.body.empty());
-//    REQUIRE(resource.actions.size() == 3);
-//
-//    REQUIRE(resource.actions[0].method == "GET");
-//    REQUIRE(resource.actions[0].description == "B\n");
-//    REQUIRE(resource.actions[0].examples.size() == 1);
-//    REQUIRE(resource.actions[0].examples[0].requests.empty());
-//    REQUIRE(resource.actions[0].examples[0].responses.size() == 1);
-//    REQUIRE(resource.actions[0].examples[0].responses[0].name == "200");
-//    REQUIRE(resource.actions[0].examples[0].responses[0].description.empty());
-//    REQUIRE(resource.actions[0].examples[0].responses[0].body == "Code 1\n");
-//
-//    REQUIRE(resource.actions[1].method == "HEAD");
-//    REQUIRE(resource.actions[1].description == "C\n");
-//    REQUIRE(resource.actions[1].examples.size() == 1);
-//    REQUIRE(resource.actions[1].examples[0].requests.size() == 1);
-//    REQUIRE(resource.actions[1].examples[0].requests[0].name == "D");
-//    REQUIRE(resource.actions[1].examples[0].requests[0].description.empty());
-//    REQUIRE(resource.actions[1].examples[0].requests[0].description.empty());
-//    REQUIRE(resource.actions[1].examples[0].responses.size() == 1);
-//    REQUIRE(resource.actions[1].examples[0].responses[0].name == "200");
-//    REQUIRE(resource.actions[1].examples[0].responses[0].description.empty());
-//    REQUIRE(resource.actions[1].examples[0].responses[0].body == "");
-//
-//    REQUIRE(resource.actions[2].method == "PUT");
-//    REQUIRE(resource.actions[2].description == "E\n");
-//    REQUIRE(resource.actions[2].examples.empty());
-//}
+TEST_CASE("Parse multiple methods", "[resource]")
+{
+    mdp::ByteBuffer source = \
+    "# /1\n"\
+    "A\n"\
+    "## GET\n"\
+    "B\n"\
+    "+ Response 200\n"\
+    "    + Body\n\n"\
+    "            Code 1\n\n"\
+    "## POST\n"\
+    "C\n"\
+    "+ Request D\n"\
+    "+ Response 200\n"\
+    "    + Body\n\n"
+    "            {}\n\n"\
+    "## PUT\n"\
+    "E\n";
+
+    Resource resource;
+    Report report;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 2); // empty reuqest asset & no response
+
+    REQUIRE(resource.uriTemplate == "/1");
+    REQUIRE(resource.description == "A\n");
+    REQUIRE(resource.model.name.empty());
+    REQUIRE(resource.model.body.empty());
+    REQUIRE(resource.actions.size() == 3);
+
+    REQUIRE(resource.actions[0].method == "GET");
+    REQUIRE(resource.actions[0].description == "B\n");
+    REQUIRE(resource.actions[0].examples.size() == 1);
+    REQUIRE(resource.actions[0].examples[0].requests.empty());
+    REQUIRE(resource.actions[0].examples[0].responses.size() == 1);
+    REQUIRE(resource.actions[0].examples[0].responses[0].name == "200");
+    REQUIRE(resource.actions[0].examples[0].responses[0].description.empty());
+    REQUIRE(resource.actions[0].examples[0].responses[0].body == "Code 1\n");
+
+    REQUIRE(resource.actions[1].method == "POST");
+    REQUIRE(resource.actions[1].description == "C\n");
+    REQUIRE(resource.actions[1].examples.size() == 1);
+    REQUIRE(resource.actions[1].examples[0].requests.size() == 1);
+    REQUIRE(resource.actions[1].examples[0].requests[0].name == "D");
+    REQUIRE(resource.actions[1].examples[0].requests[0].description.empty());
+    REQUIRE(resource.actions[1].examples[0].requests[0].description.empty());
+    REQUIRE(resource.actions[1].examples[0].responses.size() == 1);
+    REQUIRE(resource.actions[1].examples[0].responses[0].name == "200");
+    REQUIRE(resource.actions[1].examples[0].responses[0].description.empty());
+    REQUIRE(resource.actions[1].examples[0].responses[0].body == "{}\n");
+
+    REQUIRE(resource.actions[2].method == "PUT");
+    REQUIRE(resource.actions[2].description == "E\n");
+    REQUIRE(resource.actions[2].examples.empty());
+}
 
 TEST_CASE("Parse description with list", "[resource]")
 {
