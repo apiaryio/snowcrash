@@ -279,8 +279,7 @@ namespace snowcrash {
                                                                  Resource& resource) {
             
             ParseSectionResult result = std::make_pair(Result(), cur);
-            BlockIterator sectionCur(cur);
-            
+            BlockIterator sectionCur(cur);            
             
             // Retrieve URI            
             if (cur->type == HeaderBlockType &&

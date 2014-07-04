@@ -114,7 +114,7 @@ static ClassifiedExpression ClassifyExpression(const Expression& expression) {
     return undefinedExpression;
 }
 
-void URITemplateParser::parse(const URITemplate uri, const SourceCharactersBlock& sourceBlock, ParsedURITemplate& result)
+void URITemplateParser::parse(const URITemplate& uri, const SourceCharactersBlock& sourceBlock, ParsedURITemplate& result)
 {
     CaptureGroups groups;
     Expressions expressions;
@@ -126,7 +126,7 @@ void URITemplateParser::parse(const URITemplate uri, const SourceCharactersBlock
         result.scheme = groups[1];
         result.host = groups[3];
         result.path = groups[4];
-        
+
         if (HasMismatchedCurlyBrackets(result.path)) {
             result.result.warnings.push_back(Warning("The URI template contains mismatched expression brackets.", URIWarning, sourceBlock));
             return;
