@@ -11,6 +11,9 @@
 		BB03DC6917D3723300C51E52 /* test-ParameterDefinitonParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB03DC6817D3723300C51E52 /* test-ParameterDefinitonParser.cc */; };
 		BB05B9D81804493500243E1B /* perf-snowcrash.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB05B9D71804493500243E1B /* perf-snowcrash.cc */; };
 		BB05B9D918044C8200243E1B /* libsnowcrash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBFF4898170B34E6001E5FB2 /* libsnowcrash.a */; };
+		BB1112C7196A8882000F5224 /* test-UriTemplateParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB1112C5196A8870000F5224 /* test-UriTemplateParser.cc */; };
+		BB1112CA196A8892000F5224 /* UriTemplateParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB1112C8196A8892000F5224 /* UriTemplateParser.cc */; };
+		BB1112CB196A8892000F5224 /* UriTemplateParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BB1112C9196A8892000F5224 /* UriTemplateParser.h */; };
 		BB167D1D172931330030D1D5 /* test-BlueprintParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA01FF817292F9C0050B603 /* test-BlueprintParser.cc */; };
 		BB1865C91764DB8A00756B18 /* test-SymbolTable.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB1865C81764DB8A00756B18 /* test-SymbolTable.cc */; };
 		BB1D4D0B174D0932009BCB1C /* test-HeaderParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB1D4D08174D08C3009BCB1C /* test-HeaderParser.cc */; };
@@ -71,9 +74,6 @@
 		BBE53566174132B100BCA7AD /* SerializeYAML.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBE53560174132B100BCA7AD /* SerializeYAML.cc */; };
 		BBE5705D173922B70086CE22 /* test-PayloadParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBE5705C173922B70086CE22 /* test-PayloadParser.cc */; };
 		BBE57061173927870086CE22 /* PayloadParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE5705F173927870086CE22 /* PayloadParser.h */; };
-		BBED046218C7D31700961A5C /* UriParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBED046018C7D31700961A5C /* UriParser.cc */; };
-		BBED046318C7D31700961A5C /* UriParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBED046118C7D31700961A5C /* UriParser.h */; };
-		BBED046618C7D35400961A5C /* test-UriParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBED046418C7D33200961A5C /* test-UriParser.cc */; };
 		BBF46B921824554A009029DA /* BlueprintSection.h in Headers */ = {isa = PBXBuildFile; fileRef = BBF46B911824554A009029DA /* BlueprintSection.h */; };
 		BBFF48CA170B3C49001E5FB2 /* test-snowcrash.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBFF48C9170B3C49001E5FB2 /* test-snowcrash.cc */; };
 		BBFF48CD170B3EDE001E5FB2 /* snowcrash.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBFF48CC170B3EDE001E5FB2 /* snowcrash.cc */; };
@@ -138,6 +138,9 @@
 		BB05B9CE180448E300243E1B /* perf-libsnowcrash */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "perf-libsnowcrash"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB05B9D71804493500243E1B /* perf-snowcrash.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "perf-snowcrash.cc"; path = "test/performance/perf-snowcrash.cc"; sourceTree = SOURCE_ROOT; };
 		BB0793BE1782C773005BB7CC /* Platform.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Platform.h; path = src/Platform.h; sourceTree = "<group>"; };
+		BB1112C5196A8870000F5224 /* test-UriTemplateParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-UriTemplateParser.cc"; path = "test/test-UriTemplateParser.cc"; sourceTree = "<group>"; };
+		BB1112C8196A8892000F5224 /* UriTemplateParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UriTemplateParser.cc; path = src/UriTemplateParser.cc; sourceTree = "<group>"; };
+		BB1112C9196A8892000F5224 /* UriTemplateParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UriTemplateParser.h; path = src/UriTemplateParser.h; sourceTree = "<group>"; };
 		BB1865C71764D67B00756B18 /* SymbolTable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = SymbolTable.h; path = src/SymbolTable.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BB1865C81764DB8A00756B18 /* test-SymbolTable.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-SymbolTable.cc"; path = "test/test-SymbolTable.cc"; sourceTree = "<group>"; };
 		BB1D4D07174D0828009BCB1C /* HeaderParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = HeaderParser.h; path = src/HeaderParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
@@ -213,9 +216,6 @@
 		BBE53560174132B100BCA7AD /* SerializeYAML.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = SerializeYAML.cc; path = src/SerializeYAML.cc; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		BBE5705C173922B70086CE22 /* test-PayloadParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-PayloadParser.cc"; path = "test/test-PayloadParser.cc"; sourceTree = "<group>"; };
 		BBE5705F173927870086CE22 /* PayloadParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = PayloadParser.h; path = src/PayloadParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
-		BBED046018C7D31700961A5C /* UriParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UriParser.cc; path = src/UriParser.cc; sourceTree = "<group>"; };
-		BBED046118C7D31700961A5C /* UriParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UriParser.h; path = src/UriParser.h; sourceTree = "<group>"; };
-		BBED046418C7D33200961A5C /* test-UriParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-UriParser.cc"; path = "test/test-UriParser.cc"; sourceTree = "<group>"; };
 		BBF46B911824554A009029DA /* BlueprintSection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BlueprintSection.h; path = src/BlueprintSection.h; sourceTree = "<group>"; };
 		BBFF4898170B34E6001E5FB2 /* libsnowcrash.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libsnowcrash.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BBFF48C0170B3C30001E5FB2 /* test-libsnowcrash */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "test-libsnowcrash"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -380,7 +380,7 @@
 				BBFF48C9170B3C49001E5FB2 /* test-snowcrash.cc */,
 				BBCC04E518A51AA800C65A08 /* test-SymbolIdentifier.cc */,
 				BB1865C81764DB8A00756B18 /* test-SymbolTable.cc */,
-				BBED046418C7D33200961A5C /* test-UriParser.cc */,
+				BB1112C5196A8870000F5224 /* test-UriTemplateParser.cc */,
 				BB9E7029183342CB00ED5806 /* test-Warnings.cc */,
 			);
 			name = "test-libsnowcrash";
@@ -416,6 +416,7 @@
 				BBD5F9D0173542D60049BBEE /* ParserCore.h */,
 				BBE5705F173927870086CE22 /* PayloadParser.h */,
 				BB0793BE1782C773005BB7CC /* Platform.h */,
+				BB89458B17817B240079084F /* posix */,
 				BBB0F4281731CE0D00C92465 /* RegexMatch.h */,
 				BBD5F9C717353C300049BBEE /* ResourceGroupParser.h */,
 				BBD5F9CC17353CE00049BBEE /* ResourceParser.h */,
@@ -426,17 +427,16 @@
 				BBE5355C174132B100BCA7AD /* SerializeJSON.h */,
 				BBE53560174132B100BCA7AD /* SerializeYAML.cc */,
 				BBE5355D174132B100BCA7AD /* SerializeYAML.h */,
+				BBCEF19318FBF7E200A0FA24 /* snowcrash */,
 				BBFF48CC170B3EDE001E5FB2 /* snowcrash.cc */,
 				BBFF48D1170B4224001E5FB2 /* snowcrash.h */,
 				BB6A9A7F17904C7300B2F283 /* SourceAnnotation.h */,
 				BBB2A226173EA77A0020C1CE /* StringUtility.h */,
 				BB1865C71764D67B00756B18 /* SymbolTable.h */,
-				BBED046018C7D31700961A5C /* UriParser.cc */,
-				BBED046118C7D31700961A5C /* UriParser.h */,
+				BB1112C8196A8892000F5224 /* UriTemplateParser.cc */,
+				BB1112C9196A8892000F5224 /* UriTemplateParser.h */,
 				BBCEF19118FBF7B000A0FA24 /* Version.h */,
-				BB89458B17817B240079084F /* posix */,
 				BB89458E17817B720079084F /* win */,
-				BBCEF19318FBF7E200A0FA24 /* snowcrash */,
 			);
 			name = src;
 			sourceTree = "<group>";
@@ -468,9 +468,9 @@
 				BBCEF19218FBF7B000A0FA24 /* Version.h in Headers */,
 				BBB0F42A1731CE0D00C92465 /* RegexMatch.h in Headers */,
 				BBD5F9C917353C310049BBEE /* ResourceGroupParser.h in Headers */,
-				BBED046318C7D31700961A5C /* UriParser.h in Headers */,
 				BBC2D85F18301FEC00FBCEA7 /* CodeBlockUtility.h in Headers */,
 				BBD5F9CE17353CE00049BBEE /* ResourceParser.h in Headers */,
+				BB1112CB196A8892000F5224 /* UriTemplateParser.h in Headers */,
 				BBE57061173927870086CE22 /* PayloadParser.h in Headers */,
 				BBE53561174132B100BCA7AD /* Serialize.h in Headers */,
 				BBE53562174132B100BCA7AD /* SerializeJSON.h in Headers */,
@@ -615,11 +615,11 @@
 				BBA889CA17131B19005A9570 /* html.c in Sources */,
 				BB740993171C05B20023105F /* MarkdownParser.cc in Sources */,
 				BB740997171C065C0023105F /* MarkdownBlock.cc in Sources */,
-				BBED046218C7D31700961A5C /* UriParser.cc in Sources */,
 				BB86DEC11723E3A700063644 /* src_map.c in Sources */,
 				BBD5F9D21735439B0049BBEE /* ParserCore.cc in Sources */,
 				BBE53564174132B100BCA7AD /* Serialize.cc in Sources */,
 				BBE53565174132B100BCA7AD /* SerializeJSON.cc in Sources */,
+				BB1112CA196A8892000F5224 /* UriTemplateParser.cc in Sources */,
 				BB65939117845C2D00321230 /* RegexMatch.cc in Sources */,
 				BBE53566174132B100BCA7AD /* SerializeYAML.cc in Sources */,
 			);
@@ -642,10 +642,10 @@
 				BBD5F9DE173578210049BBEE /* test-ResourceParser.cc in Sources */,
 				BBE5705D173922B70086CE22 /* test-PayloadParser.cc in Sources */,
 				BB03DC6617D3718D00C51E52 /* test-ParametersParser.cc in Sources */,
+				BB1112C7196A8882000F5224 /* test-UriTemplateParser.cc in Sources */,
 				BB50F0BD17D1DCE00002C363 /* test-ActionParser.cc in Sources */,
 				BBCC04E618A51AA800C65A08 /* test-SymbolIdentifier.cc in Sources */,
 				BB3DD975174654FD004C4077 /* test-AssetParser.cc in Sources */,
-				BBED046618C7D35400961A5C /* test-UriParser.cc in Sources */,
 				BB9E702A183342CB00ED5806 /* test-Warnings.cc in Sources */,
 				BB1D4D0B174D0932009BCB1C /* test-HeaderParser.cc in Sources */,
 				BB03DC6917D3723300C51E52 /* test-ParameterDefinitonParser.cc in Sources */,
