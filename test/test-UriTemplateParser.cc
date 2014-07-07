@@ -239,7 +239,7 @@ TEST_CASE("Parse uri template for invalid variable name, contains spaces", "[inv
     parser.parse(uri, sourceBlock, result);
 
     REQUIRE(result.result.warnings.size() == 1);
-    REQUIRE(result.result.warnings[0].message == "URI template expression \"?varone, vartwo\" contains spaces. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters.");
+    REQUIRE(result.result.warnings[0].message == "URI template expression \"?varone, vartwo\" contains spaces. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters");
 
 }
 
@@ -254,7 +254,7 @@ TEST_CASE("Parse uri template for invalid variable name, contains hyphens", "[in
     parser.parse(uri, sourceBlock, result);
 
     REQUIRE(result.result.warnings.size() == 1);
-    REQUIRE(result.result.warnings[0].message == "URI template expression \"?var-one,var-two\" contains hyphens. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters.");
+    REQUIRE(result.result.warnings[0].message == "URI template expression \"?var-one,var-two\" contains hyphens. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters");
 
 }
 
@@ -269,7 +269,7 @@ TEST_CASE("Parse uri template for invalid variable name, contains assignment", "
     parser.parse(uri, sourceBlock, result);
 
     REQUIRE(result.result.warnings.size() == 1);
-    REQUIRE(result.result.warnings[0].message == "URI template expression \"?varone=vartwo\" contains assignment. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters.");
+    REQUIRE(result.result.warnings[0].message == "URI template expression \"?varone=vartwo\" contains assignment. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters");
 
 }
 
@@ -284,7 +284,7 @@ TEST_CASE("Parse uri template for invalid variable name, invalid % encoded", "[i
     parser.parse(uri, sourceBlock, result);
 
     REQUIRE(result.result.warnings.size() == 1);
-    REQUIRE(result.result.warnings[0].message == "URI template expression \"?varone%2z\" contains invalid characters. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters.");
+    REQUIRE(result.result.warnings[0].message == "URI template expression \"?varone%2z\" contains invalid characters. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters");
 
 }
 
