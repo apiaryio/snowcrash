@@ -22,6 +22,13 @@
 		BB4D8E57172D15CA0024EB04 /* libsnowcrash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBFF4898170B34E6001E5FB2 /* libsnowcrash.a */; };
 		BB50F0BD17D1DCE00002C363 /* test-ActionParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB50F0BC17D1DC9B0002C363 /* test-ActionParser.cc */; };
 		BB65939117845C2D00321230 /* RegexMatch.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB0F4271731CE0D00C92465 /* RegexMatch.cc */; };
+		BB6902A5196AAB1200B7DF76 /* CBlueprint.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB69029F196AAB1200B7DF76 /* CBlueprint.cc */; };
+		BB6902A6196AAB1200B7DF76 /* CBlueprint.h in Headers */ = {isa = PBXBuildFile; fileRef = BB6902A0196AAB1200B7DF76 /* CBlueprint.h */; };
+		BB6902A7196AAB1200B7DF76 /* csnowcrash.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB6902A1196AAB1200B7DF76 /* csnowcrash.cc */; };
+		BB6902A8196AAB1200B7DF76 /* csnowcrash.h in Headers */ = {isa = PBXBuildFile; fileRef = BB6902A2196AAB1200B7DF76 /* csnowcrash.h */; };
+		BB6902A9196AAB1200B7DF76 /* CSourceAnnotation.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB6902A3196AAB1200B7DF76 /* CSourceAnnotation.cc */; };
+		BB6902AA196AAB1200B7DF76 /* CSourceAnnotation.h in Headers */ = {isa = PBXBuildFile; fileRef = BB6902A4196AAB1200B7DF76 /* CSourceAnnotation.h */; };
+		BB6902AD196AAB5700B7DF76 /* test-csnowcrash.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB6902AB196AAB5100B7DF76 /* test-csnowcrash.cc */; };
 		BB740993171C05B20023105F /* MarkdownParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB740991171C05B20023105F /* MarkdownParser.cc */; };
 		BB740994171C05B20023105F /* MarkdownParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BB740992171C05B20023105F /* MarkdownParser.h */; };
 		BB740997171C065C0023105F /* MarkdownBlock.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB740995171C065C0023105F /* MarkdownBlock.cc */; };
@@ -152,6 +159,13 @@
 		BB4843D4174E30CF00F61291 /* Fixture.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Fixture.h; path = test/Fixture.h; sourceTree = "<group>"; };
 		BB50F0BB17D1DB4D0002C363 /* ActionParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = ActionParser.h; path = src/ActionParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BB50F0BC17D1DC9B0002C363 /* test-ActionParser.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = "test-ActionParser.cc"; path = "test/test-ActionParser.cc"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
+		BB69029F196AAB1200B7DF76 /* CBlueprint.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CBlueprint.cc; path = src/CBlueprint.cc; sourceTree = "<group>"; };
+		BB6902A0196AAB1200B7DF76 /* CBlueprint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CBlueprint.h; path = src/CBlueprint.h; sourceTree = "<group>"; };
+		BB6902A1196AAB1200B7DF76 /* csnowcrash.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = csnowcrash.cc; path = src/csnowcrash.cc; sourceTree = "<group>"; };
+		BB6902A2196AAB1200B7DF76 /* csnowcrash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = csnowcrash.h; path = src/csnowcrash.h; sourceTree = "<group>"; };
+		BB6902A3196AAB1200B7DF76 /* CSourceAnnotation.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CSourceAnnotation.cc; path = src/CSourceAnnotation.cc; sourceTree = "<group>"; };
+		BB6902A4196AAB1200B7DF76 /* CSourceAnnotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CSourceAnnotation.h; path = src/CSourceAnnotation.h; sourceTree = "<group>"; };
+		BB6902AB196AAB5100B7DF76 /* test-csnowcrash.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-csnowcrash.cc"; path = "test/test-csnowcrash.cc"; sourceTree = "<group>"; };
 		BB6A9A7F17904C7300B2F283 /* SourceAnnotation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = SourceAnnotation.h; path = src/SourceAnnotation.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BB740991171C05B20023105F /* MarkdownParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = MarkdownParser.cc; path = src/MarkdownParser.cc; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		BB740992171C05B20023105F /* MarkdownParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = MarkdownParser.h; path = src/MarkdownParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
@@ -365,6 +379,7 @@
 				BB3DD974174654FD004C4077 /* test-AssetParser.cc */,
 				BBFF48D7170C57F1001E5FB2 /* test-Blueprint.cc */,
 				BBA01FF817292F9C0050B603 /* test-BlueprintParser.cc */,
+				BB6902AB196AAB5100B7DF76 /* test-csnowcrash.cc */,
 				BB1D4D08174D08C3009BCB1C /* test-HeaderParser.cc */,
 				BB45781D182326EE00D0293A /* test-Indentation.cc */,
 				BB8AEFD717D899B900298807 /* test-ListUtility.cc */,
@@ -397,7 +412,13 @@
 				BBD5F9CF1735413A0049BBEE /* BlueprintParserCore.h */,
 				BBF46B911824554A009029DA /* BlueprintSection.h */,
 				BB92D892178EFA370098A63C /* BlueprintUtility.h */,
+				BB69029F196AAB1200B7DF76 /* CBlueprint.cc */,
+				BB6902A0196AAB1200B7DF76 /* CBlueprint.h */,
 				BBC2D85E18301FEC00FBCEA7 /* CodeBlockUtility.h */,
+				BB6902A1196AAB1200B7DF76 /* csnowcrash.cc */,
+				BB6902A2196AAB1200B7DF76 /* csnowcrash.h */,
+				BB6902A3196AAB1200B7DF76 /* CSourceAnnotation.cc */,
+				BB6902A4196AAB1200B7DF76 /* CSourceAnnotation.h */,
 				BBC2D860183024C100FBCEA7 /* DescriptionSectionUtility.h */,
 				BB1D4D07174D0828009BCB1C /* HeaderParser.h */,
 				BB92D890178EF7C10098A63C /* HTTP.cc */,
@@ -449,6 +470,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BBFF48D2170B4224001E5FB2 /* snowcrash.h in Headers */,
+				BB6902AA196AAB1200B7DF76 /* CSourceAnnotation.h in Headers */,
 				BBFF48D6170C4F30001E5FB2 /* Blueprint.h in Headers */,
 				BBA889A81712FF37005A9570 /* Parser.h in Headers */,
 				BBA889B617131AFF005A9570 /* autolink.h in Headers */,
@@ -463,6 +485,7 @@
 				BB740998171C065C0023105F /* MarkdownBlock.h in Headers */,
 				BBA91DC2171D402600649B05 /* BlueprintParser.h in Headers */,
 				BB86DEC31723E3C600063644 /* src_map.h in Headers */,
+				BB6902A8196AAB1200B7DF76 /* csnowcrash.h in Headers */,
 				BBC2D861183024C100FBCEA7 /* DescriptionSectionUtility.h in Headers */,
 				BBF46B921824554A009029DA /* BlueprintSection.h in Headers */,
 				BBCEF19218FBF7B000A0FA24 /* Version.h in Headers */,
@@ -474,6 +497,7 @@
 				BBE57061173927870086CE22 /* PayloadParser.h in Headers */,
 				BBE53561174132B100BCA7AD /* Serialize.h in Headers */,
 				BBE53562174132B100BCA7AD /* SerializeJSON.h in Headers */,
+				BB6902A6196AAB1200B7DF76 /* CBlueprint.h in Headers */,
 				BBC2D86318316DC000FBCEA7 /* ListBlockUtility.h in Headers */,
 				BBE53563174132B100BCA7AD /* SerializeYAML.h in Headers */,
 			);
@@ -605,7 +629,9 @@
 				BBFF48CD170B3EDE001E5FB2 /* snowcrash.cc in Sources */,
 				BBA889A71712FF37005A9570 /* Parser.cc in Sources */,
 				BBA889B517131AFF005A9570 /* autolink.c in Sources */,
+				BB6902A5196AAB1200B7DF76 /* CBlueprint.cc in Sources */,
 				BBA889B717131AFF005A9570 /* buffer.c in Sources */,
+				BB6902A9196AAB1200B7DF76 /* CSourceAnnotation.cc in Sources */,
 				BBA889BA17131AFF005A9570 /* markdown.c in Sources */,
 				BBA889BC17131AFF005A9570 /* stack.c in Sources */,
 				BB92D891178EF7C10098A63C /* HTTP.cc in Sources */,
@@ -621,6 +647,7 @@
 				BBE53565174132B100BCA7AD /* SerializeJSON.cc in Sources */,
 				BB1112CA196A8892000F5224 /* UriTemplateParser.cc in Sources */,
 				BB65939117845C2D00321230 /* RegexMatch.cc in Sources */,
+				BB6902A7196AAB1200B7DF76 /* csnowcrash.cc in Sources */,
 				BBE53566174132B100BCA7AD /* SerializeYAML.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -635,6 +662,7 @@
 				BB74099A171C08240023105F /* test-MarkdownBlock.cc in Sources */,
 				BB74099C171C08860023105F /* test-MarkdownParser.cc in Sources */,
 				BB167D1D172931330030D1D5 /* test-BlueprintParser.cc in Sources */,
+				BB6902AD196AAB5700B7DF76 /* test-csnowcrash.cc in Sources */,
 				BBB0F42C1731D04900C92465 /* test-RegexMatch.cc in Sources */,
 				BBD5F9DC173561DA0049BBEE /* test-ResouceGroupParser.cc in Sources */,
 				BB8AEFD817D899B900298807 /* test-ListUtility.cc in Sources */,
