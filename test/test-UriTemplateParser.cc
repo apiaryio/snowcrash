@@ -301,7 +301,7 @@ TEST_CASE("Parse uri template for variable name containing dot", "[validvariable
     REQUIRE(result.result.warnings.size() == 0);
 }
 
-TEST_CASE("Parse uri template for invalid variable name containing multple contiguous dots", "[invalidvariablenamecontiguousdots][issue][#78]")
+TEST_CASE("Parse uri template for invalid variable name containing multiple contiguous dots", "[invalidvariablenamecontiguousdots][issue][#78]")
 {
     const snowcrash::URITemplate uri = "http://www.test.com/{id}{?varone..data}";
 
@@ -312,4 +312,26 @@ TEST_CASE("Parse uri template for invalid variable name containing multple conti
     parser.parse(uri, sourceBlock, result);
 
     REQUIRE(result.result.warnings.size() == 1);
+}
+
+TEST_CASE("Parse uri template for consistent invalid character warning", "[invalidexpressionconsistentinvalidcharacterwarning][issue][#78]")
+{
+    const snowcrash::URITemplate urione = "http://www.test.com/{$a,b,c}";
+    const snowcrash::URITemplate uritwo = "http://www.test.com/{@a,b,c}";
+
+    URITemplateParser parser;
+    ParsedURITemplate result;
+    ParsedURITemplate result2;
+    SourceCharactersBlock sourceBlock;
+
+    parser.parse(urione, sourceBlock, result);
+
+    REQUIRE(result.result.warnings.size() == 1);
+    REQUIRE(result.result.warnings[0].message == "URI template expression \"$a,b,c\" contains invalid characters. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters");
+
+    parser.parse(urione, sourceBlock, result2);
+
+    REQUIRE(result2.result.warnings.size() == 1);
+    REQUIRE(result2.result.warnings[0].message == "URI template expression \"$a,b,c\" contains invalid characters. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters");
+
 }

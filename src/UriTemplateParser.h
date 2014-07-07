@@ -16,7 +16,7 @@
 
 
 #define URI_REGEX "^(http|https|ftp|file)?(://)?([^/]*)?(.*)$"
-#define URI_TEMPLATE_OPERATOR_REGEX "([+|#|.|/|;|?|&|=|,|!|@||])"
+#define URI_TEMPLATE_OPERATOR_REGEX "([+|#|.|/|;|?|&])"
 #define URI_TEMPLATE_EXPRESSION_REGEX "^([?|#|+|&]?(([A-Z|a-z|0-9|_|,])*|(%[A-F|a-f|0-9]{2})*)*\\*?)$"
 
 
