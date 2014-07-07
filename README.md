@@ -8,7 +8,7 @@ Snow Crash is the reference [API Blueprint](http://apiblueprint.org) parser buil
 API Blueprint is Web API documentation language. You can find API Blueprint documentation on the [API Blueprint site](http://apiblueprint.org).
 
 ## Status
-- [Format 1A3](https://github.com/apiaryio/api-blueprint/releases/tag/format-1A3) fully implemented 
+- [Format 1A6](https://github.com/apiaryio/api-blueprint/releases/tag/format-1A6) fully implemented 
 
 ## Install
 OS X using Homebrew:
