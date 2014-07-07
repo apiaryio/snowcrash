@@ -44,6 +44,9 @@
         'src/SerializeYAML.cc',
         'src/UriTemplateParser.cc',
         'src/snowcrash.cc',
+        'src/csnowcrash.cc',
+        'src/CBlueprint.cc',
+        'src/CSourceAnnotation.cc'
       ],
       'conditions': [
         [ 'OS=="win"', 
@@ -85,6 +88,7 @@
         'test/test-SymbolIdentifier.cc',
         'test/test-SymbolTable.cc',
         'test/test-Warnings.cc',
+        'test/test-csnowcrash.cc',
         'test/test-UriTemplateParser.cc',
         'test/test-snowcrash.cc'
       ],

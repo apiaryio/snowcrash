@@ -9,6 +9,9 @@
 #ifndef SNOWCRASH_PLATFORM_H
 #define SNOWCRASH_PLATFORM_H
 
+#define AS_TYPE(Type, Obj) reinterpret_cast<Type *>(Obj)
+#define AS_CTYPE(Type, Obj) reinterpret_cast<const Type *>(Obj)
+
 #if defined(BUILDING_SNOWCRASH)
 #   define DEPRECATED
 #endif
@@ -28,6 +31,24 @@
 #   if !defined(DEPRECATED)
 #       define DEPRECATED
 #   endif
+#endif
+
+#ifndef SC_API
+#  ifdef _WIN32
+#     if defined(CSNOWCRASH_BUILD_SHARED) /* build dll */
+#         define SC_API __declspec(dllimport)
+#     elif !defined(CSNOWCRASH_BUILD_STATIC) /* use dll */
+#         define SC_API __declspec(dllexport)
+#     else /* static library */
+#         define SC_API
+#     endif
+#  else
+#     if __GNUC__ >= 4
+#         define SC_API /*__attribute__((visibility("default")))*/
+#     else
+#         define SC_API
+#     endif
+#  endif
 #endif
 
 #endif
