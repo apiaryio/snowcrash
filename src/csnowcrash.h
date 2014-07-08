@@ -27,9 +27,9 @@ extern "C" {
      *
      *  \return Error status code. Zero represents success, non-zero a failure.
      *
-     *  \this function will allocate `result` and `bluepring`, for deallocation `sc_blueprint_free` and `sc_result_free` should be called.
+     *  \this function will allocate `result` and `bluepring`, for deallocation `sc_blueprint_free` and `sc_report_free` should be called.
      */
-    SC_API int sc_c_parse(const char* source,int option, sc_result_t** result, sc_blueprint_t** blueprint);
+    SC_API int sc_c_parse(const char* source,int option, sc_report_t** result, sc_blueprint_t** blueprint);
 
 #ifdef __cplusplus
 }
