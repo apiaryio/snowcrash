@@ -418,3 +418,20 @@ TEST_CASE("Parse root resource", "[resource]")
     REQUIRE(resource.uriTemplate == "/");
     REQUIRE(resource.actions.empty());
 }
+
+TEST_CASE("Parse resource with invalid URI Tempalte", "[resource]")
+{
+    mdp::ByteBuffer source = "# Resource [/id{? limit}]\n";
+    
+    Resource resource;
+    Report report;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+    
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(report.warnings[0].code == URIWarning);
+    
+    REQUIRE(resource.name == "Resource");
+    REQUIRE(resource.uriTemplate == "/id{? limit}");
+    REQUIRE(resource.actions.empty());
+}

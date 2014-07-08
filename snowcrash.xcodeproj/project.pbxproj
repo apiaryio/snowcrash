@@ -53,7 +53,6 @@
 		BBFC841B196C0C0F001A236A /* csnowcrash.h in Headers */ = {isa = PBXBuildFile; fileRef = BBFC8412196C0C0F001A236A /* csnowcrash.h */; };
 		BBFC841C196C0C0F001A236A /* CSourceAnnotation.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBFC8413196C0C0F001A236A /* CSourceAnnotation.cc */; };
 		BBFC841D196C0C0F001A236A /* CSourceAnnotation.h in Headers */ = {isa = PBXBuildFile; fileRef = BBFC8414196C0C0F001A236A /* CSourceAnnotation.h */; };
-		BBFC841E196C0C0F001A236A /* UriParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBFC8415196C0C0F001A236A /* UriParser.h */; };
 		BBFC841F196C0C0F001A236A /* UriTemplateParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBFC8416196C0C0F001A236A /* UriTemplateParser.cc */; };
 		BBFC8420196C0C0F001A236A /* UriTemplateParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBFC8417196C0C0F001A236A /* UriTemplateParser.h */; };
 		BBFC8424196C0C27001A236A /* test-UriTemplateParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBFC8422196C0C27001A236A /* test-UriTemplateParser.cc */; };
@@ -192,7 +191,6 @@
 		BBFC8412196C0C0F001A236A /* csnowcrash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = csnowcrash.h; path = src/csnowcrash.h; sourceTree = "<group>"; };
 		BBFC8413196C0C0F001A236A /* CSourceAnnotation.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CSourceAnnotation.cc; path = src/CSourceAnnotation.cc; sourceTree = "<group>"; };
 		BBFC8414196C0C0F001A236A /* CSourceAnnotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CSourceAnnotation.h; path = src/CSourceAnnotation.h; sourceTree = "<group>"; };
-		BBFC8415196C0C0F001A236A /* UriParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UriParser.h; path = src/UriParser.h; sourceTree = "<group>"; };
 		BBFC8416196C0C0F001A236A /* UriTemplateParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UriTemplateParser.cc; path = src/UriTemplateParser.cc; sourceTree = "<group>"; };
 		BBFC8417196C0C0F001A236A /* UriTemplateParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UriTemplateParser.h; path = src/UriTemplateParser.h; sourceTree = "<group>"; };
 		BBFC8421196C0C27001A236A /* test-csnowcrash.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-csnowcrash.cc"; path = "test/test-csnowcrash.cc"; sourceTree = "<group>"; };
@@ -371,7 +369,6 @@
 				BB6A9A7F17904C7300B2F283 /* SourceAnnotation.h */,
 				BBB2A226173EA77A0020C1CE /* StringUtility.h */,
 				BB1865C71764D67B00756B18 /* SymbolTable.h */,
-				BBFC8415196C0C0F001A236A /* UriParser.h */,
 				BBFC8416196C0C0F001A236A /* UriTemplateParser.cc */,
 				BBFC8417196C0C0F001A236A /* UriTemplateParser.h */,
 				BBCC855D19542DA100B99E90 /* ValuesParser.h */,
@@ -397,7 +394,6 @@
 				BBCEF19218FBF7B000A0FA24 /* Version.h in Headers */,
 				BBFC841B196C0C0F001A236A /* csnowcrash.h in Headers */,
 				BBB0F42A1731CE0D00C92465 /* RegexMatch.h in Headers */,
-				BBFC841E196C0C0F001A236A /* UriParser.h in Headers */,
 				BBD5F9C917353C310049BBEE /* ResourceGroupParser.h in Headers */,
 				BBFC8419196C0C0F001A236A /* CBlueprint.h in Headers */,
 				BBC2D85F18301FEC00FBCEA7 /* CodeBlockUtility.h in Headers */,
