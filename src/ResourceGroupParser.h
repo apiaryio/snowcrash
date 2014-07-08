@@ -52,7 +52,6 @@ namespace snowcrash {
                 ResourceIterator duplicate = findResource(out.resources, resource);
 
                 // TODO: Global duplicate?
-                // TODO: Some URIParser logic
 
                 if (duplicate != out.resources.end()) {
 
