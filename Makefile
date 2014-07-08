@@ -4,6 +4,7 @@ BUILDTYPE ?= Release
 BUILD_DIR ?= ./build
 PYTHON ?= python
 GYP ?= ./tools/gyp/gyp
+DESTDIR ?= /usr/local/bin
 
 # Default to verbose builds
 V ?= 1
@@ -45,19 +46,19 @@ distclean:
 	rm -rf ./build
 	rm -f ./config.mk
 	rm -f ./config.gypi
-	rm -rf ./bin	
+	rm -rf ./bin
 
 test: test-libsnowcrash snowcrash
 	$(BUILD_DIR)/out/$(BUILDTYPE)/test-libsnowcrash
 
 ifdef INTEGRATION_TESTS
 	bundle exec cucumber
-endif	
+endif
 
 perf: perf-libsnowcrash
 	$(BUILD_DIR)/out/$(BUILDTYPE)/perf-libsnowcrash ./test/performance/fixtures/fixture-1.md
 
 install: snowcrash
-	cp -f $(BUILD_DIR)/out/$(BUILDTYPE)/snowcrash /usr/local/bin/snowcrash
+	cp -f $(BUILD_DIR)/out/$(BUILDTYPE)/snowcrash $(DESTDIR)/snowcrash
 
 .PHONY: libsnowcrash test-libsnowcrash perf-libsnowcrash snowcrash clean distclean test
