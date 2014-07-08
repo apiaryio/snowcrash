@@ -128,17 +128,17 @@ void URITemplateParser::parse(const URITemplate& uri, const SourceCharactersBloc
         result.path = groups[4];
 
         if (HasMismatchedCurlyBrackets(result.path)) {
-            result.result.warnings.push_back(Warning("The URI template contains mismatched expression brackets.", URIWarning, sourceBlock));
+            result.result.warnings.push_back(Warning("The URI template contains mismatched expression brackets", URIWarning, sourceBlock));
             return;
         }
        
         if (HasNestedCurlyBrackets(result.path)) {
-            result.result.warnings.push_back(Warning("The URI template contains nested expression brackets.", URIWarning, sourceBlock));
+            result.result.warnings.push_back(Warning("The URI template contains nested expression brackets", URIWarning, sourceBlock));
             return;
         }
 
         if (PathContainsSquareBrackets(result.path)) {
-            result.result.warnings.push_back(Warning("The URI template contains square brackets, please percent encode square brackets as %5B and %5D.", URIWarning, sourceBlock));
+            result.result.warnings.push_back(Warning("The URI template contains square brackets, please percent encode square brackets as %5B and %5D", URIWarning, sourceBlock));
         }
 
         expressions = GetUriTemplateExpressions(result.path);
@@ -154,21 +154,21 @@ void URITemplateParser::parse(const URITemplate& uri, const SourceCharactersBloc
 
                 if (classifiedExpression.ContainsSpaces()) {
                     std::stringstream ss;
-                    ss << "URI template expression \"" << classifiedExpression.innerExpression << "\" contains spaces. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters.";
+                    ss << "URI template expression \"" << classifiedExpression.innerExpression << "\" contains spaces. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters";
                     result.result.warnings.push_back(Warning(ss.str(), URIWarning, sourceBlock));
                     hasIllegalCharacters = true;
                 }
 
                 if (classifiedExpression.ContainsHyphens()) {
                     std::stringstream ss;
-                    ss << "URI template expression \"" << classifiedExpression.innerExpression << "\" contains hyphens. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters.";
+                    ss << "URI template expression \"" << classifiedExpression.innerExpression << "\" contains hyphens. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters";
                     result.result.warnings.push_back(Warning(ss.str(), URIWarning, sourceBlock));
                     hasIllegalCharacters = true;
                 }
 
                 if (classifiedExpression.ContainsAssignment()) {
                     std::stringstream ss;
-                    ss << "URI template expression \"" << classifiedExpression.innerExpression << "\" contains assignment. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters.";
+                    ss << "URI template expression \"" << classifiedExpression.innerExpression << "\" contains assignment. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters";
                     result.result.warnings.push_back(Warning(ss.str(), URIWarning, sourceBlock));
                     hasIllegalCharacters = true;
                 }
@@ -176,7 +176,7 @@ void URITemplateParser::parse(const URITemplate& uri, const SourceCharactersBloc
                 if (!hasIllegalCharacters) {
                     if (classifiedExpression.IsInvalidExpressionName()) {
                         std::stringstream ss;
-                        ss << "URI template expression \"" << classifiedExpression.innerExpression << "\" contains invalid characters. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters.";
+                        ss << "URI template expression \"" << classifiedExpression.innerExpression << "\" contains invalid characters. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters";
                         result.result.warnings.push_back(Warning(ss.str(), URIWarning, sourceBlock));
                     }
                 }

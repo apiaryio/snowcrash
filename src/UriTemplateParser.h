@@ -16,7 +16,7 @@
 
 
 #define URI_REGEX "^(http|https|ftp|file)?(://)?([^/]*)?(.*)$"
-#define URI_TEMPLATE_OPERATOR_REGEX "([+|#|.|/|;|?|&|=|,|!|@||])"
+#define URI_TEMPLATE_OPERATOR_REGEX "([+|#|.|/|;|?|&])"
 #define URI_TEMPLATE_EXPRESSION_REGEX "^([?|#|+|&]?(([A-Z|a-z|0-9|_|,])*|(%[A-F|a-f|0-9]{2})*)*\\*?)$"
 
 
@@ -161,7 +161,7 @@ namespace snowcrash {
     class LabelExpansionExpression : public ClassifiedExpression {
     public :
         LabelExpansionExpression(const std::string& expression):ClassifiedExpression(expression) {
-            unsupportedWarningText = "URI template label expansion is not supported.";
+            unsupportedWarningText = "URI template label expansion is not supported";
         }
 
         bool IsExpressionType() const {
@@ -175,7 +175,7 @@ namespace snowcrash {
     class PathSegmentExpansionExpression : public ClassifiedExpression {
     public :
         PathSegmentExpansionExpression(const std::string& expression):ClassifiedExpression(expression) {
-            unsupportedWarningText = "URI template path segment expansion is not supported.";
+            unsupportedWarningText = "URI template path segment expansion is not supported";
         }
 
         bool IsExpressionType() const {
@@ -189,7 +189,7 @@ namespace snowcrash {
     class PathStyleParameterExpansionExpression : public ClassifiedExpression {
     public :
         PathStyleParameterExpansionExpression(const std::string& expression):ClassifiedExpression(expression) {
-            unsupportedWarningText = "URI template path style parameter expansion is not supported.";
+            unsupportedWarningText = "URI template path style parameter expansion is not supported";
         }
 
         bool IsExpressionType() const {
@@ -217,7 +217,7 @@ namespace snowcrash {
     class UndefinedExpression : public ClassifiedExpression{
     public :
         UndefinedExpression(const std::string& expression) :ClassifiedExpression(expression) {
-            unsupportedWarningText = "Unidentified expression.";
+            unsupportedWarningText = "Unidentified expression";
         }
 
         bool IsExpressionType() const {
