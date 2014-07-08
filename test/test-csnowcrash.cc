@@ -31,7 +31,7 @@ TEST_CASE("Parse simple blueprint with C interface", "[cinterface]")
 "\n";
 
 
-    sc_result_s* result;
+    sc_report_s* result;
     sc_blueprint_t* blueprint;
     sc_c_parse(blueprintSource.c_str(), SC_REQUIRE_BLUEPRINT_NAME_OPTION, &result, &blueprint);
 
@@ -83,7 +83,7 @@ TEST_CASE("Parse simple blueprint with C interface", "[cinterface]")
     REQUIRE(std::string(sc_header_value(header)) == "text/plain");
 
     sc_blueprint_free(blueprint);
-    sc_result_free(result);
+    sc_report_free(result);
 }
 
 TEST_CASE("Parse blueprint with multiple requests and responses via C interface", "[cinterface]")
