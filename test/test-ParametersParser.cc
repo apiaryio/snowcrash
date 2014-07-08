@@ -85,7 +85,7 @@ TEST_CASE("Parse illegal parameter among legal ones", "[parameters]")
     REQUIRE(report.warnings[0].code == IgnoringWarning);
 
     REQUIRE(parameters.size() == 2);
-    REQUIRE(parameters[0].name == "OK-1");
+    REQUIRE(parameters[0].name == "OK_1");
     REQUIRE(parameters[0].description.empty());
     REQUIRE(parameters[1].name == "OK-2");
     REQUIRE(parameters[1].description.empty());
