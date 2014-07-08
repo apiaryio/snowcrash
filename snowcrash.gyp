@@ -58,7 +58,6 @@
         'src/SerializeJSON.cc',
         'src/SerializeYAML.cc',
         'src/Signature.cc',
-        'src/UriParser.cc',
         'src/snowcrash.cc',
         'src/csnowcrash.cc',
         'src/UriTemplateParser.cc'        
@@ -91,12 +90,13 @@
         'test/test-ParameterParser.cc',
         'test/test-ParametersParser.cc',
         'test/test-PayloadParser.cc',
+        'test/test-RegexMatch.cc',
         'test/test-ResourceParser.cc',
         'test/test-ValuesParser.cc',
         'test/test-Blueprint.cc',
         'test/test-SectionParser',
         'test/test-snowcrash.cc',
-        'test/test-csnowcrash.cc',
+        # 'test/test-csnowcrash.cc',
         'test/test-UriTemplateParser.cc'
       ],
       'dependencies': [
