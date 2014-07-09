@@ -19,6 +19,11 @@ namespace snowcrash {
 
     const char* const ExpectedAPINameMessage = "expected API name, e.g. '# <API Name>'";
 
+    /** Internal type alias for Collection of Metadata */
+    typedef Collection<Metadata>::type MetadataCollection;
+
+    typedef Collection<Metadata>::iterator MetadataCollectionIterator;
+
     /**
      * Blueprint processor
      */
@@ -45,6 +50,18 @@ namespace snowcrash {
             }
 
             if (cur->type == mdp::HeaderMarkdownNodeType) {
+
+                SectionType nestedType = nestedSectionType(cur);
+
+                // If starting with Resource or Resource Group
+                if (nestedType != UndefinedSectionType) {
+
+                    pd.sectionsContext.push_back(nestedType);
+                    cur = processNestedSection(cur, cur->parent().children(), pd, report, out);
+                    pd.sectionsContext.pop_back();
+
+                    return cur;
+                }
 
                 out.name = cur->text;
                 TrimString(out.name);
@@ -155,13 +172,14 @@ namespace snowcrash {
                     report.error = Error(ExpectedAPINameMessage,
                                          BusinessError,
                                          sourceMap);
-                }
+                } else {
 
-                // WARN: No API name
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                report.warnings.push_back(Warning(ExpectedAPINameMessage,
-                                                  APINameWarning,
-                                                  sourceMap));
+                    // WARN: No API name
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                    report.warnings.push_back(Warning(ExpectedAPINameMessage,
+                                                      APINameWarning,
+                                                      sourceMap));
+                }
             }
         }
 
