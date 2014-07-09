@@ -262,7 +262,14 @@ namespace snowcrash {
         /** Resources */
         Collection<Resource>::type resources;
     };
+
+    /**
+     * Metadata Collection types
+     */
+    typedef Collection<Metadata>::type MetadataCollection;
     
+    typedef Collection<Metadata>::iterator MetadataCollectionIterator;
+
     /** 
      *  \brief API Blueprint AST
      *
@@ -272,7 +279,7 @@ namespace snowcrash {
     struct Blueprint {
         
         /** Metadata */
-        Collection<Metadata>::type metadata;
+        MetadataCollection metadata;
         
         /** The API Name */
         Name name;
