@@ -138,32 +138,33 @@ TEST_CASE("Parse nameless blueprint with a list description", "[blueprint]")
     REQUIRE(blueprint.resourceGroups.size() == 0);
 }
 
-//TEST_CASE("Parse nameless group after defined resource", "[blueprint]")
-//{
-//    mdp::ByteBuffer source = \
-//    "# API\n"\
-//    "## /1\n"\
-//    "### POST\n"\
-//    "+ Request\n\n"\
-//    "         {}\n\n"\
-//    "# Group\n";
-//
-//    Blueprint blueprint;
-//    Report report;
-//    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
-//
-//    REQUIRE(report.error.code == Error::OK);
-//    REQUIRE(report.warnings.size() == 3); // groups with same name (no name) & expected group name & no response
-//
-//    REQUIRE(blueprint.resourceGroups.size() == 2);
-//
-//    REQUIRE(blueprint.resourceGroups[0].name.empty());
-//    REQUIRE(blueprint.resourceGroups[0].description.empty());
-//    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-//
-//    REQUIRE(blueprint.resourceGroups[1].name.empty());
-//    REQUIRE(blueprint.resourceGroups[1].description.empty());
-//}
+TEST_CASE("Parse two groups with the same name", "[blueprint]")
+{
+    mdp::ByteBuffer source = \
+    "# API\n"\
+    "# Group Name\n"\
+    "## /1\n"\
+    "### POST\n"\
+    "+ Request\n\n"\
+    "         {}\n\n"\
+    "# Group Name\n";
+
+    Blueprint blueprint;
+    Report report;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 2); // groups with same name & no response
+
+    REQUIRE(blueprint.resourceGroups.size() == 2);
+
+    REQUIRE(blueprint.resourceGroups[0].name == "Name");
+    REQUIRE(blueprint.resourceGroups[0].description.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+
+    REQUIRE(blueprint.resourceGroups[1].name == "Name");
+    REQUIRE(blueprint.resourceGroups[1].description.empty());
+}
 
 TEST_CASE("Test parser options - required blueprint name", "[blueprint]")
 {

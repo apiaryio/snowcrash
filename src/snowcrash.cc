@@ -8,6 +8,7 @@
 
 #include "snowcrash.h"
 #include "MarkdownParser.h"
+//#include "BlueprintParser.h"
 
 const int snowcrash::SourceAnnotation::OK = 0;
 
@@ -59,10 +60,12 @@ int snowcrash::parse(const mdp::ByteBuffer& source,
         mdp::MarkdownParser markdownParser;
         mdp::MarkdownNode markdownAST;
         markdownParser.parse(source, markdownAST);
-        
-        // Parse Blueprint
-        // TODO::
-        // BlueprintParser::Parse(source, markdown, options, result, blueprint);
+
+//        // Build SectionParserData
+//        SectionParserData pd(options, source, blueprint);
+//
+//        // Parse Blueprint
+//        BlueprintParser::parse(markdownAST.children().begin(), markdownAST.children(), pd, report, pd.blueprint);
     }
     catch (const std::exception& e) {
         
