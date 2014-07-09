@@ -51,6 +51,7 @@ TEST_CASE("Parse simple blueprint with C interface", "[cinterface]")
     const sc_resource_groups_collection_t* res_gr_col = sc_resource_groups_collection_handle(blueprint);
     const sc_resource_groups_t* res_gr = sc_resource_groups_handle(res_gr_col, 0);
 
+    REQUIRE(sc_resource_groups_collection_size(res_gr_col) == 2);
     REQUIRE(std::string(sc_resource_groups_name(res_gr)) == "");
 
     const sc_resource_collection_t* re_col = sc_resource_collection_handle(res_gr);
