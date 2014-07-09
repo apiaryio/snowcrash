@@ -101,7 +101,7 @@ SC_API const sc_resource_groups_collection_t* sc_resource_groups_collection_hand
 
 SC_API size_t sc_resource_groups_collection_size(const sc_resource_groups_collection_t* resource)
 {
-    const snowcrash::Collection<snowcrash::Resource>::type* p = AS_CTYPE(snowcrash::Collection<snowcrash::Resource>::type, resource);
+    const snowcrash::Collection<snowcrash::ResourceGroup>::type* p = AS_CTYPE(snowcrash::Collection<snowcrash::ResourceGroup>::type, resource);
     if (!p)
         return 0;
 
@@ -287,7 +287,7 @@ SC_API const sc_parameter_collection_t* sc_parameter_collection_handle_payload(c
     const snowcrash::Payload* p = AS_CTYPE(snowcrash::Payload, handle);
     if(!p)
         return NULL;
-    
+
     return AS_CTYPE(sc_parameter_collection_t, &p->parameters);
 }
 
