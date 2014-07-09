@@ -9,7 +9,7 @@
 #include "snowcrash.h"
 
 
-int sc_c_parse(const char* source,int option, sc_result_t** result, sc_blueprint_t** blueprint)
+int sc_c_parse(const char* source, sc_blueprint_parser_options option, sc_result_t** result, sc_blueprint_t** blueprint)
 {
     snowcrash::Result* t_result = ::new snowcrash::Result;
     snowcrash::Blueprint* t_blueprint = ::new snowcrash::Blueprint;

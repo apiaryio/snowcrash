@@ -17,6 +17,22 @@
 extern "C" {
 #endif
 
+    /** brief Blueprint Parser Options */
+    typedef unsigned int sc_blueprint_parser_options;
+
+    /** brief Blueprint Parser Options Enums */
+    enum sc_blueprint_parser_option {
+        SC_RENDER_DESCRIPTIONS_OPTION = (1 << 0),       /// < Render Markdown in description.
+        SC_REQUIRE_BLUEPRINT_NAME_OPTION = (1 << 1),    /// < Treat missing blueprint name as error
+    };
+
+    /** Parameter Use flag */
+    typedef enum sc_parameter_use {
+        SC_UNDEFINED_PARAMETER_USE,
+        SC_OPTIONAL_PARAMETER_USE,
+        SC_REQUIRED_PARAMETER_USE
+    } sc_parameter_use;
+
     /** Class Blueprint wrapper */
     struct sc_blueprint_s;
     typedef struct sc_blueprint_s sc_blueprint_t;
@@ -239,7 +255,7 @@ extern "C" {
     SC_API const char* sc_parameter_type(const sc_parameter_t* handle);
 
     /** \returns Parameter Parameter Use */
-    SC_API int sc_parameter_parameter_use(const sc_parameter_t* handle);
+    SC_API sc_parameter_use sc_parameter_parameter_use(const sc_parameter_t* handle);
 
     /** \returns Parameter Default Value */
     SC_API const char* sc_parameter_default_value(const sc_parameter_t* handle);
