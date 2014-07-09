@@ -93,6 +93,23 @@ namespace snowcrash {
 
                 return cur;
             }
+            else if (pd.sectionContext() == ResourceSectionType ||
+                     pd.sectionContext() == ResourceMethodSectionType) {
+
+                Resource resource;
+                MarkdownNodeIterator cur = ResourceParser::parse(node, siblings, pd, report, resource);
+
+                // Create the default resourceGroup
+                if (out.resourceGroups.empty()) {
+
+                    ResourceGroup resourceGroup;
+                    out.resourceGroups.push_back(resourceGroup);
+                }
+
+                out.resourceGroups.front().resources.push_back(resource);
+
+                return cur;
+            }
 
             return node;
         }
@@ -104,8 +121,23 @@ namespace snowcrash {
 
         static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
 
-            // Return ResourceGroupSectionType or UndefinedSectionType
-            return SectionProcessor<ResourceGroup>::sectionType(node);
+            SectionType nestedType = UndefinedSectionType;
+
+            // Check if Resource section
+            nestedType = SectionProcessor<Resource>::sectionType(node);
+
+            if (nestedType != UndefinedSectionType) {
+                return nestedType;
+            }
+
+            // Check if ResourceGroup section
+            nestedType = SectionProcessor<ResourceGroup>::sectionType(node);
+
+            if (nestedType != UndefinedSectionType) {
+                return nestedType;
+            }
+
+            return UndefinedSectionType;
         }
 
         static void finalize(const MarkdownNodeIterator& node,
