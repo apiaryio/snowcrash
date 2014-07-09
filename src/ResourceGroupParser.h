@@ -20,6 +20,11 @@ namespace snowcrash {
     /** Resource iterator pair: its containment group and resource iterator itself */
     typedef std::pair<Collection<ResourceGroup>::const_iterator, ResourceIterator> ResourceIteratorPair;
 
+    /** Internal type alias for Collection of Resource */
+    typedef Collection<ResourceGroup>::type ResourceGroups;
+
+    typedef Collection<ResourceGroup>::const_iterator ResourceGroupIterator;
+
     /**
      * ResourceGroup Section processor
      */
