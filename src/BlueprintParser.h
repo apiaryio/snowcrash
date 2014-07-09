@@ -35,6 +35,12 @@ namespace snowcrash {
             if (cur->type == mdp::ParagraphMarkdownNodeType) {
 
                 parseMetadata(node, pd, report, out.metadata);
+
+                // First block is paragraph and is not metadata (no API name)
+                if (out.metadata.empty()) {
+                    return processDescription(cur, pd, report, out);
+                }
+
                 cur++;
             }
 
@@ -42,14 +48,10 @@ namespace snowcrash {
 
                 out.name = cur->text;
                 TrimString(out.name);
-            }
+            } else {
 
-            if (out.name.empty()) {
-
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                report.warnings.push_back(Warning(ExpectedAPINameMessage,
-                                                  APINameWarning,
-                                                  sourceMap));
+                // Any other type of block, add to description
+                return processDescription(cur, pd, report, out);
             }
 
             return ++MarkdownNodeIterator(cur);
@@ -111,14 +113,23 @@ namespace snowcrash {
                              Report& report,
                              Blueprint& out) {
 
-            if ((pd.options & RequireBlueprintNameOption) &&
-                out.name.empty()) {
+            if (out.name.empty()) {
 
-                // ERR: No API name specified
+
+                if (pd.options & RequireBlueprintNameOption) {
+
+                    // ERR: No API name specified
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                    report.error = Error(ExpectedAPINameMessage,
+                                         BusinessError,
+                                         sourceMap);
+                }
+
+                // WARN: No API name
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                report.error = Error(ExpectedAPINameMessage,
-                                     BusinessError,
-                                     sourceMap);
+                report.warnings.push_back(Warning(ExpectedAPINameMessage,
+                                                  APINameWarning,
+                                                  sourceMap));
             }
         }
 
@@ -197,7 +208,7 @@ namespace snowcrash {
     };
 
     /** Blueprint Parser */
-    typedef SectionParser<Blueprint, HeaderSectionAdapter> BlueprintParser;
+    typedef SectionParser<Blueprint, BlueprintSectionAdapter> BlueprintParser;
 }
 
 #endif
