@@ -13,6 +13,7 @@
 #include "ResourceGroupParser.h"
 #include "SectionParser.h"
 #include "RegexMatch.h"
+#include "CodeBlockUtility.h"
 
 namespace snowcrash {
 
@@ -29,7 +30,29 @@ namespace snowcrash {
                                                      Report& report,
                                                      Blueprint& out) {
 
-            return ++MarkdownNodeIterator(node);
+            MarkdownNodeIterator cur = node;
+
+            if (cur->type == mdp::ParagraphMarkdownNodeType) {
+
+                parseMetadata(node, pd, report, out.metadata);
+                cur++;
+            }
+
+            if (cur->type == mdp::HeaderMarkdownNodeType) {
+
+                out.name = cur->text;
+                TrimString(out.name);
+            }
+
+            if (out.name.empty()) {
+
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                report.warnings.push_back(Warning(ExpectedAPINameMessage,
+                                                  APINameWarning,
+                                                  sourceMap));
+            }
+
+            return ++MarkdownNodeIterator(cur);
         }
 
         static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
@@ -43,6 +66,27 @@ namespace snowcrash {
                 ResourceGroup resourceGroup;
                 MarkdownNodeIterator cur = ResourceGroupParser::parse(node, siblings, pd, report, resourceGroup);
 
+                ResourceGroupIterator duplicate = findResourceGroup(out.resourceGroups, resourceGroup);
+
+                if (duplicate != out.resourceGroups.end()) {
+
+                    // WARN: duplicate resource group
+                    std::stringstream ss;
+
+                    if (resourceGroup.name.empty()) {
+                        ss << "anonymous group";
+                    } else {
+                        ss << "group '" << resourceGroup.name << "'";
+                    }
+
+                    ss << " is already defined";
+
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                    report.warnings.push_back(Warning(ss.str(),
+                                                      DuplicateWarning,
+                                                      sourceMap));
+                }
+
                 out.resourceGroups.push_back(resourceGroup);
 
                 return cur;
@@ -53,18 +97,7 @@ namespace snowcrash {
 
         static SectionType sectionType(const MarkdownNodeIterator& node) {
 
-            if (node->type == mdp::HeaderMarkdownNodeType
-                && !node->text.empty()) {
-
-                mdp::ByteBuffer subject = node->text;
-                TrimString(subject);
-
-                if (RegexMatch(subject, GroupHeaderRegex)) {
-                    return ResourceGroupSectionType;
-                }
-            }
-
-            return UndefinedSectionType;
+            return BlueprintSectionType;
         }
 
         static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
@@ -73,6 +106,94 @@ namespace snowcrash {
             return SectionProcessor<ResourceGroup>::sectionType(node);
         }
 
+        static void finalize(const MarkdownNodeIterator& node,
+                             SectionParserData& pd,
+                             Report& report,
+                             Blueprint& out) {
+
+            if ((pd.options & RequireBlueprintNameOption) &&
+                out.name.empty()) {
+
+                // ERR: No API name specified
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                report.error = Error(ExpectedAPINameMessage,
+                                     BusinessError,
+                                     sourceMap);
+            }
+        }
+
+        static void parseMetadata(const MarkdownNodeIterator& node,
+                                  SectionParserData& pd,
+                                  Report& report,
+                                  MetadataCollection& out) {
+
+            mdp::ByteBuffer content = node->text;
+            TrimStringEnd(content);
+
+            std::vector<mdp::ByteBuffer> lines = Split(content, '\n');
+
+            for (std::vector<mdp::ByteBuffer>::iterator it = lines.begin();
+                 it != lines.end();
+                 ++it) {
+
+                Metadata metadata;
+
+                if (CodeBlockUtility::keyValueFromLine(*it, metadata)) {
+                    out.push_back(metadata);
+                }
+            }
+
+            if (lines.size() == out.size()) {
+
+                // Check duplicates
+                std::vector<mdp::ByteBuffer> duplicateKeys;
+
+                for (MetadataCollectionIterator it = out.begin();
+                     it != out.end();
+                     ++it) {
+
+                    MetadataCollectionIterator from = it;
+                    if (++from == out.end())
+                        break;
+
+                    MetadataCollectionIterator duplicate = std::find_if(from,
+                                                                        out.end(),
+                                                                        std::bind2nd(MatchFirsts<Metadata>(), *it));
+
+                    if (duplicate != out.end() &&
+                        std::find(duplicateKeys.begin(), duplicateKeys.end(), it->first) == duplicateKeys.end()) {
+
+                        duplicateKeys.push_back(it->first);
+
+                        // WARN: duplicate metadata definition
+                        std::stringstream ss;
+                        ss << "duplicate definition of '" << it->first << "'";
+
+                        mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                        report.warnings.push_back(Warning(ss.str(),
+                                                          DuplicateWarning,
+                                                          sourceMap));
+                    }
+                }
+            }
+            else if (!out.empty()) {
+
+                // WARN: malformed metadata block
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                report.warnings.push_back(Warning("ignoring possible metadata, expected '<key> : <value>', one one per line",
+                                                  FormattingWarning,
+                                                  sourceMap));
+            }
+        }
+
+        /** Finds a resource group inside an resource groups collection */
+        static ResourceGroupIterator findResourceGroup(const ResourceGroups& resourceGroups,
+                                                       const ResourceGroup& resourceGroup) {
+
+            return std::find_if(resourceGroups.begin(),
+                                resourceGroups.end(),
+                                std::bind2nd(MatchName<ResourceGroup>(), resourceGroup));
+        }
     };
 
     /** Blueprint Parser */

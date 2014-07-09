@@ -100,7 +100,8 @@ namespace snowcrash {
         
         /** \return Node to start parsing with */
         static const MarkdownNodeIterator startingNode(const MarkdownNodeIterator& seed) {
-            if (seed->type != mdp::HeaderMarkdownNodeType)
+            if (seed->type != mdp::HeaderMarkdownNodeType &&
+                seed->type != mdp::ParagraphMarkdownNodeType)
                 throw ADAPTER_MISMATCH_ERR;
             
             return seed;

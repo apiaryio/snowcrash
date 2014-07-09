@@ -95,6 +95,7 @@
         'test/test-ResourceGroupParser.cc',
         'test/test-ValuesParser.cc',
         'test/test-Blueprint.cc',
+        'test/test-BlueprintParser.cc',
         'test/test-SectionParser',
         'test/test-snowcrash.cc',
         # 'test/test-csnowcrash.cc',
