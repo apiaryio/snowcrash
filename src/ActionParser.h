@@ -26,7 +26,7 @@ namespace snowcrash {
     /** Internal type alias for Collection of Action */
     typedef Collection<Action>::type Actions;
 
-    typedef Collection<Action>::iterator ActionIterator;
+    typedef Collection<Action>::const_iterator ActionIterator;
 
     // Method signature
     enum ActionSignature {
