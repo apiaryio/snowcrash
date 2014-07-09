@@ -27,7 +27,7 @@ namespace snowcrash {
     /** Internal type alias for Collection of Resource */
     typedef Collection<Resource>::type Resources;
 
-    typedef Collection<Resource>::iterator ResourceIterator;
+    typedef Collection<Resource>::const_iterator ResourceIterator;
 
     // Resource signature
     enum ResourceSignature {
@@ -328,7 +328,7 @@ namespace snowcrash {
         }
 
         /** Finds an action inside an actions collection */
-        static ActionIterator findAction(Actions& actions,
+        static ActionIterator findAction(const Actions& actions,
                                          const Action& action) {
 
             return std::find_if(actions.begin(),
