@@ -231,42 +231,42 @@ TEST_CASE("Should parse paragraph without final newline", "[blueprint]")
     REQUIRE(blueprint.resourceGroups.empty());
 }
 
-//TEST_CASE("Blueprint starting with Resource Group should be parsed", "[blueprint]")
-//{
-//    mdp::ByteBuffer source = \
-//    "# Group Posts\n"\
-//    "## /posts";
-//
-//    Blueprint blueprint;
-//    Report report;
-//    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
-//
-//    REQUIRE(report.error.code == Error::OK);
-//    REQUIRE(report.warnings.size() == 1); // expected API name
-//
-//    REQUIRE(blueprint.name.empty());
-//    REQUIRE(blueprint.description.empty());
-//    REQUIRE(blueprint.resourceGroups.size() == 1);
-//    REQUIRE(blueprint.resourceGroups.front().name == "Posts");
-//    REQUIRE(blueprint.resourceGroups.front().resources.size() == 1);
-//    REQUIRE(blueprint.resourceGroups.front().resources.front().uriTemplate == "/posts");
-//}
+TEST_CASE("Blueprint starting with Resource Group should be parsed", "[blueprint]")
+{
+    mdp::ByteBuffer source = \
+    "# Group Posts\n"\
+    "## /posts";
 
-//TEST_CASE("Blueprint starting with Resource should be parsed", "[blueprint]")
-//{
-//    mdp::ByteBuffer source = "# /posts";
-//
-//    Blueprint blueprint;
-//    Report report;
-//    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
-//
-//    REQUIRE(report.error.code == Error::OK);
-//    REQUIRE(report.warnings.size() == 1); // expected API name
-//
-//    REQUIRE(blueprint.name.empty());
-//    REQUIRE(blueprint.description.empty());
-//    REQUIRE(blueprint.resourceGroups.size() == 1);
-//    REQUIRE(blueprint.resourceGroups.front().name.empty());
-//    REQUIRE(blueprint.resourceGroups.front().resources.size() == 1);
-//    REQUIRE(blueprint.resourceGroups.front().resources.front().uriTemplate == "/posts");
-//}
+    Blueprint blueprint;
+    Report report;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 1); // expected API name
+
+    REQUIRE(blueprint.name.empty());
+    REQUIRE(blueprint.description.empty());
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups.front().name == "Posts");
+    REQUIRE(blueprint.resourceGroups.front().resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups.front().resources.front().uriTemplate == "/posts");
+}
+
+TEST_CASE("Blueprint starting with Resource should be parsed", "[blueprint]")
+{
+    mdp::ByteBuffer source = "# /posts";
+
+    Blueprint blueprint;
+    Report report;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 1); // expected API name
+
+    REQUIRE(blueprint.name.empty());
+    REQUIRE(blueprint.description.empty());
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups.front().name.empty());
+    REQUIRE(blueprint.resourceGroups.front().resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups.front().resources.front().uriTemplate == "/posts");
+}
