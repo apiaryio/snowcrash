@@ -257,24 +257,6 @@ TEST_CASE("Parse method without name", "[action]")
     REQUIRE(action.description.empty());
 }
 
-// TODO: ResourceGroupParser
-//TEST_CASE("Make sure method followed by a group does not eat the group", "[action][blocks]")
-//{
-//    mdp::ByteBuffer source = \
-//    "## POST\n"\
-//    "# Group Two\n";
-//
-//    Action action;
-//    Report report;
-//    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, report, action);
-//
-//    REQUIRE(report.error.code == Error::OK);
-//    CHECK(report.warnings.empty());
-//
-//    REQUIRE(action.method == "POST");
-//    REQUIRE(action.description == "# Group Two\n");
-//}
-
 TEST_CASE("Parse action with parameters", "[action]")
 {
     mdp::ByteBuffer source = \

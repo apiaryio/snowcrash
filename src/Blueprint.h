@@ -262,7 +262,7 @@ namespace snowcrash {
         /** Resources */
         Collection<Resource>::type resources;
     };
-    
+
     /** 
      *  \brief API Blueprint AST
      *

@@ -144,6 +144,28 @@ namespace snowcrash {
             return ++MarkdownNodeIterator(seed);
         }
     };
+
+    /** Parser Adapter for parsing blueprint sections */
+    struct BlueprintSectionAdapter {
+
+        /** \return Node to start parsing with */
+        static const MarkdownNodeIterator startingNode(const MarkdownNodeIterator& seed) {
+            return seed;
+        }
+
+        /** \return Collection of siblings to starting Node */
+        static const MarkdownNodes& startingNodeSiblings(const MarkdownNodeIterator& seed,
+                                                         const MarkdownNodes& siblings) {
+            return siblings;
+        }
+
+        /** \return Starting node for next parsing */
+        static const MarkdownNodeIterator nextStartingNode(const MarkdownNodeIterator& seed,
+                                                           const MarkdownNodes& siblings,
+                                                           const MarkdownNodeIterator& cur) {
+            return cur;
+        }
+    };
 }
 
 #endif

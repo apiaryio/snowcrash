@@ -13,6 +13,8 @@
 #include "HeadersParser.h"
 #include "PayloadParser.h"
 #include "ParametersParser.h"
+#include "ResourceParser.h"
+#include "ResourceGroupParser.h"
 
 using namespace snowcrash;
 
@@ -24,5 +26,7 @@ bool snowcrash::HasSectionKeywordSignature(const mdp::MarkdownNodeIterator& node
             SectionProcessor<Payload>::sectionType(node) != UndefinedSectionType ||
             SectionProcessor<Values>::sectionType(node) != UndefinedSectionType ||
             SectionProcessor<Parameters>::sectionType(node) != UndefinedSectionType ||
-            SectionProcessor<Action>::sectionType(node) != UndefinedSectionType);
+            SectionProcessor<Action>::sectionType(node) != UndefinedSectionType ||
+            SectionProcessor<Resource>::sectionType(node) != UndefinedSectionType ||
+            SectionProcessor<ResourceGroup>::sectionType(node) != UndefinedSectionType);
 }

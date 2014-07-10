@@ -24,6 +24,11 @@ namespace snowcrash {
     /** Named resource matching regex */
     const char* const NamedResourceHeaderRegex = "^[[:blank:]]*" SYMBOL_IDENTIFIER "[[:blank:]]+\\[" URI_TEMPLATE "]$";
 
+    /** Internal type alias for Collection of Resource */
+    typedef Collection<Resource>::type Resources;
+
+    typedef Collection<Resource>::const_iterator ResourceIterator;
+
     // Resource signature
     enum ResourceSignature {
         NoResourceSignature = 0,
@@ -323,8 +328,8 @@ namespace snowcrash {
         }
 
         /** Finds an action inside an actions collection */
-        static ActionIterator findAction(Actions& actions,
-                                            const Action& action) {
+        static ActionIterator findAction(const Actions& actions,
+                                         const Action& action) {
 
             return std::find_if(actions.begin(),
                                 actions.end(),
