@@ -271,3 +271,34 @@ TEST_CASE("Blueprint starting with Resource should be parsed", "[blueprint]")
     REQUIRE(blueprint.resourceGroups.front().resources.size() == 1);
     REQUIRE(blueprint.resourceGroups.front().resources.front().uriTemplate == "/posts");
 }
+
+TEST_CASE("Checking a resource with global resources for duplicates", "[blueprint]")
+{
+    mdp::ByteBuffer source = \
+    "# /posts\n"\
+    "# Group Posts\n"\
+    "## Posts [/posts]\n"\
+    "### Creat a post [POST]\n"\
+    "### List posts [GET]\n";
+
+    Blueprint blueprint;
+    Report report;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint, Symbols(), 0, &blueprint);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 4); // expected API name & 2x no response & duplicate resource
+
+    REQUIRE(blueprint.name.empty());
+    REQUIRE(blueprint.description.empty());
+    REQUIRE(blueprint.resourceGroups.size() == 2);
+
+    REQUIRE(blueprint.resourceGroups[0].name.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].uriTemplate == "/posts");
+
+    REQUIRE(blueprint.resourceGroups[1].name == "Posts");
+    REQUIRE(blueprint.resourceGroups[1].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[1].resources[0].actions.size() == 2);
+    REQUIRE(blueprint.resourceGroups[1].resources[0].uriTemplate == "/posts");
+}
