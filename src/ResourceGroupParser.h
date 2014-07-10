@@ -36,6 +36,19 @@ namespace snowcrash {
                                                      Report& report,
                                                      ResourceGroup& out) {
 
+            MarkdownNodeIterator cur = node;
+            SectionType nestedType = nestedSectionType(cur);
+
+            // If starting with Resource directly
+            if (nestedType != UndefinedSectionType) {
+
+                pd.sectionsContext.push_back(nestedType);
+                cur = processNestedSection(cur, cur->parent().children(), pd, report, out);
+                pd.sectionsContext.pop_back();
+
+                return cur;
+            }
+
             CaptureGroups captureGroups;
 
             if (RegexCapture(node->text, GroupHeaderRegex, captureGroups, 3)) {
@@ -52,7 +65,8 @@ namespace snowcrash {
                                                          Report& report,
                                                          ResourceGroup& out) {
 
-            if (pd.sectionContext() == ResourceSectionType) {
+            if (pd.sectionContext() == ResourceSectionType ||
+                pd.sectionContext() == ResourceMethodSectionType) {
 
                 Resource resource;
                 MarkdownNodeIterator cur = ResourceParser::parse(node, siblings, pd, report, resource);
@@ -121,11 +135,11 @@ namespace snowcrash {
                   it != blueprint.resourceGroups.end();
                   ++it) {
 
-                 ResourceIterator match = findResource(it->resources, resource);
+                ResourceIterator match = findResource(it->resources, resource);
 
-                 if (match != it->resources.end()) {
-                     return std::make_pair(it, match);
-                 }
+                if (match != it->resources.end()) {
+                    return std::make_pair(it, match);
+                }
              }
 
              return std::make_pair(blueprint.resourceGroups.end(), ResourceIterator());

@@ -80,7 +80,9 @@ namespace snowcrash {
                                                          Report& report,
                                                          Blueprint& out) {
 
-            if (pd.sectionContext() == ResourceGroupSectionType) {
+            if (pd.sectionContext() == ResourceGroupSectionType ||
+                pd.sectionContext() == ResourceSectionType ||
+                pd.sectionContext() == ResourceMethodSectionType) {
 
                 ResourceGroup resourceGroup;
                 MarkdownNodeIterator cur = ResourceGroupParser::parse(node, siblings, pd, report, resourceGroup);
@@ -107,23 +109,6 @@ namespace snowcrash {
                 }
 
                 out.resourceGroups.push_back(resourceGroup);
-
-                return cur;
-            }
-            else if (pd.sectionContext() == ResourceSectionType ||
-                     pd.sectionContext() == ResourceMethodSectionType) {
-
-                Resource resource;
-                MarkdownNodeIterator cur = ResourceParser::parse(node, siblings, pd, report, resource);
-
-                // Create the default resourceGroup
-                if (out.resourceGroups.empty()) {
-
-                    ResourceGroup resourceGroup;
-                    out.resourceGroups.push_back(resourceGroup);
-                }
-
-                out.resourceGroups.front().resources.push_back(resource);
 
                 return cur;
             }
