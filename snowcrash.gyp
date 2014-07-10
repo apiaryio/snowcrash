@@ -2,7 +2,6 @@
   "includes": [
     "common.gypi"
   ],
-  
   'targets' : [
     {
       'target_name': 'libsundown',
@@ -38,8 +37,8 @@
       ],
       'dependencies': [
           'libsundown'
-      ]      
-    },    
+      ]
+    },
     {
       'target_name': 'libsnowcrash',
       'type': '<(libsnowcrash_type)',
@@ -51,7 +50,7 @@
       ],
       'sources': [
         'src/CBlueprint.cc',
-        'src/CSourceAnnotation.cc',      
+        'src/CSourceAnnotation.cc',
         'src/HTTP.cc',
         'src/Section.cc',
         'src/Serialize.cc',
@@ -60,11 +59,11 @@
         'src/Signature.cc',
         'src/snowcrash.cc',
         'src/csnowcrash.cc',
-        'src/UriTemplateParser.cc'        
+        'src/UriTemplateParser.cc'
       ],
       'conditions': [
-        [ 'OS=="win"', 
-          { 'sources': [ 'src/win/RegexMatch.cc' ] }, 
+        [ 'OS=="win"',
+          { 'sources': [ 'src/win/RegexMatch.cc' ] },
           { 'sources': [ 'src/posix/RegexMatch.cc' ] } # OS != Windows
         ]
       ],
@@ -86,6 +85,8 @@
       'sources': [
         'test/test-ActionParser.cc',
         'test/test-AssetParser.cc',
+        'test/test-Blueprint.cc',
+        'test/test-BlueprintParser.cc',
         'test/test-HeadersParser.cc',
         'test/test-ParameterParser.cc',
         'test/test-ParametersParser.cc',
@@ -93,13 +94,11 @@
         'test/test-RegexMatch.cc',
         'test/test-ResourceParser.cc',
         'test/test-ResourceGroupParser.cc',
-        'test/test-ValuesParser.cc',
-        'test/test-Blueprint.cc',
-        'test/test-BlueprintParser.cc',
         'test/test-SectionParser',
+        'test/test-UriTemplateParser.cc',
+        'test/test-ValuesParser.cc',
         'test/test-snowcrash.cc',
-        # 'test/test-csnowcrash.cc',
-        'test/test-UriTemplateParser.cc'
+        # 'test/test-csnowcrash.cc'
       ],
       'dependencies': [
         'libsnowcrash',
@@ -145,5 +144,5 @@
         }
       ]
     }]
-  ]  
+  ]
 }

@@ -8,7 +8,7 @@
 
 #include "snowcrash.h"
 #include "MarkdownParser.h"
-//#include "BlueprintParser.h"
+#include "BlueprintParser.h"
 
 const int snowcrash::SourceAnnotation::OK = 0;
 
@@ -21,6 +21,7 @@ using namespace snowcrash;
 static bool CheckSource(const mdp::ByteBuffer& source, Report& report)
 {
     std::string::size_type pos = source.find("\t");
+
     if (pos != std::string::npos) {
         
         mdp::BytesRangeSet rangeSet;
@@ -32,6 +33,7 @@ static bool CheckSource(const mdp::ByteBuffer& source, Report& report)
     }
     
     pos = source.find("\r");
+
     if (pos != std::string::npos) {
 
         mdp::BytesRangeSet rangeSet;
@@ -61,11 +63,11 @@ int snowcrash::parse(const mdp::ByteBuffer& source,
         mdp::MarkdownNode markdownAST;
         markdownParser.parse(source, markdownAST);
 
-//        // Build SectionParserData
-//        SectionParserData pd(options, source, blueprint);
-//
-//        // Parse Blueprint
-//        BlueprintParser::parse(markdownAST.children().begin(), markdownAST.children(), pd, report, pd.blueprint);
+        // Build SectionParserData
+        SectionParserData pd(options, source, blueprint);
+
+        // Parse Blueprint
+        BlueprintParser::parse(markdownAST.children().begin(), markdownAST.children(), pd, report, pd.blueprint);
     }
     catch (const std::exception& e) {
         

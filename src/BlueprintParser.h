@@ -164,7 +164,6 @@ namespace snowcrash {
 
             if (out.name.empty()) {
 
-
                 if (pd.options & RequireBlueprintNameOption) {
 
                     // ERR: No API name specified
