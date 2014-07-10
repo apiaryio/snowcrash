@@ -25,7 +25,8 @@ namespace snowcrashtest {
                           snowcrash::Report& report,
                           T& output,
                           const Symbols& symbols = Symbols(),
-                          const snowcrash::BlueprintParserOptions& opts = 0) {
+                          const snowcrash::BlueprintParserOptions& opts = 0,
+                          snowcrash::Blueprint bp = snowcrash::Blueprint()) {
 
             mdp::MarkdownParser markdownParser;
             mdp::MarkdownNode markdownAST;
@@ -34,7 +35,6 @@ namespace snowcrashtest {
             
             REQUIRE(!markdownAST.children().empty());
             
-            snowcrash::Blueprint bp;
             snowcrash::SectionParserData pd(opts, source, bp);
 
             pd.sectionsContext.push_back(type);
