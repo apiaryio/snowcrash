@@ -6,10 +6,9 @@
 //  Copyright (c) 2013 Apiary Inc. All rights reserved.
 //
 
-#ifndef SNOWCRASH_H
-#define SNOWCRASH_H
+#ifndef SNOWCRASH_URITEMPLATEPARSER_H
+#define SNOWCRASH_URITEMPLATEPARSER_H
 
-#include <string>
 #include "Blueprint.h"
 #include "SourceAnnotation.h"
 #include "RegexMatch.h"

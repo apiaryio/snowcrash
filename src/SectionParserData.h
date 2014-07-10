@@ -35,7 +35,7 @@ namespace snowcrash {
     struct SectionParserData {
         SectionParserData(BlueprintParserOptions opts,
                           const mdp::ByteBuffer& src,
-                          const Blueprint& bp)
+                          Blueprint& bp)
         : options(opts), sourceData(src), blueprint(bp) {}
         
         /** Parser Options */
@@ -48,7 +48,7 @@ namespace snowcrash {
         const mdp::ByteBuffer& sourceData;
         
         /** AST being parsed **/
-        const Blueprint& blueprint;
+        Blueprint& blueprint;
         
         /** Sections Context */
         typedef std::vector<SectionType> SectionsStack;
