@@ -111,6 +111,8 @@
       'include_dirs': [
         'src',
         'src/snowcrash',
+        'ext/markdown-parser/src',
+        'ext/markdown-parser/ext/sundown/src',
         'cmdline'
       ],
       'sources': [
