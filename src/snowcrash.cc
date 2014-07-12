@@ -67,7 +67,7 @@ int snowcrash::parse(const mdp::ByteBuffer& source,
         SectionParserData pd(options, source, blueprint);
 
         // Parse Blueprint
-        BlueprintParser::parse(markdownAST.children().begin(), markdownAST.children(), pd, report, pd.blueprint);
+        BlueprintParser::parse(markdownAST.children().begin(), markdownAST.children(), pd, report, blueprint);
     }
     catch (const std::exception& e) {
         
