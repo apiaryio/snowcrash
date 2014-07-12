@@ -259,7 +259,7 @@ TEST_CASE("Parse single list item", "[parser][list]")
     REQUIRE(node.sourceMap[0].length == 10);
 }
 
-TEST_CASE("Parse nested list items", "[parser][list][now]")
+TEST_CASE("Parse nested list items", "[parser][list]")
 {
     MarkdownParser parser;
     MarkdownNode ast;
