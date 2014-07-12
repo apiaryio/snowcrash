@@ -38,3 +38,16 @@ profile
 *.moved-aside
 DerivedData
 .idea/
+
+# MSVC specific
+*.suo
+*.ncb
+*.user
+*.vcxproj
+*.sdf
+*.opensdf
+*.filters
+msvc/_UpgradeReport_Files/
+msvc/Backup/
+msvc/UpgradeLog.htm
+msvc/UpgradeLog.XML
