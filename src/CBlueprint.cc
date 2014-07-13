@@ -356,13 +356,13 @@ SC_API const char* sc_parameter_type(const sc_parameter_t* handle)
     return p->type.c_str();
 }
 
-SC_API int sc_parameter_parameter_use(const sc_parameter_t* handle)
+SC_API sc_parameter_use sc_parameter_parameter_use(const sc_parameter_t* handle)
 {
     const snowcrash::Parameter* p = AS_CTYPE(snowcrash::Parameter, handle);
     if (!p)
-        return 0;
+        return SC_UNDEFINED_PARAMETER_USE;
 
-    return p->use;
+    return (sc_parameter_use)p->use;
 }
 
 SC_API const char* sc_parameter_default_value(const sc_parameter_t* handle)
