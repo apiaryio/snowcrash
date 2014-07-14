@@ -186,3 +186,32 @@ TEST_CASE("Recognize parameter when there is no description on its signature and
     REQUIRE(parameter.values[2] == "comfort");
     REQUIRE(parameter.values[3] == "vent");
 }
+
+TEST_CASE("Parentheses in parameter example ", "[parameters][issue][#109][now]")
+{
+    // Blueprint in question:
+    //R"(
+    //# GET /{id}
+    //+ Parameters
+    //  + id (optional, oData, `substringof('homer', id)`) ... test
+    //
+    //+ response 204
+    //");
+    mdp::ByteBuffer source = \
+    "+ Parameters\n"\
+    "  + id (optional, oData, `substringof('homer', id)`) ... test\n"\
+    "\n";
+
+    Parameters parameters;
+    Report report;
+    SectionParserHelper<Parameters, ParametersParser>::parse(source, ParametersSectionType, report, parameters);
+    
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.empty());
+
+    REQUIRE(parameters.size() == 1);
+    REQUIRE(parameters[0].name == "id");
+    REQUIRE(parameters[0].type == "oData");
+    REQUIRE(parameters[0].exampleValue == "substringof('homer', id)");
+    REQUIRE(parameters[0].description == "test");
+}
