@@ -461,3 +461,38 @@ TEST_CASE("Parentheses in parameter description ", "[parameters][issue][#49][sou
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].type == "string");
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].description == "lorem (ipsum)");
 }
+
+TEST_CASE("Parentheses in parameter example ", "[parameters][issue][#109]")
+{
+    // Blueprint in question:
+    //R"(
+    //# GET /{id}
+    //+ Parameters
+    //  + id (optional, oData, `substringof('homer', id)`) ... test
+    //
+    //+ response 204
+    //");
+    const std::string blueprintSource = \
+        "# GET /{id}\n"\
+        "+ Parameters\n"\
+        "  + id (optional, oData, `substringof('homer', id)`) ... test\n"\
+        "\n"\
+        "+ response 204\n";
+
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(blueprintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.empty());
+
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].name == "id");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].type == "oData");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].exampleValue == "substringof('homer', id)");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].description == "test");
+}
