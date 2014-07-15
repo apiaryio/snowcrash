@@ -6,33 +6,30 @@
 //  Copyright (c) 2014 Apiary Inc. All rights reserved.
 //
 
-#include "catch.hpp"
+#include "snowcrashtest.h"
 #include "csnowcrash.h"
-
 
 TEST_CASE("Parse simple blueprint with C interface", "[cinterface]")
 {
-    const std::string blueprintSource = \
-"\n"\
-"FORMAT: 1A\n"\
-"\n"\
-"# My API\n"\
-"Description of *My API*.\n"\
-"\n"\
-"## Message [/message]\n"\
-"### GET\n"\
-"+ Response 200 (text/plain)\n"\
-"\n"\
-"        Hello World!\n"\
-"\n"\
-"# Group test\n"\
-"\n"\
-"## Message [/message]\n"\
-"\n";
-
+    mdp::ByteBuffer source = \
+    "FORMAT: 1A\n"\
+    "\n"\
+    "# My API\n"\
+    "Description of *My API*.\n"\
+    "\n"\
+    "## Message [/message]\n"\
+    "### GET\n"\
+    "+ Response 200 (text/plain)\n"\
+    "\n"\
+    "        Hello World!\n"\
+    "\n"\
+    "# Group test\n"\
+    "\n"\
+    "## Message [/message]\n";
 
     sc_report_s* result;
     sc_blueprint_t* blueprint;
+
     sc_c_parse(blueprintSource.c_str(), SC_REQUIRE_BLUEPRINT_NAME_OPTION, &result, &blueprint);
 
     const sc_warnings_t* warns = sc_warnings_handler(result);
