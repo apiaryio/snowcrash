@@ -29,10 +29,6 @@
 
 namespace snowcrashconst {
 
-    /** Parameter Abbreviated definition matching regex */
-    const char* const ParameterAbbrevDefinitionRegex = "^" PARAMETER_IDENTIFIER \
-                                                        "([[:blank:]]*=[[:blank:]]*`([^`]*)`[[:blank:]]*)?([[:blank:]]*\\(([^)]*)\\)[[:blank:]]*)?([[:blank:]]*\\.\\.\\.[[:blank:]]*(.*))?$";
-
     /** Parameter Required matching regex */
     const char* const ParameterRequiredRegex = "^[[:blank:]]*[Rr]equired[[:blank:]]*$";
 
@@ -53,6 +49,8 @@ namespace snowcrashconst {
 
     /** Values expected content */
     const char* const ExpectedValuesContent = "nested list of possible parameter values, one element per list item e.g. '`value`'";
+
+    const std::string DescriptionIdentifier = "...";
 }
 
 namespace snowcrash {
@@ -91,7 +89,65 @@ namespace snowcrash {
                 
         return UndefinedSectionType;
     }
-    
+   
+    /** Determine if a signature is a valid parameter*/
+    FORCEINLINE bool IsValidParameterSignature(const SourceData& signature) {
+
+        SourceData innerSignature = signature;
+        innerSignature = TrimString(innerSignature);
+
+        if (innerSignature.length() == 0) {
+            return false; // Empty string, invalid
+        }
+
+        size_t firstSpace = innerSignature.find(" ");
+        if (firstSpace == std::string::npos) {
+            return RegexMatch(innerSignature, "^" PARAMETER_IDENTIFIER "$");
+        }
+        
+        std::string paramName = innerSignature.substr(0, firstSpace);
+        if (!RegexMatch(paramName, "^" PARAMETER_IDENTIFIER "$")) {
+            return false; // Invalid param name
+        }
+        // Remove param name
+        innerSignature = innerSignature.substr(firstSpace + 1);
+
+        size_t descriptionPos = innerSignature.find(snowcrashconst::DescriptionIdentifier);
+        // Remove description
+        if (descriptionPos != std::string::npos) {
+            innerSignature = innerSignature.substr(0, descriptionPos);
+            innerSignature = TrimString(innerSignature);
+        }
+
+        size_t attributesPos = innerSignature.find("(");
+        if (attributesPos != std::string::npos) {
+            size_t endOfAttributesPos = innerSignature.find_last_of(")");
+            if (endOfAttributesPos == std::string::npos) {
+                return false; // Expecting close of attributes
+            }
+            // Remove attributes
+            innerSignature = innerSignature.substr(0, attributesPos);
+            innerSignature = TrimString(innerSignature);
+        }
+
+        if (innerSignature.length() == 0) {
+            return true;
+        }
+
+        if (innerSignature.substr(0,1) == "=") {
+            innerSignature = innerSignature.substr(1);
+            innerSignature = TrimString(innerSignature);
+            if (innerSignature.length() == 0) {
+                return false; // No default value
+            }
+            if (innerSignature.substr(0,1) == "`" && innerSignature.substr(innerSignature.length()-1,1) == "`") {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      *  Returns true if given block has a parameter definition signature, false otherwise.
      */
@@ -114,9 +170,9 @@ namespace snowcrash {
         SourceData remainingContent;
         SourceData content = GetListItemSignature(begin, end, remainingContent);
         content = TrimString(content);
-        return RegexMatch(content, snowcrashconst::ParameterAbbrevDefinitionRegex);
+        return IsValidParameterSignature(content);
     }
-    
+
     /**
      *  Block Classifier, Parameter context.
      */
@@ -230,6 +286,8 @@ namespace snowcrash {
             return result;
             
         }
+
+      
         
         /**
          *  Retrieve and process parameter definition signature.
@@ -240,41 +298,57 @@ namespace snowcrash {
                                      Result& result,
                                      Parameter& parameter) {
             
-            
             // Set default values
             parameter.use = UndefinedParameterUse;
             
             // Process signature
             SourceData remainingContent;
             SourceData signature = GetListItemSignature(cur, section.bounds.second, remainingContent);
-
+            
             TrimString(signature);
-            CaptureGroups captureGroups;
-            if (RegexCapture(signature, snowcrashconst::ParameterAbbrevDefinitionRegex, captureGroups) &&
-                captureGroups.size() == 8) {
+
+            if (IsValidParameterSignature(signature)) {
                 
-                // Name
-                parameter.name = captureGroups[1];
-                TrimString(parameter.name);
-                
-                // Default value
-                if (!captureGroups[3].empty())
-                    parameter.defaultValue = captureGroups[3];
-                
-                // Additional Attributes
-                if (!captureGroups[5].empty())
-                    ProcessSignatureAdditionalTraits(section, cur, captureGroups[5], sourceData, result, parameter);
-                
-                // Description
-                if (!captureGroups[7].empty())
-                    parameter.description = captureGroups[7];
-                
-                if (!remainingContent.empty()) {
-                    parameter.description += "\n";
-                    parameter.description += remainingContent;
-                    parameter.description += "\n";
+                SourceData innerSignature = signature;
+                innerSignature = TrimString(innerSignature);
+
+                size_t firstSpace = innerSignature.find(" ");
+                if (firstSpace == std::string::npos) {
+                    // Name
+                    parameter.name = signature;
                 }
-                
+                else {
+                    parameter.name = innerSignature.substr(0, firstSpace);
+                    innerSignature = innerSignature.substr(firstSpace + 1);
+                    size_t descriptionPos = innerSignature.find(snowcrashconst::DescriptionIdentifier);
+                    if (descriptionPos != std::string::npos) {
+                        // Description
+                        parameter.description = innerSignature.substr(descriptionPos);
+                        parameter.description = TrimString(parameter.description.replace(0, snowcrashconst::DescriptionIdentifier.length(), ""));
+                        innerSignature = innerSignature.substr(0, descriptionPos);
+                        innerSignature = TrimString(innerSignature);
+                    }
+
+                    size_t attributesPos = innerSignature.find("(");
+                    if (attributesPos != std::string::npos) {
+                        size_t endOfAttributesPos = innerSignature.find_last_of(")");
+                        if (endOfAttributesPos - attributesPos > 1) {
+                            std::string attributes = innerSignature.substr(attributesPos, endOfAttributesPos - attributesPos);
+                            attributes = attributes.substr(1);
+                            ProcessSignatureAdditionalTraits(section, cur, attributes, sourceData, result, parameter);
+                            innerSignature = innerSignature.substr(0, attributesPos);
+                            innerSignature = TrimString(innerSignature);
+                        }
+                    }
+
+                    if (innerSignature.length() > 0) {
+                        // Remove =
+                        parameter.defaultValue = innerSignature;
+                        parameter.defaultValue.erase(std::remove(parameter.defaultValue.begin(), parameter.defaultValue.end(), '='), parameter.defaultValue.end());
+                        parameter.defaultValue.erase(std::remove(parameter.defaultValue.begin(), parameter.defaultValue.end(), '`'), parameter.defaultValue.end());
+                        parameter.defaultValue = TrimString(parameter.defaultValue);
+                    }
+                }
                 // Check possible required vs default clash
                 if (parameter.use != OptionalParameterUse &&
                     !parameter.defaultValue.empty()) {
@@ -290,7 +364,6 @@ namespace snowcrash {
                                                       LogicalErrorWarning,
                                                       sourceBlock));
                 }
-
             }
             else {
                 // ERR: unable to parse 
@@ -301,6 +374,7 @@ namespace snowcrash {
                                       sourceBlock));
             }
         }
+
         
         /** Parse additional parameter attributes from abbrev definition bracket */
         static void ProcessSignatureAdditionalTraits(const BlueprintSection& section,
@@ -561,6 +635,7 @@ namespace snowcrash {
 
             return;
         }
+
 
     };
     
