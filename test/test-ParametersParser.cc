@@ -496,3 +496,88 @@ TEST_CASE("Parentheses in parameter example ", "[parameters][issue][#109]")
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].exampleValue == "substringof('homer', id)");
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].description == "test");
 }
+
+TEST_CASE("Percentage encoded characters in parameter name ", "[parameters][percentageencoding][issue][#107]")
+{
+    // Blueprint in question:
+    //R"(
+    //# GET /{id%5b%5d}
+    //+ Parameters
+    //  + id%5b%5d (optional, oData, `substringof('homer', id)`) ... test
+    //
+    //+ response 204
+    //");
+    const std::string blueprintSource = \
+        "# GET /{id%5b%5d}\n"\
+        "+ Parameters\n"\
+        "  + id%5b%5d (optional, oData, `substringof('homer', id)`) ... test\n"\
+        "\n"\
+        "+ response 204\n";
+
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(blueprintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.empty());
+
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].name == "id%5b%5d");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].type == "oData");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].exampleValue == "substringof('homer', id)");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].description == "test");
+}
+
+TEST_CASE("Invalid percentage encoded characters in parameter name ", "[invalid][parameters][percentageencoding][issue][#107]")
+{
+    // Blueprint in question:
+    //R"(
+    //# GET /{id%5z}
+    //+ Parameters
+    //  + id%5z (optional, oData, `substringof('homer', id)`) ... test
+    //
+    //+ response 204
+    //");
+    const std::string blueprintSource = \
+        "# GET /{id%5z}\n"\
+        "+ Parameters\n"\
+        "  + id%5z (optional, oData, `substringof('homer', id)`) ... test\n"\
+        "\n"\
+        "+ response 204\n";
+
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(blueprintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.size()==3);
+}
+
+TEST_CASE("Incomplete percentage encoded characters in parameter name ", "[incomplete][parameters][percentageencoding][issue][#107]")
+{
+    // Blueprint in question:
+    //R"(
+    //# GET /{id%}
+    //+ Parameters
+    //  + id% (optional, oData, `substringof('homer', id)`) ... test
+    //
+    //+ response 204
+    //");
+    const std::string blueprintSource = \
+        "# GET /{id%}\n"\
+        "+ Parameters\n"\
+        "  + id% (optional, oData, `substringof('homer', id)`) ... test\n"\
+        "\n"\
+        "+ response 204\n";
+
+    Parser parser;
+    Result result;
+    Blueprint blueprint;
+    parser.parse(blueprintSource, 0, result, blueprint);
+    REQUIRE(result.error.code == Error::OK);
+    REQUIRE(result.warnings.size() == 3);
+}
