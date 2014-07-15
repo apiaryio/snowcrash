@@ -8,6 +8,7 @@
 
 #include "snowcrashtest.h"
 #include "ParametersParser.h"
+#include "snowcrash.h"
 
 using namespace snowcrash;
 using namespace snowcrashtest;
@@ -187,7 +188,7 @@ TEST_CASE("Recognize parameter when there is no description on its signature and
     REQUIRE(parameter.values[3] == "vent");
 }
 
-TEST_CASE("Parentheses in parameter example ", "[parameters][issue][#109][now]")
+TEST_CASE("Parentheses in parameter example ", "[parameters][issue][#109]")
 {
     // Blueprint in question:
     //R"(
@@ -214,4 +215,90 @@ TEST_CASE("Parentheses in parameter example ", "[parameters][issue][#109][now]")
     REQUIRE(parameters[0].type == "oData");
     REQUIRE(parameters[0].exampleValue == "substringof('homer', id)");
     REQUIRE(parameters[0].description == "test");
+}
+
+TEST_CASE("Percentage encoded characters in parameter name ", "[parameters][percentageencoding][issue][#107]")
+{
+    // Blueprint in question:
+    //R"(
+    //# GET /{id%5b%5d}
+    //+ Parameters
+    //  + id%5b%5d (optional, oData, `substringof('homer', id)`) ... test
+    //
+    //+ response 204
+    //");
+    mdp::ByteBuffer source = \
+    "# GET /{id%5b%5d}\n"\
+    "+ Parameters\n"\
+    "  + id%5b%5d (optional, oData, `substringof('homer', id)`) ... test\n"\
+    "\n"\
+    "+ response 204\n";
+
+    Blueprint blueprint;
+    Report report;
+    
+    parse(source, 0, report, blueprint);
+    
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.empty());
+
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].name == "id%5b%5d");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].type == "oData");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].exampleValue == "substringof('homer', id)");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].description == "test");
+}
+
+TEST_CASE("Invalid percentage encoded characters in parameter name ", "[invalid][parameters][percentageencoding][issue][#107]")
+{
+    // Blueprint in question:
+    //R"(
+    //# GET /{id%5z}
+    //+ Parameters
+    //  + id%5z (optional, oData, `substringof('homer', id)`) ... test
+    //
+    //+ response 204
+    //");
+    mdp::ByteBuffer source = \
+    "# GET /{id%5z}\n"\
+    "+ Parameters\n"\
+    "  + id%5z (optional, oData, `substringof('homer', id)`) ... test\n"\
+    "\n"\
+    "+ response 204\n";
+
+    Blueprint blueprint;
+    Report report;
+    
+    parse(source, 0, report, blueprint);
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 3);
+}
+
+TEST_CASE("Incomplete percentage encoded characters in parameter name ", "[incomplete][parameters][percentageencoding][issue][#107]")
+{
+    // Blueprint in question:
+    //R"(
+    //# GET /{id%}
+    //+ Parameters
+    //  + id% (optional, oData, `substringof('homer', id)`) ... test
+    //
+    //+ response 204
+    //");
+    mdp::ByteBuffer source = \
+    "# GET /{id%}\n"\
+    "+ Parameters\n"\
+    "  + id% (optional, oData, `substringof('homer', id)`) ... test\n"\
+    "\n"\
+    "+ response 204\n";
+
+    Blueprint blueprint;
+    Report report;
+    
+    parse(source, 0, report, blueprint);
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 3);
 }
