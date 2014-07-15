@@ -101,8 +101,8 @@
         'test/test-UriTemplateParser.cc',
         'test/test-ValuesParser.cc',
         'test/test-Warnings.cc',
-        'test/test-snowcrash.cc',
-        # 'test/test-csnowcrash.cc'
+        'test/test-csnowcrash.cc',
+        'test/test-snowcrash.cc'
       ],
       'dependencies': [
         'libsnowcrash',
