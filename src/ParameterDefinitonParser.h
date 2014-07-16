@@ -22,7 +22,7 @@
 #define PARAMETER_VALUE "`([^`]+)`"
 
 /** Parameter Identifier */
-#define PARAMETER_IDENTIFIER "([[:alnum:]_.-]+)"
+#define PARAMETER_IDENTIFIER "(([[:alnum:]_.-])*|(%[A-Fa-f0-9]{2})*)+"
 
 /** Lead in and out for comma separated values regex */
 #define CSV_LEADINOUT "[[:blank:]]*,?[[:blank:]]*"
