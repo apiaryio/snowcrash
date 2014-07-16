@@ -30,17 +30,21 @@ namespace snowcrashtest {
 
             mdp::MarkdownParser markdownParser;
             mdp::MarkdownNode markdownAST;
+
             snowcrash::Blueprint blueprint;
+            snowcrash::Blueprint* bppointer;
 
             markdownParser.parse(source, markdownAST);
 
             REQUIRE(!markdownAST.children().empty());
 
             if (bp == NULL) {
-                bp = &blueprint;
+                bppointer = &blueprint;
+            } else {
+                bppointer = bp;
             }
 
-            snowcrash::SectionParserData pd(opts, source, *bp);
+            snowcrash::SectionParserData pd(opts, source, *bppointer);
 
             pd.sectionsContext.push_back(type);
 
