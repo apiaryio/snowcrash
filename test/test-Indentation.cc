@@ -309,9 +309,9 @@ TEST_CASE("Full syntax - Extra indentation", "[indentation]")
     SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, report, action);
 
     REQUIRE(report.error.code == Error::OK);
-//    REQUIRE(report.warnings.size() == 1);
-//    REQUIRE(report.warnings[0].code == IndentationWarning);
-//    ReportDebugMessage(report.warnings[0].message);
+    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(report.warnings[0].code == IndentationWarning);
+    ReportDebugMessage(report.warnings[0].message);
 
     REQUIRE(action.examples.size() == 1);
     REQUIRE(action.examples[0].responses.size() == 1);

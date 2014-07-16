@@ -14,9 +14,7 @@ int sc_c_parse(const char* source, sc_blueprint_parser_options option, sc_result
     snowcrash::Report* t_result = ::new snowcrash::Report;
     snowcrash::Blueprint* t_blueprint = ::new snowcrash::Blueprint;
 
-    mdp::ByteBuffer str(source);
-
-    int ret = snowcrash::parse(str, option, *t_result, *t_blueprint);
+    int ret = snowcrash::parse(source, option, *t_result, *t_blueprint);
 
     *blueprint = AS_TYPE(sc_blueprint_t, t_blueprint);
     *result = AS_TYPE(sc_report_t, t_result);
