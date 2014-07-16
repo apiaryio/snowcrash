@@ -12,7 +12,7 @@
 using namespace snowcrash;
 using namespace snowcrashtest;
 
-TEST_CASE("Warn about keywords in API name", "[warnings]")
+TEST_CASE("Warn about keywords in API name", "[warnings][#31]")
 {
     mdp::ByteBuffer source = \
     "FORMAT: 1A\n"\
@@ -32,7 +32,7 @@ TEST_CASE("Warn about keywords in API name", "[warnings]")
     REQUIRE(blueprint.resourceGroups.empty());
 }
 
-TEST_CASE("Warn about brackets in URI template", "[warnings]")
+TEST_CASE("Warn about brackets in URI template", "[warnings][#79]")
 {
     mdp::ByteBuffer source = \
     "FORMAT: 1A\n"\
@@ -53,7 +53,7 @@ TEST_CASE("Warn about brackets in URI template", "[warnings]")
     REQUIRE(report.warnings[0].code == URIWarning);
 }
 
-TEST_CASE("Warn about unsupported uri template label expansion", "[warnings]")
+TEST_CASE("Warn about unsupported uri template label expansion", "[warnings][#78]")
 {
     mdp::ByteBuffer source = \
     "FORMAT: 1A\n"\
@@ -74,7 +74,7 @@ TEST_CASE("Warn about unsupported uri template label expansion", "[warnings]")
     REQUIRE(report.warnings[0].code == URIWarning);
 }
 
-TEST_CASE("Warn about unsupported uri template in abbreviated blueprint", "[warnings]")
+TEST_CASE("Warn about unsupported uri template in abbreviated blueprint", "[warnings][#78]")
 {
     mdp::ByteBuffer source = \
     "FORMAT: 1A\n"\

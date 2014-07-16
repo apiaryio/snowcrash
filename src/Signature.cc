@@ -30,3 +30,20 @@ bool snowcrash::HasSectionKeywordSignature(const mdp::MarkdownNodeIterator& node
             SectionProcessor<Resource>::sectionType(node) != UndefinedSectionType ||
             SectionProcessor<ResourceGroup>::sectionType(node) != UndefinedSectionType);
 }
+
+SectionType snowcrash::RecognizeCodeBlockFirstLine(const mdp::ByteBuffer& subject)
+{
+    SectionType type = UndefinedSectionType;
+
+    if (RegexMatch(subject, HeadersRegex)) {
+        return HeadersSectionType;
+    }
+    else if (RegexMatch(subject, BodyRegex)) {
+        return BodySectionType;
+    }
+    else if (RegexMatch(subject, SchemaRegex)) {
+        return SchemaSectionType;
+    }
+
+    return type;
+}

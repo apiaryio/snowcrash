@@ -24,6 +24,12 @@ namespace snowcrash {
         UndefinedAssetSignature = -1
     };
     
+    /** Body matching regex */
+    const char* const BodyRegex = "^[[:blank:]]*[Bb]ody[[:blank:]]*$";
+
+    /** Schema matching regex */
+    const char* const SchemaRegex = "^[[:blank:]]*[Ss]chema[[:blank:]]*$";
+
     /**
      *  Asset Section Processor
      */
@@ -95,12 +101,6 @@ namespace snowcrash {
         static AssetSignature assetSignature(const MarkdownNodeIterator& node) {
             mdp::ByteBuffer subject = node->children().front().text;
             TrimString(subject);
-            
-            /** Body matching regex */
-            static const char* const BodyRegex = "^[[:blank:]]*[Bb]ody[[:blank:]]*$";
-            
-            /** Schema matching regex */
-            static const char* const SchemaRegex = "^[[:blank:]]*[Ss]chema[[:blank:]]*$";
             
             if (RegexMatch(subject, BodyRegex))
                 return BodyAssetSignature;
