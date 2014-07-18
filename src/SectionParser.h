@@ -45,6 +45,14 @@ namespace snowcrash {
             if (lastCur == cur)
                 return Adapter::nextStartingNode(node, siblings, cur);
 
+            if (pd.isParsed) {
+                // Trust the section parser and finish off parsing of this section
+                SectionProcessor<T>::finalize(node, pd, report, out);
+                pd.isParsed = false;
+
+                return Adapter::nextStartingNode(node, siblings, cur);
+            }
+
             // Description nodes
             while(cur != collection.end() &&
                   SectionProcessor<T>::isDescriptionNode(cur, pd.sectionContext())) {
