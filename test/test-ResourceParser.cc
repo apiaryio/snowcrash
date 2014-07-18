@@ -274,10 +274,10 @@ TEST_CASE("Parse resource method abbreviation followed by a foreign method", "[r
 
     Resource resource;
     Report report;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceMethodSectionType, report, resource);
 
     REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(report.warnings.size() == 1); // no response (not counting `ignore block` warning because this is resource parser)
 
     REQUIRE(resource.name.empty());
     REQUIRE(resource.model.name.empty());
