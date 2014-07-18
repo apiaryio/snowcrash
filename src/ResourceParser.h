@@ -60,12 +60,12 @@ namespace snowcrash {
                 if (!captureGroups[2].empty()) {
 
                     Action action;
+                    MarkdownNodeIterator cur = ActionParser::parse(node, node->parent().children(), pd, report, action);
 
-                    action.method = captureGroups[2];
-                    ActionParser::parse(node, node->parent().children(), pd, report, action);
                     out.actions.push_back(action);
+                    pd.isParsed = true;
 
-                    return node;
+                    return cur;
                 }
             } else if (RegexCapture(node->text, NamedResourceHeaderRegex, captureGroups, 4)) {
 
