@@ -36,7 +36,7 @@ namespace snowcrash {
         SectionParserData(BlueprintParserOptions opts,
                           const mdp::ByteBuffer& src,
                           const Blueprint& bp)
-        : options(opts), sourceData(src), blueprint(bp) {}
+        : options(opts), sourceData(src), blueprint(bp), isParsed(0) {}
         
         /** Parser Options */
         BlueprintParserOptions options;
@@ -54,6 +54,9 @@ namespace snowcrash {
         typedef std::vector<SectionType> SectionsStack;
         SectionsStack sectionsContext;
         
+        /** Parsing is done for the current section */
+        bool isParsed;
+
         /** \returns Actual Section Context */
         SectionType sectionContext() const {
             return (sectionsContext.empty()) ? UndefinedSectionType : sectionsContext.back();

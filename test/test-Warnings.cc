@@ -25,6 +25,7 @@ TEST_CASE("Warn about keywords in API name", "[warnings][#31]")
 
     REQUIRE(report.error.code == Error::OK);
 
+//TODO:
 //    REQUIRE(report.warnings.size() == 1);
 //    REQUIRE(report.warnings[0].code == AmbiguityWarning);
 
@@ -92,6 +93,6 @@ TEST_CASE("Warn about unsupported uri template in abbreviated blueprint", "[warn
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 1);
-//    REQUIRE(report.warnings[0].code == URIWarning); // the resource '/res/{id}{?a,    b}' is already defined
+    REQUIRE(report.warnings[0].code == URIWarning);
 }
 
