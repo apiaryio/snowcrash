@@ -104,12 +104,8 @@ namespace snowcrash {
                                                           T& out) {
 
             // WARN: Ignoring unexpected node
-            std::stringstream ss;
-
-            ss << "ignoring unrecognized block";
-
             mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-            report.warnings.push_back(Warning(ss.str(),
+            report.warnings.push_back(Warning("ignoring unrecognized block",
                                               IgnoringWarning,
                                               sourceMap));
 
