@@ -77,14 +77,14 @@ TEST_CASE("No Indentation", "[indentation]")
     SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, report, action);
 
     REQUIRE(report.error.code == Error::OK);
-//    REQUIRE(report.warnings.size() == 1);
-//    REQUIRE(report.warnings[0].code == IndentationWarning);
-//    ReportDebugMessage(report.warnings[0].message);
+    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(report.warnings[0].code == IndentationWarning);
+    ReportDebugMessage(report.warnings[0].message);
 
     REQUIRE(action.description.empty());
     REQUIRE(action.examples[0].responses.size() == 1);
     REQUIRE(action.examples[0].responses[0].name == "200");
-//    REQUIRE(action.examples[0].responses[0].body == "{ ... }\n\n");
+    REQUIRE(action.examples[0].responses[0].body == "{ ... }\n\n");
 }
 
 TEST_CASE("Poor Indentation & No Newline", "[indentation]")
@@ -190,9 +190,9 @@ TEST_CASE("Full syntax - Poor Body Indentation", "[indentation]")
     SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, report, action);
 
     REQUIRE(report.error.code == Error::OK);
-//    REQUIRE(report.warnings.size() == 1);
-//    REQUIRE(report.warnings[0].code == IgnoringWarning);
-//    ReportDebugMessage(report.warnings[0].message);
+    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(report.warnings[0].code == IgnoringWarning);
+    ReportDebugMessage(report.warnings[0].message);
 
     REQUIRE(action.examples.size() == 1);
     REQUIRE(action.examples[0].responses.size() == 1);
@@ -214,9 +214,9 @@ TEST_CASE("Full syntax - Poor Body & Body Asset Indentation", "[indentation]")
     SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, report, action);
 
     REQUIRE(report.error.code == Error::OK);
-//    REQUIRE(report.warnings.size() == 1);
-//    REQUIRE(report.warnings[0].code == IgnoringWarning);
-//    ReportDebugMessage(report.warnings[0].message);
+    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(report.warnings[0].code == IgnoringWarning);
+    ReportDebugMessage(report.warnings[0].message);
 
     REQUIRE(action.examples.size() == 1);
     REQUIRE(action.examples[0].responses.size() == 1);
@@ -261,9 +261,11 @@ TEST_CASE("Full syntax - No Indentation", "[indentation]")
     SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, report, action);
 
     REQUIRE(report.error.code == Error::OK);
-//    REQUIRE(report.warnings.size() == 1);
-//    REQUIRE(report.warnings[0].code == IgnoringWarning);
-//    ReportDebugMessage(report.warnings[0].message);
+    REQUIRE(report.warnings.size() == 2);
+    REQUIRE(report.warnings[0].code == IgnoringWarning);
+    REQUIRE(report.warnings[1].code == IgnoringWarning);
+    ReportDebugMessage(report.warnings[0].message);
+    ReportDebugMessage(report.warnings[1].message);
 
     REQUIRE(action.examples.size() == 1);
     REQUIRE(action.examples[0].responses.size() == 1);
