@@ -76,6 +76,20 @@ namespace snowcrash {
         return elems;
     }
     
+    // Make sure last two characters are newlines
+    inline std::string& TwoNewLines(std::string& s) {
+
+        if (s[s.length() - 1] != '\n') {
+            s += "\n";
+        }
+
+        if (s[s.length() - 2] != '\n') {
+            s += "\n";
+        }
+
+        return s;
+    }
+
     /**
      *  \brief  Replace all occurrences of a string.
      *  \param  s       A string to search in.

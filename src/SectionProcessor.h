@@ -44,6 +44,7 @@ namespace snowcrash {
          */
         static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
                                                      SectionParserData& pd,
+                                                     bool& parsingRedirect,
                                                      Report& report,
                                                      T& out) {
             return ++MarkdownNodeIterator(node);
@@ -56,14 +57,7 @@ namespace snowcrash {
                                                        T& out) {
 
             if (!out.description.empty()) {
-
-                if (out.description[out.description.length() - 1] != '\n') {
-                    out.description += "\n";
-                }
-
-                if (out.description[out.description.length() - 2] != '\n') {
-                    out.description += "\n";
-                }
+                TwoNewLines(out.description);
             }
 
             out.description += mdp::MapBytesRangeSet(node->sourceMap, pd.sourceData);

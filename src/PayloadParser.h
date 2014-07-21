@@ -45,6 +45,7 @@ namespace snowcrash {
 
         static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
                                                      SectionParserData& pd,
+                                                     bool& parsingRedirect,
                                                      Report& report,
                                                      Payload& out) {
 
@@ -150,15 +151,46 @@ namespace snowcrash {
                                                           Report& report,
                                                           Payload& out) {
 
-            // WARN: Dangling blocks found
-            std::stringstream ss;
+            if ((node->type == mdp::ParagraphMarkdownNodeType ||
+                 node->type == mdp::CodeMarkdownNodeType) &&
+                sectionType == BodySectionType) {
 
-            ss << "found dangling " << SectionName(sectionType) << " block";
+                mdp::ByteBuffer asset;
 
-            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-            report.warnings.push_back(Warning(ss.str(),
-                                              IndentationWarning,
-                                              sourceMap));
+                if (node->type == mdp::CodeMarkdownNodeType) {
+                    asset = node->text;
+                } else {
+                    asset = mdp::MapBytesRangeSet(node->sourceMap, pd.sourceData);
+                }
+
+                TwoNewLines(asset);
+                out.body += asset;
+
+                if (node->type == mdp::ParagraphMarkdownNodeType) {
+
+                    size_t level = CodeBlockUtility::codeBlockIndentationLevel(sectionType);
+
+                    // WARN: Dangling asset
+                    std::stringstream ss;
+                    ss << "Dangling message-body asset, expected a pre-formatted code block, ";
+                    ss << "indent every one of it's line by " << level*4 << " spaces or " << level << " tabs";
+
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                    report.warnings.push_back(Warning(ss.str(),
+                                                      IndentationWarning,
+                                                      sourceMap));
+                }
+            } else {
+
+                // WARN: Dangling blocks found
+                std::stringstream ss;
+                ss << "found dangling " << SectionName(sectionType) << " block";
+
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                report.warnings.push_back(Warning(ss.str(),
+                                                  IndentationWarning,
+                                                  sourceMap));
+            }
 
             return ++MarkdownNodeIterator(node);
         }
