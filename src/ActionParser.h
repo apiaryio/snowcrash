@@ -45,6 +45,7 @@ namespace snowcrash {
 
         static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
                                                      SectionParserData& pd,
+                                                     bool& parsingRedirect,
                                                      Report& report,
                                                      Action& out) {
 
@@ -145,28 +146,30 @@ namespace snowcrash {
 
             if ((node->type == mdp::ParagraphMarkdownNodeType ||
                  node->type == mdp::CodeMarkdownNodeType) &&
-                sectionType == ResponseBodySectionType &&
+                (sectionType == ResponseBodySectionType ||
+                 sectionType == ResponseSectionType) &&
                 !out.examples.empty() &&
                 !out.examples.back().responses.empty()) {
 
-                mdp::ByteBuffer asset = mdp::MapBytesRangeSet(node->sourceMap, pd.sourceData);
+                mdp::ByteBuffer asset;
 
-                if (asset[asset.length() - 1] != '\n') {
-                    asset += "\n";
+                if (node->type == mdp::CodeMarkdownNodeType) {
+                    asset = node->text;
+                } else {
+                    asset = mdp::MapBytesRangeSet(node->sourceMap, pd.sourceData);
                 }
 
-                if (asset[asset.length() - 2] != '\n') {
-                    asset += "\n";
-                }
-
+                TwoNewLines(asset);
                 out.examples.back().responses.back().body += asset;
 
                 if (node->type == mdp::ParagraphMarkdownNodeType) {
 
-                    // WARN: Ignoring unexpected node
+                    size_t level = CodeBlockUtility::codeBlockIndentationLevel(sectionType);
+
+                    // WARN: Dangling asset
                     std::stringstream ss;
-                    ss << "Danling message-body asset, expected a pre-formatted code block, ";
-                    ss << "indent every one of it's line by 8 spaces or 2 tabs";
+                    ss << "Dangling message-body asset, expected a pre-formatted code block, ";
+                    ss << "indent every one of it's line by " << level*4 << " spaces or " << level << " tabs";
 
                     mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
                     report.warnings.push_back(Warning(ss.str(),

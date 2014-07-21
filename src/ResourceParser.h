@@ -46,6 +46,7 @@ namespace snowcrash {
 
         static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
                                                      SectionParserData& pd,
+                                                     bool& parsingRedirect,
                                                      Report& report,
                                                      Resource& out) {
 
@@ -63,7 +64,7 @@ namespace snowcrash {
                     MarkdownNodeIterator cur = ActionParser::parse(node, node->parent().children(), pd, report, action);
 
                     out.actions.push_back(action);
-                    pd.isParsed = true;
+                    parsingRedirect = true;
 
                     return cur;
                 }

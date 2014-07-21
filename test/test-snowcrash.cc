@@ -214,7 +214,7 @@ TEST_CASE("Parse adjacent asset blocks", "[parser][#9]")
     parse(source, 0, report, blueprint);
 
     REQUIRE(report.error.code == Error::OK);
-//    REQUIRE(report.warnings.size() == 2); // expected API name
+    REQUIRE(report.warnings.size() == 2); // expected API name
 
     REQUIRE(blueprint.resourceGroups.size() == 1);
     REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
@@ -223,7 +223,7 @@ TEST_CASE("Parse adjacent asset blocks", "[parser][#9]")
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples.size() == 1);
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 2);
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body == "asset\n\npre\n");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body == "asset\n\npre\n\n");
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[1].name == "404");
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[1].body == "Not found\n");
 }
@@ -281,5 +281,5 @@ TEST_CASE("Parse adjacent nested asset blocks", "[parser][#9]")
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
-//    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body == "A\nB\nC\n");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body == "A\nB\nC\n\n");
 }
