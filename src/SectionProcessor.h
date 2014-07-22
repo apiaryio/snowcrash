@@ -33,7 +33,7 @@ namespace snowcrash {
      */
     template<typename T>
     struct SectionProcessorBase {
-        
+
         /**
          *  \brief Process section signature Markdown node
          *  \param node     Node to process
@@ -98,8 +98,17 @@ namespace snowcrash {
                                                           T& out) {
 
             // WARN: Ignoring unexpected node
+            std::stringstream ss;
             mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-            report.warnings.push_back(Warning("ignoring unrecognized block",
+
+            if (node->type == mdp::HeaderMarkdownNodeType) {
+                ss << "unexpected header block, expected a group, resource or an action definition";
+                ss << ", e.g. '# Group <name>', '# <resource name> [<URI>]' or '# <HTTP method> <URI>'";
+            } else {
+                ss << "ignoring unrecognized block";
+            }
+
+            report.warnings.push_back(Warning(ss.str(),
                                               IgnoringWarning,
                                               sourceMap));
 

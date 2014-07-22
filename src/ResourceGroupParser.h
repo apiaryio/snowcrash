@@ -106,25 +106,26 @@ namespace snowcrash {
 
             mdp::ByteBuffer method;
             mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+            std::stringstream ss;
 
             if (isNonAbbreviatedAction(node, method) &&
                 !out.resources.empty()) {
 
                 // WARN: Unexpected action
-                std::stringstream ss;
-                ss << "unexpected action '" << method << "', to the define muliple actions for the '" << out.resources.back().uriTemplate;
+                ss << "unexpected action '" << method << "', to define multiple actions for the '" << out.resources.back().uriTemplate;
                 ss << "' resource omit the HTTP method in its definition, e.g. '# /resource'";
-
-                report.warnings.push_back(Warning(ss.str(),
-                                                  IgnoringWarning,
-                                                  sourceMap));
-            } else {
+            } else if (node->type == mdp::HeaderMarkdownNodeType) {
 
                 // WARN: Ignoring unexpected node
-                report.warnings.push_back(Warning("ignoring unrecognized block",
-                                                  IgnoringWarning,
-                                                  sourceMap));
+                ss << "unexpected header block, expected a group, resource or an action definition";
+                ss << ", e.g. '# Group <name>', '# <resource name> [<URI>]' or '# <HTTP method> <URI>'";
+            } else {
+                ss << "ignoring unrecognized block";
             }
+
+            report.warnings.push_back(Warning(ss.str(),
+                                              IgnoringWarning,
+                                              sourceMap));
 
             return ++MarkdownNodeIterator(node);
         }
