@@ -240,3 +240,61 @@ TEST_CASE("Make sure method followed by a group does not eat the group", "[resou
     REQUIRE(resourceGroup.resources[0].actions[0].method == "POST");
     REQUIRE(resourceGroup.resources[0].actions[0].description.empty());
 }
+
+TEST_CASE("Parse resource method abbreviation followed by a foreign method", "[resource_group]")
+{
+    mdp::ByteBuffer source = \
+    "# GET /resource\n"\
+    "# POST\n";
+
+    ResourceGroup resourceGroup;
+    Report report;
+    SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source, ResourceGroupSectionType, report, resourceGroup);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 2); // no response && unexpected action POST
+    REQUIRE(report.warnings[0].code == EmptyDefinitionWarning);
+    REQUIRE(report.warnings[1].code == IgnoringWarning);
+
+    REQUIRE(resourceGroup.name.empty());
+    REQUIRE(resourceGroup.description.empty());
+    REQUIRE(resourceGroup.resources.size() == 1);
+    REQUIRE(resourceGroup.resources[0].name.empty());
+    REQUIRE(resourceGroup.resources[0].uriTemplate == "/resource");
+    REQUIRE(resourceGroup.resources[0].model.name.empty());
+    REQUIRE(resourceGroup.resources[0].model.body.empty());
+    REQUIRE(resourceGroup.resources[0].actions.size() == 1);
+    REQUIRE(resourceGroup.resources[0].actions[0].method == "GET");
+}
+
+TEST_CASE("Parse resource method abbreviation followed by another", "[resource_group]")
+{
+    mdp::ByteBuffer source = \
+    "# GET /resource\n"\
+    "# POST /2\n";
+
+    ResourceGroup resourceGroup;
+    Report report;
+    SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source, ResourceGroupSectionType, report, resourceGroup);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 2); // 2x no response
+    REQUIRE(report.warnings[0].code == EmptyDefinitionWarning);
+    REQUIRE(report.warnings[1].code == EmptyDefinitionWarning);
+
+    REQUIRE(resourceGroup.name.empty());
+    REQUIRE(resourceGroup.description.empty());
+    REQUIRE(resourceGroup.resources.size() == 2);
+    REQUIRE(resourceGroup.resources[0].name.empty());
+    REQUIRE(resourceGroup.resources[0].uriTemplate == "/resource");
+    REQUIRE(resourceGroup.resources[0].model.name.empty());
+    REQUIRE(resourceGroup.resources[0].model.body.empty());
+    REQUIRE(resourceGroup.resources[0].actions.size() == 1);
+    REQUIRE(resourceGroup.resources[0].actions[0].method == "GET");
+    REQUIRE(resourceGroup.resources[1].name.empty());
+    REQUIRE(resourceGroup.resources[1].uriTemplate == "/2");
+    REQUIRE(resourceGroup.resources[1].model.name.empty());
+    REQUIRE(resourceGroup.resources[1].model.body.empty());
+    REQUIRE(resourceGroup.resources[1].actions.size() == 1);
+    REQUIRE(resourceGroup.resources[1].actions[0].method == "POST");
+}
