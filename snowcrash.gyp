@@ -116,7 +116,6 @@
         'src',
         'src/snowcrash',
         'ext/markdown-parser/src',
-        'ext/markdown-parser/ext/sundown/src',
         'cmdline'
       ],
       'sources': [
@@ -136,6 +135,7 @@
           'type': 'executable',
           'include_dirs': [
             'src',
+            'ext/markdown-parser/src',
             'cmdline',
             'test',
             'test/performance',

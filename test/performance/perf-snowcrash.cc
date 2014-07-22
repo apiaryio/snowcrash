@@ -34,7 +34,7 @@ static int testfunc(const std::string& input, double& total, double& mean, doubl
 
 	for (int i = 0; i < TestRunCount; ++i) {
         snowcrash::BlueprintParserOptions options = 0;
-        snowcrash::Result result;
+        snowcrash::Report result;
         snowcrash::Blueprint blueprint;
 
 		// Do the test.
