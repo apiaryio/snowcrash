@@ -155,31 +155,7 @@ namespace snowcrash {
                  node->type == mdp::CodeMarkdownNodeType) &&
                 sectionType == BodySectionType) {
 
-                mdp::ByteBuffer asset;
-
-                if (node->type == mdp::CodeMarkdownNodeType) {
-                    asset = node->text;
-                } else {
-                    asset = mdp::MapBytesRangeSet(node->sourceMap, pd.sourceData);
-                }
-
-                TwoNewLines(asset);
-                out.body += asset;
-
-                if (node->type == mdp::ParagraphMarkdownNodeType) {
-
-                    size_t level = CodeBlockUtility::codeBlockIndentationLevel(sectionType);
-
-                    // WARN: Dangling asset
-                    std::stringstream ss;
-                    ss << "Dangling message-body asset, expected a pre-formatted code block, ";
-                    ss << "indent every one of it's line by " << level*4 << " spaces or " << level << " tabs";
-
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                    report.warnings.push_back(Warning(ss.str(),
-                                                      IndentationWarning,
-                                                      sourceMap));
-                }
+                CodeBlockUtility::addDanglingAsset(node, pd, sectionType, report, out.body);
             } else {
 
                 // WARN: Dangling blocks found
