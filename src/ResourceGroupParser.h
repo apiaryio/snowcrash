@@ -97,6 +97,38 @@ namespace snowcrash {
             return node;
         }
 
+        static MarkdownNodeIterator processUnexpectedNode(const MarkdownNodeIterator& node,
+                                                          const MarkdownNodes& siblings,
+                                                          SectionParserData& pd,
+                                                          SectionType& lastSectionType,
+                                                          Report& report,
+                                                          ResourceGroup& out) {
+
+            mdp::ByteBuffer method;
+            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+
+            if (isNonAbbreviatedAction(node, method) &&
+                !out.resources.empty()) {
+
+                // WARN: Unexpected action
+                std::stringstream ss;
+                ss << "unexpected action '" << method << "', to the define muliple actions for the '" << out.resources.back().uriTemplate;
+                ss << "' resource omit the HTTP method in its definition, e.g. '# /resource'";
+
+                report.warnings.push_back(Warning(ss.str(),
+                                                  IgnoringWarning,
+                                                  sourceMap));
+            } else {
+
+                // WARN: Ignoring unexpected node
+                report.warnings.push_back(Warning("ignoring unrecognized block",
+                                                  IgnoringWarning,
+                                                  sourceMap));
+            }
+
+            return ++MarkdownNodeIterator(node);
+        }
+
         static SectionType sectionType(const MarkdownNodeIterator& node) {
 
             if (node->type == mdp::HeaderMarkdownNodeType
@@ -117,6 +149,42 @@ namespace snowcrash {
 
             // Return ResourceSectionType or UndefinedSectionType
             return SectionProcessor<Resource>::sectionType(node);
+        }
+
+        static bool isUnexpectedNode(const MarkdownNodeIterator& node,
+                                     SectionType sectionType) {
+
+            mdp::ByteBuffer method;
+
+            if (isNonAbbreviatedAction(node, method)) {
+                return true;
+            }
+
+            return !HasSectionKeywordSignature(node);
+        }
+
+        /** Check if node is a non-abbreviated action */
+        static bool isNonAbbreviatedAction(const MarkdownNodeIterator& node,
+                                           mdp::ByteBuffer& method) {
+
+            CaptureGroups captureGroups;
+            mdp::ByteBuffer subject = node->text;
+
+            TrimString(subject);
+
+            if (RegexCapture(subject, NamedActionHeaderRegex, captureGroups, 3)) {
+
+                method = captureGroups[2];
+                return true;
+            }
+
+            if (RegexCapture(subject, ActionHeaderRegex, captureGroups, 3) && captureGroups[2].empty()) {
+
+                method = captureGroups[1];
+                return true;
+            }
+
+            return false;
         }
 
         /** Finds a resource inside an resources collection */
