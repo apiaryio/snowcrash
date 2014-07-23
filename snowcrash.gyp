@@ -12,13 +12,21 @@
       ],
       'sources': [
         'ext/markdown-parser/ext/sundown/src/autolink.c',
+        'ext/markdown-parser/ext/sundown/src/autolink.h',
         'ext/markdown-parser/ext/sundown/src/buffer.c',
+        'ext/markdown-parser/ext/sundown/src/buffer.h',
+        'ext/markdown-parser/ext/sundown/src/html_blocks.h',
         'ext/markdown-parser/ext/sundown/src/markdown.c',
+        'ext/markdown-parser/ext/sundown/src/markdown.h',
         'ext/markdown-parser/ext/sundown/src/src_map.c',
+        'ext/markdown-parser/ext/sundown/src/src_map.h',
         'ext/markdown-parser/ext/sundown/src/stack.c',
+        'ext/markdown-parser/ext/sundown/src/stack.h',
+        'ext/markdown-parser/ext/sundown/html/houdini.h',
         'ext/markdown-parser/ext/sundown/html/houdini_href_e.c',
         'ext/markdown-parser/ext/sundown/html/houdini_html_e.c',
         'ext/markdown-parser/ext/sundown/html/html.c',
+        'ext/markdown-parser/ext/sundown/html/html.h',
         'ext/markdown-parser/ext/sundown/html/html_smartypants.c'
       ]
     },
@@ -32,8 +40,11 @@
       ],
       'sources': [
         'ext/markdown-parser/src/ByteBuffer.cc',
+        'ext/markdown-parser/src/ByteBuffer.h',
         'ext/markdown-parser/src/MarkdownNode.cc',
-        'ext/markdown-parser/src/MarkdownParser.cc'
+        'ext/markdown-parser/src/MarkdownNode.h',
+        'ext/markdown-parser/src/MarkdownParser.cc',
+        'ext/markdown-parser/src/MarkdownParser.h'
       ],
       'dependencies': [
           'libsundown'
@@ -95,7 +106,7 @@
         'test/test-RegexMatch.cc',
         'test/test-ResourceParser.cc',
         'test/test-ResourceGroupParser.cc',
-        'test/test-SectionParser',
+        'test/test-SectionParser.cc',
         'test/test-SymbolIdentifier.cc',
         'test/test-SymbolTable.cc',
         'test/test-UriTemplateParser.cc',
