@@ -379,7 +379,7 @@ TEST_CASE("Parse named resource with nameless model", "[resource][model][source]
     REQUIRE(resource.actions[0].method == "GET");
     REQUIRE(resource.actions[0].examples.size() == 1);
     REQUIRE(resource.actions[0].examples[0].responses.size() == 1);
-    REQUIRE(resource.actions[0].examples[0].responses[0].name == "Message");
+    REQUIRE(resource.actions[0].examples[0].responses[0].name == "200");
     REQUIRE(resource.actions[0].examples[0].responses[0].body == "AAA\n");
 }
 

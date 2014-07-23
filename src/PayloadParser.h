@@ -469,7 +469,6 @@ namespace snowcrash {
 
                 model = pd.symbolTable.resourceModels.at(symbol);
 
-                out.name = model.name;
                 out.description = model.description;
                 out.parameters = model.parameters;
                 out.headers = model.headers;
