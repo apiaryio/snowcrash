@@ -57,20 +57,20 @@ void PrintAnnotation(const std::string& prefix, const snowcrash::SourceAnnotatio
     std::cerr << std::endl;
 }
 
-/// \brief Print parser result to stderr.
-/// \param result A parser result to print
-void PrintResult(const snowcrash::Report& result)
+/// \brief Print parser report to stderr.
+/// \param report A parser report to print
+void PrintReport(const snowcrash::Report& report)
 {
     std::cerr << std::endl;
-    
-    if (result.error.code == Error::OK) {
+
+    if (report.error.code == Error::OK) {
         std::cerr << "OK.\n";
     }
     else {
-        PrintAnnotation("error:", result.error);
+        PrintAnnotation("error:", report.error);
     }
-    
-    for (snowcrash::Warnings::const_iterator it = result.warnings.begin(); it != result.warnings.end(); ++it) {
+
+    for (snowcrash::Warnings::const_iterator it = report.warnings.begin(); it != report.warnings.end(); ++it) {
         PrintAnnotation("warning:", *it);
     }
 }
@@ -129,10 +129,10 @@ int main(int argc, const char *argv[])
 
     // Parse
     snowcrash::BlueprintParserOptions options = 0;  // Or snowcrash::RequireBlueprintNameOption
-    snowcrash::Report result;
+    snowcrash::Report report;
     snowcrash::Blueprint blueprint;
-    snowcrash::parse(inputStream.str(), options, result, blueprint);
-    
+    snowcrash::parse(inputStream.str(), options, report, blueprint);
+
     // Output
     if (!argumentParser.exist(ValidateArgument)) {
         
@@ -163,8 +163,8 @@ int main(int argc, const char *argv[])
             std::cout << outputStream.rdbuf();
         }
     }
-    
-    // Result
-    PrintResult(result);
-    return result.error.code;
+
+    // report
+    PrintReport(report);
+    return report.error.code;
 }
