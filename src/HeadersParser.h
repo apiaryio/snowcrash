@@ -16,7 +16,10 @@
 #include "BlueprintUtility.h"
 
 namespace snowcrash {
-    
+
+    /** Headers matching regex */
+    const char* const HeadersRegex = "^[[:blank:]]*[Hh]eaders?[[:blank:]]*$";
+
     /** Internal type alias for collection of HTTP headers */
     typedef Collection<Header>::type Headers;
 
@@ -31,6 +34,7 @@ namespace snowcrash {
         
         static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
                                                      SectionParserData& pd,
+                                                     bool& parsingRedirect,
                                                      Report& report,
                                                      Headers& out) {
 
@@ -79,9 +83,6 @@ namespace snowcrash {
 
                 mdp::ByteBuffer subject = node->children().front().text;
                 TrimString(subject);
-                
-                /** Headers matching regex */
-                static const char* const HeadersRegex = "^[[:blank:]]*[Hh]eaders?[[:blank:]]*$";
                 
                 if (RegexMatch(subject, HeadersRegex))
                     return HeadersSectionType;

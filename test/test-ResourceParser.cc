@@ -266,26 +266,6 @@ TEST_CASE("Parse resource method abbreviation", "[resource]")
     REQUIRE(resource.actions[0].examples[0].responses[0].body == "{}\n");
 }
 
-TEST_CASE("Parse resource method abbreviation followed by a foreign method", "[resource]")
-{
-    mdp::ByteBuffer source = \
-    "# GET /resource\n"\
-    "# POST\n";
-
-    Resource resource;
-    Report report;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
-
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
-
-    REQUIRE(resource.name.empty());
-    REQUIRE(resource.model.name.empty());
-    REQUIRE(resource.model.body.empty());
-    REQUIRE(resource.actions.size() == 1);
-    REQUIRE(resource.actions[0].method == "GET");
-}
-
 TEST_CASE("Parse resource without name", "[resource]")
 {
     mdp::ByteBuffer source = "# /resource\n";

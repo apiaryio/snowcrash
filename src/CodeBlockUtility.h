@@ -120,7 +120,7 @@ namespace snowcrash {
             // Check for possible superfluous indentation of a recognized list items.
             mdp::ByteBuffer r;
             mdp::ByteBuffer line = GetFirstLine(node->text, r);
-            TrimStringStart(line);
+            TrimString(line);
 
             // If line appears to be a Markdown list.
             if (line.empty() ||
@@ -131,35 +131,39 @@ namespace snowcrash {
             std::string signature = line.substr(1, std::string::npos);
             TrimStringStart(signature);
             
-            // TODO: Check signature.
-//            size_t level = CodeBlockIndentationLevel(section);
-//            --level;
-//            
-//            // WARN: Superfluous indentation
-//            std::stringstream ss;
-//            ss << "excessive indentation, ";
-//            ss << SectionName(type) << " ";
-//            if (level) {
-//                ss << "section is expected to be indented by just ";
-//                ss << level * 4 << " spaces or " << level << " tab";
-//                if (level > 1)
-//                    ss << "s";
-//            }
-//            else {
-//                ss << "section is not expected to be indented";
-//            }
-//            
-//            SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur,
-//                                                                     cur,
-//                                                                     section.bounds,
-//                                                                     sourceData);
-//            result.warnings.push_back(Warning(ss.str(),
-//                                              IndentationWarning,
-//                                              sourceBlock));
+            SectionType type = RecognizeCodeBlockFirstLine(signature);
+
+            if (type != UndefinedSectionType) {
+
+                // Check signature.
+                size_t level = codeBlockIndentationLevel(pd.sectionContext());
+                --level;
+
+                // WARN: Superfluous indentation
+                std::stringstream ss;
+                ss << "excessive indentation, ";
+                ss << SectionName(type) << " ";
+
+                if (level) {
+                    ss << "section is expected to be indented by just ";
+                    ss << level * 4 << " spaces or " << level << " tab";
+
+                    if (level > 1)
+                        ss << "s";
+                }
+                else {
+                    ss << "section is not expected to be indented";
+                }
+
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                report.warnings.push_back(Warning(ss.str(),
+                                                  IndentationWarning,
+                                                  sourceMap));
+            }
             
             return false;
         }
-        
+
         /**
          *  \brief  Parse one line of raw `key:value` data.
          *  \param  line            A line to parse
@@ -178,6 +182,43 @@ namespace snowcrash {
             TrimString(keyValuePair.second);
             
             return (!keyValuePair.first.empty() && !keyValuePair.second.empty());
+        }
+
+        /**
+         *  \brief Add dangling message body asset to the given string
+         *  \param  out  The string to which the dangling asset should be added
+         */
+        static void addDanglingAsset(const MarkdownNodeIterator& node,
+                                     SectionParserData& pd,
+                                     SectionType& sectionType,
+                                     Report& report,
+                                     mdp::ByteBuffer& out) {
+
+            mdp::ByteBuffer asset;
+
+            if (node->type == mdp::CodeMarkdownNodeType) {
+                asset = node->text;
+            } else {
+                asset = mdp::MapBytesRangeSet(node->sourceMap, pd.sourceData);
+            }
+
+            TwoNewLines(asset);
+            out += asset;
+
+            if (node->type == mdp::ParagraphMarkdownNodeType) {
+
+                size_t level = CodeBlockUtility::codeBlockIndentationLevel(sectionType);
+
+                // WARN: Dangling asset
+                std::stringstream ss;
+                ss << "Dangling message-body asset, expected a pre-formatted code block, ";
+                ss << "indent every one of it's line by " << level*4 << " spaces or " << level << " tabs";
+
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                report.warnings.push_back(Warning(ss.str(),
+                                                  IndentationWarning,
+                                                  sourceMap));
+            }
         }
     };
 }

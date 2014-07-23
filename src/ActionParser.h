@@ -45,6 +45,7 @@ namespace snowcrash {
 
         static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
                                                      SectionParserData& pd,
+                                                     bool& parsingRedirect,
                                                      Report& report,
                                                      Action& out) {
 
@@ -78,6 +79,7 @@ namespace snowcrash {
             SectionType sectionType = pd.sectionContext();
             MarkdownNodeIterator cur = node;
             Payload payload;
+            std::stringstream ss;
 
             mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
 
@@ -113,11 +115,53 @@ namespace snowcrash {
                     out.examples.back().responses.push_back(payload);
                     break;
 
+                case BodySectionType:
+                case SchemaSectionType:
+                    // TODO: Can improve this
+
+                    // WARN: Ignoring section
+                    ss << "Ignoring " << SectionName(sectionType) << " list item, ";
+                    ss << SectionName(sectionType) << " list item is expected to be indented by  4  spaces or 1 tab";
+
+                    report.warnings.push_back(Warning(ss.str(),
+                                                      IgnoringWarning,
+                                                      sourceMap));
+
+                    cur = ++MarkdownNodeIterator(node);
+                    break;
+
                 default:
                     break;
             }
 
             return cur;
+        }
+
+        static MarkdownNodeIterator processUnexpectedNode(const MarkdownNodeIterator& node,
+                                                          const MarkdownNodes& siblings,
+                                                          SectionParserData& pd,
+                                                          SectionType& sectionType,
+                                                          Report& report,
+                                                          Action& out) {
+
+            if ((node->type == mdp::ParagraphMarkdownNodeType ||
+                 node->type == mdp::CodeMarkdownNodeType) &&
+                (sectionType == ResponseBodySectionType ||
+                 sectionType == ResponseSectionType) &&
+                !out.examples.empty() &&
+                !out.examples.back().responses.empty()) {
+
+                CodeBlockUtility::addDanglingAsset(node, pd, sectionType, report, out.examples.back().responses.back().body);
+            } else {
+
+                // WARN: Ignoring unexpected node
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                report.warnings.push_back(Warning("ignoring unrecognized block",
+                                                  IgnoringWarning,
+                                                  sourceMap));
+            }
+
+            return ++MarkdownNodeIterator(node);
         }
 
         static SectionType sectionType(const MarkdownNodeIterator& node) {
@@ -151,6 +195,13 @@ namespace snowcrash {
 
             // Check if payload section
             nestedType = SectionProcessor<Payload>::sectionType(node);
+
+            if (nestedType != UndefinedSectionType) {
+                return nestedType;
+            }
+
+            // Check if asset section (dangling)
+            nestedType = SectionProcessor<Asset>::sectionType(node);
 
             if (nestedType != UndefinedSectionType) {
                 return nestedType;

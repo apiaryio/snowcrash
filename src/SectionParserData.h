@@ -53,7 +53,7 @@ namespace snowcrash {
         /** Sections Context */
         typedef std::vector<SectionType> SectionsStack;
         SectionsStack sectionsContext;
-        
+
         /** \returns Actual Section Context */
         SectionType sectionContext() const {
             return (sectionsContext.empty()) ? UndefinedSectionType : sectionsContext.back();

@@ -233,7 +233,7 @@ TEST_CASE("Parse payload with dangling body", "[payload]")
     REQUIRE(payload.description.empty());
     REQUIRE(payload.parameters.empty());
     REQUIRE(payload.headers.empty());
-    REQUIRE(payload.body == "Foo\n");
+    REQUIRE(payload.body == "Foo\nBar\n\n");
     REQUIRE(payload.schema.empty());
 }
 

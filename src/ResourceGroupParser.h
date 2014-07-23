@@ -33,8 +33,22 @@ namespace snowcrash {
 
         static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
                                                      SectionParserData& pd,
+                                                     bool& parsingRedirect,
                                                      Report& report,
                                                      ResourceGroup& out) {
+
+            MarkdownNodeIterator cur = node;
+            SectionType nestedType = nestedSectionType(cur);
+
+            // If starting with Resource directly
+            if (nestedType != UndefinedSectionType) {
+
+                pd.sectionsContext.push_back(nestedType);
+                cur = processNestedSection(cur, cur->parent().children(), pd, report, out);
+                pd.sectionsContext.pop_back();
+
+                return cur;
+            }
 
             CaptureGroups captureGroups;
 
@@ -52,7 +66,8 @@ namespace snowcrash {
                                                          Report& report,
                                                          ResourceGroup& out) {
 
-            if (pd.sectionContext() == ResourceSectionType) {
+            if (pd.sectionContext() == ResourceSectionType ||
+                pd.sectionContext() == ResourceMethodSectionType) {
 
                 Resource resource;
                 MarkdownNodeIterator cur = ResourceParser::parse(node, siblings, pd, report, resource);
@@ -82,6 +97,35 @@ namespace snowcrash {
             return node;
         }
 
+        static MarkdownNodeIterator processUnexpectedNode(const MarkdownNodeIterator& node,
+                                                          const MarkdownNodes& siblings,
+                                                          SectionParserData& pd,
+                                                          SectionType& lastSectionType,
+                                                          Report& report,
+                                                          ResourceGroup& out) {
+
+            mdp::ByteBuffer method;
+
+            if (isNonAbbreviatedAction(node, method) &&
+                !out.resources.empty()) {
+
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+
+                // WARN: Unexpected action
+                std::stringstream ss;
+                ss << "unexpected action '" << method << "', to define multiple actions for the '" << out.resources.back().uriTemplate;
+                ss << "' resource omit the HTTP method in its definition, e.g. '# /resource'";
+
+                report.warnings.push_back(Warning(ss.str(),
+                                                  IgnoringWarning,
+                                                  sourceMap));
+
+                return ++MarkdownNodeIterator(node);
+            }
+
+            return SectionProcessor::processUnexpectedNode(node, siblings, pd, lastSectionType, report, out);
+        }
+
         static SectionType sectionType(const MarkdownNodeIterator& node) {
 
             if (node->type == mdp::HeaderMarkdownNodeType
@@ -104,6 +148,42 @@ namespace snowcrash {
             return SectionProcessor<Resource>::sectionType(node);
         }
 
+        static bool isUnexpectedNode(const MarkdownNodeIterator& node,
+                                     SectionType sectionType) {
+
+            mdp::ByteBuffer method;
+
+            if (isNonAbbreviatedAction(node, method)) {
+                return true;
+            }
+
+            return !HasSectionKeywordSignature(node);
+        }
+
+        /** Check if node is a non-abbreviated action */
+        static bool isNonAbbreviatedAction(const MarkdownNodeIterator& node,
+                                           mdp::ByteBuffer& method) {
+
+            CaptureGroups captureGroups;
+            mdp::ByteBuffer subject = node->text;
+
+            TrimString(subject);
+
+            if (RegexCapture(subject, NamedActionHeaderRegex, captureGroups, 3)) {
+
+                method = captureGroups[2];
+                return true;
+            }
+
+            if (RegexCapture(subject, ActionHeaderRegex, captureGroups, 3) && captureGroups[2].empty()) {
+
+                method = captureGroups[1];
+                return true;
+            }
+
+            return false;
+        }
+
         /** Finds a resource inside an resources collection */
         static ResourceIterator findResource(const Resources& resources,
                                              const Resource& resource) {
@@ -121,11 +201,11 @@ namespace snowcrash {
                   it != blueprint.resourceGroups.end();
                   ++it) {
 
-                 ResourceIterator match = findResource(it->resources, resource);
+                ResourceIterator match = findResource(it->resources, resource);
 
-                 if (match != it->resources.end()) {
-                     return std::make_pair(it, match);
-                 }
+                if (match != it->resources.end()) {
+                    return std::make_pair(it, match);
+                }
              }
 
              return std::make_pair(blueprint.resourceGroups.end(), ResourceIterator());

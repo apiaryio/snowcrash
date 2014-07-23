@@ -46,6 +46,7 @@ namespace snowcrash {
 
         static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
                                                      SectionParserData& pd,
+                                                     bool& parsingRedirect,
                                                      Report& report,
                                                      Resource& out) {
 
@@ -60,12 +61,12 @@ namespace snowcrash {
                 if (!captureGroups[2].empty()) {
 
                     Action action;
+                    MarkdownNodeIterator cur = ActionParser::parse(node, node->parent().children(), pd, report, action);
 
-                    action.method = captureGroups[2];
-                    ActionParser::parse(node, node->parent().children(), pd, report, action);
                     out.actions.push_back(action);
+                    parsingRedirect = true;
 
-                    return node;
+                    return cur;
                 }
             } else if (RegexCapture(node->text, NamedResourceHeaderRegex, captureGroups, 4)) {
 

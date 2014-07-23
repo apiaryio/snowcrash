@@ -36,14 +36,23 @@ namespace snowcrash {
                                           Report& report,
                                           T& out) {
             
+            bool isParsingRedirect = false;
             MarkdownNodeIterator cur = Adapter::startingNode(node);
             const MarkdownNodes& collection = Adapter::startingNodeSiblings(node, siblings);
             
             // Signature node
             MarkdownNodeIterator lastCur = cur;
-            cur = SectionProcessor<T>::processSignature(cur, pd, report, out);
+            cur = SectionProcessor<T>::processSignature(cur, pd, isParsingRedirect, report, out);
             if (lastCur == cur)
                 return Adapter::nextStartingNode(node, siblings, cur);
+
+            if (isParsingRedirect) {
+                // Trust the section parser and finish off parsing of this section
+                SectionProcessor<T>::finalize(node, pd, report, out);
+                isParsingRedirect = false;
+
+                return Adapter::nextStartingNode(node, siblings, cur);
+            }
 
             // Description nodes
             while(cur != collection.end() &&
@@ -82,7 +91,10 @@ namespace snowcrash {
                     cur = SectionProcessor<T>::processUnexpectedNode(cur, collection, pd, lastSectionType, report, out);
                 }
                 
-                lastSectionType = pd.sectionContext();
+                if (pd.sectionContext() != UndefinedSectionType) {
+                    lastSectionType = pd.sectionContext();
+                }
+
                 pd.sectionsContext.pop_back();
                 
                 if (lastCur == cur)

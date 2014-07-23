@@ -19,23 +19,32 @@ namespace snowcrashtest {
 
     template <typename T, typename PARSER>
     struct SectionParserHelper {
-        
+
         static void parse(const mdp::ByteBuffer& source,
                           snowcrash::SectionType type,
                           snowcrash::Report& report,
                           T& output,
                           const Symbols& symbols = Symbols(),
-                          const snowcrash::BlueprintParserOptions& opts = 0) {
+                          const snowcrash::BlueprintParserOptions& opts = 0,
+                          snowcrash::Blueprint* bp = NULL) {
 
             mdp::MarkdownParser markdownParser;
             mdp::MarkdownNode markdownAST;
 
+            snowcrash::Blueprint blueprint;
+            snowcrash::Blueprint* bppointer;
+
             markdownParser.parse(source, markdownAST);
-            
+
             REQUIRE(!markdownAST.children().empty());
-            
-            snowcrash::Blueprint bp;
-            snowcrash::SectionParserData pd(opts, source, bp);
+
+            if (bp == NULL) {
+                bppointer = &blueprint;
+            } else {
+                bppointer = bp;
+            }
+
+            snowcrash::SectionParserData pd(opts, source, *bppointer);
 
             pd.sectionsContext.push_back(type);
 

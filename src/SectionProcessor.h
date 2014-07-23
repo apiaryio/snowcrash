@@ -33,7 +33,7 @@ namespace snowcrash {
      */
     template<typename T>
     struct SectionProcessorBase {
-        
+
         /**
          *  \brief Process section signature Markdown node
          *  \param node     Node to process
@@ -44,6 +44,7 @@ namespace snowcrash {
          */
         static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
                                                      SectionParserData& pd,
+                                                     bool& parsingRedirect,
                                                      Report& report,
                                                      T& out) {
             return ++MarkdownNodeIterator(node);
@@ -56,14 +57,7 @@ namespace snowcrash {
                                                        T& out) {
 
             if (!out.description.empty()) {
-
-                if (out.description[out.description.length() - 1] != '\n') {
-                    out.description += "\n";
-                }
-
-                if (out.description[out.description.length() - 2] != '\n') {
-                    out.description += "\n";
-                }
+                TwoNewLines(out.description);
             }
 
             out.description += mdp::MapBytesRangeSet(node->sourceMap, pd.sourceData);
@@ -105,10 +99,15 @@ namespace snowcrash {
 
             // WARN: Ignoring unexpected node
             std::stringstream ss;
-
-            ss << "ignoring unrecognized block";
-
             mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+
+            if (node->type == mdp::HeaderMarkdownNodeType) {
+                ss << "unexpected header block, expected a group, resource or an action definition";
+                ss << ", e.g. '# Group <name>', '# <resource name> [<URI>]' or '# <HTTP method> <URI>'";
+            } else {
+                ss << "ignoring unrecognized block";
+            }
+
             report.warnings.push_back(Warning(ss.str(),
                                               IgnoringWarning,
                                               sourceMap));

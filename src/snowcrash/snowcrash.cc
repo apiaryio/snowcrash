@@ -46,7 +46,7 @@ void PrintAnnotation(const std::string& prefix, const snowcrash::SourceAnnotatio
     }
     
     if (!annotation.location.empty()) {
-        for (snowcrash::SourceCharactersBlock::const_iterator it = annotation.location.begin();
+        for (mdp::CharactersRangeSet::const_iterator it = annotation.location.begin();
              it != annotation.location.end();
              ++it) {
             std::cerr << ((it == annotation.location.begin()) ? " :" : ";");
@@ -59,7 +59,7 @@ void PrintAnnotation(const std::string& prefix, const snowcrash::SourceAnnotatio
 
 /// \brief Print parser result to stderr.
 /// \param result A parser result to print
-void PrintResult(const snowcrash::Result& result)
+void PrintResult(const snowcrash::Report& result)
 {
     std::cerr << std::endl;
     
@@ -129,7 +129,7 @@ int main(int argc, const char *argv[])
 
     // Parse
     snowcrash::BlueprintParserOptions options = 0;  // Or snowcrash::RequireBlueprintNameOption
-    snowcrash::Result result;
+    snowcrash::Report result;
     snowcrash::Blueprint blueprint;
     snowcrash::parse(inputStream.str(), options, result, blueprint);
     

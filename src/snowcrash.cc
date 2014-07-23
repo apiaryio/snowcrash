@@ -8,7 +8,7 @@
 
 #include "snowcrash.h"
 #include "MarkdownParser.h"
-//#include "BlueprintParser.h"
+#include "BlueprintParser.h"
 
 const int snowcrash::SourceAnnotation::OK = 0;
 
@@ -21,24 +21,26 @@ using namespace snowcrash;
 static bool CheckSource(const mdp::ByteBuffer& source, Report& report)
 {
     std::string::size_type pos = source.find("\t");
+
     if (pos != std::string::npos) {
         
         mdp::BytesRangeSet rangeSet;
-        rangeSet.push_back(mdp::BytesRange(0, source.length()));
+        rangeSet.push_back(mdp::BytesRange(pos, 1));
         report.error = Error("the use of tab(s) '\\t' in source data isn't currently supported, please contact makers",
                              BusinessError,
-                             mdp::BytesRangeSetToCharactersRangeSet(mdp::BytesRangeSet(), source));
+                             mdp::BytesRangeSetToCharactersRangeSet(rangeSet, source));
         return false;
     }
     
     pos = source.find("\r");
+
     if (pos != std::string::npos) {
 
         mdp::BytesRangeSet rangeSet;
-        rangeSet.push_back(mdp::BytesRange(0, source.length()));
+        rangeSet.push_back(mdp::BytesRange(pos, 1));
         report.error = Error("the use of carriage return(s) '\\r' in source data isn't currently supported, please contact makers",
                              BusinessError,
-                             mdp::BytesRangeSetToCharactersRangeSet(mdp::BytesRangeSet(), source));
+                             mdp::BytesRangeSetToCharactersRangeSet(rangeSet, source));
         return false;
     }
     
@@ -56,16 +58,20 @@ int snowcrash::parse(const mdp::ByteBuffer& source,
         if (!CheckSource(source, report))
             return report.error.code;
         
+        // Do nothing if blueprint is empty
+        if (source.empty())
+            return report.error.code;
+
         // Parse Markdown
         mdp::MarkdownParser markdownParser;
         mdp::MarkdownNode markdownAST;
         markdownParser.parse(source, markdownAST);
 
-//        // Build SectionParserData
-//        SectionParserData pd(options, source, blueprint);
-//
-//        // Parse Blueprint
-//        BlueprintParser::parse(markdownAST.children().begin(), markdownAST.children(), pd, report, pd.blueprint);
+        // Build SectionParserData
+        SectionParserData pd(options, source, blueprint);
+
+        // Parse Blueprint
+        BlueprintParser::parse(markdownAST.children().begin(), markdownAST.children(), pd, report, blueprint);
     }
     catch (const std::exception& e) {
         

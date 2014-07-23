@@ -45,6 +45,7 @@ namespace snowcrash {
 
         static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
                                                      SectionParserData& pd,
+                                                     bool& parsingRedirect,
                                                      Report& report,
                                                      Payload& out) {
 
@@ -150,15 +151,22 @@ namespace snowcrash {
                                                           Report& report,
                                                           Payload& out) {
 
-            // WARN: Dangling blocks found
-            std::stringstream ss;
+            if ((node->type == mdp::ParagraphMarkdownNodeType ||
+                 node->type == mdp::CodeMarkdownNodeType) &&
+                sectionType == BodySectionType) {
 
-            ss << "found dangling " << SectionName(sectionType) << " block";
+                CodeBlockUtility::addDanglingAsset(node, pd, sectionType, report, out.body);
+            } else {
 
-            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-            report.warnings.push_back(Warning(ss.str(),
-                                              IndentationWarning,
-                                              sourceMap));
+                // WARN: Dangling blocks found
+                std::stringstream ss;
+                ss << "found dangling " << SectionName(sectionType) << " block";
+
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                report.warnings.push_back(Warning(ss.str(),
+                                                  IndentationWarning,
+                                                  sourceMap));
+            }
 
             return ++MarkdownNodeIterator(node);
         }
