@@ -415,3 +415,39 @@ TEST_CASE("Parse resource with invalid URI Tempalte", "[resource]")
     REQUIRE(resource.uriTemplate == "/id{? limit}");
     REQUIRE(resource.actions.empty());
 }
+
+TEST_CASE("Deprecated resource and action headers", "[resource]")
+{
+    mdp::ByteBuffer source = \
+    "# /\n"\
+    "+ Headers\n\n"\
+    "        header1: value1\n\n"\
+    "## GET\n"\
+    "+ Headers\n\n"\
+    "        header2: value2\n\n"\
+    "+ Response 200\n"\
+    "    + Headers\n\n"\
+    "            header3: value3\n\n";
+
+    Resource resource;
+    Report report;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 2);
+    REQUIRE(report.warnings[0].code == DeprecatedWarning);
+    REQUIRE(report.warnings[1].code == DeprecatedWarning);
+
+    REQUIRE(resource.headers.empty());
+    REQUIRE(resource.actions.size() == 1);
+    REQUIRE(resource.actions[0].headers.empty());
+    REQUIRE(resource.actions[0].examples.size() == 1);
+    REQUIRE(resource.actions[0].examples[0].responses.size() == 1);
+    REQUIRE(resource.actions[0].examples[0].responses[0].headers.size() == 3);
+    REQUIRE(resource.actions[0].examples[0].responses[0].headers[0].first == "header1");
+    REQUIRE(resource.actions[0].examples[0].responses[0].headers[0].second == "value1");
+    REQUIRE(resource.actions[0].examples[0].responses[0].headers[1].first == "header2");
+    REQUIRE(resource.actions[0].examples[0].responses[0].headers[1].second == "value2");
+    REQUIRE(resource.actions[0].examples[0].responses[0].headers[2].first == "header3");
+    REQUIRE(resource.actions[0].examples[0].responses[0].headers[2].second == "value3");
+}
