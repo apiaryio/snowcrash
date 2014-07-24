@@ -241,7 +241,7 @@ TEST_CASE("Parse parameters with dot in its name", "[parameter]")
     REQUIRE(parameter.description == "Hello");
 }
 
-TEST_CASE("Parentheses in parameter description ", "[parameter]")
+TEST_CASE("Parentheses in parameter description", "[parameter]")
 {
     mdp::ByteBuffer source = "+ id (string) ... lorem (ipsum)\n";
 
@@ -255,4 +255,60 @@ TEST_CASE("Parentheses in parameter description ", "[parameter]")
     REQUIRE(parameter.name == "id");
     REQUIRE(parameter.type == "string");
     REQUIRE(parameter.description == "lorem (ipsum)");
+}
+
+TEST_CASE("Parameter with additional description", "[parameter]")
+{
+    mdp::ByteBuffer source = \
+    "+ id (string) ... lorem (ipsum)\n\n"\
+    "  Additional description";
+
+    Parameter parameter;
+    Report report;
+    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.empty());
+
+    REQUIRE(parameter.name == "id");
+    REQUIRE(parameter.type == "string");
+    REQUIRE(parameter.description == "lorem (ipsum)\n\nAdditional description");
+}
+
+TEST_CASE("Parameter with additional description as continuation of signature", "[parameter]")
+{
+    mdp::ByteBuffer source = \
+    "+ id (string) ... lorem (ipsum)\n"\
+    "  Additional description\n";
+
+    Parameter parameter;
+    Report report;
+    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.empty());
+
+    REQUIRE(parameter.name == "id");
+    REQUIRE(parameter.type == "string");
+    REQUIRE(parameter.description == "lorem (ipsum)\nAdditional description\n\n");
+}
+
+TEST_CASE("Parameter with list in description", "[parameter]")
+{
+    mdp::ByteBuffer source = \
+    "+ id (optional, string) ... lorem (ipsum)\n"\
+    "  dolor sit amet\n\n"\
+    "  + Ut pulvinar\n"\
+    "  + Mauris condimentum\n";
+
+    Parameter parameter;
+    Report report;
+    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.empty());
+
+    REQUIRE(parameter.name == "id");
+    REQUIRE(parameter.type == "string");
+    REQUIRE(parameter.description == "lorem (ipsum)\ndolor sit amet\n\n+ Ut pulvinar\n\n+ Mauris condimentum\n");
 }
