@@ -132,6 +132,32 @@ namespace snowcrash {
             }
         }
 
+        /** Inject headers into transaction examples requests and responses */
+        static void injectDeprecatedHeaders(const Headers& headers,
+                                            Collection<TransactionExample>::type& examples) {
+
+            for (Collection<TransactionExample>::iterator exampleIt = examples.begin();
+                 exampleIt != examples.end();
+                 ++exampleIt) {
+
+                // Requests
+                for (Collection<Request>::iterator reqIt = exampleIt->requests.begin();
+                     reqIt != exampleIt->requests.end();
+                     ++reqIt) {
+
+                     reqIt->headers.insert(reqIt->headers.begin(), headers.begin(), headers.end());
+                }
+
+                // Responses
+                for (Collection<Response>::iterator resIt = exampleIt->responses.begin();
+                     resIt != exampleIt->responses.end();
+                     ++resIt) {
+
+                    resIt->headers.insert(resIt->headers.begin(), headers.begin(), headers.end());
+                }
+            }
+        }
+
         /** Finds a header in its containment group by its key (first) */
         static HeaderIterator findHeader(const Headers& headers,
                                          const Header& header) {
@@ -140,7 +166,7 @@ namespace snowcrash {
                                 std::bind2nd(MatchFirsts<Header>(), header));
         }
     };
-    
+
     /** Headers Section Parser */
     typedef SectionParser<Headers, ListSectionAdapter> HeadersParser;
 }

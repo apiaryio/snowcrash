@@ -95,6 +95,9 @@ namespace snowcrash {
                 case ModelBodySectionType:
                     return processModel(node, siblings, pd, report, out);
 
+                case HeadersSectionType:
+                    return SectionProcessor<Action>::handleDeprecatedHeaders(node, siblings, pd, report, out.headers);
+
                 default:
                     break;
             }
@@ -135,6 +138,13 @@ namespace snowcrash {
                 return nestedType;
             }
 
+            // Check if headers section
+            nestedType = SectionProcessor<Headers>::sectionType(node);
+
+            if (nestedType == HeadersSectionType) {
+                return nestedType;
+            }
+
             // Check if model section
             nestedType = SectionProcessor<Payload>::sectionType(node);
 
@@ -157,17 +167,32 @@ namespace snowcrash {
         static void finalize(const MarkdownNodeIterator& node,
                              SectionParserData& pd,
                              Report& report,
-                             Resource& resource) {
+                             Resource& out) {
 
-            if (!resource.uriTemplate.empty()) {
+            if (!out.uriTemplate.empty()) {
+
                 URITemplateParser uriTemplateParser;
                 ParsedURITemplate parsedResult;
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
 
-                uriTemplateParser.parse(resource.uriTemplate, sourceMap, parsedResult);
+                uriTemplateParser.parse(out.uriTemplate, sourceMap, parsedResult);
+
                 if (!parsedResult.report.warnings.empty()) {
                     report += parsedResult.report;
                 }
+            }
+
+            // Consolidate depraceted headers into subsequent payloads
+            if (!out.headers.empty()) {
+
+                for (Collection<Action>::iterator it = out.actions.begin();
+                     it != out.actions.end();
+                     ++it) {
+
+                    SectionProcessor<Headers>::injectDeprecatedHeaders(out.headers, it->examples);
+                }
+
+                out.headers.clear();
             }
         }
 
