@@ -115,6 +115,9 @@ namespace snowcrash {
                     out.examples.back().responses.push_back(payload);
                     break;
 
+                case HeadersSectionType:
+                    return SectionProcessor<Action>::handleDeprecatedHeaders(node, siblings, pd, report, out.headers);
+
                 case BodySectionType:
                 case SchemaSectionType:
                     // TODO: Can improve this
@@ -193,6 +196,13 @@ namespace snowcrash {
                 return nestedType;
             }
 
+            // Check if headers section
+            nestedType = SectionProcessor<Headers>::sectionType(node);
+
+            if (nestedType == HeadersSectionType) {
+                return nestedType;
+            }
+
             // Check if payload section
             nestedType = SectionProcessor<Payload>::sectionType(node);
 
@@ -214,6 +224,12 @@ namespace snowcrash {
                              SectionParserData& pd,
                              Report& report,
                              Action& out) {
+
+            if (!out.headers.empty()) {
+
+                SectionProcessor<Headers>::injectDeprecatedHeaders(out.headers, out.examples);
+                out.headers.clear();
+            }
 
             if (out.examples.empty()) {
 
@@ -324,6 +340,27 @@ namespace snowcrash {
             }
 
             return false;
+        }
+
+        /** Warn about deprecated headers */
+        static MarkdownNodeIterator handleDeprecatedHeaders(const MarkdownNodeIterator& node,
+                                            const MarkdownNodes& siblings,
+                                            SectionParserData& pd,
+                                            Report& report,
+                                            Headers& headers) {
+
+            MarkdownNodeIterator cur = HeadersParser::parse(node, siblings, pd, report, headers);
+
+            // WARN: Deprecated header sections
+            std::stringstream ss;
+            ss << "the 'headers' section at this level is deprecated and will be removed in a future, use respective payload header section(s) instead";
+
+            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+            report.warnings.push_back(Warning(ss.str(),
+                                              DeprecatedWarning,
+                                              sourceMap));
+
+            return cur;
         }
     };
 
