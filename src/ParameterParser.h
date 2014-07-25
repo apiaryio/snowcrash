@@ -122,7 +122,8 @@ namespace snowcrash {
             if (node->type == mdp::ListItemMarkdownNodeType
                 && !node->children().empty()) {
 
-                mdp::ByteBuffer subject = node->children().front().text;
+                mdp::ByteBuffer subject, remainingContent;
+                subject = GetFirstLine(node->children().front().text, remainingContent);
                 TrimString(subject);
 
                 if (RegexMatch(subject, ParameterAbbrevDefinitionRegex)) {

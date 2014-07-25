@@ -150,3 +150,39 @@ TEST_CASE("Warn about multiple parameters with the same name", "[parameters]")
     REQUIRE(parameters[0].name == "id");
     REQUIRE(parameters[0].exampleValue == "43");
 }
+
+TEST_CASE("Recognize parameter when there is no description on its signature and remaining description is not a new node", "[parameters]")
+{
+    mdp::ByteBuffer source = \
+    "+ Parameters\n\n"\
+    "    + id (number) ... The ID number of the car\n"\
+    "    + state (string)\n"\
+    "        The desired state of the panoramic roof. The approximate percent open values for each state are `open` = 100%, `close` = 0%, `comfort` = 80%, and `vent` = ~15%\n"\
+    "        + Values\n"\
+    "            + `open`\n"\
+    "            + `close`\n"\
+    "            + `comfort`\n"\
+    "            + `vent`";
+
+    Parameters parameters;
+    Report report;
+    SectionParserHelper<Parameters, ParametersParser>::parse(source, ParametersSectionType, report, parameters);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.empty());
+
+    REQUIRE(parameters.size() == 2);
+    REQUIRE(parameters[0].name == "id");
+    REQUIRE(parameters[0].type == "number");
+    REQUIRE(parameters[0].description == "The ID number of the car");
+
+    Parameter parameter = parameters[1];
+    REQUIRE(parameter.name == "state");
+    REQUIRE(parameter.type == "string");
+    REQUIRE(parameter.description == "\nThe desired state of the panoramic roof. The approximate percent open values for each state are `open` = 100%, `close` = 0%, `comfort` = 80%, and `vent` = ~15%\n\n");
+    REQUIRE(parameter.values.size() == 4);
+    REQUIRE(parameter.values[0] == "open");
+    REQUIRE(parameter.values[1] == "close");
+    REQUIRE(parameter.values[2] == "comfort");
+    REQUIRE(parameter.values[3] == "vent");
+}
