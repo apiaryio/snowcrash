@@ -51,3 +51,8 @@ msvc/_UpgradeReport_Files/
 msvc/Backup/
 msvc/UpgradeLog.htm
 msvc/UpgradeLog.XML
+
+# Eclipse specific
+.project
+.cproject
+.settings

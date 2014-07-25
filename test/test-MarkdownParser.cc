@@ -38,6 +38,46 @@ TEST_CASE("Parse one paragaraph", "[parser][paragraph]")
     REQUIRE(node.sourceMap[0].length == 13);
 }
 
+TEST_CASE("Parse when starting with empty line", "[parser][empty_line]")
+{
+    MarkdownParser parser;
+    MarkdownNode ast;
+
+    ByteBuffer src =\
+    "\n"\
+    "Lorem\n"\
+    "\n"\
+    "Ipsum\n";
+
+    parser.parse(src, ast);
+
+    REQUIRE(ast.type == RootMarkdownNodeType);
+    REQUIRE(ast.text.empty());
+    REQUIRE(ast.data == 0);
+    REQUIRE(ast.children().size() == 2);
+    REQUIRE(ast.sourceMap.size() == 1);
+    REQUIRE(ast.sourceMap[0].location == 0);
+    REQUIRE(ast.sourceMap[0].length == 14);
+
+    MarkdownNode& node = ast.children()[0];
+    REQUIRE(node.type == ParagraphMarkdownNodeType);
+    REQUIRE(node.text == "Lorem");
+    REQUIRE(node.data == 0);
+    REQUIRE(node.children().empty());
+    REQUIRE(node.sourceMap.size() == 1);
+    REQUIRE(node.sourceMap[0].location == 1);
+    REQUIRE(node.sourceMap[0].length == 7);
+
+    node = ast.children()[1];
+    REQUIRE(node.type == ParagraphMarkdownNodeType);
+    REQUIRE(node.text == "Ipsum");
+    REQUIRE(node.data == 0);
+    REQUIRE(node.children().empty());
+    REQUIRE(node.sourceMap.size() == 1);
+    REQUIRE(node.sourceMap[0].location == 8);
+    REQUIRE(node.sourceMap[0].length == 6);
+}
+
 TEST_CASE("Parse multiple paragaraphs", "[parser][paragraph]")
 {
     MarkdownParser parser;
