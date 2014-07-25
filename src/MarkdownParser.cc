@@ -46,7 +46,7 @@ void MarkdownParser::parse(const ByteBuffer& source, MarkdownNode& ast)
     
     RenderCallbacks callbacks = renderCallbacks();
 
-	::sd_markdown *sundown = ::sd_markdown_new(ParserExtensions, MaxNesting, &callbacks, renderCallbackData());
+    ::sd_markdown *sundown = ::sd_markdown_new(ParserExtensions, MaxNesting, &callbacks, renderCallbackData());
     ::buf *output = ::bufnew(OutputUnitSize);
     
     ::sd_markdown_render(output, reinterpret_cast<const uint8_t *>(source.c_str()), source.length(), sundown);
@@ -335,9 +335,9 @@ void MarkdownParser::blockDidParse(const BytesRangeSet& sourceMap)
     
     if (!m_workingNode)
         throw NO_WORKING_NODE_ERR;
-    
+
     if (m_workingNode->children().empty())
-        throw std::logic_error("no working node children");
+        return;
     
     MarkdownNode &lMarkdownNode = m_workingNode->children().back();
     lMarkdownNode.sourceMap.append(sourceMap);
