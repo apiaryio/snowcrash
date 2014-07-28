@@ -70,6 +70,37 @@ TEST_CASE("Parse canonical blueprint", "[blueprint]")
     REQUIRE(blueprint.resourceGroups[1].resources.empty());
 }
 
+TEST_CASE("Parse blueprint with multiple metadata sections", "[blueprint]")
+{
+    mdp::ByteBuffer source = "FORMAT: 1A\n\n";
+    source += BlueprintFixture;
+
+    Blueprint blueprint;
+    Report report;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.empty());
+
+    REQUIRE(blueprint.metadata.size() == 2);
+    REQUIRE(blueprint.metadata[0].first == "FORMAT");
+    REQUIRE(blueprint.metadata[0].second == "1A");
+    REQUIRE(blueprint.metadata[1].first == "meta");
+    REQUIRE(blueprint.metadata[1].second == "verse");
+
+    REQUIRE(blueprint.name == "Snowcrash API");
+    REQUIRE(blueprint.description == "## Character\n\nUncle Enzo\n\n");
+    REQUIRE(blueprint.resourceGroups.size() == 2);
+
+    REQUIRE(blueprint.resourceGroups[0].name == "First");
+    REQUIRE(blueprint.resourceGroups[0].description == "p1\n");
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+
+    REQUIRE(blueprint.resourceGroups[1].name == "Second");
+    REQUIRE(blueprint.resourceGroups[1].description == "p2\n");
+    REQUIRE(blueprint.resourceGroups[1].resources.empty());
+}
+
 TEST_CASE("Parse API with Name and abbreviated resource", "[blueprint]")
 {
     mdp::ByteBuffer source = \
