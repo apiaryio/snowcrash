@@ -251,7 +251,7 @@ TEST_CASE("Parse inline payload with symbol reference", "[payload]")
     SectionParserHelper<Payload, PayloadParser>::parse(SymbolFixture, RequestBodySectionType, report, payload, symbols);
 
     REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(report.warnings.size() == 0);
 
     REQUIRE(payload.name.empty());
     REQUIRE(payload.description == "Foo");
@@ -278,7 +278,7 @@ TEST_CASE("Parse inline payload with symbol reference with foreign content", "[p
     SectionParserHelper<Payload, PayloadParser>::parse(source, RequestBodySectionType, report, payload, symbols);
 
     REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 3); // ignoring foreign entry
+    REQUIRE(report.warnings.size() == 1); // ignoring foreign entry
 
     REQUIRE(payload.name.empty());
     REQUIRE(payload.description == "Foo");
