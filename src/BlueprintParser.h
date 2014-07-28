@@ -38,13 +38,16 @@ namespace snowcrash {
 
             MarkdownNodeIterator cur = node;
 
-            if (cur->type == mdp::ParagraphMarkdownNodeType) {
+            while (cur->type == mdp::ParagraphMarkdownNodeType) {
 
-                parseMetadata(node, pd, report, out.metadata);
+                MetadataCollection metadata;
+                parseMetadata(cur, pd, report, metadata);
 
                 // First block is paragraph and is not metadata (no API name)
-                if (out.metadata.empty()) {
+                if (metadata.empty()) {
                     return processDescription(cur, pd, report, out);
+                } else {
+                    out.metadata.insert(out.metadata.end(), metadata.begin(), metadata.end());
                 }
 
                 cur++;
