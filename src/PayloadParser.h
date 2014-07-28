@@ -83,7 +83,6 @@ namespace snowcrash {
                                                    Payload& out) {
 
             mdp::ByteBuffer content;
-            CodeBlockUtility::contentAsCodeBlock(node, pd, report, content);
 
             if (!out.symbol.empty()) {
                 //WARN: ignoring extraneous content after symbol reference
@@ -97,6 +96,7 @@ namespace snowcrash {
                                                   IgnoringWarning,
                                                   sourceMap));
             } else {
+                CodeBlockUtility::contentAsCodeBlock(node, pd, report, content);
                 out.body += content;
 
                 parseSymbolReference(pd, report, out);

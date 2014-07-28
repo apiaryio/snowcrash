@@ -67,6 +67,10 @@ namespace snowcrash {
             // Other blocks, process & warn
             content += mdp::MapBytesRangeSet(node->sourceMap, pd.sourceData);
 
+            if (checkSymbol(content)) {
+                return;
+            }
+
             // WARN: Not a preformatted code block
             size_t level = codeBlockIndentationLevel(pd.parentSectionContext());
             std::stringstream ss;
@@ -95,9 +99,14 @@ namespace snowcrash {
             content += remainingContent;
             content += "\n";
             
+            if (checkSymbol(content)) {
+                return;
+            }
+
             // WARN: Not a preformatted code block but multiline signature
             size_t level = codeBlockIndentationLevel(pd.parentSectionContext());
             std::stringstream ss;
+
             ss << SectionName(pd.sectionContext());
             ss << " is expected to be a pre-formatted code block, separate it by a newline and ";
             ss << "indent every of its line by ";
@@ -109,6 +118,16 @@ namespace snowcrash {
                                               sourceMap));
         }
         
+        static bool checkSymbol(const mdp::ByteBuffer& content) {
+
+            mdp::ByteBuffer data = content;
+            SymbolName symbol;
+
+            TrimString(data);
+
+            return GetSymbolReference(data, symbol);
+        }
+
         /**
          *  \brief Check for potential excessive indentation of a list section
          *  \return True if code block contains a recognized list section, false otherwise.
