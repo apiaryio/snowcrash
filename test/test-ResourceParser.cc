@@ -468,3 +468,43 @@ TEST_CASE("Deprecated resource and action headers", "[resource]")
     REQUIRE(resource.actions[0].examples[0].responses[0].headers[2].first == "header3");
     REQUIRE(resource.actions[0].examples[0].responses[0].headers[2].second == "value3");
 }
+
+TEST_CASE("bug fix for recognition of model as a part of other word or as a quote, issue #92 and #152", "[model]")
+{
+    mdp::ByteBuffer source = \
+"## Resource [/resource]\n"\
+"### Attributes\n"\
+"- A\n"\
+"- Cmodel\n"\
+"- `model`\n";
+
+    Resource resource;
+    Report report;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 0);
+
+    REQUIRE(resource.name == "Resource");
+    REQUIRE(resource.description == "### Attributes\n\n- A\n\n- Cmodel\n\n- `model`\n");
+}
+
+TEST_CASE("Parse resource with multi-word named model", "[resource][model]")
+{
+    mdp::ByteBuffer source = \
+"# My Resource [/resource]\n\n"\
+"Awesome description\n\n"\
+"+ a really good name Model (text/plain)\n\n"\
+"        body of the `model`\n";
+
+    Resource resource;
+    Report report;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.empty());
+
+    REQUIRE(resource.model.name == "a really good name");
+    REQUIRE(resource.model.body == "body of the `model`\n");
+    REQUIRE(resource.actions.empty());
+}
