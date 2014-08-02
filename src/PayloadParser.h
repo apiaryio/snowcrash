@@ -35,7 +35,7 @@ namespace snowcrash {
     const char* const ResponseRegex = "^[[:blank:]]*[Rr]esponse([[:blank:][:digit:]]+)?" MEDIA_TYPE "?[[:blank:]]*";
 
     /** Model matching regex */
-    const char* const  ModelRegex = "^[[:blank:]]*" SYMBOL_IDENTIFIER "?[Mm]odel" MEDIA_TYPE "?[[:blank:]]*";
+    const char* const  ModelRegex = "(^[[:blank:]]*[^][()]+)?(^[[:blank:]]*|[[:blank:]]+)[Mm]odel" MEDIA_TYPE "?[[:blank:]]*";
 
     /**
      * Payload Section Processor
@@ -375,6 +375,8 @@ namespace snowcrash {
             mdp::ByteBuffer mediaType;
             CaptureGroups captureGroups;
 
+            bool modelHasParsed = false;
+
             switch (pd.sectionContext()) {
                 case RequestSectionType:
                 case RequestBodySectionType:
@@ -388,6 +390,7 @@ namespace snowcrash {
 
                 case ModelSectionType:
                 case ModelBodySectionType:
+                    modelHasParsed = true;
                     regex = ModelRegex;
                     break;
 
@@ -442,7 +445,12 @@ namespace snowcrash {
 
                 out.name = captureGroups[1];
                 TrimString(out.name);
-                mediaType = captureGroups[3];
+                if(modelHasParsed){
+                    mediaType = captureGroups[4];
+                }
+                else{
+                    mediaType = captureGroups[3];
+                }
                 TrimString(mediaType);
 
                 if (!mediaType.empty()) {
