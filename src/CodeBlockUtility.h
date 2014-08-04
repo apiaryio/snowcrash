@@ -67,7 +67,9 @@ namespace snowcrash {
             // Other blocks, process & warn
             content += mdp::MapBytesRangeSet(node->sourceMap, pd.sourceData);
 
-            if (checkSymbol(content)) {
+            if (node->type == mdp::ParagraphMarkdownNodeType &&
+                checkSymbol(content)) {
+
                 return;
             }
 
@@ -99,7 +101,9 @@ namespace snowcrash {
             content += remainingContent;
             content += "\n";
             
-            if (checkSymbol(content)) {
+            if (node->type == mdp::ParagraphMarkdownNodeType &&
+                checkSymbol(content)) {
+
                 return;
             }
 
@@ -118,6 +122,10 @@ namespace snowcrash {
                                               sourceMap));
         }
         
+        /**
+         *  \brief Check for any symbol reference
+         *  \return True if symbol reference exists
+         */
         static bool checkSymbol(const mdp::ByteBuffer& content) {
 
             mdp::ByteBuffer data = content;
