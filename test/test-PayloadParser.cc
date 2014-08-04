@@ -261,6 +261,34 @@ TEST_CASE("Parse inline payload with symbol reference", "[payload]")
     REQUIRE(payload.schema.empty());
 }
 
+TEST_CASE("Parse inline payload with symbol reference with extra indentation", "[payload]")
+{
+    ResourceModel model;
+    Symbols symbols;
+
+    model.description = "Foo";
+    model.body = "Bar";
+    symbols.push_back(ResourceModelSymbol("Symbol", model));
+
+    mdp::ByteBuffer source = \
+    "+ Request\n\n"\
+    "        [Symbol][]\n";
+
+    Payload payload;
+    Report report;
+    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestBodySectionType, report, payload, symbols);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 0);
+
+    REQUIRE(payload.name.empty());
+    REQUIRE(payload.description.empty());
+    REQUIRE(payload.parameters.empty());
+    REQUIRE(payload.headers.empty());
+    REQUIRE(payload.body == "[Symbol][]\n");
+    REQUIRE(payload.schema.empty());
+}
+
 TEST_CASE("Parse inline payload with symbol reference with foreign content", "[payload]")
 {
     mdp::ByteBuffer source = SymbolFixture;
