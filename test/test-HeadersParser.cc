@@ -84,7 +84,7 @@ TEST_CASE("parse malformed headers fixture", "[headers]")
     REQUIRE(headers[1].second == "Hello World!");
 }
 
-TEST_CASE("hparser/parse-multiple-blocks", "Parse header section composed of multiple blocks")
+TEST_CASE("Parse header section composed of multiple blocks", "[headers]")
 {
     // Blueprint in question:
     //R"(
@@ -115,4 +115,18 @@ TEST_CASE("hparser/parse-multiple-blocks", "Parse header section composed of mul
     REQUIRE(headers[1].second == "100");
     REQUIRE(headers[2].first == "X-My-Header");
     REQUIRE(headers[2].second == "42");
+}
+
+TEST_CASE("Parse header section with missing headers", "[headers]")
+{
+    mdp::ByteBuffer source = "+ Headers\n\n";
+
+    Headers headers;
+    Report report;
+    SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, report, headers);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 1); // no headers
+
+    REQUIRE(headers.size() == 0);
 }
