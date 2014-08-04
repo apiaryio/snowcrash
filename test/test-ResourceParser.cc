@@ -356,14 +356,12 @@ TEST_CASE("Parse named resource with nameless model", "[resource][model][source]
 {
     mdp::ByteBuffer source = \
     "# Message [/message]\n"\
-    "+ Model\n"\
-    "  \n"\
+    "+ Model\n\n"\
     "        AAA\n"\
     "\n"\
     "## Retrieve a message [GET]\n"\
-    "+ Response 200\n"\
-    "    \n"\
-    "        [Message][]\n\n";
+    "+ Response 200\n\n"\
+    "    [Message][]\n\n";
 
     Resource resource;
     Report report;

@@ -99,7 +99,9 @@ namespace snowcrash {
                 CodeBlockUtility::contentAsCodeBlock(node, pd, report, content);
                 out.body += content;
 
-                parseSymbolReference(pd, report, out);
+                if (node->type == mdp::ParagraphMarkdownNodeType) {
+                    parseSymbolReference(pd, report, out);
+                }
             }
 
             return ++MarkdownNodeIterator(node);
