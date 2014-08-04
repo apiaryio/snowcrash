@@ -70,7 +70,7 @@ namespace snowcrash {
                     out.description = remainingContent;
                 } else {
                     CodeBlockUtility::signatureContentAsCodeBlock(node, pd, report, out.body);
-                    parseSymbolReference(pd, report, out);
+                    parseSymbolReference(node, pd, report, out);
                 }
             }
 
@@ -99,9 +99,7 @@ namespace snowcrash {
                 CodeBlockUtility::contentAsCodeBlock(node, pd, report, content);
                 out.body += content;
 
-                if (node->type == mdp::ParagraphMarkdownNodeType) {
-                    parseSymbolReference(pd, report, out);
-                }
+                parseSymbolReference(node, pd, report, out);
             }
 
             return ++MarkdownNodeIterator(node);
@@ -456,9 +454,14 @@ namespace snowcrash {
             return true;
         }
 
-        static void parseSymbolReference(SectionParserData& pd,
+        static void parseSymbolReference(const MarkdownNodeIterator& node,
+                                         SectionParserData& pd,
                                          Report& report,
                                          Payload& out) {
+
+            if (node->type == mdp::CodeMarkdownNodeType) {
+                return;
+            }
 
             mdp::ByteBuffer source = out.body;
             SymbolName symbol;
@@ -468,6 +471,19 @@ namespace snowcrash {
 
             if (GetSymbolReference(source, symbol)) {
                 out.symbol = symbol;
+
+                // If symbol doesn't exist
+                if (pd.symbolTable.resourceModels.find(symbol) == pd.symbolTable.resourceModels.end()) {
+
+                    // ERR: Undefiend symbol
+                    std::stringstream ss;
+                    ss << "Undefined symbol " << symbol;
+
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                    report.error = Error(ss.str(), SymbolError, sourceMap);
+
+                    return;
+                }
 
                 model = pd.symbolTable.resourceModels.at(symbol);
 
