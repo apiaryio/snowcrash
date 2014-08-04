@@ -83,12 +83,27 @@ namespace snowcrash {
 
                 mdp::ByteBuffer subject = node->children().front().text;
                 TrimString(subject);
-                
+
                 if (RegexMatch(subject, HeadersRegex))
                     return HeadersSectionType;
             }
 
             return UndefinedSectionType;
+        }
+
+        static void finalize(const MarkdownNodeIterator& node,
+                             SectionParserData& pd,
+                             Report& report,
+                             Headers& out) {
+
+            if (out.empty()) {
+
+                // WARN: No headers defined
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                report.warnings.push_back(Warning("No headers defined in headers section",
+                                                  EmptyDefinitionWarning,
+                                                  sourceMap));
+            }
         }
 
         /** Retrieve headers from content */
