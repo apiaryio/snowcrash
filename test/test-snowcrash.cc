@@ -113,7 +113,7 @@ TEST_CASE("Do not report duplicate response when media type differs", "[method][
     parse(source, 0, report, blueprint);
 
     REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1); // expected API name
+    REQUIRE(report.warnings.empty());
 }
 
 TEST_CASE("Support description ending with an list item", "[parser][#8]")
@@ -130,7 +130,7 @@ TEST_CASE("Support description ending with an list item", "[parser][#8]")
     parse(source, 0, report, blueprint);
 
     REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1); // expected API name
+    REQUIRE(report.warnings.empty());
 
     REQUIRE(blueprint.resourceGroups.size() == 1);
     REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
@@ -154,7 +154,7 @@ TEST_CASE("Invalid ‘warning: empty body asset’ for certain status codes", "[
     parse(source, 0, report, blueprint);
 
     REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1); // expected API name
+    REQUIRE(report.warnings.empty());
 
     REQUIRE(blueprint.resourceGroups.size() == 1);
     REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
@@ -214,7 +214,7 @@ TEST_CASE("Parse adjacent asset blocks", "[parser][#9]")
     parse(source, 0, report, blueprint);
 
     REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 2); // expected API name
+    REQUIRE(report.warnings.size() == 1);
 
     REQUIRE(blueprint.resourceGroups.size() == 1);
     REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
@@ -241,7 +241,7 @@ TEST_CASE("Parse adjacent asset list blocks", "[parser][#9]")
     parse(source, 0, report, blueprint);
 
     REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 2); // expected API name
+    REQUIRE(report.warnings.size() == 1);
     REQUIRE(report.warnings[0].code == IgnoringWarning);
 
     REQUIRE(blueprint.resourceGroups.size() == 1);
@@ -271,7 +271,7 @@ TEST_CASE("Parse adjacent nested asset blocks", "[parser][#9]")
     parse(source, 0, report, blueprint);
 
     REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 3); // expected API name
+    REQUIRE(report.warnings.size() == 2);
     REQUIRE(report.warnings[0].code == IndentationWarning);
     REQUIRE(report.warnings[1].code == IndentationWarning);
 
