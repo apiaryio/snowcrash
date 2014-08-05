@@ -67,12 +67,6 @@ namespace snowcrash {
             // Other blocks, process & warn
             content += mdp::MapBytesRangeSet(node->sourceMap, pd.sourceData);
 
-            if (node->type == mdp::ParagraphMarkdownNodeType &&
-                checkSymbol(content)) {
-
-                return;
-            }
-
             // WARN: Not a preformatted code block
             size_t level = codeBlockIndentationLevel(pd.parentSectionContext());
             std::stringstream ss;
@@ -100,12 +94,6 @@ namespace snowcrash {
             
             content += remainingContent;
             content += "\n";
-            
-            if (node->type == mdp::ParagraphMarkdownNodeType &&
-                checkSymbol(content)) {
-
-                return;
-            }
 
             // WARN: Not a preformatted code block but multiline signature
             size_t level = codeBlockIndentationLevel(pd.parentSectionContext());
@@ -122,20 +110,6 @@ namespace snowcrash {
                                               sourceMap));
         }
         
-        /**
-         *  \brief Check for any symbol reference
-         *  \return True if symbol reference exists
-         */
-        static bool checkSymbol(const mdp::ByteBuffer& content) {
-
-            mdp::ByteBuffer data = content;
-            SymbolName symbol;
-
-            TrimString(data);
-
-            return GetSymbolReference(data, symbol);
-        }
-
         /**
          *  \brief Check for potential excessive indentation of a list section
          *  \return True if code block contains a recognized list section, false otherwise.
