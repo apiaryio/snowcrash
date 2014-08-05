@@ -38,13 +38,16 @@ namespace snowcrash {
 
             MarkdownNodeIterator cur = node;
 
-            if (cur->type == mdp::ParagraphMarkdownNodeType) {
+            while (cur->type == mdp::ParagraphMarkdownNodeType) {
 
-                parseMetadata(node, pd, report, out.metadata);
+                MetadataCollection metadata;
+                parseMetadata(cur, pd, report, metadata);
 
                 // First block is paragraph and is not metadata (no API name)
-                if (out.metadata.empty()) {
+                if (metadata.empty()) {
                     return processDescription(cur, pd, report, out);
+                } else {
+                    out.metadata.insert(out.metadata.end(), metadata.begin(), metadata.end());
                 }
 
                 cur++;
@@ -148,23 +151,14 @@ namespace snowcrash {
                              Report& report,
                              Blueprint& out) {
 
-            if (out.name.empty()) {
+            if (out.name.empty() &&
+                (pd.options & RequireBlueprintNameOption)) {
 
-                if (pd.options & RequireBlueprintNameOption) {
-
-                    // ERR: No API name specified
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                    report.error = Error(ExpectedAPINameMessage,
-                                         BusinessError,
-                                         sourceMap);
-                } else {
-
-                    // WARN: No API name
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                    report.warnings.push_back(Warning(ExpectedAPINameMessage,
-                                                      APINameWarning,
-                                                      sourceMap));
-                }
+                // ERR: No API name specified
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                report.error = Error(ExpectedAPINameMessage,
+                                     BusinessError,
+                                     sourceMap);
             }
         }
 

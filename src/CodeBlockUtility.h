@@ -94,10 +94,11 @@ namespace snowcrash {
             
             content += remainingContent;
             content += "\n";
-            
+
             // WARN: Not a preformatted code block but multiline signature
             size_t level = codeBlockIndentationLevel(pd.parentSectionContext());
             std::stringstream ss;
+
             ss << SectionName(pd.sectionContext());
             ss << " is expected to be a pre-formatted code block, separate it by a newline and ";
             ss << "indent every of its line by ";
@@ -212,7 +213,7 @@ namespace snowcrash {
                 // WARN: Dangling asset
                 std::stringstream ss;
                 ss << "Dangling message-body asset, expected a pre-formatted code block, ";
-                ss << "indent every one of it's line by " << level*4 << " spaces or " << level << " tabs";
+                ss << "indent every of it's line by " << level*4 << " spaces or " << level << " tabs";
 
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
                 report.warnings.push_back(Warning(ss.str(),

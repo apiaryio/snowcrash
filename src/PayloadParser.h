@@ -68,9 +68,8 @@ namespace snowcrash {
             if (!remainingContent.empty()) {
                 if (!isAbbreviated(pd.sectionContext())) {
                     out.description = remainingContent;
-                } else {
+                } else if (!parseSymbolReference(node, pd, remainingContent, report, out)) {
                     CodeBlockUtility::signatureContentAsCodeBlock(node, pd, report, out.body);
-                    parseSymbolReference(pd, report, out);
                 }
             }
 
@@ -83,7 +82,6 @@ namespace snowcrash {
                                                    Payload& out) {
 
             mdp::ByteBuffer content;
-            CodeBlockUtility::contentAsCodeBlock(node, pd, report, content);
 
             if (!out.symbol.empty()) {
                 //WARN: ignoring extraneous content after symbol reference
@@ -97,9 +95,14 @@ namespace snowcrash {
                                                   IgnoringWarning,
                                                   sourceMap));
             } else {
-                out.body += content;
 
-                parseSymbolReference(pd, report, out);
+                if (!out.body.empty() ||
+                    node->type != mdp::ParagraphMarkdownNodeType ||
+                    !parseSymbolReference(node, pd, node->text, report, out)) {
+
+                    CodeBlockUtility::contentAsCodeBlock(node, pd, report, content);
+                    out.body += content;
+                }
             }
 
             return ++MarkdownNodeIterator(node);
@@ -454,11 +457,12 @@ namespace snowcrash {
             return true;
         }
 
-        static void parseSymbolReference(SectionParserData& pd,
+        static bool parseSymbolReference(const MarkdownNodeIterator& node,
+                                         SectionParserData& pd,
+                                         mdp::ByteBuffer& source,
                                          Report& report,
                                          Payload& out) {
 
-            mdp::ByteBuffer source = out.body;
             SymbolName symbol;
             ResourceModel model;
 
@@ -467,6 +471,19 @@ namespace snowcrash {
             if (GetSymbolReference(source, symbol)) {
                 out.symbol = symbol;
 
+                // If symbol doesn't exist
+                if (pd.symbolTable.resourceModels.find(symbol) == pd.symbolTable.resourceModels.end()) {
+
+                    // ERR: Undefined symbol
+                    std::stringstream ss;
+                    ss << "Undefined symbol " << symbol;
+
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                    report.error = Error(ss.str(), SymbolError, sourceMap);
+
+                    return true;
+                }
+
                 model = pd.symbolTable.resourceModels.at(symbol);
 
                 out.description = model.description;
@@ -474,7 +491,11 @@ namespace snowcrash {
                 out.headers = model.headers;
                 out.body = model.body;
                 out.schema = model.schema;
+
+                return true;
             }
+
+            return false;
         }
     };
 

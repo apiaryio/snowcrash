@@ -356,14 +356,12 @@ TEST_CASE("Parse named resource with nameless model", "[resource][model][source]
 {
     mdp::ByteBuffer source = \
     "# Message [/message]\n"\
-    "+ Model\n"\
-    "  \n"\
+    "+ Model\n\n"\
     "        AAA\n"\
     "\n"\
     "## Retrieve a message [GET]\n"\
-    "+ Response 200\n"\
-    "    \n"\
-    "        [Message][]\n\n";
+    "+ Response 200\n\n"\
+    "    [Message][]\n\n";
 
     Resource resource;
     Report report;
@@ -381,6 +379,25 @@ TEST_CASE("Parse named resource with nameless model", "[resource][model][source]
     REQUIRE(resource.actions[0].examples[0].responses.size() == 1);
     REQUIRE(resource.actions[0].examples[0].responses[0].name == "200");
     REQUIRE(resource.actions[0].examples[0].responses[0].body == "AAA\n");
+}
+
+TEST_CASE("Parse named resource with nameless model but reference a non-existing model", "[resource]")
+{
+    mdp::ByteBuffer source = \
+    "# Posts [/posts]\n"\
+    "+ Model\n\n"\
+    "        {}\n"\
+    "\n"\
+    "## List [GET]\n"\
+    "+ Response 200\n\n"\
+    "    [Post][]\n";
+
+    Resource resource;
+    Report report;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+
+    REQUIRE(report.error.code == SymbolError);
+    REQUIRE(report.warnings.empty());
 }
 
 TEST_CASE("Parse root resource", "[resource]")
