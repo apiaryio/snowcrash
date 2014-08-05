@@ -146,7 +146,7 @@ TEST_CASE("Parse nameless blueprint description", "[blueprint]")
     SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
 
     REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1); // expected API name
+    REQUIRE(report.warnings.empty());
 
     REQUIRE(blueprint.name.empty());
     REQUIRE(blueprint.description == "A\n\n# B\n");
@@ -162,7 +162,7 @@ TEST_CASE("Parse nameless blueprint with a list description", "[blueprint]")
     SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
 
     REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1); // expected API name
+    REQUIRE(report.warnings.empty());
 
     REQUIRE(blueprint.name.empty());
     REQUIRE(blueprint.description == "+ List\n");
@@ -206,7 +206,7 @@ TEST_CASE("Test parser options - required blueprint name", "[blueprint]")
 
     SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
     REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1); // expected API name
+    REQUIRE(report.warnings.empty());
 
     SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint, Symbols(), RequireBlueprintNameOption);
     REQUIRE(report.error.code != Error::OK);
@@ -274,7 +274,7 @@ TEST_CASE("Blueprint starting with Resource Group should be parsed", "[blueprint
     SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
 
     REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1); // expected API name
+    REQUIRE(report.warnings.empty());
 
     REQUIRE(blueprint.name.empty());
     REQUIRE(blueprint.description.empty());
@@ -293,7 +293,7 @@ TEST_CASE("Blueprint starting with Resource should be parsed", "[blueprint]")
     SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
 
     REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1); // expected API name
+    REQUIRE(report.warnings.empty());
 
     REQUIRE(blueprint.name.empty());
     REQUIRE(blueprint.description.empty());
@@ -317,7 +317,7 @@ TEST_CASE("Checking a resource with global resources for duplicates", "[blueprin
     SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint, Symbols(), 0, &blueprint);
 
     REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 4); // expected API name & 2x no response & duplicate resource
+    REQUIRE(report.warnings.size() == 3); // 2x no response & duplicate resource
 
     REQUIRE(blueprint.name.empty());
     REQUIRE(blueprint.description.empty());

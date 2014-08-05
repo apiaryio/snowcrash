@@ -21,7 +21,7 @@ TEST_CASE("Punctuation in identifiers", "[symbol_identifier]")
     parse(source, 0, report, blueprint);
 
     REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1); // expected API name
+    REQUIRE(report.warnings.empty());
 
     REQUIRE(blueprint.resourceGroups.size() == 1);
     REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
@@ -45,7 +45,7 @@ TEST_CASE("Non ASCII characters in identifiers", "[symbol_identifier]")
     parse(source, 0, report, blueprint);
 
     REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1); // expected API name
+    REQUIRE(report.warnings.empty());
 
     REQUIRE(blueprint.resourceGroups.size() == 1);
     REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
