@@ -71,6 +71,11 @@ namespace snowcrash {
             size_t level = codeBlockIndentationLevel(pd.parentSectionContext());
             std::stringstream ss;
             ss << SectionName(pd.sectionContext());
+
+            if (pd.sectionContext() == BodySectionType) {
+                ss << " asset";
+            }
+
             ss << " is expected to be a pre-formatted code block, every of its line indented by exactly ";
             ss << level * 4 << " spaces or " << level << " tabs";
             
@@ -100,6 +105,11 @@ namespace snowcrash {
             std::stringstream ss;
 
             ss << SectionName(pd.sectionContext());
+
+            if (pd.sectionContext() == BodySectionType) {
+                ss << " asset";
+            }
+
             ss << " is expected to be a pre-formatted code block, separate it by a newline and ";
             ss << "indent every of its line by ";
             ss << level * 4 << " spaces or " << level << " tabs";
