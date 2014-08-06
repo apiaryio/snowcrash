@@ -32,6 +32,20 @@ TEST_CASE("recognize explicit body signature", "[asset]")
     REQUIRE(SectionProcessor<Asset>::sectionType(markdownAST.children().begin()) == BodySectionType);
 }
 
+TEST_CASE("recognize body with content on signature", "[asset]")
+{
+    mdp::ByteBuffer source = \
+    "+ Body\n"\
+    "        Lorem Ipsum\n";
+
+    mdp::MarkdownParser markdownParser;
+    mdp::MarkdownNode markdownAST;
+    markdownParser.parse(source, markdownAST);
+
+    REQUIRE(!markdownAST.children().empty());
+    REQUIRE(SectionProcessor<Asset>::sectionType(markdownAST.children().begin()) == BodySectionType);
+}
+
 TEST_CASE("recognize schema signature", "[asset]")
 {
     mdp::MarkdownParser markdownParser;
