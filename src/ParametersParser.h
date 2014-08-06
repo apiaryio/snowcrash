@@ -128,6 +128,17 @@ namespace snowcrash {
             return SectionProcessor<Parameter>::sectionType(node);
         }
 
+        static SectionTypes nestedSectionTypes() {
+            SectionTypes nested;
+
+            // Parameter & descendants
+            nested.push_back(ParameterSectionType);
+            SectionTypes types = SectionProcessor<Parameter>::nestedSectionTypes();
+            nested.insert(nested.end(), types.begin(), types.end());
+
+            return nested;
+        }
+
         static void finalize(const MarkdownNodeIterator& node,
                              SectionParserData& pd,
                              Report& report,

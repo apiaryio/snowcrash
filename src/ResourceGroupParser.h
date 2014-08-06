@@ -148,6 +148,30 @@ namespace snowcrash {
             return SectionProcessor<Resource>::sectionType(node);
         }
 
+        static SectionTypes nestedSectionTypes() {
+            SectionTypes nested;
+
+            // Resource & descendants
+            nested.push_back(ResourceSectionType);
+            nested.push_back(ResourceMethodSectionType);
+            SectionTypes types = SectionProcessor<Resource>::nestedSectionTypes();
+            nested.insert(nested.end(), types.begin(), types.end());
+
+            return nested;
+        }
+
+        static bool isDescriptionNode(const MarkdownNodeIterator& node,
+                                      SectionType sectionType) {
+
+            mdp::ByteBuffer method;
+
+            if (isNonAbbreviatedAction(node, method)) {
+                return false;
+            }
+
+            return SectionProcessorBase<ResourceGroup>::isDescriptionNode(node, sectionType);
+        }
+
         static bool isUnexpectedNode(const MarkdownNodeIterator& node,
                                      SectionType sectionType) {
 
@@ -157,7 +181,7 @@ namespace snowcrash {
                 return true;
             }
 
-            return !HasSectionKeywordSignature(node);
+            return (SectionKeywordSignature(node) == UndefinedSectionType);
         }
 
         /** Check if node is a non-abbreviated action */

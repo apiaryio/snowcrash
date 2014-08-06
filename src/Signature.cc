@@ -18,17 +18,36 @@
 
 using namespace snowcrash;
 
-bool snowcrash::HasSectionKeywordSignature(const mdp::MarkdownNodeIterator& node)
+SectionType snowcrash::SectionKeywordSignature(const mdp::MarkdownNodeIterator& node)
 {
     // Note: Every-keyword defined section should be listed here...
-    return (SectionProcessor<Headers>::sectionType(node) != UndefinedSectionType ||
-            SectionProcessor<Asset>::sectionType(node) != UndefinedSectionType ||
-            SectionProcessor<Payload>::sectionType(node) != UndefinedSectionType ||
-            SectionProcessor<Values>::sectionType(node) != UndefinedSectionType ||
-            SectionProcessor<Parameters>::sectionType(node) != UndefinedSectionType ||
-            SectionProcessor<Action>::sectionType(node) != UndefinedSectionType ||
-            SectionProcessor<Resource>::sectionType(node) != UndefinedSectionType ||
-            SectionProcessor<ResourceGroup>::sectionType(node) != UndefinedSectionType);
+    SectionType type = UndefinedSectionType;
+
+    if ((type = SectionProcessor<Headers>::sectionType(node)) != UndefinedSectionType)
+        return type;
+
+    if ((type = SectionProcessor<Asset>::sectionType(node)) != UndefinedSectionType)
+        return type;
+
+    if ((type = SectionProcessor<Payload>::sectionType(node)) != UndefinedSectionType)
+        return type;
+
+    if ((type = SectionProcessor<Values>::sectionType(node)) != UndefinedSectionType)
+        return type;
+
+    if ((type = SectionProcessor<Parameters>::sectionType(node)) != UndefinedSectionType)
+        return type;
+
+    if ((type = SectionProcessor<Action>::sectionType(node)) != UndefinedSectionType)
+        return type;
+
+    if ((type = SectionProcessor<Resource>::sectionType(node)) != UndefinedSectionType)
+        return type;
+
+    if ((type = SectionProcessor<ResourceGroup>::sectionType(node)) != UndefinedSectionType)
+        return type;
+
+    return type;
 }
 
 SectionType snowcrash::RecognizeCodeBlockFirstLine(const mdp::ByteBuffer& subject)
