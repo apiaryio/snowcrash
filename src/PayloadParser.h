@@ -35,7 +35,7 @@ namespace snowcrash {
     const char* const ResponseRegex = "^[[:blank:]]*[Rr]esponse([[:blank:][:digit:]]+)?" MEDIA_TYPE "?[[:blank:]]*";
 
     /** Model matching regex */
-    const char* const  ModelRegex = "(^[[:blank:]]*[^][()]+)?(^[[:blank:]]*|[[:blank:]]+)[Mm]odel" MEDIA_TYPE "?[[:blank:]]*";
+    const char* const  ModelRegex = "^[[:blank:]]*(" SYMBOL_IDENTIFIER "[[:blank:]]+)?[Mm]odel" MEDIA_TYPE "?[[:blank:]]*$";
 
     /**
      * Payload Section Processor
@@ -321,15 +321,19 @@ namespace snowcrash {
         static PayloadSignature payloadSignature(const MarkdownNodeIterator& node) {
 
             mdp::ByteBuffer subject = node->children().front().text;
-            TrimString(subject);
+            mdp::ByteBuffer subjectFirstLine;
+            mdp::ByteBuffer remainingContent;
 
-            if (RegexMatch(subject, RequestRegex))
+            subjectFirstLine = GetFirstLine(subject, remainingContent);
+            TrimString(subjectFirstLine);
+
+            if (RegexMatch(subjectFirstLine, RequestRegex))
                 return RequestPayloadSignature;
 
-            if (RegexMatch(subject, ResponseRegex))
+            if (RegexMatch(subjectFirstLine, ResponseRegex))
                 return ResponsePayloadSignature;
 
-            if (RegexMatch(subject, ModelRegex))
+            if (RegexMatch(subjectFirstLine, ModelRegex))
                 return ModelPayloadSignature;
 
             return NoPayloadSignature;
@@ -375,8 +379,6 @@ namespace snowcrash {
             mdp::ByteBuffer mediaType;
             CaptureGroups captureGroups;
 
-            bool modelHasParsed = false;
-
             switch (pd.sectionContext()) {
                 case RequestSectionType:
                 case RequestBodySectionType:
@@ -390,7 +392,6 @@ namespace snowcrash {
 
                 case ModelSectionType:
                 case ModelBodySectionType:
-                    modelHasParsed = true;
                     regex = ModelRegex;
                     break;
 
@@ -443,14 +444,17 @@ namespace snowcrash {
                     return false;
                 }
 
-                out.name = captureGroups[1];
-                TrimString(out.name);
-                if(modelHasParsed){
+                if(pd.sectionContext() == ModelSectionType ||
+                   pd.sectionContext() == ModelBodySectionType){
+                    out.name = captureGroups[2];
                     mediaType = captureGroups[4];
                 }
                 else{
+                    out.name = captureGroups[1];
                     mediaType = captureGroups[3];
                 }
+
+                TrimString(out.name);
                 TrimString(mediaType);
 
                 if (!mediaType.empty()) {

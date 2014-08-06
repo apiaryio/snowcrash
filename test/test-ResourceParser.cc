@@ -455,11 +455,12 @@ TEST_CASE("Deprecated resource and action headers", "[resource]")
 TEST_CASE("bug fix for recognition of model as a part of other word or as a quote, issue #92 and #152", "[model]")
 {
     mdp::ByteBuffer source = \
-"## Resource [/resource]\n"\
-"### Attributes\n"\
-"- A\n"\
-"- Cmodel\n"\
-"- `model`\n";
+    "## Resource [/resource]\n"\
+    "### Attributes\n"\
+    "- A\n"\
+    "- Cmodel\n"\
+    "- Single data model for all exchange data\n"\
+    "- `model`\n";
 
     Resource resource;
     Report report;
@@ -469,16 +470,16 @@ TEST_CASE("bug fix for recognition of model as a part of other word or as a quot
     REQUIRE(report.warnings.size() == 0);
 
     REQUIRE(resource.name == "Resource");
-    REQUIRE(resource.description == "### Attributes\n\n- A\n\n- Cmodel\n\n- `model`\n");
+    REQUIRE(resource.description == "### Attributes\n\n- A\n\n- Cmodel\n\n- Single data model for all exchange data\n\n- `model`\n");
 }
 
 TEST_CASE("Parse resource with multi-word named model", "[resource][model]")
 {
     mdp::ByteBuffer source = \
-"# My Resource [/resource]\n\n"\
-"Awesome description\n\n"\
-"+ a really good name Model (text/plain)\n\n"\
-"        body of the `model`\n";
+    "# My Resource [/resource]\n\n"\
+    "Awesome description\n\n"\
+    "+ a really good name Model (text/plain)\n\n"\
+    "        body of the `model`\n";
 
     Resource resource;
     Report report;
