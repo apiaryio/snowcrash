@@ -101,7 +101,9 @@ namespace snowcrash {
         
         /** Resolve asset signature */
         static AssetSignature assetSignature(const MarkdownNodeIterator& node) {
-            mdp::ByteBuffer subject = node->children().front().text;
+
+            mdp::ByteBuffer remaining, subject = node->children().front().text;
+            subject = GetFirstLine(subject, remaining);
             TrimString(subject);
             
             if (RegexMatch(subject, BodyRegex))
