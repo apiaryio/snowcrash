@@ -333,3 +333,41 @@ TEST_CASE("Checking a resource with global resources for duplicates", "[blueprin
     REQUIRE(blueprint.resourceGroups[1].resources[0].actions.size() == 2);
     REQUIRE(blueprint.resourceGroups[1].resources[0].uriTemplate == "/posts");
 }
+
+TEST_CASE("Parsing unexpected blocks", "[blueprint]")
+{
+    mdp::ByteBuffer source = \
+    "FORMAT: 1A\n"\
+    "\n"\
+    "# S\n"\
+    "\n"\
+    "Hello\n"\
+    "\n"\
+    "+ Response\n"\
+    "\n"\
+    "Moar text\n"\
+    "\n"\
+    "# GET /\n";
+
+    Blueprint blueprint;
+    Report report;
+
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint, Symbols(), 0, &blueprint);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 1); // no response
+    REQUIRE(report.warnings[0].code == EmptyDefinitionWarning);
+
+    REQUIRE(blueprint.name == "S");
+    REQUIRE(blueprint.description == "Hello\n\n+ Response\n\nMoar text\n\n");
+
+    REQUIRE(blueprint.metadata.size() == 1);
+    REQUIRE(blueprint.metadata[0].first == "FORMAT");
+    REQUIRE(blueprint.metadata[0].second == "1A");
+
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].uriTemplate == "/");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].method == "GET");
+}
