@@ -177,8 +177,9 @@ namespace snowcrash {
         static bool isDescriptionNode(const MarkdownNodeIterator& node,
                                       SectionType sectionType) {
 
-            if (!HasSectionKeywordSignature(node) &&
-                !isAbbreviated(sectionType)) {
+            if (!isAbbreviated(sectionType) &&
+                (SectionKeywordSignature(node) == UndefinedSectionType)) {
+
                 return true;
             }
 
@@ -188,8 +189,9 @@ namespace snowcrash {
         static bool isContentNode(const MarkdownNodeIterator& node,
                                   SectionType sectionType) {
 
-            if (!HasSectionKeywordSignature(node) &&
-                isAbbreviated(sectionType)) {
+            if (isAbbreviated(sectionType) &&
+                (SectionKeywordSignature(node) == UndefinedSectionType)) {
+
                 return true;
             }
 
@@ -245,6 +247,16 @@ namespace snowcrash {
             }
 
             return UndefinedSectionType;
+        }
+
+        static SectionTypes nestedSectionTypes() {
+            SectionTypes nested;
+
+            nested.push_back(HeadersSectionType);
+            nested.push_back(BodySectionType);
+            nested.push_back(SchemaSectionType);
+
+            return nested;
         }
 
         static void finalize(const MarkdownNodeIterator& node,

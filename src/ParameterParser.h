@@ -139,6 +139,14 @@ namespace snowcrash {
             return SectionProcessor<Values>::sectionType(node);
         }
 
+        static SectionTypes nestedSectionTypes() {
+            SectionTypes nested;
+
+            nested.push_back(ValuesSectionType);
+
+            return nested;
+        }
+
         static void parseSignature(const mdp::MarkdownNodeIterator& node,
                                    SectionParserData& pd,
                                    mdp::ByteBuffer& signature,
