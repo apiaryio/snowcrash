@@ -69,7 +69,10 @@ namespace snowcrash {
                 if (!isAbbreviated(pd.sectionContext())) {
                     out.description = remainingContent;
                 } else if (!parseSymbolReference(node, pd, remainingContent, report, out)) {
+
+                    pd.sectionsContext.push_back(BodySectionType);
                     CodeBlockUtility::signatureContentAsCodeBlock(node, pd, report, out.body);
+                    pd.sectionsContext.pop_back();
                 }
             }
 
@@ -100,7 +103,10 @@ namespace snowcrash {
                     node->type != mdp::ParagraphMarkdownNodeType ||
                     !parseSymbolReference(node, pd, node->text, report, out)) {
 
+                    pd.sectionsContext.push_back(BodySectionType);
                     CodeBlockUtility::contentAsCodeBlock(node, pd, report, content);
+                    pd.sectionsContext.pop_back();
+
                     out.body += content;
                 }
             }
