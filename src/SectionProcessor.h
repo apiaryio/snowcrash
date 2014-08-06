@@ -19,6 +19,8 @@ namespace snowcrash {
     using mdp::MarkdownNodes;
     using mdp::MarkdownNodeIterator;
     
+    typedef Collection<SectionType>::type SectionTypes;
+
     /*
      * Forward Declarations
      */
@@ -126,9 +128,27 @@ namespace snowcrash {
         static bool isDescriptionNode(const MarkdownNodeIterator& node,
                                       SectionType sectionType) {
 
-            return  !SectionProcessor<T>::isContentNode(node, sectionType) &&
-                    SectionProcessor<T>::nestedSectionType(node) == UndefinedSectionType &&
-                    !HasSectionKeywordSignature(node);
+            if (SectionProcessor<T>::isContentNode(node, sectionType) ||
+                SectionProcessor<T>::nestedSectionType(node) != UndefinedSectionType) {
+
+                return false;
+            }
+
+            SectionType keywordSectionType = SectionKeywordSignature(node);
+
+            if (keywordSectionType == UndefinedSectionType) {
+                return true;
+            }
+
+            SectionTypes nestedTypes = SectionProcessor<T>::nestedSectionTypes();
+
+            if (std::find(nestedTypes.begin(), nestedTypes.end(), keywordSectionType) != nestedTypes.end()) {
+                // Node is a keyword defined section defined in one of the nested sections
+                // Treat it as a description
+                return true;
+            }
+
+            return false;
         }
 
         /** \return True if the node is a section-specific content node */
@@ -141,7 +161,12 @@ namespace snowcrash {
         static bool isUnexpectedNode(const MarkdownNodeIterator& node,
                                      SectionType sectionType) {
 
-            return !HasSectionKeywordSignature(node);
+            return (SectionKeywordSignature(node) == UndefinedSectionType);
+        }
+
+        /** \return Nested sections of the section */
+        static SectionTypes nestedSectionTypes() {
+            return SectionTypes();
         }
 
         /** \return %SectionType of the node */
