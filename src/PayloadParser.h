@@ -13,6 +13,7 @@
 #include "RegexMatch.h"
 #include "AssetParser.h"
 #include "HeadersParser.h"
+#include "ParametersParser.h"
 
 /** Media type in brackets regex */
 #define MEDIA_TYPE "([[:blank:]]*\\(([^\\)]*)\\))"
@@ -184,7 +185,7 @@ namespace snowcrash {
                                       SectionType sectionType) {
 
             if (!isAbbreviated(sectionType) &&
-                (SectionKeywordSignature(node) == UndefinedSectionType)) {
+                SectionProcessorBase<Payload>::isDescriptionNode(node, sectionType)) {
 
                 return true;
             }
@@ -256,11 +257,16 @@ namespace snowcrash {
         }
 
         static SectionTypes nestedSectionTypes() {
-            SectionTypes nested;
+            SectionTypes nested, types;
 
             nested.push_back(HeadersSectionType);
             nested.push_back(BodySectionType);
             nested.push_back(SchemaSectionType);
+
+            // Parameters & descendants
+            nested.push_back(ParametersSectionType);
+            types = SectionProcessor<Parameters>::nestedSectionTypes();
+            nested.insert(nested.end(), types.begin(), types.end());
 
             return nested;
         }
