@@ -47,8 +47,12 @@ namespace snowcrash {
             if (!remainingContent.empty()) {
 
                 // WARN: Extra content in parameters section
+                std::stringstream ss;
+                ss << "ignoring additional content after 'parameters' keyword,";
+                ss << " expected a nested list of parameters, one parameter per list item";
+
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                report.warnings.push_back(Warning("additional content in parameters sections",
+                report.warnings.push_back(Warning(ss.str(),
                                                   IgnoringWarning,
                                                   sourceMap));
             }
@@ -112,7 +116,9 @@ namespace snowcrash {
             if (node->type == mdp::ListItemMarkdownNodeType
                 && !node->children().empty()) {
 
-                mdp::ByteBuffer subject = node->children().front().text;
+                mdp::ByteBuffer remaining, subject = node->children().front().text;
+
+                subject = GetFirstLine(subject, remaining);
                 TrimString(subject);
 
                 if (RegexMatch(subject, ParametersRegex)) {
@@ -148,8 +154,8 @@ namespace snowcrash {
 
                 // WARN: No parameters defined
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                report.warnings.push_back(Warning("No parameters defined in parameters section",
-                                                  EmptyDefinitionWarning,
+                report.warnings.push_back(Warning(NoParametersMessage,
+                                                  FormattingWarning,
                                                   sourceMap));
             }
         }
