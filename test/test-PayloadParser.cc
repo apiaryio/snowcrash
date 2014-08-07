@@ -481,3 +481,23 @@ TEST_CASE("Empty body section should shouldn't be parsed as description", "[payl
 
     REQUIRE(payload.body == "");
 }
+
+TEST_CASE("Parameters section should be taken as a description node", "[payload]")
+{
+    mdp::ByteBuffer source = \
+    "+ Response 200\n\n"\
+    "    + Parameters\n\n"\
+    "        + id (string)\n\n"\
+    "    + Body\n\n"\
+    "            {}\n";
+
+    Payload payload;
+    Report report;
+    SectionParserHelper<Payload, PayloadParser>::parse(source, ResponseSectionType, report, payload);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.empty());
+
+    REQUIRE(payload.description == "+ Parameters\n\n    + id (string)\n");
+    REQUIRE(payload.body == "{}\n");
+}
