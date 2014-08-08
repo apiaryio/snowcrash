@@ -222,7 +222,7 @@ namespace snowcrash {
 
                 // WARN: Dangling asset
                 std::stringstream ss;
-                ss << "Dangling message-body asset, expected a pre-formatted code block, ";
+                ss << "dangling message-body asset, expected a pre-formatted code block, ";
                 ss << "indent every of it's line by " << level*4 << " spaces or " << level << " tabs";
 
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
