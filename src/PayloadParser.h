@@ -71,6 +71,8 @@ namespace snowcrash {
                     out.description = remainingContent;
                 } else if (!parseSymbolReference(node, pd, remainingContent, report, out)) {
 
+                    // NOTE: NOT THE CORRECT WAY TO DO THIS
+                    // https://github.com/apiaryio/snowcrash/commit/a7c5868e62df0048a85e2f9aeeb42c3b3e0a2f07#commitcomment-7322085
                     pd.sectionsContext.push_back(BodySectionType);
                     CodeBlockUtility::signatureContentAsCodeBlock(node, pd, report, out.body);
                     pd.sectionsContext.pop_back();
@@ -104,6 +106,8 @@ namespace snowcrash {
                     node->type != mdp::ParagraphMarkdownNodeType ||
                     !parseSymbolReference(node, pd, node->text, report, out)) {
 
+                    // NOTE: NOT THE CORRECT WAY TO DO THIS
+                    // https://github.com/apiaryio/snowcrash/commit/a7c5868e62df0048a85e2f9aeeb42c3b3e0a2f07#commitcomment-7322085
                     pd.sectionsContext.push_back(BodySectionType);
                     CodeBlockUtility::contentAsCodeBlock(node, pd, report, content);
                     pd.sectionsContext.pop_back();
