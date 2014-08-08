@@ -13,6 +13,7 @@
 #include "RegexMatch.h"
 #include "AssetParser.h"
 #include "HeadersParser.h"
+#include "ParametersParser.h"
 
 /** Media type in brackets regex */
 #define MEDIA_TYPE "([[:blank:]]*\\(([^\\)]*)\\))"
@@ -69,7 +70,12 @@ namespace snowcrash {
                 if (!isAbbreviated(pd.sectionContext())) {
                     out.description = remainingContent;
                 } else if (!parseSymbolReference(node, pd, remainingContent, report, out)) {
+
+                    // NOTE: NOT THE CORRECT WAY TO DO THIS
+                    // https://github.com/apiaryio/snowcrash/commit/a7c5868e62df0048a85e2f9aeeb42c3b3e0a2f07#commitcomment-7322085
+                    pd.sectionsContext.push_back(BodySectionType);
                     CodeBlockUtility::signatureContentAsCodeBlock(node, pd, report, out.body);
+                    pd.sectionsContext.pop_back();
                 }
             }
 
@@ -100,7 +106,12 @@ namespace snowcrash {
                     node->type != mdp::ParagraphMarkdownNodeType ||
                     !parseSymbolReference(node, pd, node->text, report, out)) {
 
+                    // NOTE: NOT THE CORRECT WAY TO DO THIS
+                    // https://github.com/apiaryio/snowcrash/commit/a7c5868e62df0048a85e2f9aeeb42c3b3e0a2f07#commitcomment-7322085
+                    pd.sectionsContext.push_back(BodySectionType);
                     CodeBlockUtility::contentAsCodeBlock(node, pd, report, content);
+                    pd.sectionsContext.pop_back();
+
                     out.body += content;
                 }
             }
@@ -178,7 +189,7 @@ namespace snowcrash {
                                       SectionType sectionType) {
 
             if (!isAbbreviated(sectionType) &&
-                (SectionKeywordSignature(node) == UndefinedSectionType)) {
+                SectionProcessorBase<Payload>::isDescriptionNode(node, sectionType)) {
 
                 return true;
             }
@@ -250,11 +261,16 @@ namespace snowcrash {
         }
 
         static SectionTypes nestedSectionTypes() {
-            SectionTypes nested;
+            SectionTypes nested, types;
 
             nested.push_back(HeadersSectionType);
             nested.push_back(BodySectionType);
             nested.push_back(SchemaSectionType);
+
+            // Parameters & descendants
+            nested.push_back(ParametersSectionType);
+            types = SectionProcessor<Parameters>::nestedSectionTypes();
+            nested.insert(nested.end(), types.begin(), types.end());
 
             return nested;
         }

@@ -223,11 +223,6 @@ namespace snowcrash {
         static SectionTypes nestedSectionTypes() {
             SectionTypes nested, types;
 
-            // Parameters & descendants
-            nested.push_back(ParametersSectionType);
-            types = SectionProcessor<Parameters>::nestedSectionTypes();
-            nested.insert(nested.end(), types.begin(), types.end());
-
             // Payload & descendants
             nested.push_back(ResponseBodySectionType);
             nested.push_back(ResponseSectionType);

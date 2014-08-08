@@ -101,8 +101,8 @@ namespace snowcrash {
 
                 // WARN: No headers defined
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                report.warnings.push_back(Warning("No headers defined in headers section",
-                                                  EmptyDefinitionWarning,
+                report.warnings.push_back(Warning("no headers specified",
+                                                  FormattingWarning,
                                                   sourceMap));
             }
         }
