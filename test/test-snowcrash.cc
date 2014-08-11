@@ -283,3 +283,18 @@ TEST_CASE("Parse adjacent nested asset blocks", "[parser][#9]")
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body == "A\nB\nC\n\n");
 }
+
+TEST_CASE("Exception while parsing a blueprint with leading empty space", "[regression][parser][now]")
+{
+    mdp::ByteBuffer source = \
+    "\n"\
+    "# PUT /branch\n";
+    
+    Blueprint blueprint;
+    Report report;
+    
+    REQUIRE_NOTHROW(parse(source, 0, report, blueprint));
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(report.warnings[0].code == EmptyDefinitionWarning);
+}
