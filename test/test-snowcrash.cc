@@ -284,7 +284,7 @@ TEST_CASE("Parse adjacent nested asset blocks", "[parser][#9]")
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body == "A\nB\nC\n\n");
 }
 
-TEST_CASE("Exception while parsing a blueprint with leading empty space", "[regression][parser][now]")
+TEST_CASE("Exception while parsing a blueprint with leading empty space", "[regression][parser]")
 {
     mdp::ByteBuffer source = \
     "\n"\
@@ -297,4 +297,21 @@ TEST_CASE("Exception while parsing a blueprint with leading empty space", "[regr
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 1);
     REQUIRE(report.warnings[0].code == EmptyDefinitionWarning);
+}
+
+TEST_CASE("Invalid source map without closing newline", "[regression][parser]")
+{
+    mdp::ByteBuffer source = \
+    "# PUT /branch";
+    
+    Blueprint blueprint;
+    Report report;
+    
+    REQUIRE_NOTHROW(parse(source, 0, report, blueprint));
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(report.warnings[0].code == EmptyDefinitionWarning);
+    REQUIRE(report.warnings[0].location.size() == 1);
+    REQUIRE(report.warnings[0].location[0].location == 0);
+    REQUIRE(report.warnings[0].location[0].length == 13);
 }
