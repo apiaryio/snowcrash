@@ -36,6 +36,7 @@ namespace mdp {
         MarkdownNode* m_workingNode;
         bool m_listBlockContext;
         const ByteBuffer* m_source;
+        size_t m_sourceLength;
         
         static const size_t OutputUnitSize;
         static const size_t MaxNesting;

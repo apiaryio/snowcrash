@@ -30,10 +30,16 @@ static size_t strnlen_utf8(const char* s, size_t len)
 /* Convert range of bytes to a range of characters */
 static CharactersRange BytesRangeToCharactersRange(const BytesRange& bytesRange, const ByteBuffer& byteBuffer)
 {
-    if (byteBuffer.empty() ||
-        bytesRange.location + bytesRange.length > byteBuffer.length())
+    if (byteBuffer.empty()) {
         return CharactersRange();
+    }
     
+    BytesRange workRange = bytesRange;
+    if (bytesRange.location + bytesRange.length > byteBuffer.length()) {
+        // Accomodate maximum possible length
+        workRange.length -= bytesRange.location + bytesRange.length - byteBuffer.length();
+    }
+
     size_t charLocation = 0;
     if (bytesRange.location > 0)
         charLocation = strnlen_utf8(byteBuffer.c_str(), bytesRange.location);

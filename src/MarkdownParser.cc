@@ -31,7 +31,7 @@ static ByteBuffer ByteBufferFromSundown(const struct buf *text)
 }
 
 MarkdownParser::MarkdownParser()
-: m_workingNode(NULL), m_listBlockContext(false), m_source(NULL)
+: m_workingNode(NULL), m_listBlockContext(false), m_source(NULL), m_sourceLength(0)
 {
 }
 
@@ -42,6 +42,7 @@ void MarkdownParser::parse(const ByteBuffer& source, MarkdownNode& ast)
     m_workingNode->type = RootMarkdownNodeType;
     m_workingNode->sourceMap.push_back(BytesRange(0, source.length()));
     m_source = &source;
+    m_sourceLength = source.length();
     m_listBlockContext = false;    
     
     RenderCallbacks callbacks = renderCallbacks();
@@ -56,6 +57,7 @@ void MarkdownParser::parse(const ByteBuffer& source, MarkdownNode& ast)
     
     m_workingNode = NULL;
     m_source = NULL;
+    m_sourceLength = 0;
     m_listBlockContext = false;
     
 #ifdef DEBUG
@@ -329,7 +331,7 @@ void MarkdownParser::blockDidParse(const src_map* map, const uint8_t *txt_data, 
 void MarkdownParser::blockDidParse(const BytesRangeSet& sourceMap)
 {
     if (m_listBlockContext) {
-        m_listBlockContext = false; // Ingore list blocks events
+        m_listBlockContext = false; // ignore list blocks events
         return;
     }
     
@@ -340,7 +342,26 @@ void MarkdownParser::blockDidParse(const BytesRangeSet& sourceMap)
         return;
     
     MarkdownNode &lMarkdownNode = m_workingNode->children().back();
-    lMarkdownNode.sourceMap.append(sourceMap);
+
+    // Sundown +1 newline compensation
+    //
+    // If new source map would exceed the actual source size
+    // this happens when sundown appends an artifical new line
+    // truncate the source map length to match the actual size
+    if (sourceMap.back().location + sourceMap.back().length > m_sourceLength) {
+        
+        size_t workMapLength = m_sourceLength - sourceMap.back().location;
+        if (!workMapLength)
+            return; // Ignore any artifical trailing new lines in source maps
+        
+        BytesRangeSet workMap = sourceMap;
+        workMap.back().length = workMapLength;
+        lMarkdownNode.sourceMap.append(workMap);
+    }
+    else {
+
+        lMarkdownNode.sourceMap.append(sourceMap);
+    }
     
     // No "inline" list items:
     // Share the list item source map with its artifical node, if exists.

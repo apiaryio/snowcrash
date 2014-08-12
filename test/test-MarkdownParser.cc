@@ -547,3 +547,29 @@ TEST_CASE("Source map crash", "[parser][sourcemap][issue][snowcrash][62]")
     REQUIRE(ast.data == 0);
     REQUIRE(ast.children().size() == 2);
 }
+
+TEST_CASE("Map node without trailing newline", "[parser][sourcemap]")
+{
+    MarkdownParser parser;
+    MarkdownNode ast;
+    
+    ByteBuffer src = "# Hello World";
+    
+    parser.parse(src, ast);
+    
+    REQUIRE(ast.type == RootMarkdownNodeType);
+    REQUIRE(ast.text.empty());
+    REQUIRE(ast.data == 0);
+    REQUIRE(ast.children().size() == 1);
+    REQUIRE(ast.sourceMap.size() == 1);
+    REQUIRE(ast.sourceMap[0].location == 0);
+    REQUIRE(ast.sourceMap[0].length == 13);
+    
+    MarkdownNode& node = ast.children().front();
+    REQUIRE(node.type == HeaderMarkdownNodeType);
+    REQUIRE(node.text == "Hello World");
+    REQUIRE(node.children().empty());
+    REQUIRE(node.sourceMap.size() == 1);
+    REQUIRE(node.sourceMap[0].location == 0);
+    REQUIRE(node.sourceMap[0].length == 13);
+}

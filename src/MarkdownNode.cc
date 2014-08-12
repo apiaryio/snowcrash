@@ -127,7 +127,17 @@ void MarkdownNode::printNode(size_t level) const
     }
     
     cout << " (type " << type << ", data " << data << ") - ";
-    cout << "`" << text << "` ";
+    cout << "`" << text << "`";
+    
+    if (!sourceMap.empty()) {
+        for (mdp::BytesRangeSet::const_iterator it = sourceMap.begin();
+             it != sourceMap.end();
+             ++it) {
+            std::cout << ((it == sourceMap.begin()) ? " :" : ";");
+            std::cout << it->location << ":" << it->length;
+        }
+    }
+    
     cout << std::endl;
     
     for (MarkdownNodeIterator it = m_children->begin();
