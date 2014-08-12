@@ -573,3 +573,56 @@ TEST_CASE("Map node without trailing newline", "[parser][sourcemap]")
     REQUIRE(node.sourceMap[0].location == 0);
     REQUIRE(node.sourceMap[0].length == 13);
 }
+
+TEST_CASE("Multi-paragraph list item source map", "[parser][sourcemap]")
+{
+    MarkdownParser parser;
+    MarkdownNode ast;
+
+    // List item with two paragraphs & lazy indentation:
+    //
+    //+   Lorem ipsum
+    //dolor sit amet
+    //
+    //    consectetur
+    //adipiscing elit
+    
+    ByteBuffer src = \
+    "+   Lorem ipsum\n"\
+    "dolor sit amet\n"\
+    "\n"\
+    "    consectetur\n"\
+    "adipiscing elit\n";
+    
+    parser.parse(src, ast);
+    
+    REQUIRE(ast.type == RootMarkdownNodeType);
+    REQUIRE(ast.text.empty());
+    REQUIRE(ast.data == 0);
+    REQUIRE(ast.children().size() == 1);
+    REQUIRE(ast.sourceMap.size() == 1);
+    REQUIRE(ast.sourceMap[0].location == 0);
+    REQUIRE(ast.sourceMap[0].length == 64);
+    
+    MarkdownNode& node = ast.children().front();
+    REQUIRE(node.type == ListItemMarkdownNodeType);
+    REQUIRE(node.children().size() == 2);
+    REQUIRE(node.sourceMap.size() == 1);
+    REQUIRE(node.sourceMap[0].location == 0);
+    REQUIRE(node.sourceMap[0].length == 64);
+
+    MarkdownNode& p1 = node.children().front();
+    REQUIRE(p1.text == "  Lorem ipsum\ndolor sit amet");
+    REQUIRE(p1.children().empty());
+    REQUIRE(p1.sourceMap.size() == 1);
+    REQUIRE(p1.sourceMap[0].location == 2);
+    REQUIRE(p1.sourceMap[0].length == 30);
+    
+    MarkdownNode& p2 = node.children().back();
+    REQUIRE(p2.text == "consectetur\nadipiscing elit");
+    REQUIRE(p2.children().empty());
+    REQUIRE(p2.sourceMap.size() == 1);
+    REQUIRE(p2.sourceMap[0].location == 36);
+    REQUIRE(p2.sourceMap[0].length == 28);
+}
+
