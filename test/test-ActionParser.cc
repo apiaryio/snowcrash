@@ -368,3 +368,29 @@ TEST_CASE("Warn when request is not followed by a response", "[action]")
     REQUIRE(action.examples[1].requests.size() == 1);
     REQUIRE(action.examples[1].responses.size() == 0);
 }
+
+TEST_CASE("Parse the whole body even when there are multiple nodes with different indentation", "[action]")
+{
+    mdp::ByteBuffer source = \
+    "# GET /1\n"\
+    "+ Response 200\n"\
+    "{\n\n"\
+    "    time_connection_int\n"\
+    "}\n";
+
+    Action action;
+    Report report;
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, report, action);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 2);
+    REQUIRE(report.warnings[0].code == IndentationWarning);
+    REQUIRE(report.warnings[1].code == IndentationWarning);
+
+    REQUIRE(action.examples.size() == 1);
+    REQUIRE(action.examples[0].requests.size() == 0);
+    REQUIRE(action.examples[0].responses.size() == 1);
+    REQUIRE(action.examples[0].responses[0].name == "200");
+    REQUIRE(action.examples[0].responses[0].description.empty());
+    REQUIRE(action.examples[0].responses[0].body == "{\n\n    time_connection_int\n}\n");
+}
