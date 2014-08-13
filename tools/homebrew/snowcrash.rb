@@ -6,6 +6,7 @@ class Snowcrash < Formula
 
   def install
     system "./configure"
-    system "make", "install"
+    system "make", "snowcrash"
+    bin.install Dir["bin/snowcrash"]
   end
 end
