@@ -320,3 +320,31 @@ TEST_CASE("Full syntax - Extra indentation", "[indentation]")
     REQUIRE(action.examples[0].responses[0].name == "200");
     REQUIRE(action.examples[0].responses[0].body == "+ Body\n\n        { ... }\n");
 }
+
+TEST_CASE("No Indentation & No Newline multi-line", "[indentation]")
+{
+    mdp::ByteBuffer source = \
+    "## GET /1\n"\
+    "+ Response 200\n"\
+    "{\n"\
+    "\n"\
+    "    Hello\n"\
+    "}\n";
+    
+    Action action;
+    Report report;
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, report, action);
+    
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 2);
+    REQUIRE(report.warnings[0].code == IndentationWarning);
+    ReportDebugMessage(report.warnings[0].message);
+    
+    REQUIRE(report.warnings[1].code == IndentationWarning);
+    ReportDebugMessage(report.warnings[1].message);
+    
+    REQUIRE(action.examples.size() == 1);
+    REQUIRE(action.examples[0].responses.size() == 1);
+    REQUIRE(action.examples[0].responses[0].name == "200");
+    REQUIRE(action.examples[0].responses[0].body == "{\nHello\n}\n");
+}
