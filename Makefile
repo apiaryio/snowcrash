@@ -56,7 +56,7 @@ ifdef INTEGRATION_TESTS
 endif
 
 perf: perf-libsnowcrash
-	$(BUILD_DIR)/out/$(BUILDTYPE)/perf-libsnowcrash ./test/performance/fixtures/fixture-1.md
+	$(BUILD_DIR)/out/$(BUILDTYPE)/perf-libsnowcrash ./test/performance/fixtures/fixture-1.apib
 
 install: snowcrash
 	cp -f $(BUILD_DIR)/out/$(BUILDTYPE)/snowcrash $(DESTDIR)/snowcrash
