@@ -27,11 +27,11 @@ TEST_CASE("Parse simple blueprint with C interface", "[cinterface]")
     "\n"\
     "## Message [/message]\n";
 
-    sc_report_s* result;
+    sc_report_s* report;
     sc_blueprint_t* blueprint;
-    sc_c_parse(source.c_str(), 0, &result, &blueprint);
+    sc_c_parse(source.c_str(), 0, &report, &blueprint);
 
-    const sc_warnings_t* warns = sc_warnings_handler(result);
+    const sc_warnings_t* warns = sc_warnings_handler(report);
     REQUIRE(sc_warnings_size(warns) == 1);
 
     const sc_warning_t* warn = sc_warning_handler(warns, 0);
@@ -79,5 +79,5 @@ TEST_CASE("Parse simple blueprint with C interface", "[cinterface]")
     REQUIRE(std::string(sc_header_value(header)) == "text/plain");
 
     sc_blueprint_free(blueprint);
-    sc_report_free(result);
+    sc_report_free(report);
 }

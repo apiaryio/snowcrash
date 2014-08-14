@@ -17,7 +17,7 @@
 extern "C" {
 #endif
 
-    /** Class Result wrapper */
+    /** Class Report wrapper */
     struct sc_report_s;
     typedef struct sc_report_s sc_report_t;
 
@@ -47,7 +47,7 @@ extern "C" {
     SC_API sc_report_t* sc_report_new();
 
     /** \deallocate Report from pointer*/
-    SC_API void sc_report_free(sc_report_t* result);
+    SC_API void sc_report_free(sc_report_t* report);
 
     /*----------------------------------------------------------------------*/
 
@@ -66,7 +66,7 @@ extern "C" {
     /*----------------------------------------------------------------------*/
 
     /** \returns error handler*/
-    SC_API const sc_error_t* sc_error_handler(const sc_report_t* result);
+    SC_API const sc_error_t* sc_error_handler(const sc_report_t* report);
 
     /** \returns error message*/
     SC_API const char* sc_error_message(const sc_error_t* error);
@@ -80,7 +80,7 @@ extern "C" {
     /*----------------------------------------------------------------------*/
 
     /** \returns warnings handler*/
-    SC_API const sc_warnings_t* sc_warnings_handler(const sc_report_t* result);
+    SC_API const sc_warnings_t* sc_warnings_handler(const sc_report_t* report);
 
     /** \returns warnings array size*/
     SC_API size_t sc_warnings_size(const sc_warnings_t* warning);

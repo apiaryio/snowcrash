@@ -34,9 +34,9 @@ snowcrash::SourceData blueprint = R"(
 
         Hello World!
 )";
-snowcrash::Result result;
+snowcrash::Report report;
 snowcrash::Blueprint ast;
-snowcrash::parse(blueprint, 0, result, ast);
+snowcrash::parse(blueprint, 0, report, ast);
 
 std::cout << "API Name: " << ast.name << std::endl;
 ```
