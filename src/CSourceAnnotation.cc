@@ -16,9 +16,9 @@ SC_API sc_report_t* sc_report_new()
     return AS_TYPE(sc_report_t, ::new snowcrash::Report);
 }
 
-SC_API void sc_report_free(sc_report_t* result)
+SC_API void sc_report_free(sc_report_t* report)
 {
-    ::delete AS_TYPE(snowcrash::Report, result);
+    ::delete AS_TYPE(snowcrash::Report, report);
 }
 
 /*----------------------------------------------------------------------*/
@@ -57,9 +57,9 @@ SC_API size_t sc_location_location(const sc_location_t* location, size_t index)
 
 /*----------------------------------------------------------------------*/
 
-SC_API const sc_error_t* sc_error_handler(const sc_report_t* result)
+SC_API const sc_error_t* sc_error_handler(const sc_report_t* report)
 {
-    const snowcrash::Report* p = AS_CTYPE(snowcrash::Report, result);
+    const snowcrash::Report* p = AS_CTYPE(snowcrash::Report, report);
     if(!p)
         return NULL;
     return AS_CTYPE(sc_error_t, &p->error);
@@ -91,9 +91,9 @@ SC_API int sc_error_ok(const sc_error_t* error)
 
 /*----------------------------------------------------------------------*/
 
-SC_API const sc_warnings_t* sc_warnings_handler(const sc_report_t* result)
+SC_API const sc_warnings_t* sc_warnings_handler(const sc_report_t* report)
 {
-    const snowcrash::Report* p = AS_CTYPE(snowcrash::Report, result);
+    const snowcrash::Report* p = AS_CTYPE(snowcrash::Report, report);
     if(!p)
         return NULL;
     return AS_CTYPE(sc_warnings_t, &p->warnings);
