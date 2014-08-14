@@ -20,6 +20,8 @@
 		BB8C3E7419241C1600EF36FA /* Section.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB8C3E7319241C1600EF36FA /* Section.cc */; };
 		BB92D891178EF7C10098A63C /* HTTP.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB92D890178EF7C10098A63C /* HTTP.cc */; };
 		BBA25671172BFEB800C1AD5E /* snowcrash.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA25670172BFEB800C1AD5E /* snowcrash.cc */; };
+		BBA35FB7199C359300B7C726 /* libmarkdownparser.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB8C3E701923F09900EF36FA /* libmarkdownparser.a */; };
+		BBA35FB8199C35A300B7C726 /* libmarkdownparser.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB8C3E701923F09900EF36FA /* libmarkdownparser.a */; };
 		BBA91DC2171D402600649B05 /* BlueprintParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA91DC0171D402600649B05 /* BlueprintParser.h */; };
 		BBB0F42A1731CE0D00C92465 /* RegexMatch.h in Headers */ = {isa = PBXBuildFile; fileRef = BBB0F4281731CE0D00C92465 /* RegexMatch.h */; };
 		BBB127881999700E0041E9AE /* test-ResourceGroupParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB127871999700E0041E9AE /* test-ResourceGroupParser.cc */; };
@@ -70,13 +72,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		BB05B9DC18044CA100243E1B /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = BBFF4890170B34E6001E5FB2 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = BBFF4897170B34E6001E5FB2;
-			remoteInfo = libsnowcrash;
-		};
 		BB4D8E55172D15AA0024EB04 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = BBFF4890170B34E6001E5FB2 /* Project object */;
@@ -85,6 +80,13 @@
 			remoteInfo = libsnowcrash;
 		};
 		BB8C3E6D1923F06E00EF36FA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BBFF4890170B34E6001E5FB2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BBFF4897170B34E6001E5FB2;
+			remoteInfo = libsnowcrash;
+		};
+		BBA35FB5199C34E600B7C726 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = BBFF4890170B34E6001E5FB2 /* Project object */;
 			proxyType = 1;
@@ -206,6 +208,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BBA35FB7199C359300B7C726 /* libmarkdownparser.a in Frameworks */,
 				BB05B9D918044C8200243E1B /* libsnowcrash.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -214,6 +217,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BBA35FB8199C35A300B7C726 /* libmarkdownparser.a in Frameworks */,
 				BB4D8E57172D15CA0024EB04 /* libsnowcrash.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -413,7 +417,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				BB05B9DD18044CA100243E1B /* PBXTargetDependency */,
+				BBA35FB6199C34E600B7C726 /* PBXTargetDependency */,
 			);
 			name = "perf-libsnowcrash";
 			productName = "perf-snowcrash";
@@ -568,11 +572,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		BB05B9DD18044CA100243E1B /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = BBFF4897170B34E6001E5FB2 /* libsnowcrash */;
-			targetProxy = BB05B9DC18044CA100243E1B /* PBXContainerItemProxy */;
-		};
 		BB4D8E56172D15AA0024EB04 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = BBFF4897170B34E6001E5FB2 /* libsnowcrash */;
@@ -583,28 +582,21 @@
 			target = BBFF4897170B34E6001E5FB2 /* libsnowcrash */;
 			targetProxy = BB8C3E6D1923F06E00EF36FA /* PBXContainerItemProxy */;
 		};
+		BBA35FB6199C34E600B7C726 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BBFF4897170B34E6001E5FB2 /* libsnowcrash */;
+			targetProxy = BBA35FB5199C34E600B7C726 /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		BB05B9D4180448E300243E1B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
+				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/snowcrash-etyympsdikhephgzkvczxkaprkpp/Build/Products/Debug",
 				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNUSED_FUNCTION = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -612,17 +604,10 @@
 		BB05B9D5180448E300243E1B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				ENABLE_NS_ASSERTIONS = NO;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNUSED_FUNCTION = YES;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/snowcrash-etyympsdikhephgzkvczxkaprkpp/Build/Products/Debug",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -630,6 +615,10 @@
 		BBA2566D172BFE4C00C1AD5E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/snowcrash-etyympsdikhephgzkvczxkaprkpp/Build/Products/Debug",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -637,6 +626,10 @@
 		BBA2566E172BFE4C00C1AD5E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/snowcrash-etyympsdikhephgzkvczxkaprkpp/Build/Products/Debug",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
