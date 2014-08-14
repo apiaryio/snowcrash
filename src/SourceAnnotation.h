@@ -134,7 +134,7 @@ namespace snowcrash {
     typedef std::vector<Warning> Warnings;
     
     /**
-     *  \brief A parsing result Report.
+     *  \brief A parsing report Report.
      *
      *  Result of a source data parsing operation.
      *  Composed of ONE error source annotation
