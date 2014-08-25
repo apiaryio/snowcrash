@@ -30,7 +30,7 @@ TEST_CASE("Parse simple blueprint with C interface", "[cinterface]")
     sc_report_s* report;
     sc_blueprint_t* blueprint;
 
-    sc_c_parse(blueprintSource.c_str(), SC_REQUIRE_BLUEPRINT_NAME_OPTION, &report, &blueprint);
+    sc_c_parse(source.c_str(), SC_REQUIRE_BLUEPRINT_NAME_OPTION, &report, &blueprint);
 
     const sc_warnings_t* warns = sc_warnings_handler(report);
     REQUIRE(sc_warnings_size(warns) == 1);
@@ -106,9 +106,9 @@ TEST_CASE("Parse blueprint with multiple requests and responses via C interface"
 "        200-B\n"\
 "\n";
 
-    sc_result_s* result;
+    sc_report_s* report;
     sc_blueprint_t* blueprint;
-    sc_c_parse(blueprintSource.c_str(), SC_RENDER_DESCRIPTIONS_OPTION, &result, &blueprint);
+    sc_c_parse(blueprintSource.c_str(), SC_RENDER_DESCRIPTIONS_OPTION, &report, &blueprint);
 
     const sc_resource_groups_collection_t* res_gr_col = sc_resource_groups_collection_handle(blueprint);
     const sc_resource_groups_t* res_gr = sc_resource_groups_handle(res_gr_col, 0);
@@ -158,9 +158,9 @@ TEST_CASE("CBlueprint issue on sc_resource_groups_handle", "[cinterface]")
 "        B2\n"\
 "\n";
 
-    sc_result_s* result;
+    sc_report_s* report;
     sc_blueprint_t* blueprint;
-    sc_c_parse(blueprintSource.c_str(), 0, &result, &blueprint);
+    sc_c_parse(blueprintSource.c_str(), 0, &report, &blueprint);
 
     const sc_resource_groups_collection_t* res_gr_col = sc_resource_groups_collection_handle(blueprint);
     const sc_resource_groups_t* res_gr1 = sc_resource_groups_handle(res_gr_col, 0);
