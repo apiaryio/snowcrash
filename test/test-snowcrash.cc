@@ -315,3 +315,51 @@ TEST_CASE("Invalid source map without closing newline", "[regression][parser]")
     REQUIRE(report.warnings[0].location[0].location == 0);
     REQUIRE(report.warnings[0].location[0].length == 13);
 }
+
+TEST_CASE("Warn about missing API name if there is an API description", "[parser][regression]")
+{
+    mdp::ByteBuffer source = \
+    "Hello World\n";
+    
+    Blueprint blueprint;
+    Report report;
+    
+    parse(source, 0, report, blueprint);
+    
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(report.warnings[0].code == APINameWarning);
+    
+    REQUIRE(blueprint.name.empty());
+    REQUIRE(blueprint.description == "Hello World\n");
+    REQUIRE(blueprint.resourceGroups.empty());
+    
+    mdp::ByteBuffer source2 = \
+    "# API\n"\
+    "Hello World\n";
+    
+    Blueprint blueprint2;
+    Report report2;
+    
+    parse(source2, 0, report2, blueprint2);
+    
+    REQUIRE(report2.error.code == Error::OK);
+    REQUIRE(report2.warnings.empty());
+    
+    REQUIRE(blueprint2.name == "API");
+    REQUIRE(blueprint2.description == "Hello World\n");
+    REQUIRE(blueprint2.resourceGroups.empty());
+
+    mdp::ByteBuffer source3 = \
+    "# POST /1\n"\
+    "+ Response 201";
+    
+    Blueprint blueprint3;
+    Report report3;
+    
+    parse(source3, 0, report3, blueprint3);
+    
+    REQUIRE(report3.error.code == Error::OK);
+    REQUIRE(report3.warnings.empty());
+}
+
