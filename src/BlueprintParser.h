@@ -161,15 +161,24 @@ namespace snowcrash {
                              SectionParserData& pd,
                              Report& report,
                              Blueprint& out) {
+            
+            if (!out.name.empty())
+                return;
 
-            if (out.name.empty() &&
-                (pd.options & RequireBlueprintNameOption)) {
+            if (pd.options & RequireBlueprintNameOption) {
 
                 // ERR: No API name specified
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
                 report.error = Error(ExpectedAPINameMessage,
                                      BusinessError,
                                      sourceMap);
+                
+            }
+            else if (!out.description.empty()) {
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                report.warnings.push_back(Warning(ExpectedAPINameMessage,
+                                                  APINameWarning,
+                                                  sourceMap));
             }
         }
 

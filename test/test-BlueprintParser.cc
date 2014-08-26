@@ -146,7 +146,8 @@ TEST_CASE("Parse nameless blueprint description", "[blueprint]")
     SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
 
     REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(report.warnings.size());
+    REQUIRE(report.warnings[0].code == APINameWarning);
 
     REQUIRE(blueprint.name.empty());
     REQUIRE(blueprint.description == "A\n\n# B\n");
@@ -162,7 +163,8 @@ TEST_CASE("Parse nameless blueprint with a list description", "[blueprint]")
     SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
 
     REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(report.warnings[0].code == APINameWarning);
 
     REQUIRE(blueprint.name.empty());
     REQUIRE(blueprint.description == "+ List\n");
@@ -206,7 +208,8 @@ TEST_CASE("Test parser options - required blueprint name", "[blueprint]")
 
     SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
     REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(report.warnings[0].code == APINameWarning);
 
     SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint, Symbols(), RequireBlueprintNameOption);
     REQUIRE(report.error.code != Error::OK);
