@@ -68,7 +68,9 @@ namespace snowcrash {
             if (pd.sectionContext() == ResourceSectionType) {
 
                 Resource resource;
-                MarkdownNodeIterator cur = ResourceParser::parse(node, siblings, pd, report, resource);
+                ResourceSM resourceSM;
+
+                MarkdownNodeIterator cur = ResourceParser::parse(node, siblings, pd, report, resource, resourceSM);
 
                 ResourceIterator duplicate = findResource(out.resources, resource);
                 ResourceIteratorPair globalDuplicate;
@@ -124,7 +126,7 @@ namespace snowcrash {
                 return ++MarkdownNodeIterator(node);
             }
 
-            return SectionProcessorBase<ResourceGroup>::processUnexpectedNode(node, siblings, pd, lastSectionType, report, out);
+            return SectionProcessorBase<ResourceGroup, ResourceGroupSM>::processUnexpectedNode(node, siblings, pd, lastSectionType, report, out, outSM);
         }
 
         static SectionType sectionType(const MarkdownNodeIterator& node) {
@@ -179,7 +181,7 @@ namespace snowcrash {
                 return true;
             }
 
-            return SectionProcessorBase<ResourceGroup>::isUnexpectedNode(node, sectionType);
+            return SectionProcessorBase<ResourceGroup, ResourceGroupSM>::isUnexpectedNode(node, sectionType);
         }
 
         /** Finds a resource inside an resources collection */

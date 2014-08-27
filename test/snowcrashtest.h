@@ -17,7 +17,7 @@ namespace snowcrashtest {
 
     typedef std::vector<snowcrash::ResourceModelSymbol> Symbols;
 
-    template <typename T, typename PARSER>
+    template <typename T, typename TSM, typename PARSER>
     struct SectionParserHelper {
 
         static void parse(const mdp::ByteBuffer& source,
@@ -50,11 +50,14 @@ namespace snowcrashtest {
 
             pd.symbolTable.resourceModels.insert(symbols.begin(), symbols.end());
 
+            TSM outputSM;
+
             PARSER::parse(markdownAST.children().begin(),
                           markdownAST.children(),
                           pd,
                           report,
-                          output);
+                          output,
+                          outputSM);
         }
     };
 }

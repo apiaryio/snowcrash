@@ -69,8 +69,6 @@ TEST_CASE("Parse uri template for invalid format curly brackets (missing end bra
     REQUIRE(result.report.warnings.size() == 1);
 }
 
-
-
 TEST_CASE("Parse uri template for supported level one variable expansion", "[supportedlevelonevariableexpansionexpression][issue][#78]")
 {
     const snowcrash::URI uri = "http://www.test.com/{id}/{test}";

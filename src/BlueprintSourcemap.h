@@ -58,9 +58,6 @@ namespace snowcrash {
     /** Array of Parameter values source maps */
     typedef Collection<ValueSM>::type ValuesSM;
 
-    /** Array of Parameters source maps */
-    typedef Collection<ParameterSM>::type ParametersSM;
-
     /** Source Map Structure for Parameter */
     struct ParameterSM {
 
@@ -85,6 +82,9 @@ namespace snowcrash {
         /** Enumeration of possible values */
         ValuesSM values;
     };
+
+    /** Array of Parameters source maps */
+    typedef Collection<ParameterSM>::type ParametersSM;
 
     /** Source Map of Name of a symbol */
     typedef mdp::BytesRangeSet SymbolNameSM;

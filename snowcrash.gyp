@@ -88,6 +88,7 @@
         'src/AssetParser.h',
         'src/Blueprint.h',
         'src/BlueprintParser.h',
+        'src/BlueprintSourcemap.h',
         'src/BlueprintUtility.h',
         'src/CodeBlockUtility.h',
         'src/HeadersParser.h',
@@ -160,6 +161,7 @@
         'src',
         'src/snowcrash',
         'ext/markdown-parser/src',
+        'ext/markdown-parser/ext/sundown/src',
         'ext/cmdline'
       ],
       'sources': [

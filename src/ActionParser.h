@@ -73,17 +73,18 @@ namespace snowcrash {
             SectionType sectionType = pd.sectionContext();
             MarkdownNodeIterator cur = node;
             Payload payload;
+            PayloadSM payloadSM;
             std::stringstream ss;
 
             mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
 
             switch (sectionType) {
                 case ParametersSectionType:
-                    return ParametersParser::parse(node, siblings, pd, report, out.parameters);
+                    return ParametersParser::parse(node, siblings, pd, report, out.parameters, outSM.parameters);
 
                 case RequestSectionType:
                 case RequestBodySectionType:
-                    cur = PayloadParser::parse(node, siblings, pd, report, payload);
+                    cur = PayloadParser::parse(node, siblings, pd, report, payload, payloadSM);
 
                     if (out.examples.empty() || !out.examples.back().responses.empty()) {
                         TransactionExample transaction;
@@ -97,7 +98,7 @@ namespace snowcrash {
 
                 case ResponseSectionType:
                 case ResponseBodySectionType:
-                    cur = PayloadParser::parse(node, siblings, pd, report, payload);
+                    cur = PayloadParser::parse(node, siblings, pd, report, payload, payloadSM);
 
                     if (out.examples.empty()) {
                         TransactionExample transaction;
@@ -110,7 +111,7 @@ namespace snowcrash {
                     break;
 
                 case HeadersSectionType:
-                    return SectionProcessor<Action>::handleDeprecatedHeaders(node, siblings, pd, report, out.headers);
+                    return SectionProcessor<Action, ActionSM>::handleDeprecatedHeaders(node, siblings, pd, report, out.headers, outSM.headers);
 
                 default:
                     break;
@@ -371,9 +372,10 @@ namespace snowcrash {
                                                             const MarkdownNodes& siblings,
                                                             SectionParserData& pd,
                                                             Report& report,
-                                                            Headers& headers) {
+                                                            Headers& headers,
+                                                            HeadersSM& headersSM) {
 
-            MarkdownNodeIterator cur = HeadersParser::parse(node, siblings, pd, report, headers);
+            MarkdownNodeIterator cur = HeadersParser::parse(node, siblings, pd, report, headers, headersSM);
 
             // WARN: Deprecated header sections
             std::stringstream ss;

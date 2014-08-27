@@ -132,7 +132,7 @@ namespace snowcrash {
 
             switch (pd.sectionContext()) {
                 case HeadersSectionType:
-                    return HeadersParser::parse(node, siblings, pd, report, out.headers);
+                    return HeadersParser::parse(node, siblings, pd, report, out.headers, outSM.headers);
 
                 case BodySectionType:
                     if (!out.body.empty()) {
@@ -143,7 +143,7 @@ namespace snowcrash {
                                                            sourceMap));
                     }
 
-                    return AssetParser::parse(node, siblings, pd, report, out.body);
+                    return AssetParser::parse(node, siblings, pd, report, out.body, outSM.body);
 
                 case SchemaSectionType:
                     if (!out.schema.empty()) {
@@ -154,7 +154,7 @@ namespace snowcrash {
                                                            sourceMap));
                     }
 
-                    return AssetParser::parse(node, siblings, pd, report, out.schema);
+                    return AssetParser::parse(node, siblings, pd, report, out.schema, outSM.schema);
 
                 default:
                     break;

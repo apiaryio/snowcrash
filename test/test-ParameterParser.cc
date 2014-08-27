@@ -27,14 +27,15 @@ TEST_CASE("Recognize parameter definition signature", "[parameter]")
     markdownParser.parse(ParameterFixture, markdownAST);
 
     REQUIRE(!markdownAST.children().empty());
-    REQUIRE(SectionProcessor<Parameter>::sectionType(markdownAST.children().begin()) == ParameterSectionType);
+    SectionType sectionType = SectionProcessor<Parameter, ParameterSM>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == ParameterSectionType);
 }
 
 TEST_CASE("Parse canonical parameter definition", "[parameter]")
 {
     Parameter parameter;
     Report report;
-    SectionParserHelper<Parameter, ParameterParser>::parse(ParameterFixture, ParameterSectionType, report, parameter);
+    SectionParserHelper<Parameter, ParameterSM, ParameterParser>::parse(ParameterFixture, ParameterSectionType, report, parameter);
 
     REQUIRE(report.error.code == Error::OK);
     CHECK(report.warnings.empty());
@@ -62,7 +63,7 @@ TEST_CASE("Warn when re-setting the values attribute", "[parameter]")
 
     Parameter parameter;
     Report report;
-    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
+    SectionParserHelper<Parameter, ParameterSM, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 1);
@@ -81,7 +82,7 @@ TEST_CASE("Warn when there are no values in the values attribute", "[parameter]"
 
     Parameter parameter;
     Report report;
-    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
+    SectionParserHelper<Parameter, ParameterSM, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 1);
@@ -97,7 +98,7 @@ TEST_CASE("Parse full abbreviated syntax", "[parameter]")
 
     Parameter parameter;
     Report report;
-    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
+    SectionParserHelper<Parameter, ParameterSM, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
 
     REQUIRE(report.error.code == Error::OK);
     CHECK(report.warnings.empty());
@@ -117,7 +118,7 @@ TEST_CASE("Warn on error in  abbreviated syntax attribute bracket", "[parameter]
 
     Parameter parameter;
     Report report;
-    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
+    SectionParserHelper<Parameter, ParameterSM, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 1);
@@ -138,7 +139,7 @@ TEST_CASE("Warn about required vs default clash", "[parameter]")
 
     Parameter parameter;
     Report report;
-    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
+    SectionParserHelper<Parameter, ParameterSM, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 1);
@@ -155,7 +156,7 @@ TEST_CASE("Warn about implicit required vs default clash", "[parameter_definitio
 
     Parameter parameter;
     Report report;
-    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
+    SectionParserHelper<Parameter, ParameterSM, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 1);
@@ -175,7 +176,7 @@ TEST_CASE("Unrecognized 'values' keyword", "[parameter]")
 
     Parameter parameter;
     Report report;
-    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
+    SectionParserHelper<Parameter, ParameterSM, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.empty());
@@ -195,7 +196,7 @@ TEST_CASE("warn missing example item in values", "[parameter]")
 
     Parameter parameter;
     Report report;
-    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
+    SectionParserHelper<Parameter, ParameterSM, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 1);
@@ -215,7 +216,7 @@ TEST_CASE("warn missing default value in values", "[parameter]")
 
     Parameter parameter;
     Report report;
-    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
+    SectionParserHelper<Parameter, ParameterSM, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 1);
@@ -232,7 +233,7 @@ TEST_CASE("Parse parameters with dot in its name", "[parameter]")
 
     Parameter parameter;
     Report report;
-    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
+    SectionParserHelper<Parameter, ParameterSM, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.empty());
@@ -247,7 +248,7 @@ TEST_CASE("Parentheses in parameter description", "[parameter]")
 
     Parameter parameter;
     Report report;
-    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
+    SectionParserHelper<Parameter, ParameterSM, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.empty());
@@ -265,7 +266,7 @@ TEST_CASE("Parameter with additional description", "[parameter]")
 
     Parameter parameter;
     Report report;
-    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
+    SectionParserHelper<Parameter, ParameterSM, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.empty());
@@ -283,7 +284,7 @@ TEST_CASE("Parameter with additional description as continuation of signature", 
 
     Parameter parameter;
     Report report;
-    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
+    SectionParserHelper<Parameter, ParameterSM, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.empty());
@@ -303,7 +304,7 @@ TEST_CASE("Parameter with list in description", "[parameter]")
 
     Parameter parameter;
     Report report;
-    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
+    SectionParserHelper<Parameter, ParameterSM, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.empty());
