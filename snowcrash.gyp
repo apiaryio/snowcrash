@@ -169,30 +169,24 @@
         'libsnowcrash',
         'libmarkdownparser'
       ]
-    }
-  ],
-  'conditions': [
-    ['OS in "mac linux"', {
-      'targets': [
-        {
-          'target_name': 'perf-libsnowcrash',
-          'type': 'executable',
-          'include_dirs': [
-            'src',
-            'ext/markdown-parser/src',
-            'cmdline',
-            'test',
-            'test/performance',
-          ],
-          'sources': [
-            'test/performance/perf-snowcrash.cc'
-          ],
-          'dependencies': [
-            'libsnowcrash',
-            'libmarkdownparser'
-          ]
-        }
+    },
+	{
+      'target_name': 'perf-libsnowcrash',
+      'type': 'executable',
+      'include_dirs': [
+        'src',
+        'ext/markdown-parser/src',
+        'cmdline',
+        'test',
+        'test/performance',
+      ],
+      'sources': [
+        'test/performance/perf-snowcrash.cc'
+      ],
+      'dependencies': [
+        'libsnowcrash',
+        'libmarkdownparser'
       ]
-    }]
+    }
   ]
 }
