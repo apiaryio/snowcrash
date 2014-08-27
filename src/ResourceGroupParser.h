@@ -29,14 +29,15 @@ namespace snowcrash {
      * ResourceGroup Section processor
      */
     template<>
-    struct SectionProcessor<ResourceGroup> : public SectionProcessorBase<ResourceGroup> {
+    struct SectionProcessor<ResourceGroup, ResourceGroupSM> : public SectionProcessorBase<ResourceGroup, ResourceGroupSM> {
 
         static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
                                                      const MarkdownNodes& siblings,
                                                      SectionParserData& pd,
                                                      SectionLayout& layout,
                                                      Report& report,
-                                                     ResourceGroup& out) {
+                                                     ResourceGroup& out,
+                                                     ResourceGroupSM& outSM) {
 
             MarkdownNodeIterator cur = node;
             SectionType nestedType = nestedSectionType(cur);
@@ -61,7 +62,8 @@ namespace snowcrash {
                                                          const MarkdownNodes& siblings,
                                                          SectionParserData& pd,
                                                          Report& report,
-                                                         ResourceGroup& out) {
+                                                         ResourceGroup& out,
+                                                         ResourceGroupSM& outSM) {
 
             if (pd.sectionContext() == ResourceSectionType) {
 
@@ -98,15 +100,16 @@ namespace snowcrash {
                                                           SectionParserData& pd,
                                                           SectionType& lastSectionType,
                                                           Report& report,
-                                                          ResourceGroup& out) {
+                                                          ResourceGroup& out,
+                                                          ResourceGroupSM& outSM) {
 
-            if (SectionProcessor<Action>::actionType(node) == DependentActionType &&
+            if (SectionProcessor<Action, ActionSM>::actionType(node) == DependentActionType &&
                 !out.resources.empty()) {
 
                 mdp::ByteBuffer method;
                 mdp::ByteBuffer name;
 
-                SectionProcessor<Action>::actionHTTPMethodAndName(node, method, name);
+                SectionProcessor<Action, ActionSM>::actionHTTPMethodAndName(node, method, name);
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
 
                 // WARN: Unexpected action
@@ -143,7 +146,7 @@ namespace snowcrash {
         static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
 
             // Return ResourceSectionType or UndefinedSectionType
-            return SectionProcessor<Resource>::sectionType(node);
+            return SectionProcessor<Resource, ResourceSM>::sectionType(node);
         }
 
         static SectionTypes nestedSectionTypes() {
@@ -151,7 +154,7 @@ namespace snowcrash {
 
             // Resource & descendants
             nested.push_back(ResourceSectionType);
-            SectionTypes types = SectionProcessor<Resource>::nestedSectionTypes();
+            SectionTypes types = SectionProcessor<Resource, ResourceSM>::nestedSectionTypes();
             nested.insert(nested.end(), types.begin(), types.end());
 
             return nested;
@@ -162,17 +165,17 @@ namespace snowcrash {
 
             mdp::ByteBuffer method;
 
-            if (SectionProcessor<Action>::actionType(node) == CompleteActionType) {
+            if (SectionProcessor<Action, ActionSM>::actionType(node) == CompleteActionType) {
                 return false;
             }
 
-            return SectionProcessorBase<ResourceGroup>::isDescriptionNode(node, sectionType);
+            return SectionProcessorBase<ResourceGroup, ResourceGroupSM>::isDescriptionNode(node, sectionType);
         }
 
         static bool isUnexpectedNode(const MarkdownNodeIterator& node,
                                      SectionType sectionType) {
 
-            if (SectionProcessor<Action>::actionType(node) == DependentActionType) {
+            if (SectionProcessor<Action, ActionSM>::actionType(node) == DependentActionType) {
                 return true;
             }
 
@@ -208,7 +211,7 @@ namespace snowcrash {
     };
 
     /** ResourceGroup Section Parser */
-    typedef SectionParser<ResourceGroup, HeaderSectionAdapter> ResourceGroupParser;
+    typedef SectionParser<ResourceGroup, ResourceGroupSM, HeaderSectionAdapter> ResourceGroupParser;
 }
 
 #endif

@@ -40,14 +40,15 @@ namespace snowcrash {
      * Action Section processor
      */
     template<>
-    struct SectionProcessor<Action> : public SectionProcessorBase<Action> {
+    struct SectionProcessor<Action, ActionSM> : public SectionProcessorBase<Action, ActionSM> {
 
         static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
                                                      const MarkdownNodes& siblings,
                                                      SectionParserData& pd,
                                                      SectionLayout& layout,
                                                      Report& report,
-                                                     Action& out) {
+                                                     Action& out,
+                                                     ActionSM& outSM) {
 
             actionHTTPMethodAndName(node, out.method, out.name);
             TrimString(out.name);
@@ -66,7 +67,8 @@ namespace snowcrash {
                                                          const MarkdownNodes& siblings,
                                                          SectionParserData& pd,
                                                          Report& report,
-                                                         Action& out) {
+                                                         Action& out,
+                                                         ActionSM& outSM) {
 
             SectionType sectionType = pd.sectionContext();
             MarkdownNodeIterator cur = node;
@@ -120,11 +122,11 @@ namespace snowcrash {
         static bool isUnexpectedNode(const MarkdownNodeIterator& node,
                                      SectionType sectionType) {
             
-            if ( SectionProcessor<Asset>::sectionType(node) != UndefinedSectionType) {
+            if (SectionProcessor<Asset, AssetSM>::sectionType(node) != UndefinedSectionType) {
                 return true;
             }
             
-            return SectionProcessorBase<Action>::isUnexpectedNode(node, sectionType);
+            return SectionProcessorBase<Action, ActionSM>::isUnexpectedNode(node, sectionType);
         }
         
         static MarkdownNodeIterator processUnexpectedNode(const MarkdownNodeIterator& node,
@@ -132,7 +134,8 @@ namespace snowcrash {
                                                           SectionParserData& pd,
                                                           SectionType& sectionType,
                                                           Report& report,
-                                                          Action& out) {
+                                                          Action& out,
+                                                          ActionSM& outSM) {
 
             if ((node->type == mdp::ParagraphMarkdownNodeType ||
                  node->type == mdp::CodeMarkdownNodeType) &&
@@ -158,7 +161,7 @@ namespace snowcrash {
                 return ++MarkdownNodeIterator(node);
             }
             
-            SectionType assetType = SectionProcessor<Asset>::sectionType(node);
+            SectionType assetType = SectionProcessor<Asset, AssetSM>::sectionType(node);
             
             if (assetType != UndefinedSectionType) {
                 
@@ -176,7 +179,7 @@ namespace snowcrash {
                 return ++MarkdownNodeIterator(node);
             }
             
-            return SectionProcessorBase<Action>::processUnexpectedNode(node, siblings, pd, sectionType, report, out);            
+            return SectionProcessorBase<Action, ActionSM>::processUnexpectedNode(node, siblings, pd, sectionType, report, out, outSM);            
         }
 
         static SectionType sectionType(const MarkdownNodeIterator& node) {
@@ -202,21 +205,21 @@ namespace snowcrash {
             SectionType nestedType = UndefinedSectionType;
 
             // Check if parameters section
-            nestedType = SectionProcessor<Parameters>::sectionType(node);
+            nestedType = SectionProcessor<Parameters, ParametersSM>::sectionType(node);
 
             if (nestedType != UndefinedSectionType) {
                 return nestedType;
             }
 
             // Check if headers section
-            nestedType = SectionProcessor<Headers>::sectionType(node);
+            nestedType = SectionProcessor<Headers, HeadersSM>::sectionType(node);
 
             if (nestedType == HeadersSectionType) {
                 return nestedType;
             }
 
             // Check if payload section
-            nestedType = SectionProcessor<Payload>::sectionType(node);
+            nestedType = SectionProcessor<Payload, PayloadSM>::sectionType(node);
 
             if (nestedType != UndefinedSectionType) {
                 return nestedType;
@@ -234,7 +237,7 @@ namespace snowcrash {
             nested.push_back(RequestBodySectionType);
             nested.push_back(RequestSectionType);
 
-            types = SectionProcessor<Payload>::nestedSectionTypes();
+            types = SectionProcessor<Payload, PayloadSM>::nestedSectionTypes();
             nested.insert(nested.end(), types.begin(), types.end());
 
             return nested;
@@ -243,11 +246,12 @@ namespace snowcrash {
         static void finalize(const MarkdownNodeIterator& node,
                              SectionParserData& pd,
                              Report& report,
-                             Action& out) {
+                             Action& out,
+                             ActionSM& outSM) {
 
             if (!out.headers.empty()) {
 
-                SectionProcessor<Headers>::injectDeprecatedHeaders(out.headers, out.examples);
+                SectionProcessor<Headers, HeadersSM>::injectDeprecatedHeaders(out.headers, out.examples);
                 out.headers.clear();
             }
 
@@ -433,7 +437,7 @@ namespace snowcrash {
     };
 
     /** Action Section Parser */
-    typedef SectionParser<Action, HeaderSectionAdapter> ActionParser;
+    typedef SectionParser<Action, ActionSM, HeaderSectionAdapter> ActionParser;
 }
 
 #endif

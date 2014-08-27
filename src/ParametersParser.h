@@ -32,14 +32,15 @@ namespace snowcrash {
      * Parameters section processor
      */
     template<>
-    struct SectionProcessor<Parameters> : public SectionProcessorBase<Parameters> {
+    struct SectionProcessor<Parameters, ParametersSM> : public SectionProcessorBase<Parameters, ParametersSM> {
 
         static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
                                                      const MarkdownNodes& siblings,
                                                      SectionParserData& pd,
                                                      SectionLayout& layout,
                                                      Report& report,
-                                                     Parameters& out) {
+                                                     Parameters& out,
+                                                     ParametersSM& outSM) {
 
             mdp::ByteBuffer remainingContent;
 
@@ -65,7 +66,8 @@ namespace snowcrash {
                                                        const MarkdownNodes& siblings,
                                                        SectionParserData& pd,
                                                        Report& report,
-                                                       Parameters& out) {
+                                                       Parameters& out,
+                                                       ParametersSM& outSM) {
 
             return node;
         }
@@ -74,7 +76,8 @@ namespace snowcrash {
                                                          const MarkdownNodes& siblings,
                                                          SectionParserData& pd,
                                                          Report& report,
-                                                         Parameters& out) {
+                                                         Parameters& out,
+                                                         ParametersSM& outSM) {
 
             if (pd.sectionContext() != ParameterSectionType) {
                 return node;
@@ -131,7 +134,7 @@ namespace snowcrash {
 
         static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
 
-            return SectionProcessor<Parameter>::sectionType(node);
+            return SectionProcessor<Parameter, ParameterSM>::sectionType(node);
         }
 
         static SectionTypes nestedSectionTypes() {
@@ -139,7 +142,7 @@ namespace snowcrash {
 
             // Parameter & descendants
             nested.push_back(ParameterSectionType);
-            SectionTypes types = SectionProcessor<Parameter>::nestedSectionTypes();
+            SectionTypes types = SectionProcessor<Parameter, ParameterSM>::nestedSectionTypes();
             nested.insert(nested.end(), types.begin(), types.end());
 
             return nested;
@@ -148,7 +151,8 @@ namespace snowcrash {
         static void finalize(const MarkdownNodeIterator& node,
                              SectionParserData& pd,
                              Report& report,
-                             Parameters& out) {
+                             Parameters& out,
+                             ParametersSM& outSM) {
 
             if (out.empty()) {
 
@@ -171,7 +175,7 @@ namespace snowcrash {
     };
 
     /** Parameters Section parser */
-    typedef SectionParser<Parameters, ListSectionAdapter> ParametersParser;
+    typedef SectionParser<Parameters, ParametersSM, ListSectionAdapter> ParametersParser;
 }
 
 #endif

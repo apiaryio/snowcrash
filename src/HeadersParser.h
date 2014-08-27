@@ -30,14 +30,15 @@ namespace snowcrash {
      *  Headers Section Processor
      */
     template<>
-    struct SectionProcessor<Headers> : public SectionProcessorBase<Headers> {
+    struct SectionProcessor<Headers, HeadersSM> : public SectionProcessorBase<Headers, HeadersSM> {
         
         static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
                                                      const MarkdownNodes& siblings,
                                                      SectionParserData& pd,
                                                      SectionLayout& layout,
                                                      Report& report,
-                                                     Headers& out) {
+                                                     Headers& out,
+                                                     HeadersSM& outSM) {
 
             mdp::ByteBuffer content;
             CodeBlockUtility::signatureContentAsCodeBlock(node, pd, report, content);
@@ -51,7 +52,9 @@ namespace snowcrash {
                                                        const MarkdownNodes& siblings,
                                                        SectionParserData& pd,
                                                        Report& report,
-                                                       Headers& out) {
+                                                       Headers& out,
+                                                       HeadersSM& outSM) {
+
             return node;
         }
 
@@ -59,7 +62,8 @@ namespace snowcrash {
                                                    const MarkdownNodes& siblings,
                                                    SectionParserData& pd,
                                                    Report& report,
-                                                   Headers& out) {
+                                                   Headers& out,
+                                                   HeadersSM& outSM) {
 
             mdp::ByteBuffer content;
             CodeBlockUtility::contentAsCodeBlock(node, pd, report, content);
@@ -102,7 +106,8 @@ namespace snowcrash {
         static void finalize(const MarkdownNodeIterator& node,
                              SectionParserData& pd,
                              Report& report,
-                             Headers& out) {
+                             Headers& out,
+                             HeadersSM& outSM) {
 
             if (out.empty()) {
 
@@ -120,6 +125,7 @@ namespace snowcrash {
                                        SectionParserData& pd,
                                        Report& report,
                                        Headers& headers) {
+
             std::vector<std::string> lines = Split(content, '\n');
 
             for (std::vector<std::string>::iterator line = lines.begin();
@@ -184,6 +190,7 @@ namespace snowcrash {
         /** Finds a header in its containment group by its key (first) */
         static HeaderIterator findHeader(const Headers& headers,
                                          const Header& header) {
+
             return std::find_if(headers.begin(),
                                 headers.end(),
                                 std::bind2nd(MatchFirsts<Header>(), header));
@@ -191,7 +198,7 @@ namespace snowcrash {
     };
 
     /** Headers Section Parser */
-    typedef SectionParser<Headers, ListSectionAdapter> HeadersParser;
+    typedef SectionParser<Headers, HeadersSM, ListSectionAdapter> HeadersParser;
 }
 
 #endif

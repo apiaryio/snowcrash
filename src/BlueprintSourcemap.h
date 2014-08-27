@@ -10,6 +10,7 @@
 #define SNOWCRASH_BLUEPRINT_SOURCEMAP_H
 
 #include "Blueprint.h"
+#include "MarkdownParser.h"
 
 /**
  *  API Blueprint Sourcemap Abstract Syntax Tree
@@ -39,8 +40,8 @@ namespace snowcrash {
     typedef mdp::BytesRangeSet ValueSM;
 
     /** Standard types for array of Source Maps */
-    Collection<mdp::BytesRangeSet>::type SourceMaps;
-    Collection<mdp::BytesRangeSet>::iterator SourceMapsIterator;
+    typedef Collection<mdp::BytesRangeSet>::type SourceMaps;
+    typedef Collection<mdp::BytesRangeSet>::iterator SourceMapsIterator;
 
     /** Source Map of an asset data */
     typedef mdp::BytesRangeSet AssetSM;
@@ -53,6 +54,12 @@ namespace snowcrash {
 
     /** Source Map of Parameter Use flag */
     typedef mdp::BytesRangeSet ParameterUseSM;
+
+    /** Array of Parameter values source maps */
+    typedef Collection<ValueSM>::type ValuesSM;
+
+    /** Array of Parameters source maps */
+    typedef Collection<ParameterSM>::type ParametersSM;
 
     /** Source Map Structure for Parameter */
     struct ParameterSM {
@@ -76,7 +83,7 @@ namespace snowcrash {
         ValueSM exampleValue;
 
         /** Enumeration of possible values */
-        Collection<ValueSM>::type values;
+        ValuesSM values;
     };
 
     /** Source Map of Name of a symbol */
@@ -94,7 +101,7 @@ namespace snowcrash {
         DescriptionSM description;
 
         /** Payload-specific Parameters */
-        Collection<Parameter>::type parameters;
+        ParametersSM parameters;
 
         /** Payload-specific Headers */
         HeadersSM headers;
@@ -156,7 +163,7 @@ namespace snowcrash {
         DescriptionSM description;
 
         /** Action-specific Parameters */
-        Collection<ParameterSM>::type parameters;
+        ParametersSM parameters;
 
         /**
          *  \brief Action-specific HTTP headers
@@ -194,7 +201,7 @@ namespace snowcrash {
         ResourceModelSM model;
 
         /** Parameters */
-        Collection<ParameterSM>::type parameters;
+        ParametersSM parameters;
 
         /**
          *  \brief Resource-specific HTTP Headers

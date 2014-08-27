@@ -28,14 +28,15 @@ namespace snowcrash {
      * Blueprint processor
      */
     template<>
-    struct SectionProcessor<Blueprint> : public SectionProcessorBase<Blueprint> {
+    struct SectionProcessor<Blueprint, BlueprintSM> : public SectionProcessorBase<Blueprint, BlueprintSM> {
 
         static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
                                                      const MarkdownNodes& siblings,
                                                      SectionParserData& pd,
                                                      SectionLayout& layout,
                                                      Report& report,
-                                                     Blueprint& out) {
+                                                     Blueprint& out,
+                                                     BlueprintSM& outSM) {
 
             MarkdownNodeIterator cur = node;
 
@@ -47,7 +48,7 @@ namespace snowcrash {
 
                 // First block is paragraph and is not metadata (no API name)
                 if (metadata.empty()) {
-                    return processDescription(cur, siblings, pd, report, out);
+                    return processDescription(cur, siblings, pd, report, out, outSM);
                 } else {
                     out.metadata.insert(out.metadata.end(), metadata.begin(), metadata.end());
                 }
@@ -75,7 +76,7 @@ namespace snowcrash {
             } else {
 
                 // Any other type of block, add to description
-                return processDescription(cur, siblings, pd, report, out);
+                return processDescription(cur, siblings, pd, report, out, outSM);
             }
 
             return ++MarkdownNodeIterator(cur);
@@ -85,7 +86,8 @@ namespace snowcrash {
                                                          const MarkdownNodes& siblings,
                                                          SectionParserData& pd,
                                                          Report& report,
-                                                         Blueprint& out) {
+                                                         Blueprint& out,
+                                                         BlueprintSM& outSM) {
 
             if (pd.sectionContext() == ResourceGroupSectionType ||
                 pd.sectionContext() == ResourceSectionType) {
@@ -132,14 +134,14 @@ namespace snowcrash {
             SectionType nestedType = UndefinedSectionType;
 
             // Check if Resource section
-            nestedType = SectionProcessor<Resource>::sectionType(node);
+            nestedType = SectionProcessor<Resource, ResourceSM>::sectionType(node);
 
             if (nestedType != UndefinedSectionType) {
                 return nestedType;
             }
 
             // Check if ResourceGroup section
-            nestedType = SectionProcessor<ResourceGroup>::sectionType(node);
+            nestedType = SectionProcessor<ResourceGroup, ResourceGroupSM>::sectionType(node);
 
             if (nestedType != UndefinedSectionType) {
                 return nestedType;
@@ -153,7 +155,7 @@ namespace snowcrash {
 
             // Resource Group & descendants
             nested.push_back(ResourceGroupSectionType);
-            SectionTypes types = SectionProcessor<ResourceGroup>::nestedSectionTypes();
+            SectionTypes types = SectionProcessor<ResourceGroup, ResourceGroupSM>::nestedSectionTypes();
             nested.insert(nested.end(), types.begin(), types.end());
 
             return nested;
@@ -162,7 +164,8 @@ namespace snowcrash {
         static void finalize(const MarkdownNodeIterator& node,
                              SectionParserData& pd,
                              Report& report,
-                             Blueprint& out) {
+                             Blueprint& out,
+                             BlueprintSM& outSM) {
             
             if (!out.name.empty())
                 return;
@@ -267,7 +270,7 @@ namespace snowcrash {
     };
 
     /** Blueprint Parser */
-    typedef SectionParser<Blueprint, BlueprintSectionAdapter> BlueprintParser;
+    typedef SectionParser<Blueprint, BlueprintSM, BlueprintSectionAdapter> BlueprintParser;
 }
 
 #endif
