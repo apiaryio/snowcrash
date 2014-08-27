@@ -9,7 +9,7 @@
 #ifndef SNOWCRASH_SECTIONPARSERDATA_H
 #define SNOWCRASH_SECTIONPARSERDATA_H
 
-#include "Blueprint.h"
+#include "BlueprintSourcemap.h"
 #include "Section.h"
 #include "SymbolTable.h"
 

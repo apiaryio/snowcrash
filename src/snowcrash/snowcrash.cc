@@ -136,13 +136,14 @@ int main(int argc, const char *argv[])
     snowcrash::BlueprintParserOptions options = 0;  // Or snowcrash::RequireBlueprintNameOption
     snowcrash::Report report;
     snowcrash::Blueprint blueprint;
+    snowcrash::BlueprintSM blueprintSM;
 
     if (argumentParser.exist(SourcemapArgument)) {
         options = snowcrash::ExportSourcemapOption;
     }
 
     // Parse
-    snowcrash::parse(inputStream.str(), options, report, blueprint);
+    snowcrash::parse(inputStream.str(), options, report, blueprint, blueprintSM);
 
     // Output
     if (!argumentParser.exist(ValidateArgument)) {

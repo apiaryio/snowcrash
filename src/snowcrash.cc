@@ -7,7 +7,6 @@
 //
 
 #include "snowcrash.h"
-#include "MarkdownParser.h"
 #include "BlueprintParser.h"
 
 const int snowcrash::SourceAnnotation::OK = 0;
@@ -18,8 +17,8 @@ using namespace snowcrash;
  *  \brief  Check source for unsupported character \t & \r
  *  \return True if passed (not found), false otherwise
  */
-static bool CheckSource(const mdp::ByteBuffer& source, Report& report)
-{
+static bool CheckSource(const mdp::ByteBuffer& source, Report& report) {
+
     std::string::size_type pos = source.find("\t");
 
     if (pos != std::string::npos) {
@@ -50,8 +49,9 @@ static bool CheckSource(const mdp::ByteBuffer& source, Report& report)
 int snowcrash::parse(const mdp::ByteBuffer& source,
                      BlueprintParserOptions options,
                      Report& report,
-                     Blueprint& blueprint)
-{
+                     Blueprint& blueprint,
+                     BlueprintSM& blueprintSM) {
+
     try {
         
         // Sanity Check
@@ -71,7 +71,7 @@ int snowcrash::parse(const mdp::ByteBuffer& source,
         SectionParserData pd(options, source, blueprint);
 
         // Parse Blueprint
-        BlueprintParser::parse(markdownAST.children().begin(), markdownAST.children(), pd, report, blueprint);
+        BlueprintParser::parse(markdownAST.children().begin(), markdownAST.children(), pd, report, blueprint, blueprintSM);
     }
     catch (const std::exception& e) {
         
