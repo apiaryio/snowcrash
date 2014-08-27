@@ -8,15 +8,64 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
-#include <sys/time.h>
 #include <cmath>
 #include "cmdline.h"
 #include "snowcrash.h"
+
+#if defined (_MSC_VER)
+#include <windows.h>
+#else
+#include <sys/time.h>
+#endif
 
 using snowcrash::SourceAnnotation;
 using snowcrash::Error;
 
 static const int TestRunCount = 1000;
+
+#if defined (_MSC_VER)
+const __int64 DELTA_EPOCH_IN_MICROSECS = 11644473600000000;
+
+struct timezone
+{
+    int tz_minuteswest;     /* minutes west of Greenwich */
+    int tz_dsttime;         /* type of DST correction */
+};
+
+int gettimeofday(struct timeval* tv, struct timezone* tz)
+{
+    FILETIME ft;
+    TIME_ZONE_INFORMATION tz_winapi;
+    __int64 tmpres = 0;
+    int rez = 0;
+
+    ZeroMemory(&ft, sizeof(ft));
+    ZeroMemory(&tz_winapi, sizeof(tz_winapi));
+
+    GetSystemTimeAsFileTime(&ft);
+
+    tmpres = ft.dwHighDateTime;
+    tmpres <<= 32;
+    tmpres |= ft.dwLowDateTime;
+
+    tmpres /= 10;
+    tmpres -= DELTA_EPOCH_IN_MICROSECS;
+
+    if (tv) {
+        tv->tv_sec = (__int32)( tmpres * 0.000001 );
+        tv->tv_usec = ( tmpres % 1000000 );
+    }
+
+    if (tz) {
+        rez = GetTimeZoneInformation(&tz_winapi);
+        tz->tz_dsttime = (rez == 2) ? true:false;
+        tz->tz_minuteswest = tz_winapi.Bias + ((rez == 2) ? tz_winapi.DaylightBias:0);
+    }
+
+    return 0;
+}
+#endif
+
 
 /**
  *  \brief  Parse input @TestRunCount -times
