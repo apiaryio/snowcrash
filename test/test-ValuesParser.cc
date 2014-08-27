@@ -26,14 +26,15 @@ TEST_CASE("Recognize values signature", "[values]")
     markdownParser.parse(ValuesFixture, markdownAST);
 
     REQUIRE(!markdownAST.children().empty());
-    REQUIRE(SectionProcessor<Values>::sectionType(markdownAST.children().begin()) == ValuesSectionType);
+    SectionType sectionType = SectionProcessor<Values, ValuesSM>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == ValuesSectionType);
 }
 
 TEST_CASE("Parse canonical values", "[values]")
 {
     Values values;
     Report report;
-    SectionParserHelper<Values, ValuesParser>::parse(ValuesFixture, ValuesSectionType, report, values);
+    SectionParserHelper<Values, ValuesSM, ValuesParser>::parse(ValuesFixture, ValuesSectionType, report, values);
 
     REQUIRE(report.error.code == Error::OK);
     CHECK(report.warnings.empty());
@@ -53,7 +54,7 @@ TEST_CASE("Warn superfluous content in values attribute", "[values]")
 
     Values values;
     Report report;
-    SectionParserHelper<Values, ValuesParser>::parse(source, ValuesSectionType, report, values);
+    SectionParserHelper<Values, ValuesSM, ValuesParser>::parse(source, ValuesSectionType, report, values);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 1);
@@ -73,7 +74,7 @@ TEST_CASE("Warn about illegal entities in values attribute", "[values]")
 
     Values values;
     Report report;
-    SectionParserHelper<Values, ValuesParser>::parse(source, ValuesSectionType, report, values);
+    SectionParserHelper<Values, ValuesSM, ValuesParser>::parse(source, ValuesSectionType, report, values);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 1);

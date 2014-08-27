@@ -87,7 +87,9 @@ namespace snowcrash {
                 pd.sectionContext() == ResourceMethodSectionType) {
 
                 ResourceGroup resourceGroup;
-                MarkdownNodeIterator cur = ResourceGroupParser::parse(node, siblings, pd, report, resourceGroup);
+                ResourceGroupSM resourceGroupSM;
+
+                MarkdownNodeIterator cur = ResourceGroupParser::parse(node, siblings, pd, report, resourceGroup, resourceGroupSM);
 
                 ResourceGroupIterator duplicate = findResourceGroup(out.resourceGroups, resourceGroup);
 

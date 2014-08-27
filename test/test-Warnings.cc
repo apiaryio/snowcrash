@@ -20,8 +20,9 @@ TEST_CASE("Warn about keywords in API name", "[warnings][#31]")
     "# POST\n";
 
     Blueprint blueprint;
+    BlueprintSM blueprintSM;
     Report report;
-    parse(source, 0, report, blueprint);
+    parse(source, 0, report, blueprint, blueprintSM);
 
     REQUIRE(report.error.code == Error::OK);
 
@@ -46,8 +47,9 @@ TEST_CASE("Warn about brackets in URI template", "[warnings][#79]")
     "A test uri template\n";
 
     Blueprint blueprint;
+    BlueprintSM blueprintSM;
     Report report;
-    parse(source, 0, report, blueprint);
+    parse(source, 0, report, blueprint, blueprintSM);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 1);
@@ -67,8 +69,9 @@ TEST_CASE("Warn about unsupported uri template label expansion", "[warnings][#78
     "A test uri template\n";
 
     Blueprint blueprint;
+    BlueprintSM blueprintSM;
     Report report;
-    parse(source, 0, report, blueprint);
+    parse(source, 0, report, blueprint, blueprintSM);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 1);
@@ -88,8 +91,9 @@ TEST_CASE("Warn about unsupported uri template in abbreviated blueprint", "[warn
     "+ Response 200";
 
     Blueprint blueprint;
+    BlueprintSM blueprintSM;
     Report report;
-    parse(source, 0, report, blueprint);
+    parse(source, 0, report, blueprint, blueprintSM);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 1);

@@ -82,7 +82,9 @@ namespace snowcrash {
             }
 
             Parameter parameter;
-            ParameterParser::parse(node, siblings, pd, report, parameter);
+            ParameterSM parameterSM;
+
+            ParameterParser::parse(node, siblings, pd, report, parameter, parameterSM);
 
             if (!out.empty()) {
 

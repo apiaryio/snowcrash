@@ -29,7 +29,8 @@ TEST_CASE("recognize explicit body signature", "[asset]")
     markdownParser.parse(BodyAssetFixture, markdownAST);
     
     REQUIRE(!markdownAST.children().empty());
-    REQUIRE(SectionProcessor<Asset>::sectionType(markdownAST.children().begin()) == BodySectionType);
+    SectionType sectionType = SectionProcessor<Asset, AssetSM>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == BodySectionType);
 }
 
 TEST_CASE("recognize body with content on signature", "[asset]")
@@ -43,7 +44,8 @@ TEST_CASE("recognize body with content on signature", "[asset]")
     markdownParser.parse(source, markdownAST);
 
     REQUIRE(!markdownAST.children().empty());
-    REQUIRE(SectionProcessor<Asset>::sectionType(markdownAST.children().begin()) == BodySectionType);
+    SectionType sectionType = SectionProcessor<Asset, AssetSM>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == BodySectionType);
 }
 
 TEST_CASE("recognize schema signature", "[asset]")
@@ -53,14 +55,15 @@ TEST_CASE("recognize schema signature", "[asset]")
     markdownParser.parse(SchemaAssetFixture, markdownAST);
     
     REQUIRE(!markdownAST.children().empty());
-    REQUIRE(SectionProcessor<Asset>::sectionType(markdownAST.children().begin()) == SchemaSectionType);
+    SectionType sectionType = SectionProcessor<Asset, AssetSM>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == SchemaSectionType);
 }
 
 TEST_CASE("parse body asset", "[asset]")
 {
     Asset asset;
     Report report;
-    SectionParserHelper<Asset, AssetParser>::parse(BodyAssetFixture, BodySectionType, report, asset);
+    SectionParserHelper<Asset, AssetSM, AssetParser>::parse(BodyAssetFixture, BodySectionType, report, asset);
     
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.empty());
@@ -71,7 +74,7 @@ TEST_CASE("parse schema asset", "[asset]")
 {
     Asset asset;
     Report report;
-    SectionParserHelper<Asset, AssetParser>::parse(SchemaAssetFixture, SchemaSectionType, report, asset);
+    SectionParserHelper<Asset, AssetSM, AssetParser>::parse(SchemaAssetFixture, SchemaSectionType, report, asset);
     
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.empty());
@@ -87,7 +90,7 @@ TEST_CASE("Foreign block inside", "[asset]")
     
     Asset asset;
     Report report;
-    SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, report, asset);
+    SectionParserHelper<Asset, AssetSM, AssetParser>::parse(source, BodySectionType, report, asset);
     
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 1);
@@ -104,7 +107,7 @@ TEST_CASE("Nested list block inside", "[asset]")
     
     Asset asset;
     Report report;
-    SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, report, asset);
+    SectionParserHelper<Asset, AssetSM, AssetParser>::parse(source, BodySectionType, report, asset);
     
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 1);
@@ -122,7 +125,7 @@ TEST_CASE("Multiline signature", "[asset]")
     
     Asset asset;
     Report report;
-    SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, report, asset);
+    SectionParserHelper<Asset, AssetSM, AssetParser>::parse(source, BodySectionType, report, asset);
     
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 1);
@@ -143,7 +146,7 @@ TEST_CASE("Multiple blocks", "[asset]")
     
     Asset asset;
     Report report;
-    SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, report, asset);
+    SectionParserHelper<Asset, AssetSM, AssetParser>::parse(source, BodySectionType, report, asset);
     
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 2);
@@ -161,7 +164,7 @@ TEST_CASE("Extra spaces before signature", "[asset]")
     
     Asset asset;
     Report report;
-    SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, report, asset);
+    SectionParserHelper<Asset, AssetSM, AssetParser>::parse(source, BodySectionType, report, asset);
     
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.empty());
@@ -177,7 +180,7 @@ TEST_CASE("Asset parser greediness", "[asset]")
     
     Asset asset;
     Report report;
-    SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, report, asset);
+    SectionParserHelper<Asset, AssetSM, AssetParser>::parse(source, BodySectionType, report, asset);
     
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.empty());

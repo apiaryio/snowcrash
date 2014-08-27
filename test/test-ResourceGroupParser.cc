@@ -34,18 +34,21 @@ TEST_CASE("Resource group block classifier", "[resource_group]")
 
     mdp::MarkdownParser markdownParser;
     mdp::MarkdownNode markdownAST;
+    SectionType sectionType;
     markdownParser.parse(source, markdownAST);
 
     REQUIRE(!markdownAST.children().empty());
-    REQUIRE(SectionProcessor<ResourceGroup>::sectionType(markdownAST.children().begin()) == ResourceGroupSectionType);
-    REQUIRE(SectionProcessor<ResourceGroup>::sectionType(markdownAST.children().begin() + 8) == ResourceGroupSectionType);
+    sectionType = SectionProcessor<ResourceGroup, ResourceGroupSM>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == ResourceGroupSectionType);
+    sectionType = SectionProcessor<ResourceGroup, ResourceGroupSM>::sectionType(markdownAST.children().begin() + 8);
+    REQUIRE(sectionType == ResourceGroupSectionType);
 }
 
 TEST_CASE("Parse canonical resource group", "[resource_group]")
 {
     ResourceGroup resourceGroup;
     Report report;
-    SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(ResourceGroupFixture, ResourceGroupSectionType, report, resourceGroup);
+    SectionParserHelper<ResourceGroup, ResourceGroupSM, ResourceGroupParser>::parse(ResourceGroupFixture, ResourceGroupSectionType, report, resourceGroup);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.empty());
@@ -66,7 +69,7 @@ TEST_CASE("Parse resource group with empty resource", "[resource_group]")
 
     ResourceGroup resourceGroup;
     Report report;
-    SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source, ResourceGroupSectionType, report, resourceGroup);
+    SectionParserHelper<ResourceGroup, ResourceGroupSM, ResourceGroupParser>::parse(source, ResourceGroupSectionType, report, resourceGroup);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.empty());
@@ -88,7 +91,7 @@ TEST_CASE("Parse multiple resource in anonymous group", "[resource_group]")
 
     ResourceGroup resourceGroup;
     Report report;
-    SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source, ResourceGroupSectionType, report, resourceGroup);
+    SectionParserHelper<ResourceGroup, ResourceGroupSM, ResourceGroupParser>::parse(source, ResourceGroupSectionType, report, resourceGroup);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.empty());
@@ -115,7 +118,7 @@ TEST_CASE("Parse multiple resources with payloads", "[resource_group]")
 
     ResourceGroup resourceGroup;
     Report report;
-    SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source, ResourceGroupSectionType, report, resourceGroup);
+    SectionParserHelper<ResourceGroup, ResourceGroupSM, ResourceGroupParser>::parse(source, ResourceGroupSectionType, report, resourceGroup);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 4);
@@ -159,7 +162,7 @@ TEST_CASE("Parse multiple resources with the same name", "[resource_group]")
 
     ResourceGroup resourceGroup;
     Report report;
-    SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source, ResourceGroupSectionType, report, resourceGroup);
+    SectionParserHelper<ResourceGroup, ResourceGroupSM, ResourceGroupParser>::parse(source, ResourceGroupSectionType, report, resourceGroup);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 1);
@@ -182,7 +185,7 @@ TEST_CASE("Parse resource with list in its description", "[resource_group]")
 
     ResourceGroup resourceGroup;
     Report report;
-    SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source, ResourceGroupSectionType, report, resourceGroup);
+    SectionParserHelper<ResourceGroup, ResourceGroupSM, ResourceGroupParser>::parse(source, ResourceGroupSectionType, report, resourceGroup);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 3);   // preformatted asset & ignoring unrecognized node & no response
@@ -207,7 +210,7 @@ TEST_CASE("Parse resource groups with hr in description", "[resource_group]")
 
     ResourceGroup resourceGroup;
     Report report;
-    SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source, ResourceGroupSectionType, report, resourceGroup);
+    SectionParserHelper<ResourceGroup, ResourceGroupSM, ResourceGroupParser>::parse(source, ResourceGroupSectionType, report, resourceGroup);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.empty());
@@ -227,7 +230,7 @@ TEST_CASE("Make sure method followed by a group does not eat the group", "[resou
 
     ResourceGroup resourceGroup;
     Report report;
-    SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source, ResourceGroupSectionType, report, resourceGroup);
+    SectionParserHelper<ResourceGroup, ResourceGroupSM, ResourceGroupParser>::parse(source, ResourceGroupSectionType, report, resourceGroup);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 1); // no response
@@ -249,7 +252,7 @@ TEST_CASE("Parse resource method abbreviation followed by a foreign method", "[r
 
     ResourceGroup resourceGroup;
     Report report;
-    SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source, ResourceGroupSectionType, report, resourceGroup);
+    SectionParserHelper<ResourceGroup, ResourceGroupSM, ResourceGroupParser>::parse(source, ResourceGroupSectionType, report, resourceGroup);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 2); // no response && unexpected action POST
@@ -275,7 +278,7 @@ TEST_CASE("Parse resource method abbreviation followed by another", "[resource_g
 
     ResourceGroup resourceGroup;
     Report report;
-    SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source, ResourceGroupSectionType, report, resourceGroup);
+    SectionParserHelper<ResourceGroup, ResourceGroupSM, ResourceGroupParser>::parse(source, ResourceGroupSectionType, report, resourceGroup);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 2); // 2x no response

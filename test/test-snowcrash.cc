@@ -18,9 +18,10 @@ TEST_CASE("Parse empty blueprint", "[parser]")
     mdp::ByteBuffer source = "";
 
     Blueprint blueprint;
+    BlueprintSM blueprintSM;
     Report report;
 
-    parse(source, 0, report, blueprint);
+    parse(source, 0, report, blueprint, blueprintSM);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.empty());
@@ -43,9 +44,10 @@ TEST_CASE("Parse simple blueprint", "[parser]")
     "            { ... }\n";
 
     Blueprint blueprint;
+    BlueprintSM blueprintSM;
     Report report;
 
-    parse(source, 0, report, blueprint);
+    parse(source, 0, report, blueprint, blueprintSM);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.empty());
@@ -78,9 +80,10 @@ TEST_CASE("Parse simple blueprint", "[parser]")
 TEST_CASE("Parse blueprint with unsupported characters", "[parser]")
 {
     Blueprint blueprint1;
+    BlueprintSM blueprintSM1;
     Report report1;
 
-    parse("hello\t", 0, report1, blueprint1);
+    parse("hello\t", 0, report1, blueprint1, blueprintSM1);
 
     REQUIRE(report1.error.code != Error::OK);
     REQUIRE(report1.error.location.size() == 1);
@@ -88,9 +91,10 @@ TEST_CASE("Parse blueprint with unsupported characters", "[parser]")
     REQUIRE(report1.error.location[0].length == 1);
 
     Blueprint blueprint2;
+    BlueprintSM blueprintSM2;
     Report report2;
 
-    snowcrash::parse("sun\n\rsalt\n\r", 0, report2, blueprint2);
+    snowcrash::parse("sun\n\rsalt\n\r", 0, report2, blueprint2, blueprintSM2);
 
     REQUIRE(report2.error.code != Error::OK);
     REQUIRE(report2.error.location.size() == 1);
@@ -108,9 +112,10 @@ TEST_CASE("Do not report duplicate response when media type differs", "[method][
     "        Hello.\n";
 
     Blueprint blueprint;
+    BlueprintSM blueprintSM;
     Report report;
 
-    parse(source, 0, report, blueprint);
+    parse(source, 0, report, blueprint, blueprintSM);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.empty());
@@ -125,9 +130,10 @@ TEST_CASE("Support description ending with an list item", "[parser][#8]")
     "        ...\n";
 
     Blueprint blueprint;
+    BlueprintSM blueprintSM;
     Report report;
 
-    parse(source, 0, report, blueprint);
+    parse(source, 0, report, blueprint, blueprintSM);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.empty());
@@ -149,9 +155,10 @@ TEST_CASE("Invalid ‘warning: empty body asset’ for certain status codes", "[
     "+ Response 304\n";
 
     Blueprint blueprint;
+    BlueprintSM blueprintSM;
     Report report;
 
-    parse(source, 0, report, blueprint);
+    parse(source, 0, report, blueprint, blueprintSM);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.empty());
@@ -187,9 +194,10 @@ TEST_CASE("SIGTERM parsing blueprint", "[parser][#45]")
     "> K";
 
     Blueprint blueprint;
+    BlueprintSM blueprintSM;
     Report report;
 
-    parse(source, 0, report, blueprint);
+    parse(source, 0, report, blueprint, blueprintSM);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 4);
@@ -209,9 +217,10 @@ TEST_CASE("Parse adjacent asset blocks", "[parser][#9]")
     "        Not found\n";
 
     Blueprint blueprint;
+    BlueprintSM blueprintSM;
     Report report;
 
-    parse(source, 0, report, blueprint);
+    parse(source, 0, report, blueprint, blueprintSM);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 1);
@@ -236,9 +245,10 @@ TEST_CASE("Parse adjacent asset list blocks", "[parser][#9]")
     "+ list\n";
 
     Blueprint blueprint;
+    BlueprintSM blueprintSM;
     Report report;
 
-    parse(source, 0, report, blueprint);
+    parse(source, 0, report, blueprint, blueprintSM);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 1);
@@ -266,9 +276,10 @@ TEST_CASE("Parse adjacent nested asset blocks", "[parser][#9]")
     "C\n";
 
     Blueprint blueprint;
+    BlueprintSM blueprintSM;
     Report report;
 
-    parse(source, 0, report, blueprint);
+    parse(source, 0, report, blueprint, blueprintSM);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 2);
@@ -291,9 +302,10 @@ TEST_CASE("Exception while parsing a blueprint with leading empty space", "[regr
     "# PUT /branch\n";
     
     Blueprint blueprint;
+    BlueprintSM blueprintSM;
     Report report;
     
-    REQUIRE_NOTHROW(parse(source, 0, report, blueprint));
+    REQUIRE_NOTHROW(parse(source, 0, report, blueprint, blueprintSM));
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 1);
     REQUIRE(report.warnings[0].code == EmptyDefinitionWarning);
@@ -305,9 +317,10 @@ TEST_CASE("Invalid source map without closing newline", "[regression][parser]")
     "# PUT /branch";
     
     Blueprint blueprint;
+    BlueprintSM blueprintSM;
     Report report;
     
-    REQUIRE_NOTHROW(parse(source, 0, report, blueprint));
+    REQUIRE_NOTHROW(parse(source, 0, report, blueprint, blueprintSM));
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 1);
     REQUIRE(report.warnings[0].code == EmptyDefinitionWarning);
@@ -318,30 +331,32 @@ TEST_CASE("Invalid source map without closing newline", "[regression][parser]")
 
 TEST_CASE("Warn about missing API name if there is an API description", "[parser][regression]")
 {
-    mdp::ByteBuffer source = \
+    mdp::ByteBuffer source1 = \
     "Hello World\n";
     
-    Blueprint blueprint;
-    Report report;
+    Blueprint blueprint1;
+    BlueprintSM blueprintSM1;
+    Report report1;
     
-    parse(source, 0, report, blueprint);
+    parse(source1, 0, report1, blueprint1, blueprintSM1);
     
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
-    REQUIRE(report.warnings[0].code == APINameWarning);
+    REQUIRE(report1.error.code == Error::OK);
+    REQUIRE(report1.warnings.size() == 1);
+    REQUIRE(report1.warnings[0].code == APINameWarning);
     
-    REQUIRE(blueprint.name.empty());
-    REQUIRE(blueprint.description == "Hello World\n");
-    REQUIRE(blueprint.resourceGroups.empty());
+    REQUIRE(blueprint1.name.empty());
+    REQUIRE(blueprint1.description == "Hello World\n");
+    REQUIRE(blueprint1.resourceGroups.empty());
     
     mdp::ByteBuffer source2 = \
     "# API\n"\
     "Hello World\n";
     
     Blueprint blueprint2;
+    BlueprintSM blueprintSM2;
     Report report2;
     
-    parse(source2, 0, report2, blueprint2);
+    parse(source2, 0, report2, blueprint2, blueprintSM2);
     
     REQUIRE(report2.error.code == Error::OK);
     REQUIRE(report2.warnings.empty());
@@ -355,9 +370,10 @@ TEST_CASE("Warn about missing API name if there is an API description", "[parser
     "+ Response 201";
     
     Blueprint blueprint3;
+    BlueprintSM blueprintSM3;
     Report report3;
     
-    parse(source3, 0, report3, blueprint3);
+    parse(source3, 0, report3, blueprint3, blueprintSM3);
     
     REQUIRE(report3.error.code == Error::OK);
     REQUIRE(report3.warnings.empty());
@@ -373,9 +389,10 @@ TEST_CASE("Resource with incorrect URI segfault", "[parser][regression]")
     "\n";
     
     Blueprint blueprint;
+    BlueprintSM blueprintSM;
     Report report;
     
-    parse(source, 0, report, blueprint);
+    parse(source, 0, report, blueprint, blueprintSM);
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.empty());
     

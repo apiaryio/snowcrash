@@ -97,7 +97,7 @@ namespace snowcrash {
             // Clear any previous values
             out.values.clear();
 
-            ValuesParser::parse(node, siblings, pd, report, out.values);
+            ValuesParser::parse(node, siblings, pd, report, out.values, outSM.values);
 
             if (out.values.empty()) {
                 // WARN: empty definition

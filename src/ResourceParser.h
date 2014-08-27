@@ -62,7 +62,9 @@ namespace snowcrash {
                 if (!captureGroups[2].empty()) {
 
                     Action action;
-                    MarkdownNodeIterator cur = ActionParser::parse(node, node->parent().children(), pd, report, action);
+                    ActionSM actionSM;
+
+                    MarkdownNodeIterator cur = ActionParser::parse(node, node->parent().children(), pd, report, action, actionSM);
 
                     out.actions.push_back(action);
                     layout = RedirectSectionLayout;
@@ -88,17 +90,17 @@ namespace snowcrash {
 
             switch (pd.sectionContext()) {
                 case ActionSectionType:
-                    return processAction(node, siblings, pd, report, out);
+                    return processAction(node, siblings, pd, report, out, outSM);
 
                 case ParametersSectionType:
-                    return processParameters(node, siblings, pd, report, out);
+                    return processParameters(node, siblings, pd, report, out, outSM);
 
                 case ModelSectionType:
                 case ModelBodySectionType:
-                    return processModel(node, siblings, pd, report, out);
+                    return processModel(node, siblings, pd, report, out, outSM);
 
                 case HeadersSectionType:
-                    return SectionProcessor<Action, ActionSM>::handleDeprecatedHeaders(node, siblings, pd, report, out.headers);
+                    return SectionProcessor<Action, ActionSM>::handleDeprecatedHeaders(node, siblings, pd, report, out.headers, outSM.headers);
 
                 default:
                     break;
@@ -218,11 +220,13 @@ namespace snowcrash {
                                                   const MarkdownNodes& siblings,
                                                   SectionParserData& pd,
                                                   Report& report,
-                                                  Resource& out) {
+                                                  Resource& out,
+                                                  ResourceSM& outSM) {
 
             Action action;
-            MarkdownNodeIterator cur = ActionParser::parse(node, siblings, pd, report, action);
+            ActionSM actionSM;
 
+            MarkdownNodeIterator cur = ActionParser::parse(node, siblings, pd, report, action, actionSM);
             ActionIterator duplicate = findAction(out.actions, action);
 
             if (duplicate != out.actions.end()) {
@@ -253,10 +257,13 @@ namespace snowcrash {
                                                       const MarkdownNodes& siblings,
                                                       SectionParserData& pd,
                                                       Report& report,
-                                                      Resource& out) {
+                                                      Resource& out,
+                                                      ResourceSM& outSM) {
 
             Parameters parameters;
-            MarkdownNodeIterator cur = ParametersParser::parse(node, siblings, pd, report, parameters);
+            ParametersSM parametersSM;
+
+            MarkdownNodeIterator cur = ParametersParser::parse(node, siblings, pd, report, parameters, parametersSM);
 
             if (!parameters.empty()) {
 
@@ -272,10 +279,13 @@ namespace snowcrash {
                                                  const MarkdownNodes& siblings,
                                                  SectionParserData& pd,
                                                  Report& report,
-                                                 Resource& out) {
+                                                 Resource& out,
+                                                 ResourceSM& outSM) {
 
             Payload model;
-            MarkdownNodeIterator cur = PayloadParser::parse(node, siblings, pd, report, model);
+            PayloadSM modelSM;
+
+            MarkdownNodeIterator cur = PayloadParser::parse(node, siblings, pd, report, model, modelSM);
 
             // Check whether there isn't a model already
             if (!out.model.name.empty()) {
