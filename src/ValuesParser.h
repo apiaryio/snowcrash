@@ -28,13 +28,14 @@ namespace snowcrash {
      * Values section processor
      */
     template<>
-    struct SectionProcessor<Values> : public SectionProcessorBase<Values> {
+    struct SectionProcessor<Values, ValuesSM> : public SectionProcessorBase<Values, ValuesSM> {
 
         static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
                                                          const MarkdownNodes& siblings,
                                                          SectionParserData& pd,
                                                          Report& report,
-                                                         Values& out) {
+                                                         Values& out,
+                                                         ValuesSM& outSM) {
 
             if (pd.sectionContext() == ValueSectionType) {
 
@@ -68,7 +69,8 @@ namespace snowcrash {
         static MarkdownNodeIterator processDescription(const MarkdownNodeIterator& node,
                                                        SectionParserData& pd,
                                                        Report& report,
-                                                       Values& out) {
+                                                       Values& out,
+                                                       ValuesSM& outSM) {
 
             return node;
         }
@@ -115,7 +117,7 @@ namespace snowcrash {
     };
 
     /** Parameter Section Parser */
-    typedef SectionParser<Values, ListSectionAdapter> ValuesParser;
+    typedef SectionParser<Values, ValuesSM, ListSectionAdapter> ValuesParser;
 }
 
 #endif

@@ -9,7 +9,7 @@
 #ifndef SNOWCRASH_H
 #define SNOWCRASH_H
 
-#include "Blueprint.h"
+#include "BlueprintSourcemap.h"
 #include "SourceAnnotation.h"
 #include "SectionParser.h"
 
@@ -35,12 +35,14 @@ namespace snowcrash {
      *  \param options       Parser options. Use 0 for no additional options.
      *  \param report        Parsing report.
      *  \param blueprint     Parsed blueprint AST.
+     *  \param blueprintSM   Blueprint sourcemap AST
      *  \return Error status code. Zero represents success, non-zero a failure.
      */
     int parse(const mdp::ByteBuffer& source,
               BlueprintParserOptions options,
               Report& report,
-              Blueprint& blueprint);
+              Blueprint& blueprint,
+              BlueprintSM& blueprintSM);
 }
 
 #endif

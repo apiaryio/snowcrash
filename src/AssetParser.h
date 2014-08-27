@@ -34,13 +34,14 @@ namespace snowcrash {
      *  Asset Section Processor
      */
     template<>
-    struct SectionProcessor<Asset> : public SectionProcessorBase<Asset> {
+    struct SectionProcessor<Asset, AssetSM> : public SectionProcessorBase<Asset, AssetSM> {
         
         static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
                                                      SectionParserData& pd,
                                                      SectionLayout& layout,
                                                      Report& report,
-                                                     Asset& out) {
+                                                     Asset& out,
+                                                     AssetSM& outSM) {
             
             out = "";
             CodeBlockUtility::signatureContentAsCodeBlock(node, pd, report, out);
@@ -50,15 +51,17 @@ namespace snowcrash {
         static MarkdownNodeIterator processDescription(const MarkdownNodeIterator& node,
                                                        SectionParserData& pd,
                                                        Report& report,
-                                                       Asset& out) {
+                                                       Asset& out,
+                                                       AssetSM& outSM) {
+
             return node;
         }
 
         static MarkdownNodeIterator processContent(const MarkdownNodeIterator& node,
                                                    SectionParserData& pd,
                                                    Report& report,
-                                                   Asset& out) {
-            
+                                                   Asset& out,
+                                                   AssetSM& outSM) {
             
             mdp::ByteBuffer content;
             CodeBlockUtility::contentAsCodeBlock(node, pd, report, content);
@@ -117,7 +120,7 @@ namespace snowcrash {
     };
     
     /** Asset Section Parser */
-    typedef SectionParser<Asset, ListSectionAdapter> AssetParser;
+    typedef SectionParser<Asset, AssetSM, ListSectionAdapter> AssetParser;
 }
 
 #endif

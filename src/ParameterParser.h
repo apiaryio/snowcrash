@@ -48,13 +48,14 @@ namespace snowcrash {
      * Parameter section processor
      */
     template<>
-    struct SectionProcessor<Parameter> : public SectionProcessorBase<Parameter> {
+    struct SectionProcessor<Parameter, ParameterSM> : public SectionProcessorBase<Parameter, ParameterSM> {
 
         static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
                                                      SectionParserData& pd,
                                                      SectionLayout& layout,
                                                      Report& report,
-                                                     Parameter& out) {
+                                                     Parameter& out,
+                                                     ParameterSM& outSM) {
 
             mdp::ByteBuffer signature, remainingContent;
             signature = GetFirstLine(node->text, remainingContent);
@@ -73,7 +74,8 @@ namespace snowcrash {
                                                          const MarkdownNodes& siblings,
                                                          SectionParserData& pd,
                                                          Report& report,
-                                                         Parameter& out) {
+                                                         Parameter& out,
+                                                         ParameterSM& outSM) {
 
             if (pd.sectionContext() != ValuesSectionType) {
                 return node;
@@ -136,7 +138,7 @@ namespace snowcrash {
 
         static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
 
-            return SectionProcessor<Values>::sectionType(node);
+            return SectionProcessor<Values, ValuesSM>::sectionType(node);
         }
 
         static SectionTypes nestedSectionTypes() {
@@ -324,7 +326,7 @@ namespace snowcrash {
     };
 
     /** Parameter Section Parser */
-    typedef SectionParser<Parameter, ListSectionAdapter> ParameterParser;
+    typedef SectionParser<Parameter, ParameterSM, ListSectionAdapter> ParameterParser;
 }
 
 #endif
