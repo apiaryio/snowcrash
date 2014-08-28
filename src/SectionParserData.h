@@ -72,6 +72,11 @@ namespace snowcrash {
                 return sectionsContext[size-2];
         }
         
+        /** \returns True if exporting source maps */
+        bool exportSM() const {
+            return options & ExportSourcemapOption;
+        }
+
     private:
         SectionParserData();
         SectionParserData(const SectionParserData&);

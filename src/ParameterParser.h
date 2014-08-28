@@ -66,10 +66,14 @@ namespace snowcrash {
             mdp::ByteBuffer signature, remainingContent;
             signature = GetFirstLine(node->text, remainingContent);
 
-            parseSignature(node, pd, signature, report, out);
+            parseSignature(node, pd, signature, report, out, outSM);
 
             if (!remainingContent.empty()) {
                 out.description += "\n" + remainingContent + "\n";
+
+                if (pd.exportSM()) {
+                    outSM.description.append(node->sourceMap);
+                }
             }
 
             return ++MarkdownNodeIterator(node);
@@ -102,6 +106,10 @@ namespace snowcrash {
 
             // Clear any previous values
             out.values.clear();
+
+            if (pd.exportSM()) {
+                outSM.values.clear();
+            }
 
             ValuesParser::parse(node, siblings, pd, report, out.values, outSM.values);
 
@@ -159,7 +167,8 @@ namespace snowcrash {
                                    SectionParserData& pd,
                                    mdp::ByteBuffer& signature,
                                    Report& report,
-                                   Parameter& parameter) {
+                                   Parameter& parameter,
+                                   ParameterSM& parameterSM) {
 
             parameter.use = UndefinedParameterUse;
 
@@ -181,12 +190,14 @@ namespace snowcrash {
                 else {
                     parameter.name = innerSignature.substr(0, firstSpace);
                     innerSignature = innerSignature.substr(firstSpace + 1);
+
                     size_t descriptionPos = innerSignature.find(snowcrash::DescriptionIdentifier);
 
                     if (descriptionPos != std::string::npos) {
                         // Description
                         parameter.description = innerSignature.substr(descriptionPos);
                         parameter.description = TrimString(parameter.description.replace(0, snowcrash::DescriptionIdentifier.length(), ""));
+
                         innerSignature = innerSignature.substr(0, descriptionPos);
                         innerSignature = TrimString(innerSignature);
                     }
@@ -199,7 +210,9 @@ namespace snowcrash {
                         if (endOfAttributesPos - attributesPos > 1) {
                             std::string attributes = innerSignature.substr(attributesPos, endOfAttributesPos - attributesPos);
                             attributes = attributes.substr(1);
-                            parseAdditionalTraits(node, pd, attributes, report, parameter);
+
+                            parseAdditionalTraits(node, pd, attributes, report, parameter, parameterSM);
+
                             innerSignature = innerSignature.substr(0, attributesPos);
                             innerSignature = TrimString(innerSignature);
                         }
@@ -208,9 +221,25 @@ namespace snowcrash {
                     if (innerSignature.length() > 0) {
                         // Remove =
                         parameter.defaultValue = innerSignature;
+
                         parameter.defaultValue.erase(std::remove(parameter.defaultValue.begin(), parameter.defaultValue.end(), '='), parameter.defaultValue.end());
                         parameter.defaultValue.erase(std::remove(parameter.defaultValue.begin(), parameter.defaultValue.end(), '`'), parameter.defaultValue.end());
+
                         parameter.defaultValue = TrimString(parameter.defaultValue);
+                    }
+                }
+
+                if (pd.exportSM()) {
+                    if (!parameter.name.empty()) {
+                        parameterSM.name = node->sourceMap;
+                    }
+
+                    if (!parameter.description.empty()) {
+                        parameterSM.description = node->sourceMap;
+                    }
+
+                    if (!parameter.defaultValue.empty()) {
+                        parameterSM.defaultValue = node->sourceMap;
                     }
                 }
 
@@ -241,7 +270,8 @@ namespace snowcrash {
                                           SectionParserData& pd,
                                           mdp::ByteBuffer& traits,
                                           Report& report,
-                                          Parameter& parameter) {
+                                          Parameter& parameter,
+                                          ParameterSM& parameterSM) {
 
             TrimString(traits);
 
@@ -257,7 +287,11 @@ namespace snowcrash {
                 if (pos != std::string::npos) {
                     traits.replace(pos, captureGroups[0].length(), std::string());
                 }
-            }
+
+                if (pd.exportSM()) {
+                    parameterSM.exampleValue = node->sourceMap;
+                }
+             }
 
             captureGroups.clear();
 
@@ -270,6 +304,10 @@ namespace snowcrash {
 
                 if (pos != std::string::npos) {
                     traits.replace(pos, captureGroups[0].length(), std::string());
+                }
+
+                if (pd.exportSM()) {
+                    parameterSM.use = node->sourceMap;
                 }
             }
 
@@ -284,6 +322,10 @@ namespace snowcrash {
 
                 if (pos != std::string::npos) {
                     traits.replace(pos, captureGroups[0].length(), std::string());
+                }
+
+                if (pd.exportSM()) {
+                    parameterSM.type = node->sourceMap;
                 }
             }
 
@@ -305,6 +347,12 @@ namespace snowcrash {
                 parameter.type.clear();
                 parameter.exampleValue.clear();
                 parameter.use = UndefinedParameterUse;
+
+                if (pd.exportSM()) {
+                    parameterSM.type.clear();
+                    parameterSM.exampleValue.clear();
+                    parameterSM.use.clear();
+                }
             }
         }
 

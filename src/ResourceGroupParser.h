@@ -55,6 +55,10 @@ namespace snowcrash {
                 TrimString(out.name);
             }
 
+            if (pd.exportSM() && !out.name.empty()) {
+                outSM.name = node->sourceMap;
+            }
+
             return ++MarkdownNodeIterator(node);
         }
 
@@ -90,6 +94,10 @@ namespace snowcrash {
                 }
 
                 out.resources.push_back(resource);
+
+                if (pd.exportSM()) {
+                    outSM.resources.push_back(resourceSM);
+                }
 
                 return cur;
             }

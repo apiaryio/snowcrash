@@ -43,7 +43,7 @@ namespace snowcrash {
             mdp::ByteBuffer content;
             CodeBlockUtility::signatureContentAsCodeBlock(node, pd, report, content);
 
-            headersFromContent(node, content, pd, report, out);
+            headersFromContent(node, content, pd, report, out, outSM);
 
             return ++MarkdownNodeIterator(node);
         }
@@ -68,7 +68,7 @@ namespace snowcrash {
             mdp::ByteBuffer content;
             CodeBlockUtility::contentAsCodeBlock(node, pd, report, content);
 
-            headersFromContent(node, content, pd, report, out);
+            headersFromContent(node, content, pd, report, out, outSM);
 
             return ++MarkdownNodeIterator(node);
         }
@@ -124,13 +124,15 @@ namespace snowcrash {
                                        const mdp::ByteBuffer& content,
                                        SectionParserData& pd,
                                        Report& report,
-                                       Headers& headers) {
+                                       Headers& headers,
+                                       HeadersSM& headersSM) {
 
             std::vector<std::string> lines = Split(content, '\n');
 
             for (std::vector<std::string>::iterator line = lines.begin();
                  line != lines.end();
                  ++line) {
+
                 if (TrimString(*line).empty()) {
                     continue;
                 }
@@ -151,6 +153,10 @@ namespace snowcrash {
                     }
 
                     headers.push_back(header);
+
+                    if (pd.exportSM()) {
+                        headersSM.push_back(node->sourceMap);
+                    }
                 } else {
                     // WARN: unable to parse header
                     mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
@@ -162,8 +168,11 @@ namespace snowcrash {
         }
 
         /** Inject headers into transaction examples requests and responses */
-        static void injectDeprecatedHeaders(const Headers& headers,
-                                            Collection<TransactionExample>::type& examples) {
+        static void injectDeprecatedHeaders(SectionParserData& pd,
+                                            const Headers& headers,
+                                            const HeadersSM& headersSM,
+                                            Collection<TransactionExample>::type& examples,
+                                            Collection<TransactionExampleSM>::type& examplesSM) {
 
             for (Collection<TransactionExample>::iterator exampleIt = examples.begin();
                  exampleIt != examples.end();

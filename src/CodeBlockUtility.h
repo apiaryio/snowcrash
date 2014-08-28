@@ -197,12 +197,14 @@ namespace snowcrash {
         /**
          *  \brief Add dangling message body asset to the given string
          *  \param  out  The string to which the dangling asset should be added
+         *  \param  outSM The source map to which source map should be added
+         *  \return asset The value of the asset
          */
-        static void addDanglingAsset(const MarkdownNodeIterator& node,
-                                     SectionParserData& pd,
-                                     SectionType& sectionType,
-                                     Report& report,
-                                     mdp::ByteBuffer& out) {
+        static mdp::ByteBuffer addDanglingAsset(const MarkdownNodeIterator& node,
+                                                SectionParserData& pd,
+                                                SectionType& sectionType,
+                                                Report& report,
+                                                mdp::ByteBuffer& out) {
 
             mdp::ByteBuffer asset;
 
@@ -232,6 +234,8 @@ namespace snowcrash {
                                                   IndentationWarning,
                                                   sourceMap));
             }
+
+            return asset;
         }
     };
 }
