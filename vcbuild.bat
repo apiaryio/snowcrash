@@ -179,14 +179,14 @@ echo Failed to create vc project files.
 goto exit
 
 :help
-echo vcbuild.bat [debug/release] [test] [clean] [noprojgen] [nobuild] [x86/x64] [inttest] [MSVC2008/MSVC2010/MSVC2012/MSVC2013]
+echo vcbuild.bat [debug/release] [test] [clean] [noprojgen] [nobuild] [x86/x64] [inttest] [MSVC2012/MSVC2013]
 echo Examples:
 echo   vcbuild.bat                : builds release build
 echo   vcbuild.bat nobuild        : generate MSVS project files only
 echo   vcbuild.bat debug          : builds debug build
 echo   vcbuild.bat test           : builds debug build and runs tests
 echo   vcbuild.bat inttest        : include integration tests
-echo   vcbuild.bat MSVC2013       : indicate target solution's version, could also define as MSVC2008 , MSVC2010 , MSVC2012, MSVC2013
+echo   vcbuild.bat MSVC2013       : indicate target solution's version, could also define as MSVC2012, MSVC2013
 goto exit
 
 :exit
