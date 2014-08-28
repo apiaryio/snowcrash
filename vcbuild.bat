@@ -53,7 +53,7 @@ if "%config%"=="Debug" set debug_arg=--debug
 :project-gen
 @rem Skip project generation if requested.
 if defined noprojgen goto msbuild
-if "%GYP_MSVS_VERSION%"=="" set GYP_MSVS_VERSION=2013
+if "%GYP_MSVS_VERSION%"=="" set GYP_MSVS_VERSION=2012
 
 @rem Generate the VS project.
 SETLOCAL
