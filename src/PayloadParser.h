@@ -54,7 +54,7 @@ namespace snowcrash {
             mdp::ByteBuffer signature, remainingContent;
             signature = GetFirstLine(node->text, remainingContent);
 
-            parseSignature(node, pd, signature, report, out);
+            parseSignature(node, pd, signature, report, out, outSM);
 
             // WARN: missing status code
             if (out.name.empty() &&
@@ -70,13 +70,21 @@ namespace snowcrash {
             if (!remainingContent.empty()) {
                 if (!isAbbreviated(pd.sectionContext())) {
                     out.description = remainingContent;
-                } else if (!parseSymbolReference(node, pd, remainingContent, report, out)) {
+
+                    if (pd.exportSM() && !out.description.empty()) {
+                        outSM.description.append(node->sourceMap);
+                    }
+                } else if (!parseSymbolReference(node, pd, remainingContent, report, out, outSM)) {
 
                     // NOTE: NOT THE CORRECT WAY TO DO THIS
                     // https://github.com/apiaryio/snowcrash/commit/a7c5868e62df0048a85e2f9aeeb42c3b3e0a2f07#commitcomment-7322085
                     pd.sectionsContext.push_back(BodySectionType);
                     CodeBlockUtility::signatureContentAsCodeBlock(node, pd, report, out.body);
                     pd.sectionsContext.pop_back();
+
+                    if (pd.exportSM() && !out.body.empty()) {
+                        outSM.body.append(node->sourceMap);
+                    }
                 }
             }
 
@@ -106,13 +114,17 @@ namespace snowcrash {
 
                 if (!out.body.empty() ||
                     node->type != mdp::ParagraphMarkdownNodeType ||
-                    !parseSymbolReference(node, pd, node->text, report, out)) {
+                    !parseSymbolReference(node, pd, node->text, report, out, outSM)) {
 
                     // NOTE: NOT THE CORRECT WAY TO DO THIS
                     // https://github.com/apiaryio/snowcrash/commit/a7c5868e62df0048a85e2f9aeeb42c3b3e0a2f07#commitcomment-7322085
                     pd.sectionsContext.push_back(BodySectionType);
                     CodeBlockUtility::contentAsCodeBlock(node, pd, report, content);
                     pd.sectionsContext.pop_back();
+
+                    if (pd.exportSM() && !content.empty()) {
+                        outSM.body.append(node->sourceMap);
+                    }
 
                     out.body += content;
                 }
@@ -173,7 +185,11 @@ namespace snowcrash {
                  node->type == mdp::CodeMarkdownNodeType) &&
                 sectionType == BodySectionType) {
 
-                CodeBlockUtility::addDanglingAsset(node, pd, sectionType, report, out.body);
+                mdp::ByteBuffer content = CodeBlockUtility::addDanglingAsset(node, pd, sectionType, report, out.body);
+
+                if (pd.exportSM() && !content.empty()) {
+                    outSM.body.append(node->sourceMap);
+                }
             } else {
 
                 // WARN: Dangling blocks found
@@ -409,7 +425,8 @@ namespace snowcrash {
                                    SectionParserData& pd,
                                    const mdp::ByteBuffer& signature,
                                    Report& report,
-                                   Payload& out) {
+                                   Payload& out,
+                                   PayloadSM& outSM) {
 
             const char* regex;
             mdp::ByteBuffer mediaType;
@@ -493,9 +510,17 @@ namespace snowcrash {
                 TrimString(out.name);
                 TrimString(mediaType);
 
+                if (pd.exportSM() && !out.name.empty()) {
+                    outSM.name = node->sourceMap;
+                }
+
                 if (!mediaType.empty()) {
                     Header header = std::make_pair(HTTPHeaderName::ContentType, mediaType);
                     out.headers.push_back(header);
+
+                    if (pd.exportSM()) {
+                        outSM.headers.push_back(node->sourceMap);
+                    }
                 }
             }
 
@@ -506,7 +531,8 @@ namespace snowcrash {
                                          SectionParserData& pd,
                                          mdp::ByteBuffer& source,
                                          Report& report,
-                                         Payload& out) {
+                                         Payload& out,
+                                         PayloadSM& outSM) {
 
             SymbolName symbol;
             ResourceModel model;
@@ -515,6 +541,10 @@ namespace snowcrash {
 
             if (GetSymbolReference(source, symbol)) {
                 out.symbol = symbol;
+
+                if (pd.exportSM() && !symbol.empty()) {
+                    outSM.symbol = node->sourceMap;
+                }
 
                 // If symbol doesn't exist
                 if (pd.symbolTable.resourceModels.find(symbol) == pd.symbolTable.resourceModels.end()) {

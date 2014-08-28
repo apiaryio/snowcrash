@@ -46,6 +46,10 @@ namespace snowcrash {
 
                 if (captureGroups.size() > 1) {
                     out.push_back(captureGroups[1]);
+
+                    if (pd.exportSM()) {
+                        outSM.push_back(node->sourceMap);
+                    }
                 } else {
                     TrimString(content);
 
@@ -106,7 +110,7 @@ namespace snowcrash {
                 TrimString(subject);
 
                 if (node->children().size() == 1 &&
-                        !subject.empty()) {
+                    !subject.empty()) {
 
                     return ValueSectionType;
                 }

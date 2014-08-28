@@ -64,8 +64,22 @@ namespace snowcrash {
                 TrimString(out.name);
             }
 
+            if (pd.exportSM()) {
+                if (!out.method.empty()) {
+                    outSM.method = node->sourceMap;
+                }
+
+                if (!out.name.empty()) {
+                    outSM.name = node->sourceMap;
+                }
+            }
+
             if (!remainingContent.empty()) {
                 out.description += remainingContent;
+
+                if (pd.exportSM()) {
+                    outSM.description.append(node->sourceMap);
+                }
             }
 
             return ++MarkdownNodeIterator(node);
@@ -96,12 +110,22 @@ namespace snowcrash {
 
                     if (out.examples.empty() || !out.examples.back().responses.empty()) {
                         TransactionExample transaction;
+                        TransactionExampleSM transactionSM;
+
                         out.examples.push_back(transaction);
+
+                        if (pd.exportSM()) {
+                            outSM.examples.push_back(transactionSM);
+                        }
                     }
 
                     checkPayload(sectionType, sourceMap, payload, out, report);
 
                     out.examples.back().requests.push_back(payload);
+
+                    if (pd.exportSM()) {
+                        outSM.examples.back().requests.push_back(payloadSM);
+                    }
                     break;
 
                 case ResponseSectionType:
@@ -110,12 +134,22 @@ namespace snowcrash {
 
                     if (out.examples.empty()) {
                         TransactionExample transaction;
+                        TransactionExampleSM transactionSM;
+
                         out.examples.push_back(transaction);
+
+                        if (pd.exportSM()) {
+                            outSM.examples.push_back(transactionSM);
+                        }
                     }
 
                     checkPayload(sectionType, sourceMap, payload, out, report);
 
                     out.examples.back().responses.push_back(payload);
+
+                    if (pd.exportSM()) {
+                        outSM.examples.back().responses.push_back(payloadSM);
+                    }
                     break;
 
                 case HeadersSectionType:
@@ -158,7 +192,11 @@ namespace snowcrash {
                 !out.examples.empty() &&
                 !out.examples.back().responses.empty()) {
 
-                CodeBlockUtility::addDanglingAsset(node, pd, sectionType, report, out.examples.back().responses.back().body);
+                mdp::ByteBuffer content = CodeBlockUtility::addDanglingAsset(node, pd, sectionType, report, out.examples.back().responses.back().body);
+
+                if (pd.exportSM() && !content.empty()) {
+                    outSM.examples.back().responses.back().body.append(node->sourceMap);
+                }
             } else {
 
                 // WARN: Ignoring unexpected node
@@ -247,8 +285,12 @@ namespace snowcrash {
 
             if (!out.headers.empty()) {
 
-                SectionProcessor<Headers, HeadersSM>::injectDeprecatedHeaders(out.headers, out.examples);
+                SectionProcessor<Headers, HeadersSM>::injectDeprecatedHeaders(pd, out.headers, outSM.headers, out.examples, outSM.examples);
                 out.headers.clear();
+
+                if (pd.exportSM()) {
+                    outSM.headers.clear();
+                }
             }
 
             if (out.examples.empty()) {

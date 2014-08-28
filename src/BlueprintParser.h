@@ -42,13 +42,18 @@ namespace snowcrash {
             while (cur->type == mdp::ParagraphMarkdownNodeType) {
 
                 MetadataCollection metadata;
-                parseMetadata(cur, pd, report, metadata);
+                MetadataCollectionSM metadataSM;
+                parseMetadata(cur, pd, report, metadata, metadataSM);
 
                 // First block is paragraph and is not metadata (no API name)
                 if (metadata.empty()) {
                     return processDescription(cur, pd, report, out, outSM);
                 } else {
                     out.metadata.insert(out.metadata.end(), metadata.begin(), metadata.end());
+
+                    if (pd.exportSM()) {
+                        outSM.metadata.insert(outSM.metadata.end(), metadataSM.begin(), metadataSM.end());
+                    }
                 }
 
                 cur++;
@@ -66,6 +71,10 @@ namespace snowcrash {
 
                 out.name = cur->text;
                 TrimString(out.name);
+
+                if (pd.exportSM() && !out.name.empty()) {
+                    outSM.name = cur->sourceMap;
+                }
             } else {
 
                 // Any other type of block, add to description
@@ -113,6 +122,10 @@ namespace snowcrash {
                 }
 
                 out.resourceGroups.push_back(resourceGroup);
+
+                if (pd.exportSM()) {
+                    outSM.resourceGroups.push_back(resourceGroupSM);
+                }
 
                 return cur;
             }
@@ -194,7 +207,8 @@ namespace snowcrash {
         static void parseMetadata(const MarkdownNodeIterator& node,
                                   SectionParserData& pd,
                                   Report& report,
-                                  MetadataCollection& out) {
+                                  MetadataCollection& out,
+                                  MetadataCollectionSM& outSM) {
 
             mdp::ByteBuffer content = node->text;
             TrimStringEnd(content);
@@ -209,6 +223,10 @@ namespace snowcrash {
 
                 if (CodeBlockUtility::keyValueFromLine(*it, metadata)) {
                     out.push_back(metadata);
+
+                    if (pd.exportSM()) {
+                        outSM.push_back(node->sourceMap);
+                    }
                 }
             }
 

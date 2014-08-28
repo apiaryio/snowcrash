@@ -45,6 +45,11 @@ namespace snowcrash {
             
             out = "";
             CodeBlockUtility::signatureContentAsCodeBlock(node, pd, report, out);
+
+            if (pd.exportSM() && !out.empty()) {
+                outSM.append(node->sourceMap);
+            }
+
             return ++MarkdownNodeIterator(node);
         }
         
@@ -65,6 +70,11 @@ namespace snowcrash {
             
             mdp::ByteBuffer content;
             CodeBlockUtility::contentAsCodeBlock(node, pd, report, content);
+
+            if (pd.exportSM() && !content.empty()) {
+                outSM.append(node->sourceMap);
+            }
+
             out += content;
             return ++MarkdownNodeIterator(node);
         }

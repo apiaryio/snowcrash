@@ -46,17 +46,17 @@ namespace snowcrash {
     /** Source Map of an asset data */
     typedef mdp::BytesRangeSet AssetSM;
 
-    /** Source Map of Metadata */
-    typedef SourceMaps MetadataSM;
+    /** Source Map of Metadata Collection */
+    typedef SourceMaps MetadataCollectionSM;
 
     /** Source Map of Headers */
     typedef SourceMaps HeadersSM;
 
+    /** Array of Parameter values source maps */
+    typedef SourceMaps ValuesSM;
+
     /** Source Map of Parameter Use flag */
     typedef mdp::BytesRangeSet ParameterUseSM;
-
-    /** Array of Parameter values source maps */
-    typedef Collection<ValueSM>::type ValuesSM;
 
     /** Source Map Structure for Parameter */
     struct ParameterSM {
@@ -245,7 +245,7 @@ namespace snowcrash {
     struct BlueprintSM {
 
         /** Source Map of API Blueprint metadata */
-        MetadataSM metadata;
+        MetadataCollectionSM metadata;
 
         /** Source Map of the API Name */
         NameSM name;

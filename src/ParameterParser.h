@@ -60,10 +60,14 @@ namespace snowcrash {
             mdp::ByteBuffer signature, remainingContent;
             signature = GetFirstLine(node->text, remainingContent);
 
-            parseSignature(node, pd, signature, report, out);
+            parseSignature(node, pd, signature, report, out, outSM);
 
             if (!remainingContent.empty()) {
                 out.description += "\n" + remainingContent + "\n";
+
+                if (pd.exportSM()) {
+                    outSM.description.append(node->sourceMap);
+                }
             }
 
             return ++MarkdownNodeIterator(node);
@@ -96,6 +100,10 @@ namespace snowcrash {
 
             // Clear any previous values
             out.values.clear();
+
+            if (pd.exportSM()) {
+                outSM.values.clear();
+            }
 
             ValuesParser::parse(node, siblings, pd, report, out.values, outSM.values);
 
@@ -153,7 +161,8 @@ namespace snowcrash {
                                    SectionParserData& pd,
                                    mdp::ByteBuffer& signature,
                                    Report& report,
-                                   Parameter& parameter) {
+                                   Parameter& parameter,
+                                   ParameterSM& parameterSM) {
 
             parameter.use = UndefinedParameterUse;
 
@@ -168,19 +177,31 @@ namespace snowcrash {
                 parameter.name = captureGroups[1];
                 TrimString(parameter.name);
 
+                if (pd.exportSM() && !parameter.name.empty()) {
+                    parameterSM.name = node->sourceMap;
+                }
+
                 // Default value
                 if (!captureGroups[3].empty()) {
                     parameter.defaultValue = captureGroups[3];
+
+                    if (pd.exportSM()) {
+                        parameterSM.defaultValue = node->sourceMap;
+                    }
                 }
 
                 // Additional attributes
                 if (!captureGroups[5].empty()) {
-                    parseAdditionalTraits(node, pd, captureGroups[5], report, parameter);
+                    parseAdditionalTraits(node, pd, captureGroups[5], report, parameter, parameterSM);
                 }
 
                 // Description
                 if (!captureGroups[7].empty()) {
                     parameter.description = captureGroups[7];
+
+                    if (pd.exportSM()) {
+                        parameterSM.description = node->sourceMap;
+                    }
                 }
 
                 if (parameter.use != OptionalParameterUse &&
@@ -209,7 +230,8 @@ namespace snowcrash {
                                           SectionParserData& pd,
                                           mdp::ByteBuffer& traits,
                                           Report& report,
-                                          Parameter& parameter) {
+                                          Parameter& parameter,
+                                          ParameterSM& parameterSM) {
 
             TrimString(traits);
 
@@ -225,7 +247,11 @@ namespace snowcrash {
                 if (pos != std::string::npos) {
                     traits.replace(pos, captureGroups[0].length(), std::string());
                 }
-            }
+
+                if (pd.exportSM()) {
+                    parameterSM.exampleValue = node->sourceMap;
+                }
+             }
 
             captureGroups.clear();
 
@@ -238,6 +264,10 @@ namespace snowcrash {
 
                 if (pos != std::string::npos) {
                     traits.replace(pos, captureGroups[0].length(), std::string());
+                }
+
+                if (pd.exportSM()) {
+                    parameterSM.use = node->sourceMap;
                 }
             }
 
@@ -252,6 +282,10 @@ namespace snowcrash {
 
                 if (pos != std::string::npos) {
                     traits.replace(pos, captureGroups[0].length(), std::string());
+                }
+
+                if (pd.exportSM()) {
+                    parameterSM.type = node->sourceMap;
                 }
             }
 
@@ -273,6 +307,12 @@ namespace snowcrash {
                 parameter.type.clear();
                 parameter.exampleValue.clear();
                 parameter.use = UndefinedParameterUse;
+
+                if (pd.exportSM()) {
+                    parameterSM.type.clear();
+                    parameterSM.exampleValue.clear();
+                    parameterSM.use.clear();
+                }
             }
         }
 

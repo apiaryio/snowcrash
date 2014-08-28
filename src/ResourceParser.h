@@ -66,6 +66,10 @@ namespace snowcrash {
 
                     MarkdownNodeIterator cur = ActionParser::parse(node, node->parent().children(), pd, report, action, actionSM);
 
+                    if (pd.exportSM()) {
+                        outSM.actions.push_back(actionSM);
+                    }
+
                     out.actions.push_back(action);
                     layout = RedirectSectionLayout;
 
@@ -76,6 +80,16 @@ namespace snowcrash {
                 out.name = captureGroups[1];
                 TrimString(out.name);
                 out.uriTemplate = captureGroups[2];
+            }
+
+            if (pd.exportSM()) {
+                if (!out.uriTemplate.empty()) {
+                    outSM.uriTemplate = node->sourceMap;
+                }
+
+                if (!out.name.empty()) {
+                    outSM.name = node->sourceMap;
+                }
             }
 
             return ++MarkdownNodeIterator(node);
@@ -201,17 +215,24 @@ namespace snowcrash {
                 }
             }
 
-            // Consolidate depraceted headers into subsequent payloads
+            // Consolidate deprecated headers into subsequent payloads
             if (!out.headers.empty()) {
 
-                for (Collection<Action>::iterator it = out.actions.begin();
-                     it != out.actions.end();
-                     ++it) {
+                Collection<Action>::iterator actIt = out.actions.begin();
+                Collection<ActionSM>::iterator actSMIt = outSM.actions.begin();
 
-                    SectionProcessor<Headers, HeadersSM>::injectDeprecatedHeaders(out.headers, it->examples);
+                for (;
+                     actIt != out.actions.end();
+                     ++actIt, ++actSMIt) {
+
+                    SectionProcessor<Headers, HeadersSM>::injectDeprecatedHeaders(pd, out.headers, outSM.headers, actIt->examples, actSMIt->examples);
                 }
 
                 out.headers.clear();
+
+                if (pd.exportSM()) {
+                    outSM.headers.clear();
+                }
             }
         }
 
@@ -249,6 +270,10 @@ namespace snowcrash {
 
             out.actions.push_back(action);
 
+            if (pd.exportSM()) {
+                outSM.actions.push_back(actionSM);
+            }
+
             return cur;
         }
 
@@ -269,6 +294,10 @@ namespace snowcrash {
 
                 checkParametersEligibility(node, pd, out, parameters, report);
                 out.parameters.insert(out.parameters.end(), parameters.begin(), parameters.end());
+
+                if (pd.exportSM()) {
+                    outSM.parameters.insert(outSM.parameters.end(), parametersSM.begin(), parametersSM.end());
+                }
             }
 
             return cur;
