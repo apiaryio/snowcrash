@@ -107,6 +107,10 @@ namespace snowcrash {
 
             out.push_back(parameter);
 
+            if (pd.exportSM()) {
+                outSM.push_back(parameterSM);
+            }
+
             return ++MarkdownNodeIterator(node);
         }
 

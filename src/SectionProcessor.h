@@ -77,7 +77,13 @@ namespace snowcrash {
                 TwoNewLines(out.description);
             }
 
-            out.description += mdp::MapBytesRangeSet(node->sourceMap, pd.sourceData);
+            mdp::ByteBuffer content = mdp::MapBytesRangeSet(node->sourceMap, pd.sourceData);
+
+            if (pd.exportSM() && !content.empty()) {
+                outSM.description.append(node->sourceMap);
+            }
+
+            out.description += content;
 
             return ++MarkdownNodeIterator(node);
         }

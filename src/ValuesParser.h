@@ -46,6 +46,10 @@ namespace snowcrash {
 
                 if (captureGroups.size() > 1) {
                     out.push_back(captureGroups[1]);
+
+                    if (pd.exportSM()) {
+                        outSM.push_back(node->sourceMap);
+                    }
                 } else {
                     TrimString(content);
 
