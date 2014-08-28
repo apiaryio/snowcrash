@@ -146,7 +146,7 @@ TEST_CASE("Parse nameless blueprint description", "[blueprint]")
     SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
 
     REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size());
+    REQUIRE(report.warnings.size() == 1);
     REQUIRE(report.warnings[0].code == APINameWarning);
 
     REQUIRE(blueprint.name.empty());
