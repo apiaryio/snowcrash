@@ -36,6 +36,7 @@ if /i "%1"=="noprojgen"     set noprojgen=1&goto arg-ok
 if /i "%1"=="nobuild"       set nobuild=1&goto arg-ok
 if /i "%1"=="test"          set test=test&goto arg-ok
 if /i "%1"=="inttest"       set inttest=1&goto arg-ok
+if /i "%1"=="MSVC2013"      set GYP_MSVS_VERSION=2013&goto arg-ok
 if /i "%1"=="MSVC2012"      set GYP_MSVS_VERSION=2012&goto arg-ok
 if /i "%1"=="MSVC2010"      set GYP_MSVS_VERSION=2010&goto arg-ok
 if /i "%1"=="MSVC2008"      set GYP_MSVS_VERSION=2008&goto arg-ok
@@ -56,7 +57,7 @@ if "%GYP_MSVS_VERSION%"=="" set GYP_MSVS_VERSION=2012
 
 @rem Generate the VS project.
 SETLOCAL
-  if defined VS100COMNTOOLS call "%VS100COMNTOOLS%\VCVarsQueryRegistry.bat"
+  if defined VS120COMNTOOLS call "%VS120COMNTOOLS%\VCVarsQueryRegistry.bat"
   if defined inttest python configure %debug_arg% --dest-cpu=%target_arch% --include-integration-tests
   if not defined inttest python configure %debug_arg% --dest-cpu=%target_arch%
   if errorlevel 1 goto create-msvs-files-failed
@@ -70,10 +71,18 @@ ENDLOCAL
 :msbuild
 @rem Skip project generation if requested.
 if defined nobuild goto exit
+if "%GYP_MSVS_VERSION%"=="2012" goto vc-set-2012
 if "%GYP_MSVS_VERSION%"=="2010" goto vc-set-2010
 if "%GYP_MSVS_VERSION%"=="2008" goto vc-set-2008
 
-@rem Look for Visual Studio 2012
+@rem Look for Visual Studio 2013
+if not defined VS120COMNTOOLS goto vc-set-2012
+if not exist "%VS120COMNTOOLS%\..\..\vc\vcvarsall.bat" goto vc-set-2012
+call "%VS120COMNTOOLS%\..\..\vc\vcvarsall.bat"
+if not defined VCINSTALLDIR goto msbuild-not-found
+goto msbuild-found
+
+:vc-set-2012
 if not defined VS110COMNTOOLS goto vc-set-2010
 if not exist "%VS110COMNTOOLS%\..\..\vc\vcvarsall.bat" goto vc-set-2010
 call "%VS110COMNTOOLS%\..\..\vc\vcvarsall.bat"
@@ -170,14 +179,14 @@ echo Failed to create vc project files.
 goto exit
 
 :help
-echo vcbuild.bat [debug/release] [test] [clean] [noprojgen] [nobuild] [x86/x64] [inttest] [MSVC2008/MSVC2010/MSVC2012]
+echo vcbuild.bat [debug/release] [test] [clean] [noprojgen] [nobuild] [x86/x64] [inttest] [MSVC2012/MSVC2013]
 echo Examples:
 echo   vcbuild.bat                : builds release build
 echo   vcbuild.bat nobuild        : generate MSVS project files only
 echo   vcbuild.bat debug          : builds debug build
 echo   vcbuild.bat test           : builds debug build and runs tests
 echo   vcbuild.bat inttest        : include integration tests
-echo   vcbuild.bat MSVC2012       : indicate target solution's version, could also define as MSVC2008 , MSVC2010 , MSVC2012
+echo   vcbuild.bat MSVC2013       : indicate target solution's version, could also define as MSVC2012, MSVC2013
 goto exit
 
 :exit
