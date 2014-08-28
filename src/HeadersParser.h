@@ -174,24 +174,57 @@ namespace snowcrash {
                                             Collection<TransactionExample>::type& examples,
                                             Collection<TransactionExampleSM>::type& examplesSM) {
 
-            for (Collection<TransactionExample>::iterator exampleIt = examples.begin();
-                 exampleIt != examples.end();
-                 ++exampleIt) {
+            Collection<TransactionExample>::iterator exampleIt = examples.begin();
+            Collection<TransactionExampleSM>::iterator exampleSMIt;
+
+            if (pd.exportSM()) {
+                exampleSMIt = examplesSM.begin();
+            }
+
+            while (exampleIt != examples.end()) {
+
+                Collection<Request>::iterator reqIt = exampleIt->requests.begin();
+                Collection<RequestSM>::iterator reqSMIt;
+
+                if (pd.exportSM()) {
+                    reqSMIt = exampleSMIt->requests.begin();
+                }
 
                 // Requests
-                for (Collection<Request>::iterator reqIt = exampleIt->requests.begin();
-                     reqIt != exampleIt->requests.end();
-                     ++reqIt) {
+                while (reqIt != exampleIt->requests.end()) {
 
                      reqIt->headers.insert(reqIt->headers.begin(), headers.begin(), headers.end());
+                     ++reqIt;
+
+                     if (pd.exportSM()) {
+                         reqSMIt->headers.insert(reqSMIt->headers.begin(), headersSM.begin(), headersSM.end());
+                         ++reqSMIt;
+                     }
+                }
+
+                Collection<Response>::iterator resIt = exampleIt->responses.begin();
+                Collection<ResponseSM>::iterator resSMIt;
+
+                if (pd.exportSM()) {
+                    resSMIt = exampleSMIt->responses.begin();
                 }
 
                 // Responses
-                for (Collection<Response>::iterator resIt = exampleIt->responses.begin();
-                     resIt != exampleIt->responses.end();
-                     ++resIt) {
+                while(resIt != exampleIt->responses.end()) {
 
                     resIt->headers.insert(resIt->headers.begin(), headers.begin(), headers.end());
+                    ++resIt;
+
+                    if (pd.exportSM()) {
+                        resSMIt->headers.insert(resSMIt->headers.begin(), headersSM.begin(), headersSM.end());
+                        ++resSMIt;
+                    }
+                }
+
+                ++exampleIt;
+
+                if (pd.exportSM()) {
+                    ++exampleSMIt;
                 }
             }
         }
