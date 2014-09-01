@@ -123,7 +123,7 @@ namespace snowcrash {
                 return ++MarkdownNodeIterator(node);
             }
 
-            return SectionProcessor::processUnexpectedNode(node, siblings, pd, lastSectionType, report, out);
+            return SectionProcessorBase::processUnexpectedNode(node, siblings, pd, lastSectionType, report, out);
         }
 
         static SectionType sectionType(const MarkdownNodeIterator& node) {
