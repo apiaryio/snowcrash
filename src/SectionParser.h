@@ -100,8 +100,8 @@ namespace snowcrash {
                                                         const MarkdownNodes& collection,
                                                         SectionParserData& pd,
                                                         Report& report,
-                                                        T& out)
-        {
+                                                        T& out) {
+
             MarkdownNodeIterator cur = node;
             MarkdownNodeIterator lastCur = cur;
             
@@ -127,8 +127,8 @@ namespace snowcrash {
                      (cur->type != mdp::ParagraphMarkdownNodeType &&
                       cur->type != mdp::CodeMarkdownNodeType))) {
                          
-                         lastSectionType = pd.sectionContext();
-                     }
+                    lastSectionType = pd.sectionContext();
+                }
                 
                 pd.sectionsContext.pop_back();
                 
