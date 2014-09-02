@@ -530,6 +530,7 @@ namespace snowcrash {
 
             SymbolName symbol;
             ResourceModel model;
+            ResourceModelSM modelSM;
 
             TrimString(source);
 
@@ -589,6 +590,17 @@ namespace snowcrash {
                 
                 out.body = model.body;
                 out.schema = model.schema;
+
+                if (pd.exportSM()) {
+
+                    modelSM = pd.symbolTableSM.resourceModels.at(symbol);
+
+                    outSM.description = modelSM.description;
+                    outSM.parameters = modelSM.parameters;
+                    outSM.headers = modelSM.headers;
+                    outSM.body = modelSM.body;
+                    outSM.schema = modelSM.schema;
+                }
 
                 return true;
             }
