@@ -52,7 +52,7 @@ namespace snowcrash {
 
         static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
                                                      SectionParserData& pd,
-                                                     bool& parsingRedirect,
+                                                     SectionLayout& layout,
                                                      Report& report,
                                                      Parameter& out) {
 

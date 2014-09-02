@@ -363,3 +363,27 @@ TEST_CASE("Warn about missing API name if there is an API description", "[parser
     REQUIRE(report3.warnings.empty());
 }
 
+TEST_CASE("Resource with incorrect URI segfault", "[parser][regression]")
+{
+    mdp::ByteBuffer source = \
+    "# Group A\n"\
+    "## Resource [wronguri]\n"\
+    "### Retrieve [GET]\n"\
+    "+ Response 200\n"\
+    "\n";
+    
+    Blueprint blueprint;
+    Report report;
+    
+    parse(source, 0, report, blueprint);
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.empty());
+    
+    REQUIRE(blueprint.name.empty());
+    REQUIRE(blueprint.description.empty());
+    
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].name == "A");
+    REQUIRE(blueprint.resourceGroups[0].description == "## Resource [wronguri]\n\n### Retrieve [GET]\n\n+ Response 200\n\n");
+    
+}

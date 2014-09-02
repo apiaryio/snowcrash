@@ -21,6 +21,7 @@ namespace snowcrash {
      */
     template<typename T, typename Adapter>
     struct SectionParser {
+
         
         /**
          *  \brief  Parse a section of blueprint
@@ -36,24 +37,35 @@ namespace snowcrash {
                                           Report& report,
                                           T& out) {
             
-            bool isParsingRedirect = false;
+            SectionLayout layout = DefaultSectionLayout;
             MarkdownNodeIterator cur = Adapter::startingNode(node);
             const MarkdownNodes& collection = Adapter::startingNodeSiblings(node, siblings);
             
             // Signature node
             MarkdownNodeIterator lastCur = cur;
-            cur = SectionProcessor<T>::processSignature(cur, pd, isParsingRedirect, report, out);
-            if (lastCur == cur)
-                return Adapter::nextStartingNode(node, siblings, cur);
+            cur = SectionProcessor<T>::processSignature(cur, pd, layout, report, out);
 
-            if (isParsingRedirect) {
-                // Trust the section parser and finish off parsing of this section
+            // Exclusive Nested Sections Layout
+            if (layout == ExclusiveNestedSectionLayout) {
+
+                cur = parseNestedSections(cur, collection, pd, report, out);
+                
                 SectionProcessor<T>::finalize(node, pd, report, out);
-                isParsingRedirect = false;
-
+                
+                return Adapter::nextStartingNode(node, siblings, cur);
+            }
+            
+            // Parser redirect layout
+            if (layout == RedirectSectionLayout) {
+                SectionProcessor<T>::finalize(node, pd, report, out);
+                
                 return Adapter::nextStartingNode(node, siblings, cur);
             }
 
+            // Default layout
+            if (lastCur == cur)
+                return Adapter::nextStartingNode(node, siblings, cur);
+            
             // Description nodes
             while(cur != collection.end() &&
                   SectionProcessor<T>::isDescriptionNode(cur, pd.sectionContext())) {
@@ -74,8 +86,27 @@ namespace snowcrash {
                     return Adapter::nextStartingNode(node, siblings, cur);
             }
             
-            SectionType lastSectionType = UndefinedSectionType;
+            // Nested Sections
+            cur = parseNestedSections(cur, collection, pd, report, out);
 
+            SectionProcessor<T>::finalize(node, pd, report, out);
+
+            return Adapter::nextStartingNode(node, siblings, cur);
+        }
+        
+        
+        /** Parse nested sections */
+        static MarkdownNodeIterator parseNestedSections(const MarkdownNodeIterator& node,
+                                                        const MarkdownNodes& collection,
+                                                        SectionParserData& pd,
+                                                        Report& report,
+                                                        T& out) {
+
+            MarkdownNodeIterator cur = node;
+            MarkdownNodeIterator lastCur = cur;
+            
+            SectionType lastSectionType = UndefinedSectionType;
+            
             // Nested sections
             while(cur != collection.end()) {
                 
@@ -93,21 +124,19 @@ namespace snowcrash {
                 
                 if (cur != collection.end() &&
                     (pd.sectionContext() != UndefinedSectionType ||
-                    (cur->type != mdp::ParagraphMarkdownNodeType &&
-                     cur->type != mdp::CodeMarkdownNodeType))) {
-
+                     (cur->type != mdp::ParagraphMarkdownNodeType &&
+                      cur->type != mdp::CodeMarkdownNodeType))) {
+                         
                     lastSectionType = pd.sectionContext();
                 }
-
+                
                 pd.sectionsContext.pop_back();
                 
                 if (lastCur == cur)
                     break;
             }
-
-            SectionProcessor<T>::finalize(node, pd, report, out);
-
-            return Adapter::nextStartingNode(node, siblings, cur);
+            
+            return cur;
         }
     };
     
