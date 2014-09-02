@@ -214,7 +214,7 @@ namespace snowcrash {
             if (node->type == mdp::ListItemMarkdownNodeType
                 && !node->children().empty()) {
 
-                SectionType nestedType;
+                SectionType nestedType = UndefinedSectionType;
                 PayloadSignature signature = payloadSignature(node);
 
                 if (signature == NoPayloadSignature) {
