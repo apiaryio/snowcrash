@@ -32,7 +32,7 @@ namespace snowcrash {
 
         static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
                                                      SectionParserData& pd,
-                                                     bool& parsingRedirect,
+                                                     SectionLayout& layout,
                                                      Report& report,
                                                      Blueprint& out) {
 
@@ -57,13 +57,9 @@ namespace snowcrash {
 
                 SectionType nestedType = nestedSectionType(cur);
 
-                // If starting with Resource or Resource Group
+                // Resources Groups only, parse as exclusive nested sections
                 if (nestedType != UndefinedSectionType) {
-
-                    pd.sectionsContext.push_back(nestedType);
-                    cur = processNestedSection(cur, cur->parent().children(), pd, report, out);
-                    pd.sectionsContext.pop_back();
-
+                    layout = ExclusiveNestedSectionLayout;
                     return cur;
                 }
 
@@ -181,6 +177,14 @@ namespace snowcrash {
                                                   sourceMap));
             }
         }
+
+        static bool isUnexpectedNode(const MarkdownNodeIterator& node,
+                                     SectionType sectionType) {
+            
+            // Since Blueprint is currently top-level node any unprocessed node should be reported
+            return true;
+        }
+
 
         static void parseMetadata(const MarkdownNodeIterator& node,
                                   SectionParserData& pd,

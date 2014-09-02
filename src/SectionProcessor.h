@@ -20,6 +20,15 @@ namespace snowcrash {
     using mdp::MarkdownNodeIterator;
     
     typedef Collection<SectionType>::type SectionTypes;
+    
+    /**
+     *  Layout of the section being parsed
+     */
+    enum SectionLayout {
+        DefaultSectionLayout,          /// Default Section Layout: Signature > Description > Content > Nested
+        ExclusiveNestedSectionLayout,  /// Section is composed of nested sections only
+        RedirectSectionLayout          /// Section should be parsed by another parser as whole
+    };
 
     /*
      * Forward Declarations
@@ -46,7 +55,7 @@ namespace snowcrash {
          */
         static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
                                                      SectionParserData& pd,
-                                                     bool& parsingRedirect,
+                                                     SectionLayout& layout,
                                                      Report& report,
                                                      T& out) {
             return ++MarkdownNodeIterator(node);
