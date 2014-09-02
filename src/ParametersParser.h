@@ -83,6 +83,7 @@ namespace snowcrash {
 
             Parameter parameter;
             ParameterSM parameterSM;
+            bool paramIsDuplicate = false;
 
             ParameterParser::parse(node, siblings, pd, report, parameter, parameterSM);
 
@@ -101,14 +102,16 @@ namespace snowcrash {
                                                       RedefinitionWarning,
                                                       sourceMap));
 
-                    out.erase(duplicate);
+                    paramIsDuplicate = true;
                 }
             }
 
-            out.push_back(parameter);
+            if (!paramIsDuplicate) {
+                out.push_back(parameter);
 
-            if (pd.exportSM()) {
-                outSM.push_back(parameterSM);
+                if (pd.exportSM()) {
+                    outSM.push_back(parameterSM);
+                }
             }
 
             return ++MarkdownNodeIterator(node);
