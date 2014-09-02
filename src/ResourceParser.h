@@ -374,6 +374,10 @@ namespace snowcrash {
 
                 if (!out.name.empty()) {
                     model.name = out.name;
+
+                    if (pd.exportSM()) {
+                        modelSM.name = outSM.name;
+                    }
                 } else {
 
                     // ERR: No name specified for resource model
@@ -393,6 +397,10 @@ namespace snowcrash {
             if (it == pd.symbolTable.resourceModels.end()) {
 
                 pd.symbolTable.resourceModels[model.name] = model;
+
+                if (pd.exportSM()) {
+                    pd.symbolTableSM.resourceModels[model.name] = modelSM;
+                }
             } else {
 
                 // ERR: Symbol already defined
@@ -406,6 +414,10 @@ namespace snowcrash {
             }
 
             out.model = model;
+
+            if (pd.exportSM()) {
+                outSM.model = modelSM;
+            }
 
             return cur;
         }

@@ -45,6 +45,9 @@ namespace snowcrash {
         /** Symbol Table */
         SymbolTable symbolTable;
         
+        /** Symbol Table Sourcemap */
+        SymbolTableSM symbolTableSM;
+
         /** Source Data */
         const mdp::ByteBuffer& sourceData;
         
