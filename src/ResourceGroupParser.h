@@ -119,7 +119,7 @@ namespace snowcrash {
                 return ++MarkdownNodeIterator(node);
             }
 
-            return SectionProcessorBase::processUnexpectedNode(node, siblings, pd, lastSectionType, report, out);
+            return SectionProcessorBase<ResourceGroup>::processUnexpectedNode(node, siblings, pd, lastSectionType, report, out);
         }
 
         static SectionType sectionType(const MarkdownNodeIterator& node) {
@@ -177,7 +177,7 @@ namespace snowcrash {
                 return true;
             }
 
-            return SectionProcessorBase::isUnexpectedNode(node, sectionType);
+            return SectionProcessorBase<ResourceGroup>::isUnexpectedNode(node, sectionType);
         }
 
         /**
