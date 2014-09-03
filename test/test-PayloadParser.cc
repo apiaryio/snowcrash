@@ -243,12 +243,8 @@ TEST_CASE("Parse payload with dangling body", "[payload]")
 
 TEST_CASE("Parse inline payload with symbol reference", "[payload]")
 {
-    ResourceModel model;
     Symbols symbols;
-
-    model.description = "Foo";
-    model.body = "Bar";
-    symbols.push_back(ResourceModelSymbol("Symbol", model));
+    buildSymbol("Symbol", symbols);
 
     Payload payload;
     Report report;
@@ -267,16 +263,12 @@ TEST_CASE("Parse inline payload with symbol reference", "[payload]")
 
 TEST_CASE("Parse inline payload with symbol reference with extra indentation", "[payload]")
 {
-    ResourceModel model;
-    Symbols symbols;
-
-    model.description = "Foo";
-    model.body = "Bar";
-    symbols.push_back(ResourceModelSymbol("Symbol", model));
-
     mdp::ByteBuffer source = \
     "+ Request\n\n"\
     "        [Symbol][]\n";
+
+    Symbols symbols;
+    buildSymbol("Symbol", symbols);
 
     Payload payload;
     Report report;
@@ -298,12 +290,8 @@ TEST_CASE("Parse inline payload with symbol reference with foreign content", "[p
     mdp::ByteBuffer source = SymbolFixture;
     source += "\n    Foreign\n";
 
-    ResourceModel model;
     Symbols symbols;
-
-    model.description = "Foo";
-    model.body = "Bar";
-    symbols.push_back(ResourceModelSymbol("Symbol", model));
+    buildSymbol("Symbol", symbols);
 
     Payload payload;
     Report report;

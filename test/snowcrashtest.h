@@ -15,7 +15,12 @@
 
 namespace snowcrashtest {
 
-    typedef std::vector<snowcrash::ResourceModelSymbol> Symbols;
+    struct Symbols {
+
+        std::vector<snowcrash::ResourceModelSymbol> models;
+        std::vector<snowcrash::ResourceModelSymbolSourceMap> modelsSM;
+
+    };
 
     template <typename T, typename PARSER>
     struct SectionParserHelper {
@@ -44,11 +49,15 @@ namespace snowcrashtest {
                 bppointer = bp;
             }
 
-            snowcrash::SectionParserData pd(opts, source, *bppointer);
+            // Export source maps
+            snowcrash::BlueprintParserOptions options = opts | snowcrash::ExportSourcemapOption;
+
+            snowcrash::SectionParserData pd(options, source, *bppointer);
 
             pd.sectionsContext.push_back(type);
 
-            pd.symbolTable.resourceModels.insert(symbols.begin(), symbols.end());
+            pd.symbolTable.resourceModels.insert(symbols.models.begin(), symbols.models.end());
+            pd.symbolSourceMapTable.resourceModels.insert(symbols.modelsSM.begin(), symbols.modelsSM.end());
 
             PARSER::parse(markdownAST.children().begin(),
                           markdownAST.children(),
@@ -57,6 +66,25 @@ namespace snowcrashtest {
                           output);
         }
     };
+
+    /** Builds a Symbols entry for testing purposes */
+    static void buildSymbol(mdp::ByteBuffer name,
+                            Symbols& symbols) {
+
+        snowcrash::ResourceModel model;
+        snowcrash::SourceMap<snowcrash::ResourceModel> modelSM;
+        mdp::BytesRangeSet sourcemap;
+
+        sourcemap.push_back(mdp::BytesRange(0, 1));
+
+        model.description = "Foo";
+        model.body = "Bar";
+        symbols.models.push_back(snowcrash::ResourceModelSymbol(name, model));
+
+        modelSM.description.sourceMap = sourcemap;
+        modelSM.body.sourceMap = sourcemap;
+        symbols.modelsSM.push_back(snowcrash::ResourceModelSymbolSourceMap(name, modelSM));
+    }
 }
 
 #endif
