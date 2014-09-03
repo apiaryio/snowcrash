@@ -21,12 +21,8 @@ TEST_CASE("Parse object resource symbol", "[symbol_table]")
     "          {...}\n";
 
     // Check we will get error parsing the same symbol again with the same symbol table
-    ResourceModel model;
     Symbols symbols;
-
-    model.description = "Foo";
-    model.body = "Bar";
-    symbols.push_back(ResourceModelSymbol("Super", model));
+    buildSymbol("Super", symbols);
 
     Resource resource;
     Report report;
