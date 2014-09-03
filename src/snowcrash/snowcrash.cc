@@ -139,7 +139,7 @@ int main(int argc, const char *argv[])
     snowcrash::BlueprintSM blueprintSM;
 
     if (argumentParser.exist(SourcemapArgument)) {
-        options = snowcrash::ExportSourcemapOption;
+        options |= snowcrash::ExportSourcemapOption;
     }
 
     // Parse
