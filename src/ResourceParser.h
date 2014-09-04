@@ -95,6 +95,16 @@ namespace snowcrash {
 
             return node;
         }
+        
+        static bool isDescriptionNode(const MarkdownNodeIterator& node,
+                                      SectionType sectionType) {
+            
+            if (SectionProcessor<Action>::actionType(node) == CompleteActionType) {
+                return false;
+            }
+                
+            return SectionProcessorBase<Resource>::isDescriptionNode(node, sectionType);
+        }
 
         static SectionType sectionType(const MarkdownNodeIterator& node) {
 
@@ -146,6 +156,12 @@ namespace snowcrash {
             nestedType = SectionProcessor<Action>::sectionType(node);
 
             if (nestedType == ActionSectionType) {
+                
+                // Do not consider complete actions as nested
+                mdp::ByteBuffer method;
+                if (SectionProcessor<Action>::actionType(node) == CompleteActionType)
+                    return UndefinedSectionType;
+                
                 return nestedType;
             }
 
