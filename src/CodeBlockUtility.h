@@ -214,11 +214,14 @@ namespace snowcrash {
 
             TwoNewLines(asset);
             out += asset;
+            
+            size_t level = CodeBlockUtility::codeBlockIndentationLevel(sectionType);
 
-            if (node->type == mdp::ParagraphMarkdownNodeType) {
+            if (node->type == mdp::CodeMarkdownNodeType)
+                level--;  // Deduct one level for a code block
 
-                size_t level = CodeBlockUtility::codeBlockIndentationLevel(sectionType);
-
+                
+            if (level) {
                 // WARN: Dangling asset
                 std::stringstream ss;
                 ss << "dangling message-body asset, expected a pre-formatted code block, ";

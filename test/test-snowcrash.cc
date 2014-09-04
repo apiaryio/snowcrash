@@ -214,7 +214,7 @@ TEST_CASE("Parse adjacent asset blocks", "[parser][#9]")
     parse(source, 0, report, blueprint);
 
     REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(report.warnings.size() == 2);
 
     REQUIRE(blueprint.resourceGroups.size() == 1);
     REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
@@ -386,4 +386,32 @@ TEST_CASE("Resource with incorrect URI segfault", "[parser][regression]")
     REQUIRE(blueprint.resourceGroups[0].name == "A");
     REQUIRE(blueprint.resourceGroups[0].description == "## Resource [wronguri]\n\n### Retrieve [GET]\n\n+ Response 200\n\n");
     
+}
+
+TEST_CASE("Dangling block not recognized", "[parser][regression][#186]")
+{
+    mdp::ByteBuffer source = \
+    "# A [/a]\n"\
+    "+ Model\n"\
+    "\n"\
+    "```js\n"\
+    "    { ... }\n"\
+    "```\n";
+    
+    Blueprint blueprint;
+    Report report;
+    
+    parse(source, 0, report, blueprint);
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(report.warnings[0].code == IndentationWarning);
+    
+    REQUIRE(blueprint.name.empty());
+    REQUIRE(blueprint.description.empty());
+    
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].name == "A");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].uriTemplate == "/a");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].model.body == "    { ... }\n\n");
 }

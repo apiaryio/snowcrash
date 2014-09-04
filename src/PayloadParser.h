@@ -170,19 +170,10 @@ namespace snowcrash {
                 sectionType == BodySectionType) {
 
                 CodeBlockUtility::addDanglingAsset(node, pd, sectionType, report, out.body);
-            } else {
-
-                // WARN: Dangling blocks found
-                std::stringstream ss;
-                ss << "found dangling " << SectionName(sectionType) << " block";
-
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                report.warnings.push_back(Warning(ss.str(),
-                                                  IndentationWarning,
-                                                  sourceMap));
+                return ++MarkdownNodeIterator(node);
             }
-
-            return ++MarkdownNodeIterator(node);
+            
+            return SectionProcessorBase<Payload>::processUnexpectedNode(node, siblings, pd, sectionType, report, out);
         }
 
         static bool isDescriptionNode(const MarkdownNodeIterator& node,
