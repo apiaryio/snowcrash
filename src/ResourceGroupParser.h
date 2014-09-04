@@ -168,8 +168,6 @@ namespace snowcrash {
         static bool isUnexpectedNode(const MarkdownNodeIterator& node,
                                      SectionType sectionType) {
 
-            mdp::ByteBuffer method;
-
             if (SectionProcessor<Action>::actionType(node) == DependentActionType) {
                 return true;
             }

@@ -552,3 +552,25 @@ TEST_CASE("Dangling transaction example assets", "[resource]")
     REQUIRE(resource.actions[0].examples[0].responses[0].body == "dangling response body\n\n");
 }
 
+TEST_CASE("Body list item in description", "[resource][regression][#190]")
+{
+    mdp::ByteBuffer source = \
+    "## GET /A\n"\
+    "Lorem Ipsum\n"\
+    "\n"\
+    "+ Body\n"\
+    "\n"\
+    "    { ... }\n"\
+    "\n"\
+    "+ Response 200\n";
+    
+    Resource resource;
+    Report report;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+    
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.empty());
+    
+    REQUIRE(resource.actions.size() == 1);
+    REQUIRE(resource.actions[0].description == "Lorem Ipsum\n\n+ Body\n\n    { ... }\n\n");
+}
