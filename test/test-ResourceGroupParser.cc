@@ -299,28 +299,50 @@ TEST_CASE("Parse resource method abbreviation followed by another", "[resource_g
     REQUIRE(resourceGroup.resources[1].actions[0].method == "POST");
 }
 
-//TEST_CASE("Resource followed by a complete action", "[parser][regression][#185][now]")
-//{
-//    mdp::ByteBuffer source = \
-//    "# Resource [/A]\n"\
-//    "# POST /B\n"\
-//    "+ Response 201\n";
-//    
-//    ResourceGroup resourceGroup;
-//    Report report;
-//    SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source, ResourceGroupSectionType, report, resourceGroup);
-//    
-//    REQUIRE(report.error.code == Error::OK);
-//    REQUIRE(report.warnings.empty());
-//    
-//    REQUIRE(resourceGroup.name.empty());
-//    REQUIRE(resourceGroup.description.empty());
-//    
-//    REQUIRE(resourceGroup.resources.size() == 2);
-//    REQUIRE(resourceGroup.resources[0].name == "Resource");
-//    REQUIRE(resourceGroup.resources[0].uriTemplate == "/A");
-//    REQUIRE(resourceGroup.resources[1].name.empty());
-//    REQUIRE(resourceGroup.resources[1].uriTemplate == "/B");
-//    REQUIRE(resourceGroup.resources[1].actions.size() == 1);
-//    REQUIRE(resourceGroup.resources[1].actions[0].method == "POST");
-//}
+TEST_CASE("Resource followed by a complete action", "[resource_group][regression][#185]")
+{
+    mdp::ByteBuffer source = \
+    "# Resource [/A]\n"\
+    "# POST /B\n"\
+    "+ Response 201\n";
+    
+    ResourceGroup resourceGroup;
+    Report report;
+    SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source, ResourceGroupSectionType, report, resourceGroup);
+    
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.empty());
+    
+    REQUIRE(resourceGroup.name.empty());
+    REQUIRE(resourceGroup.description.empty());
+    
+    REQUIRE(resourceGroup.resources.size() == 2);
+    REQUIRE(resourceGroup.resources[0].name == "Resource");
+    REQUIRE(resourceGroup.resources[0].uriTemplate == "/A");
+    REQUIRE(resourceGroup.resources[1].name.empty());
+    REQUIRE(resourceGroup.resources[1].uriTemplate == "/B");
+    REQUIRE(resourceGroup.resources[1].actions.size() == 1);
+    REQUIRE(resourceGroup.resources[1].actions[0].method == "POST");
+}
+
+TEST_CASE("Too eager complete action processing", "[resource_group][regression][#187]")
+{
+    mdp::ByteBuffer source = \
+    "# Group A\n"\
+    "\n"\
+    "```\n"\
+    "GET /A\n"\
+    "```\n"\
+    "\n"\
+    "Lorem Ipsum\n";
+    
+    ResourceGroup resourceGroup;
+    Report report;
+    SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source, ResourceGroupSectionType, report, resourceGroup);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.empty());
+    
+    REQUIRE(resourceGroup.name == "A");
+    REQUIRE(resourceGroup.description == "```\nGET /A\n```\n\nLorem Ipsum\n");
+}

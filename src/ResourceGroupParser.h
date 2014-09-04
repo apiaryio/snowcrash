@@ -99,11 +99,10 @@ namespace snowcrash {
                                                           Report& report,
                                                           ResourceGroup& out) {
 
-            mdp::ByteBuffer method;
-
-            if (SectionProcessor<Action>::isDependentAction(node, method) &&
+            if (SectionProcessor<Action>::actionType(node) == DependentActionType &&
                 !out.resources.empty()) {
 
+                mdp::ByteBuffer method = SectionProcessor<Action>::actionHTTPRequestMethod(node);
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
 
                 // WARN: Unexpected action
@@ -159,7 +158,7 @@ namespace snowcrash {
 
             mdp::ByteBuffer method;
 
-            if (SectionProcessor<Action>::isCompleteAction(node, method)) {
+            if (SectionProcessor<Action>::actionType(node) == CompleteActionType) {
                 return false;
             }
 
@@ -171,7 +170,7 @@ namespace snowcrash {
 
             mdp::ByteBuffer method;
 
-            if (SectionProcessor<Action>::isDependentAction(node, method)) {
+            if (SectionProcessor<Action>::actionType(node) == DependentActionType) {
                 return true;
             }
 

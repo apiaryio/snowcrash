@@ -27,14 +27,13 @@ namespace snowcrash {
     typedef Collection<Action>::type Actions;
 
     typedef Collection<Action>::const_iterator ActionIterator;
-
-    // Method signature
-    enum ActionSignature {
-        NoActionSignature = 0,
-        MethodActionSignature,      // # GET
-        MethodURIActionSignature,   // # GET /uri
-        NamedActionSignature,       // # My Method [GET]
-        UndefinedActionSignature = -1
+    
+    /** Action Definition Type */
+    enum ActionType {
+        UndefinedActionType,    /// Action type has not been defined
+        DependentActionType,    /// Action isn't fully defined, depends on parents resource URI
+        CompleteActionType,     /// Action is fully defined including its URI
+        NotActionType = -1       /// The subject is not an Action
     };
 
     /**
@@ -378,60 +377,53 @@ namespace snowcrash {
             return cur;
         }
         
-        /**
-         *  \brief Check if a node represents a complete action
-         *
-         *  \node   Node to check
-         *  \method Output buffer to store the HTTP request method for the transition
-         *  \return True if the node signatures a complete transition, false otherwise
-         *
-         *  A complete transtion (action) is a transtition defined
-         *  as a combination of an HTTP request method and an URI.
-         */
-        static bool isCompleteAction(const MarkdownNodeIterator& node,
-                                     mdp::ByteBuffer& method) {
+        /** \return %ActionType of a node */
+        static ActionType actionType(const MarkdownNodeIterator& node) {
             
-            CaptureGroups captureGroups;
+            if (node->type != mdp::HeaderMarkdownNodeType || node->text.empty())
+                return NotActionType;
+                
             mdp::ByteBuffer subject = node->text;
-            
             TrimString(subject);
             
-            if (RegexCapture(subject, ActionHeaderRegex, captureGroups, 3) && !captureGroups[2].empty()) {
-                
-                method = captureGroups[1];
-                return true;
+            if (RegexMatch(subject, NamedActionHeaderRegex)) {
+                return DependentActionType;
             }
             
-            return false;
+            CaptureGroups captureGroups;
+            if (RegexCapture(subject, ActionHeaderRegex, captureGroups, 3)) {
+                
+                if (captureGroups[2].empty()) {
+                    return DependentActionType;
+                }
+                else {
+                    return CompleteActionType;
+                }
+            }
+            
+            return NotActionType;
         }
-        
-        /**
-         *  \brief Check if a node represents a dependent action
-         *
-         *  A dependent action is defined by an HTTP request method only and as
-         *  such it depends on its parent resource URI.
-         */
-        static bool isDependentAction(const MarkdownNodeIterator& node,
-                                      mdp::ByteBuffer& method) {
+
+        /** \return HTTP request method of an action */
+        static mdp::ByteBuffer actionHTTPRequestMethod(const MarkdownNodeIterator& node) {
             
             CaptureGroups captureGroups;
             mdp::ByteBuffer subject = node->text;
+            mdp::ByteBuffer method;
             
             TrimString(subject);
             
-            if (RegexCapture(subject, ActionHeaderRegex, captureGroups, 3) && captureGroups[2].empty()) {
+            if (RegexCapture(subject, ActionHeaderRegex, captureGroups, 3)) {
                 
                 method = captureGroups[1];
-                return true;
             }
             
             if (RegexCapture(subject, NamedActionHeaderRegex, captureGroups, 3)) {
                 
                 method = captureGroups[2];
-                return true;
             }
             
-            return false;
+            return method;
         }
     };
 
