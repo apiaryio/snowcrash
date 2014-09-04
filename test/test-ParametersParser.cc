@@ -42,12 +42,18 @@ TEST_CASE("Parse canonical parameters", "[parameters]")
     REQUIRE(parameters.report.warnings.empty());
 
     REQUIRE(parameters.node.size() == 2);
-
     REQUIRE(parameters.node[0].name == "id");
     REQUIRE(parameters.node[0].description == "Lorem ipsum\n");
-
     REQUIRE(parameters.node[1].name == "name");
     REQUIRE(parameters.node[1].description.empty());
+
+    REQUIRE(parameters.sourceMap.list.size() == 2);
+    REQUIRE(parameters.sourceMap.list[0].name.sourceMap.size() == 1);
+    REQUIRE(parameters.sourceMap.list[0].name.sourceMap[0].location == 19);
+    REQUIRE(parameters.sourceMap.list[0].name.sourceMap[0].length == 40);
+    REQUIRE(parameters.sourceMap.list[1].name.sourceMap.size() == 1);
+    REQUIRE(parameters.sourceMap.list[1].name.sourceMap[0].location == 165);
+    REQUIRE(parameters.sourceMap.list[1].name.sourceMap[0].length == 5);
 }
 
 TEST_CASE("Parse ilegal parameter", "[parameters]")
@@ -65,6 +71,7 @@ TEST_CASE("Parse ilegal parameter", "[parameters]")
     REQUIRE(parameters.report.warnings[1].code == FormattingWarning);
 
     REQUIRE(parameters.node.empty());
+    REQUIRE(parameters.sourceMap.list.empty());
 }
 
 TEST_CASE("Parse illegal parameter among legal ones", "[parameters]")
@@ -87,6 +94,16 @@ TEST_CASE("Parse illegal parameter among legal ones", "[parameters]")
     REQUIRE(parameters.node[0].description.empty());
     REQUIRE(parameters.node[1].name == "OK-2");
     REQUIRE(parameters.node[1].description.empty());
+
+    REQUIRE(parameters.sourceMap.list.size() == 2);
+    REQUIRE(parameters.sourceMap.list[0].name.sourceMap.size() == 1);
+    REQUIRE(parameters.sourceMap.list[0].name.sourceMap[0].location == 19);
+    REQUIRE(parameters.sourceMap.list[0].name.sourceMap[0].length == 5);
+    REQUIRE(parameters.sourceMap.list[0].description.sourceMap.empty());
+    REQUIRE(parameters.sourceMap.list[1].name.sourceMap.size() == 1);
+    REQUIRE(parameters.sourceMap.list[1].name.sourceMap[0].location == 44);
+    REQUIRE(parameters.sourceMap.list[1].name.sourceMap[0].length == 5);
+    REQUIRE(parameters.sourceMap.list[1].description.sourceMap.empty());
 }
 
 TEST_CASE("Warn about additional content in parameters section", "[parameters]")
@@ -106,6 +123,12 @@ TEST_CASE("Warn about additional content in parameters section", "[parameters]")
     REQUIRE(parameters.node.size() == 1);
     REQUIRE(parameters.node[0].name == "id");
     REQUIRE(parameters.node[0].description.empty());
+
+    REQUIRE(parameters.sourceMap.list.size() == 1);
+    REQUIRE(parameters.sourceMap.list[0].name.sourceMap.size() == 1);
+    REQUIRE(parameters.sourceMap.list[0].name.sourceMap[0].location == 30);
+    REQUIRE(parameters.sourceMap.list[0].name.sourceMap[0].length == 3);
+    REQUIRE(parameters.sourceMap.list[0].description.sourceMap.empty());
 }
 
 TEST_CASE("Warn about additional content block in parameters section", "[parameters]")
@@ -125,6 +148,12 @@ TEST_CASE("Warn about additional content block in parameters section", "[paramet
     REQUIRE(parameters.node.size() == 1);
     REQUIRE(parameters.node[0].name == "id");
     REQUIRE(parameters.node[0].description.empty());
+
+    REQUIRE(parameters.sourceMap.list.size() == 1);
+    REQUIRE(parameters.sourceMap.list[0].name.sourceMap.size() == 1);
+    REQUIRE(parameters.sourceMap.list[0].name.sourceMap[0].location == 31);
+    REQUIRE(parameters.sourceMap.list[0].name.sourceMap[0].length == 3);
+    REQUIRE(parameters.sourceMap.list[0].description.sourceMap.empty());
 }
 
 TEST_CASE("Warn about multiple parameters with the same name", "[parameters]")
@@ -144,6 +173,11 @@ TEST_CASE("Warn about multiple parameters with the same name", "[parameters]")
     REQUIRE(parameters.node.size() == 1);
     REQUIRE(parameters.node[0].name == "id");
     REQUIRE(parameters.node[0].exampleValue == "42");
+
+    REQUIRE(parameters.sourceMap.list.size() == 1);
+    REQUIRE(parameters.sourceMap.list[0].name.sourceMap.size() == 1);
+    REQUIRE(parameters.sourceMap.list[0].name.sourceMap[0].location == 19);
+    REQUIRE(parameters.sourceMap.list[0].name.sourceMap[0].length == 10);
 }
 
 TEST_CASE("Recognize parameter when there is no description on its signature and remaining description is not a new node", "[parameters]")
@@ -179,4 +213,6 @@ TEST_CASE("Recognize parameter when there is no description on its signature and
     REQUIRE(parameter.values[1] == "close");
     REQUIRE(parameter.values[2] == "comfort");
     REQUIRE(parameter.values[3] == "vent");
+
+    REQUIRE(parameters.sourceMap.list.size() == 2);
 }

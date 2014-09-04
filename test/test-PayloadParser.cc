@@ -100,6 +100,27 @@ TEST_CASE("Parse request payload", "[payload]")
     REQUIRE(payload.node.headers[1].second == "42");
     REQUIRE(payload.node.body == "Code\n");
     REQUIRE(payload.node.schema == "Code 2\n");
+
+    REQUIRE(payload.sourceMap.name.sourceMap.size() == 1);
+    REQUIRE(payload.sourceMap.name.sourceMap[0].location == 2);
+    REQUIRE(payload.sourceMap.name.sourceMap[0].length == 34);
+    REQUIRE(payload.sourceMap.description.sourceMap.size() == 1);
+    REQUIRE(payload.sourceMap.description.sourceMap[0].location == 38);
+    REQUIRE(payload.sourceMap.description.sourceMap[0].length == 12);
+    REQUIRE(payload.sourceMap.parameters.list.empty());
+    REQUIRE(payload.sourceMap.headers.list.size() == 2);
+    REQUIRE(payload.sourceMap.headers.list[0].sourceMap.size() == 1);
+    REQUIRE(payload.sourceMap.headers.list[0].sourceMap[0].location == 2);
+    REQUIRE(payload.sourceMap.headers.list[0].sourceMap[0].length == 34);
+    REQUIRE(payload.sourceMap.headers.list[1].sourceMap.size() == 1);
+    REQUIRE(payload.sourceMap.headers.list[1].sourceMap[0].location == 74);
+    REQUIRE(payload.sourceMap.headers.list[1].sourceMap[0].length == 17);
+    REQUIRE(payload.sourceMap.body.sourceMap.size() == 1);
+    REQUIRE(payload.sourceMap.body.sourceMap[0].location == 112);
+    REQUIRE(payload.sourceMap.body.sourceMap[0].length == 9);
+    REQUIRE(payload.sourceMap.schema.sourceMap.size() == 1);
+    REQUIRE(payload.sourceMap.schema.sourceMap[0].location == 144);
+    REQUIRE(payload.sourceMap.schema.sourceMap[0].length == 11);
 }
 
 TEST_CASE("Parse abbreviated payload body", "[payload]")
@@ -116,6 +137,19 @@ TEST_CASE("Parse abbreviated payload body", "[payload]")
     REQUIRE(payload.node.headers.size() == 1);
     REQUIRE(payload.node.body == "Hello World!\n");
     REQUIRE(payload.node.schema.empty());
+
+    REQUIRE(payload.sourceMap.name.sourceMap.size() == 1);
+    REQUIRE(payload.sourceMap.name.sourceMap[0].location == 2);
+    REQUIRE(payload.sourceMap.name.sourceMap[0].length == 27);
+    REQUIRE(payload.sourceMap.description.sourceMap.empty());
+    REQUIRE(payload.sourceMap.parameters.list.empty());
+    REQUIRE(payload.sourceMap.headers.list.size() == 1);
+    REQUIRE(payload.sourceMap.headers.list[0].sourceMap.size() == 1);
+    REQUIRE(payload.sourceMap.headers.list[0].sourceMap[0].location == 2);
+    REQUIRE(payload.sourceMap.headers.list[0].sourceMap[0].length == 27);
+    REQUIRE(payload.sourceMap.body.sourceMap.size() == 1);
+    REQUIRE(payload.sourceMap.body.sourceMap[0].location == 33);
+    REQUIRE(payload.sourceMap.body.sourceMap[0].length == 17);
 }
 
 TEST_CASE("Parse abbreviated inline payload body", "[payload]")
@@ -135,6 +169,18 @@ TEST_CASE("Parse abbreviated inline payload body", "[payload]")
     REQUIRE(payload.node.headers.empty());
     REQUIRE(payload.node.body == "Hello World!\nB\n");
     REQUIRE(payload.node.schema.empty());
+
+    REQUIRE(payload.sourceMap.name.sourceMap.size() == 1);
+    REQUIRE(payload.sourceMap.name.sourceMap[0].location == 2);
+    REQUIRE(payload.sourceMap.name.sourceMap[0].length == 11);
+    REQUIRE(payload.sourceMap.description.sourceMap.empty());
+    REQUIRE(payload.sourceMap.parameters.list.empty());
+    REQUIRE(payload.sourceMap.headers.list.empty());
+    REQUIRE(payload.sourceMap.body.sourceMap.size() == 2);
+    REQUIRE(payload.sourceMap.body.sourceMap[0].location == 17);
+    REQUIRE(payload.sourceMap.body.sourceMap[0].length == 17);
+    REQUIRE(payload.sourceMap.body.sourceMap[1].location == 36);
+    REQUIRE(payload.sourceMap.body.sourceMap[1].length == 2);
 }
 
 TEST_CASE("Parse payload description with list", "[payload]")
@@ -168,6 +214,16 @@ TEST_CASE("Parse payload description with list", "[payload]")
     REQUIRE(payload.node.headers.empty());
     REQUIRE(payload.node.body == "{}\n");
     REQUIRE(payload.node.schema.empty());
+
+    REQUIRE(payload.sourceMap.name.sourceMap.empty());
+    REQUIRE(payload.sourceMap.description.sourceMap.size() == 1);
+    REQUIRE(payload.sourceMap.description.sourceMap[0].location == 15);
+    REQUIRE(payload.sourceMap.description.sourceMap[0].length == 4);
+    REQUIRE(payload.sourceMap.parameters.list.empty());
+    REQUIRE(payload.sourceMap.headers.list.empty());
+    REQUIRE(payload.sourceMap.body.sourceMap.size() == 1);
+    REQUIRE(payload.sourceMap.body.sourceMap[0].location == 40);
+    REQUIRE(payload.sourceMap.body.sourceMap[0].length == 7);
 }
 
 TEST_CASE("Parse payload with foreign list item", "[payload]")
@@ -201,6 +257,14 @@ TEST_CASE("Parse payload with foreign list item", "[payload]")
     REQUIRE(payload.node.headers.empty());
     REQUIRE(payload.node.body == "{}\n");
     REQUIRE(payload.node.schema.empty());
+
+    REQUIRE(payload.sourceMap.name.sourceMap.empty());
+    REQUIRE(payload.sourceMap.description.sourceMap.empty());
+    REQUIRE(payload.sourceMap.parameters.list.empty());
+    REQUIRE(payload.sourceMap.headers.list.empty());
+    REQUIRE(payload.sourceMap.body.sourceMap.size() == 1);
+    REQUIRE(payload.sourceMap.body.sourceMap[0].location == 31);
+    REQUIRE(payload.sourceMap.body.sourceMap[0].length == 7);
 }
 
 TEST_CASE("Parse payload with dangling body", "[payload]")
@@ -233,6 +297,16 @@ TEST_CASE("Parse payload with dangling body", "[payload]")
     REQUIRE(payload.node.headers.empty());
     REQUIRE(payload.node.body == "Foo\nBar\n\n");
     REQUIRE(payload.node.schema.empty());
+
+    REQUIRE(payload.sourceMap.name.sourceMap.empty());
+    REQUIRE(payload.sourceMap.description.sourceMap.empty());
+    REQUIRE(payload.sourceMap.parameters.list.empty());
+    REQUIRE(payload.sourceMap.headers.list.empty());
+    REQUIRE(payload.sourceMap.body.sourceMap.size() == 2);
+    REQUIRE(payload.sourceMap.body.sourceMap[0].location == 30);
+    REQUIRE(payload.sourceMap.body.sourceMap[0].length == 8);
+    REQUIRE(payload.sourceMap.body.sourceMap[1].location == 43);
+    REQUIRE(payload.sourceMap.body.sourceMap[1].length == 4);
 }
 
 TEST_CASE("Parse inline payload with symbol reference", "[payload]")
@@ -252,6 +326,16 @@ TEST_CASE("Parse inline payload with symbol reference", "[payload]")
     REQUIRE(payload.node.headers.empty());
     REQUIRE(payload.node.body == "Bar");
     REQUIRE(payload.node.schema.empty());
+
+    REQUIRE(payload.sourceMap.name.sourceMap.empty());
+    REQUIRE(payload.sourceMap.description.sourceMap.size() == 1);
+    REQUIRE(payload.sourceMap.description.sourceMap[0].location == 0);
+    REQUIRE(payload.sourceMap.description.sourceMap[0].length == 1);
+    REQUIRE(payload.sourceMap.parameters.list.empty());
+    REQUIRE(payload.sourceMap.headers.list.empty());
+    REQUIRE(payload.sourceMap.body.sourceMap.size() == 1);
+    REQUIRE(payload.sourceMap.body.sourceMap[0].location == 0);
+    REQUIRE(payload.sourceMap.body.sourceMap[0].length == 1);
 }
 
 TEST_CASE("Parse inline payload with symbol reference with extra indentation", "[payload]")
@@ -275,6 +359,14 @@ TEST_CASE("Parse inline payload with symbol reference with extra indentation", "
     REQUIRE(payload.node.headers.empty());
     REQUIRE(payload.node.body == "[Symbol][]\n");
     REQUIRE(payload.node.schema.empty());
+
+    REQUIRE(payload.sourceMap.name.sourceMap.empty());
+    REQUIRE(payload.sourceMap.description.sourceMap.empty());
+    REQUIRE(payload.sourceMap.parameters.list.empty());
+    REQUIRE(payload.sourceMap.headers.list.empty());
+    REQUIRE(payload.sourceMap.body.sourceMap.size() == 1);
+    REQUIRE(payload.sourceMap.body.sourceMap[0].location == 15);
+    REQUIRE(payload.sourceMap.body.sourceMap[0].length == 15);
 }
 
 TEST_CASE("Parse inline payload with symbol reference with foreign content", "[payload]")
@@ -297,6 +389,16 @@ TEST_CASE("Parse inline payload with symbol reference with foreign content", "[p
     REQUIRE(payload.node.headers.empty());
     REQUIRE(payload.node.body == "Bar");
     REQUIRE(payload.node.schema.empty());
+
+    REQUIRE(payload.sourceMap.name.sourceMap.empty());
+    REQUIRE(payload.sourceMap.description.sourceMap.size() == 1);
+    REQUIRE(payload.sourceMap.description.sourceMap[0].location == 0);
+    REQUIRE(payload.sourceMap.description.sourceMap[0].length == 1);
+    REQUIRE(payload.sourceMap.parameters.list.empty());
+    REQUIRE(payload.sourceMap.headers.list.empty());
+    REQUIRE(payload.sourceMap.body.sourceMap.size() == 1);
+    REQUIRE(payload.sourceMap.body.sourceMap[0].location == 0);
+    REQUIRE(payload.sourceMap.body.sourceMap[0].length == 1);
 }
 
 TEST_CASE("Parse named model", "[payload]")
@@ -325,6 +427,19 @@ TEST_CASE("Parse named model", "[payload]")
     REQUIRE(payload.node.headers[0].second == "text/plain");
     REQUIRE(payload.node.body == "Hello World!\n");
     REQUIRE(payload.node.schema.empty());
+
+    REQUIRE(payload.sourceMap.name.sourceMap.size() == 1);
+    REQUIRE(payload.sourceMap.name.sourceMap[0].location == 2);
+    REQUIRE(payload.sourceMap.name.sourceMap[0].length == 26);
+    REQUIRE(payload.sourceMap.description.sourceMap.empty());
+    REQUIRE(payload.sourceMap.parameters.list.empty());
+    REQUIRE(payload.sourceMap.headers.list.size() == 1);
+    REQUIRE(payload.sourceMap.headers.list[0].sourceMap.size() == 1);
+    REQUIRE(payload.sourceMap.headers.list[0].sourceMap[0].location == 2);
+    REQUIRE(payload.sourceMap.headers.list[0].sourceMap[0].length == 26);
+    REQUIRE(payload.sourceMap.body.sourceMap.size() == 1);
+    REQUIRE(payload.sourceMap.body.sourceMap[0].location == 32);
+    REQUIRE(payload.sourceMap.body.sourceMap[0].length == 17);
 }
 
 TEST_CASE("Parse nameless model", "[payload]")
@@ -353,6 +468,18 @@ TEST_CASE("Parse nameless model", "[payload]")
     REQUIRE(payload.node.headers[0].second == "text/plain");
     REQUIRE(payload.node.body == "Hello World!\n");
     REQUIRE(payload.node.schema.empty());
+
+    REQUIRE(payload.sourceMap.name.sourceMap.empty());
+    REQUIRE(payload.sourceMap.description.sourceMap.empty());
+    REQUIRE(payload.sourceMap.parameters.list.empty());
+    REQUIRE(payload.sourceMap.headers.list.size() == 1);
+    REQUIRE(payload.sourceMap.headers.list[0].sourceMap.size() == 1);
+    REQUIRE(payload.sourceMap.headers.list[0].sourceMap[0].location == 2);
+    REQUIRE(payload.sourceMap.headers.list[0].sourceMap[0].length == 20);
+    REQUIRE(payload.sourceMap.body.sourceMap.size() == 1);
+    REQUIRE(payload.sourceMap.body.sourceMap[0].location == 26);
+    REQUIRE(payload.sourceMap.body.sourceMap[0].length == 17);
+    REQUIRE(payload.sourceMap.schema.sourceMap.empty());
 }
 
 TEST_CASE("Warn on malformed payload signature", "[payload]")
@@ -388,6 +515,20 @@ TEST_CASE("Warn on malformed payload signature", "[payload]")
     REQUIRE(payload.node.headers.empty());
     REQUIRE(payload.node.body == "Hello World!\n");
     REQUIRE(payload.node.schema.empty());
+
+    REQUIRE(payload.sourceMap.name.sourceMap.empty());
+    REQUIRE(payload.sourceMap.description.sourceMap.size() == 3);
+    REQUIRE(payload.sourceMap.description.sourceMap[0].location == 2);
+    REQUIRE(payload.sourceMap.description.sourceMap[0].length == 34);
+    REQUIRE(payload.sourceMap.description.sourceMap[1].location == 38);
+    REQUIRE(payload.sourceMap.description.sourceMap[1].length == 13);
+    REQUIRE(payload.sourceMap.description.sourceMap[2].location == 54);
+    REQUIRE(payload.sourceMap.description.sourceMap[2].length == 7);
+    REQUIRE(payload.sourceMap.parameters.list.empty());
+    REQUIRE(payload.sourceMap.headers.list.empty());
+    REQUIRE(payload.sourceMap.body.sourceMap.size() == 1);
+    REQUIRE(payload.sourceMap.body.sourceMap[0].location == 82);
+    REQUIRE(payload.sourceMap.body.sourceMap[0].length == 17);
 }
 
 TEST_CASE("Give a warning of empty message body for requests with certain headers", "[payload]")
@@ -409,6 +550,8 @@ TEST_CASE("Give a warning of empty message body for requests with certain header
     REQUIRE(payload.node.headers[0].first == "Content-Length");
     REQUIRE(payload.node.headers[0].second == "100");
     REQUIRE(payload.node.body.empty());
+
+    REQUIRE(payload.sourceMap.body.sourceMap.empty());
 }
 
 TEST_CASE("Do not report empty message body for requests", "[payload]")
@@ -456,6 +599,8 @@ TEST_CASE("Empty body section should shouldn't be parsed as description", "[payl
     REQUIRE(payload.report.warnings.empty());
 
     REQUIRE(payload.node.body == "");
+
+    REQUIRE(payload.sourceMap.body.sourceMap.empty());
 }
 
 TEST_CASE("Parameters section should be taken as a description node", "[payload]")
@@ -475,4 +620,14 @@ TEST_CASE("Parameters section should be taken as a description node", "[payload]
 
     REQUIRE(payload.node.description == "+ Parameters\n\n    + id (string)\n");
     REQUIRE(payload.node.body == "{}\n");
+
+    REQUIRE(payload.sourceMap.description.sourceMap.size() == 2);
+    REQUIRE(payload.sourceMap.description.sourceMap[0].location == 20);
+    REQUIRE(payload.sourceMap.description.sourceMap[0].length == 14);
+    REQUIRE(payload.sourceMap.description.sourceMap[1].location == 38);
+    REQUIRE(payload.sourceMap.description.sourceMap[1].length == 18);
+    REQUIRE(payload.sourceMap.parameters.list.empty());
+    REQUIRE(payload.sourceMap.body.sourceMap.size() == 1);
+    REQUIRE(payload.sourceMap.body.sourceMap[0].location == 77);
+    REQUIRE(payload.sourceMap.body.sourceMap[0].length == 7);
 }

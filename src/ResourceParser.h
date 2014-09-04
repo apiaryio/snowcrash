@@ -66,6 +66,7 @@ namespace snowcrash {
 
                     if (pd.exportSM()) {
                         out.sourceMap.actions.list.push_back(action.sourceMap);
+                        out.sourceMap.uriTemplate.sourceMap = node->sourceMap;
                     }
 
                     return cur;
