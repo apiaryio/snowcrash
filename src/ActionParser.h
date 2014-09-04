@@ -154,16 +154,23 @@ namespace snowcrash {
                 !out.examples.back().responses.empty()) {
 
                 CodeBlockUtility::addDanglingAsset(node, pd, sectionType, report, out.examples.back().responses.back().body);
-            } else {
-
-                // WARN: Ignoring unexpected node
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                report.warnings.push_back(Warning("ignoring unrecognized block",
-                                                  IgnoringWarning,
-                                                  sourceMap));
+                
+                return ++MarkdownNodeIterator(node);
             }
-
-            return ++MarkdownNodeIterator(node);
+            
+            if ((node->type == mdp::ParagraphMarkdownNodeType ||
+                 node->type == mdp::CodeMarkdownNodeType) &&
+                (sectionType == RequestBodySectionType ||
+                 sectionType == RequestSectionType) &&
+                !out.examples.empty() &&
+                !out.examples.back().requests.empty()) {
+                
+                CodeBlockUtility::addDanglingAsset(node, pd, sectionType, report, out.examples.back().requests.back().body);
+                
+                return ++MarkdownNodeIterator(node);
+            }
+            
+            return SectionProcessorBase<Action>::processUnexpectedNode(node, siblings, pd, sectionType, report, out);            
         }
 
         static SectionType sectionType(const MarkdownNodeIterator& node) {

@@ -96,6 +96,26 @@ namespace snowcrash {
             return node;
         }
         
+        static MarkdownNodeIterator processUnexpectedNode(const MarkdownNodeIterator& node,
+                                                          const MarkdownNodes& siblings,
+                                                          SectionParserData& pd,
+                                                          SectionType& sectionType,
+                                                          Report& report,
+                                                          Resource& out) {
+            
+            if ((node->type == mdp::ParagraphMarkdownNodeType ||
+                 node->type == mdp::CodeMarkdownNodeType) &&
+                (sectionType == ModelBodySectionType ||
+                 sectionType == ModelSectionType)) {
+                
+                CodeBlockUtility::addDanglingAsset(node, pd, sectionType, report, out.model.body);
+                
+                return ++MarkdownNodeIterator(node);
+            }
+            
+            return SectionProcessorBase<Resource>::processUnexpectedNode(node, siblings, pd, sectionType, report, out);
+        }
+        
         static bool isDescriptionNode(const MarkdownNodeIterator& node,
                                       SectionType sectionType) {
             
