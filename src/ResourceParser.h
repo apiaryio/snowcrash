@@ -29,15 +29,6 @@ namespace snowcrash {
 
     typedef Collection<Resource>::const_iterator ResourceIterator;
 
-    // Resource signature
-    enum ResourceSignature {
-        NoResourceSignature = 0,
-        URIResourceSignature,
-        MethodURIResourceSignature,
-        NamedResourceSignature,
-        UndefinedResourceSignature = -1
-    };
-
     /**
      * Resource Section processor
      */
@@ -115,12 +106,9 @@ namespace snowcrash {
 
                 TrimString(subject);
 
-                if (RegexMatch(subject, NamedResourceHeaderRegex)) {
+                if (RegexMatch(subject, NamedResourceHeaderRegex) ||
+                    RegexMatch(subject, ResourceHeaderRegex)) {
                     return ResourceSectionType;
-                }
-
-                if (RegexCapture(subject, ResourceHeaderRegex, captureGroups, 4)) {
-                    return (captureGroups[2].empty()) ? ResourceSectionType : ResourceMethodSectionType;
                 }
             }
 

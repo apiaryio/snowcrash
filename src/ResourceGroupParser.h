@@ -62,8 +62,7 @@ namespace snowcrash {
                                                          Report& report,
                                                          ResourceGroup& out) {
 
-            if (pd.sectionContext() == ResourceSectionType ||
-                pd.sectionContext() == ResourceMethodSectionType) {
+            if (pd.sectionContext() == ResourceSectionType) {
 
                 Resource resource;
                 MarkdownNodeIterator cur = ResourceParser::parse(node, siblings, pd, report, resource);
@@ -102,7 +101,7 @@ namespace snowcrash {
 
             mdp::ByteBuffer method;
 
-            if (isDependentAction(node, method) &&
+            if (SectionProcessor<Action>::isDependentAction(node, method) &&
                 !out.resources.empty()) {
 
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
@@ -149,7 +148,6 @@ namespace snowcrash {
 
             // Resource & descendants
             nested.push_back(ResourceSectionType);
-            nested.push_back(ResourceMethodSectionType);
             SectionTypes types = SectionProcessor<Resource>::nestedSectionTypes();
             nested.insert(nested.end(), types.begin(), types.end());
 
@@ -161,7 +159,7 @@ namespace snowcrash {
 
             mdp::ByteBuffer method;
 
-            if (isCompleteAction(node, method)) {
+            if (SectionProcessor<Action>::isCompleteAction(node, method)) {
                 return false;
             }
 
@@ -173,67 +171,11 @@ namespace snowcrash {
 
             mdp::ByteBuffer method;
 
-            if (isDependentAction(node, method)) {
+            if (SectionProcessor<Action>::isDependentAction(node, method)) {
                 return true;
             }
 
             return SectionProcessorBase<ResourceGroup>::isUnexpectedNode(node, sectionType);
-        }
-
-        /**
-         *  \brief Check if a node represents a complete action
-         *
-         *  \node   Node to check
-         *  \method Output buffer to store the HTTP request method for the transition
-         *  \return True if the node signatures a complete transition, false otherwise
-         *
-         *  A complete transtion (action) is a transtition defined
-         *  as a combination of an HTTP request method and an URI.
-         */
-        static bool isCompleteAction(const MarkdownNodeIterator& node,
-                                     mdp::ByteBuffer& method) {
-
-            CaptureGroups captureGroups;
-            mdp::ByteBuffer subject = node->text;
-
-            TrimString(subject);
-
-            if (RegexCapture(subject, ActionHeaderRegex, captureGroups, 3) && !captureGroups[2].empty()) {
-
-                method = captureGroups[1];
-                return true;
-            }
-
-            return false;
-        }
-        
-        /**
-         *  \brief Check if a node represents a dependent action
-         *
-         *  A dependent action is defined by an HTTP request method only and as 
-         *  such it depends on its parent resource URI.
-         */
-        static bool isDependentAction(const MarkdownNodeIterator& node,
-                                      mdp::ByteBuffer& method) {
-            
-            CaptureGroups captureGroups;
-            mdp::ByteBuffer subject = node->text;
-            
-            TrimString(subject);
-            
-            if (RegexCapture(subject, ActionHeaderRegex, captureGroups, 3) && captureGroups[2].empty()) {
-                
-                method = captureGroups[1];
-                return true;
-            }
-            
-            if (RegexCapture(subject, NamedActionHeaderRegex, captureGroups, 3)) {
-                
-                method = captureGroups[2];
-                return true;
-            }
-            
-            return false;
         }
 
         /** Finds a resource inside an resources collection */
