@@ -36,7 +36,7 @@ parser.add_option("--shared",
     dest="shared",
     help="Build and use shared libsnowcrash instead of static one.")
 
-parser.add_option("--include-integration-tests",
+parser.add_option("-i", "--include-integration-tests",
     action="store_true",
     dest="include_integration_tests",
     help="Configure for integration testing using Cucumber")
