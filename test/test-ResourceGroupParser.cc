@@ -57,6 +57,17 @@ TEST_CASE("Parse canonical resource group", "[resource_group]")
     REQUIRE(resourceGroup.node.resources.size() == 1);
     REQUIRE(resourceGroup.node.resources.front().uriTemplate == "/resource/{id}");
     REQUIRE(resourceGroup.node.resources.front().name == "My Resource");
+
+    REQUIRE(resourceGroup.sourceMap.name.sourceMap.size() == 1);
+    REQUIRE(resourceGroup.sourceMap.name.sourceMap[0].location == 0);
+    REQUIRE(resourceGroup.sourceMap.name.sourceMap[0].length == 15);
+    REQUIRE(resourceGroup.sourceMap.description.sourceMap.size() == 1);
+    REQUIRE(resourceGroup.sourceMap.description.sourceMap[0].location == 15);
+    REQUIRE(resourceGroup.sourceMap.description.sourceMap[0].length == 14);
+    REQUIRE(resourceGroup.sourceMap.resources.list.size() == 1);
+    REQUIRE(resourceGroup.sourceMap.resources.list[0].name.sourceMap.size() == 1);
+    REQUIRE(resourceGroup.sourceMap.resources.list[0].name.sourceMap[0].location == 29);
+    REQUIRE(resourceGroup.sourceMap.resources.list[0].name.sourceMap[0].length == 32);
 }
 
 TEST_CASE("Parse resource group with empty resource", "[resource_group]")
@@ -76,6 +87,17 @@ TEST_CASE("Parse resource group with empty resource", "[resource_group]")
     REQUIRE(resourceGroup.node.description == "p1\n");
     REQUIRE(resourceGroup.node.resources.size() == 1);
     REQUIRE(resourceGroup.node.resources.front().uriTemplate == "/resource");
+
+    REQUIRE(resourceGroup.sourceMap.name.sourceMap.size() == 1);
+    REQUIRE(resourceGroup.sourceMap.name.sourceMap[0].location == 0);
+    REQUIRE(resourceGroup.sourceMap.name.sourceMap[0].length == 13);
+    REQUIRE(resourceGroup.sourceMap.description.sourceMap.size() == 1);
+    REQUIRE(resourceGroup.sourceMap.description.sourceMap[0].location == 13);
+    REQUIRE(resourceGroup.sourceMap.description.sourceMap[0].length == 3);
+    REQUIRE(resourceGroup.sourceMap.resources.list.size() == 1);
+    REQUIRE(resourceGroup.sourceMap.resources.list[0].uriTemplate.sourceMap.size() == 1);
+    REQUIRE(resourceGroup.sourceMap.resources.list[0].uriTemplate.sourceMap[0].location == 16);
+    REQUIRE(resourceGroup.sourceMap.resources.list[0].uriTemplate.sourceMap[0].length == 12);
 }
 
 TEST_CASE("Parse multiple resource in anonymous group", "[resource_group]")
@@ -100,6 +122,10 @@ TEST_CASE("Parse multiple resource in anonymous group", "[resource_group]")
     REQUIRE(resourceGroup.node.resources[0].description == "p1\n");
     REQUIRE(resourceGroup.node.resources[1].uriTemplate == "/r2");
     REQUIRE(resourceGroup.node.resources[1].description == "p2\n");
+
+    REQUIRE(resourceGroup.sourceMap.name.sourceMap.empty());
+    REQUIRE(resourceGroup.sourceMap.description.sourceMap.empty());
+    REQUIRE(resourceGroup.sourceMap.resources.list.size() == 2);
 }
 
 TEST_CASE("Parse multiple resources with payloads", "[resource_group]")
@@ -147,6 +173,10 @@ TEST_CASE("Parse multiple resources with payloads", "[resource_group]")
     REQUIRE(resource2.actions[0].examples[0].requests[0].description.empty());
     REQUIRE(resource2.actions[0].examples[0].requests[0].body.empty());
     REQUIRE(resource2.actions[0].examples[0].responses.empty());
+
+    REQUIRE(resourceGroup.sourceMap.name.sourceMap.empty());
+    REQUIRE(resourceGroup.sourceMap.description.sourceMap.empty());
+    REQUIRE(resourceGroup.sourceMap.resources.list.size() == 2);
 }
 
 TEST_CASE("Parse multiple resources with the same name", "[resource_group]")
@@ -166,6 +196,10 @@ TEST_CASE("Parse multiple resources with the same name", "[resource_group]")
     REQUIRE(resourceGroup.node.name.empty());
     REQUIRE(resourceGroup.node.description.empty());
     REQUIRE(resourceGroup.node.resources.size() == 2);
+
+    REQUIRE(resourceGroup.sourceMap.name.sourceMap.empty());
+    REQUIRE(resourceGroup.sourceMap.description.sourceMap.empty());
+    REQUIRE(resourceGroup.sourceMap.resources.list.size() == 2);
 }
 
 TEST_CASE("Parse resource with list in its description", "[resource_group]")
@@ -193,6 +227,10 @@ TEST_CASE("Parse resource with list in its description", "[resource_group]")
     REQUIRE(resourceGroup.node.resources[0].actions[0].method == "GET");
     REQUIRE(resourceGroup.node.resources[0].actions[0].description == "");
     REQUIRE(resourceGroup.node.resources[0].actions[0].examples.size() == 1);
+
+    REQUIRE(resourceGroup.sourceMap.name.sourceMap.empty());
+    REQUIRE(resourceGroup.sourceMap.description.sourceMap.empty());
+    REQUIRE(resourceGroup.sourceMap.resources.list.size() == 1);
 }
 
 TEST_CASE("Parse resource groups with hr in description", "[resource_group]")
@@ -211,6 +249,14 @@ TEST_CASE("Parse resource groups with hr in description", "[resource_group]")
     REQUIRE(resourceGroup.node.name == "1");
     REQUIRE(resourceGroup.node.description == "---\n\nA\n");
     REQUIRE(resourceGroup.node.resources.empty());
+
+    REQUIRE(resourceGroup.sourceMap.name.sourceMap.size() == 1);
+    REQUIRE(resourceGroup.sourceMap.name.sourceMap[0].location == 0);
+    REQUIRE(resourceGroup.sourceMap.name.sourceMap[0].length == 10);
+    REQUIRE(resourceGroup.sourceMap.description.sourceMap.size() == 1);
+    REQUIRE(resourceGroup.sourceMap.description.sourceMap[0].location == 10);
+    REQUIRE(resourceGroup.sourceMap.description.sourceMap[0].length == 6);
+    REQUIRE(resourceGroup.sourceMap.resources.list.empty());
 }
 
 TEST_CASE("Make sure method followed by a group does not eat the group", "[resource_group]")
@@ -234,6 +280,12 @@ TEST_CASE("Make sure method followed by a group does not eat the group", "[resou
     REQUIRE(resourceGroup.node.resources[0].actions.size() == 1);
     REQUIRE(resourceGroup.node.resources[0].actions[0].method == "POST");
     REQUIRE(resourceGroup.node.resources[0].actions[0].description.empty());
+
+    REQUIRE(resourceGroup.sourceMap.name.sourceMap.size() == 1);
+    REQUIRE(resourceGroup.sourceMap.name.sourceMap[0].location == 0);
+    REQUIRE(resourceGroup.sourceMap.name.sourceMap[0].length == 12);
+    REQUIRE(resourceGroup.sourceMap.description.sourceMap.empty());
+    REQUIRE(resourceGroup.sourceMap.resources.list.size() == 1);
 }
 
 TEST_CASE("Parse resource method abbreviation followed by a foreign method", "[resource_group]")
@@ -259,6 +311,10 @@ TEST_CASE("Parse resource method abbreviation followed by a foreign method", "[r
     REQUIRE(resourceGroup.node.resources[0].model.body.empty());
     REQUIRE(resourceGroup.node.resources[0].actions.size() == 1);
     REQUIRE(resourceGroup.node.resources[0].actions[0].method == "GET");
+
+    REQUIRE(resourceGroup.sourceMap.name.sourceMap.empty());
+    REQUIRE(resourceGroup.sourceMap.description.sourceMap.empty());
+    REQUIRE(resourceGroup.sourceMap.resources.list.size() == 1);
 }
 
 TEST_CASE("Parse resource method abbreviation followed by another", "[resource_group]")
@@ -290,6 +346,12 @@ TEST_CASE("Parse resource method abbreviation followed by another", "[resource_g
     REQUIRE(resourceGroup.node.resources[1].model.body.empty());
     REQUIRE(resourceGroup.node.resources[1].actions.size() == 1);
     REQUIRE(resourceGroup.node.resources[1].actions[0].method == "POST");
+
+    REQUIRE(resourceGroup.sourceMap.name.sourceMap.empty());
+    REQUIRE(resourceGroup.sourceMap.description.sourceMap.empty());
+    REQUIRE(resourceGroup.sourceMap.resources.list.size() == 2);
+    REQUIRE(resourceGroup.sourceMap.resources.list[0].actions.list.size() == 1);
+    REQUIRE(resourceGroup.sourceMap.resources.list[1].actions.list.size() == 1);
 }
 
 TEST_CASE("Resource followed by a complete action", "[resource_group][regression][#185]")
