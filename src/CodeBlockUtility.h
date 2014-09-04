@@ -29,7 +29,6 @@ namespace snowcrash {
             if (type == BlueprintSectionType ||
                 type == ResourceGroupSectionType ||
                 type == ResourceSectionType ||
-                type == ResourceMethodSectionType ||
                 type == ActionSectionType) {
                 
                 return 1;

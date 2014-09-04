@@ -81,8 +81,7 @@ namespace snowcrash {
                                                          Blueprint& out) {
 
             if (pd.sectionContext() == ResourceGroupSectionType ||
-                pd.sectionContext() == ResourceSectionType ||
-                pd.sectionContext() == ResourceMethodSectionType) {
+                pd.sectionContext() == ResourceSectionType) {
 
                 ResourceGroup resourceGroup;
                 MarkdownNodeIterator cur = ResourceGroupParser::parse(node, siblings, pd, report, resourceGroup);

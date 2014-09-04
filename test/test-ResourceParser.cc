@@ -49,7 +49,7 @@ TEST_CASE("Resource block classifier", "[resource]")
 
     // Resource Method
     markdownAST.children().front().text = "GET /resource";
-    REQUIRE(SectionProcessor<Resource>::sectionType(markdownAST.children().begin()) == ResourceMethodSectionType);
+    REQUIRE(SectionProcessor<Resource>::sectionType(markdownAST.children().begin()) == ResourceSectionType);
 }
 
 TEST_CASE("Parse resource", "[resource]")
