@@ -10,12 +10,15 @@
 #define SNOWCRASH_SERIALIZE_JSON_H
 
 #include <ostream>
-#include "Blueprint.h"
+#include "BlueprintSourcemap.h"
 
 namespace snowcrash {
 
     // Naive JSON serialization to ostream
     void SerializeJSON(const snowcrash::Blueprint& blueprint, std::ostream &os);
+
+    // Naive Sourcmap JSON serialization to ostream
+    void SerializeSourceMapJSON(const snowcrash::SourceMap<snowcrash::Blueprint>& blueprint, std::ostream &os);
 }
 
 #endif 
