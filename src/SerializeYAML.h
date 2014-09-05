@@ -10,12 +10,15 @@
 #define SNOWCRASH_SERIALIZE_YAML_H
 
 #include <ostream>
-#include "Blueprint.h"
+#include "BlueprintSourcemap.h"
 
 namespace snowcrash {
     
     // Naive YAML serialization to ostream
     void SerializeYAML(const snowcrash::Blueprint& blueprint, std::ostream &os);
+
+    // Naive Sourcmap YAML serialization to ostream
+    void SerializeSourceMapYAML(const snowcrash::SourceMap<snowcrash::Blueprint>& blueprint, std::ostream &os);
 }
 
 #endif
