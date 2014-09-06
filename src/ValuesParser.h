@@ -18,9 +18,6 @@
 
 namespace snowcrash {
 
-    /** Parameter Values */
-    typedef Collection<Value>::type Values; // TODO: Move this into core later
-
     /** Parameter Values matching regex */
     const char* const ValuesRegex = "^[[:blank:]]*[Vv]alues[[:blank:]]*$";
 

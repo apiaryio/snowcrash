@@ -23,9 +23,7 @@ namespace snowcrash {
     /** No parameters specified message */
     const char* const NoParametersMessage = "no parameters specified, expected a nested list of parameters, one parameter per list item";
 
-    /** Internal type alias for Collection of Parameter */
-    typedef Collection<Parameter>::type Parameters;
-
+    /** Internal type alias for Collection iterator of Parameter */
     typedef Collection<Parameter>::iterator ParameterIterator;
 
     /**

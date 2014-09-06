@@ -23,9 +23,7 @@ namespace snowcrash {
     /** Named action matching regex */
     const char* const NamedActionHeaderRegex = "^[[:blank:]]*" SYMBOL_IDENTIFIER "\\[" HTTP_REQUEST_METHOD "]$";
 
-    /** Internal type alias for Collection of Action */
-    typedef Collection<Action>::type Actions;
-
+    /** Internal type alias for Collection iterator of Action */
     typedef Collection<Action>::const_iterator ActionIterator;
     
     /** Action Definition Type */
@@ -402,11 +400,11 @@ namespace snowcrash {
 
             if (sectionType == RequestSectionType) {
 
-                Collection<Request>::const_iterator duplicate = FindRequest(example, payload);
+                RequestIterator duplicate = SectionProcessor<Payload, PayloadSM>::findRequest(example, payload);
                 return duplicate != example.requests.end();
             } else if (sectionType == ResponseSectionType) {
 
-                Collection<Response>::const_iterator duplicate = FindResponse(example, payload);
+                ResponseIterator duplicate = SectionProcessor<Payload, PayloadSM>::findResponse(example, payload);
                 return duplicate != example.responses.end();
             }
 
@@ -481,6 +479,15 @@ namespace snowcrash {
             }
             
             return;
+        }
+
+        /** Finds an action inside an actions collection */
+        static ActionIterator findAction(const Actions& actions,
+                                         const Action& action) {
+
+            return std::find_if(actions.begin(),
+                                actions.end(),
+                                std::bind2nd(MatchAction<Action>(), action));
         }
     };
 

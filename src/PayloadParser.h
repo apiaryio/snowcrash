@@ -20,6 +20,10 @@
 
 namespace snowcrash {
 
+    /** Internal type alias for Collection iterator of Response */
+    typedef Collection<Response>::const_iterator ResponseIterator;
+    typedef Collection<Request>::const_iterator RequestIterator;
+
     /// Payload signature
     enum PayloadSignature {
         NoPayloadSignature = 0,
@@ -302,7 +306,7 @@ namespace snowcrash {
 
             SectionType sectionType = pd.sectionContext();
 
-            for (Collection<Header>::const_iterator it = out.headers.begin();
+            for (HeaderIterator it = out.headers.begin();
                  it != out.headers.end();
                  ++it) {
 
@@ -559,10 +563,10 @@ namespace snowcrash {
                 out.description = model.description;
                 out.parameters = model.parameters;
                 
-                Collection<Header>::const_iterator modelContentType = std::find_if(model.headers.begin(),
-                                                                                   model.headers.end(),
-                                                                                   std::bind2nd(MatchFirstWith<Header, std::string>(),
-                                                                                                HTTPHeaderName::ContentType));
+                HeaderIterator modelContentType = std::find_if(model.headers.begin(),
+                                                               model.headers.end(),
+                                                               std::bind2nd(MatchFirstWith<Header, std::string>(),
+                                                                            HTTPHeaderName::ContentType));
                 
                 bool isPayloadContentType = !out.headers.empty();
                 bool isModelContentType = modelContentType != model.headers.end();
@@ -606,6 +610,34 @@ namespace snowcrash {
             }
 
             return false;
+        }
+
+        /**
+         *  \brief  Find a request within given action.
+         *  \param  transaction  A transaction to check.
+         *  \param  request A request to look for.
+         *  \return Iterator pointing to the matching request within given method requests.
+         */
+        static RequestIterator findRequest(const TransactionExample& example,
+                                           const Request& request) {
+
+            return std::find_if(example.requests.begin(),
+                                example.requests.end(),
+                                std::bind2nd(MatchPayload(), request));
+        }
+
+        /**
+         *  \brief  Find a response within responses of a given action.
+         *  \param  transaction  A transaction to check.
+         *  \param  response A response to look for.
+         *  \return Iterator pointing to the matching response within given method requests.
+         */
+        static ResponseIterator findResponse(const TransactionExample& example,
+                                             const Response& response) {
+
+            return std::find_if(example.responses.begin(),
+                                example.responses.end(),
+                                std::bind2nd(MatchPayload(), response));
         }
     };
 
