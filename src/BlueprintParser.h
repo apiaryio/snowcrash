@@ -19,9 +19,7 @@ namespace snowcrash {
 
     const char* const ExpectedAPINameMessage = "expected API name, e.g. '# <API Name>'";
 
-    /** Internal type alias for Collection of Metadata */
-    typedef Collection<Metadata>::type MetadataCollection;
-
+    /** Internal type alias for Collection iterator of Metadata */
     typedef Collection<Metadata>::iterator MetadataCollectionIterator;
 
     /**

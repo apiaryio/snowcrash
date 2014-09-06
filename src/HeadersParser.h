@@ -20,9 +20,6 @@ namespace snowcrash {
     /** Headers matching regex */
     const char* const HeadersRegex = "^[[:blank:]]*[Hh]eaders?[[:blank:]]*$";
 
-    /** Internal type alias for collection of HTTP headers */
-    typedef Collection<Header>::type Headers;
-
     /** Header Iterator in its containment group */
     typedef Collection<Header>::const_iterator HeaderIterator;
     
@@ -164,8 +161,8 @@ namespace snowcrash {
         static void injectDeprecatedHeaders(SectionParserData& pd,
                                             const Headers& headers,
                                             const HeadersSM& headersSM,
-                                            Collection<TransactionExample>::type& examples,
-                                            Collection<TransactionExampleSM>::type& examplesSM) {
+                                            TransactionExamples& examples,
+                                            TransactionExamplesSM& examplesSM) {
 
             Collection<TransactionExample>::iterator exampleIt = examples.begin();
             Collection<TransactionExampleSM>::iterator exampleSMIt;

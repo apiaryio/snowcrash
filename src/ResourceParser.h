@@ -24,9 +24,7 @@ namespace snowcrash {
     /** Named resource matching regex */
     const char* const NamedResourceHeaderRegex = "^[[:blank:]]*" SYMBOL_IDENTIFIER "[[:blank:]]+\\[" URI_TEMPLATE "]$";
 
-    /** Internal type alias for Collection of Resource */
-    typedef Collection<Resource>::type Resources;
-
+    /** Internal type alias for Collection iterator of Resource */
     typedef Collection<Resource>::const_iterator ResourceIterator;
 
     // Resource signature
@@ -248,7 +246,7 @@ namespace snowcrash {
             ActionSM actionSM;
 
             MarkdownNodeIterator cur = ActionParser::parse(node, siblings, pd, report, action, actionSM);
-            ActionIterator duplicate = findAction(out.actions, action);
+            ActionIterator duplicate = SectionProcessor<Action, ActionSM>::findAction(out.actions, action);
 
             if (duplicate != out.actions.end()) {
 
@@ -421,13 +419,13 @@ namespace snowcrash {
             }
         }
 
-        /** Finds an action inside an actions collection */
-        static ActionIterator findAction(const Actions& actions,
-                                         const Action& action) {
+        /** Finds a resource inside an resources collection */
+        static ResourceIterator findResource(const Resources& resources,
+                                             const Resource& resource) {
 
-            return std::find_if(actions.begin(),
-                                actions.end(),
-                                std::bind2nd(MatchAction<Action>(), action));
+            return std::find_if(resources.begin(),
+                                resources.end(),
+                                std::bind2nd(MatchResource(), resource));
         }
     };
 
