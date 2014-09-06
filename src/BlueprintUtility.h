@@ -60,12 +60,14 @@ namespace snowcrash {
             
             // Resolve left content type
             Collection<Header>::const_iterator header;
+
             header = std::find_if(left.headers.begin(),
                                   left.headers.end(),
                                   std::bind2nd(MatchFirstWith<Header, std::string>(),
                                                HTTPHeaderName::ContentType));
 
             std::string leftContentType;
+
             if (header != left.headers.end())
                 leftContentType = header->second;
             
@@ -76,6 +78,7 @@ namespace snowcrash {
                                                HTTPHeaderName::ContentType));
 
             std::string rightContentType;
+
             if (header != right.headers.end())
                 rightContentType = header->second;
             
@@ -97,30 +100,6 @@ namespace snowcrash {
             return first.method == second.method;
         }
     };
-    
-    /**
-     *  \brief  Find a request within given action.
-     *  \param  transaction  A transaction to check.
-     *  \param  request A request to look for.
-     *  \return Iterator pointing to the matching request within given method requests.
-     */
-    inline Collection<Request>::const_iterator FindRequest(const TransactionExample& example, const Request& request) {
-        return std::find_if(example.requests.begin(),
-                            example.requests.end(),
-                            std::bind2nd(MatchPayload(), request));
-    }
-
-    /**
-     *  \brief  Find a response within responses of a given action.
-     *  \param  transaction  A transaction to check.
-     *  \param  response A response to look for.
-     *  \return Iterator pointing to the matching response within given method requests.
-     */
-    inline Collection<Response>::const_iterator FindResponse(const TransactionExample& example, const Response& response) {
-        return std::find_if(example.responses.begin(),
-                            example.responses.end(),
-                            std::bind2nd(MatchPayload(), response));
-    }
 }
 
 #endif

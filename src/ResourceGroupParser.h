@@ -17,13 +17,11 @@ namespace snowcrash {
 
     const char* const GroupHeaderRegex = "^[[:blank:]]*[Gg]roup[[:blank:]]+" SYMBOL_IDENTIFIER "[[:blank:]]*$";
 
-    /** Resource iterator pair: its containment group and resource iterator itself */
-    typedef std::pair<Collection<ResourceGroup>::const_iterator, ResourceIterator> ResourceIteratorPair;
-
-    /** Internal type alias for Collection of Resource */
-    typedef Collection<ResourceGroup>::type ResourceGroups;
-
+    /** Internal type alias for Collection iterator of Resource */
     typedef Collection<ResourceGroup>::const_iterator ResourceGroupIterator;
+
+    /** Resource iterator pair: its containment group and resource iterator itself */
+    typedef std::pair<ResourceGroupIterator, ResourceIterator> ResourceIteratorPair;
 
     /**
      * ResourceGroup Section processor
@@ -76,7 +74,7 @@ namespace snowcrash {
 
                 MarkdownNodeIterator cur = ResourceParser::parse(node, siblings, pd, report, resource, resourceSM);
 
-                ResourceIterator duplicate = findResource(out.resources, resource);
+                ResourceIterator duplicate = SectionProcessor<Resource, ResourceSM>::findResource(out.resources, resource);
                 ResourceIteratorPair globalDuplicate;
 
                 if (duplicate == out.resources.end()) {
@@ -192,24 +190,15 @@ namespace snowcrash {
             return SectionProcessorBase<ResourceGroup, ResourceGroupSM>::isUnexpectedNode(node, sectionType);
         }
 
-        /** Finds a resource inside an resources collection */
-        static ResourceIterator findResource(const Resources& resources,
-                                             const Resource& resource) {
-
-            return std::find_if(resources.begin(),
-                                resources.end(),
-                                std::bind2nd(MatchResource(), resource));
-        }
-
         /** Finds a resource in blueprint by its URI template */
         static ResourceIteratorPair findResource(const Blueprint& blueprint,
                                                  const Resource& resource) {
 
-            for (Collection<ResourceGroup>::const_iterator it = blueprint.resourceGroups.begin();
+            for (ResourceGroupIterator it = blueprint.resourceGroups.begin();
                   it != blueprint.resourceGroups.end();
                   ++it) {
 
-                ResourceIterator match = findResource(it->resources, resource);
+                ResourceIterator match = SectionProcessor<Resource, ResourceSM>::findResource(it->resources, resource);
 
                 if (match != it->resources.end()) {
                     return std::make_pair(it, match);

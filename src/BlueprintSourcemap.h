@@ -39,21 +39,23 @@ namespace snowcrash {
     /** Source Map of Parameter Value */
     typedef mdp::BytesRangeSet ValueSM;
 
-    /** Standard types for array of Source Maps */
-    typedef Collection<mdp::BytesRangeSet>::type SourceMaps;
-    typedef Collection<mdp::BytesRangeSet>::iterator SourceMapsIterator;
-
     /** Source Map of an asset data */
     typedef mdp::BytesRangeSet AssetSM;
 
+    /** Source Map of Metadata */
+    typedef mdp::BytesRangeSet MetadataSM;
+
+    /** Source Map of Header */
+    typedef mdp::BytesRangeSet HeaderSM;
+
     /** Source Map of Metadata Collection */
-    typedef SourceMaps MetadataCollectionSM;
+    typedef Collection<MetadataSM>::type MetadataCollectionSM;
 
     /** Source Map of Headers */
-    typedef SourceMaps HeadersSM;
+    typedef Collection<HeaderSM>::type HeadersSM;
 
-    /** Array of Parameter values source maps */
-    typedef SourceMaps ValuesSM;
+    /** Source Map of Collection of Parameter values */
+    typedef Collection<ValueSM>::type ValuesSM;
 
     /** Source Map of Parameter Use flag */
     typedef mdp::BytesRangeSet ParameterUseSM;
@@ -83,7 +85,7 @@ namespace snowcrash {
         ValuesSM values;
     };
 
-    /** Array of Parameters source maps */
+    /** Source Map of Collection of Parameters */
     typedef Collection<ParameterSM>::type ParametersSM;
 
     /** Source Map of Name of a symbol */
@@ -122,13 +124,14 @@ namespace snowcrash {
     /** Source Map structure for Request */
     typedef PayloadSM RequestSM;
 
-    /**
-     *  \brief Source Map structure for Response
-     *
-     *  A payload returned in a response to an action.
-     *  Payload's name represents the HTTP status code.
-     */
+    /** Source Map structure for Response */
     typedef PayloadSM ResponseSM;
+
+    /** Source Map of Collection of Requests */
+    typedef Collection<RequestSM>::type RequestsSM;
+
+    /** Source Map of Collection of Responses */
+    typedef Collection<ResponseSM>::type ResponsesSM;
 
     /**
      *  Source Map Structure for an HTTP transaction example.
@@ -142,11 +145,14 @@ namespace snowcrash {
         DescriptionSM description;
 
         /** Requests */
-        Collection<RequestSM>::type requests;
+        RequestsSM requests;
 
         /** Responses */
-        Collection<ResponseSM>::type responses;
+        ResponsesSM responses;
     };
+
+    /** Source Map of Collection of Transaction examples */
+    typedef Collection<TransactionExampleSM>::type TransactionExamplesSM;
 
     /**
      *  Source Map Structure for Action
@@ -180,8 +186,11 @@ namespace snowcrash {
         DEPRECATED HeadersSM headers;
 
         /** Transactions examples */
-        Collection<TransactionExampleSM>::type examples;
+        TransactionExamplesSM examples;
     };
+
+    /** Source Map of Collection of Actions */
+    typedef Collection<ActionSM>::type ActionsSM;
 
     /**
      *  Source Map Structure for API Resource
@@ -218,8 +227,11 @@ namespace snowcrash {
         DEPRECATED HeadersSM headers;
 
         /** A set of Actions specified for this Resource */
-        Collection<ActionSM>::type actions;
+        ActionsSM actions;
     };
+
+    /** Source Map of Collection of Resources */
+    typedef Collection<ResourceSM>::type ResourcesSM;
 
     /**
      *  Source Map Structure for Group of API Resources
@@ -233,8 +245,11 @@ namespace snowcrash {
         DescriptionSM description;
 
         /** Resources */
-        Collection<ResourceSM>::type resources;
+        ResourcesSM resources;
     };
+
+    /** Source Map of Collection of Resource groups */
+    typedef Collection<ResourceGroupSM>::type ResourceGroupsSM;
 
     /**
      *  \brief API Blueprint Sourcemap AST
@@ -254,7 +269,7 @@ namespace snowcrash {
         DescriptionSM description;
 
         /** The set of API Resource Groups */
-        Collection<ResourceGroupSM>::type resourceGroups;
+        ResourceGroupsSM resourceGroups;
     };
 }
 
