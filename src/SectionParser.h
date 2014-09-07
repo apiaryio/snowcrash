@@ -19,7 +19,7 @@ namespace snowcrash {
     /**
      *  Blueprint section parser
      */
-    template<typename T, typename TSM, typename Adapter>
+    template<typename T, typename Adapter>
     struct SectionParser {
 
         
@@ -34,9 +34,7 @@ namespace snowcrash {
         static MarkdownNodeIterator parse(const MarkdownNodeIterator& node,
                                           const MarkdownNodes& siblings,
                                           SectionParserData& pd,
-                                          Report& report,
-                                          T& out,
-                                          TSM& outSM) {
+                                          ParseResult<T>& out) {
             
             SectionLayout layout = DefaultSectionLayout;
             MarkdownNodeIterator cur = Adapter::startingNode(node);
@@ -44,21 +42,21 @@ namespace snowcrash {
             
             // Signature node
             MarkdownNodeIterator lastCur = cur;
-            cur = SectionProcessor<T, TSM>::processSignature(cur, collection, pd, layout, report, out, outSM);
+            cur = SectionProcessor<T>::processSignature(cur, collection, pd, layout, out);
 
             // Exclusive Nested Sections Layout
             if (layout == ExclusiveNestedSectionLayout) {
 
-                cur = parseNestedSections(cur, collection, pd, report, out, outSM);
+                cur = parseNestedSections(cur, collection, pd, out);
                 
-                SectionProcessor<T, TSM>::finalize(node, pd, report, out, outSM);
+                SectionProcessor<T>::finalize(node, pd, out);
                 
                 return Adapter::nextStartingNode(node, siblings, cur);
             }
             
             // Parser redirect layout
             if (layout == RedirectSectionLayout) {
-                SectionProcessor<T, TSM>::finalize(node, pd, report, out, outSM);
+                SectionProcessor<T>::finalize(node, pd, out);
                 
                 return Adapter::nextStartingNode(node, siblings, cur);
             }
@@ -69,30 +67,30 @@ namespace snowcrash {
             
             // Description nodes
             while(cur != collection.end() &&
-                  SectionProcessor<T, TSM>::isDescriptionNode(cur, pd.sectionContext())) {
+                  SectionProcessor<T>::isDescriptionNode(cur, pd.sectionContext())) {
                 
                 lastCur = cur;
-                cur = SectionProcessor<T, TSM>::processDescription(cur, collection, pd, report, out, outSM);
-                
+                cur = SectionProcessor<T>::processDescription(cur, collection, pd, out);
+
                 if (lastCur == cur)
                     return Adapter::nextStartingNode(node, siblings, cur);
             }
             
             // Content nodes
             while(cur != collection.end() &&
-                  SectionProcessor<T, TSM>::isContentNode(cur, pd.sectionContext())) {
+                  SectionProcessor<T>::isContentNode(cur, pd.sectionContext())) {
                 
                 lastCur = cur;
-                cur = SectionProcessor<T, TSM>::processContent(cur, collection, pd, report, out, outSM);
-                
+                cur = SectionProcessor<T>::processContent(cur, collection, pd, out);
+
                 if (lastCur == cur)
                     return Adapter::nextStartingNode(node, siblings, cur);
             }
             
             // Nested Sections
-            cur = parseNestedSections(cur, collection, pd, report, out, outSM);
+            cur = parseNestedSections(cur, collection, pd, out);
 
-            SectionProcessor<T, TSM>::finalize(node, pd, report, out, outSM);
+            SectionProcessor<T>::finalize(node, pd, out);
 
             return Adapter::nextStartingNode(node, siblings, cur);
         }
@@ -102,9 +100,7 @@ namespace snowcrash {
         static MarkdownNodeIterator parseNestedSections(const MarkdownNodeIterator& node,
                                                         const MarkdownNodes& collection,
                                                         SectionParserData& pd,
-                                                        Report& report,
-                                                        T& out,
-                                                        TSM& outSM) {
+                                                        ParseResult<T>& out) {
 
             MarkdownNodeIterator cur = node;
             MarkdownNodeIterator lastCur = cur;
@@ -115,16 +111,17 @@ namespace snowcrash {
             while(cur != collection.end()) {
                 
                 lastCur = cur;
-                SectionType nestedType = SectionProcessor<T, TSM>::nestedSectionType(cur);
+                SectionType nestedType = SectionProcessor<T>::nestedSectionType(cur);
                 
                 pd.sectionsContext.push_back(nestedType);
                 
                 if (nestedType != UndefinedSectionType) {
-                    cur = SectionProcessor<T, TSM>::processNestedSection(cur, collection, pd, report, out, outSM);
+                    cur = SectionProcessor<T>::processNestedSection(cur, collection, pd, out);
                 }
                 else if (Adapter::nextSkipsUnexpected ||
-                         SectionProcessor<T, TSM>::isUnexpectedNode(cur, pd.sectionContext())) {
-                    cur = SectionProcessor<T, TSM>::processUnexpectedNode(cur, collection, pd, lastSectionType, report, out, outSM);
+                         SectionProcessor<T>::isUnexpectedNode(cur, pd.sectionContext())) {
+
+                    cur = SectionProcessor<T>::processUnexpectedNode(cur, collection, pd, lastSectionType, out);
                 }
                 
                 if (cur != collection.end() &&

@@ -33,19 +33,19 @@ TEST_CASE("Blueprint block classifier", "[blueprint]")
     REQUIRE(!markdownAST.children().empty());
 
     // meta: verse
-    sectionType = SectionProcessor<Blueprint, BlueprintSM>::sectionType(markdownAST.children().begin());
+    sectionType = SectionProcessor<Blueprint>::sectionType(markdownAST.children().begin());
     REQUIRE(sectionType == BlueprintSectionType);
     
     // # Snowcrash API
-    sectionType = SectionProcessor<Blueprint, BlueprintSM>::sectionType(markdownAST.children().begin() + 1);
+    sectionType = SectionProcessor<Blueprint>::sectionType(markdownAST.children().begin() + 1);
     REQUIRE(sectionType == BlueprintSectionType);
     
     // ## Character
-    sectionType = SectionProcessor<Blueprint, BlueprintSM>::sectionType(markdownAST.children().begin() + 2);
+    sectionType = SectionProcessor<Blueprint>::sectionType(markdownAST.children().begin() + 2);
     REQUIRE(sectionType == BlueprintSectionType);
     
     // Uncle Enzo
-    sectionType = SectionProcessor<Blueprint, BlueprintSM>::sectionType(markdownAST.children().begin() + 3);
+    sectionType = SectionProcessor<Blueprint>::sectionType(markdownAST.children().begin() + 3);
     REQUIRE(sectionType == BlueprintSectionType);
 }
 
@@ -53,7 +53,7 @@ TEST_CASE("Parse canonical blueprint", "[blueprint]")
 {
     Blueprint blueprint;
     Report report;
-    SectionParserHelper<Blueprint, BlueprintSM, BlueprintParser>::parse(BlueprintFixture, BlueprintSectionType, report, blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(BlueprintFixture, BlueprintSectionType, report, blueprint);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.empty());
@@ -82,7 +82,7 @@ TEST_CASE("Parse blueprint with multiple metadata sections", "[blueprint]")
 
     Blueprint blueprint;
     Report report;
-    SectionParserHelper<Blueprint, BlueprintSM, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.empty());
@@ -118,7 +118,7 @@ TEST_CASE("Parse API with Name and abbreviated resource", "[blueprint]")
 
     Blueprint blueprint;
     Report report;
-    SectionParserHelper<Blueprint, BlueprintSM, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.empty());
@@ -148,7 +148,7 @@ TEST_CASE("Parse nameless blueprint description", "[blueprint]")
 
     Blueprint blueprint;
     Report report;
-    SectionParserHelper<Blueprint, BlueprintSM, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 1);
@@ -165,7 +165,7 @@ TEST_CASE("Parse nameless blueprint with a list description", "[blueprint]")
 
     Blueprint blueprint;
     Report report;
-    SectionParserHelper<Blueprint, BlueprintSM, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 1);
@@ -189,7 +189,7 @@ TEST_CASE("Parse two groups with the same name", "[blueprint]")
 
     Blueprint blueprint;
     Report report;
-    SectionParserHelper<Blueprint, BlueprintSM, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 2); // groups with same name & no response
@@ -211,12 +211,12 @@ TEST_CASE("Test parser options - required blueprint name", "[blueprint]")
     Blueprint blueprint;
     Report report;
 
-    SectionParserHelper<Blueprint, BlueprintSM, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 1);
     REQUIRE(report.warnings[0].code == APINameWarning);
 
-    SectionParserHelper<Blueprint, BlueprintSM, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint, Symbols(), RequireBlueprintNameOption);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint, Symbols(), RequireBlueprintNameOption);
     REQUIRE(report.error.code != Error::OK);
 }
 
@@ -230,7 +230,7 @@ TEST_CASE("Test required blueprint name on blueprint that starts with metadata",
     Blueprint blueprint;
     Report report;
 
-    SectionParserHelper<Blueprint, BlueprintSM, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint, Symbols(), RequireBlueprintNameOption);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint, Symbols(), RequireBlueprintNameOption);
     REQUIRE(report.error.code != Error::OK);
 }
 
@@ -243,7 +243,7 @@ TEST_CASE("Should parse nested lists in description", "[blueprint]")
 
     Blueprint blueprint;
     Report report;
-    SectionParserHelper<Blueprint, BlueprintSM, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.empty());
@@ -261,7 +261,7 @@ TEST_CASE("Should parse paragraph without final newline", "[blueprint]")
 
     Blueprint blueprint;
     Report report;
-    SectionParserHelper<Blueprint, BlueprintSM, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.empty());
@@ -279,7 +279,7 @@ TEST_CASE("Blueprint starting with Resource Group should be parsed", "[blueprint
 
     Blueprint blueprint;
     Report report;
-    SectionParserHelper<Blueprint, BlueprintSM, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.empty());
@@ -298,7 +298,7 @@ TEST_CASE("Blueprint starting with Resource should be parsed", "[blueprint]")
 
     Blueprint blueprint;
     Report report;
-    SectionParserHelper<Blueprint, BlueprintSM, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.empty());
@@ -322,7 +322,7 @@ TEST_CASE("Checking a resource with global resources for duplicates", "[blueprin
 
     Blueprint blueprint;
     Report report;
-    SectionParserHelper<Blueprint, BlueprintSM, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint, Symbols(), 0, &blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint, Symbols(), 0, &blueprint);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 3); // 2x no response & duplicate resource
@@ -360,7 +360,7 @@ TEST_CASE("Parsing unexpected blocks", "[blueprint]")
     Blueprint blueprint;
     Report report;
 
-    SectionParserHelper<Blueprint, BlueprintSM, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint, Symbols(), 0, &blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint, Symbols(), 0, &blueprint);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 1); // no response

@@ -53,26 +53,24 @@ namespace snowcrash {
      * Parameter section processor
      */
     template<>
-    struct SectionProcessor<Parameter, ParameterSM> : public SectionProcessorBase<Parameter, ParameterSM> {
+    struct SectionProcessor<Parameter> : public SectionProcessorBase<Parameter> {
 
         static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
                                                      const MarkdownNodes& siblings,
                                                      SectionParserData& pd,
                                                      SectionLayout& layout,
-                                                     Report& report,
-                                                     Parameter& out,
-                                                     ParameterSM& outSM) {
+                                                     ParseResult<Parameter>& out) {
 
             mdp::ByteBuffer signature, remainingContent;
             signature = GetFirstLine(node->text, remainingContent);
 
-            parseSignature(node, pd, signature, report, out, outSM);
+            parseSignature(node, pd, signature, out);
 
             if (!remainingContent.empty()) {
-                out.description += "\n" + remainingContent + "\n";
+                out.node.description += "\n" + remainingContent + "\n";
 
                 if (pd.exportSM()) {
-                    outSM.description.append(node->sourceMap);
+                    out.sourceMap.description.sourceMap.append(node->sourceMap);
                 }
             }
 
@@ -83,51 +81,50 @@ namespace snowcrash {
         static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
                                                          const MarkdownNodes& siblings,
                                                          SectionParserData& pd,
-                                                         Report& report,
-                                                         Parameter& out,
-                                                         ParameterSM& outSM) {
+                                                         ParseResult<Parameter>& out) {
 
             if (pd.sectionContext() != ValuesSectionType) {
                 return node;
             }
 
             // Check redefinition
-            if (!out.values.empty()) {
+            if (!out.node.values.empty()) {
                 // WARN: parameter values are already defined
                 std::stringstream ss;
                 ss << "overshadowing previous 'values' definition";
-                ss << " for parameter '" << out.name << "'";
+                ss << " for parameter '" << out.node.name << "'";
 
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                report.warnings.push_back(Warning(ss.str(),
-                                                  RedefinitionWarning,
-                                                  sourceMap));
+                out.report.warnings.push_back(Warning(ss.str(),
+                                                      RedefinitionWarning,
+                                                      sourceMap));
             }
 
             // Clear any previous values
-            out.values.clear();
+            out.node.values.clear();
 
             if (pd.exportSM()) {
-                outSM.values.clear();
+                out.sourceMap.values.sourceMap.clear();
             }
 
-            ValuesParser::parse(node, siblings, pd, report, out.values, outSM.values);
+            ParseResult<Values> values(out.report, out.node.values, out.sourceMap.values);
+            ValuesParser::parse(node, siblings, pd, values);
 
-            if (out.values.empty()) {
+            if (out.node.values.empty()) {
                 // WARN: empty definition
                 std::stringstream ss;
-                ss << "no possible values specified for parameter '" << out.name << "'";
+                ss << "no possible values specified for parameter '" << out.node.name << "'";
 
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                report.warnings.push_back(Warning(ss.str(),
-                                                  EmptyDefinitionWarning,
-                                                  sourceMap));
+                out.report.warnings.push_back(Warning(ss.str(),
+                                                      EmptyDefinitionWarning,
+                                                      sourceMap));
             }
 
-            if ((!out.exampleValue.empty() || !out.defaultValue.empty()) &&
-                 !out.values.empty()) {
+            if ((!out.node.exampleValue.empty() || !out.node.defaultValue.empty()) &&
+                 !out.node.values.empty()) {
 
-                checkExampleAndDefaultValue(node, pd, report, out);
+                checkExampleAndDefaultValue(node, pd, out);
             }
 
             return ++MarkdownNodeIterator(node);
@@ -152,7 +149,7 @@ namespace snowcrash {
 
         static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
 
-            return SectionProcessor<Values, ValuesSM>::sectionType(node);
+            return SectionProcessor<Values>::sectionType(node);
         }
 
         static SectionTypes nestedSectionTypes() {
@@ -166,11 +163,9 @@ namespace snowcrash {
         static void parseSignature(const mdp::MarkdownNodeIterator& node,
                                    SectionParserData& pd,
                                    mdp::ByteBuffer& signature,
-                                   Report& report,
-                                   Parameter& parameter,
-                                   ParameterSM& parameterSM) {
+                                   ParseResult<Parameter>& out) {
 
-            parameter.use = UndefinedParameterUse;
+            out.node.use = UndefinedParameterUse;
 
             TrimString(signature);
 
@@ -185,18 +180,18 @@ namespace snowcrash {
 
                 if (firstSpace == std::string::npos) {
                     // Name
-                    parameter.name = signature;
+                    out.node.name = signature;
                 }
                 else {
-                    parameter.name = innerSignature.substr(0, firstSpace);
+                    out.node.name = innerSignature.substr(0, firstSpace);
                     innerSignature = innerSignature.substr(firstSpace + 1);
 
                     size_t descriptionPos = innerSignature.find(snowcrash::DescriptionIdentifier);
 
                     if (descriptionPos != std::string::npos) {
                         // Description
-                        parameter.description = innerSignature.substr(descriptionPos);
-                        parameter.description = TrimString(parameter.description.replace(0, snowcrash::DescriptionIdentifier.length(), ""));
+                        out.node.description = innerSignature.substr(descriptionPos);
+                        out.node.description = TrimString(out.node.description.replace(0, snowcrash::DescriptionIdentifier.length(), ""));
 
                         innerSignature = innerSignature.substr(0, descriptionPos);
                         innerSignature = TrimString(innerSignature);
@@ -211,7 +206,7 @@ namespace snowcrash {
                             std::string attributes = innerSignature.substr(attributesPos, endOfAttributesPos - attributesPos);
                             attributes = attributes.substr(1);
 
-                            parseAdditionalTraits(node, pd, attributes, report, parameter, parameterSM);
+                            parseAdditionalTraits(node, pd, attributes, out);
 
                             innerSignature = innerSignature.substr(0, attributesPos);
                             innerSignature = TrimString(innerSignature);
@@ -220,58 +215,56 @@ namespace snowcrash {
                     
                     if (innerSignature.length() > 0) {
                         // Remove =
-                        parameter.defaultValue = innerSignature;
+                        out.node.defaultValue = innerSignature;
 
-                        parameter.defaultValue.erase(std::remove(parameter.defaultValue.begin(), parameter.defaultValue.end(), '='), parameter.defaultValue.end());
-                        parameter.defaultValue.erase(std::remove(parameter.defaultValue.begin(), parameter.defaultValue.end(), '`'), parameter.defaultValue.end());
+                        out.node.defaultValue.erase(std::remove(out.node.defaultValue.begin(), out.node.defaultValue.end(), '='), out.node.defaultValue.end());
+                        out.node.defaultValue.erase(std::remove(out.node.defaultValue.begin(), out.node.defaultValue.end(), '`'), out.node.defaultValue.end());
 
-                        parameter.defaultValue = TrimString(parameter.defaultValue);
+                        out.node.defaultValue = TrimString(out.node.defaultValue);
                     }
                 }
 
                 if (pd.exportSM()) {
-                    if (!parameter.name.empty()) {
-                        parameterSM.name = node->sourceMap;
+                    if (!out.node.name.empty()) {
+                        out.sourceMap.name.sourceMap = node->sourceMap;
                     }
 
-                    if (!parameter.description.empty()) {
-                        parameterSM.description = node->sourceMap;
+                    if (!out.node.description.empty()) {
+                        out.sourceMap.description.sourceMap = node->sourceMap;
                     }
 
-                    if (!parameter.defaultValue.empty()) {
-                        parameterSM.defaultValue = node->sourceMap;
+                    if (!out.node.defaultValue.empty()) {
+                        out.sourceMap.defaultValue.sourceMap = node->sourceMap;
                     }
                 }
 
                 // Check possible required vs default clash
-                if (parameter.use != OptionalParameterUse &&
-                    !parameter.defaultValue.empty()) {
-                    
+                if (out.node.use != OptionalParameterUse &&
+                    !out.node.defaultValue.empty()) {
+
                     // WARN: Required vs default clash
                     std::stringstream ss;
-                    ss << "specifying parameter '" << parameter.name << "' as required supersedes its default value"\
+                    ss << "specifying parameter '" << out.node.name << "' as required supersedes its default value"\
                           ", declare the parameter as 'optional' to specify its default value";
 
                     mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                    report.warnings.push_back(Warning(ss.str(),
-                                                      LogicalErrorWarning,
-                                                      sourceMap));
+                    out.report.warnings.push_back(Warning(ss.str(),
+                                                          LogicalErrorWarning,
+                                                          sourceMap));
                 }
             } else {
                 // ERR: unable to parse
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                report.error = Error("unable to parse parameter specification",
-                                     BusinessError,
-                                     sourceMap);
+                out.report.error = Error("unable to parse parameter specification",
+                                         BusinessError,
+                                         sourceMap);
             }
         }
 
         static void parseAdditionalTraits(const mdp::MarkdownNodeIterator& node,
                                           SectionParserData& pd,
                                           mdp::ByteBuffer& traits,
-                                          Report& report,
-                                          Parameter& parameter,
-                                          ParameterSM& parameterSM) {
+                                          ParseResult<Parameter>& out) {
 
             TrimString(traits);
 
@@ -281,7 +274,7 @@ namespace snowcrash {
             if (RegexCapture(traits, AdditionalTraitsExampleRegex, captureGroups) &&
                 captureGroups.size() > 1) {
 
-                parameter.exampleValue = captureGroups[1];
+                out.node.exampleValue = captureGroups[1];
                 std::string::size_type pos = traits.find(captureGroups[0]);
 
                 if (pos != std::string::npos) {
@@ -289,7 +282,7 @@ namespace snowcrash {
                 }
 
                 if (pd.exportSM()) {
-                    parameterSM.exampleValue = node->sourceMap;
+                    out.sourceMap.exampleValue.sourceMap = node->sourceMap;
                 }
              }
 
@@ -299,7 +292,7 @@ namespace snowcrash {
             if (RegexCapture(traits, AdditionalTraitsUseRegex, captureGroups) &&
                 captureGroups.size() > 1) {
 
-                parameter.use = RegexMatch(captureGroups[1], ParameterOptionalRegex) ? OptionalParameterUse : RequiredParameterUse;
+                out.node.use = RegexMatch(captureGroups[1], ParameterOptionalRegex) ? OptionalParameterUse : RequiredParameterUse;
                 std::string::size_type pos = traits.find(captureGroups[0]);
 
                 if (pos != std::string::npos) {
@@ -307,7 +300,7 @@ namespace snowcrash {
                 }
 
                 if (pd.exportSM()) {
-                    parameterSM.use = node->sourceMap;
+                    out.sourceMap.use.sourceMap = node->sourceMap;
                 }
             }
 
@@ -317,7 +310,7 @@ namespace snowcrash {
             if (RegexCapture(traits, AdditionalTraitsTypeRegex, captureGroups) &&
                 captureGroups.size() > 1) {
 
-                parameter.type = captureGroups[1];
+                out.node.type = captureGroups[1];
                 std::string::size_type pos = traits.find(captureGroups[0]);
 
                 if (pos != std::string::npos) {
@@ -325,7 +318,7 @@ namespace snowcrash {
                 }
 
                 if (pd.exportSM()) {
-                    parameterSM.type = node->sourceMap;
+                    out.sourceMap.type.sourceMap = node->sourceMap;
                 }
             }
 
@@ -340,18 +333,18 @@ namespace snowcrash {
                 ss << ", e.g. '(optional, string, `Hello World`)'";
 
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                report.warnings.push_back(Warning(ss.str(),
-                                                  FormattingWarning,
-                                                  sourceMap));
+                out.report.warnings.push_back(Warning(ss.str(),
+                                                            FormattingWarning,
+                                                            sourceMap));
 
-                parameter.type.clear();
-                parameter.exampleValue.clear();
-                parameter.use = UndefinedParameterUse;
+                out.node.type.clear();
+                out.node.exampleValue.clear();
+                out.node.use = UndefinedParameterUse;
 
                 if (pd.exportSM()) {
-                    parameterSM.type.clear();
-                    parameterSM.exampleValue.clear();
-                    parameterSM.use.clear();
+                    out.sourceMap.type.sourceMap.clear();
+                    out.sourceMap.exampleValue.sourceMap.clear();
+                    out.sourceMap.use.sourceMap.clear();
                 }
             }
         }
@@ -359,7 +352,7 @@ namespace snowcrash {
         static void checkExampleAndDefaultValue(const mdp::MarkdownNodeIterator& node,
                                                 SectionParserData& pd,
                                                 Report& report,
-                                                Parameter& parameter) {
+                                                ParseResult<Parameter>& out) {
 
             bool isExampleFound = false;
             bool isDefaultFound = false;
@@ -367,32 +360,32 @@ namespace snowcrash {
             std::stringstream ss;
             bool printWarning = false;
 
-            for (Collection<Value>::iterator it = parameter.values.begin();
-                 it != parameter.values.end();
+            for (Collection<Value>::iterator it = out.node.values.begin();
+                 it != out.node.values.end();
                  ++it) {
 
-                if (parameter.exampleValue == *it) {
+                if (out.node.exampleValue == *it) {
                     isExampleFound = true;
                 }
 
-                if (parameter.defaultValue == *it) {
+                if (out.node.defaultValue == *it) {
                     isDefaultFound = true;
                 }
             }
 
-            if(!parameter.exampleValue.empty() &&
+            if(!out.node.exampleValue.empty() &&
                !isExampleFound) {
 
                 // WARN: missing example in values.
-                ss << "the example value '" << parameter.exampleValue << "' of parameter '"<< parameter.name <<"' is not in its list of expected values";
+                ss << "the example value '" << out.node.exampleValue << "' of parameter '"<< out.node.name <<"' is not in its list of expected values";
                 printWarning = true;
             }
 
-            if(!parameter.defaultValue.empty() &&
+            if(!out.node.defaultValue.empty() &&
                !isDefaultFound) {
 
                 // WARN: missing default in values.
-                ss << "the default value '" << parameter.defaultValue << "' of parameter '"<< parameter.name <<"' is not in its list of expected values";
+                ss << "the default value '" << out.node.defaultValue << "' of parameter '"<< out.node.name <<"' is not in its list of expected values";
                 printWarning = true;
             }
 
@@ -473,7 +466,7 @@ namespace snowcrash {
     };
 
     /** Parameter Section Parser */
-    typedef SectionParser<Parameter, ParameterSM, ListSectionAdapter> ParameterParser;
+    typedef SectionParser<Parameter, ListSectionAdapter> ParameterParser;
 }
 
 #endif

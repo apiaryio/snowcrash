@@ -134,16 +134,14 @@ int main(int argc, const char *argv[])
 
     // Initialize
     snowcrash::BlueprintParserOptions options = 0;  // Or snowcrash::RequireBlueprintNameOption
-    snowcrash::Report report;
-    snowcrash::Blueprint blueprint;
-    snowcrash::BlueprintSM blueprintSM;
+    snowcrash::ParseResult<snowcrash::Blueprint> blueprint;
 
     if (argumentParser.exist(SourcemapArgument)) {
         options |= snowcrash::ExportSourcemapOption;
     }
 
     // Parse
-    snowcrash::parse(inputStream.str(), options, report, blueprint, blueprintSM);
+    snowcrash::parse(inputStream.str(), options, blueprint);
 
     // Output
     if (!argumentParser.exist(ValidateArgument)) {
@@ -151,10 +149,10 @@ int main(int argc, const char *argv[])
         std::stringstream outputStream;
 
         if (argumentParser.get<std::string>(FormatArgument) == "json") {
-            SerializeJSON(blueprint, outputStream);
+            SerializeJSON(blueprint.node, outputStream);
         }
         else if (argumentParser.get<std::string>(FormatArgument) == "yaml") {
-            SerializeYAML(blueprint, outputStream);
+            SerializeYAML(blueprint.node, outputStream);
         }
         
         std::string outputFileName = argumentParser.get<std::string>(OutputArgument);
@@ -179,6 +177,6 @@ int main(int argc, const char *argv[])
     }
 
     // report
-    PrintReport(report);
-    return report.error.code;
+    PrintReport(blueprint.report);
+    return blueprint.report.error.code;
 }
