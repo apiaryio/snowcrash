@@ -19,15 +19,14 @@ TEST_CASE("Warn about keywords in API name", "[warnings][#31]")
     "\n"\
     "# POST\n";
 
-    Blueprint blueprint;
-    Report report;
-    parse(source, 0, report, blueprint);
+    ParseResult<Blueprint> blueprint;
+    parse(source, 0, blueprint);
 
-    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(blueprint.report.error.code == Error::OK);
 
 //TODO:
-//    REQUIRE(report.warnings.size() == 1);
-//    REQUIRE(report.warnings[0].code == AmbiguityWarning);
+//    REQUIRE(blueprint.report.warnings.size() == 1);
+//    REQUIRE(blueprint.report.warnings[0].code == AmbiguityWarning);
 
 //    REQUIRE(blueprint.name.empty());
     REQUIRE(blueprint.resourceGroups.empty());
@@ -45,13 +44,12 @@ TEST_CASE("Warn about brackets in URI template", "[warnings][#79]")
     "## test [/test/{id}[2]]\n"\
     "A test uri template\n";
 
-    Blueprint blueprint;
-    Report report;
-    parse(source, 0, report, blueprint);
+    ParseResult<Blueprint> blueprint;
+    parse(source, 0, blueprint);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
-    REQUIRE(report.warnings[0].code == URIWarning);
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.size() == 1);
+    REQUIRE(blueprint.report.warnings[0].code == URIWarning);
 }
 
 TEST_CASE("Warn about unsupported uri template label expansion", "[warnings][#78]")
@@ -66,13 +64,12 @@ TEST_CASE("Warn about unsupported uri template label expansion", "[warnings][#78
     "## test [/test/{.varone}]\n"\
     "A test uri template\n";
 
-    Blueprint blueprint;
-    Report report;
-    parse(source, 0, report, blueprint);
+    ParseResult<Blueprint> blueprint;
+    parse(source, 0, blueprint);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
-    REQUIRE(report.warnings[0].code == URIWarning);
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.size() == 1);
+    REQUIRE(blueprint.report.warnings[0].code == URIWarning);
 }
 
 TEST_CASE("Warn about unsupported uri template in abbreviated blueprint", "[warnings][#78]")
@@ -87,12 +84,11 @@ TEST_CASE("Warn about unsupported uri template in abbreviated blueprint", "[warn
     "## GET /res/{id}{?a,    b}\n"\
     "+ Response 200";
 
-    Blueprint blueprint;
-    Report report;
-    parse(source, 0, report, blueprint);
+    ParseResult<Blueprint> blueprint;
+    parse(source, 0, blueprint);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
-    REQUIRE(report.warnings[0].code == URIWarning);
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.size() == 1);
+    REQUIRE(blueprint.report.warnings[0].code == URIWarning);
 }
 
