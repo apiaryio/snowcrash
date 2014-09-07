@@ -24,9 +24,8 @@ TEST_CASE("Parse object resource symbol", "[symbol_table]")
     Symbols symbols;
     buildSymbol("Super", symbols);
 
-    Resource resource;
-    Report report;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ModelBodySectionType, report, resource, symbols);
+    ParseResult<Resource> resource;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ModelBodySectionType, resource, symbols);
 
     REQUIRE(report.error.code != Error::OK);
 }

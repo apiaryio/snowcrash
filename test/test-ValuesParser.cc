@@ -32,17 +32,16 @@ TEST_CASE("Recognize values signature", "[values]")
 
 TEST_CASE("Parse canonical values", "[values]")
 {
-    Values values;
-    Report report;
-    SectionParserHelper<Values, ValuesParser>::parse(ValuesFixture, ValuesSectionType, report, values);
+    ParseResult<Values> values;
+    SectionParserHelper<Values, ValuesParser>::parse(ValuesFixture, ValuesSectionType, values);
 
-    REQUIRE(report.error.code == Error::OK);
-    CHECK(report.warnings.empty());
+    REQUIRE(values.report.error.code == Error::OK);
+    CHECK(values.report.warnings.empty());
 
-    REQUIRE(values.size() == 3);
-    REQUIRE(values[0] == "1234");
-    REQUIRE(values[1] == "0000");
-    REQUIRE(values[2] == "beef");
+    REQUIRE(values.node.size() == 3);
+    REQUIRE(values.node[0] == "1234");
+    REQUIRE(values.node[1] == "0000");
+    REQUIRE(values.node[2] == "beef");
 }
 
 TEST_CASE("Warn superfluous content in values attribute", "[values]")
@@ -52,16 +51,15 @@ TEST_CASE("Warn superfluous content in values attribute", "[values]")
     " extra\n\n"\
     "    + `Hello`\n";
 
-    Values values;
-    Report report;
-    SectionParserHelper<Values, ValuesParser>::parse(source, ValuesSectionType, report, values);
+    ParseResult<Values> values;
+    SectionParserHelper<Values, ValuesParser>::parse(source, ValuesSectionType, values);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
-    REQUIRE(report.warnings[0].code == IgnoringWarning);
+    REQUIRE(values.report.error.code == Error::OK);
+    REQUIRE(values.report.warnings.size() == 1);
+    REQUIRE(values.report.warnings[0].code == IgnoringWarning);
 
-    REQUIRE(values.size() == 1);
-    REQUIRE(values[0] == "Hello");
+    REQUIRE(values.node.size() == 1);
+    REQUIRE(values.node[0] == "Hello");
 }
 
 TEST_CASE("Warn about illegal entities in values attribute", "[values]")
@@ -72,14 +70,13 @@ TEST_CASE("Warn about illegal entities in values attribute", "[values]")
     "    + illegal\n"\
     "    + `Hi`\n";
 
-    Values values;
-    Report report;
-    SectionParserHelper<Values, ValuesParser>::parse(source, ValuesSectionType, report, values);
+    ParseResult<Values> values;
+    SectionParserHelper<Values, ValuesParser>::parse(source, ValuesSectionType, values);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(values.report.error.code == Error::OK);
+    REQUIRE(values.report.warnings.size() == 1);
 
-    REQUIRE(values.size() == 2);
-    REQUIRE(values[0] == "Hello");
-    REQUIRE(values[1] == "Hi");
+    REQUIRE(values.node.size() == 2);
+    REQUIRE(values.node[0] == "Hello");
+    REQUIRE(values.node[1] == "Hi");
 }
