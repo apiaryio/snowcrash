@@ -40,9 +40,7 @@ namespace snowcrash {
      */
     int parse(const mdp::ByteBuffer& source,
               BlueprintParserOptions options,
-              Report& report,
-              Blueprint& blueprint,
-              BlueprintSM& blueprintSM);
+              ParseResult<Blueprint>& out);
 }
 
 #endif

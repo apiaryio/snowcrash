@@ -30,7 +30,7 @@ TEST_CASE("recognize headers signature", "[headers]")
     markdownParser.parse(HeadersFixture, markdownAST);
     
     REQUIRE(!markdownAST.children().empty());
-    SectionType sectionType = SectionProcessor<Headers, HeadersSM>::sectionType(markdownAST.children().begin());
+    SectionType sectionType = SectionProcessor<Headers>::sectionType(markdownAST.children().begin());
     REQUIRE(sectionType == HeadersSectionType);
 }
 
@@ -38,7 +38,7 @@ TEST_CASE("parse headers fixture", "[headers]")
 {
     Headers headers;
     Report report;
-    SectionParserHelper<Headers, HeadersSM, HeadersParser>::parse(HeadersFixture, HeadersSectionType, report, headers);
+    SectionParserHelper<Headers, HeadersParser>::parse(HeadersFixture, HeadersSectionType, report, headers);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.empty());
@@ -54,7 +54,7 @@ TEST_CASE("parse headers fixture with no empty line between signature and conten
 {
     Headers headers;
     Report report;
-    SectionParserHelper<Headers, HeadersSM, HeadersParser>::parse(HeadersSignatureContentFixture, HeadersSectionType, report, headers);
+    SectionParserHelper<Headers, HeadersParser>::parse(HeadersSignatureContentFixture, HeadersSectionType, report, headers);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 1); // content in signature
@@ -73,7 +73,7 @@ TEST_CASE("parse malformed headers fixture", "[headers]")
 
     Headers headers;
     Report report;
-    SectionParserHelper<Headers, HeadersSM, HeadersParser>::parse(source, HeadersSectionType, report, headers);
+    SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, report, headers);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 1); // malformed header
@@ -104,7 +104,7 @@ TEST_CASE("Parse header section composed of multiple blocks", "[headers]")
 
     Headers headers;
     Report report;
-    SectionParserHelper<Headers, HeadersSM, HeadersParser>::parse(source, HeadersSectionType, report, headers);
+    SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, report, headers);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 1); // not a code block
@@ -124,7 +124,7 @@ TEST_CASE("Parse header section with missing headers", "[headers]")
 
     Headers headers;
     Report report;
-    SectionParserHelper<Headers, HeadersSM, HeadersParser>::parse(source, HeadersSectionType, report, headers);
+    SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, report, headers);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 1); // no headers

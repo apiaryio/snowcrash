@@ -48,19 +48,17 @@ static bool CheckSource(const mdp::ByteBuffer& source, Report& report) {
 
 int snowcrash::parse(const mdp::ByteBuffer& source,
                      BlueprintParserOptions options,
-                     Report& report,
-                     Blueprint& blueprint,
-                     BlueprintSM& blueprintSM) {
+                     ParseResult<Blueprint>& out) {
 
     try {
         
         // Sanity Check
-        if (!CheckSource(source, report))
-            return report.error.code;
+        if (!CheckSource(source, out.report))
+            return out.report.error.code;
         
         // Do nothing if blueprint is empty
         if (source.empty())
-            return report.error.code;
+            return out.report.error.code;
 
         // Parse Markdown
         mdp::MarkdownParser markdownParser;
@@ -68,21 +66,21 @@ int snowcrash::parse(const mdp::ByteBuffer& source,
         markdownParser.parse(source, markdownAST);
 
         // Build SectionParserData
-        SectionParserData pd(options, source, blueprint);
+        SectionParserData pd(options, source, out.node);
 
         // Parse Blueprint
-        BlueprintParser::parse(markdownAST.children().begin(), markdownAST.children(), pd, report, blueprint, blueprintSM);
+        BlueprintParser::parse(markdownAST.children().begin(), markdownAST.children(), pd, out);
     }
     catch (const std::exception& e) {
         
         std::stringstream ss;
         ss << "parser exception: '" << e.what() << "'";
-        report.error = Error(ss.str(), 1);
+        out.report.error = Error(ss.str(), 1);
     }
     catch (...) {
         
-        report.error = Error("parser exception has occured", 1);
+        out.report.error = Error("parser exception has occured", 1);
     }
 
-    return report.error.code;
+    return out.report.error.code;
 }

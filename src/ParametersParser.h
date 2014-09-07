@@ -30,14 +30,12 @@ namespace snowcrash {
      * Parameters section processor
      */
     template<>
-    struct SectionProcessor<Parameters, ParametersSM> : public SectionProcessorBase<Parameters, ParametersSM> {
+    struct SectionProcessor<Parameters> : public SectionProcessorBase<Parameters> {
 
         static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
                                                      SectionParserData& pd,
                                                      SectionLayout& layout,
-                                                     Report& report,
-                                                     Parameters& out,
-                                                     ParametersSM& outSM) {
+                                                     ParseResult<Parameters>& out) {
 
             mdp::ByteBuffer remainingContent;
 
@@ -51,9 +49,9 @@ namespace snowcrash {
                 ss << " expected a nested list of parameters, one parameter per list item";
 
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                report.warnings.push_back(Warning(ss.str(),
-                                                  IgnoringWarning,
-                                                  sourceMap));
+                out.report.warnings.push_back(Warning(ss.str(),
+                                                      IgnoringWarning,
+                                                      sourceMap));
             }
 
             return ++MarkdownNodeIterator(node);
@@ -61,9 +59,7 @@ namespace snowcrash {
 
         static MarkdownNodeIterator processDescription(const MarkdownNodeIterator& node,
                                                        SectionParserData& pd,
-                                                       Report& report,
-                                                       Parameters& out,
-                                                       ParametersSM& outSM) {
+                                                       ParseResult<Parameters>& out) {
 
             return node;
         }
@@ -71,44 +67,43 @@ namespace snowcrash {
         static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
                                                          const MarkdownNodes& siblings,
                                                          SectionParserData& pd,
-                                                         Report& report,
-                                                         Parameters& out,
-                                                         ParametersSM& outSM) {
+                                                         ParseResult<Parameters>& out) {
 
             if (pd.sectionContext() != ParameterSectionType) {
                 return node;
             }
 
-            Parameter parameter;
-            ParameterSM parameterSM;
+            ParseResult<Parameter> parameter;
             bool paramIsDuplicate = false;
 
-            ParameterParser::parse(node, siblings, pd, report, parameter, parameterSM);
+            ParameterParser::parse(node, siblings, pd, parameter);
 
-            if (!out.empty()) {
+            out.report += parameter.report;
 
-                ParameterIterator duplicate = findParameter(out, parameter);
+            if (!out.node.empty()) {
 
-                if (duplicate != out.end()) {
+                ParameterIterator duplicate = findParameter(out.node, parameter.node);
+
+                if (duplicate != out.node.end()) {
 
                     // WARN: Parameter already defined
                     std::stringstream ss;
-                    ss << "overshadowing previous parameter '" << parameter.name << "' definition";
+                    ss << "overshadowing previous parameter '" << parameter.node.name << "' definition";
 
                     mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                    report.warnings.push_back(Warning(ss.str(),
-                                                      RedefinitionWarning,
-                                                      sourceMap));
+                    out.report.warnings.push_back(Warning(ss.str(),
+                                                          RedefinitionWarning,
+                                                          sourceMap));
 
                     paramIsDuplicate = true;
                 }
             }
 
             if (!paramIsDuplicate) {
-                out.push_back(parameter);
+                out.node.push_back(parameter.node);
 
                 if (pd.exportSM()) {
-                    outSM.push_back(parameterSM);
+                    out.sourceMap.sourceMap.push_back(parameter.sourceMap);
                 }
             }
 
@@ -141,7 +136,7 @@ namespace snowcrash {
 
         static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
 
-            return SectionProcessor<Parameter, ParameterSM>::sectionType(node);
+            return SectionProcessor<Parameter>::sectionType(node);
         }
 
         static SectionTypes nestedSectionTypes() {
@@ -149,7 +144,7 @@ namespace snowcrash {
 
             // Parameter & descendants
             nested.push_back(ParameterSectionType);
-            SectionTypes types = SectionProcessor<Parameter, ParameterSM>::nestedSectionTypes();
+            SectionTypes types = SectionProcessor<Parameter>::nestedSectionTypes();
             nested.insert(nested.end(), types.begin(), types.end());
 
             return nested;
@@ -157,17 +152,15 @@ namespace snowcrash {
 
         static void finalize(const MarkdownNodeIterator& node,
                              SectionParserData& pd,
-                             Report& report,
-                             Parameters& out,
-                             ParametersSM& outSM) {
+                             ParseResult<Parameters>& out) {
 
-            if (out.empty()) {
+            if (out.node.empty()) {
 
                 // WARN: No parameters defined
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                report.warnings.push_back(Warning(NoParametersMessage,
-                                                  FormattingWarning,
-                                                  sourceMap));
+                out.report.warnings.push_back(Warning(NoParametersMessage,
+                                                      FormattingWarning,
+                                                      sourceMap));
             }
         }
 
@@ -182,7 +175,7 @@ namespace snowcrash {
     };
 
     /** Parameters Section parser */
-    typedef SectionParser<Parameters, ParametersSM, ListSectionAdapter> ParametersParser;
+    typedef SectionParser<Parameters, ListSectionAdapter> ParametersParser;
 }
 
 #endif

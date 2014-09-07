@@ -30,7 +30,7 @@ TEST_CASE("Parse object resource symbol", "[symbol_table]")
 
     Resource resource;
     Report report;
-    SectionParserHelper<Resource, ResourceSM, ResourceParser>::parse(source, ModelBodySectionType, report, resource, symbols);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ModelBodySectionType, report, resource, symbols);
 
     REQUIRE(report.error.code != Error::OK);
 }

@@ -19,157 +19,141 @@
  *  Data types in this documents define the API Blueprint Sourcemap AST.
  */
 
+#define SOURCE_MAP_COLLECTION(T, TC) template<>\
+struct SourceMap<TC> {\
+    Collection<SourceMap<T> >::type sourceMap;\
+};\
+
 namespace snowcrash {
 
-    /** Source Map of Name of a an API Blueprint entity. */
-    typedef mdp::BytesRangeSet NameSM;
+    struct SourceMapBase {
+        mdp::BytesRangeSet sourceMap;
+    };
 
-    /** Source Map of an API Blueprint entity Description. */
-    typedef mdp::BytesRangeSet DescriptionSM;
-
-    /** Source Map of URI template */
-    typedef mdp::BytesRangeSet URITemplateSM;
-
-    /** Source Map of HTTP Method */
-    typedef mdp::BytesRangeSet HTTPMethodSM;
-
-    /** Source Map of Parameter Type */
-    typedef mdp::BytesRangeSet TypeSM;
-
-    /** Source Map of Parameter Value */
-    typedef mdp::BytesRangeSet ValueSM;
-
-    /** Source Map of an asset data */
-    typedef mdp::BytesRangeSet AssetSM;
-
-    /** Source Map of Metadata */
-    typedef mdp::BytesRangeSet MetadataSM;
-
-    /** Source Map of Header */
-    typedef mdp::BytesRangeSet HeaderSM;
+    template<typename T>
+    struct SourceMap : public SourceMapBase {
+    };
 
     /** Source Map of Metadata Collection */
-    typedef Collection<MetadataSM>::type MetadataCollectionSM;
+    SOURCE_MAP_COLLECTION(Metadata, MetadataCollection);
 
     /** Source Map of Headers */
-    typedef Collection<HeaderSM>::type HeadersSM;
+    typedef SourceMap<MetadataCollection> SourceMap<Headers>;
 
     /** Source Map of Collection of Parameter values */
-    typedef Collection<ValueSM>::type ValuesSM;
-
-    /** Source Map of Parameter Use flag */
-    typedef mdp::BytesRangeSet ParameterUseSM;
+    SOURCE_MAP_COLLECTION(Value, Values);
 
     /** Source Map Structure for Parameter */
-    struct ParameterSM {
+    template<>
+    struct SourceMap<Parameter> : public SourceMapBase {
 
         /** Source Map of Parameter Name */
-        NameSM name;
+        SourceMap<Name> name;
 
         /** Source Map of Parameter Description */
-        DescriptionSM description;
+        SourceMap<Description> description;
 
         /** Source Map of Parameter Type */
-        TypeSM type;
+        SourceMap<Type> type;
 
         /** Source Map of Required flag */
-        ParameterUseSM use;
+        SourceMap<ParameterUse> use;
 
         /** Source Map of Default Value, applicable only when `required == false` */
-        ValueSM defaultValue;
+        SourceMap<Value> defaultValue;
 
         /** Source Map of Example Value */
-        ValueSM exampleValue;
+        SourceMap<Value> exampleValue;
 
         /** Enumeration of possible values */
-        ValuesSM values;
+        SourceMap<Values> values;
     };
 
     /** Source Map of Collection of Parameters */
-    typedef Collection<ParameterSM>::type ParametersSM;
-
-    /** Source Map of Name of a symbol */
-    typedef mdp::BytesRangeSet SymbolNameSM;
+    SOURCE_MAP_COLLECTION(Parameter, Parameters);
 
     /**
      * Source Map Structure for Payload
      */
-    struct PayloadSM {
+    template<>
+    struct SourceMap<Payload> : public SourceMapBase {
 
         /** Source Map of a Payload Name */
-        NameSM name;
+        SourceMap<Name> name;
 
         /** Source Map of Payload Description */
-        DescriptionSM description;
+        SourceMap<Description> description;
 
         /** Payload-specific Parameters */
-        ParametersSM parameters;
+        SourceMap<Parameters> parameters;
 
         /** Payload-specific Headers */
-        HeadersSM headers;
+        SourceMap<Headers> headers;
 
         /** Source Map of Body */
-        AssetSM body;
+        SourceMap<Asset> body;
 
         /** Source Map of Schema */
-        AssetSM schema;
+        SourceMap<Asset> schema;
 
         /** Source Map of Symbol */
-        SymbolNameSM symbol;
+        SourceMap<SymbolName> symbol;
     };
 
     /** Source Map structure for Resource Model */
-    typedef PayloadSM ResourceModelSM;
+    typedef SourceMap<Payload> SourceMap<ResourceModel>;
 
     /** Source Map structure for Request */
-    typedef PayloadSM RequestSM;
+    typedef SourceMap<Payload> SourceMap<Request>;
 
     /** Source Map structure for Response */
-    typedef PayloadSM ResponseSM;
+    typedef SourceMap<Payload> SourceMap<Response>;
 
     /** Source Map of Collection of Requests */
-    typedef Collection<RequestSM>::type RequestsSM;
+    SOURCE_MAP_COLLECTION(Request, Requests);
 
     /** Source Map of Collection of Responses */
-    typedef Collection<ResponseSM>::type ResponsesSM;
+    typedef SourceMap<Responses> SourceMap<Requests>;
 
     /**
      *  Source Map Structure for an HTTP transaction example.
      */
-    struct TransactionExampleSM {
+    template<>
+    struct SourceMap<TransactionExample> : public SourceMapBase {
 
         /** Source Map of an example name */
-        NameSM name;
+        SourceMap<Name> name;
 
         /** Source Map of Description */
-        DescriptionSM description;
+        SourceMap<Description> description;
 
         /** Requests */
-        RequestsSM requests;
+        SourceMap<Requests> requests;
 
         /** Responses */
-        ResponsesSM responses;
+        SourceMap<Responses> responses;
     };
 
     /** Source Map of Collection of Transaction examples */
-    typedef Collection<TransactionExampleSM>::type TransactionExamplesSM;
+    SOURCE_MAP_COLLECTION(TransactionExample, TransactionExamples);
 
     /**
      *  Source Map Structure for Action
      */
-    struct ActionSM {
+    template<>
+    struct SourceMap<Action> : public SourceMapBase {
 
         /** Source Map of HTTP method */
-        HTTPMethodSM method;
+        SourceMap<HTTPMethod> method;
 
         /** Source Map of an Action name */
-        NameSM name;
+        SourceMap<Name> name;
 
         /** Source Map of Description */
-        DescriptionSM description;
+        SourceMap<Description> description;
 
         /** Action-specific Parameters */
-        ParametersSM parameters;
+        SourceMap<Parameters> parameters;
 
         /**
          *  \brief Action-specific HTTP headers
@@ -183,34 +167,35 @@ namespace snowcrash {
          *
          *  Use respective payload's header collection instead.
          */
-        DEPRECATED HeadersSM headers;
+        DEPRECATED SourceMap<Headers> headers;
 
         /** Transactions examples */
-        TransactionExamplesSM examples;
+        SourceMap<TransactionExamples> examples;
     };
 
     /** Source Map of Collection of Actions */
-    typedef Collection<ActionSM>::type ActionsSM;
+    SOURCE_MAP_COLLECTION(Action, Actions);
 
     /**
      *  Source Map Structure for API Resource
      */
-    struct ResourceSM {
+    template<>
+    struct SourceMap<Resource> : public SourceMapBase {
 
         /** Source Map of URI template */
-        URITemplateSM uriTemplate;
+        SourceMap<URITemplate> uriTemplate;
 
         /** Source Map of a Resource Name */
-        NameSM name;
+        SourceMap<Name> name;
 
         /** Source Map of Description of the resource */
-        DescriptionSM description;
+        SourceMap<Description> description;
 
         /** Model representing this Resource */
-        ResourceModelSM model;
+        SourceMap<ResourceModel> model;
 
         /** Parameters */
-        ParametersSM parameters;
+        SourceMap<Parameters> parameters;
 
         /**
          *  \brief Resource-specific HTTP Headers
@@ -224,32 +209,33 @@ namespace snowcrash {
          *
          *  Use respective payload's header collection instead.
          */
-        DEPRECATED HeadersSM headers;
+        DEPRECATED SourceMap<Headers> headers;
 
         /** A set of Actions specified for this Resource */
-        ActionsSM actions;
+        SourceMap<Actions> actions;
     };
 
     /** Source Map of Collection of Resources */
-    typedef Collection<ResourceSM>::type ResourcesSM;
+    SOURCE_MAP_COLLECTION(Resource, Resources);
 
     /**
      *  Source Map Structure for Group of API Resources
      */
-    struct ResourceGroupSM {
+    template<>
+    struct SourceMap<ResourceGroup> : public SourceMapBase {
 
         /** Source Map of a Group Name */
-        NameSM name;
+        SourceMap<Name> name;
 
         /** Source Map of Group description */
-        DescriptionSM description;
+        SourceMap<Description> description;
 
         /** Resources */
-        ResourcesSM resources;
+        SourceMap<Resources> resources;
     };
 
     /** Source Map of Collection of Resource groups */
-    typedef Collection<ResourceGroupSM>::type ResourceGroupsSM;
+    SOURCE_MAP_COLLECTION(ResourceGroup, ResourceGroups);
 
     /**
      *  \brief API Blueprint Sourcemap AST
@@ -257,19 +243,20 @@ namespace snowcrash {
      *  This is top-level (or root if you prefer) of API Blueprint Sourcemap abstract syntax tree.
      *  Start reading a parsed API here.
      */
-    struct BlueprintSM {
+    template<>
+    struct SourceMap<Blueprint> : public SourceMapBase {
 
         /** Source Map of API Blueprint metadata */
-        MetadataCollectionSM metadata;
+        SourceMap<MetadataCollection> metadata;
 
         /** Source Map of the API Name */
-        NameSM name;
+        SourceMap<Name> name;
 
         /** Source Map of an API Overview description */
-        DescriptionSM description;
+        SourceMap<Description> description;
 
         /** The set of API Resource Groups */
-        ResourceGroupsSM resourceGroups;
+        SourceMap<ResourceGroups> resourceGroups;
     };
 }
 

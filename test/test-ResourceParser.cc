@@ -38,22 +38,22 @@ TEST_CASE("Resource block classifier", "[resource]")
     markdownParser.parse(ResourceFixture, markdownAST);
 
     REQUIRE(!markdownAST.children().empty());
-    sectionType = SectionProcessor<Resource, ResourceSM>::sectionType(markdownAST.children().begin());
+    sectionType = SectionProcessor<Resource>::sectionType(markdownAST.children().begin());
     REQUIRE(sectionType == ResourceSectionType);
 
     // Nameless resource: "/resource"
     markdownAST.children().front().text = "/resource";
-    sectionType = SectionProcessor<Resource, ResourceSM>::sectionType(markdownAST.children().begin());
+    sectionType = SectionProcessor<Resource>::sectionType(markdownAST.children().begin());
     REQUIRE(sectionType == ResourceSectionType);
 
     // Keyword "group"
     markdownAST.children().front().text = "Group A";
-    sectionType = SectionProcessor<Resource, ResourceSM>::sectionType(markdownAST.children().begin());
+    sectionType = SectionProcessor<Resource>::sectionType(markdownAST.children().begin());
     REQUIRE(sectionType == UndefinedSectionType);
 
     // Resource Method
     markdownAST.children().front().text = "GET /resource";
-    sectionType = SectionProcessor<Resource, ResourceSM>::sectionType(markdownAST.children().begin());
+    sectionType = SectionProcessor<Resource>::sectionType(markdownAST.children().begin());
     REQUIRE(sectionType == ResourceMethodSectionType);
 }
 
@@ -61,7 +61,7 @@ TEST_CASE("Parse resource", "[resource]")
 {
     Resource resource;
     Report report;
-    SectionParserHelper<Resource, ResourceSM, ResourceParser>::parse(ResourceFixture, ResourceSectionType, report, resource);
+    SectionParserHelper<Resource, ResourceParser>::parse(ResourceFixture, ResourceSectionType, report, resource);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.empty());
@@ -93,7 +93,7 @@ TEST_CASE("Parse partially defined resource", "[resource]")
 
     Resource resource;
     Report report;
-    SectionParserHelper<Resource, ResourceSM, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 2); // no response & preformatted asset
@@ -126,7 +126,7 @@ TEST_CASE("Parse multiple method descriptions", "[resource]")
 
     Resource resource;
     Report report;
-    SectionParserHelper<Resource, ResourceSM, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 2); // 2x no response
@@ -163,7 +163,7 @@ TEST_CASE("Parse multiple methods", "[resource]")
 
     Resource resource;
     Report report;
-    SectionParserHelper<Resource, ResourceSM, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 2); // empty reuqest asset & no response
@@ -210,7 +210,7 @@ TEST_CASE("Parse description with list", "[resource]")
 
     Resource resource;
     Report report;
-    SectionParserHelper<Resource, ResourceSM, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.empty());
@@ -232,7 +232,7 @@ TEST_CASE("Parse resource with a HR", "[resource][block]")
 
     Resource resource;
     Report report;
-    SectionParserHelper<Resource, ResourceSM, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.empty());
@@ -255,7 +255,7 @@ TEST_CASE("Parse resource method abbreviation", "[resource]")
 
     Resource resource;
     Report report;
-    SectionParserHelper<Resource, ResourceSM, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.empty());
@@ -277,7 +277,7 @@ TEST_CASE("Parse resource without name", "[resource]")
 
     Resource resource;
     Report report;
-    SectionParserHelper<Resource, ResourceSM, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.empty());
@@ -303,7 +303,7 @@ TEST_CASE("Warn about parameters not in URI template", "[resource][source]")
 
     Resource resource;
     Report report;
-    SectionParserHelper<Resource, ResourceSM, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 2);
@@ -328,7 +328,7 @@ TEST_CASE("Parse nameless resource with named model", "[resource][model][source]
 
     Resource resource;
     Report report;
-    SectionParserHelper<Resource, ResourceSM, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.empty());
@@ -349,7 +349,7 @@ TEST_CASE("Parse nameless resource with nameless model", "[resource][model][sour
 
     Resource resource;
     Report report;
-    SectionParserHelper<Resource, ResourceSM, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
 
     REQUIRE(report.error.code == SymbolError);
     REQUIRE(report.warnings.empty());
@@ -370,7 +370,7 @@ TEST_CASE("Parse named resource with nameless model", "[resource][model][source]
 
     Resource resource;
     Report report;
-    SectionParserHelper<Resource, ResourceSM, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.empty());
@@ -399,7 +399,7 @@ TEST_CASE("Parse named resource with nameless model but reference a non-existing
 
     Resource resource;
     Report report;
-    SectionParserHelper<Resource, ResourceSM, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
 
     REQUIRE(report.error.code == SymbolError);
     REQUIRE(report.warnings.empty());
@@ -411,7 +411,7 @@ TEST_CASE("Parse root resource", "[resource]")
 
     Resource resource;
     Report report;
-    SectionParserHelper<Resource, ResourceSM, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.empty());
@@ -427,7 +427,7 @@ TEST_CASE("Parse resource with invalid URI Tempalte", "[resource]")
     
     Resource resource;
     Report report;
-    SectionParserHelper<Resource, ResourceSM, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
     
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 1);
@@ -453,7 +453,7 @@ TEST_CASE("Deprecated resource and action headers", "[resource]")
 
     Resource resource;
     Report report;
-    SectionParserHelper<Resource, ResourceSM, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 2);
@@ -486,7 +486,7 @@ TEST_CASE("bug fix for recognition of model as a part of other word or as a quot
 
     Resource resource;
     Report report;
-    SectionParserHelper<Resource, ResourceSM, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 0);
@@ -505,7 +505,7 @@ TEST_CASE("Parse resource with multi-word named model", "[resource][model]")
 
     Resource resource;
     Report report;
-    SectionParserHelper<Resource, ResourceSM, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.empty());

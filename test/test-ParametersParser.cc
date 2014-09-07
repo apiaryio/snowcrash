@@ -29,7 +29,7 @@ TEST_CASE("Recognize Parameters section block", "[parameters]")
     markdownParser.parse(ParametersFixture, markdownAST);
 
     REQUIRE(!markdownAST.children().empty());
-    SectionType sectionType = SectionProcessor<Parameters, ParametersSM>::sectionType(markdownAST.children().begin());
+    SectionType sectionType = SectionProcessor<Parameters>::sectionType(markdownAST.children().begin());
     REQUIRE(sectionType == ParametersSectionType);
 }
 
@@ -37,7 +37,7 @@ TEST_CASE("Parse canonical parameters", "[parameters]")
 {
     Parameters parameters;
     Report report;
-    SectionParserHelper<Parameters, ParametersSM, ParametersParser>::parse(ParametersFixture, ParametersSectionType, report, parameters);
+    SectionParserHelper<Parameters, ParametersParser>::parse(ParametersFixture, ParametersSectionType, report, parameters);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.empty());
@@ -59,7 +59,7 @@ TEST_CASE("Parse ilegal parameter", "[parameters]")
 
     Parameters parameters;
     Report report;
-    SectionParserHelper<Parameters, ParametersSM, ParametersParser>::parse(source, ParametersSectionType, report, parameters);
+    SectionParserHelper<Parameters, ParametersParser>::parse(source, ParametersSectionType, report, parameters);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 2);
@@ -79,7 +79,7 @@ TEST_CASE("Parse illegal parameter among legal ones", "[parameters]")
 
     Parameters parameters;
     Report report;
-    SectionParserHelper<Parameters, ParametersSM, ParametersParser>::parse(source, ParametersSectionType, report, parameters);
+    SectionParserHelper<Parameters, ParametersParser>::parse(source, ParametersSectionType, report, parameters);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 1);
@@ -101,7 +101,7 @@ TEST_CASE("Warn about additional content in parameters section", "[parameters]")
 
     Parameters parameters;
     Report report;
-    SectionParserHelper<Parameters, ParametersSM, ParametersParser>::parse(source, ParametersSectionType, report, parameters);
+    SectionParserHelper<Parameters, ParametersParser>::parse(source, ParametersSectionType, report, parameters);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 1);
@@ -121,7 +121,7 @@ TEST_CASE("Warn about additional content block in parameters section", "[paramet
 
     Parameters parameters;
     Report report;
-    SectionParserHelper<Parameters, ParametersSM, ParametersParser>::parse(source, ParametersSectionType, report, parameters);
+    SectionParserHelper<Parameters, ParametersParser>::parse(source, ParametersSectionType, report, parameters);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 1);
@@ -141,7 +141,7 @@ TEST_CASE("Warn about multiple parameters with the same name", "[parameters]")
 
     Parameters parameters;
     Report report;
-    SectionParserHelper<Parameters, ParametersSM, ParametersParser>::parse(source, ParametersSectionType, report, parameters);
+    SectionParserHelper<Parameters, ParametersParser>::parse(source, ParametersSectionType, report, parameters);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 1);
@@ -167,7 +167,7 @@ TEST_CASE("Recognize parameter when there is no description on its signature and
 
     Parameters parameters;
     Report report;
-    SectionParserHelper<Parameters, ParametersSM, ParametersParser>::parse(source, ParametersSectionType, report, parameters);
+    SectionParserHelper<Parameters, ParametersParser>::parse(source, ParametersSectionType, report, parameters);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.empty());
