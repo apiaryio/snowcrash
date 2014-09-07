@@ -38,37 +38,35 @@ namespace snowcrash {
      * Action Section processor
      */
     template<>
-    struct SectionProcessor<Action, ActionSM> : public SectionProcessorBase<Action, ActionSM> {
+    struct SectionProcessor<Action> : public SectionProcessorBase<Action> {
 
         static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
                                                      const MarkdownNodes& siblings,
                                                      SectionParserData& pd,
                                                      SectionLayout& layout,
-                                                     Report& report,
-                                                     Action& out,
-                                                     ActionSM& outSM) {
+                                                     ParseResult<Action>& out) {
 
-            actionHTTPMethodAndName(node, out.method, out.name);
-            TrimString(out.name);
+            actionHTTPMethodAndName(node, out.node.method, out.node.name);
+            TrimString(out.node.name);
 
             mdp::ByteBuffer remainingContent;
             GetFirstLine(node->text, remainingContent);
 
             if (pd.exportSM()) {
-                if (!out.method.empty()) {
-                    outSM.method = node->sourceMap;
+                if (!out.node.method.empty()) {
+                    out.sourceMap.method.sourceMap = node->sourceMap;
                 }
 
-                if (!out.name.empty()) {
-                    outSM.name = node->sourceMap;
+                if (!out.node.name.empty()) {
+                    out.sourceMap.name.sourceMap = node->sourceMap;
                 }
             }
 
             if (!remainingContent.empty()) {
-                out.description += remainingContent;
+                out.node.description += remainingContent;
 
                 if (pd.exportSM()) {
-                    outSM.description.append(node->sourceMap);
+                    out.sourceMap.description.sourceMap.append(node->sourceMap);
                 }
             }
 
@@ -78,72 +76,76 @@ namespace snowcrash {
         static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
                                                          const MarkdownNodes& siblings,
                                                          SectionParserData& pd,
-                                                         Report& report,
-                                                         Action& out,
-                                                         ActionSM& outSM) {
+                                                         ParseResult<Action>& out) {
 
             SectionType sectionType = pd.sectionContext();
             MarkdownNodeIterator cur = node;
-            Payload payload;
-            PayloadSM payloadSM;
             std::stringstream ss;
 
             mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
 
             switch (sectionType) {
                 case ParametersSectionType:
-                    return ParametersParser::parse(node, siblings, pd, report, out.parameters, outSM.parameters);
+                    ParseResult<Parameters> parameters(out.report, out.node.parameters, out.sourceMap.parameters);
+                    return ParametersParser::parse(node, siblings, pd, parameters);
 
                 case RequestSectionType:
                 case RequestBodySectionType:
-                    cur = PayloadParser::parse(node, siblings, pd, report, payload, payloadSM);
+                    ParseResult<Payload> payload;
+                    cur = PayloadParser::parse(node, siblings, pd, payload);
 
-                    if (out.examples.empty() || !out.examples.back().responses.empty()) {
+                    out.report += payload.report;
+
+                    if (out.node.examples.empty() || !out.node.examples.back().responses.empty()) {
                         TransactionExample transaction;
-                        TransactionExampleSM transactionSM;
+                        SourceMap<TransactionExample> transactionSM;
 
-                        out.examples.push_back(transaction);
+                        out.node.examples.push_back(transaction);
 
                         if (pd.exportSM()) {
-                            outSM.examples.push_back(transactionSM);
+                            out.sourceMap.examples.sourceMap.push_back(transactionSM);
                         }
                     }
 
-                    checkPayload(sectionType, sourceMap, payload, out, report);
+                    checkPayload(sectionType, sourceMap, payload.node, out);
 
-                    out.examples.back().requests.push_back(payload);
+                    out.node.examples.back().requests.push_back(payload.node);
 
                     if (pd.exportSM()) {
-                        outSM.examples.back().requests.push_back(payloadSM);
+                        out.sourceMap.examples.sourceMap.back().requests.sourceMap.push_back(payload.sourceMap);
                     }
                     break;
 
                 case ResponseSectionType:
                 case ResponseBodySectionType:
-                    cur = PayloadParser::parse(node, siblings, pd, report, payload, payloadSM);
+                    ParseResult<Payload> payload;
+                    cur = PayloadParser::parse(node, siblings, pd, payload);
 
-                    if (out.examples.empty()) {
+                    out.report += payload.report;
+
+                    if (out.node.examples.empty()) {
                         TransactionExample transaction;
-                        TransactionExampleSM transactionSM;
+                        SourceMap<TransactionExample> transactionSM;
 
-                        out.examples.push_back(transaction);
+                        out.node.examples.push_back(transaction);
 
                         if (pd.exportSM()) {
-                            outSM.examples.push_back(transactionSM);
+                            out.sourceMap.examples.sourceMap.push_back(transactionSM);
                         }
                     }
 
-                    checkPayload(sectionType, sourceMap, payload, out, report);
+                    checkPayload(sectionType, sourceMap, payload.node, out);
 
-                    out.examples.back().responses.push_back(payload);
+                    out.node.examples.back().responses.push_back(payload.node);
 
                     if (pd.exportSM()) {
-                        outSM.examples.back().responses.push_back(payloadSM);
+                        out.sourceMap.examples.sourceMap.back().responses.sourceMap.push_back(payload.sourceMap);
                     }
                     break;
 
                 case HeadersSectionType:
-                    return SectionProcessor<Action, ActionSM>::handleDeprecatedHeaders(node, siblings, pd, report, out.headers, outSM.headers);
+                    ParseResult<Headers> headers(out.report, out.node.headers, out.sourceMap.headers);
+                    return SectionProcessor<Action>::handleDeprecatedHeaders(node, siblings, pd, headers);
 
                 default:
                     break;
@@ -155,32 +157,30 @@ namespace snowcrash {
         static bool isUnexpectedNode(const MarkdownNodeIterator& node,
                                      SectionType sectionType) {
             
-            if (SectionProcessor<Asset, AssetSM>::sectionType(node) != UndefinedSectionType) {
+            if (SectionProcessor<Asset>::sectionType(node) != UndefinedSectionType) {
                 return true;
             }
             
-            return SectionProcessorBase<Action, ActionSM>::isUnexpectedNode(node, sectionType);
+            return SectionProcessorBase<Action>::isUnexpectedNode(node, sectionType);
         }
         
         static MarkdownNodeIterator processUnexpectedNode(const MarkdownNodeIterator& node,
                                                           const MarkdownNodes& siblings,
                                                           SectionParserData& pd,
                                                           SectionType& sectionType,
-                                                          Report& report,
-                                                          Action& out,
-                                                          ActionSM& outSM) {
+                                                          ParseResult<Action>& out) {
 
             if ((node->type == mdp::ParagraphMarkdownNodeType ||
                  node->type == mdp::CodeMarkdownNodeType) &&
                 (sectionType == ResponseBodySectionType ||
                  sectionType == ResponseSectionType) &&
-                !out.examples.empty() &&
-                !out.examples.back().responses.empty()) {
+                !out.node.examples.empty() &&
+                !out.node.examples.back().responses.empty()) {
 
-                mdp::ByteBuffer content = CodeBlockUtility::addDanglingAsset(node, pd, sectionType, report, out.examples.back().responses.back().body);
+                mdp::ByteBuffer content = CodeBlockUtility::addDanglingAsset(node, pd, sectionType, out.report, out.node.examples.back().responses.back().body);
 
                 if (pd.exportSM() && !content.empty()) {
-                    outSM.examples.back().responses.back().body.append(node->sourceMap);
+                    out.sourceMap.examples.sourceMap.back().responses.sourceMap.back().body.sourceMap.append(node->sourceMap);
                 }
 
                 return ++MarkdownNodeIterator(node);
@@ -193,16 +193,16 @@ namespace snowcrash {
                 !out.examples.empty() &&
                 !out.examples.back().requests.empty()) {
                 
-                mdp::ByteBuffer content = CodeBlockUtility::addDanglingAsset(node, pd, sectionType, report, out.examples.back().requests.back().body);
+                mdp::ByteBuffer content = CodeBlockUtility::addDanglingAsset(node, pd, sectionType, out.report, out.examples.back().requests.back().body);
 
                 if (pd.exportSM() && !content.empty()) {
-                    outSM.examples.back().requests.back().body.append(node->sourceMap);
+                    out.sourceMap.examples.sourceMap.back().requests.sourceMap.back().body.sourceMap.append(node->sourceMap);
                 }
 
                 return ++MarkdownNodeIterator(node);
             }
             
-            SectionType assetType = SectionProcessor<Asset, AssetSM>::sectionType(node);
+            SectionType assetType = SectionProcessor<Asset>::sectionType(node);
             
             if (assetType != UndefinedSectionType) {
                 
@@ -213,14 +213,14 @@ namespace snowcrash {
                 ss << "Ignoring " << SectionName(assetType) << " list item, ";
                 ss << SectionName(assetType) << " list item is expected to be indented by 4 spaces or 1 tab";
 
-                report.warnings.push_back(Warning(ss.str(),
-                                                  IgnoringWarning,
-                                                  sourceMap));
+                out.report.warnings.push_back(Warning(ss.str(),
+                                                      IgnoringWarning,
+                                                      sourceMap));
 
                 return ++MarkdownNodeIterator(node);
             }
             
-            return SectionProcessorBase<Action, ActionSM>::processUnexpectedNode(node, siblings, pd, sectionType, report, out, outSM);            
+            return SectionProcessorBase<Action>::processUnexpectedNode(node, siblings, pd, sectionType, out);            
         }
 
         static SectionType sectionType(const MarkdownNodeIterator& node) {
@@ -246,21 +246,21 @@ namespace snowcrash {
             SectionType nestedType = UndefinedSectionType;
 
             // Check if parameters section
-            nestedType = SectionProcessor<Parameters, ParametersSM>::sectionType(node);
+            nestedType = SectionProcessor<Parameters>::sectionType(node);
 
             if (nestedType != UndefinedSectionType) {
                 return nestedType;
             }
 
             // Check if headers section
-            nestedType = SectionProcessor<Headers, HeadersSM>::sectionType(node);
+            nestedType = SectionProcessor<Headers>::sectionType(node);
 
             if (nestedType == HeadersSectionType) {
                 return nestedType;
             }
 
             // Check if payload section
-            nestedType = SectionProcessor<Payload, PayloadSM>::sectionType(node);
+            nestedType = SectionProcessor<Payload>::sectionType(node);
 
             if (nestedType != UndefinedSectionType) {
                 return nestedType;
@@ -278,7 +278,7 @@ namespace snowcrash {
             nested.push_back(RequestBodySectionType);
             nested.push_back(RequestSectionType);
 
-            types = SectionProcessor<Payload, PayloadSM>::nestedSectionTypes();
+            types = SectionProcessor<Payload>::nestedSectionTypes();
             nested.insert(nested.end(), types.begin(), types.end());
 
             return nested;
@@ -286,45 +286,43 @@ namespace snowcrash {
 
         static void finalize(const MarkdownNodeIterator& node,
                              SectionParserData& pd,
-                             Report& report,
-                             Action& out,
-                             ActionSM& outSM) {
+                             ParseResult<Action>& out) {
 
-            if (!out.headers.empty()) {
+            if (!out.node.headers.empty()) {
 
-                SectionProcessor<Headers, HeadersSM>::injectDeprecatedHeaders(pd, out.headers, outSM.headers, out.examples, outSM.examples);
-                out.headers.clear();
+                SectionProcessor<Headers>::injectDeprecatedHeaders(pd, out.node.headers, out.sourceMap.headers, out.node.examples, out.sourceMap.examples);
+                out.node.headers.clear();
 
                 if (pd.exportSM()) {
-                    outSM.headers.clear();
+                    out.sourceMap.headers.sourceMap.clear();
                 }
             }
 
-            if (out.examples.empty()) {
+            if (out.node.examples.empty()) {
 
                 // WARN: No response for action
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                report.warnings.push_back(Warning("action is missing a response",
-                                                  EmptyDefinitionWarning,
-                                                  sourceMap));
-            } else if (!out.examples.empty() &&
-                !out.examples.back().requests.empty() &&
-                out.examples.back().responses.empty()) {
+                out.report.warnings.push_back(Warning("action is missing a response",
+                                                      EmptyDefinitionWarning,
+                                                      sourceMap));
+            } else if (!out.node.examples.empty() &&
+                !out.node.examples.back().requests.empty() &&
+                out.node.examples.back().responses.empty()) {
 
                 // WARN: No response for request
                 std::stringstream ss;
                 ss << "action is missing a response for ";
 
-                if (out.examples.back().requests.back().name.empty()) {
+                if (out.node.examples.back().requests.back().name.empty()) {
                     ss << "a request";
                 } else {
-                    ss << "the '" << out.examples.back().requests.back().name << "' request";
+                    ss << "the '" << out.node.examples.back().requests.back().name << "' request";
                 }
 
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                report.warnings.push_back(Warning(ss.str(),
-                                                  EmptyDefinitionWarning,
-                                                  sourceMap));
+                out.report.warnings.push_back(Warning(ss.str(),
+                                                      EmptyDefinitionWarning,
+                                                      sourceMap));
             }
         }
 
@@ -339,19 +337,18 @@ namespace snowcrash {
         static void checkPayload(SectionType sectionType,
                                  const mdp::CharactersRangeSet sourceMap,
                                  const Payload& payload,
-                                 const Action& action,
-                                 Report& report) {
+                                 ParseResult<Action>& out) {
 
-            if (isPayloadDuplicate(sectionType, payload, action.examples.back())) {
+            if (isPayloadDuplicate(sectionType, payload, out.node.examples.back())) {
 
                 // WARN: Duplicate payload
                 std::stringstream ss;
                 ss << SectionName(sectionType) << " payload `" << payload.name << "`";
-                ss << " already defined for `" << action.method << "` method";
+                ss << " already defined for `" << out.node.method << "` method";
 
-                report.warnings.push_back(Warning(ss.str(),
-                                                  DuplicateWarning,
-                                                  sourceMap));
+                out.report.warnings.push_back(Warning(ss.str(),
+                                                      DuplicateWarning,
+                                                      sourceMap));
             }
 
             if (sectionType == ResponseSectionType || sectionType == ResponseBodySectionType) {
@@ -362,27 +359,27 @@ namespace snowcrash {
                     std::stringstream(payload.name) >> code;
                 }
 
-                HTTPMethodTraits methodTraits = GetMethodTrait(action.method);
+                HTTPMethodTraits methodTraits = GetMethodTrait(out.node.method);
 
                 if (!methodTraits.allowBody && !payload.body.empty()) {
 
                     // WARN: Edge case for 2xx CONNECT
-                    if (action.method == HTTPMethodName::Connect && code/100 == 2) {
+                    if (out.node.method == HTTPMethodName::Connect && code/100 == 2) {
 
                         std::stringstream ss;
-                        ss << "the response for " << code << " " << action.method << " request MUST NOT include a " << SectionName(BodySectionType);
+                        ss << "the response for " << code << " " << out.node.method << " request MUST NOT include a " << SectionName(BodySectionType);
 
-                        report.warnings.push_back(Warning(ss.str(),
-                                                          EmptyDefinitionWarning,
-                                                          sourceMap));
-                    } else if (action.method != HTTPMethodName::Connect && !methodTraits.allowBody) {
+                        out.report.warnings.push_back(Warning(ss.str(),
+                                                              EmptyDefinitionWarning,
+                                                              sourceMap));
+                    } else if (out.node.method != HTTPMethodName::Connect && !methodTraits.allowBody) {
 
                         std::stringstream ss;
-                        ss << "the response for " << action.method << " request MUST NOT include a " << SectionName(BodySectionType);
+                        ss << "the response for " << out.node.method << " request MUST NOT include a " << SectionName(BodySectionType);
 
-                        report.warnings.push_back(Warning(ss.str(),
-                                                          EmptyDefinitionWarning,
-                                                          sourceMap));
+                        out.report.warnings.push_back(Warning(ss.str(),
+                                                              EmptyDefinitionWarning,
+                                                              sourceMap));
                     }
 
                     return;
@@ -400,11 +397,11 @@ namespace snowcrash {
 
             if (sectionType == RequestSectionType) {
 
-                RequestIterator duplicate = SectionProcessor<Payload, PayloadSM>::findRequest(example, payload);
+                RequestIterator duplicate = SectionProcessor<Payload>::findRequest(example, payload);
                 return duplicate != example.requests.end();
             } else if (sectionType == ResponseSectionType) {
 
-                ResponseIterator duplicate = SectionProcessor<Payload, PayloadSM>::findResponse(example, payload);
+                ResponseIterator duplicate = SectionProcessor<Payload>::findResponse(example, payload);
                 return duplicate != example.responses.end();
             }
 
@@ -415,20 +412,18 @@ namespace snowcrash {
         static MarkdownNodeIterator handleDeprecatedHeaders(const MarkdownNodeIterator& node,
                                                             const MarkdownNodes& siblings,
                                                             SectionParserData& pd,
-                                                            Report& report,
-                                                            Headers& headers,
-                                                            HeadersSM& headersSM) {
+                                                            ParseResult<Headers>& out) {
 
-            MarkdownNodeIterator cur = HeadersParser::parse(node, siblings, pd, report, headers, headersSM);
+            MarkdownNodeIterator cur = HeadersParser::parse(node, siblings, pd, out);
 
             // WARN: Deprecated header sections
             std::stringstream ss;
             ss << "the 'headers' section at this level is deprecated and will be removed in a future, use respective payload header section(s) instead";
 
             mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-            report.warnings.push_back(Warning(ss.str(),
-                                              DeprecatedWarning,
-                                              sourceMap));
+            out.report.warnings.push_back(Warning(ss.str(),
+                                                  DeprecatedWarning,
+                                                  sourceMap));
 
             return cur;
         }
@@ -492,7 +487,7 @@ namespace snowcrash {
     };
 
     /** Action Section Parser */
-    typedef SectionParser<Action, ActionSM, HeaderSectionAdapter> ActionParser;
+    typedef SectionParser<Action, HeaderSectionAdapter> ActionParser;
 }
 
 #endif

@@ -27,15 +27,13 @@ namespace snowcrash {
      * ResourceGroup Section processor
      */
     template<>
-    struct SectionProcessor<ResourceGroup, ResourceGroupSM> : public SectionProcessorBase<ResourceGroup, ResourceGroupSM> {
+    struct SectionProcessor<ResourceGroup> : public SectionProcessorBase<ResourceGroup> {
 
         static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
                                                      const MarkdownNodes& siblings,
                                                      SectionParserData& pd,
                                                      SectionLayout& layout,
-                                                     Report& report,
-                                                     ResourceGroup& out,
-                                                     ResourceGroupSM& outSM) {
+                                                     ParseResult<ResourceGroup>& out) {
 
             MarkdownNodeIterator cur = node;
             SectionType nestedType = nestedSectionType(cur);
@@ -49,12 +47,12 @@ namespace snowcrash {
             CaptureGroups captureGroups;
 
             if (RegexCapture(node->text, GroupHeaderRegex, captureGroups, 3)) {
-                out.name = captureGroups[1];
-                TrimString(out.name);
+                out.node.name = captureGroups[1];
+                TrimString(out.node.name);
             }
 
-            if (pd.exportSM() && !out.name.empty()) {
-                outSM.name = node->sourceMap;
+            if (pd.exportSM() && !out.node.name.empty()) {
+                out.sourceMap.name.sourceMap = node->sourceMap;
             }
 
             return ++MarkdownNodeIterator(node);
@@ -63,38 +61,36 @@ namespace snowcrash {
         static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
                                                          const MarkdownNodes& siblings,
                                                          SectionParserData& pd,
-                                                         Report& report,
-                                                         ResourceGroup& out,
-                                                         ResourceGroupSM& outSM) {
+                                                         ParseResult<ResourceGroup>& out) {
 
             if (pd.sectionContext() == ResourceSectionType) {
 
-                Resource resource;
-                ResourceSM resourceSM;
+                ParseResult<Resource> resource;
+                MarkdownNodeIterator cur = ResourceParser::parse(node, siblings, pd, resource);
 
-                MarkdownNodeIterator cur = ResourceParser::parse(node, siblings, pd, report, resource, resourceSM);
+                out.report += resource.report;
 
-                ResourceIterator duplicate = SectionProcessor<Resource, ResourceSM>::findResource(out.resources, resource);
+                ResourceIterator duplicate = SectionProcessor<Resource>::findResource(out.node.resources, resource.node);
                 ResourceIteratorPair globalDuplicate;
 
-                if (duplicate == out.resources.end()) {
-                    globalDuplicate = findResource(pd.blueprint, resource);
+                if (duplicate == out.node.resources.end()) {
+                    globalDuplicate = findResource(pd.blueprint, resource.node);
                 }
 
-                if (duplicate != out.resources.end() ||
+                if (duplicate != out.node.resources.end() ||
                     globalDuplicate.first != pd.blueprint.resourceGroups.end()) {
 
                     // WARN: Duplicate resource
                     mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                    report.warnings.push_back(Warning("the resource '" + resource.uriTemplate + "' is already defined",
-                                                      DuplicateWarning,
-                                                      sourceMap));
+                    out.report.warnings.push_back(Warning("the resource '" + resource.node.uriTemplate + "' is already defined",
+                                                          DuplicateWarning,
+                                                          sourceMap));
                 }
 
-                out.resources.push_back(resource);
+                out.node.resources.push_back(resource.node);
 
                 if (pd.exportSM()) {
-                    outSM.resources.push_back(resourceSM);
+                    out.sourceMap.resources.sourceMap.push_back(resource.sourceMap);
                 }
 
                 return cur;
@@ -107,32 +103,30 @@ namespace snowcrash {
                                                           const MarkdownNodes& siblings,
                                                           SectionParserData& pd,
                                                           SectionType& lastSectionType,
-                                                          Report& report,
-                                                          ResourceGroup& out,
-                                                          ResourceGroupSM& outSM) {
+                                                          ParseResult<ResourceGroup>& out) {
 
-            if (SectionProcessor<Action, ActionSM>::actionType(node) == DependentActionType &&
-                !out.resources.empty()) {
+            if (SectionProcessor<Action>::actionType(node) == DependentActionType &&
+                !out.node.resources.empty()) {
 
                 mdp::ByteBuffer method;
                 mdp::ByteBuffer name;
 
-                SectionProcessor<Action, ActionSM>::actionHTTPMethodAndName(node, method, name);
+                SectionProcessor<Action>::actionHTTPMethodAndName(node, method, name);
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
 
                 // WARN: Unexpected action
                 std::stringstream ss;
-                ss << "unexpected action '" << method << "', to define multiple actions for the '" << out.resources.back().uriTemplate;
+                ss << "unexpected action '" << method << "', to define multiple actions for the '" << out.node.resources.back().uriTemplate;
                 ss << "' resource omit the HTTP method in its definition, e.g. '# /resource'";
 
-                report.warnings.push_back(Warning(ss.str(),
-                                                  IgnoringWarning,
-                                                  sourceMap));
+                out.report.warnings.push_back(Warning(ss.str(),
+                                                      IgnoringWarning,
+                                                      sourceMap));
 
                 return ++MarkdownNodeIterator(node);
             }
 
-            return SectionProcessorBase<ResourceGroup, ResourceGroupSM>::processUnexpectedNode(node, siblings, pd, lastSectionType, report, out, outSM);
+            return SectionProcessorBase<ResourceGroup>::processUnexpectedNode(node, siblings, pd, lastSectionType, out);
         }
 
         static SectionType sectionType(const MarkdownNodeIterator& node) {
@@ -154,7 +148,7 @@ namespace snowcrash {
         static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
 
             // Return ResourceSectionType or UndefinedSectionType
-            return SectionProcessor<Resource, ResourceSM>::sectionType(node);
+            return SectionProcessor<Resource>::sectionType(node);
         }
 
         static SectionTypes nestedSectionTypes() {
@@ -162,7 +156,7 @@ namespace snowcrash {
 
             // Resource & descendants
             nested.push_back(ResourceSectionType);
-            SectionTypes types = SectionProcessor<Resource, ResourceSM>::nestedSectionTypes();
+            SectionTypes types = SectionProcessor<Resource>::nestedSectionTypes();
             nested.insert(nested.end(), types.begin(), types.end());
 
             return nested;
@@ -173,21 +167,21 @@ namespace snowcrash {
 
             mdp::ByteBuffer method;
 
-            if (SectionProcessor<Action, ActionSM>::actionType(node) == CompleteActionType) {
+            if (SectionProcessor<Action>::actionType(node) == CompleteActionType) {
                 return false;
             }
 
-            return SectionProcessorBase<ResourceGroup, ResourceGroupSM>::isDescriptionNode(node, sectionType);
+            return SectionProcessorBase<ResourceGroup>::isDescriptionNode(node, sectionType);
         }
 
         static bool isUnexpectedNode(const MarkdownNodeIterator& node,
                                      SectionType sectionType) {
 
-            if (SectionProcessor<Action, ActionSM>::actionType(node) == DependentActionType) {
+            if (SectionProcessor<Action>::actionType(node) == DependentActionType) {
                 return true;
             }
 
-            return SectionProcessorBase<ResourceGroup, ResourceGroupSM>::isUnexpectedNode(node, sectionType);
+            return SectionProcessorBase<ResourceGroup>::isUnexpectedNode(node, sectionType);
         }
 
         /** Finds a resource in blueprint by its URI template */
@@ -198,7 +192,7 @@ namespace snowcrash {
                   it != blueprint.resourceGroups.end();
                   ++it) {
 
-                ResourceIterator match = SectionProcessor<Resource, ResourceSM>::findResource(it->resources, resource);
+                ResourceIterator match = SectionProcessor<Resource>::findResource(it->resources, resource);
 
                 if (match != it->resources.end()) {
                     return std::make_pair(it, match);
@@ -210,7 +204,7 @@ namespace snowcrash {
     };
 
     /** ResourceGroup Section Parser */
-    typedef SectionParser<ResourceGroup, ResourceGroupSM, HeaderSectionAdapter> ResourceGroupParser;
+    typedef SectionParser<ResourceGroup, HeaderSectionAdapter> ResourceGroupParser;
 }
 
 #endif

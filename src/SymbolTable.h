@@ -37,13 +37,13 @@ namespace snowcrash {
     typedef std::pair<SymbolName, ResourceModel> ResourceModelSymbol;
 
     // Resource Object Symbol source map
-    typedef std::pair<SymbolName, ResourceModelSM> ResourceModelSymbolSM;
+    typedef std::pair<SymbolName, SourceMap<ResourceModel> > ResourceModelSymbolSourceMap;
 
     // Resource Object Symbol Table
     typedef std::map<SymbolName, ResourceModel> ResourceModelSymbolTable;
     
     // Reesource Object Symbol Table source map
-    typedef std::map<SymbolName, ResourceModelSM> ResourceModelSymbolTableSM;
+    typedef std::map<SymbolName, SourceMap<ResourceModel> > ResourceModelSymbolSourceMapTable;
 
     struct SymbolTable {
         
@@ -51,10 +51,10 @@ namespace snowcrash {
         ResourceModelSymbolTable resourceModels;
     };
     
-    struct SymbolTableSM {
+    struct SymbolSourceMapTable {
 
         // Resource Object Symbol Table source map
-        ResourceModelSymbolTableSM resourceModels;
+        ResourceModelSymbolSourceMapTable resourceModels;
     };
     
     // Checks whether given source data represents reference to a symbol returning true if so,

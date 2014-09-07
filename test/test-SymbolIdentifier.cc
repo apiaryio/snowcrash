@@ -17,9 +17,8 @@ TEST_CASE("Punctuation in identifiers", "[symbol_identifier]")
     mdp::ByteBuffer source = "# Parcel's sticker @#!$%^&*=-?><,.~`\"' [/]\n";
 
     Blueprint blueprint;
-    BlueprintSM blueprintSM;
     Report report;
-    parse(source, 0, report, blueprint, blueprintSM);
+    parse(source, 0, report, blueprint);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.empty());
@@ -42,9 +41,8 @@ TEST_CASE("Non ASCII characters in identifiers", "[symbol_identifier]")
     mdp::ByteBuffer source = "# \xD0\x9A\xD0\xB0\xD1\x82\xD0\xB5\xD0\xB3\xD0\xBE\xD1\x80\xD0\xB8\xD0\xB8 [/]\n";
 
     Blueprint blueprint;
-    BlueprintSM blueprintSM;
     Report report;
-    parse(source, 0, report, blueprint, blueprintSM);
+    parse(source, 0, report, blueprint);
 
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.empty());

@@ -30,10 +30,25 @@ namespace snowcrash {
         RedirectSectionLayout          /// Section should be parsed by another parser as whole
     };
 
+    /**
+     * Compound product of parsing a node
+     */
+    template<typename T>
+    struct ParseResult {
+        ParseResult(Report& report,
+                    T& node,
+                    SourceMap<T>& sourceMap)
+        : report(report), node(node), sourceMap(sourceMap) {}
+
+        T node;                  /// Parsed AST node
+        Report report;           /// Parser's report
+        SourceMap<T> sourceMap;  /// Parsed AST node source map
+    };
+
     /*
      * Forward Declarations
      */
-    template<typename T, typename TSM>
+    template<typename T>
     struct SectionProcessor;
     
     /**
@@ -42,7 +57,7 @@ namespace snowcrash {
      *  Defines section processor interface alongised with its default
      *  behavior.
      */
-    template<typename T, typename TSM>
+    template<typename T>
     struct SectionProcessorBase {
 
         /**
@@ -58,9 +73,7 @@ namespace snowcrash {
                                                      const MarkdownNodes& siblings,
                                                      SectionParserData& pd,
                                                      SectionLayout& layout,
-                                                     Report& report,
-                                                     T& out,
-                                                     TSM& outSM) {
+                                                     ParseResult<T>& out) {
 
             return ++MarkdownNodeIterator(node);
         }
@@ -69,18 +82,16 @@ namespace snowcrash {
         static MarkdownNodeIterator processDescription(const MarkdownNodeIterator& node,
                                                        const MarkdownNodes& siblings,
                                                        SectionParserData& pd,
-                                                       Report& report,
-                                                       T& out,
-                                                       TSM& outSM) {
+                                                       ParseResult<T>& out) {
 
-            if (!out.description.empty()) {
-                TwoNewLines(out.description);
+            if (!out.node.description.empty()) {
+                TwoNewLines(out.node.description);
             }
 
             mdp::ByteBuffer content = mdp::MapBytesRangeSet(node->sourceMap, pd.sourceData);
 
             if (pd.exportSM() && !content.empty()) {
-                outSM.description.append(node->sourceMap);
+                out.sourceMap.description.append(node->sourceMap);
             }
 
             out.description += content;
@@ -92,9 +103,7 @@ namespace snowcrash {
         static MarkdownNodeIterator processContent(const MarkdownNodeIterator& node,
                                                    const MarkdownNodes& siblings,
                                                    SectionParserData& pd,
-                                                   Report& report,
-                                                   T& out,
-                                                   TSM& outSM) {
+                                                   ParseResult<T>& out) {
 
             return ++MarkdownNodeIterator(node);
         }
@@ -110,9 +119,7 @@ namespace snowcrash {
         static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
                                                          const MarkdownNodes& siblings,
                                                          SectionParserData& pd,
-                                                         Report& report,
-                                                         T& out,
-                                                         TSM& outSM) {
+                                                         ParseResult<T>& out) {
 
             return node;
         }
@@ -122,9 +129,7 @@ namespace snowcrash {
                                                           const MarkdownNodes& siblings,
                                                           SectionParserData& pd,
                                                           SectionType& lastSectionType,
-                                                          Report& report,
-                                                          T& out,
-                                                          TSM& outSM) {
+                                                          ParseResult<T>& out) {
 
             // WARN: Ignoring unexpected node
             std::stringstream ss;
@@ -137,9 +142,9 @@ namespace snowcrash {
                 ss << "ignoring unrecognized block";
             }
 
-            report.warnings.push_back(Warning(ss.str(),
-                                              IgnoringWarning,
-                                              sourceMap));
+            out.report.warnings.push_back(Warning(ss.str(),
+                                                  IgnoringWarning,
+                                                  sourceMap));
 
             return ++MarkdownNodeIterator(node);
         }
@@ -147,17 +152,15 @@ namespace snowcrash {
         /** Final validation after processing */
         static void finalize(const MarkdownNodeIterator& node,
                              SectionParserData& pd,
-                             Report& report,
-                             T& out,
-                             TSM& outSM) {
+                             ParseResult<T>& out) {
         }
         
         /** \return True if the node is a section description node */
         static bool isDescriptionNode(const MarkdownNodeIterator& node,
                                       SectionType sectionType) {
 
-            if (SectionProcessor<T, TSM>::isContentNode(node, sectionType) ||
-                SectionProcessor<T, TSM>::nestedSectionType(node) != UndefinedSectionType) {
+            if (SectionProcessor<T>::isContentNode(node, sectionType) ||
+                SectionProcessor<T>::nestedSectionType(node) != UndefinedSectionType) {
 
                 return false;
             }
@@ -168,7 +171,7 @@ namespace snowcrash {
                 return true;
             }
 
-            SectionTypes nestedTypes = SectionProcessor<T, TSM>::nestedSectionTypes();
+            SectionTypes nestedTypes = SectionProcessor<T>::nestedSectionTypes();
 
             if (std::find(nestedTypes.begin(), nestedTypes.end(), keywordSectionType) != nestedTypes.end()) {
                 // Node is a keyword defined section defined in one of the nested sections
@@ -218,8 +221,8 @@ namespace snowcrash {
     /**
      *  Default Section Processor
      */
-    template<typename T, typename TSM>
-    struct SectionProcessor : public SectionProcessorBase<T, TSM> {
+    template<typename T>
+    struct SectionProcessor : public SectionProcessorBase<T> {
     };
 }
 
