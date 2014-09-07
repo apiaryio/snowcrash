@@ -27,8 +27,7 @@ namespace snowcrashtest {
 
         static void parse(const mdp::ByteBuffer& source,
                           snowcrash::SectionType type,
-                          snowcrash::Report& report,
-                          T& output,
+                          snowcrash::ParseResult<T>& out,
                           const Symbols& symbols = Symbols(),
                           const snowcrash::BlueprintParserOptions& opts = 0,
                           snowcrash::Blueprint* bp = NULL) {
@@ -62,8 +61,7 @@ namespace snowcrashtest {
             PARSER::parse(markdownAST.children().begin(),
                           markdownAST.children(),
                           pd,
-                          report,
-                          output);
+                          out);
         }
     };
 

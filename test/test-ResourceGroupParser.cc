@@ -46,18 +46,17 @@ TEST_CASE("Resource group block classifier", "[resource_group]")
 
 TEST_CASE("Parse canonical resource group", "[resource_group]")
 {
-    ResourceGroup resourceGroup;
-    Report report;
-    SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(ResourceGroupFixture, ResourceGroupSectionType, report, resourceGroup);
+    ParseResult<ResourceGroup> resourceGroup;
+    SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(ResourceGroupFixture, ResourceGroupSectionType, resourceGroup);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(resourceGroup.report.error.code == Error::OK);
+    REQUIRE(resourceGroup.report.warnings.empty());
 
-    REQUIRE(resourceGroup.name == "First");
-    REQUIRE(resourceGroup.description == "Fiber Optics\n\n");
-    REQUIRE(resourceGroup.resources.size() == 1);
-    REQUIRE(resourceGroup.resources.front().uriTemplate == "/resource/{id}");
-    REQUIRE(resourceGroup.resources.front().name == "My Resource");
+    REQUIRE(resourceGroup.node.name == "First");
+    REQUIRE(resourceGroup.node.description == "Fiber Optics\n\n");
+    REQUIRE(resourceGroup.node.resources.size() == 1);
+    REQUIRE(resourceGroup.node.resources.front().uriTemplate == "/resource/{id}");
+    REQUIRE(resourceGroup.node.resources.front().name == "My Resource");
 }
 
 TEST_CASE("Parse resource group with empty resource", "[resource_group]")
@@ -67,17 +66,16 @@ TEST_CASE("Parse resource group with empty resource", "[resource_group]")
     "p1\n"\
     "## /resource";
 
-    ResourceGroup resourceGroup;
-    Report report;
-    SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source, ResourceGroupSectionType, report, resourceGroup);
+    ParseResult<ResourceGroup> resourceGroup;
+    SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source, ResourceGroupSectionType, resourceGroup);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(resourceGroup.report.error.code == Error::OK);
+    REQUIRE(resourceGroup.report.warnings.empty());
 
-    REQUIRE(resourceGroup.name == "Name");
-    REQUIRE(resourceGroup.description == "p1\n");
-    REQUIRE(resourceGroup.resources.size() == 1);
-    REQUIRE(resourceGroup.resources.front().uriTemplate == "/resource");
+    REQUIRE(resourceGroup.node.name == "Name");
+    REQUIRE(resourceGroup.node.description == "p1\n");
+    REQUIRE(resourceGroup.node.resources.size() == 1);
+    REQUIRE(resourceGroup.node.resources.front().uriTemplate == "/resource");
 }
 
 TEST_CASE("Parse multiple resource in anonymous group", "[resource_group]")
@@ -89,20 +87,19 @@ TEST_CASE("Parse multiple resource in anonymous group", "[resource_group]")
     "## /r2\n"\
     "p2\n";
 
-    ResourceGroup resourceGroup;
-    Report report;
-    SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source, ResourceGroupSectionType, report, resourceGroup);
+    ParseResult<ResourceGroup> resourceGroup;
+    SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source, ResourceGroupSectionType, resourceGroup);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(resourceGroup.report.error.code == Error::OK);
+    REQUIRE(resourceGroup.report.warnings.empty());
 
-    REQUIRE(resourceGroup.name.empty());
-    REQUIRE(resourceGroup.description.empty());
-    REQUIRE(resourceGroup.resources.size() == 2);
-    REQUIRE(resourceGroup.resources[0].uriTemplate == "/r1");
-    REQUIRE(resourceGroup.resources[0].description == "p1\n");
-    REQUIRE(resourceGroup.resources[1].uriTemplate == "/r2");
-    REQUIRE(resourceGroup.resources[1].description == "p2\n");
+    REQUIRE(resourceGroup.node.name.empty());
+    REQUIRE(resourceGroup.node.description.empty());
+    REQUIRE(resourceGroup.node.resources.size() == 2);
+    REQUIRE(resourceGroup.node.resources[0].uriTemplate == "/r1");
+    REQUIRE(resourceGroup.node.resources[0].description == "p1\n");
+    REQUIRE(resourceGroup.node.resources[1].uriTemplate == "/r2");
+    REQUIRE(resourceGroup.node.resources[1].description == "p2\n");
 }
 
 TEST_CASE("Parse multiple resources with payloads", "[resource_group]")
@@ -116,16 +113,15 @@ TEST_CASE("Parse multiple resources with payloads", "[resource_group]")
     "### GET\n"\
     "+ Request\n\n";
 
-    ResourceGroup resourceGroup;
-    Report report;
-    SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source, ResourceGroupSectionType, report, resourceGroup);
+    ParseResult<ResourceGroup> resourceGroup;
+    SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source, ResourceGroupSectionType, resourceGroup);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 4);
+    REQUIRE(resourceGroup.report.error.code == Error::OK);
+    REQUIRE(resourceGroup.report.warnings.size() == 4);
 
-    REQUIRE(resourceGroup.name.empty());
-    REQUIRE(resourceGroup.description.empty());
-    REQUIRE(resourceGroup.resources.size() == 2);
+    REQUIRE(resourceGroup.node.name.empty());
+    REQUIRE(resourceGroup.node.description.empty());
+    REQUIRE(resourceGroup.node.resources.size() == 2);
 
     Resource resource1 = resourceGroup.resources[0];
     REQUIRE(resource1.uriTemplate == "/1");
@@ -160,17 +156,16 @@ TEST_CASE("Parse multiple resources with the same name", "[resource_group]")
     "## /r1\n"\
     "## /r1\n";
 
-    ResourceGroup resourceGroup;
-    Report report;
-    SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source, ResourceGroupSectionType, report, resourceGroup);
+    ParseResult<ResourceGroup> resourceGroup;
+    SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source, ResourceGroupSectionType, resourceGroup);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
-    REQUIRE(report.warnings[0].code == DuplicateWarning);
+    REQUIRE(resourceGroup.report.error.code == Error::OK);
+    REQUIRE(resourceGroup.report.warnings.size() == 1);
+    REQUIRE(resourceGroup.report.warnings[0].code == DuplicateWarning);
 
-    REQUIRE(resourceGroup.name.empty());
-    REQUIRE(resourceGroup.description.empty());
-    REQUIRE(resourceGroup.resources.size() == 2);
+    REQUIRE(resourceGroup.node.name.empty());
+    REQUIRE(resourceGroup.node.description.empty());
+    REQUIRE(resourceGroup.node.resources.size() == 2);
 }
 
 TEST_CASE("Parse resource with list in its description", "[resource_group]")
@@ -183,22 +178,21 @@ TEST_CASE("Parse resource with list in its description", "[resource_group]")
     "    Hello\n"\
     "+ Lorem Ipsum\n";
 
-    ResourceGroup resourceGroup;
-    Report report;
-    SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source, ResourceGroupSectionType, report, resourceGroup);
+    ParseResult<ResourceGroup> resourceGroup;
+    SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source, ResourceGroupSectionType, resourceGroup);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 3);   // preformatted asset & ignoring unrecognized node & no response
+    REQUIRE(resourceGroup.report.error.code == Error::OK);
+    REQUIRE(resourceGroup.report.warnings.size() == 3);   // preformatted asset & ignoring unrecognized node & no response
 
-    REQUIRE(resourceGroup.name.empty());
-    REQUIRE(resourceGroup.description.empty());
-    REQUIRE(resourceGroup.resources.size() == 1);
-    REQUIRE(resourceGroup.resources[0].uriTemplate == "/1");
-    REQUIRE(resourceGroup.resources[0].description.empty());
-    REQUIRE(resourceGroup.resources[0].actions.size() == 1);
-    REQUIRE(resourceGroup.resources[0].actions[0].method == "GET");
-    REQUIRE(resourceGroup.resources[0].actions[0].description == "");
-    REQUIRE(resourceGroup.resources[0].actions[0].examples.size() == 1);
+    REQUIRE(resourceGroup.node.name.empty());
+    REQUIRE(resourceGroup.node.description.empty());
+    REQUIRE(resourceGroup.node.resources.size() == 1);
+    REQUIRE(resourceGroup.node.resources[0].uriTemplate == "/1");
+    REQUIRE(resourceGroup.node.resources[0].description.empty());
+    REQUIRE(resourceGroup.node.resources[0].actions.size() == 1);
+    REQUIRE(resourceGroup.node.resources[0].actions[0].method == "GET");
+    REQUIRE(resourceGroup.node.resources[0].actions[0].description == "");
+    REQUIRE(resourceGroup.node.resources[0].actions[0].examples.size() == 1);
 }
 
 TEST_CASE("Parse resource groups with hr in description", "[resource_group]")
@@ -208,16 +202,15 @@ TEST_CASE("Parse resource groups with hr in description", "[resource_group]")
     "---\n"\
     "A\n";
 
-    ResourceGroup resourceGroup;
-    Report report;
-    SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source, ResourceGroupSectionType, report, resourceGroup);
+    ParseResult<ResourceGroup> resourceGroup;
+    SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source, ResourceGroupSectionType, resourceGroup);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(resourceGroup.report.error.code == Error::OK);
+    REQUIRE(resourceGroup.report.warnings.empty());
 
-    REQUIRE(resourceGroup.name == "1");
-    REQUIRE(resourceGroup.description == "---\n\nA\n");
-    REQUIRE(resourceGroup.resources.empty());
+    REQUIRE(resourceGroup.node.name == "1");
+    REQUIRE(resourceGroup.node.description == "---\n\nA\n");
+    REQUIRE(resourceGroup.node.resources.empty());
 }
 
 TEST_CASE("Make sure method followed by a group does not eat the group", "[resource_group]")
@@ -228,20 +221,19 @@ TEST_CASE("Make sure method followed by a group does not eat the group", "[resou
     "### POST\n"\
     "# Group Two\n";
 
-    ResourceGroup resourceGroup;
-    Report report;
-    SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source, ResourceGroupSectionType, report, resourceGroup);
+    ParseResult<ResourceGroup> resourceGroup;
+    SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source, ResourceGroupSectionType, resourceGroup);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1); // no response
+    REQUIRE(resourceGroup.report.error.code == Error::OK);
+    REQUIRE(resourceGroup.report.warnings.size() == 1); // no response
 
-    REQUIRE(resourceGroup.name == "One");
-    REQUIRE(resourceGroup.description.empty());
-    REQUIRE(resourceGroup.resources.size() == 1);
-    REQUIRE(resourceGroup.resources[0].uriTemplate == "/1");
-    REQUIRE(resourceGroup.resources[0].actions.size() == 1);
-    REQUIRE(resourceGroup.resources[0].actions[0].method == "POST");
-    REQUIRE(resourceGroup.resources[0].actions[0].description.empty());
+    REQUIRE(resourceGroup.node.name == "One");
+    REQUIRE(resourceGroup.node.description.empty());
+    REQUIRE(resourceGroup.node.resources.size() == 1);
+    REQUIRE(resourceGroup.node.resources[0].uriTemplate == "/1");
+    REQUIRE(resourceGroup.node.resources[0].actions.size() == 1);
+    REQUIRE(resourceGroup.node.resources[0].actions[0].method == "POST");
+    REQUIRE(resourceGroup.node.resources[0].actions[0].description.empty());
 }
 
 TEST_CASE("Parse resource method abbreviation followed by a foreign method", "[resource_group]")
@@ -250,24 +242,23 @@ TEST_CASE("Parse resource method abbreviation followed by a foreign method", "[r
     "# GET /resource\n"\
     "# POST\n";
 
-    ResourceGroup resourceGroup;
-    Report report;
-    SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source, ResourceGroupSectionType, report, resourceGroup);
+    ParseResult<ResourceGroup> resourceGroup;
+    SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source, ResourceGroupSectionType, resourceGroup);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 2); // no response && unexpected action POST
-    REQUIRE(report.warnings[0].code == EmptyDefinitionWarning);
-    REQUIRE(report.warnings[1].code == IgnoringWarning);
+    REQUIRE(resourceGroup.report.error.code == Error::OK);
+    REQUIRE(resourceGroup.report.warnings.size() == 2); // no response && unexpected action POST
+    REQUIRE(resourceGroup.report.warnings[0].code == EmptyDefinitionWarning);
+    REQUIRE(resourceGroup.report.warnings[1].code == IgnoringWarning);
 
-    REQUIRE(resourceGroup.name.empty());
-    REQUIRE(resourceGroup.description.empty());
-    REQUIRE(resourceGroup.resources.size() == 1);
-    REQUIRE(resourceGroup.resources[0].name.empty());
-    REQUIRE(resourceGroup.resources[0].uriTemplate == "/resource");
-    REQUIRE(resourceGroup.resources[0].model.name.empty());
-    REQUIRE(resourceGroup.resources[0].model.body.empty());
-    REQUIRE(resourceGroup.resources[0].actions.size() == 1);
-    REQUIRE(resourceGroup.resources[0].actions[0].method == "GET");
+    REQUIRE(resourceGroup.node.name.empty());
+    REQUIRE(resourceGroup.node.description.empty());
+    REQUIRE(resourceGroup.node.resources.size() == 1);
+    REQUIRE(resourceGroup.node.resources[0].name.empty());
+    REQUIRE(resourceGroup.node.resources[0].uriTemplate == "/resource");
+    REQUIRE(resourceGroup.node.resources[0].model.name.empty());
+    REQUIRE(resourceGroup.node.resources[0].model.body.empty());
+    REQUIRE(resourceGroup.node.resources[0].actions.size() == 1);
+    REQUIRE(resourceGroup.node.resources[0].actions[0].method == "GET");
 }
 
 TEST_CASE("Parse resource method abbreviation followed by another", "[resource_group]")
@@ -276,28 +267,27 @@ TEST_CASE("Parse resource method abbreviation followed by another", "[resource_g
     "# GET /resource\n"\
     "# POST /2\n";
 
-    ResourceGroup resourceGroup;
-    Report report;
-    SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source, ResourceGroupSectionType, report, resourceGroup);
+    ParseResult<ResourceGroup> resourceGroup;
+    SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source, ResourceGroupSectionType, resourceGroup);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 2); // 2x no response
-    REQUIRE(report.warnings[0].code == EmptyDefinitionWarning);
-    REQUIRE(report.warnings[1].code == EmptyDefinitionWarning);
+    REQUIRE(resourceGroup.report.error.code == Error::OK);
+    REQUIRE(resourceGroup.report.warnings.size() == 2); // 2x no response
+    REQUIRE(resourceGroup.report.warnings[0].code == EmptyDefinitionWarning);
+    REQUIRE(resourceGroup.report.warnings[1].code == EmptyDefinitionWarning);
 
-    REQUIRE(resourceGroup.name.empty());
-    REQUIRE(resourceGroup.description.empty());
-    REQUIRE(resourceGroup.resources.size() == 2);
-    REQUIRE(resourceGroup.resources[0].name.empty());
-    REQUIRE(resourceGroup.resources[0].uriTemplate == "/resource");
-    REQUIRE(resourceGroup.resources[0].model.name.empty());
-    REQUIRE(resourceGroup.resources[0].model.body.empty());
-    REQUIRE(resourceGroup.resources[0].actions.size() == 1);
-    REQUIRE(resourceGroup.resources[0].actions[0].method == "GET");
-    REQUIRE(resourceGroup.resources[1].name.empty());
-    REQUIRE(resourceGroup.resources[1].uriTemplate == "/2");
-    REQUIRE(resourceGroup.resources[1].model.name.empty());
-    REQUIRE(resourceGroup.resources[1].model.body.empty());
-    REQUIRE(resourceGroup.resources[1].actions.size() == 1);
-    REQUIRE(resourceGroup.resources[1].actions[0].method == "POST");
+    REQUIRE(resourceGroup.node.name.empty());
+    REQUIRE(resourceGroup.node.description.empty());
+    REQUIRE(resourceGroup.node.resources.size() == 2);
+    REQUIRE(resourceGroup.node.resources[0].name.empty());
+    REQUIRE(resourceGroup.node.resources[0].uriTemplate == "/resource");
+    REQUIRE(resourceGroup.node.resources[0].model.name.empty());
+    REQUIRE(resourceGroup.node.resources[0].model.body.empty());
+    REQUIRE(resourceGroup.node.resources[0].actions.size() == 1);
+    REQUIRE(resourceGroup.node.resources[0].actions[0].method == "GET");
+    REQUIRE(resourceGroup.node.resources[1].name.empty());
+    REQUIRE(resourceGroup.node.resources[1].uriTemplate == "/2");
+    REQUIRE(resourceGroup.node.resources[1].model.name.empty());
+    REQUIRE(resourceGroup.node.resources[1].model.body.empty());
+    REQUIRE(resourceGroup.node.resources[1].actions.size() == 1);
+    REQUIRE(resourceGroup.node.resources[1].actions[0].method == "POST");
 }
