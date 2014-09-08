@@ -94,11 +94,14 @@ namespace snowcrash {
 
             switch (sectionType) {
                 case ParametersSectionType:
+                {
                     ParseResult<Parameters> parameters(out.report, out.node.parameters, out.sourceMap.parameters);
                     return ParametersParser::parse(node, siblings, pd, parameters);
+                }
 
                 case RequestSectionType:
                 case RequestBodySectionType:
+                {
                     ParseResult<Payload> payload;
                     cur = PayloadParser::parse(node, siblings, pd, payload);
 
@@ -111,7 +114,7 @@ namespace snowcrash {
                         out.node.examples.push_back(transaction);
 
                         if (pd.exportSM()) {
-                            out.sourceMap.examples.sourceMap.push_back(transactionSM);
+                            out.sourceMap.examples.list.push_back(transactionSM);
                         }
                     }
 
@@ -120,12 +123,15 @@ namespace snowcrash {
                     out.node.examples.back().requests.push_back(payload.node);
 
                     if (pd.exportSM()) {
-                        out.sourceMap.examples.sourceMap.back().requests.sourceMap.push_back(payload.sourceMap);
+                        out.sourceMap.examples.list.back().requests.list.push_back(payload.sourceMap);
                     }
+
                     break;
+                }
 
                 case ResponseSectionType:
                 case ResponseBodySectionType:
+                {
                     ParseResult<Payload> payload;
                     cur = PayloadParser::parse(node, siblings, pd, payload);
 
@@ -138,7 +144,7 @@ namespace snowcrash {
                         out.node.examples.push_back(transaction);
 
                         if (pd.exportSM()) {
-                            out.sourceMap.examples.sourceMap.push_back(transactionSM);
+                            out.sourceMap.examples.list.push_back(transactionSM);
                         }
                     }
 
@@ -147,18 +153,21 @@ namespace snowcrash {
                     out.node.examples.back().responses.push_back(payload.node);
 
                     if (pd.exportSM()) {
-                        out.sourceMap.examples.sourceMap.back().responses.sourceMap.push_back(payload.sourceMap);
+                        out.sourceMap.examples.list.back().responses.list.push_back(payload.sourceMap);
                     }
+
                     break;
+                }
 
                 case HeadersSectionType:
+                {
                     ParseResult<Headers> headers(out.report, out.node.headers, out.sourceMap.headers);
                     return SectionProcessor<Action>::handleDeprecatedHeaders(node, siblings, pd, headers);
+                }
 
                 case BodySectionType:
                 case SchemaSectionType:
                     // TODO: Can improve this
-
                     // WARN: Ignoring section
                     ss << "Ignoring " << SectionName(sectionType) << " list item, ";
                     ss << SectionName(sectionType) << " list item is expected to be indented by  4  spaces or 1 tab";
@@ -193,7 +202,7 @@ namespace snowcrash {
                 mdp::ByteBuffer content = CodeBlockUtility::addDanglingAsset(node, pd, sectionType, out.report, out.node.examples.back().responses.back().body);
 
                 if (pd.exportSM() && !content.empty()) {
-                    out.sourceMap.examples.sourceMap.back().responses.sourceMap.back().body.sourceMap.append(node->sourceMap);
+                    out.sourceMap.examples.list.back().responses.list.back().body.sourceMap.append(node->sourceMap);
                 }
             } else {
 
@@ -285,7 +294,7 @@ namespace snowcrash {
                 out.node.headers.clear();
 
                 if (pd.exportSM()) {
-                    out.sourceMap.headers.sourceMap.clear();
+                    out.sourceMap.headers.list.clear();
                 }
             }
 

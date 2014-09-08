@@ -98,7 +98,7 @@ namespace snowcrash {
             out.node.values.clear();
 
             if (pd.exportSM()) {
-                out.sourceMap.values.sourceMap.clear();
+                out.sourceMap.values.list.clear();
             }
 
             ParseResult<Values> values(out.report, out.node.values, out.sourceMap.values);
@@ -311,7 +311,6 @@ namespace snowcrash {
 
         static void checkExampleAndDefaultValue(const mdp::MarkdownNodeIterator& node,
                                                 SectionParserData& pd,
-                                                Report& report,
                                                 ParseResult<Parameter>& out) {
 
             bool isExampleFound = false;
@@ -351,9 +350,9 @@ namespace snowcrash {
 
             if (printWarning) {
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                report.warnings.push_back(Warning(ss.str(),
-                                                  LogicalErrorWarning,
-                                                  sourceMap));
+                out.report.warnings.push_back(Warning(ss.str(),
+                                                      LogicalErrorWarning,
+                                                      sourceMap));
             }
         }
     };

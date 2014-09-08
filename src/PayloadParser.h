@@ -140,10 +140,13 @@ namespace snowcrash {
 
             switch (pd.sectionContext()) {
                 case HeadersSectionType:
+                {
                     ParseResult<Headers> headers(out.report, out.node.headers, out.sourceMap.headers);
                     return HeadersParser::parse(node, siblings, pd, headers);
+                }
 
                 case BodySectionType:
+                {
                     if (!out.node.body.empty()) {
                         // WARN: Multiple body section
                         mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
@@ -154,8 +157,10 @@ namespace snowcrash {
 
                     ParseResult<Asset> asset(out.report, out.node.body, out.sourceMap.body);
                     return AssetParser::parse(node, siblings, pd, asset);
+                }
 
                 case SchemaSectionType:
+                {
                     if (!out.node.schema.empty()) {
                         // WARN: Multiple schema section
                         mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
@@ -166,6 +171,7 @@ namespace snowcrash {
 
                     ParseResult<Asset> asset(out.report, out.node.schema, out.sourceMap.schema);
                     return AssetParser::parse(node, siblings, pd, asset);
+                }
 
                 default:
                     break;
@@ -514,7 +520,9 @@ namespace snowcrash {
                     out.node.headers.push_back(header);
 
                     if (pd.exportSM()) {
-                        out.sourceMap.headers.sourceMap.push_back(node->sourceMap);
+                        SourceMap<Header> headerSM;
+                        headerSM.sourceMap = node->sourceMap;
+                        out.sourceMap.headers.list.push_back(headerSM);
                     }
                 }
             }

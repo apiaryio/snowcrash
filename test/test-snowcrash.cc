@@ -50,7 +50,7 @@ TEST_CASE("Parse simple blueprint", "[parser]")
     REQUIRE(blueprint.node.description.empty());
     REQUIRE(blueprint.node.resourceGroups.size() == 1);
 
-    ResourceGroup& resourceGroup = blueprint.resourceGroups.front();
+    ResourceGroup& resourceGroup = blueprint.node.resourceGroups.front();
     REQUIRE(resourceGroup.name.empty());
     REQUIRE(resourceGroup.description.empty());
     REQUIRE(resourceGroup.resources.size() == 1);
@@ -313,7 +313,7 @@ TEST_CASE("Warn about missing API name if there is an API description", "[parser
     "# API\n"\
     "Hello World\n";
     
-    ParseResult<Blueprint> blueprint;
+    ParseResult<Blueprint> blueprint2;
     parse(source2, 0, blueprint2);
     
     REQUIRE(blueprint2.report.error.code == Error::OK);
@@ -327,7 +327,7 @@ TEST_CASE("Warn about missing API name if there is an API description", "[parser
     "# POST /1\n"\
     "+ Response 201";
     
-    ParseResult<Blueprint> blueprint;
+    ParseResult<Blueprint> blueprint3;
     parse(source3, 0, blueprint3);
     
     REQUIRE(blueprint3.report.error.code == Error::OK);

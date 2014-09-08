@@ -135,7 +135,9 @@ namespace snowcrash {
                     out.node.push_back(header);
 
                     if (pd.exportSM()) {
-                        out.sourceMap.sourceMap.push_back(node->sourceMap);
+                        SourceMap<Header> headerSM;
+                        headerSM.sourceMap = node->sourceMap;
+                        out.sourceMap.list.push_back(headerSM);
                     }
                 } else {
                     // WARN: unable to parse header
@@ -155,19 +157,19 @@ namespace snowcrash {
                                             SourceMap<TransactionExamples>& examplesSM) {
 
             Collection<TransactionExample>::iterator exampleIt = examples.begin();
-            Collection<SourceMap<TransactionExample>>::iterator exampleSMIt;
+            Collection<SourceMap<TransactionExample> >::iterator exampleSMIt;
 
             if (pd.exportSM()) {
-                exampleSMIt = examplesSM.sourceMap.begin();
+                exampleSMIt = examplesSM.list.begin();
             }
 
             while (exampleIt != examples.end()) {
 
                 Collection<Request>::iterator reqIt = exampleIt->requests.begin();
-                Collection<SourceMap<Request>>::iterator reqSMIt;
+                Collection<SourceMap<Request> >::iterator reqSMIt;
 
                 if (pd.exportSM()) {
-                    reqSMIt = exampleSMIt->requests.sourceMap.begin();
+                    reqSMIt = exampleSMIt->requests.list.begin();
                 }
 
                 // Requests
@@ -177,16 +179,16 @@ namespace snowcrash {
                      ++reqIt;
 
                      if (pd.exportSM()) {
-                         reqSMIt->headers.sourceMap.insert(reqSMIt->headers.sourceMap.begin(), headersSM.sourceMap.begin(), headersSM.sourceMap.end());
+                         reqSMIt->headers.list.insert(reqSMIt->headers.list.begin(), headersSM.list.begin(), headersSM.list.end());
                          ++reqSMIt;
                      }
                 }
 
                 Collection<Response>::iterator resIt = exampleIt->responses.begin();
-                Collection<SourceMap<Response>>::iterator resSMIt;
+                Collection<SourceMap<Response> >::iterator resSMIt;
 
                 if (pd.exportSM()) {
-                    resSMIt = exampleSMIt->responses.sourceMap.begin();
+                    resSMIt = exampleSMIt->responses.list.begin();
                 }
 
                 // Responses
@@ -196,7 +198,7 @@ namespace snowcrash {
                     ++resIt;
 
                     if (pd.exportSM()) {
-                        resSMIt->headers.sourceMap.insert(resSMIt->headers.sourceMap.begin(), headersSM.sourceMap.begin(), headersSM.sourceMap.end());
+                        resSMIt->headers.list.insert(resSMIt->headers.list.begin(), headersSM.list.begin(), headersSM.list.end());
                         ++resSMIt;
                     }
                 }

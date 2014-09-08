@@ -170,7 +170,7 @@ TEST_CASE("Recognize parameter when there is no description on its signature and
     REQUIRE(parameters.node[0].type == "number");
     REQUIRE(parameters.node[0].description == "The ID number of the car");
 
-    Parameter parameter = parameters[1];
+    Parameter parameter = parameters.node[1];
     REQUIRE(parameter.name == "state");
     REQUIRE(parameter.type == "string");
     REQUIRE(parameter.description == "\nThe desired state of the panoramic roof. The approximate percent open values for each state are `open` = 100%, `close` = 0%, `comfort` = 80%, and `vent` = ~15%\n\n");

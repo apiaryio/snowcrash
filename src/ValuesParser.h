@@ -43,7 +43,9 @@ namespace snowcrash {
                     out.node.push_back(captureGroups[1]);
 
                     if (pd.exportSM()) {
-                        out.sourceMap.sourceMap.push_back(node->sourceMap);
+                        SourceMap<Value> valueSM;
+                        valueSM.sourceMap = node->sourceMap;
+                        out.sourceMap.list.push_back(valueSM);
                     }
                 } else {
                     TrimString(content);

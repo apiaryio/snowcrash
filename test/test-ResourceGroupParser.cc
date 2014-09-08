@@ -123,7 +123,7 @@ TEST_CASE("Parse multiple resources with payloads", "[resource_group]")
     REQUIRE(resourceGroup.node.description.empty());
     REQUIRE(resourceGroup.node.resources.size() == 2);
 
-    Resource resource1 = resourceGroup.resources[0];
+    Resource resource1 = resourceGroup.node.resources[0];
     REQUIRE(resource1.uriTemplate == "/1");
     REQUIRE(resource1.description.empty());
     REQUIRE(resource1.actions.size() == 1);
@@ -136,7 +136,7 @@ TEST_CASE("Parse multiple resources with payloads", "[resource_group]")
     REQUIRE(resource1.actions[0].examples[0].requests[0].body.empty());
     REQUIRE(resource1.actions[0].examples[0].responses.empty());
 
-    Resource resource2 = resourceGroup.resources[1];
+    Resource resource2 = resourceGroup.node.resources[1];
     REQUIRE(resource2.uriTemplate == "/2");
     REQUIRE(resource2.description.empty());
     REQUIRE(resource2.actions.size() == 1);
