@@ -21,7 +21,7 @@
 
 #define SOURCE_MAP_COLLECTION(T, TC) template<>\
 struct SourceMap<TC> {\
-    Collection<SourceMap<T> >::type sourceMap;\
+    Collection<SourceMap<T> >::type list;\
 };\
 
 namespace snowcrash {
@@ -38,7 +38,7 @@ namespace snowcrash {
     SOURCE_MAP_COLLECTION(Metadata, MetadataCollection);
 
     /** Source Map of Headers */
-    typedef SourceMap<MetadataCollection> SourceMap<Headers>;
+//    SOURCE_MAP_COLLECTION(Header, Headers);
 
     /** Source Map of Collection of Parameter values */
     SOURCE_MAP_COLLECTION(Value, Values);
@@ -101,19 +101,19 @@ namespace snowcrash {
     };
 
     /** Source Map structure for Resource Model */
-    typedef SourceMap<Payload> SourceMap<ResourceModel>;
+//    typedef SourceMap<Payload> SourceMap<ResourceModel>;
 
     /** Source Map structure for Request */
-    typedef SourceMap<Payload> SourceMap<Request>;
+//    typedef SourceMap<Payload> SourceMap<Request>;
 
     /** Source Map structure for Response */
-    typedef SourceMap<Payload> SourceMap<Response>;
+//    typedef SourceMap<Payload> SourceMap<Response>;
 
     /** Source Map of Collection of Requests */
     SOURCE_MAP_COLLECTION(Request, Requests);
 
     /** Source Map of Collection of Responses */
-    typedef SourceMap<Responses> SourceMap<Requests>;
+//    SOURCE_MAP_COLLECTION(Response, Responses);
 
     /**
      *  Source Map Structure for an HTTP transaction example.

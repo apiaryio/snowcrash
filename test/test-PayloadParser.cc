@@ -238,10 +238,10 @@ TEST_CASE("Parse payload with dangling body", "[payload]")
 TEST_CASE("Parse inline payload with symbol reference", "[payload]")
 {
     Symbols symbols;
-    buildSymbol("Symbol", symbols);
+    SymbolHelper::buildSymbol("Symbol", symbols);
 
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(SymbolFixture, RequestBodySectionType, report, payload, symbols);
+    SectionParserHelper<Payload, PayloadParser>::parse(SymbolFixture, RequestBodySectionType, payload, symbols);
 
     REQUIRE(payload.report.error.code == Error::OK);
     REQUIRE(payload.report.warnings.size() == 0);
@@ -261,10 +261,10 @@ TEST_CASE("Parse inline payload with symbol reference with extra indentation", "
     "        [Symbol][]\n";
 
     Symbols symbols;
-    buildSymbol("Symbol", symbols);
+    SymbolHelper::buildSymbol("Symbol", symbols);
 
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestBodySectionType, report, payload, symbols);
+    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestBodySectionType, payload, symbols);
 
     REQUIRE(payload.report.error.code == Error::OK);
     REQUIRE(payload.report.warnings.size() == 1);
@@ -284,10 +284,10 @@ TEST_CASE("Parse inline payload with symbol reference with foreign content", "[p
     source += "\n    Foreign\n";
 
     Symbols symbols;
-    buildSymbol("Symbol", symbols);
+    SymbolHelper::buildSymbol("Symbol", symbols);
 
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestBodySectionType, report, payload, symbols);
+    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestBodySectionType, payload, symbols);
 
     REQUIRE(payload.report.error.code == Error::OK);
     REQUIRE(payload.report.warnings.size() == 1); // ignoring foreign entry

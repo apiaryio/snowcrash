@@ -28,7 +28,7 @@ TEST_CASE("Blueprint block classifier", "[blueprint]")
     mdp::MarkdownParser markdownParser;
     mdp::MarkdownNode markdownAST;
     SectionType sectionType;
-    markdownParser.parse(blueprint.nodeFixture, markdownAST);
+    markdownParser.parse(BlueprintFixture, markdownAST);
 
     REQUIRE(!markdownAST.children().empty());
 
@@ -124,7 +124,7 @@ TEST_CASE("Parse API with Name and abbreviated resource", "[blueprint]")
     REQUIRE(blueprint.node.description == "A\n");
     REQUIRE(blueprint.node.resourceGroups.size() == 1);
 
-    ResourceGroup group = blueprint.resourceGroups.front();
+    ResourceGroup group = blueprint.node.resourceGroups.front();
     REQUIRE(group.name.empty());
     REQUIRE(group.description.empty());
     REQUIRE(group.resources.size() == 1);
@@ -209,7 +209,7 @@ TEST_CASE("Test parser options - required blueprint name", "[blueprint]")
     REQUIRE(blueprint.report.warnings.size() == 1);
     REQUIRE(blueprint.report.warnings[0].code == APINameWarning);
 
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint, Symbols(), RequireBlueprintNameOption);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, Symbols(), RequireBlueprintNameOption);
     REQUIRE(blueprint.report.error.code != Error::OK);
 }
 
@@ -222,7 +222,7 @@ TEST_CASE("Test required blueprint name on blueprint that starts with metadata",
 
     ParseResult<Blueprint> blueprint;
 
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint, Symbols(), RequireBlueprintNameOption);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, Symbols(), RequireBlueprintNameOption);
     REQUIRE(blueprint.report.error.code != Error::OK);
 }
 
@@ -309,7 +309,7 @@ TEST_CASE("Checking a resource with global resources for duplicates", "[blueprin
     "### List posts [GET]\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint, Symbols(), 0, &blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, Symbols(), 0, &blueprint);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.size() == 3); // 2x no response & duplicate resource
@@ -346,7 +346,7 @@ TEST_CASE("Parsing unexpected blocks", "[blueprint]")
 
     ParseResult<Blueprint> blueprint;
 
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint, Symbols(), 0, &blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, Symbols(), 0, &blueprint);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.size() == 1); // no response

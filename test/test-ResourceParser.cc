@@ -106,7 +106,7 @@ TEST_CASE("Parse partially defined resource", "[resource]")
     REQUIRE(resource.node.actions.size() == 1);
     REQUIRE(resource.node.actions.front().method == "GET");
     REQUIRE(resource.node.actions.front().description.empty());
-    REQUIRE(!resource.actions.front().examples.empty());
+    REQUIRE(!resource.node.actions.front().examples.empty());
     REQUIRE(resource.node.actions.front().examples.front().requests.size() == 1);
     REQUIRE(resource.node.actions.front().examples.front().requests.front().name.empty());
     REQUIRE(resource.node.actions.front().examples.front().requests.front().description.empty());

@@ -30,13 +30,13 @@ namespace snowcrashtest {
                           snowcrash::ParseResult<T>& out,
                           const Symbols& symbols = Symbols(),
                           const snowcrash::BlueprintParserOptions& opts = 0,
-                          snowcrash::Blueprint* bp = NULL) {
+                          snowcrash::ParseResult<snowcrash::Blueprint>* bp = NULL) {
 
             mdp::MarkdownParser markdownParser;
             mdp::MarkdownNode markdownAST;
 
-            snowcrash::Blueprint blueprint;
-            snowcrash::Blueprint* bppointer;
+            snowcrash::ParseResult<snowcrash::Blueprint> blueprint;
+            snowcrash::ParseResult<snowcrash::Blueprint>* bppointer;
 
             markdownParser.parse(source, markdownAST);
 
@@ -51,7 +51,7 @@ namespace snowcrashtest {
             // Export source maps
             snowcrash::BlueprintParserOptions options = opts | snowcrash::ExportSourcemapOption;
 
-            snowcrash::SectionParserData pd(options, source, *bppointer);
+            snowcrash::SectionParserData pd(options, source, bppointer->node);
 
             pd.sectionsContext.push_back(type);
 
@@ -65,24 +65,27 @@ namespace snowcrashtest {
         }
     };
 
-    /** Builds a Symbols entry for testing purposes */
-    static void buildSymbol(mdp::ByteBuffer name,
-                            Symbols& symbols) {
+    struct SymbolHelper {
 
-        snowcrash::ResourceModel model;
-        snowcrash::SourceMap<snowcrash::ResourceModel> modelSM;
-        mdp::BytesRangeSet sourcemap;
+        /** Builds a Symbols entry for testing purposes */
+        static void buildSymbol(mdp::ByteBuffer name,
+                                Symbols& symbols) {
 
-        sourcemap.push_back(mdp::BytesRange(0, 1));
+            snowcrash::ResourceModel model;
+            snowcrash::SourceMap<snowcrash::ResourceModel> modelSM;
+            mdp::BytesRangeSet sourcemap;
 
-        model.description = "Foo";
-        model.body = "Bar";
-        symbols.models.push_back(snowcrash::ResourceModelSymbol(name, model));
+            sourcemap.push_back(mdp::BytesRange(0, 1));
 
-        modelSM.description.sourceMap = sourcemap;
-        modelSM.body.sourceMap = sourcemap;
-        symbols.modelsSM.push_back(snowcrash::ResourceModelSymbolSourceMap(name, modelSM));
-    }
+            model.description = "Foo";
+            model.body = "Bar";
+            symbols.models.push_back(snowcrash::ResourceModelSymbol(name, model));
+
+            modelSM.description.sourceMap = sourcemap;
+            modelSM.body.sourceMap = sourcemap;
+            symbols.modelsSM.push_back(snowcrash::ResourceModelSymbolSourceMap(name, modelSM));
+        }
+    };
 }
 
 #endif
