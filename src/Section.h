@@ -21,7 +21,6 @@ namespace snowcrash {
         BlueprintSectionType,           /// < Blueprint overview
         ResourceGroupSectionType,       /// < Resource group
         ResourceSectionType,            /// < Resource
-        ResourceMethodSectionType,      /// < Resource & Action combined (abbrev)
         ActionSectionType,              /// < Action
         RequestSectionType,             /// < Request
         RequestBodySectionType,         /// < Request & Payload body combined (abbrev)

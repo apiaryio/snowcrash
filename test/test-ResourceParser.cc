@@ -49,7 +49,7 @@ TEST_CASE("Resource block classifier", "[resource]")
 
     // Resource Method
     markdownAST.children().front().text = "GET /resource";
-    REQUIRE(SectionProcessor<Resource>::sectionType(markdownAST.children().begin()) == ResourceMethodSectionType);
+    REQUIRE(SectionProcessor<Resource>::sectionType(markdownAST.children().begin()) == ResourceSectionType);
 }
 
 TEST_CASE("Parse resource", "[resource]")
@@ -508,4 +508,69 @@ TEST_CASE("Parse resource with multi-word named model", "[resource][model]")
     REQUIRE(resource.model.name == "a really good name");
     REQUIRE(resource.model.body == "body of the `model`\n");
     REQUIRE(resource.actions.empty());
+}
+
+TEST_CASE("Dangling transaction example assets", "[resource]")
+{
+    mdp::ByteBuffer source = \
+    "# A [/a]\n"\
+    "## GET\n"\
+    "+ Request A\n"\
+    "\n"\
+    "```js\n"\
+    "dangling request body\n"\
+    "```\n"\
+    "\n"\
+    "+ Response 200\n"\
+    "\n"\
+    "```\n"\
+    "dangling response body\n"\
+    "```\n";
+    
+    Resource resource;
+    Report report;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+    
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 3);
+    REQUIRE(report.warnings[0].code == EmptyDefinitionWarning);
+    REQUIRE(report.warnings[1].code == IndentationWarning);
+    REQUIRE(report.warnings[2].code == IndentationWarning);
+    
+    REQUIRE(resource.name == "A");
+    REQUIRE(resource.uriTemplate == "/a");
+    REQUIRE(resource.actions.size() == 1);
+    
+    REQUIRE(resource.actions[0].method == "GET");
+    REQUIRE(resource.actions[0].examples.size() == 1);
+    REQUIRE(resource.actions[0].examples[0].requests.size() == 1);
+    REQUIRE(resource.actions[0].examples[0].requests[0].name == "A");
+    REQUIRE(resource.actions[0].examples[0].requests[0].body == "dangling request body\n\n");
+    
+    REQUIRE(resource.actions[0].examples[0].responses.size() == 1);
+    REQUIRE(resource.actions[0].examples[0].responses[0].name == "200");
+    REQUIRE(resource.actions[0].examples[0].responses[0].body == "dangling response body\n\n");
+}
+
+TEST_CASE("Body list item in description", "[resource][regression][#190]")
+{
+    mdp::ByteBuffer source = \
+    "## GET /A\n"\
+    "Lorem Ipsum\n"\
+    "\n"\
+    "+ Body\n"\
+    "\n"\
+    "    { ... }\n"\
+    "\n"\
+    "+ Response 200\n";
+    
+    Resource resource;
+    Report report;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+    
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.empty());
+    
+    REQUIRE(resource.actions.size() == 1);
+    REQUIRE(resource.actions[0].description == "Lorem Ipsum\n\n+ Body\n\n    { ... }\n\n");
 }

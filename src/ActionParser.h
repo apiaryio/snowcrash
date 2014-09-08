@@ -27,14 +27,13 @@ namespace snowcrash {
     typedef Collection<Action>::type Actions;
 
     typedef Collection<Action>::const_iterator ActionIterator;
-
-    // Method signature
-    enum ActionSignature {
-        NoActionSignature = 0,
-        MethodActionSignature,      // # GET
-        MethodURIActionSignature,   // # GET /uri
-        NamedActionSignature,       // # My Method [GET]
-        UndefinedActionSignature = -1
+    
+    /** Action Definition Type */
+    enum ActionType {
+        UndefinedActionType,    /// Action type has not been defined
+        DependentActionType,    /// Action isn't fully defined, depends on parents resource URI
+        CompleteActionType,     /// Action is fully defined including its URI
+        NotActionType = -1       /// The subject is not an Action
     };
 
     /**
@@ -118,21 +117,6 @@ namespace snowcrash {
                 case HeadersSectionType:
                     return SectionProcessor<Action>::handleDeprecatedHeaders(node, siblings, pd, report, out.headers);
 
-                case BodySectionType:
-                case SchemaSectionType:
-                    // TODO: Can improve this
-
-                    // WARN: Ignoring section
-                    ss << "Ignoring " << SectionName(sectionType) << " list item, ";
-                    ss << SectionName(sectionType) << " list item is expected to be indented by  4  spaces or 1 tab";
-
-                    report.warnings.push_back(Warning(ss.str(),
-                                                      IgnoringWarning,
-                                                      sourceMap));
-
-                    cur = ++MarkdownNodeIterator(node);
-                    break;
-
                 default:
                     break;
             }
@@ -140,6 +124,16 @@ namespace snowcrash {
             return cur;
         }
 
+        static bool isUnexpectedNode(const MarkdownNodeIterator& node,
+                                     SectionType sectionType) {
+            
+            if ( SectionProcessor<Asset>::sectionType(node) != UndefinedSectionType) {
+                return true;
+            }
+            
+            return SectionProcessorBase<Action>::isUnexpectedNode(node, sectionType);
+        }
+        
         static MarkdownNodeIterator processUnexpectedNode(const MarkdownNodeIterator& node,
                                                           const MarkdownNodes& siblings,
                                                           SectionParserData& pd,
@@ -155,16 +149,41 @@ namespace snowcrash {
                 !out.examples.back().responses.empty()) {
 
                 CodeBlockUtility::addDanglingAsset(node, pd, sectionType, report, out.examples.back().responses.back().body);
-            } else {
-
-                // WARN: Ignoring unexpected node
+                
+                return ++MarkdownNodeIterator(node);
+            }
+            
+            if ((node->type == mdp::ParagraphMarkdownNodeType ||
+                 node->type == mdp::CodeMarkdownNodeType) &&
+                (sectionType == RequestBodySectionType ||
+                 sectionType == RequestSectionType) &&
+                !out.examples.empty() &&
+                !out.examples.back().requests.empty()) {
+                
+                CodeBlockUtility::addDanglingAsset(node, pd, sectionType, report, out.examples.back().requests.back().body);
+                
+                return ++MarkdownNodeIterator(node);
+            }
+            
+            SectionType assetType = SectionProcessor<Asset>::sectionType(node);
+            
+            if (assetType != UndefinedSectionType) {
+                
+                // WARN: Ignoring section
+                std::stringstream ss;
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                report.warnings.push_back(Warning("ignoring unrecognized block",
+                
+                ss << "Ignoring " << SectionName(assetType) << " list item, ";
+                ss << SectionName(assetType) << " list item is expected to be indented by 4 spaces or 1 tab";
+
+                report.warnings.push_back(Warning(ss.str(),
                                                   IgnoringWarning,
                                                   sourceMap));
-            }
 
-            return ++MarkdownNodeIterator(node);
+                return ++MarkdownNodeIterator(node);
+            }
+            
+            return SectionProcessorBase<Action>::processUnexpectedNode(node, siblings, pd, sectionType, report, out);            
         }
 
         static SectionType sectionType(const MarkdownNodeIterator& node) {
@@ -205,13 +224,6 @@ namespace snowcrash {
 
             // Check if payload section
             nestedType = SectionProcessor<Payload>::sectionType(node);
-
-            if (nestedType != UndefinedSectionType) {
-                return nestedType;
-            }
-
-            // Check if asset section (dangling)
-            nestedType = SectionProcessor<Asset>::sectionType(node);
 
             if (nestedType != UndefinedSectionType) {
                 return nestedType;
@@ -376,6 +388,55 @@ namespace snowcrash {
                                               sourceMap));
 
             return cur;
+        }
+        
+        /** \return %ActionType of a node */
+        static ActionType actionType(const MarkdownNodeIterator& node) {
+            
+            if (node->type != mdp::HeaderMarkdownNodeType || node->text.empty())
+                return NotActionType;
+                
+            mdp::ByteBuffer subject = node->text;
+            TrimString(subject);
+            
+            if (RegexMatch(subject, NamedActionHeaderRegex)) {
+                return DependentActionType;
+            }
+            
+            CaptureGroups captureGroups;
+            if (RegexCapture(subject, ActionHeaderRegex, captureGroups, 3)) {
+                
+                if (captureGroups[2].empty()) {
+                    return DependentActionType;
+                }
+                else {
+                    return CompleteActionType;
+                }
+            }
+            
+            return NotActionType;
+        }
+
+        /** \return HTTP request method of an action */
+        static mdp::ByteBuffer actionHTTPRequestMethod(const MarkdownNodeIterator& node) {
+            
+            CaptureGroups captureGroups;
+            mdp::ByteBuffer subject = node->text;
+            mdp::ByteBuffer method;
+            
+            TrimString(subject);
+            
+            if (RegexCapture(subject, ActionHeaderRegex, captureGroups, 3)) {
+                
+                method = captureGroups[1];
+            }
+            
+            if (RegexCapture(subject, NamedActionHeaderRegex, captureGroups, 3)) {
+                
+                method = captureGroups[2];
+            }
+            
+            return method;
         }
     };
 

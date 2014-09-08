@@ -29,15 +29,6 @@ namespace snowcrash {
 
     typedef Collection<Resource>::const_iterator ResourceIterator;
 
-    // Resource signature
-    enum ResourceSignature {
-        NoResourceSignature = 0,
-        URIResourceSignature,
-        MethodURIResourceSignature,
-        NamedResourceSignature,
-        UndefinedResourceSignature = -1
-    };
-
     /**
      * Resource Section processor
      */
@@ -104,6 +95,36 @@ namespace snowcrash {
 
             return node;
         }
+        
+        static MarkdownNodeIterator processUnexpectedNode(const MarkdownNodeIterator& node,
+                                                          const MarkdownNodes& siblings,
+                                                          SectionParserData& pd,
+                                                          SectionType& sectionType,
+                                                          Report& report,
+                                                          Resource& out) {
+            
+            if ((node->type == mdp::ParagraphMarkdownNodeType ||
+                 node->type == mdp::CodeMarkdownNodeType) &&
+                (sectionType == ModelBodySectionType ||
+                 sectionType == ModelSectionType)) {
+                
+                CodeBlockUtility::addDanglingAsset(node, pd, sectionType, report, out.model.body);
+                
+                return ++MarkdownNodeIterator(node);
+            }
+            
+            return SectionProcessorBase<Resource>::processUnexpectedNode(node, siblings, pd, sectionType, report, out);
+        }
+        
+        static bool isDescriptionNode(const MarkdownNodeIterator& node,
+                                      SectionType sectionType) {
+            
+            if (SectionProcessor<Action>::actionType(node) == CompleteActionType) {
+                return false;
+            }
+                
+            return SectionProcessorBase<Resource>::isDescriptionNode(node, sectionType);
+        }
 
         static SectionType sectionType(const MarkdownNodeIterator& node) {
 
@@ -115,12 +136,9 @@ namespace snowcrash {
 
                 TrimString(subject);
 
-                if (RegexMatch(subject, NamedResourceHeaderRegex)) {
+                if (RegexMatch(subject, NamedResourceHeaderRegex) ||
+                    RegexMatch(subject, ResourceHeaderRegex)) {
                     return ResourceSectionType;
-                }
-
-                if (RegexCapture(subject, ResourceHeaderRegex, captureGroups, 4)) {
-                    return (captureGroups[2].empty()) ? ResourceSectionType : ResourceMethodSectionType;
                 }
             }
 
@@ -158,6 +176,12 @@ namespace snowcrash {
             nestedType = SectionProcessor<Action>::sectionType(node);
 
             if (nestedType == ActionSectionType) {
+                
+                // Do not consider complete actions as nested
+                mdp::ByteBuffer method;
+                if (SectionProcessor<Action>::actionType(node) == CompleteActionType)
+                    return UndefinedSectionType;
+                
                 return nestedType;
             }
 

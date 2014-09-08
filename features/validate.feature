@@ -23,7 +23,7 @@ Feature: Validate a blueprint
     Then the output should contain:
     """
     OK.
-    warning: (5)  ignoring unrecognized block :24:29
+    warning: (5)  unexpected header block, expected a group, resource or an action definition, e.g. '# Group <name>', '# <resource name> [<URI>]' or '# <HTTP method> <URI>' :24:29
     """
 
   Scenario: Validate an invalid blueprint input
@@ -33,5 +33,5 @@ Feature: Validate a blueprint
     Then the output should contain:
     """
     OK.
-    warning: (5)  ignoring unrecognized block :24:29
+    warning: (5)  unexpected header block, expected a group, resource or an action definition, e.g. '# Group <name>', '# <resource name> [<URI>]' or '# <HTTP method> <URI>' :24:29
     """
