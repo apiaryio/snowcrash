@@ -38,10 +38,16 @@ SectionType snowcrash::SectionKeywordSignature(const mdp::MarkdownNodeIterator& 
     if ((type = SectionProcessor<Parameters>::sectionType(node)) != UndefinedSectionType)
         return type;
 
-    if ((type = SectionProcessor<Action>::sectionType(node)) != UndefinedSectionType)
-        return type;
-
+    /* 
+     *  NOTE: Order is important. Resource MUST preceed the Action.
+     *
+     *  This is because an HTTP Request Method + URI is recognized as both %ActionSectionType and %ResourceSectionType.
+     *  This is not optimal and should be addressed in the future.
+     */
     if ((type = SectionProcessor<Resource>::sectionType(node)) != UndefinedSectionType)
+        return type;
+    
+    if ((type = SectionProcessor<Action>::sectionType(node)) != UndefinedSectionType)
         return type;
 
     if ((type = SectionProcessor<ResourceGroup>::sectionType(node)) != UndefinedSectionType)
