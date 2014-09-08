@@ -415,3 +415,34 @@ TEST_CASE("Dangling block not recognized", "[parser][regression][#186]")
     REQUIRE(blueprint.resourceGroups[0].resources[0].uriTemplate == "/a");
     REQUIRE(blueprint.resourceGroups[0].resources[0].model.body == "    { ... }\n\n");
 }
+
+
+TEST_CASE("Ignoring block recovery", "[parser][regression][#188]")
+{
+    mdp::ByteBuffer source = \
+    "## Note [/notes/{id}]\n"\
+    "\n"\
+    "+ Parameters\n"\
+    "    + id\n"\
+    "\n"\
+    "+ Response 200\n"\
+    "\n"\
+    "### Remove a Note [DELETE]\n";
+    
+    Blueprint blueprint;
+    Report report;
+    
+    parse(source, 0, report, blueprint);
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 2);
+    REQUIRE(report.warnings[0].code == IgnoringWarning);
+    REQUIRE(report.warnings[1].code == EmptyDefinitionWarning);
+    
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].name == "Note");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].name == "Remove a Note");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].method == "DELETE");
+}
+

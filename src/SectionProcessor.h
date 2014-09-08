@@ -169,8 +169,15 @@ namespace snowcrash {
         /** \return True if the node is unexpected in the current context */
         static bool isUnexpectedNode(const MarkdownNodeIterator& node,
                                      SectionType sectionType) {
+            
+            SectionType keywordSectionType = SectionKeywordSignature(node);
+            SectionTypes nestedTypes = SectionProcessor<T>::nestedSectionTypes();
 
-            return (SectionKeywordSignature(node) == UndefinedSectionType);
+            if (std::find(nestedTypes.begin(), nestedTypes.end(), keywordSectionType) != nestedTypes.end()) {
+                return true;
+            }
+            
+            return (keywordSectionType == UndefinedSectionType);
         }
 
         /** \return Nested sections of the section */
