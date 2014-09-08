@@ -501,3 +501,27 @@ TEST_CASE("Parameters section should be taken as a description node", "[payload]
     REQUIRE(payload.description == "+ Parameters\n\n    + id (string)\n");
     REQUIRE(payload.body == "{}\n");
 }
+
+TEST_CASE("Report ignoring nested request objects", "[payload][#163][#189]")
+{
+    mdp::ByteBuffer source = \
+    "+ Request\n"\
+    "    + Headers\n"\
+    "\n"\
+    "            Authorization: Basic AAAAA\n"\
+    "\n"\
+    "    + Request (application/x-www-form-urlencoded)\n"\
+    "\n"\
+    "            Hello World\n";
+    
+    Payload payload;
+    Report report;
+    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, report, payload);
+    
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(report.warnings[0].code == IgnoringWarning);
+    
+    REQUIRE(payload.headers.size() == 1);
+    REQUIRE(payload.body.empty());
+}
