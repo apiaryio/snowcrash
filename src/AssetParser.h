@@ -39,29 +39,36 @@ namespace snowcrash {
         static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
                                                      SectionParserData& pd,
                                                      SectionLayout& layout,
-                                                     Report& report,
-                                                     Asset& out) {
+                                                     ParseResult<Asset>& out) {
             
-            out = "";
-            CodeBlockUtility::signatureContentAsCodeBlock(node, pd, report, out);
+            out.node = "";
+            CodeBlockUtility::signatureContentAsCodeBlock(node, pd, out.report, out.node);
+
+            if (pd.exportSM() && !out.node.empty()) {
+                out.sourceMap.sourceMap.append(node->sourceMap);
+            }
+
             return ++MarkdownNodeIterator(node);
         }
         
         static MarkdownNodeIterator processDescription(const MarkdownNodeIterator& node,
                                                        SectionParserData& pd,
-                                                       Report& report,
-                                                       Asset& out) {
+                                                       ParseResult<Asset>& out) {
+
             return node;
         }
 
         static MarkdownNodeIterator processContent(const MarkdownNodeIterator& node,
                                                    SectionParserData& pd,
-                                                   Report& report,
-                                                   Asset& out) {
-            
+                                                   ParseResult<Asset>& out) {
             
             mdp::ByteBuffer content;
-            CodeBlockUtility::contentAsCodeBlock(node, pd, report, content);
+            CodeBlockUtility::contentAsCodeBlock(node, pd, out.report, content);
+
+            if (pd.exportSM() && !content.empty()) {
+                out.sourceMap.sourceMap.append(node->sourceMap);
+            }
+
             out += content;
             return ++MarkdownNodeIterator(node);
         }

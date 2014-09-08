@@ -19,7 +19,7 @@
 #include "Serialize.h"
 #endif
 
-#include "Blueprint.h"
+#include "BlueprintSourcemap.h"
 #include "StringUtility.h"
 
 // Symbol identifier regex
@@ -36,15 +36,26 @@ namespace snowcrash {
     // Resource Object Symbol
     typedef std::pair<SymbolName, ResourceModel> ResourceModelSymbol;
 
+    // Resource Object Symbol source map
+    typedef std::pair<SymbolName, SourceMap<ResourceModel> > ResourceModelSymbolSourceMap;
+
     // Resource Object Symbol Table
     typedef std::map<SymbolName, ResourceModel> ResourceModelSymbolTable;
     
+    // Reesource Object Symbol Table source map
+    typedef std::map<SymbolName, SourceMap<ResourceModel> > ResourceModelSymbolSourceMapTable;
+
     struct SymbolTable {
         
         // Resource Object Symbol Table
         ResourceModelSymbolTable resourceModels;
     };
     
+    struct SymbolSourceMapTable {
+
+        // Resource Object Symbol Table source map
+        ResourceModelSymbolSourceMapTable resourceModels;
+    };
     
     // Checks whether given source data represents reference to a symbol returning true if so,
     // false otherwise. If source data is represent reference referred symbol name is filled in.

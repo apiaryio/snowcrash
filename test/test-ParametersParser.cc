@@ -29,25 +29,25 @@ TEST_CASE("Recognize Parameters section block", "[parameters]")
     markdownParser.parse(ParametersFixture, markdownAST);
 
     REQUIRE(!markdownAST.children().empty());
-    REQUIRE(SectionProcessor<Parameters>::sectionType(markdownAST.children().begin()) == ParametersSectionType);
+    SectionType sectionType = SectionProcessor<Parameters>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == ParametersSectionType);
 }
 
 TEST_CASE("Parse canonical parameters", "[parameters]")
 {
-    Parameters parameters;
-    Report report;
-    SectionParserHelper<Parameters, ParametersParser>::parse(ParametersFixture, ParametersSectionType, report, parameters);
+    ParseResult<Parameters> parameters;
+    SectionParserHelper<Parameters, ParametersParser>::parse(ParametersFixture, ParametersSectionType, parameters);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(parameters.report.error.code == Error::OK);
+    REQUIRE(parameters.report.warnings.empty());
 
-    REQUIRE(parameters.size() == 2);
+    REQUIRE(parameters.node.size() == 2);
 
-    REQUIRE(parameters[0].name == "id");
-    REQUIRE(parameters[0].description == "Lorem ipsum\n");
+    REQUIRE(parameters.node[0].name == "id");
+    REQUIRE(parameters.node[0].description == "Lorem ipsum\n");
 
-    REQUIRE(parameters[1].name == "name");
-    REQUIRE(parameters[1].description.empty());
+    REQUIRE(parameters.node[1].name == "name");
+    REQUIRE(parameters.node[1].description.empty());
 }
 
 TEST_CASE("Parse ilegal parameter", "[parameters]")
@@ -56,16 +56,15 @@ TEST_CASE("Parse ilegal parameter", "[parameters]")
     "+ Parameters\n"\
     "    + i:legal\n\n";
 
-    Parameters parameters;
-    Report report;
-    SectionParserHelper<Parameters, ParametersParser>::parse(source, ParametersSectionType, report, parameters);
+    ParseResult<Parameters> parameters;
+    SectionParserHelper<Parameters, ParametersParser>::parse(source, ParametersSectionType, parameters);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 2);
-    REQUIRE(report.warnings[0].code == IgnoringWarning);
-    REQUIRE(report.warnings[1].code == FormattingWarning);
+    REQUIRE(parameters.report.error.code == Error::OK);
+    REQUIRE(parameters.report.warnings.size() == 2);
+    REQUIRE(parameters.report.warnings[0].code == IgnoringWarning);
+    REQUIRE(parameters.report.warnings[1].code == FormattingWarning);
 
-    REQUIRE(parameters.empty());
+    REQUIRE(parameters.node.empty());
 }
 
 TEST_CASE("Parse illegal parameter among legal ones", "[parameters]")
@@ -76,19 +75,18 @@ TEST_CASE("Parse illegal parameter among legal ones", "[parameters]")
     "    + i:legal\n"\
     "    + OK-2\n";
 
-    Parameters parameters;
-    Report report;
-    SectionParserHelper<Parameters, ParametersParser>::parse(source, ParametersSectionType, report, parameters);
+    ParseResult<Parameters> parameters;
+    SectionParserHelper<Parameters, ParametersParser>::parse(source, ParametersSectionType, parameters);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
-    REQUIRE(report.warnings[0].code == IgnoringWarning);
+    REQUIRE(parameters.report.error.code == Error::OK);
+    REQUIRE(parameters.report.warnings.size() == 1);
+    REQUIRE(parameters.report.warnings[0].code == IgnoringWarning);
 
-    REQUIRE(parameters.size() == 2);
-    REQUIRE(parameters[0].name == "OK_1");
-    REQUIRE(parameters[0].description.empty());
-    REQUIRE(parameters[1].name == "OK-2");
-    REQUIRE(parameters[1].description.empty());
+    REQUIRE(parameters.node.size() == 2);
+    REQUIRE(parameters.node[0].name == "OK_1");
+    REQUIRE(parameters.node[0].description.empty());
+    REQUIRE(parameters.node[1].name == "OK-2");
+    REQUIRE(parameters.node[1].description.empty());
 }
 
 TEST_CASE("Warn about additional content in parameters section", "[parameters]")
@@ -98,17 +96,16 @@ TEST_CASE("Warn about additional content in parameters section", "[parameters]")
     "  extra-1\n\n"\
     "    + id\n";
 
-    Parameters parameters;
-    Report report;
-    SectionParserHelper<Parameters, ParametersParser>::parse(source, ParametersSectionType, report, parameters);
+    ParseResult<Parameters> parameters;
+    SectionParserHelper<Parameters, ParametersParser>::parse(source, ParametersSectionType, parameters);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
-    REQUIRE(report.warnings[0].code == IgnoringWarning);
+    REQUIRE(parameters.report.error.code == Error::OK);
+    REQUIRE(parameters.report.warnings.size() == 1);
+    REQUIRE(parameters.report.warnings[0].code == IgnoringWarning);
 
-    REQUIRE(parameters.size() == 1);
-    REQUIRE(parameters[0].name == "id");
-    REQUIRE(parameters[0].description.empty());
+    REQUIRE(parameters.node.size() == 1);
+    REQUIRE(parameters.node[0].name == "id");
+    REQUIRE(parameters.node[0].description.empty());
 }
 
 TEST_CASE("Warn about additional content block in parameters section", "[parameters]")
@@ -118,17 +115,16 @@ TEST_CASE("Warn about additional content block in parameters section", "[paramet
     "  extra-1\n\n"\
     "    + id\n";
 
-    Parameters parameters;
-    Report report;
-    SectionParserHelper<Parameters, ParametersParser>::parse(source, ParametersSectionType, report, parameters);
+    ParseResult<Parameters> parameters;
+    SectionParserHelper<Parameters, ParametersParser>::parse(source, ParametersSectionType, parameters);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
-    REQUIRE(report.warnings[0].code == IgnoringWarning);
+    REQUIRE(parameters.report.error.code == Error::OK);
+    REQUIRE(parameters.report.warnings.size() == 1);
+    REQUIRE(parameters.report.warnings[0].code == IgnoringWarning);
 
-    REQUIRE(parameters.size() == 1);
-    REQUIRE(parameters[0].name == "id");
-    REQUIRE(parameters[0].description.empty());
+    REQUIRE(parameters.node.size() == 1);
+    REQUIRE(parameters.node[0].name == "id");
+    REQUIRE(parameters.node[0].description.empty());
 }
 
 TEST_CASE("Warn about multiple parameters with the same name", "[parameters]")
@@ -138,17 +134,16 @@ TEST_CASE("Warn about multiple parameters with the same name", "[parameters]")
     "    + id (`42`)\n"\
     "    + id (`43`)\n";
 
-    Parameters parameters;
-    Report report;
-    SectionParserHelper<Parameters, ParametersParser>::parse(source, ParametersSectionType, report, parameters);
+    ParseResult<Parameters> parameters;
+    SectionParserHelper<Parameters, ParametersParser>::parse(source, ParametersSectionType, parameters);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
-    REQUIRE(report.warnings[0].code == RedefinitionWarning);
+    REQUIRE(parameters.report.error.code == Error::OK);
+    REQUIRE(parameters.report.warnings.size() == 1);
+    REQUIRE(parameters.report.warnings[0].code == RedefinitionWarning);
 
-    REQUIRE(parameters.size() == 1);
-    REQUIRE(parameters[0].name == "id");
-    REQUIRE(parameters[0].exampleValue == "43");
+    REQUIRE(parameters.node.size() == 1);
+    REQUIRE(parameters.node[0].name == "id");
+    REQUIRE(parameters.node[0].exampleValue == "42");
 }
 
 TEST_CASE("Recognize parameter when there is no description on its signature and remaining description is not a new node", "[parameters]")
@@ -164,17 +159,16 @@ TEST_CASE("Recognize parameter when there is no description on its signature and
     "            + `comfort`\n"\
     "            + `vent`";
 
-    Parameters parameters;
-    Report report;
-    SectionParserHelper<Parameters, ParametersParser>::parse(source, ParametersSectionType, report, parameters);
+    ParseResult<Parameters> parameters;
+    SectionParserHelper<Parameters, ParametersParser>::parse(source, ParametersSectionType, parameters);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(parameters.report.error.code == Error::OK);
+    REQUIRE(parameters.report.warnings.empty());
 
-    REQUIRE(parameters.size() == 2);
-    REQUIRE(parameters[0].name == "id");
-    REQUIRE(parameters[0].type == "number");
-    REQUIRE(parameters[0].description == "The ID number of the car");
+    REQUIRE(parameters.node.size() == 2);
+    REQUIRE(parameters.node[0].name == "id");
+    REQUIRE(parameters.node[0].type == "number");
+    REQUIRE(parameters.node[0].description == "The ID number of the car");
 
     Parameter parameter = parameters[1];
     REQUIRE(parameter.name == "state");

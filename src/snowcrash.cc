@@ -7,7 +7,6 @@
 //
 
 #include "snowcrash.h"
-#include "MarkdownParser.h"
 #include "BlueprintParser.h"
 
 const int snowcrash::SourceAnnotation::OK = 0;
@@ -18,8 +17,8 @@ using namespace snowcrash;
  *  \brief  Check source for unsupported character \t & \r
  *  \return True if passed (not found), false otherwise
  */
-static bool CheckSource(const mdp::ByteBuffer& source, Report& report)
-{
+static bool CheckSource(const mdp::ByteBuffer& source, Report& report) {
+
     std::string::size_type pos = source.find("\t");
 
     if (pos != std::string::npos) {
@@ -49,18 +48,17 @@ static bool CheckSource(const mdp::ByteBuffer& source, Report& report)
 
 int snowcrash::parse(const mdp::ByteBuffer& source,
                      BlueprintParserOptions options,
-                     Report& report,
-                     Blueprint& blueprint)
-{
+                     ParseResult<Blueprint>& out) {
+
     try {
         
         // Sanity Check
-        if (!CheckSource(source, report))
-            return report.error.code;
+        if (!CheckSource(source, out.report))
+            return out.report.error.code;
         
         // Do nothing if blueprint is empty
         if (source.empty())
-            return report.error.code;
+            return out.report.error.code;
 
         // Parse Markdown
         mdp::MarkdownParser markdownParser;
@@ -68,21 +66,21 @@ int snowcrash::parse(const mdp::ByteBuffer& source,
         markdownParser.parse(source, markdownAST);
 
         // Build SectionParserData
-        SectionParserData pd(options, source, blueprint);
+        SectionParserData pd(options, source, out.node);
 
         // Parse Blueprint
-        BlueprintParser::parse(markdownAST.children().begin(), markdownAST.children(), pd, report, blueprint);
+        BlueprintParser::parse(markdownAST.children().begin(), markdownAST.children(), pd, out);
     }
     catch (const std::exception& e) {
         
         std::stringstream ss;
         ss << "parser exception: '" << e.what() << "'";
-        report.error = Error(ss.str(), 1);
+        out.report.error = Error(ss.str(), 1);
     }
     catch (...) {
         
-        report.error = Error("parser exception has occured", 1);
+        out.report.error = Error("parser exception has occured", 1);
     }
 
-    return report.error.code;
+    return out.report.error.code;
 }

@@ -45,7 +45,8 @@ TEST_CASE("recognize request signature", "[payload]")
     markdownParser.parse(RequestFixture, markdownAST);
 
     REQUIRE(!markdownAST.children().empty());
-    REQUIRE(SectionProcessor<Payload>::sectionType(markdownAST.children().begin()) == RequestSectionType);
+    SectionType sectionType = SectionProcessor<Payload>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == RequestSectionType);
 }
 
 TEST_CASE("recognize abbreviated request signature", "[payload]")
@@ -55,7 +56,8 @@ TEST_CASE("recognize abbreviated request signature", "[payload]")
     markdownParser.parse(RequestBodyFixture, markdownAST);
 
     REQUIRE(!markdownAST.children().empty());
-    REQUIRE(SectionProcessor<Payload>::sectionType(markdownAST.children().begin()) == RequestBodySectionType);
+    SectionType sectionType = SectionProcessor<Payload>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == RequestBodySectionType);
 }
 
 TEST_CASE("recognize abbreviated response signature", "[payload]")
@@ -65,7 +67,8 @@ TEST_CASE("recognize abbreviated response signature", "[payload]")
     markdownParser.parse(ResponseBodyFixture, markdownAST);
 
     REQUIRE(!markdownAST.children().empty());
-    REQUIRE(SectionProcessor<Payload>::sectionType(markdownAST.children().begin()) == ResponseBodySectionType);
+    SectionType sectionType = SectionProcessor<Payload>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == ResponseBodySectionType);
 }
 
 TEST_CASE("recognize empty body response signature as non-abbreviated", "[payload]")
@@ -75,45 +78,44 @@ TEST_CASE("recognize empty body response signature as non-abbreviated", "[payloa
     markdownParser.parse(EmptyBodyFixture, markdownAST);
 
     REQUIRE(!markdownAST.children().empty());
-    REQUIRE(SectionProcessor<Payload>::sectionType(markdownAST.children().begin()) == ResponseSectionType);
+    SectionType sectionType = SectionProcessor<Payload>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == ResponseSectionType);
 }
 
 TEST_CASE("Parse request payload", "[payload]")
 {
-    Payload payload;
-    Report report;
-    SectionParserHelper<Payload, PayloadParser>::parse(RequestFixture, RequestSectionType, report, payload);
+    ParseResult<Payload> payload;
+    SectionParserHelper<Payload, PayloadParser>::parse(RequestFixture, RequestSectionType, payload);
 
-    REQUIRE(report.error.code == Error::OK);
-    CHECK(report.warnings.empty());
+    REQUIRE(payload.report.error.code == Error::OK);
+    CHECK(payload.report.warnings.empty());
 
-    REQUIRE(payload.name == "Hello World");
-    REQUIRE(payload.description == "Description\n");
-    REQUIRE(payload.parameters.empty());
-    REQUIRE(payload.headers.size() == 2);
-    REQUIRE(payload.headers[0].first == "Content-Type");
-    REQUIRE(payload.headers[0].second == "text/plain");
-    REQUIRE(payload.headers[1].first == "X-Header");
-    REQUIRE(payload.headers[1].second == "42");
-    REQUIRE(payload.body == "Code\n");
-    REQUIRE(payload.schema == "Code 2\n");
+    REQUIRE(payload.node.name == "Hello World");
+    REQUIRE(payload.node.description == "Description\n");
+    REQUIRE(payload.node.parameters.empty());
+    REQUIRE(payload.node.headers.size() == 2);
+    REQUIRE(payload.node.headers[0].first == "Content-Type");
+    REQUIRE(payload.node.headers[0].second == "text/plain");
+    REQUIRE(payload.node.headers[1].first == "X-Header");
+    REQUIRE(payload.node.headers[1].second == "42");
+    REQUIRE(payload.node.body == "Code\n");
+    REQUIRE(payload.node.schema == "Code 2\n");
 }
 
 TEST_CASE("Parse abbreviated payload body", "[payload]")
 {
-    Payload payload;
-    Report report;
-    SectionParserHelper<Payload, PayloadParser>::parse(ResponseBodyFixture, ResponseBodySectionType, report, payload);
+    ParseResult<Payload> payload;
+    SectionParserHelper<Payload, PayloadParser>::parse(ResponseBodyFixture, ResponseBodySectionType, payload);
 
-    REQUIRE(report.error.code == Error::OK);
-    CHECK(report.warnings.empty());
+    REQUIRE(payload.report.error.code == Error::OK);
+    CHECK(payload.report.warnings.empty());
 
-    REQUIRE(payload.name == "200");
-    REQUIRE(payload.description.empty());
-    REQUIRE(payload.parameters.empty());
-    REQUIRE(payload.headers.size() == 1);
-    REQUIRE(payload.body == "Hello World!\n");
-    REQUIRE(payload.schema.empty());
+    REQUIRE(payload.node.name == "200");
+    REQUIRE(payload.node.description.empty());
+    REQUIRE(payload.node.parameters.empty());
+    REQUIRE(payload.node.headers.size() == 1);
+    REQUIRE(payload.node.body == "Hello World!\n");
+    REQUIRE(payload.node.schema.empty());
 }
 
 TEST_CASE("Parse abbreviated inline payload body", "[payload]")
@@ -121,19 +123,18 @@ TEST_CASE("Parse abbreviated inline payload body", "[payload]")
     mdp::ByteBuffer source = RequestBodyFixture;
     source += "  B\n";
 
-    Payload payload;
-    Report report;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestBodySectionType, report, payload);
+    ParseResult<Payload> payload;
+    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestBodySectionType, payload);
 
-    REQUIRE(report.error.code == Error::OK);
-    CHECK(report.warnings.size() == 1); // preformatted code block
+    REQUIRE(payload.report.error.code == Error::OK);
+    CHECK(payload.report.warnings.size() == 1); // preformatted code block
 
-    REQUIRE(payload.name == "A");
-    REQUIRE(payload.description.empty());
-    REQUIRE(payload.parameters.empty());
-    REQUIRE(payload.headers.empty());
-    REQUIRE(payload.body == "Hello World!\nB\n");
-    REQUIRE(payload.schema.empty());
+    REQUIRE(payload.node.name == "A");
+    REQUIRE(payload.node.description.empty());
+    REQUIRE(payload.node.parameters.empty());
+    REQUIRE(payload.node.headers.empty());
+    REQUIRE(payload.node.body == "Hello World!\nB\n");
+    REQUIRE(payload.node.schema.empty());
 }
 
 TEST_CASE("Parse payload description with list", "[payload]")
@@ -155,19 +156,18 @@ TEST_CASE("Parse payload description with list", "[payload]")
     "    + Body\n\n"\
     "            {}\n";
 
-    Payload payload;
-    Report report;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, report, payload);
+    ParseResult<Payload> payload;
+    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, payload);
 
-    REQUIRE(report.error.code == Error::OK);
-    CHECK(report.warnings.empty());
+    REQUIRE(payload.report.error.code == Error::OK);
+    CHECK(payload.report.warnings.empty());
 
-    REQUIRE(payload.name.empty());
-    REQUIRE(payload.description == "+ B\n");
-    REQUIRE(payload.parameters.empty());
-    REQUIRE(payload.headers.empty());
-    REQUIRE(payload.body == "{}\n");
-    REQUIRE(payload.schema.empty());
+    REQUIRE(payload.node.name.empty());
+    REQUIRE(payload.node.description == "+ B\n");
+    REQUIRE(payload.node.parameters.empty());
+    REQUIRE(payload.node.headers.empty());
+    REQUIRE(payload.node.body == "{}\n");
+    REQUIRE(payload.node.schema.empty());
 }
 
 TEST_CASE("Parse payload with foreign list item", "[payload]")
@@ -189,19 +189,18 @@ TEST_CASE("Parse payload with foreign list item", "[payload]")
     "            {}\n\n"\
     "    + Bar\n";
 
-    Payload payload;
-    Report report;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, report, payload);
+    ParseResult<Payload> payload;
+    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, payload);
 
-    REQUIRE(report.error.code == Error::OK);
-    CHECK(report.warnings.size() == 1); // dangling block
+    REQUIRE(payload.report.error.code == Error::OK);
+    CHECK(payload.report.warnings.size() == 1); // dangling block
 
-    REQUIRE(payload.name.empty());
-    REQUIRE(payload.description.empty());
-    REQUIRE(payload.parameters.empty());
-    REQUIRE(payload.headers.empty());
-    REQUIRE(payload.body == "{}\n");
-    REQUIRE(payload.schema.empty());
+    REQUIRE(payload.node.name.empty());
+    REQUIRE(payload.node.description.empty());
+    REQUIRE(payload.node.parameters.empty());
+    REQUIRE(payload.node.headers.empty());
+    REQUIRE(payload.node.body == "{}\n");
+    REQUIRE(payload.node.schema.empty());
 }
 
 TEST_CASE("Parse payload with dangling body", "[payload]")
@@ -221,72 +220,61 @@ TEST_CASE("Parse payload with dangling body", "[payload]")
     source += "            Foo\n\n";
     source += "    Bar\n";
 
-    Payload payload;
-    Report report;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, report, payload);
+    ParseResult<Payload> payload;
+    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, payload);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1); // dangling block
-    REQUIRE(report.warnings[0].code == IndentationWarning);
+    REQUIRE(payload.report.error.code == Error::OK);
+    REQUIRE(payload.report.warnings.size() == 1); // dangling block
+    REQUIRE(payload.report.warnings[0].code == IndentationWarning);
 
-    REQUIRE(payload.name.empty());
-    REQUIRE(payload.description.empty());
-    REQUIRE(payload.parameters.empty());
-    REQUIRE(payload.headers.empty());
-    REQUIRE(payload.body == "Foo\nBar\n\n");
-    REQUIRE(payload.schema.empty());
+    REQUIRE(payload.node.name.empty());
+    REQUIRE(payload.node.description.empty());
+    REQUIRE(payload.node.parameters.empty());
+    REQUIRE(payload.node.headers.empty());
+    REQUIRE(payload.node.body == "Foo\nBar\n\n");
+    REQUIRE(payload.node.schema.empty());
 }
 
 TEST_CASE("Parse inline payload with symbol reference", "[payload]")
 {
-    ResourceModel model;
     Symbols symbols;
+    buildSymbol("Symbol", symbols);
 
-    model.description = "Foo";
-    model.body = "Bar";
-    symbols.push_back(ResourceModelSymbol("Symbol", model));
-
-    Payload payload;
-    Report report;
+    ParseResult<Payload> payload;
     SectionParserHelper<Payload, PayloadParser>::parse(SymbolFixture, RequestBodySectionType, report, payload, symbols);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 0);
+    REQUIRE(payload.report.error.code == Error::OK);
+    REQUIRE(payload.report.warnings.size() == 0);
 
-    REQUIRE(payload.name.empty());
-    REQUIRE(payload.description == "Foo");
-    REQUIRE(payload.parameters.empty());
-    REQUIRE(payload.headers.empty());
-    REQUIRE(payload.body == "Bar");
-    REQUIRE(payload.schema.empty());
+    REQUIRE(payload.node.name.empty());
+    REQUIRE(payload.node.description == "Foo");
+    REQUIRE(payload.node.parameters.empty());
+    REQUIRE(payload.node.headers.empty());
+    REQUIRE(payload.node.body == "Bar");
+    REQUIRE(payload.node.schema.empty());
 }
 
 TEST_CASE("Parse inline payload with symbol reference with extra indentation", "[payload]")
 {
-    ResourceModel model;
-    Symbols symbols;
-
-    model.description = "Foo";
-    model.body = "Bar";
-    symbols.push_back(ResourceModelSymbol("Symbol", model));
-
     mdp::ByteBuffer source = \
     "+ Request\n\n"\
     "        [Symbol][]\n";
 
-    Payload payload;
-    Report report;
+    Symbols symbols;
+    buildSymbol("Symbol", symbols);
+
+    ParseResult<Payload> payload;
     SectionParserHelper<Payload, PayloadParser>::parse(source, RequestBodySectionType, report, payload, symbols);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 0);
+    REQUIRE(payload.report.error.code == Error::OK);
+    REQUIRE(payload.report.warnings.size() == 0);
 
-    REQUIRE(payload.name.empty());
-    REQUIRE(payload.description.empty());
-    REQUIRE(payload.parameters.empty());
-    REQUIRE(payload.headers.empty());
-    REQUIRE(payload.body == "[Symbol][]\n");
-    REQUIRE(payload.schema.empty());
+    REQUIRE(payload.node.name.empty());
+    REQUIRE(payload.node.description.empty());
+    REQUIRE(payload.node.parameters.empty());
+    REQUIRE(payload.node.headers.empty());
+    REQUIRE(payload.node.body == "[Symbol][]\n");
+    REQUIRE(payload.node.schema.empty());
 }
 
 TEST_CASE("Parse inline payload with symbol reference with foreign content", "[payload]")
@@ -294,26 +282,21 @@ TEST_CASE("Parse inline payload with symbol reference with foreign content", "[p
     mdp::ByteBuffer source = SymbolFixture;
     source += "\n    Foreign\n";
 
-    ResourceModel model;
     Symbols symbols;
+    buildSymbol("Symbol", symbols);
 
-    model.description = "Foo";
-    model.body = "Bar";
-    symbols.push_back(ResourceModelSymbol("Symbol", model));
-
-    Payload payload;
-    Report report;
+    ParseResult<Payload> payload;
     SectionParserHelper<Payload, PayloadParser>::parse(source, RequestBodySectionType, report, payload, symbols);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1); // ignoring foreign entry
+    REQUIRE(payload.report.error.code == Error::OK);
+    REQUIRE(payload.report.warnings.size() == 1); // ignoring foreign entry
 
-    REQUIRE(payload.name.empty());
-    REQUIRE(payload.description == "Foo");
-    REQUIRE(payload.parameters.empty());
-    REQUIRE(payload.headers.empty());
-    REQUIRE(payload.body == "Bar");
-    REQUIRE(payload.schema.empty());
+    REQUIRE(payload.node.name.empty());
+    REQUIRE(payload.node.description == "Foo");
+    REQUIRE(payload.node.parameters.empty());
+    REQUIRE(payload.node.headers.empty());
+    REQUIRE(payload.node.body == "Bar");
+    REQUIRE(payload.node.schema.empty());
 }
 
 TEST_CASE("Parse named model", "[payload]")
@@ -328,21 +311,20 @@ TEST_CASE("Parse named model", "[payload]")
     mdp::ByteBuffer source = "+ Super Model (text/plain)\n\n";
     source += "        Hello World!\n";
 
-    Payload payload;
-    Report report;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, ModelBodySectionType, report, payload);
+    ParseResult<Payload> payload;
+    SectionParserHelper<Payload, PayloadParser>::parse(source, ModelBodySectionType, payload);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(payload.report.error.code == Error::OK);
+    REQUIRE(payload.report.warnings.empty());
 
-    REQUIRE(payload.name == "Super");
-    REQUIRE(payload.description.empty());
-    REQUIRE(payload.parameters.empty());
-    REQUIRE(payload.headers.size() == 1);
-    REQUIRE(payload.headers[0].first == "Content-Type");
-    REQUIRE(payload.headers[0].second == "text/plain");
-    REQUIRE(payload.body == "Hello World!\n");
-    REQUIRE(payload.schema.empty());
+    REQUIRE(payload.node.name == "Super");
+    REQUIRE(payload.node.description.empty());
+    REQUIRE(payload.node.parameters.empty());
+    REQUIRE(payload.node.headers.size() == 1);
+    REQUIRE(payload.node.headers[0].first == "Content-Type");
+    REQUIRE(payload.node.headers[0].second == "text/plain");
+    REQUIRE(payload.node.body == "Hello World!\n");
+    REQUIRE(payload.node.schema.empty());
 }
 
 TEST_CASE("Parse nameless model", "[payload]")
@@ -357,21 +339,20 @@ TEST_CASE("Parse nameless model", "[payload]")
     mdp::ByteBuffer source = "+ Model (text/plain)\n\n";
     source += "        Hello World!\n";
 
-    Payload payload;
-    Report report;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, ModelBodySectionType, report, payload);
+    ParseResult<Payload> payload;
+    SectionParserHelper<Payload, PayloadParser>::parse(source, ModelBodySectionType, payload);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(payload.report.error.code == Error::OK);
+    REQUIRE(payload.report.warnings.empty());
 
-    REQUIRE(payload.name.empty());
-    REQUIRE(payload.description.empty());
-    REQUIRE(payload.parameters.empty());
-    REQUIRE(payload.headers.size() == 1);
-    REQUIRE(payload.headers[0].first == "Content-Type");
-    REQUIRE(payload.headers[0].second == "text/plain");
-    REQUIRE(payload.body == "Hello World!\n");
-    REQUIRE(payload.schema.empty());
+    REQUIRE(payload.node.name.empty());
+    REQUIRE(payload.node.description.empty());
+    REQUIRE(payload.node.parameters.empty());
+    REQUIRE(payload.node.headers.size() == 1);
+    REQUIRE(payload.node.headers[0].first == "Content-Type");
+    REQUIRE(payload.node.headers[0].second == "text/plain");
+    REQUIRE(payload.node.body == "Hello World!\n");
+    REQUIRE(payload.node.schema.empty());
 }
 
 TEST_CASE("Warn on malformed payload signature", "[payload]")
@@ -394,20 +375,19 @@ TEST_CASE("Warn on malformed payload signature", "[payload]")
     source += "    + Body\n\n";
     source += "            Hello World!\n";
 
-    Payload payload;
-    Report report;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, report, payload);
+    ParseResult<Payload> payload;
+    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, payload);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
-    REQUIRE(report.warnings[0].code == FormattingWarning);
+    REQUIRE(payload.report.error.code == Error::OK);
+    REQUIRE(payload.report.warnings.size() == 1);
+    REQUIRE(payload.report.warnings[0].code == FormattingWarning);
 
-    REQUIRE(payload.name.empty());
-    REQUIRE(payload.description == "Description\n\nLine 2\n");
-    REQUIRE(payload.parameters.empty());
-    REQUIRE(payload.headers.empty());
-    REQUIRE(payload.body == "Hello World!\n");
-    REQUIRE(payload.schema.empty());
+    REQUIRE(payload.node.name.empty());
+    REQUIRE(payload.node.description == "Description\n\nLine 2\n");
+    REQUIRE(payload.node.parameters.empty());
+    REQUIRE(payload.node.headers.empty());
+    REQUIRE(payload.node.body == "Hello World!\n");
+    REQUIRE(payload.node.schema.empty());
 }
 
 TEST_CASE("Give a warning of empty message body for requests with certain headers", "[payload]")
@@ -418,18 +398,17 @@ TEST_CASE("Give a warning of empty message body for requests with certain header
     "\n"\
     "            Content-Length: 100\n";
 
-    Payload payload;
-    Report report;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, report, payload);
+    ParseResult<Payload> payload;
+    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, payload);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
-    REQUIRE(report.warnings[0].code == EmptyDefinitionWarning);
+    REQUIRE(payload.report.error.code == Error::OK);
+    REQUIRE(payload.report.warnings.size() == 1);
+    REQUIRE(payload.report.warnings[0].code == EmptyDefinitionWarning);
 
-    REQUIRE(payload.headers.size() == 1);
-    REQUIRE(payload.headers[0].first == "Content-Length");
-    REQUIRE(payload.headers[0].second == "100");
-    REQUIRE(payload.body.empty());
+    REQUIRE(payload.node.headers.size() == 1);
+    REQUIRE(payload.node.headers[0].first == "Content-Length");
+    REQUIRE(payload.node.headers[0].second == "100");
+    REQUIRE(payload.node.body.empty());
 }
 
 TEST_CASE("Do not report empty message body for requests", "[payload]")
@@ -440,17 +419,16 @@ TEST_CASE("Do not report empty message body for requests", "[payload]")
     "\n"\
     "            Accept: application/json, application/javascript\n";
 
-    Payload payload;
-    Report report;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, report, payload);
+    ParseResult<Payload> payload;
+    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, payload);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(payload.report.error.code == Error::OK);
+    REQUIRE(payload.report.warnings.empty());
 
-    REQUIRE(payload.headers.size() == 1);
-    REQUIRE(payload.headers[0].first == "Accept");
-    REQUIRE(payload.headers[0].second == "application/json, application/javascript");
-    REQUIRE(payload.body.empty());
+    REQUIRE(payload.node.headers.size() == 1);
+    REQUIRE(payload.node.headers[0].first == "Accept");
+    REQUIRE(payload.node.headers[0].second == "application/json, application/javascript");
+    REQUIRE(payload.node.body.empty());
 }
 
 TEST_CASE("Give a warning when 100 response has a body", "[payload]")
@@ -459,27 +437,25 @@ TEST_CASE("Give a warning when 100 response has a body", "[payload]")
     "+ Response 100\n\n"\
     "        {}\n";
 
-    Payload payload;
-    Report report;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, ResponseBodySectionType, report, payload);
+    ParseResult<Payload> payload;
+    SectionParserHelper<Payload, PayloadParser>::parse(source, ResponseBodySectionType, payload);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
-    REQUIRE(report.warnings[0].code == EmptyDefinitionWarning);
+    REQUIRE(payload.report.error.code == Error::OK);
+    REQUIRE(payload.report.warnings.size() == 1);
+    REQUIRE(payload.report.warnings[0].code == EmptyDefinitionWarning);
 
-    REQUIRE(payload.body == "{}\n");
+    REQUIRE(payload.node.body == "{}\n");
 }
 
 TEST_CASE("Empty body section should shouldn't be parsed as description", "[payload]")
 {
-    Payload payload;
-    Report report;
-    SectionParserHelper<Payload, PayloadParser>::parse(EmptyBodyFixture, ResponseSectionType, report, payload);
+    ParseResult<Payload> payload;
+    SectionParserHelper<Payload, PayloadParser>::parse(EmptyBodyFixture, ResponseSectionType, payload);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(payload.report.error.code == Error::OK);
+    REQUIRE(payload.report.warnings.empty());
 
-    REQUIRE(payload.body == "");
+    REQUIRE(payload.node.body == "");
 }
 
 TEST_CASE("Parameters section should be taken as a description node", "[payload]")
@@ -491,13 +467,12 @@ TEST_CASE("Parameters section should be taken as a description node", "[payload]
     "    + Body\n\n"\
     "            {}\n";
 
-    Payload payload;
-    Report report;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, ResponseSectionType, report, payload);
+    ParseResult<Payload> payload;
+    SectionParserHelper<Payload, PayloadParser>::parse(source, ResponseSectionType, payload);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(payload.report.error.code == Error::OK);
+    REQUIRE(payload.report.warnings.empty());
 
-    REQUIRE(payload.description == "+ Parameters\n\n    + id (string)\n");
-    REQUIRE(payload.body == "{}\n");
+    REQUIRE(payload.node.description == "+ Parameters\n\n    + id (string)\n");
+    REQUIRE(payload.node.body == "{}\n");
 }

@@ -27,47 +27,51 @@ TEST_CASE("Blueprint block classifier", "[blueprint]")
 {
     mdp::MarkdownParser markdownParser;
     mdp::MarkdownNode markdownAST;
-    markdownParser.parse(BlueprintFixture, markdownAST);
+    SectionType sectionType;
+    markdownParser.parse(blueprint.nodeFixture, markdownAST);
 
     REQUIRE(!markdownAST.children().empty());
 
     // meta: verse
-    REQUIRE(SectionProcessor<Blueprint>::sectionType(markdownAST.children().begin()) == BlueprintSectionType);
+    sectionType = SectionProcessor<Blueprint>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == BlueprintSectionType);
     
     // # Snowcrash API
-    REQUIRE(SectionProcessor<Blueprint>::sectionType(markdownAST.children().begin() + 1) == BlueprintSectionType);
+    sectionType = SectionProcessor<Blueprint>::sectionType(markdownAST.children().begin() + 1);
+    REQUIRE(sectionType == BlueprintSectionType);
     
     // ## Character
-    REQUIRE(SectionProcessor<Blueprint>::sectionType(markdownAST.children().begin() + 2) == BlueprintSectionType);
+    sectionType = SectionProcessor<Blueprint>::sectionType(markdownAST.children().begin() + 2);
+    REQUIRE(sectionType == BlueprintSectionType);
     
     // Uncle Enzo
-    REQUIRE(SectionProcessor<Blueprint>::sectionType(markdownAST.children().begin() + 3) == BlueprintSectionType);
+    sectionType = SectionProcessor<Blueprint>::sectionType(markdownAST.children().begin() + 3);
+    REQUIRE(sectionType == BlueprintSectionType);
 }
 
 TEST_CASE("Parse canonical blueprint", "[blueprint]")
 {
-    Blueprint blueprint;
-    Report report;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(BlueprintFixture, BlueprintSectionType, report, blueprint);
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(BlueprintFixture, BlueprintSectionType, blueprint);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.empty());
 
-    REQUIRE(blueprint.metadata.size() == 1);
-    REQUIRE(blueprint.metadata[0].first == "meta");
-    REQUIRE(blueprint.metadata[0].second == "verse");
+    REQUIRE(blueprint.node.metadata.size() == 1);
+    REQUIRE(blueprint.node.metadata[0].first == "meta");
+    REQUIRE(blueprint.node.metadata[0].second == "verse");
 
-    REQUIRE(blueprint.name == "Snowcrash API");
-    REQUIRE(blueprint.description == "## Character\n\nUncle Enzo\n\n");
-    REQUIRE(blueprint.resourceGroups.size() == 2);
+    REQUIRE(blueprint.node.name == "Snowcrash API");
+    REQUIRE(blueprint.node.description == "## Character\n\nUncle Enzo\n\n");
+    REQUIRE(blueprint.node.resourceGroups.size() == 2);
 
-    REQUIRE(blueprint.resourceGroups[0].name == "First");
-    REQUIRE(blueprint.resourceGroups[0].description == "p1\n");
-    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].name == "First");
+    REQUIRE(blueprint.node.resourceGroups[0].description == "p1\n");
+    REQUIRE(blueprint.node.resourceGroups[0].resources.size() == 1);
 
-    REQUIRE(blueprint.resourceGroups[1].name == "Second");
-    REQUIRE(blueprint.resourceGroups[1].description == "p2\n");
-    REQUIRE(blueprint.resourceGroups[1].resources.empty());
+    REQUIRE(blueprint.node.resourceGroups[1].name == "Second");
+    REQUIRE(blueprint.node.resourceGroups[1].description == "p2\n");
+    REQUIRE(blueprint.node.resourceGroups[1].resources.empty());
 }
 
 TEST_CASE("Parse blueprint with multiple metadata sections", "[blueprint]")
@@ -75,30 +79,29 @@ TEST_CASE("Parse blueprint with multiple metadata sections", "[blueprint]")
     mdp::ByteBuffer source = "FORMAT: 1A\n\n";
     source += BlueprintFixture;
 
-    Blueprint blueprint;
-    Report report;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.empty());
 
-    REQUIRE(blueprint.metadata.size() == 2);
-    REQUIRE(blueprint.metadata[0].first == "FORMAT");
-    REQUIRE(blueprint.metadata[0].second == "1A");
-    REQUIRE(blueprint.metadata[1].first == "meta");
-    REQUIRE(blueprint.metadata[1].second == "verse");
+    REQUIRE(blueprint.node.metadata.size() == 2);
+    REQUIRE(blueprint.node.metadata[0].first == "FORMAT");
+    REQUIRE(blueprint.node.metadata[0].second == "1A");
+    REQUIRE(blueprint.node.metadata[1].first == "meta");
+    REQUIRE(blueprint.node.metadata[1].second == "verse");
 
-    REQUIRE(blueprint.name == "Snowcrash API");
-    REQUIRE(blueprint.description == "## Character\n\nUncle Enzo\n\n");
-    REQUIRE(blueprint.resourceGroups.size() == 2);
+    REQUIRE(blueprint.node.name == "Snowcrash API");
+    REQUIRE(blueprint.node.description == "## Character\n\nUncle Enzo\n\n");
+    REQUIRE(blueprint.node.resourceGroups.size() == 2);
 
-    REQUIRE(blueprint.resourceGroups[0].name == "First");
-    REQUIRE(blueprint.resourceGroups[0].description == "p1\n");
-    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].name == "First");
+    REQUIRE(blueprint.node.resourceGroups[0].description == "p1\n");
+    REQUIRE(blueprint.node.resourceGroups[0].resources.size() == 1);
 
-    REQUIRE(blueprint.resourceGroups[1].name == "Second");
-    REQUIRE(blueprint.resourceGroups[1].description == "p2\n");
-    REQUIRE(blueprint.resourceGroups[1].resources.empty());
+    REQUIRE(blueprint.node.resourceGroups[1].name == "Second");
+    REQUIRE(blueprint.node.resourceGroups[1].description == "p2\n");
+    REQUIRE(blueprint.node.resourceGroups[1].resources.empty());
 }
 
 TEST_CASE("Parse API with Name and abbreviated resource", "[blueprint]")
@@ -111,16 +114,15 @@ TEST_CASE("Parse API with Name and abbreviated resource", "[blueprint]")
     "+ Response 200\n\n"\
     "        {}";
 
-    Blueprint blueprint;
-    Report report;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.empty());
 
-    REQUIRE(blueprint.name == "API");
-    REQUIRE(blueprint.description == "A\n");
-    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.node.name == "API");
+    REQUIRE(blueprint.node.description == "A\n");
+    REQUIRE(blueprint.node.resourceGroups.size() == 1);
 
     ResourceGroup group = blueprint.resourceGroups.front();
     REQUIRE(group.name.empty());
@@ -141,34 +143,32 @@ TEST_CASE("Parse nameless blueprint description", "[blueprint]")
     "A\n"\
     "# B\n";
 
-    Blueprint blueprint;
-    Report report;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
-    REQUIRE(report.warnings[0].code == APINameWarning);
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.size() == 1);
+    REQUIRE(blueprint.report.warnings[0].code == APINameWarning);
 
-    REQUIRE(blueprint.name.empty());
-    REQUIRE(blueprint.description == "A\n\n# B\n");
-    REQUIRE(blueprint.resourceGroups.size() == 0);
+    REQUIRE(blueprint.node.name.empty());
+    REQUIRE(blueprint.node.description == "A\n\n# B\n");
+    REQUIRE(blueprint.node.resourceGroups.size() == 0);
 }
 
 TEST_CASE("Parse nameless blueprint with a list description", "[blueprint]")
 {
     mdp::ByteBuffer source = "+ List\n";
 
-    Blueprint blueprint;
-    Report report;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
-    REQUIRE(report.warnings[0].code == APINameWarning);
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.size() == 1);
+    REQUIRE(blueprint.report.warnings[0].code == APINameWarning);
 
-    REQUIRE(blueprint.name.empty());
-    REQUIRE(blueprint.description == "+ List\n");
-    REQUIRE(blueprint.resourceGroups.size() == 0);
+    REQUIRE(blueprint.node.name.empty());
+    REQUIRE(blueprint.node.description == "+ List\n");
+    REQUIRE(blueprint.node.resourceGroups.size() == 0);
 }
 
 TEST_CASE("Parse two groups with the same name", "[blueprint]")
@@ -182,37 +182,35 @@ TEST_CASE("Parse two groups with the same name", "[blueprint]")
     "         {}\n\n"\
     "# Group Name\n";
 
-    Blueprint blueprint;
-    Report report;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 2); // groups with same name & no response
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.size() == 2); // groups with same name & no response
 
-    REQUIRE(blueprint.resourceGroups.size() == 2);
+    REQUIRE(blueprint.node.resourceGroups.size() == 2);
 
-    REQUIRE(blueprint.resourceGroups[0].name == "Name");
-    REQUIRE(blueprint.resourceGroups[0].description.empty());
-    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].name == "Name");
+    REQUIRE(blueprint.node.resourceGroups[0].description.empty());
+    REQUIRE(blueprint.node.resourceGroups[0].resources.size() == 1);
 
-    REQUIRE(blueprint.resourceGroups[1].name == "Name");
-    REQUIRE(blueprint.resourceGroups[1].description.empty());
+    REQUIRE(blueprint.node.resourceGroups[1].name == "Name");
+    REQUIRE(blueprint.node.resourceGroups[1].description.empty());
 }
 
 TEST_CASE("Test parser options - required blueprint name", "[blueprint]")
 {
     mdp::ByteBuffer source = "Lorem Ipsum";
 
-    Blueprint blueprint;
-    Report report;
+    ParseResult<Blueprint> blueprint;
 
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
-    REQUIRE(report.warnings[0].code == APINameWarning);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint);
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.size() == 1);
+    REQUIRE(blueprint.report.warnings[0].code == APINameWarning);
 
     SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint, Symbols(), RequireBlueprintNameOption);
-    REQUIRE(report.error.code != Error::OK);
+    REQUIRE(blueprint.report.error.code != Error::OK);
 }
 
 TEST_CASE("Test required blueprint name on blueprint that starts with metadata", "[blueprint]")
@@ -222,11 +220,10 @@ TEST_CASE("Test required blueprint name on blueprint that starts with metadata",
     "foo:bar\n\n"\
     "Hello";
 
-    Blueprint blueprint;
-    Report report;
+    ParseResult<Blueprint> blueprint;
 
     SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint, Symbols(), RequireBlueprintNameOption);
-    REQUIRE(report.error.code != Error::OK);
+    REQUIRE(blueprint.report.error.code != Error::OK);
 }
 
 TEST_CASE("Should parse nested lists in description", "[blueprint]")
@@ -236,16 +233,15 @@ TEST_CASE("Should parse nested lists in description", "[blueprint]")
     "+ List\n"\
     "   + Nested Item\n";
 
-    Blueprint blueprint;
-    Report report;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.empty());
 
-    REQUIRE(blueprint.name == "API");
-    REQUIRE(blueprint.description == "+ List\n   + Nested Item\n");
-    REQUIRE(blueprint.resourceGroups.empty());
+    REQUIRE(blueprint.node.name == "API");
+    REQUIRE(blueprint.node.description == "+ List\n   + Nested Item\n");
+    REQUIRE(blueprint.node.resourceGroups.empty());
 }
 
 TEST_CASE("Should parse paragraph without final newline", "[blueprint]")
@@ -254,16 +250,15 @@ TEST_CASE("Should parse paragraph without final newline", "[blueprint]")
     "# API\n"\
     "Lorem Ipsum";
 
-    Blueprint blueprint;
-    Report report;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.empty());
 
-    REQUIRE(blueprint.name == "API");
-    REQUIRE(blueprint.description == "Lorem Ipsum");
-    REQUIRE(blueprint.resourceGroups.empty());
+    REQUIRE(blueprint.node.name == "API");
+    REQUIRE(blueprint.node.description == "Lorem Ipsum");
+    REQUIRE(blueprint.node.resourceGroups.empty());
 }
 
 TEST_CASE("Blueprint starting with Resource Group should be parsed", "[blueprint]")
@@ -272,38 +267,36 @@ TEST_CASE("Blueprint starting with Resource Group should be parsed", "[blueprint
     "# Group Posts\n"\
     "## /posts";
 
-    Blueprint blueprint;
-    Report report;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.empty());
 
-    REQUIRE(blueprint.name.empty());
-    REQUIRE(blueprint.description.empty());
-    REQUIRE(blueprint.resourceGroups.size() == 1);
-    REQUIRE(blueprint.resourceGroups.front().name == "Posts");
-    REQUIRE(blueprint.resourceGroups.front().resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups.front().resources.front().uriTemplate == "/posts");
+    REQUIRE(blueprint.node.name.empty());
+    REQUIRE(blueprint.node.description.empty());
+    REQUIRE(blueprint.node.resourceGroups.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups.front().name == "Posts");
+    REQUIRE(blueprint.node.resourceGroups.front().resources.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups.front().resources.front().uriTemplate == "/posts");
 }
 
 TEST_CASE("Blueprint starting with Resource should be parsed", "[blueprint]")
 {
     mdp::ByteBuffer source = "# /posts";
 
-    Blueprint blueprint;
-    Report report;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint);
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.empty());
 
-    REQUIRE(blueprint.name.empty());
-    REQUIRE(blueprint.description.empty());
-    REQUIRE(blueprint.resourceGroups.size() == 1);
-    REQUIRE(blueprint.resourceGroups.front().name.empty());
-    REQUIRE(blueprint.resourceGroups.front().resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups.front().resources.front().uriTemplate == "/posts");
+    REQUIRE(blueprint.node.name.empty());
+    REQUIRE(blueprint.node.description.empty());
+    REQUIRE(blueprint.node.resourceGroups.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups.front().name.empty());
+    REQUIRE(blueprint.node.resourceGroups.front().resources.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups.front().resources.front().uriTemplate == "/posts");
 }
 
 TEST_CASE("Checking a resource with global resources for duplicates", "[blueprint]")
@@ -315,26 +308,25 @@ TEST_CASE("Checking a resource with global resources for duplicates", "[blueprin
     "### Creat a post [POST]\n"\
     "### List posts [GET]\n";
 
-    Blueprint blueprint;
-    Report report;
+    ParseResult<Blueprint> blueprint;
     SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint, Symbols(), 0, &blueprint);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 3); // 2x no response & duplicate resource
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.size() == 3); // 2x no response & duplicate resource
 
-    REQUIRE(blueprint.name.empty());
-    REQUIRE(blueprint.description.empty());
-    REQUIRE(blueprint.resourceGroups.size() == 2);
+    REQUIRE(blueprint.node.name.empty());
+    REQUIRE(blueprint.node.description.empty());
+    REQUIRE(blueprint.node.resourceGroups.size() == 2);
 
-    REQUIRE(blueprint.resourceGroups[0].name.empty());
-    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.empty());
-    REQUIRE(blueprint.resourceGroups[0].resources[0].uriTemplate == "/posts");
+    REQUIRE(blueprint.node.resourceGroups[0].name.empty());
+    REQUIRE(blueprint.node.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions.empty());
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].uriTemplate == "/posts");
 
-    REQUIRE(blueprint.resourceGroups[1].name == "Posts");
-    REQUIRE(blueprint.resourceGroups[1].resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups[1].resources[0].actions.size() == 2);
-    REQUIRE(blueprint.resourceGroups[1].resources[0].uriTemplate == "/posts");
+    REQUIRE(blueprint.node.resourceGroups[1].name == "Posts");
+    REQUIRE(blueprint.node.resourceGroups[1].resources.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[1].resources[0].actions.size() == 2);
+    REQUIRE(blueprint.node.resourceGroups[1].resources[0].uriTemplate == "/posts");
 }
 
 TEST_CASE("Parsing unexpected blocks", "[blueprint]")
@@ -352,25 +344,24 @@ TEST_CASE("Parsing unexpected blocks", "[blueprint]")
     "\n"\
     "# GET /\n";
 
-    Blueprint blueprint;
-    Report report;
+    ParseResult<Blueprint> blueprint;
 
     SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, report, blueprint, Symbols(), 0, &blueprint);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1); // no response
-    REQUIRE(report.warnings[0].code == EmptyDefinitionWarning);
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.size() == 1); // no response
+    REQUIRE(blueprint.report.warnings[0].code == EmptyDefinitionWarning);
 
-    REQUIRE(blueprint.name == "S");
-    REQUIRE(blueprint.description == "Hello\n\n+ Response\n\nMoar text\n\n");
+    REQUIRE(blueprint.node.name == "S");
+    REQUIRE(blueprint.node.description == "Hello\n\n+ Response\n\nMoar text\n\n");
 
-    REQUIRE(blueprint.metadata.size() == 1);
-    REQUIRE(blueprint.metadata[0].first == "FORMAT");
-    REQUIRE(blueprint.metadata[0].second == "1A");
+    REQUIRE(blueprint.node.metadata.size() == 1);
+    REQUIRE(blueprint.node.metadata[0].first == "FORMAT");
+    REQUIRE(blueprint.node.metadata[0].second == "1A");
 
-    REQUIRE(blueprint.resourceGroups.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].uriTemplate == "/");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].method == "GET");
+    REQUIRE(blueprint.node.resourceGroups.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].uriTemplate == "/");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].method == "GET");
 }

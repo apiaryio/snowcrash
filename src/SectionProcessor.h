@@ -30,6 +30,21 @@ namespace snowcrash {
         RedirectSectionLayout          /// Section should be parsed by another parser as whole
     };
 
+    /**
+     * Compound product of parsing a node
+     */
+    template<typename T>
+    struct ParseResult {
+        ParseResult(Report& report,
+                    T& node,
+                    SourceMap<T>& sourceMap)
+        : report(report), node(node), sourceMap(sourceMap) {}
+
+        T node;                  /// Parsed AST node
+        Report report;           /// Parser's report
+        SourceMap<T> sourceMap;  /// Parsed AST node source map
+    };
+
     /*
      * Forward Declarations
      */
@@ -56,22 +71,27 @@ namespace snowcrash {
         static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
                                                      SectionParserData& pd,
                                                      SectionLayout& layout,
-                                                     Report& report,
-                                                     T& out) {
+                                                     ParseResult<T>& out) {
+
             return ++MarkdownNodeIterator(node);
         }
 
         /** Process section description Markdown node */
         static MarkdownNodeIterator processDescription(const MarkdownNodeIterator& node,
                                                        SectionParserData& pd,
-                                                       Report& report,
-                                                       T& out) {
+                                                       ParseResult<T>& out) {
 
-            if (!out.description.empty()) {
-                TwoNewLines(out.description);
+            if (!out.node.description.empty()) {
+                TwoNewLines(out.node.description);
             }
 
-            out.description += mdp::MapBytesRangeSet(node->sourceMap, pd.sourceData);
+            mdp::ByteBuffer content = mdp::MapBytesRangeSet(node->sourceMap, pd.sourceData);
+
+            if (pd.exportSM() && !content.empty()) {
+                out.sourceMap.description.sourceMap.append(node->sourceMap);
+            }
+
+            out.description += content;
 
             return ++MarkdownNodeIterator(node);
         }
@@ -79,8 +99,8 @@ namespace snowcrash {
         /** Process section-specific content Markdown node */
         static MarkdownNodeIterator processContent(const MarkdownNodeIterator& node,
                                                    SectionParserData& pd,
-                                                   Report& report,
-                                                   T& out) {
+                                                   ParseResult<T>& out) {
+
             return ++MarkdownNodeIterator(node);
         }
         
@@ -95,8 +115,8 @@ namespace snowcrash {
         static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
                                                          const MarkdownNodes& siblings,
                                                          SectionParserData& pd,
-                                                         Report& report,
-                                                         T& out) {
+                                                         ParseResult<T>& out) {
+
             return node;
         }
         
@@ -105,8 +125,7 @@ namespace snowcrash {
                                                           const MarkdownNodes& siblings,
                                                           SectionParserData& pd,
                                                           SectionType& lastSectionType,
-                                                          Report& report,
-                                                          T& out) {
+                                                          ParseResult<T>& out) {
 
             // WARN: Ignoring unexpected node
             std::stringstream ss;
@@ -119,9 +138,9 @@ namespace snowcrash {
                 ss << "ignoring unrecognized block";
             }
 
-            report.warnings.push_back(Warning(ss.str(),
-                                              IgnoringWarning,
-                                              sourceMap));
+            out.report.warnings.push_back(Warning(ss.str(),
+                                                  IgnoringWarning,
+                                                  sourceMap));
 
             return ++MarkdownNodeIterator(node);
         }
@@ -129,8 +148,7 @@ namespace snowcrash {
         /** Final validation after processing */
         static void finalize(const MarkdownNodeIterator& node,
                              SectionParserData& pd,
-                             Report& report,
-                             T& out) {
+                             ParseResult<T>& out) {
         }
         
         /** \return True if the node is a section description node */

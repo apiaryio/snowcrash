@@ -34,8 +34,7 @@ namespace snowcrash {
         static MarkdownNodeIterator parse(const MarkdownNodeIterator& node,
                                           const MarkdownNodes& siblings,
                                           SectionParserData& pd,
-                                          Report& report,
-                                          T& out) {
+                                          ParseResult<T>& out) {
             
             SectionLayout layout = DefaultSectionLayout;
             MarkdownNodeIterator cur = Adapter::startingNode(node);
@@ -43,21 +42,21 @@ namespace snowcrash {
             
             // Signature node
             MarkdownNodeIterator lastCur = cur;
-            cur = SectionProcessor<T>::processSignature(cur, pd, layout, report, out);
+            cur = SectionProcessor<T>::processSignature(cur, pd, layout, out);
 
             // Exclusive Nested Sections Layout
             if (layout == ExclusiveNestedSectionLayout) {
 
-                cur = parseNestedSections(cur, collection, pd, report, out);
+                cur = parseNestedSections(cur, collection, pd, out);
                 
-                SectionProcessor<T>::finalize(node, pd, report, out);
+                SectionProcessor<T>::finalize(node, pd, out);
                 
                 return Adapter::nextStartingNode(node, siblings, cur);
             }
             
             // Parser redirect layout
             if (layout == RedirectSectionLayout) {
-                SectionProcessor<T>::finalize(node, pd, report, out);
+                SectionProcessor<T>::finalize(node, pd, out);
                 
                 return Adapter::nextStartingNode(node, siblings, cur);
             }
@@ -71,7 +70,7 @@ namespace snowcrash {
                   SectionProcessor<T>::isDescriptionNode(cur, pd.sectionContext())) {
                 
                 lastCur = cur;
-                cur = SectionProcessor<T>::processDescription(cur, pd, report, out);
+                cur = SectionProcessor<T>::processDescription(cur, pd, out);
                 if (lastCur == cur)
                     return Adapter::nextStartingNode(node, siblings, cur);
             }
@@ -81,15 +80,15 @@ namespace snowcrash {
                   SectionProcessor<T>::isContentNode(cur, pd.sectionContext())) {
                 
                 lastCur = cur;
-                cur = SectionProcessor<T>::processContent(cur, pd, report, out);
+                cur = SectionProcessor<T>::processContent(cur, pd, out);
                 if (lastCur == cur)
                     return Adapter::nextStartingNode(node, siblings, cur);
             }
             
             // Nested Sections
-            cur = parseNestedSections(cur, collection, pd, report, out);
+            cur = parseNestedSections(cur, collection, pd, out);
 
-            SectionProcessor<T>::finalize(node, pd, report, out);
+            SectionProcessor<T>::finalize(node, pd, out);
 
             return Adapter::nextStartingNode(node, siblings, cur);
         }
@@ -99,8 +98,7 @@ namespace snowcrash {
         static MarkdownNodeIterator parseNestedSections(const MarkdownNodeIterator& node,
                                                         const MarkdownNodes& collection,
                                                         SectionParserData& pd,
-                                                        Report& report,
-                                                        T& out) {
+                                                        ParseResult<T>& out) {
 
             MarkdownNodeIterator cur = node;
             MarkdownNodeIterator lastCur = cur;
@@ -116,10 +114,10 @@ namespace snowcrash {
                 pd.sectionsContext.push_back(nestedType);
                 
                 if (nestedType != UndefinedSectionType) {
-                    cur = SectionProcessor<T>::processNestedSection(cur, collection, pd, report, out);
+                    cur = SectionProcessor<T>::processNestedSection(cur, collection, pd, out);
                 }
                 else if (SectionProcessor<T>::isUnexpectedNode(cur, pd.sectionContext())) {
-                    cur = SectionProcessor<T>::processUnexpectedNode(cur, collection, pd, lastSectionType, report, out);
+                    cur = SectionProcessor<T>::processUnexpectedNode(cur, collection, pd, lastSectionType, out);
                 }
                 
                 if (cur != collection.end() &&

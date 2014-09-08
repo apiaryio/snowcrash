@@ -78,8 +78,8 @@
         'src/Signature.h',
         'src/snowcrash.cc',
         'src/snowcrash.h',
-        'src/csnowcrash.cc',
-        'src/csnowcrash.h',
+        # 'src/csnowcrash.cc',
+        # 'src/csnowcrash.h',
         'src/UriTemplateParser.cc',
         'src/UriTemplateParser.h',
         'src/PayloadParser.h',
@@ -88,6 +88,7 @@
         'src/AssetParser.h',
         'src/Blueprint.h',
         'src/BlueprintParser.h',
+        'src/BlueprintSourcemap.h',
         'src/BlueprintUtility.h',
         'src/CodeBlockUtility.h',
         'src/HeadersParser.h',
@@ -145,7 +146,7 @@
         'test/test-UriTemplateParser.cc',
         'test/test-ValuesParser.cc',
         'test/test-Warnings.cc',
-        'test/test-csnowcrash.cc',
+        # 'test/test-csnowcrash.cc',
         'test/test-snowcrash.cc'
       ],
       'dependencies': [
@@ -160,6 +161,7 @@
         'src',
         'src/snowcrash',
         'ext/markdown-parser/src',
+        'ext/markdown-parser/ext/sundown/src',
         'cmdline'
       ],
       'sources': [
@@ -170,7 +172,7 @@
         'libmarkdownparser'
       ]
     },
-	{
+    {
       'target_name': 'perf-libsnowcrash',
       'type': 'executable',
       'include_dirs': [

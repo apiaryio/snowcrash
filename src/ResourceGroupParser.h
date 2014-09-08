@@ -17,13 +17,11 @@ namespace snowcrash {
 
     const char* const GroupHeaderRegex = "^[[:blank:]]*[Gg]roup[[:blank:]]+" SYMBOL_IDENTIFIER "[[:blank:]]*$";
 
-    /** Resource iterator pair: its containment group and resource iterator itself */
-    typedef std::pair<Collection<ResourceGroup>::const_iterator, ResourceIterator> ResourceIteratorPair;
-
-    /** Internal type alias for Collection of Resource */
-    typedef Collection<ResourceGroup>::type ResourceGroups;
-
+    /** Internal type alias for Collection iterator of Resource */
     typedef Collection<ResourceGroup>::const_iterator ResourceGroupIterator;
+
+    /** Resource iterator pair: its containment group and resource iterator itself */
+    typedef std::pair<ResourceGroupIterator, ResourceIterator> ResourceIteratorPair;
 
     /**
      * ResourceGroup Section processor
@@ -34,8 +32,7 @@ namespace snowcrash {
         static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
                                                      SectionParserData& pd,
                                                      SectionLayout& layout,
-                                                     Report& report,
-                                                     ResourceGroup& out) {
+                                                     ParseResult<ResourceGroup>& out) {
 
             MarkdownNodeIterator cur = node;
             SectionType nestedType = nestedSectionType(cur);
@@ -49,8 +46,12 @@ namespace snowcrash {
             CaptureGroups captureGroups;
 
             if (RegexCapture(node->text, GroupHeaderRegex, captureGroups, 3)) {
-                out.name = captureGroups[1];
-                TrimString(out.name);
+                out.node.name = captureGroups[1];
+                TrimString(out.node.name);
+            }
+
+            if (pd.exportSM() && !out.node.name.empty()) {
+                out.sourceMap.name.sourceMap = node->sourceMap;
             }
 
             return ++MarkdownNodeIterator(node);
@@ -59,33 +60,38 @@ namespace snowcrash {
         static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
                                                          const MarkdownNodes& siblings,
                                                          SectionParserData& pd,
-                                                         Report& report,
-                                                         ResourceGroup& out) {
+                                                         ParseResult<ResourceGroup>& out) {
 
             if (pd.sectionContext() == ResourceSectionType ||
                 pd.sectionContext() == ResourceMethodSectionType) {
 
-                Resource resource;
-                MarkdownNodeIterator cur = ResourceParser::parse(node, siblings, pd, report, resource);
+                ParseResult<Resource> resource;
+                MarkdownNodeIterator cur = ResourceParser::parse(node, siblings, pd, resource);
 
-                ResourceIterator duplicate = findResource(out.resources, resource);
+                out.report += resource.report;
+
+                ResourceIterator duplicate = SectionProcessor<Resource>::findResource(out.node.resources, resource.node);
                 ResourceIteratorPair globalDuplicate;
 
-                if (duplicate == out.resources.end()) {
-                    globalDuplicate = findResource(pd.blueprint, resource);
+                if (duplicate == out.node.resources.end()) {
+                    globalDuplicate = findResource(pd.blueprint, resource.node);
                 }
 
-                if (duplicate != out.resources.end() ||
+                if (duplicate != out.node.resources.end() ||
                     globalDuplicate.first != pd.blueprint.resourceGroups.end()) {
 
                     // WARN: Duplicate resource
                     mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                    report.warnings.push_back(Warning("the resource '" + resource.uriTemplate + "' is already defined",
-                                                      DuplicateWarning,
-                                                      sourceMap));
+                    out.report.warnings.push_back(Warning("the resource '" + resource.node.uriTemplate + "' is already defined",
+                                                          DuplicateWarning,
+                                                          sourceMap));
                 }
 
-                out.resources.push_back(resource);
+                out.node.resources.push_back(resource.node);
+
+                if (pd.exportSM()) {
+                    out.sourceMap.resources.sourceMap.push_back(resource.sourceMap);
+                }
 
                 return cur;
             }
@@ -97,29 +103,28 @@ namespace snowcrash {
                                                           const MarkdownNodes& siblings,
                                                           SectionParserData& pd,
                                                           SectionType& lastSectionType,
-                                                          Report& report,
-                                                          ResourceGroup& out) {
+                                                          ParseResult<ResourceGroup>& out) {
 
             mdp::ByteBuffer method;
 
             if (isDependentAction(node, method) &&
-                !out.resources.empty()) {
+                !out.node.resources.empty()) {
 
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
 
                 // WARN: Unexpected action
                 std::stringstream ss;
-                ss << "unexpected action '" << method << "', to define multiple actions for the '" << out.resources.back().uriTemplate;
+                ss << "unexpected action '" << method << "', to define multiple actions for the '" << out.node.resources.back().uriTemplate;
                 ss << "' resource omit the HTTP method in its definition, e.g. '# /resource'";
 
-                report.warnings.push_back(Warning(ss.str(),
-                                                  IgnoringWarning,
-                                                  sourceMap));
+                out.report.warnings.push_back(Warning(ss.str(),
+                                                      IgnoringWarning,
+                                                      sourceMap));
 
                 return ++MarkdownNodeIterator(node);
             }
 
-            return SectionProcessorBase<ResourceGroup>::processUnexpectedNode(node, siblings, pd, lastSectionType, report, out);
+            return SectionProcessorBase<ResourceGroup>::processUnexpectedNode(node, siblings, pd, lastSectionType, out);
         }
 
         static SectionType sectionType(const MarkdownNodeIterator& node) {
@@ -236,24 +241,15 @@ namespace snowcrash {
             return false;
         }
 
-        /** Finds a resource inside an resources collection */
-        static ResourceIterator findResource(const Resources& resources,
-                                             const Resource& resource) {
-
-            return std::find_if(resources.begin(),
-                                resources.end(),
-                                std::bind2nd(MatchResource(), resource));
-        }
-
         /** Finds a resource in blueprint by its URI template */
         static ResourceIteratorPair findResource(const Blueprint& blueprint,
                                                  const Resource& resource) {
 
-            for (Collection<ResourceGroup>::const_iterator it = blueprint.resourceGroups.begin();
+            for (ResourceGroupIterator it = blueprint.resourceGroups.begin();
                   it != blueprint.resourceGroups.end();
                   ++it) {
 
-                ResourceIterator match = findResource(it->resources, resource);
+                ResourceIterator match = SectionProcessor<Resource>::findResource(it->resources, resource);
 
                 if (match != it->resources.end()) {
                     return std::make_pair(it, match);

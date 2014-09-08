@@ -21,16 +21,11 @@ TEST_CASE("Parse object resource symbol", "[symbol_table]")
     "          {...}\n";
 
     // Check we will get error parsing the same symbol again with the same symbol table
-    ResourceModel model;
     Symbols symbols;
+    buildSymbol("Super", symbols);
 
-    model.description = "Foo";
-    model.body = "Bar";
-    symbols.push_back(ResourceModelSymbol("Super", model));
-
-    Resource resource;
-    Report report;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ModelBodySectionType, report, resource, symbols);
+    ParseResult<Resource> resource;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ModelBodySectionType, resource, symbols);
 
     REQUIRE(report.error.code != Error::OK);
 }
