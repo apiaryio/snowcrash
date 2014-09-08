@@ -26,33 +26,30 @@ namespace snowcrash {
      * Blueprint processor
      */
     template<>
-    struct SectionProcessor<Blueprint, BlueprintSM> : public SectionProcessorBase<Blueprint, BlueprintSM> {
+    struct SectionProcessor<Blueprint> : public SectionProcessorBase<Blueprint> {
 
         static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
                                                      const MarkdownNodes& siblings,
                                                      SectionParserData& pd,
                                                      SectionLayout& layout,
-                                                     Report& report,
-                                                     Blueprint& out,
-                                                     BlueprintSM& outSM) {
+                                                     ParseResult<Blueprint>& out) {
 
             MarkdownNodeIterator cur = node;
 
             while (cur != siblings.end() &&
                    cur->type == mdp::ParagraphMarkdownNodeType) {
 
-                MetadataCollection metadata;
-                MetadataCollectionSM metadataSM;
-                parseMetadata(cur, pd, report, metadata, metadataSM);
+                ParseResult<MetadataCollection> metadata(out.report, out.node.metadata, out.sourceMap.metadata);
+                parseMetadata(cur, pd, metadata);
 
                 // First block is paragraph and is not metadata (no API name)
-                if (metadata.empty()) {
-                    return processDescription(cur, siblings, pd, report, out, outSM);
+                if (metadata.node.empty()) {
+                    return processDescription(cur, siblings, pd, out);
                 } else {
-                    out.metadata.insert(out.metadata.end(), metadata.begin(), metadata.end());
+                    out.node.metadata.insert(out.node.metadata.end(), metadata.node.begin(), metadata.node.end());
 
                     if (pd.exportSM()) {
-                        outSM.metadata.insert(outSM.metadata.end(), metadataSM.begin(), metadataSM.end());
+                        out.sourceMap.metadata.list.insert(out.sourceMap.metadata.list.end(), metadata.sourceMap.list.begin(), metadata.sourceMap.list.end());
                     }
                 }
 
@@ -74,16 +71,16 @@ namespace snowcrash {
                     return cur;
                 }
 
-                out.name = cur->text;
-                TrimString(out.name);
+                out.node.name = cur->text;
+                TrimString(out.node.name);
 
-                if (pd.exportSM() && !out.name.empty()) {
-                    outSM.name = cur->sourceMap;
+                if (pd.exportSM() && !out.node.name.empty()) {
+                    out.sourceMap.name.sourceMap = cur->sourceMap;
                 }
             } else {
 
                 // Any other type of block, add to description
-                return processDescription(cur, siblings, pd, report, out, outSM);
+                return processDescription(cur, siblings, pd, out);
             }
 
             return ++MarkdownNodeIterator(cur);
@@ -92,43 +89,41 @@ namespace snowcrash {
         static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
                                                          const MarkdownNodes& siblings,
                                                          SectionParserData& pd,
-                                                         Report& report,
-                                                         Blueprint& out,
-                                                         BlueprintSM& outSM) {
+                                                         ParseResult<Blueprint>& out) {
 
             if (pd.sectionContext() == ResourceGroupSectionType ||
                 pd.sectionContext() == ResourceSectionType) {
 
-                ResourceGroup resourceGroup;
-                ResourceGroupSM resourceGroupSM;
+                ParseResult<ResourceGroup> resourceGroup;
+                MarkdownNodeIterator cur = ResourceGroupParser::parse(node, siblings, pd, resourceGroup);
 
-                MarkdownNodeIterator cur = ResourceGroupParser::parse(node, siblings, pd, report, resourceGroup, resourceGroupSM);
+                out.report += resourceGroup.report;
 
-                ResourceGroupIterator duplicate = findResourceGroup(out.resourceGroups, resourceGroup);
+                ResourceGroupIterator duplicate = findResourceGroup(out.node.resourceGroups, resourceGroup.node);
 
-                if (duplicate != out.resourceGroups.end()) {
+                if (duplicate != out.node.resourceGroups.end()) {
 
                     // WARN: duplicate resource group
                     std::stringstream ss;
 
-                    if (resourceGroup.name.empty()) {
+                    if (resourceGroup.node.name.empty()) {
                         ss << "anonymous group";
                     } else {
-                        ss << "group '" << resourceGroup.name << "'";
+                        ss << "group '" << resourceGroup.node.name << "'";
                     }
 
                     ss << " is already defined";
 
                     mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                    report.warnings.push_back(Warning(ss.str(),
-                                                      DuplicateWarning,
-                                                      sourceMap));
+                    out.report.warnings.push_back(Warning(ss.str(),
+                                                          DuplicateWarning,
+                                                          sourceMap));
                 }
 
-                out.resourceGroups.push_back(resourceGroup);
+                out.node.resourceGroups.push_back(resourceGroup.node);
 
                 if (pd.exportSM()) {
-                    outSM.resourceGroups.push_back(resourceGroupSM);
+                    out.sourceMap.resourceGroups.list.push_back(resourceGroup.sourceMap);
                 }
 
                 return cur;
@@ -147,14 +142,14 @@ namespace snowcrash {
             SectionType nestedType = UndefinedSectionType;
 
             // Check if Resource section
-            nestedType = SectionProcessor<Resource, ResourceSM>::sectionType(node);
+            nestedType = SectionProcessor<Resource>::sectionType(node);
 
             if (nestedType != UndefinedSectionType) {
                 return nestedType;
             }
 
             // Check if ResourceGroup section
-            nestedType = SectionProcessor<ResourceGroup, ResourceGroupSM>::sectionType(node);
+            nestedType = SectionProcessor<ResourceGroup>::sectionType(node);
 
             if (nestedType != UndefinedSectionType) {
                 return nestedType;
@@ -168,7 +163,7 @@ namespace snowcrash {
 
             // Resource Group & descendants
             nested.push_back(ResourceGroupSectionType);
-            SectionTypes types = SectionProcessor<ResourceGroup, ResourceGroupSM>::nestedSectionTypes();
+            SectionTypes types = SectionProcessor<ResourceGroup>::nestedSectionTypes();
             nested.insert(nested.end(), types.begin(), types.end());
 
             return nested;
@@ -176,27 +171,25 @@ namespace snowcrash {
 
         static void finalize(const MarkdownNodeIterator& node,
                              SectionParserData& pd,
-                             Report& report,
-                             Blueprint& out,
-                             BlueprintSM& outSM) {
+                             ParseResult<Blueprint>& out) {
             
-            if (!out.name.empty())
+            if (!out.node.name.empty())
                 return;
 
             if (pd.options & RequireBlueprintNameOption) {
 
                 // ERR: No API name specified
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                report.error = Error(ExpectedAPINameMessage,
-                                     BusinessError,
-                                     sourceMap);
+                out.report.error = Error(ExpectedAPINameMessage,
+                                         BusinessError,
+                                         sourceMap);
                 
             }
-            else if (!out.description.empty()) {
+            else if (!out.node.description.empty()) {
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                report.warnings.push_back(Warning(ExpectedAPINameMessage,
-                                                  APINameWarning,
-                                                  sourceMap));
+                out.report.warnings.push_back(Warning(ExpectedAPINameMessage,
+                                                      APINameWarning,
+                                                      sourceMap));
             }
         }
 
@@ -210,9 +203,7 @@ namespace snowcrash {
 
         static void parseMetadata(const MarkdownNodeIterator& node,
                                   SectionParserData& pd,
-                                  Report& report,
-                                  MetadataCollection& out,
-                                  MetadataCollectionSM& outSM) {
+                                  ParseResult<MetadataCollection>& out) {
 
             mdp::ByteBuffer content = node->text;
             TrimStringEnd(content);
@@ -226,32 +217,34 @@ namespace snowcrash {
                 Metadata metadata;
 
                 if (CodeBlockUtility::keyValueFromLine(*it, metadata)) {
-                    out.push_back(metadata);
+                    out.node.push_back(metadata);
 
                     if (pd.exportSM()) {
-                        outSM.push_back(node->sourceMap);
+                        SourceMap<Metadata> metadataSM;
+                        metadataSM.sourceMap = node->sourceMap;
+                        out.sourceMap.list.push_back(metadataSM);
                     }
                 }
             }
 
-            if (lines.size() == out.size()) {
+            if (lines.size() == out.node.size()) {
 
                 // Check duplicates
                 std::vector<mdp::ByteBuffer> duplicateKeys;
 
-                for (MetadataCollectionIterator it = out.begin();
-                     it != out.end();
+                for (MetadataCollectionIterator it = out.node.begin();
+                     it != out.node.end();
                      ++it) {
 
                     MetadataCollectionIterator from = it;
-                    if (++from == out.end())
+                    if (++from == out.node.end())
                         break;
 
                     MetadataCollectionIterator duplicate = std::find_if(from,
-                                                                        out.end(),
+                                                                        out.node.end(),
                                                                         std::bind2nd(MatchFirsts<Metadata>(), *it));
 
-                    if (duplicate != out.end() &&
+                    if (duplicate != out.node.end() &&
                         std::find(duplicateKeys.begin(), duplicateKeys.end(), it->first) == duplicateKeys.end()) {
 
                         duplicateKeys.push_back(it->first);
@@ -261,19 +254,19 @@ namespace snowcrash {
                         ss << "duplicate definition of '" << it->first << "'";
 
                         mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                        report.warnings.push_back(Warning(ss.str(),
-                                                          DuplicateWarning,
-                                                          sourceMap));
+                        out.report.warnings.push_back(Warning(ss.str(),
+                                                              DuplicateWarning,
+                                                              sourceMap));
                     }
                 }
             }
-            else if (!out.empty()) {
+            else if (!out.node.empty()) {
 
                 // WARN: malformed metadata block
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                report.warnings.push_back(Warning("ignoring possible metadata, expected '<key> : <value>', one one per line",
-                                                  FormattingWarning,
-                                                  sourceMap));
+                out.report.warnings.push_back(Warning("ignoring possible metadata, expected '<key> : <value>', one one per line",
+                                                      FormattingWarning,
+                                                      sourceMap));
             }
         }
 
@@ -288,7 +281,7 @@ namespace snowcrash {
     };
 
     /** Blueprint Parser */
-    typedef SectionParser<Blueprint, BlueprintSM, BlueprintSectionAdapter> BlueprintParser;
+    typedef SectionParser<Blueprint, BlueprintSectionAdapter> BlueprintParser;
 }
 
 #endif
