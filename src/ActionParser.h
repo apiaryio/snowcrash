@@ -87,8 +87,17 @@ namespace snowcrash {
             switch (sectionType) {
                 case ParametersSectionType:
                 {
-                    ParseResult<Parameters> parameters(out.report, out.node.parameters, out.sourceMap.parameters);
-                    return ParametersParser::parse(node, siblings, pd, parameters);
+                    ParseResult<Parameters> parameters;
+                    parameters.node = out.node.parameters;
+                    parameters.sourceMap = out.sourceMap.parameters;
+
+                    MarkdownNodeIterator cur = ParametersParser::parse(node, siblings, pd, parameters);
+
+                    out.report += parameters.report;
+                    out.node.parameters = parameters.node;
+                    out.sourceMap.parameters = parameters.sourceMap;
+
+                    return cur;
                 }
 
                 case RequestSectionType:
@@ -153,8 +162,17 @@ namespace snowcrash {
 
                 case HeadersSectionType:
                 {
-                    ParseResult<Headers> headers(out.report, out.node.headers, out.sourceMap.headers);
-                    return SectionProcessor<Action>::handleDeprecatedHeaders(node, siblings, pd, headers);
+                    ParseResult<Headers> headers;
+                    headers.node = out.node.headers;
+                    headers.sourceMap = out.sourceMap.headers;
+
+                    MarkdownNodeIterator cur = SectionProcessor<Action>::handleDeprecatedHeaders(node, siblings, pd, headers);
+
+                    out.report += headers.report;
+                    out.node.headers = headers.node;
+                    out.sourceMap.headers = headers.sourceMap;
+
+                    return cur;
                 }
 
                 default:

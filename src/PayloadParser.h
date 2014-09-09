@@ -143,8 +143,17 @@ namespace snowcrash {
             switch (pd.sectionContext()) {
                 case HeadersSectionType:
                 {
-                    ParseResult<Headers> headers(out.report, out.node.headers, out.sourceMap.headers);
-                    return HeadersParser::parse(node, siblings, pd, headers);
+                    ParseResult<Headers> headers;
+                    headers.node = out.node.headers;
+                    headers.sourceMap = out.sourceMap.headers;
+
+                    MarkdownNodeIterator cur = HeadersParser::parse(node, siblings, pd, headers);
+
+                    out.report += headers.report;
+                    out.node.headers = headers.node;
+                    out.sourceMap.headers = headers.sourceMap;
+
+                    return cur;
                 }
 
                 case BodySectionType:
@@ -157,8 +166,14 @@ namespace snowcrash {
                                                               sourceMap));
                     }
 
-                    ParseResult<Asset> asset(out.report, out.node.body, out.sourceMap.body);
-                    return AssetParser::parse(node, siblings, pd, asset);
+                    ParseResult<Asset> asset;
+                    MarkdownNodeIterator cur = AssetParser::parse(node, siblings, pd, asset);
+
+                    out.report += asset.report;
+                    out.node.body = asset.node;
+                    out.sourceMap.body = asset.sourceMap;
+
+                    return cur;
                 }
 
                 case SchemaSectionType:
@@ -171,8 +186,14 @@ namespace snowcrash {
                                                               sourceMap));
                     }
 
-                    ParseResult<Asset> asset(out.report, out.node.schema, out.sourceMap.schema);
-                    return AssetParser::parse(node, siblings, pd, asset);
+                    ParseResult<Asset> asset;
+                    MarkdownNodeIterator cur = AssetParser::parse(node, siblings, pd, asset);
+
+                    out.report += asset.report;
+                    out.node.schema = asset.node;
+                    out.sourceMap.schema = asset.sourceMap;
+
+                    return cur;
                 }
 
                 default:
