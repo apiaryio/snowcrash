@@ -37,8 +37,10 @@ namespace snowcrash {
 
             while (cur->type == mdp::ParagraphMarkdownNodeType) {
 
-                ParseResult<MetadataCollection> metadata(out.report, out.node.metadata, out.sourceMap.metadata);
+                ParseResult<MetadataCollection> metadata;
                 parseMetadata(cur, pd, metadata);
+
+                out.report += metadata.report;
 
                 // First block is paragraph and is not metadata (no API name)
                 if (metadata.node.empty()) {

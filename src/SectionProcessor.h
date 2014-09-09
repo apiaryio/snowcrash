@@ -35,13 +35,6 @@ namespace snowcrash {
      */
     template<typename T>
     struct ParseResult {
-        ParseResult() {}
-
-        ParseResult(Report& report,
-                    T& node,
-                    SourceMap<T>& sourceMap)
-        : report(report), node(node), sourceMap(sourceMap) {}
-
         Report report;           /// Parser's report
         T node;                  /// Parsed AST node
         SourceMap<T> sourceMap;  /// Parsed AST node source map
