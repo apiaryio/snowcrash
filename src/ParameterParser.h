@@ -107,8 +107,12 @@ namespace snowcrash {
                 out.sourceMap.values.list.clear();
             }
 
-            ParseResult<Values> values(out.report, out.node.values, out.sourceMap.values);
+            ParseResult<Values> values;
             ValuesParser::parse(node, siblings, pd, values);
+
+            out.report += values.report;
+            out.node.values = values.node;
+            out.sourceMap.values = values.sourceMap;
 
             if (out.node.values.empty()) {
                 // WARN: empty definition

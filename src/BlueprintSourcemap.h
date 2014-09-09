@@ -38,7 +38,7 @@ namespace snowcrash {
     SOURCE_MAP_COLLECTION(Metadata, MetadataCollection);
 
     /** Source Map of Headers */
-//    SOURCE_MAP_COLLECTION(Header, Headers);
+    // SOURCE_MAP_COLLECTION(Header, Headers);
 
     /** Source Map of Collection of Parameter values */
     SOURCE_MAP_COLLECTION(Value, Values);
@@ -100,20 +100,11 @@ namespace snowcrash {
         SourceMap<SymbolName> symbol;
     };
 
-    /** Source Map structure for Resource Model */
-//    typedef SourceMap<Payload> SourceMap<ResourceModel>;
-
-    /** Source Map structure for Request */
-//    typedef SourceMap<Payload> SourceMap<Request>;
-
-    /** Source Map structure for Response */
-//    typedef SourceMap<Payload> SourceMap<Response>;
-
     /** Source Map of Collection of Requests */
     SOURCE_MAP_COLLECTION(Request, Requests);
 
     /** Source Map of Collection of Responses */
-//    SOURCE_MAP_COLLECTION(Response, Responses);
+    // SOURCE_MAP_COLLECTION(Response, Responses);
 
     /**
      *  Source Map Structure for an HTTP transaction example.

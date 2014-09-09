@@ -100,8 +100,17 @@ namespace snowcrash {
 
                 case HeadersSectionType:
                 {
-                    ParseResult<Headers> headers(out.report, out.node.headers, out.sourceMap.headers);
-                    return SectionProcessor<Action>::handleDeprecatedHeaders(node, siblings, pd, headers);
+                    ParseResult<Headers> headers;
+                    headers.node = out.node.headers;
+                    headers.sourceMap = out.sourceMap.headers;
+
+                    MarkdownNodeIterator cur = SectionProcessor<Action>::handleDeprecatedHeaders(node, siblings, pd, headers);
+
+                    out.report += headers.report;
+                    out.node.headers = headers.node;
+                    out.sourceMap.headers = headers.sourceMap;
+
+                    return cur;
                 }
 
                 default:
