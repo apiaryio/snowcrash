@@ -170,6 +170,7 @@ namespace snowcrash {
                 innerSignature = TrimString(innerSignature);
                 
                 size_t firstSpace = innerSignature.find(" ");
+
                 if (firstSpace == std::string::npos) {
                     // Name
                     parameter.name = signature;
@@ -178,6 +179,7 @@ namespace snowcrash {
                     parameter.name = innerSignature.substr(0, firstSpace);
                     innerSignature = innerSignature.substr(firstSpace + 1);
                     size_t descriptionPos = innerSignature.find(snowcrash::DescriptionIdentifier);
+
                     if (descriptionPos != std::string::npos) {
                         // Description
                         parameter.description = innerSignature.substr(descriptionPos);
@@ -187,8 +189,10 @@ namespace snowcrash {
                     }
                     
                     size_t attributesPos = innerSignature.find("(");
+
                     if (attributesPos != std::string::npos) {
                         size_t endOfAttributesPos = innerSignature.find_last_of(")");
+
                         if (endOfAttributesPos - attributesPos > 1) {
                             std::string attributes = innerSignature.substr(attributesPos, endOfAttributesPos - attributesPos);
                             attributes = attributes.substr(1);
@@ -206,6 +210,7 @@ namespace snowcrash {
                         parameter.defaultValue = TrimString(parameter.defaultValue);
                     }
                 }
+
                 // Check possible required vs default clash
                 if (parameter.use != OptionalParameterUse &&
                     !parameter.defaultValue.empty()) {
@@ -220,8 +225,7 @@ namespace snowcrash {
                                                       LogicalErrorWarning,
                                                       sourceMap));
                 }
-            }
-            else {
+            } else {
                 // ERR: unable to parse
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
                 report.error = Error("unable to parse parameter specification",
@@ -360,18 +364,21 @@ namespace snowcrash {
             }
             
             size_t firstSpace = innerSignature.find(" ");
+
             if (firstSpace == std::string::npos) {
                 return RegexMatch(innerSignature, "^" PARAMETER_IDENTIFIER "$");
             }
             
             std::string paramName = innerSignature.substr(0, firstSpace);
+
             if (!RegexMatch(paramName, "^" PARAMETER_IDENTIFIER "$")) {
                 return false; // Invalid param name
             }
+
             // Remove param name
             innerSignature = innerSignature.substr(firstSpace + 1);
-            
             size_t descriptionPos = innerSignature.find(snowcrash::DescriptionIdentifier);
+
             // Remove description
             if (descriptionPos != std::string::npos) {
                 innerSignature = innerSignature.substr(0, descriptionPos);
@@ -379,11 +386,14 @@ namespace snowcrash {
             }
             
             size_t attributesPos = innerSignature.find("(");
+
             if (attributesPos != std::string::npos) {
                 size_t endOfAttributesPos = innerSignature.find_last_of(")");
+
                 if (endOfAttributesPos == std::string::npos) {
                     return false; // Expecting close of attributes
                 }
+
                 // Remove attributes
                 innerSignature = innerSignature.substr(0, attributesPos);
                 innerSignature = TrimString(innerSignature);
@@ -396,9 +406,11 @@ namespace snowcrash {
             if (innerSignature.substr(0,1) == "=") {
                 innerSignature = innerSignature.substr(1);
                 innerSignature = TrimString(innerSignature);
+
                 if (innerSignature.length() == 0) {
                     return false; // No default value
                 }
+
                 if (innerSignature.substr(0,1) == "`" && innerSignature.substr(innerSignature.length()-1,1) == "`") {
                     return true;
                 }
