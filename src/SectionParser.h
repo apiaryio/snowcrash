@@ -118,7 +118,8 @@ namespace snowcrash {
                 if (nestedType != UndefinedSectionType) {
                     cur = SectionProcessor<T>::processNestedSection(cur, collection, pd, report, out);
                 }
-                else if (SectionProcessor<T>::isUnexpectedNode(cur, pd.sectionContext())) {
+                else if (Adapter::nextSkipsUnexpected ||
+                         SectionProcessor<T>::isUnexpectedNode(cur, pd.sectionContext())) {
                     cur = SectionProcessor<T>::processUnexpectedNode(cur, collection, pd, lastSectionType, report, out);
                 }
                 
@@ -163,6 +164,14 @@ namespace snowcrash {
                                                            const MarkdownNodeIterator& cur) {
             return cur;
         }
+        
+        /** 
+         *  \brief Adapter Markdown node skipping behavior trait.
+         *
+         *  Adapter trait signalizing that the adapter can possibly skip some Markdown nodes on a nextStartingNode() call.
+         *  If set to true, a call to nextStartingNode() can skip some nodes causing some information loss. False otherwise.
+         */
+        static const bool nextSkipsUnexpected = false;
     };
     
     /** Parser Adapter for parsing list-defined sections */
@@ -188,6 +197,8 @@ namespace snowcrash {
             
             return ++MarkdownNodeIterator(seed);
         }
+        
+        static const bool nextSkipsUnexpected = true;
     };
 
     /** Parser Adapter for parsing blueprint sections */
@@ -210,6 +221,8 @@ namespace snowcrash {
                                                            const MarkdownNodeIterator& cur) {
             return cur;
         }
+        
+        static const bool nextSkipsUnexpected = false;
     };
 }
 

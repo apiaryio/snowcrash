@@ -14,17 +14,16 @@
 #include "RegexMatch.h"
 #include "StringUtility.h"
 
+/** Parameter Value regex */
+#define PARAMETER_VALUE "`([^`]+)`"
+
 /** Parameter Identifier */
-#define PARAMETER_IDENTIFIER "([[:alnum:]_.-]+)"
+#define PARAMETER_IDENTIFIER "(([[:alnum:]_.-])*|(%[A-Fa-f0-9]{2})*)+"
 
 /** Lead in and out for comma separated values regex */
 #define CSV_LEADINOUT "[[:blank:]]*,?[[:blank:]]*"
 
 namespace snowcrash {
-
-    /** Parameter Abbreviated definition matching regex */
-    const char* const ParameterAbbrevDefinitionRegex = "^" PARAMETER_IDENTIFIER \
-                                                        "([[:blank:]]*=[[:blank:]]*`([^`]*)`[[:blank:]]*)?([[:blank:]]*\\(([^)]*)\\)[[:blank:]]*)?([[:blank:]]*\\.\\.\\.[[:blank:]]*(.*))?$";
 
     /** Parameter Required matching regex */
     const char* const ParameterRequiredRegex = "^[[:blank:]]*[Rr]equired[[:blank:]]*$";
@@ -40,9 +39,15 @@ namespace snowcrash {
 
     /** Additonal Parameter Traits Type matching regex */
     const char* const AdditionalTraitsTypeRegex = CSV_LEADINOUT "([^,]*)" CSV_LEADINOUT;
+    
+    /** Parameter Values matching regex */
+    const char* const ParameterValuesRegex = "^[[:blank:]]*[Vv]alues[[:blank:]]*$";
 
     /** Values expected content */
     const char* const ExpectedValuesContent = "nested list of possible parameter values, one element per list item e.g. '`value`'";
+    
+    /** Parameter description delimiter */
+    const std::string DescriptionIdentifier = "...";
 
     /**
      * Parameter section processor
@@ -126,7 +131,7 @@ namespace snowcrash {
                 subject = GetFirstLine(node->children().front().text, remainingContent);
                 TrimString(subject);
 
-                if (RegexMatch(subject, ParameterAbbrevDefinitionRegex)) {
+                if (isValidParameterSignature(subject)) {
                     return ParameterSectionType;
                 }
             }
@@ -159,31 +164,57 @@ namespace snowcrash {
 
             CaptureGroups captureGroups;
 
-            if (RegexCapture(signature, ParameterAbbrevDefinitionRegex, captureGroups) &&
-                captureGroups.size() == 8) {
+            if (isValidParameterSignature(signature)) {
+                
+                mdp::ByteBuffer innerSignature = signature;
+                innerSignature = TrimString(innerSignature);
+                
+                size_t firstSpace = innerSignature.find(" ");
 
-                // Name
-                parameter.name = captureGroups[1];
-                TrimString(parameter.name);
+                if (firstSpace == std::string::npos) {
+                    // Name
+                    parameter.name = signature;
+                }
+                else {
+                    parameter.name = innerSignature.substr(0, firstSpace);
+                    innerSignature = innerSignature.substr(firstSpace + 1);
+                    size_t descriptionPos = innerSignature.find(snowcrash::DescriptionIdentifier);
 
-                // Default value
-                if (!captureGroups[3].empty()) {
-                    parameter.defaultValue = captureGroups[3];
+                    if (descriptionPos != std::string::npos) {
+                        // Description
+                        parameter.description = innerSignature.substr(descriptionPos);
+                        parameter.description = TrimString(parameter.description.replace(0, snowcrash::DescriptionIdentifier.length(), ""));
+                        innerSignature = innerSignature.substr(0, descriptionPos);
+                        innerSignature = TrimString(innerSignature);
+                    }
+                    
+                    size_t attributesPos = innerSignature.find("(");
+
+                    if (attributesPos != std::string::npos) {
+                        size_t endOfAttributesPos = innerSignature.find_last_of(")");
+
+                        if (endOfAttributesPos - attributesPos > 1) {
+                            std::string attributes = innerSignature.substr(attributesPos, endOfAttributesPos - attributesPos);
+                            attributes = attributes.substr(1);
+                            parseAdditionalTraits(node, pd, attributes, report, parameter);
+                            innerSignature = innerSignature.substr(0, attributesPos);
+                            innerSignature = TrimString(innerSignature);
+                        }
+                    }
+                    
+                    if (innerSignature.length() > 0) {
+                        // Remove =
+                        parameter.defaultValue = innerSignature;
+                        parameter.defaultValue.erase(std::remove(parameter.defaultValue.begin(), parameter.defaultValue.end(), '='), parameter.defaultValue.end());
+                        parameter.defaultValue.erase(std::remove(parameter.defaultValue.begin(), parameter.defaultValue.end(), '`'), parameter.defaultValue.end());
+                        parameter.defaultValue = TrimString(parameter.defaultValue);
+                    }
                 }
 
-                // Additional attributes
-                if (!captureGroups[5].empty()) {
-                    parseAdditionalTraits(node, pd, captureGroups[5], report, parameter);
-                }
-
-                // Description
-                if (!captureGroups[7].empty()) {
-                    parameter.description = captureGroups[7];
-                }
-
+                // Check possible required vs default clash
                 if (parameter.use != OptionalParameterUse &&
                     !parameter.defaultValue.empty()) {
-
+                    
                     // WARN: Required vs default clash
                     std::stringstream ss;
                     ss << "specifying parameter '" << parameter.name << "' as required supersedes its default value"\
@@ -195,7 +226,7 @@ namespace snowcrash {
                                                       sourceMap));
                 }
             } else {
-                // ERR: Unable to parse
+                // ERR: unable to parse
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
                 report.error = Error("unable to parse parameter specification",
                                      BusinessError,
@@ -321,6 +352,73 @@ namespace snowcrash {
                                                   sourceMap));
             }
         }
+        
+        /** Determine if a signature is a valid parameter*/
+        static bool isValidParameterSignature(const mdp::ByteBuffer& signature) {
+            
+            mdp::ByteBuffer innerSignature = signature;
+            innerSignature = TrimString(innerSignature);
+            
+            if (innerSignature.length() == 0) {
+                return false; // Empty string, invalid
+            }
+            
+            size_t firstSpace = innerSignature.find(" ");
+
+            if (firstSpace == std::string::npos) {
+                return RegexMatch(innerSignature, "^" PARAMETER_IDENTIFIER "$");
+            }
+            
+            std::string paramName = innerSignature.substr(0, firstSpace);
+
+            if (!RegexMatch(paramName, "^" PARAMETER_IDENTIFIER "$")) {
+                return false; // Invalid param name
+            }
+
+            // Remove param name
+            innerSignature = innerSignature.substr(firstSpace + 1);
+            size_t descriptionPos = innerSignature.find(snowcrash::DescriptionIdentifier);
+
+            // Remove description
+            if (descriptionPos != std::string::npos) {
+                innerSignature = innerSignature.substr(0, descriptionPos);
+                innerSignature = TrimString(innerSignature);
+            }
+            
+            size_t attributesPos = innerSignature.find("(");
+
+            if (attributesPos != std::string::npos) {
+                size_t endOfAttributesPos = innerSignature.find_last_of(")");
+
+                if (endOfAttributesPos == std::string::npos) {
+                    return false; // Expecting close of attributes
+                }
+
+                // Remove attributes
+                innerSignature = innerSignature.substr(0, attributesPos);
+                innerSignature = TrimString(innerSignature);
+            }
+            
+            if (innerSignature.length() == 0) {
+                return true;
+            }
+            
+            if (innerSignature.substr(0,1) == "=") {
+                innerSignature = innerSignature.substr(1);
+                innerSignature = TrimString(innerSignature);
+
+                if (innerSignature.length() == 0) {
+                    return false; // No default value
+                }
+
+                if (innerSignature.substr(0,1) == "`" && innerSignature.substr(innerSignature.length()-1,1) == "`") {
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+
     };
 
     /** Parameter Section Parser */
