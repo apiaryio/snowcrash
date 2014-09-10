@@ -519,7 +519,10 @@ namespace snowcrash {
 
                 out.description = model.description;
                 out.parameters = model.parameters;
-                out.headers = model.headers;
+                
+                // Inject headers (content-type only for this time being)
+                out.headers.insert(out.headers.end(), model.headers.begin(), model.headers.end());
+                
                 out.body = model.body;
                 out.schema = model.schema;
 
