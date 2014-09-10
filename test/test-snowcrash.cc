@@ -416,7 +416,6 @@ TEST_CASE("Dangling block not recognized", "[parser][regression][#186]")
     REQUIRE(blueprint.resourceGroups[0].resources[0].model.body == "    { ... }\n\n");
 }
 
-
 TEST_CASE("Ignoring block recovery", "[parser][regression][#188]")
 {
     mdp::ByteBuffer source = \
@@ -445,4 +444,38 @@ TEST_CASE("Ignoring block recovery", "[parser][regression][#188]")
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].name == "Remove a Note");
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].method == "DELETE");
 }
+
+TEST_CASE("Ignoring dangling model assets", "[parser][regression][#196][now]")
+{
+    mdp::ByteBuffer source = \
+    "# A [/A]\n"\
+    "+ model (Y)\n"\
+    "\n"\
+    "{ A }\n"\
+    "\n"\
+    "## POST /B\n"\
+    "+ Response 200\n"\
+    "\n"\
+    "    [A][]\n";
+    
+    Blueprint blueprint;
+    Report report;
+    
+    parse(source, 0, report, blueprint);
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(report.warnings[0].code == IndentationWarning);
+
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 2);
+    REQUIRE(blueprint.resourceGroups[0].resources[1].name.empty());
+    REQUIRE(blueprint.resourceGroups[0].resources[1].uriTemplate == "/B");
+    REQUIRE(blueprint.resourceGroups[0].resources[1].actions.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[1].actions[0].method == "POST");
+    REQUIRE(blueprint.resourceGroups[0].resources[1].actions[0].examples.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[1].actions[0].examples[0].responses.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[1].actions[0].examples[0].responses[0].name == "200");
+    REQUIRE(blueprint.resourceGroups[0].resources[1].actions[0].examples[0].responses[0].body == "{ A }\n\n");
+}
+
 
