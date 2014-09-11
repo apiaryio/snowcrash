@@ -478,7 +478,7 @@ TEST_CASE("Ignoring dangling model assets", "[parser][regression][#196]")
     REQUIRE(blueprint.resourceGroups[0].resources[1].actions[0].examples[0].responses[0].body == "{ A }\n\n");
 }
 
-TEST_CASE("Ignoring local media type", "[parser][regression][#195][now]")
+TEST_CASE("Ignoring local media type", "[parser][regression][#195]")
 {
     mdp::ByteBuffer source = \
     "# A [/A]\n"\
@@ -511,3 +511,31 @@ TEST_CASE("Ignoring local media type", "[parser][regression][#195][now]")
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[1].first == "Content-Type");
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[1].second == "Y");
 }
+
+TEST_CASE("Parse ill-formated header", "[parser][#198][regression]")
+{
+    mdp::ByteBuffer source = \
+    "# GET /A\n"\
+    "+ Response 200\n"\
+    "    + Header\n"\
+    "        Location: new_url\n";
+    
+    Blueprint blueprint;
+    Report report;
+    
+    parse(source, 0, report, blueprint);
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(report.warnings[0].code == IndentationWarning);
+    
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[0].first == "Location");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[0].second == "new_url");
+}
+
