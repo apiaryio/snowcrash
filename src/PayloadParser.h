@@ -516,12 +516,38 @@ namespace snowcrash {
                 }
 
                 model = pd.symbolTable.resourceModels.at(symbol);
-
+                
                 out.description = model.description;
                 out.parameters = model.parameters;
                 
-                // Inject headers (content-type only for this time being)
-                out.headers.insert(out.headers.end(), model.headers.begin(), model.headers.end());
+                Collection<Header>::const_iterator modelContentType = std::find_if(model.headers.begin(),
+                                                                                   model.headers.end(),
+                                                                                   std::bind2nd(MatchFirstWith<Header, std::string>(),
+                                                                                                HTTPHeaderName::ContentType));
+                
+                bool isPayloadContentType = !out.headers.empty();
+                bool isModelContentType = modelContentType != model.headers.end();
+                
+                if (isPayloadContentType && isModelContentType) {
+                    
+                    // WARN: Ignoring payload content-type, when referencing a model with headers
+                    std::stringstream ss;
+                    
+                    ss << "ignoring additional " << SectionName(pd.sectionContext()) << " header(s), ";
+                    ss << "specify this header(s) in the referenced model definition instead";
+                    
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                    report.warnings.push_back(Warning(ss.str(),
+                                                      IgnoringWarning,
+                                                      sourceMap));
+                }
+
+                if (isPayloadContentType && !isModelContentType) {
+                    out.headers.insert(out.headers.end(), model.headers.begin(), model.headers.end());
+                }
+                else {
+                    out.headers = model.headers;
+                }
                 
                 out.body = model.body;
                 out.schema = model.schema;
