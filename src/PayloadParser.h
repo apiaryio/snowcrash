@@ -343,19 +343,19 @@ namespace snowcrash {
         static PayloadSignature payloadSignature(const MarkdownNodeIterator& node) {
 
             mdp::ByteBuffer subject = node->children().front().text;
-            mdp::ByteBuffer subjectFirstLine;
+            mdp::ByteBuffer signature;
             mdp::ByteBuffer remainingContent;
 
-            subjectFirstLine = GetFirstLine(subject, remainingContent);
-            TrimString(subjectFirstLine);
+            signature = GetFirstLine(subject, remainingContent);
+            TrimString(signature);
 
-            if (RegexMatch(subjectFirstLine, RequestRegex))
+            if (RegexMatch(signature, RequestRegex))
                 return RequestPayloadSignature;
 
-            if (RegexMatch(subjectFirstLine, ResponseRegex))
+            if (RegexMatch(signature, ResponseRegex))
                 return ResponsePayloadSignature;
 
-            if (RegexMatch(subjectFirstLine, ModelRegex))
+            if (RegexMatch(signature, ModelRegex))
                 return ModelPayloadSignature;
 
             return NoPayloadSignature;
