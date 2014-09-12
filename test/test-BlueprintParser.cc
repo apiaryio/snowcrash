@@ -79,11 +79,11 @@ TEST_CASE("Parse canonical blueprint", "[blueprint]")
     REQUIRE(blueprint.sourceMap.description.sourceMap.size() == 1);
     REQUIRE(blueprint.sourceMap.description.sourceMap[0].location == 30);
     REQUIRE(blueprint.sourceMap.description.sourceMap[0].length == 25);
-    REQUIRE(blueprint.sourceMap.metadata.list.size() == 1);
-    REQUIRE(blueprint.sourceMap.metadata.list[0].sourceMap.size() == 1);
-    REQUIRE(blueprint.sourceMap.metadata.list[0].sourceMap[0].location == 0);
-    REQUIRE(blueprint.sourceMap.metadata.list[0].sourceMap[0].length == 13);
-    REQUIRE(blueprint.sourceMap.resourceGroups.list.size() == 2);
+    REQUIRE(blueprint.sourceMap.metadata.collection.size() == 1);
+    REQUIRE(blueprint.sourceMap.metadata.collection[0].sourceMap.size() == 1);
+    REQUIRE(blueprint.sourceMap.metadata.collection[0].sourceMap[0].location == 0);
+    REQUIRE(blueprint.sourceMap.metadata.collection[0].sourceMap[0].length == 13);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection.size() == 2);
 }
 
 TEST_CASE("Parse blueprint with multiple metadata sections", "[blueprint]")
@@ -121,14 +121,14 @@ TEST_CASE("Parse blueprint with multiple metadata sections", "[blueprint]")
     REQUIRE(blueprint.sourceMap.description.sourceMap.size() == 1);
     REQUIRE(blueprint.sourceMap.description.sourceMap[0].location == 42);
     REQUIRE(blueprint.sourceMap.description.sourceMap[0].length == 25);
-    REQUIRE(blueprint.sourceMap.metadata.list.size() == 2);
-    REQUIRE(blueprint.sourceMap.metadata.list[0].sourceMap.size() == 1);
-    REQUIRE(blueprint.sourceMap.metadata.list[0].sourceMap[0].location == 0);
-    REQUIRE(blueprint.sourceMap.metadata.list[0].sourceMap[0].length == 12);
-    REQUIRE(blueprint.sourceMap.metadata.list[1].sourceMap.size() == 1);
-    REQUIRE(blueprint.sourceMap.metadata.list[1].sourceMap[0].location == 12);
-    REQUIRE(blueprint.sourceMap.metadata.list[1].sourceMap[0].length == 13);
-    REQUIRE(blueprint.sourceMap.resourceGroups.list.size() == 2);
+    REQUIRE(blueprint.sourceMap.metadata.collection.size() == 2);
+    REQUIRE(blueprint.sourceMap.metadata.collection[0].sourceMap.size() == 1);
+    REQUIRE(blueprint.sourceMap.metadata.collection[0].sourceMap[0].location == 0);
+    REQUIRE(blueprint.sourceMap.metadata.collection[0].sourceMap[0].length == 12);
+    REQUIRE(blueprint.sourceMap.metadata.collection[1].sourceMap.size() == 1);
+    REQUIRE(blueprint.sourceMap.metadata.collection[1].sourceMap[0].location == 12);
+    REQUIRE(blueprint.sourceMap.metadata.collection[1].sourceMap[0].length == 13);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection.size() == 2);
 }
 
 TEST_CASE("Parse API with Name and abbreviated resource", "[blueprint]")
@@ -169,8 +169,8 @@ TEST_CASE("Parse API with Name and abbreviated resource", "[blueprint]")
     REQUIRE(blueprint.sourceMap.description.sourceMap.size() == 1);
     REQUIRE(blueprint.sourceMap.description.sourceMap[0].location == 6);
     REQUIRE(blueprint.sourceMap.description.sourceMap[0].length == 2);
-    REQUIRE(blueprint.sourceMap.metadata.list.size() == 0);
-    REQUIRE(blueprint.sourceMap.resourceGroups.list.size() == 1);
+    REQUIRE(blueprint.sourceMap.metadata.collection.size() == 0);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection.size() == 1);
 }
 
 TEST_CASE("Parse nameless blueprint description", "[blueprint]")
@@ -194,8 +194,8 @@ TEST_CASE("Parse nameless blueprint description", "[blueprint]")
     REQUIRE(blueprint.sourceMap.description.sourceMap.size() == 1);
     REQUIRE(blueprint.sourceMap.description.sourceMap[0].location == 0);
     REQUIRE(blueprint.sourceMap.description.sourceMap[0].length == 6);
-    REQUIRE(blueprint.sourceMap.metadata.list.size() == 0);
-    REQUIRE(blueprint.sourceMap.resourceGroups.list.size() == 0);
+    REQUIRE(blueprint.sourceMap.metadata.collection.size() == 0);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection.size() == 0);
 }
 
 TEST_CASE("Parse nameless blueprint with a list description", "[blueprint]")
@@ -217,8 +217,8 @@ TEST_CASE("Parse nameless blueprint with a list description", "[blueprint]")
     REQUIRE(blueprint.sourceMap.description.sourceMap.size() == 1);
     REQUIRE(blueprint.sourceMap.description.sourceMap[0].location == 0);
     REQUIRE(blueprint.sourceMap.description.sourceMap[0].length == 7);
-    REQUIRE(blueprint.sourceMap.metadata.list.size() == 0);
-    REQUIRE(blueprint.sourceMap.resourceGroups.list.size() == 0);
+    REQUIRE(blueprint.sourceMap.metadata.collection.size() == 0);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection.size() == 0);
 }
 
 TEST_CASE("Parse two groups with the same name", "[blueprint]")
@@ -251,8 +251,8 @@ TEST_CASE("Parse two groups with the same name", "[blueprint]")
     REQUIRE(blueprint.sourceMap.name.sourceMap[0].location == 0);
     REQUIRE(blueprint.sourceMap.name.sourceMap[0].length == 6);
     REQUIRE(blueprint.sourceMap.description.sourceMap.empty());
-    REQUIRE(blueprint.sourceMap.metadata.list.size() == 0);
-    REQUIRE(blueprint.sourceMap.resourceGroups.list.size() == 2);
+    REQUIRE(blueprint.sourceMap.metadata.collection.size() == 0);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection.size() == 2);
 }
 
 TEST_CASE("Test parser options - required blueprint name", "[blueprint]")
@@ -306,8 +306,8 @@ TEST_CASE("Should parse nested lists in description", "[blueprint]")
     REQUIRE(blueprint.sourceMap.description.sourceMap.size() == 1);
     REQUIRE(blueprint.sourceMap.description.sourceMap[0].location == 6);
     REQUIRE(blueprint.sourceMap.description.sourceMap[0].length == 24);
-    REQUIRE(blueprint.sourceMap.metadata.list.size() == 0);
-    REQUIRE(blueprint.sourceMap.resourceGroups.list.size() == 0);
+    REQUIRE(blueprint.sourceMap.metadata.collection.size() == 0);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection.size() == 0);
 }
 
 TEST_CASE("Should parse paragraph without final newline", "[blueprint]")
@@ -348,8 +348,8 @@ TEST_CASE("Blueprint starting with Resource Group should be parsed", "[blueprint
 
     REQUIRE(blueprint.sourceMap.name.sourceMap.empty());
     REQUIRE(blueprint.sourceMap.description.sourceMap.empty());
-    REQUIRE(blueprint.sourceMap.metadata.list.size() == 0);
-    REQUIRE(blueprint.sourceMap.resourceGroups.list.size() == 1);
+    REQUIRE(blueprint.sourceMap.metadata.collection.size() == 0);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection.size() == 1);
 }
 
 TEST_CASE("Blueprint starting with Resource should be parsed", "[blueprint]")
@@ -371,8 +371,8 @@ TEST_CASE("Blueprint starting with Resource should be parsed", "[blueprint]")
 
     REQUIRE(blueprint.sourceMap.name.sourceMap.empty());
     REQUIRE(blueprint.sourceMap.description.sourceMap.empty());
-    REQUIRE(blueprint.sourceMap.metadata.list.size() == 0);
-    REQUIRE(blueprint.sourceMap.resourceGroups.list.size() == 1);
+    REQUIRE(blueprint.sourceMap.metadata.collection.size() == 0);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection.size() == 1);
 }
 
 TEST_CASE("Checking a resource with global resources for duplicates", "[blueprint]")
@@ -406,10 +406,10 @@ TEST_CASE("Checking a resource with global resources for duplicates", "[blueprin
 
     REQUIRE(blueprint.sourceMap.name.sourceMap.empty());
     REQUIRE(blueprint.sourceMap.description.sourceMap.empty());
-    REQUIRE(blueprint.sourceMap.metadata.list.size() == 0);
-    REQUIRE(blueprint.sourceMap.resourceGroups.list.size() == 2);
-    REQUIRE(blueprint.sourceMap.resourceGroups.list[0].resources.list.size() == 1);
-    REQUIRE(blueprint.sourceMap.resourceGroups.list[1].resources.list.size() == 1);
+    REQUIRE(blueprint.sourceMap.metadata.collection.size() == 0);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection.size() == 2);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection.size() == 1);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[1].resources.collection.size() == 1);
 }
 
 TEST_CASE("Parsing unexpected blocks", "[blueprint]")
@@ -454,9 +454,9 @@ TEST_CASE("Parsing unexpected blocks", "[blueprint]")
     REQUIRE(blueprint.sourceMap.description.sourceMap.size() == 1);
     REQUIRE(blueprint.sourceMap.description.sourceMap[0].location == 17);
     REQUIRE(blueprint.sourceMap.description.sourceMap[0].length == 30);
-    REQUIRE(blueprint.sourceMap.metadata.list.size() == 1);
-    REQUIRE(blueprint.sourceMap.metadata.list[0].sourceMap.size() == 1);
-    REQUIRE(blueprint.sourceMap.metadata.list[0].sourceMap[0].location == 0);
-    REQUIRE(blueprint.sourceMap.metadata.list[0].sourceMap[0].length == 12);
-    REQUIRE(blueprint.sourceMap.resourceGroups.list.size() == 1);
+    REQUIRE(blueprint.sourceMap.metadata.collection.size() == 1);
+    REQUIRE(blueprint.sourceMap.metadata.collection[0].sourceMap.size() == 1);
+    REQUIRE(blueprint.sourceMap.metadata.collection[0].sourceMap[0].location == 0);
+    REQUIRE(blueprint.sourceMap.metadata.collection[0].sourceMap[0].length == 12);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection.size() == 1);
 }

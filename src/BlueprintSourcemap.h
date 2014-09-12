@@ -21,7 +21,7 @@
 
 #define SOURCE_MAP_COLLECTION(T, TC) template<>\
 struct SourceMap<TC> {\
-    Collection<SourceMap<T> >::type list;\
+    Collection<SourceMap<T> >::type collection;\
 };\
 
 namespace snowcrash {

@@ -43,16 +43,16 @@ TEST_CASE("Parse canonical values", "[values]")
     REQUIRE(values.node[1] == "0000");
     REQUIRE(values.node[2] == "beef");
 
-    REQUIRE(values.sourceMap.list.size() == 3);
-    REQUIRE(values.sourceMap.list[0].sourceMap.size() == 1);
-    REQUIRE(values.sourceMap.list[0].sourceMap[0].location == 13);
-    REQUIRE(values.sourceMap.list[0].sourceMap[0].length == 9);
-    REQUIRE(values.sourceMap.list[1].sourceMap.size() == 1);
-    REQUIRE(values.sourceMap.list[1].sourceMap[0].location == 26);
-    REQUIRE(values.sourceMap.list[1].sourceMap[0].length == 9);
-    REQUIRE(values.sourceMap.list[2].sourceMap.size() == 1);
-    REQUIRE(values.sourceMap.list[2].sourceMap[0].location == 39);
-    REQUIRE(values.sourceMap.list[2].sourceMap[0].length == 9);
+    REQUIRE(values.sourceMap.collection.size() == 3);
+    REQUIRE(values.sourceMap.collection[0].sourceMap.size() == 1);
+    REQUIRE(values.sourceMap.collection[0].sourceMap[0].location == 13);
+    REQUIRE(values.sourceMap.collection[0].sourceMap[0].length == 9);
+    REQUIRE(values.sourceMap.collection[1].sourceMap.size() == 1);
+    REQUIRE(values.sourceMap.collection[1].sourceMap[0].location == 26);
+    REQUIRE(values.sourceMap.collection[1].sourceMap[0].length == 9);
+    REQUIRE(values.sourceMap.collection[2].sourceMap.size() == 1);
+    REQUIRE(values.sourceMap.collection[2].sourceMap[0].location == 39);
+    REQUIRE(values.sourceMap.collection[2].sourceMap[0].length == 9);
 }
 
 TEST_CASE("Warn superfluous content in values attribute", "[values]")
@@ -72,10 +72,10 @@ TEST_CASE("Warn superfluous content in values attribute", "[values]")
     REQUIRE(values.node.size() == 1);
     REQUIRE(values.node[0] == "Hello");
 
-    REQUIRE(values.sourceMap.list.size() == 1);
-    REQUIRE(values.sourceMap.list[0].sourceMap.size() == 1);
-    REQUIRE(values.sourceMap.list[0].sourceMap[0].location == 22);
-    REQUIRE(values.sourceMap.list[0].sourceMap[0].length == 10);
+    REQUIRE(values.sourceMap.collection.size() == 1);
+    REQUIRE(values.sourceMap.collection[0].sourceMap.size() == 1);
+    REQUIRE(values.sourceMap.collection[0].sourceMap[0].location == 22);
+    REQUIRE(values.sourceMap.collection[0].sourceMap[0].length == 10);
 }
 
 TEST_CASE("Warn about illegal entities in values attribute", "[values]")
@@ -96,11 +96,11 @@ TEST_CASE("Warn about illegal entities in values attribute", "[values]")
     REQUIRE(values.node[0] == "Hello");
     REQUIRE(values.node[1] == "Hi");
 
-    REQUIRE(values.sourceMap.list.size() == 2);
-    REQUIRE(values.sourceMap.list[0].sourceMap.size() == 1);
-    REQUIRE(values.sourceMap.list[0].sourceMap[0].location == 13);
-    REQUIRE(values.sourceMap.list[0].sourceMap[0].length == 10);
-    REQUIRE(values.sourceMap.list[1].sourceMap.size() == 1);
-    REQUIRE(values.sourceMap.list[1].sourceMap[0].location == 41);
-    REQUIRE(values.sourceMap.list[1].sourceMap[0].length == 7);
+    REQUIRE(values.sourceMap.collection.size() == 2);
+    REQUIRE(values.sourceMap.collection[0].sourceMap.size() == 1);
+    REQUIRE(values.sourceMap.collection[0].sourceMap[0].location == 13);
+    REQUIRE(values.sourceMap.collection[0].sourceMap[0].length == 10);
+    REQUIRE(values.sourceMap.collection[1].sourceMap.size() == 1);
+    REQUIRE(values.sourceMap.collection[1].sourceMap[0].location == 41);
+    REQUIRE(values.sourceMap.collection[1].sourceMap[0].length == 7);
 }

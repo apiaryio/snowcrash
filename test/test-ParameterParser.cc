@@ -68,16 +68,16 @@ TEST_CASE("Parse canonical parameter definition", "[parameter]")
     REQUIRE(parameter.sourceMap.use.sourceMap.size() == 1);
     REQUIRE(parameter.sourceMap.use.sourceMap[0].location == 2);
     REQUIRE(parameter.sourceMap.use.sourceMap[0].length == 40);
-    REQUIRE(parameter.sourceMap.values.list.size() == 3);
-    REQUIRE(parameter.sourceMap.values.list[0].sourceMap.size() == 1);
-    REQUIRE(parameter.sourceMap.values.list[0].sourceMap[0].location == 80);
-    REQUIRE(parameter.sourceMap.values.list[0].sourceMap[0].length == 9);
-    REQUIRE(parameter.sourceMap.values.list[1].sourceMap.size() == 1);
-    REQUIRE(parameter.sourceMap.values.list[1].sourceMap[0].location == 97);
-    REQUIRE(parameter.sourceMap.values.list[1].sourceMap[0].length == 9);
-    REQUIRE(parameter.sourceMap.values.list[2].sourceMap.size() == 1);
-    REQUIRE(parameter.sourceMap.values.list[2].sourceMap[0].location == 114);
-    REQUIRE(parameter.sourceMap.values.list[2].sourceMap[0].length == 9);
+    REQUIRE(parameter.sourceMap.values.collection.size() == 3);
+    REQUIRE(parameter.sourceMap.values.collection[0].sourceMap.size() == 1);
+    REQUIRE(parameter.sourceMap.values.collection[0].sourceMap[0].location == 80);
+    REQUIRE(parameter.sourceMap.values.collection[0].sourceMap[0].length == 9);
+    REQUIRE(parameter.sourceMap.values.collection[1].sourceMap.size() == 1);
+    REQUIRE(parameter.sourceMap.values.collection[1].sourceMap[0].location == 97);
+    REQUIRE(parameter.sourceMap.values.collection[1].sourceMap[0].length == 9);
+    REQUIRE(parameter.sourceMap.values.collection[2].sourceMap.size() == 1);
+    REQUIRE(parameter.sourceMap.values.collection[2].sourceMap[0].location == 114);
+    REQUIRE(parameter.sourceMap.values.collection[2].sourceMap[0].length == 9);
 }
 
 TEST_CASE("Warn when re-setting the values attribute", "[parameter]")
@@ -104,10 +104,10 @@ TEST_CASE("Warn when re-setting the values attribute", "[parameter]")
     REQUIRE(parameter.sourceMap.name.sourceMap.size() == 1);
     REQUIRE(parameter.sourceMap.name.sourceMap[0].location == 2);
     REQUIRE(parameter.sourceMap.name.sourceMap[0].length == 3);
-    REQUIRE(parameter.sourceMap.values.list.size() == 1);
-    REQUIRE(parameter.sourceMap.values.list[0].sourceMap.size() == 1);
-    REQUIRE(parameter.sourceMap.values.list[0].sourceMap[0].location == 56);
-    REQUIRE(parameter.sourceMap.values.list[0].sourceMap[0].length == 10);
+    REQUIRE(parameter.sourceMap.values.collection.size() == 1);
+    REQUIRE(parameter.sourceMap.values.collection[0].sourceMap.size() == 1);
+    REQUIRE(parameter.sourceMap.values.collection[0].sourceMap[0].location == 56);
+    REQUIRE(parameter.sourceMap.values.collection[0].sourceMap[0].length == 10);
     REQUIRE(parameter.sourceMap.use.sourceMap.size() == 0);
 }
 
@@ -164,7 +164,7 @@ TEST_CASE("Parse full abbreviated syntax", "[parameter]")
     REQUIRE(parameter.sourceMap.use.sourceMap.size() == 1);
     REQUIRE(parameter.sourceMap.use.sourceMap[0].location == 2);
     REQUIRE(parameter.sourceMap.use.sourceMap[0].length == 58);
-    REQUIRE(parameter.sourceMap.values.list.empty());
+    REQUIRE(parameter.sourceMap.values.collection.empty());
 }
 
 TEST_CASE("Warn on error in  abbreviated syntax attribute bracket", "[parameter]")
@@ -196,7 +196,7 @@ TEST_CASE("Warn on error in  abbreviated syntax attribute bracket", "[parameter]
     REQUIRE(parameter.sourceMap.description.sourceMap[0].location == 2);
     REQUIRE(parameter.sourceMap.description.sourceMap[0].length == 54);
     REQUIRE(parameter.sourceMap.use.sourceMap.empty());
-    REQUIRE(parameter.sourceMap.values.list.empty());
+    REQUIRE(parameter.sourceMap.values.collection.empty());
 }
 
 TEST_CASE("Warn about required vs default clash", "[parameter]")
@@ -226,7 +226,7 @@ TEST_CASE("Warn about required vs default clash", "[parameter]")
     REQUIRE(parameter.sourceMap.use.sourceMap.size() == 1);
     REQUIRE(parameter.sourceMap.use.sourceMap[0].location == 2);
     REQUIRE(parameter.sourceMap.use.sourceMap[0].length == 21);
-    REQUIRE(parameter.sourceMap.values.list.empty());
+    REQUIRE(parameter.sourceMap.values.collection.empty());
 }
 
 TEST_CASE("Warn about implicit required vs default clash", "[parameter_definition][source]")
@@ -254,7 +254,7 @@ TEST_CASE("Warn about implicit required vs default clash", "[parameter_definitio
     REQUIRE(parameter.sourceMap.exampleValue.sourceMap.empty());
     REQUIRE(parameter.sourceMap.description.sourceMap.empty());
     REQUIRE(parameter.sourceMap.use.sourceMap.empty());
-    REQUIRE(parameter.sourceMap.values.list.empty());
+    REQUIRE(parameter.sourceMap.values.collection.empty());
 }
 
 TEST_CASE("Unrecognized 'values' keyword", "[parameter]")
@@ -287,7 +287,7 @@ TEST_CASE("Unrecognized 'values' keyword", "[parameter]")
     REQUIRE(parameter.sourceMap.description.sourceMap[1].location == 26);
     REQUIRE(parameter.sourceMap.description.sourceMap[1].length == 14);
     REQUIRE(parameter.sourceMap.use.sourceMap.empty());
-    REQUIRE(parameter.sourceMap.values.list.empty());
+    REQUIRE(parameter.sourceMap.values.collection.empty());
 }
 
 TEST_CASE("warn missing example item in values", "[parameter]")
@@ -308,10 +308,10 @@ TEST_CASE("warn missing example item in values", "[parameter]")
     REQUIRE(parameter.node.exampleValue == "Value1");
     REQUIRE(parameter.node.defaultValue == "Value2");
 
-    REQUIRE(parameter.sourceMap.values.list.size() == 1);
-    REQUIRE(parameter.sourceMap.values.list[0].sourceMap.size() == 1);
-    REQUIRE(parameter.sourceMap.values.list[0].sourceMap[0].location == 66);
-    REQUIRE(parameter.sourceMap.values.list[0].sourceMap[0].length == 11);
+    REQUIRE(parameter.sourceMap.values.collection.size() == 1);
+    REQUIRE(parameter.sourceMap.values.collection[0].sourceMap.size() == 1);
+    REQUIRE(parameter.sourceMap.values.collection[0].sourceMap[0].location == 66);
+    REQUIRE(parameter.sourceMap.values.collection[0].sourceMap[0].length == 11);
 }
 
 TEST_CASE("warn missing default value in values", "[parameter]")
@@ -332,10 +332,10 @@ TEST_CASE("warn missing default value in values", "[parameter]")
     REQUIRE(parameter.node.exampleValue == "Value2");
     REQUIRE(parameter.node.defaultValue == "Value1");
 
-    REQUIRE(parameter.sourceMap.values.list.size() == 1);
-    REQUIRE(parameter.sourceMap.values.list[0].sourceMap.size() == 1);
-    REQUIRE(parameter.sourceMap.values.list[0].sourceMap[0].location == 66);
-    REQUIRE(parameter.sourceMap.values.list[0].sourceMap[0].length == 11);
+    REQUIRE(parameter.sourceMap.values.collection.size() == 1);
+    REQUIRE(parameter.sourceMap.values.collection[0].sourceMap.size() == 1);
+    REQUIRE(parameter.sourceMap.values.collection[0].sourceMap[0].location == 66);
+    REQUIRE(parameter.sourceMap.values.collection[0].sourceMap[0].length == 11);
 }
 
 TEST_CASE("Parse parameters with dot in its name", "[parameter]")
@@ -361,7 +361,7 @@ TEST_CASE("Parse parameters with dot in its name", "[parameter]")
     REQUIRE(parameter.sourceMap.description.sourceMap[0].location == 2);
     REQUIRE(parameter.sourceMap.description.sourceMap[0].length == 21);
     REQUIRE(parameter.sourceMap.use.sourceMap.empty());
-    REQUIRE(parameter.sourceMap.values.list.empty());
+    REQUIRE(parameter.sourceMap.values.collection.empty());
 }
 
 TEST_CASE("Parentheses in parameter description", "[parameter]")
@@ -390,7 +390,7 @@ TEST_CASE("Parentheses in parameter description", "[parameter]")
     REQUIRE(parameter.sourceMap.description.sourceMap[0].location == 2);
     REQUIRE(parameter.sourceMap.description.sourceMap[0].length == 30);
     REQUIRE(parameter.sourceMap.use.sourceMap.empty());
-    REQUIRE(parameter.sourceMap.values.list.empty());
+    REQUIRE(parameter.sourceMap.values.collection.empty());
 }
 
 TEST_CASE("Parameter with additional description", "[parameter]")
@@ -423,7 +423,7 @@ TEST_CASE("Parameter with additional description", "[parameter]")
     REQUIRE(parameter.sourceMap.description.sourceMap[1].location == 35);
     REQUIRE(parameter.sourceMap.description.sourceMap[1].length == 22);
     REQUIRE(parameter.sourceMap.use.sourceMap.empty());
-    REQUIRE(parameter.sourceMap.values.list.empty());
+    REQUIRE(parameter.sourceMap.values.collection.empty());
 }
 
 TEST_CASE("Parameter with additional description as continuation of signature", "[parameter]")
@@ -456,7 +456,7 @@ TEST_CASE("Parameter with additional description as continuation of signature", 
     REQUIRE(parameter.sourceMap.description.sourceMap[1].location == 0);
     REQUIRE(parameter.sourceMap.description.sourceMap[1].length == 57);
     REQUIRE(parameter.sourceMap.use.sourceMap.empty());
-    REQUIRE(parameter.sourceMap.values.list.empty());
+    REQUIRE(parameter.sourceMap.values.collection.empty());
 }
 
 TEST_CASE("Parameter with list in description", "[parameter]")
@@ -495,5 +495,5 @@ TEST_CASE("Parameter with list in description", "[parameter]")
     REQUIRE(parameter.sourceMap.description.sourceMap[4].length == 14);
     REQUIRE(parameter.sourceMap.description.sourceMap[5].location == 78);
     REQUIRE(parameter.sourceMap.description.sourceMap[5].length == 21);
-    REQUIRE(parameter.sourceMap.values.list.empty());
+    REQUIRE(parameter.sourceMap.values.collection.empty());
 }

@@ -144,7 +144,7 @@ namespace snowcrash {
                     if (pd.exportSM()) {
                         SourceMap<Header> headerSM;
                         headerSM.sourceMap = node->sourceMap;
-                        out.sourceMap.list.push_back(headerSM);
+                        out.sourceMap.collection.push_back(headerSM);
                     }
                 } else {
                     // WARN: unable to parse header
@@ -167,7 +167,7 @@ namespace snowcrash {
             Collection<SourceMap<TransactionExample> >::iterator exampleSMIt;
 
             if (pd.exportSM()) {
-                exampleSMIt = examplesSM.list.begin();
+                exampleSMIt = examplesSM.collection.begin();
             }
 
             while (exampleIt != examples.end()) {
@@ -176,7 +176,7 @@ namespace snowcrash {
                 Collection<SourceMap<Request> >::iterator reqSMIt;
 
                 if (pd.exportSM()) {
-                    reqSMIt = exampleSMIt->requests.list.begin();
+                    reqSMIt = exampleSMIt->requests.collection.begin();
                 }
 
                 // Requests
@@ -186,7 +186,7 @@ namespace snowcrash {
                      ++reqIt;
 
                      if (pd.exportSM()) {
-                         reqSMIt->headers.list.insert(reqSMIt->headers.list.begin(), headersSM.list.begin(), headersSM.list.end());
+                         reqSMIt->headers.collection.insert(reqSMIt->headers.collection.begin(), headersSM.collection.begin(), headersSM.collection.end());
                          ++reqSMIt;
                      }
                 }
@@ -195,7 +195,7 @@ namespace snowcrash {
                 Collection<SourceMap<Response> >::iterator resSMIt;
 
                 if (pd.exportSM()) {
-                    resSMIt = exampleSMIt->responses.list.begin();
+                    resSMIt = exampleSMIt->responses.collection.begin();
                 }
 
                 // Responses
@@ -205,7 +205,7 @@ namespace snowcrash {
                     ++resIt;
 
                     if (pd.exportSM()) {
-                        resSMIt->headers.list.insert(resSMIt->headers.list.begin(), headersSM.list.begin(), headersSM.list.end());
+                        resSMIt->headers.collection.insert(resSMIt->headers.collection.begin(), headersSM.collection.begin(), headersSM.collection.end());
                         ++resSMIt;
                     }
                 }
