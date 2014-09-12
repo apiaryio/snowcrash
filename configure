@@ -139,9 +139,9 @@ if options.include_integration_tests:
         if e.errno == os.errno.ENOENT:
             raise RuntimeError(
                 "Integration test dependecies rely on Ruby Bundler "
-                "but it cannot be find in the system $PATH. "
+                "but it cannot be found in the system $PATH. "
                 "Please make sure to install Bundler or/and to "
-                "add it to the $PATH."
+                "add it to the $PATH. E.g.: by running `sudo gem install bundler`"
             )
         else:
             raise
