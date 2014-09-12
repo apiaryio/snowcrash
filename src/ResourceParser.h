@@ -57,7 +57,7 @@ namespace snowcrash {
                     layout = RedirectSectionLayout;
 
                     if (pd.exportSM()) {
-                        out.sourceMap.actions.list.push_back(action.sourceMap);
+                        out.sourceMap.actions.collection.push_back(action.sourceMap);
                         out.sourceMap.uriTemplate.sourceMap = node->sourceMap;
                     }
 
@@ -254,7 +254,7 @@ namespace snowcrash {
             if (!out.node.headers.empty()) {
 
                 Collection<Action>::iterator actIt = out.node.actions.begin();
-                Collection<SourceMap<Action> >::iterator actSMIt = out.sourceMap.actions.list.begin();
+                Collection<SourceMap<Action> >::iterator actSMIt = out.sourceMap.actions.collection.begin();
 
                 for (;
                      actIt != out.node.actions.end();
@@ -266,7 +266,7 @@ namespace snowcrash {
                 out.node.headers.clear();
 
                 if (pd.exportSM()) {
-                    out.sourceMap.headers.list.clear();
+                    out.sourceMap.headers.collection.clear();
                 }
             }
         }
@@ -304,7 +304,7 @@ namespace snowcrash {
             out.node.actions.push_back(action.node);
 
             if (pd.exportSM()) {
-                out.sourceMap.actions.list.push_back(action.sourceMap);
+                out.sourceMap.actions.collection.push_back(action.sourceMap);
             }
 
             return cur;
@@ -327,9 +327,9 @@ namespace snowcrash {
                 out.node.parameters.insert(out.node.parameters.end(), parameters.node.begin(), parameters.node.end());
 
                 if (pd.exportSM()) {
-                    out.sourceMap.parameters.list.insert(out.sourceMap.parameters.list.end(),
-                                                         parameters.sourceMap.list.begin(),
-                                                         parameters.sourceMap.list.end());
+                    out.sourceMap.parameters.collection.insert(out.sourceMap.parameters.collection.end(),
+                                                               parameters.sourceMap.collection.begin(),
+                                                               parameters.sourceMap.collection.end());
                 }
             }
 

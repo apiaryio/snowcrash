@@ -104,7 +104,7 @@ namespace snowcrash {
             out.node.values.clear();
 
             if (pd.exportSM()) {
-                out.sourceMap.values.list.clear();
+                out.sourceMap.values.collection.clear();
             }
 
             ParseResult<Values> values;

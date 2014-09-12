@@ -48,17 +48,17 @@ TEST_CASE("parse headers fixture", "[headers]")
     REQUIRE(headers.node[1].first == "X-My-Header");
     REQUIRE(headers.node[1].second == "Hello World!");
 
-    REQUIRE(headers.sourceMap.list.size() == 2);
-    REQUIRE(headers.sourceMap.list[0].sourceMap.size() == 2);
-    REQUIRE(headers.sourceMap.list[0].sourceMap[0].location == 15);
-    REQUIRE(headers.sourceMap.list[0].sourceMap[0].length == 35);
-    REQUIRE(headers.sourceMap.list[0].sourceMap[1].location == 54);
-    REQUIRE(headers.sourceMap.list[0].sourceMap[1].length == 30);
-    REQUIRE(headers.sourceMap.list[1].sourceMap.size() == 2);
-    REQUIRE(headers.sourceMap.list[1].sourceMap[0].location == 15);
-    REQUIRE(headers.sourceMap.list[1].sourceMap[0].length == 35);
-    REQUIRE(headers.sourceMap.list[1].sourceMap[1].location == 54);
-    REQUIRE(headers.sourceMap.list[1].sourceMap[1].length == 30);
+    REQUIRE(headers.sourceMap.collection.size() == 2);
+    REQUIRE(headers.sourceMap.collection[0].sourceMap.size() == 2);
+    REQUIRE(headers.sourceMap.collection[0].sourceMap[0].location == 15);
+    REQUIRE(headers.sourceMap.collection[0].sourceMap[0].length == 35);
+    REQUIRE(headers.sourceMap.collection[0].sourceMap[1].location == 54);
+    REQUIRE(headers.sourceMap.collection[0].sourceMap[1].length == 30);
+    REQUIRE(headers.sourceMap.collection[1].sourceMap.size() == 2);
+    REQUIRE(headers.sourceMap.collection[1].sourceMap[0].location == 15);
+    REQUIRE(headers.sourceMap.collection[1].sourceMap[0].length == 35);
+    REQUIRE(headers.sourceMap.collection[1].sourceMap[1].location == 54);
+    REQUIRE(headers.sourceMap.collection[1].sourceMap[1].length == 30);
 }
 
 TEST_CASE("parse headers fixture with no empty line between signature and content", "[headers]")
@@ -75,13 +75,13 @@ TEST_CASE("parse headers fixture with no empty line between signature and conten
     REQUIRE(headers.node[1].first == "X-My-Header");
     REQUIRE(headers.node[1].second == "Hello World!");
 
-    REQUIRE(headers.sourceMap.list.size() == 2);
-    REQUIRE(headers.sourceMap.list[0].sourceMap.size() == 1);
-    REQUIRE(headers.sourceMap.list[0].sourceMap[0].location == 0);
-    REQUIRE(headers.sourceMap.list[0].sourceMap[0].length == 83);
-    REQUIRE(headers.sourceMap.list[1].sourceMap.size() == 1);
-    REQUIRE(headers.sourceMap.list[1].sourceMap[0].location == 0);
-    REQUIRE(headers.sourceMap.list[1].sourceMap[0].length == 83);
+    REQUIRE(headers.sourceMap.collection.size() == 2);
+    REQUIRE(headers.sourceMap.collection[0].sourceMap.size() == 1);
+    REQUIRE(headers.sourceMap.collection[0].sourceMap[0].location == 0);
+    REQUIRE(headers.sourceMap.collection[0].sourceMap[0].length == 83);
+    REQUIRE(headers.sourceMap.collection[1].sourceMap.size() == 1);
+    REQUIRE(headers.sourceMap.collection[1].sourceMap[0].location == 0);
+    REQUIRE(headers.sourceMap.collection[1].sourceMap[0].length == 83);
 }
 
 TEST_CASE("parse malformed headers fixture", "[headers]")
@@ -101,21 +101,21 @@ TEST_CASE("parse malformed headers fixture", "[headers]")
     REQUIRE(headers.node[1].first == "X-My-Header");
     REQUIRE(headers.node[1].second == "Hello World!");
 
-    REQUIRE(headers.sourceMap.list.size() == 2);
-    REQUIRE(headers.sourceMap.list[0].sourceMap.size() == 3);
-    REQUIRE(headers.sourceMap.list[0].sourceMap[0].location == 15);
-    REQUIRE(headers.sourceMap.list[0].sourceMap[0].length == 35);
-    REQUIRE(headers.sourceMap.list[0].sourceMap[1].location == 54);
-    REQUIRE(headers.sourceMap.list[0].sourceMap[1].length == 30);
-    REQUIRE(headers.sourceMap.list[0].sourceMap[2].location == 88);
-    REQUIRE(headers.sourceMap.list[0].sourceMap[2].length == 21);
-    REQUIRE(headers.sourceMap.list[1].sourceMap.size() == 3);
-    REQUIRE(headers.sourceMap.list[1].sourceMap[0].location == 15);
-    REQUIRE(headers.sourceMap.list[1].sourceMap[0].length == 35);
-    REQUIRE(headers.sourceMap.list[1].sourceMap[1].location == 54);
-    REQUIRE(headers.sourceMap.list[1].sourceMap[1].length == 30);
-    REQUIRE(headers.sourceMap.list[1].sourceMap[2].location == 88);
-    REQUIRE(headers.sourceMap.list[1].sourceMap[2].length == 21);
+    REQUIRE(headers.sourceMap.collection.size() == 2);
+    REQUIRE(headers.sourceMap.collection[0].sourceMap.size() == 3);
+    REQUIRE(headers.sourceMap.collection[0].sourceMap[0].location == 15);
+    REQUIRE(headers.sourceMap.collection[0].sourceMap[0].length == 35);
+    REQUIRE(headers.sourceMap.collection[0].sourceMap[1].location == 54);
+    REQUIRE(headers.sourceMap.collection[0].sourceMap[1].length == 30);
+    REQUIRE(headers.sourceMap.collection[0].sourceMap[2].location == 88);
+    REQUIRE(headers.sourceMap.collection[0].sourceMap[2].length == 21);
+    REQUIRE(headers.sourceMap.collection[1].sourceMap.size() == 3);
+    REQUIRE(headers.sourceMap.collection[1].sourceMap[0].location == 15);
+    REQUIRE(headers.sourceMap.collection[1].sourceMap[0].length == 35);
+    REQUIRE(headers.sourceMap.collection[1].sourceMap[1].location == 54);
+    REQUIRE(headers.sourceMap.collection[1].sourceMap[1].length == 30);
+    REQUIRE(headers.sourceMap.collection[1].sourceMap[2].location == 88);
+    REQUIRE(headers.sourceMap.collection[1].sourceMap[2].length == 21);
 }
 
 TEST_CASE("Parse header section composed of multiple blocks", "[headers]")
@@ -149,16 +149,16 @@ TEST_CASE("Parse header section composed of multiple blocks", "[headers]")
     REQUIRE(headers.node[2].first == "X-My-Header");
     REQUIRE(headers.node[2].second == "42");
 
-    REQUIRE(headers.sourceMap.list.size() == 3);
-    REQUIRE(headers.sourceMap.list[0].sourceMap.size() == 1);
-    REQUIRE(headers.sourceMap.list[0].sourceMap[0].location == 15);
-    REQUIRE(headers.sourceMap.list[0].sourceMap[0].length == 33);
-    REQUIRE(headers.sourceMap.list[1].sourceMap.size() == 1);
-    REQUIRE(headers.sourceMap.list[1].sourceMap[0].location == 52);
-    REQUIRE(headers.sourceMap.list[1].sourceMap[0].length == 9);
-    REQUIRE(headers.sourceMap.list[2].sourceMap.size() == 1);
-    REQUIRE(headers.sourceMap.list[2].sourceMap[0].location == 65);
-    REQUIRE(headers.sourceMap.list[2].sourceMap[0].length == 20);
+    REQUIRE(headers.sourceMap.collection.size() == 3);
+    REQUIRE(headers.sourceMap.collection[0].sourceMap.size() == 1);
+    REQUIRE(headers.sourceMap.collection[0].sourceMap[0].location == 15);
+    REQUIRE(headers.sourceMap.collection[0].sourceMap[0].length == 33);
+    REQUIRE(headers.sourceMap.collection[1].sourceMap.size() == 1);
+    REQUIRE(headers.sourceMap.collection[1].sourceMap[0].location == 52);
+    REQUIRE(headers.sourceMap.collection[1].sourceMap[0].length == 9);
+    REQUIRE(headers.sourceMap.collection[2].sourceMap.size() == 1);
+    REQUIRE(headers.sourceMap.collection[2].sourceMap[0].location == 65);
+    REQUIRE(headers.sourceMap.collection[2].sourceMap[0].length == 20);
 }
 
 TEST_CASE("Parse header section with missing headers", "[headers]")
@@ -172,5 +172,5 @@ TEST_CASE("Parse header section with missing headers", "[headers]")
     REQUIRE(headers.report.warnings.size() == 1); // no headers
 
     REQUIRE(headers.node.size() == 0);
-    REQUIRE(headers.sourceMap.list.size() == 0);
+    REQUIRE(headers.sourceMap.collection.size() == 0);
 }
