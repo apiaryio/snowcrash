@@ -123,7 +123,7 @@ namespace snowcrash {
                         out.node.examples.push_back(transaction);
 
                         if (pd.exportSM()) {
-                            out.sourceMap.examples.list.push_back(transactionSM);
+                            out.sourceMap.examples.collection.push_back(transactionSM);
                         }
                     }
 
@@ -132,7 +132,7 @@ namespace snowcrash {
                     out.node.examples.back().requests.push_back(payload.node);
 
                     if (pd.exportSM()) {
-                        out.sourceMap.examples.list.back().requests.list.push_back(payload.sourceMap);
+                        out.sourceMap.examples.collection.back().requests.collection.push_back(payload.sourceMap);
                     }
 
                     break;
@@ -153,7 +153,7 @@ namespace snowcrash {
                         out.node.examples.push_back(transaction);
 
                         if (pd.exportSM()) {
-                            out.sourceMap.examples.list.push_back(transactionSM);
+                            out.sourceMap.examples.collection.push_back(transactionSM);
                         }
                     }
 
@@ -162,7 +162,7 @@ namespace snowcrash {
                     out.node.examples.back().responses.push_back(payload.node);
 
                     if (pd.exportSM()) {
-                        out.sourceMap.examples.list.back().responses.list.push_back(payload.sourceMap);
+                        out.sourceMap.examples.collection.back().responses.collection.push_back(payload.sourceMap);
                     }
 
                     break;
@@ -220,7 +220,7 @@ namespace snowcrash {
                 mdp::ByteBuffer content = CodeBlockUtility::addDanglingAsset(node, pd, sectionType, out.report, out.node.examples.back().responses.back().body);
 
                 if (pd.exportSM() && !content.empty()) {
-                    out.sourceMap.examples.list.back().responses.list.back().body.sourceMap.append(node->sourceMap);
+                    out.sourceMap.examples.collection.back().responses.collection.back().body.sourceMap.append(node->sourceMap);
                 }
             } else {
 
@@ -312,7 +312,7 @@ namespace snowcrash {
                 out.node.headers.clear();
 
                 if (pd.exportSM()) {
-                    out.sourceMap.headers.list.clear();
+                    out.sourceMap.headers.collection.clear();
                 }
             }
 

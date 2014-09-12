@@ -49,7 +49,9 @@ namespace snowcrash {
                     out.node.metadata.insert(out.node.metadata.end(), metadata.node.begin(), metadata.node.end());
 
                     if (pd.exportSM()) {
-                        out.sourceMap.metadata.list.insert(out.sourceMap.metadata.list.end(), metadata.sourceMap.list.begin(), metadata.sourceMap.list.end());
+                        out.sourceMap.metadata.collection.insert(out.sourceMap.metadata.collection.end(),
+                                                                 metadata.sourceMap.collection.begin(),
+                                                                 metadata.sourceMap.collection.end());
                     }
                 }
 
@@ -119,7 +121,7 @@ namespace snowcrash {
                 out.node.resourceGroups.push_back(resourceGroup.node);
 
                 if (pd.exportSM()) {
-                    out.sourceMap.resourceGroups.list.push_back(resourceGroup.sourceMap);
+                    out.sourceMap.resourceGroups.collection.push_back(resourceGroup.sourceMap);
                 }
 
                 return cur;
@@ -218,7 +220,7 @@ namespace snowcrash {
                     if (pd.exportSM()) {
                         SourceMap<Metadata> metadataSM;
                         metadataSM.sourceMap = node->sourceMap;
-                        out.sourceMap.list.push_back(metadataSM);
+                        out.sourceMap.collection.push_back(metadataSM);
                     }
                 }
             }

@@ -256,9 +256,9 @@ static void serialize(const Collection<SourceMap<Parameter> >::type& parameters,
         // Values
         serialize(SerializeKey::Values, std::string(), level + 1, os);
 
-        if (!it->values.list.empty()) {
-            for (Collection<SourceMap<Value> >::const_iterator val_it = it->values.list.begin();
-                 val_it != it->values.list.end();
+        if (!it->values.collection.empty()) {
+            for (Collection<SourceMap<Value> >::const_iterator val_it = it->values.collection.begin();
+                 val_it != it->values.collection.end();
                  ++val_it) {
 
                 ArrayItemLeadIn(level + 2, os);
@@ -322,8 +322,8 @@ static void serialize(const SourceMap<Payload>& payload, size_t level, bool arra
     // Headers
     serialize(SerializeKey::Headers, std::string(), level, os);
 
-    if (!payload.headers.list.empty()) {
-        serialize(payload.headers.list, level, os);
+    if (!payload.headers.collection.empty()) {
+        serialize(payload.headers.collection, level, os);
     }
 
     // Body
@@ -383,9 +383,9 @@ static void serialize(const SourceMap<TransactionExample>& example, std::ostream
     // Requests
     serialize(SerializeKey::Requests, std::string(), 4, os);
 
-    if (!example.requests.list.empty()) {
-        for (Collection<SourceMap<Request> >::const_iterator it = example.requests.list.begin();
-             it != example.requests.list.end();
+    if (!example.requests.collection.empty()) {
+        for (Collection<SourceMap<Request> >::const_iterator it = example.requests.collection.begin();
+             it != example.requests.collection.end();
              ++it) {
 
             serialize(*it, 5, true, os);
@@ -395,9 +395,9 @@ static void serialize(const SourceMap<TransactionExample>& example, std::ostream
     // Responses
     serialize(SerializeKey::Responses, std::string(), 4, os);
 
-    if (!example.responses.list.empty()) {
-        for (Collection<SourceMap<Response> >::const_iterator it = example.responses.list.begin();
-             it != example.responses.list.end();
+    if (!example.responses.collection.empty()) {
+        for (Collection<SourceMap<Response> >::const_iterator it = example.responses.collection.begin();
+             it != example.responses.collection.end();
              ++it) {
 
             serialize(*it, 5, true, os);
@@ -455,15 +455,15 @@ static void serialize(const SourceMap<Action>& action, std::ostream &os)
     // Parameters
     serialize(SerializeKey::Parameters, std::string(), 3, os);
 
-    if (!action.parameters.list.empty())
-        serialize(action.parameters.list, 3, os);
+    if (!action.parameters.collection.empty())
+        serialize(action.parameters.collection, 3, os);
 
     // Examples
     serialize(SerializeKey::Examples, std::string(), 3, os);
 
-    if (!action.examples.list.empty()) {
-        for (Collection<SourceMap<TransactionExample> >::const_iterator it = action.examples.list.begin();
-             it != action.examples.list.end();
+    if (!action.examples.collection.empty()) {
+        for (Collection<SourceMap<TransactionExample> >::const_iterator it = action.examples.collection.begin();
+             it != action.examples.collection.end();
              ++it) {
 
             serialize(*it, os);
@@ -534,17 +534,17 @@ static void serialize(const SourceMap<Resource>& resource, std::ostream &os)
     // Parameters
     serialize(SerializeKey::Parameters, std::string(), 2, os);
 
-    if (!resource.parameters.list.empty())
-        serialize(resource.parameters.list, 2, os);
+    if (!resource.parameters.collection.empty())
+        serialize(resource.parameters.collection, 2, os);
 
     // Actions
     serialize(SerializeKey::Actions, std::string(), 2, os);
 
-    if (resource.actions.list.empty())
+    if (resource.actions.collection.empty())
         return;
 
-    for (Collection<SourceMap<Action> >::const_iterator it = resource.actions.list.begin();
-         it != resource.actions.list.end();
+    for (Collection<SourceMap<Action> >::const_iterator it = resource.actions.collection.begin();
+         it != resource.actions.collection.end();
          ++it) {
 
         serialize(*it, os);
@@ -590,11 +590,11 @@ static void serialize(const SourceMap<ResourceGroup>& group, std::ostream &os)
     // Resources
     serialize(SerializeKey::Resources, std::string(), 1, os);
 
-    if (group.resources.list.empty())
+    if (group.resources.collection.empty())
         return;
 
-    for (Collection<SourceMap<Resource> >::const_iterator it = group.resources.list.begin();
-         it != group.resources.list.end();
+    for (Collection<SourceMap<Resource> >::const_iterator it = group.resources.collection.begin();
+         it != group.resources.collection.end();
          ++it) {
 
         serialize(*it, os);
@@ -634,7 +634,7 @@ static void serialize(const Blueprint& blueprint, std::ostream &os)
 static void serialize(const SourceMap<Blueprint>& blueprint, std::ostream &os)
 {
     // Metadata
-    serialize(blueprint.metadata.list, os);
+    serialize(blueprint.metadata.collection, os);
 
     // API Name
     serialize(SerializeKey::Name, blueprint.name, 0, os);
@@ -645,11 +645,11 @@ static void serialize(const SourceMap<Blueprint>& blueprint, std::ostream &os)
     // Resource Groups
     serialize(SerializeKey::ResourceGroups, std::string(), 0, os);
 
-    if (blueprint.resourceGroups.list.empty())
+    if (blueprint.resourceGroups.collection.empty())
         return;
 
-    for (Collection<SourceMap<ResourceGroup> >::type::const_iterator it = blueprint.resourceGroups.list.begin();
-         it != blueprint.resourceGroups.list.end();
+    for (Collection<SourceMap<ResourceGroup> >::type::const_iterator it = blueprint.resourceGroups.collection.begin();
+         it != blueprint.resourceGroups.collection.end();
          ++it) {
 
         serialize(*it, os);

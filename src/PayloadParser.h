@@ -543,7 +543,7 @@ namespace snowcrash {
                     if (pd.exportSM()) {
                         SourceMap<Header> headerSM;
                         headerSM.sourceMap = node->sourceMap;
-                        out.sourceMap.headers.list.push_back(headerSM);
+                        out.sourceMap.headers.collection.push_back(headerSM);
                     }
                 }
             }

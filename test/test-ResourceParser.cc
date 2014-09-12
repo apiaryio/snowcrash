@@ -90,24 +90,24 @@ TEST_CASE("Parse resource", "[resource]")
     REQUIRE(resource.sourceMap.uriTemplate.sourceMap.size() == 1);
     REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].location == 0);
     REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].length == 40);
-    REQUIRE(resource.sourceMap.headers.list.size() == 0);
-    REQUIRE(resource.sourceMap.parameters.list.size() == 2);
-    REQUIRE(resource.sourceMap.parameters.list[0].name.sourceMap.size() == 1);
-    REQUIRE(resource.sourceMap.parameters.list[0].name.sourceMap[0].location == 125);
-    REQUIRE(resource.sourceMap.parameters.list[0].name.sourceMap[0].length == 40);
-    REQUIRE(resource.sourceMap.parameters.list[1].name.sourceMap.size() == 1);
-    REQUIRE(resource.sourceMap.parameters.list[1].name.sourceMap[0].location == 271);
-    REQUIRE(resource.sourceMap.parameters.list[1].name.sourceMap[0].length == 6);
+    REQUIRE(resource.sourceMap.headers.collection.size() == 0);
+    REQUIRE(resource.sourceMap.parameters.collection.size() == 2);
+    REQUIRE(resource.sourceMap.parameters.collection[0].name.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.parameters.collection[0].name.sourceMap[0].location == 125);
+    REQUIRE(resource.sourceMap.parameters.collection[0].name.sourceMap[0].length == 40);
+    REQUIRE(resource.sourceMap.parameters.collection[1].name.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.parameters.collection[1].name.sourceMap[0].location == 271);
+    REQUIRE(resource.sourceMap.parameters.collection[1].name.sourceMap[0].length == 6);
     REQUIRE(resource.sourceMap.model.name.sourceMap.size() == 1);
     REQUIRE(resource.sourceMap.model.name.sourceMap[0].location == 63);
     REQUIRE(resource.sourceMap.model.name.sourceMap[0].length == 29);
     REQUIRE(resource.sourceMap.model.body.sourceMap.size() == 1);
     REQUIRE(resource.sourceMap.model.body.sourceMap[0].location == 96);
     REQUIRE(resource.sourceMap.model.body.sourceMap[0].length == 9);
-    REQUIRE(resource.sourceMap.actions.list.size() == 1);
-    REQUIRE(resource.sourceMap.actions.list[0].method.sourceMap.size() == 1);
-    REQUIRE(resource.sourceMap.actions.list[0].method.sourceMap[0].location == 278);
-    REQUIRE(resource.sourceMap.actions.list[0].method.sourceMap[0].length == 20);
+    REQUIRE(resource.sourceMap.actions.collection.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].method.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].method.sourceMap[0].location == 278);
+    REQUIRE(resource.sourceMap.actions.collection[0].method.sourceMap[0].length == 20);
 }
 
 TEST_CASE("Parse partially defined resource", "[resource]")
@@ -145,10 +145,10 @@ TEST_CASE("Parse partially defined resource", "[resource]")
     REQUIRE(resource.sourceMap.uriTemplate.sourceMap.size() == 1);
     REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].location == 0);
     REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].length == 5);
-    REQUIRE(resource.sourceMap.actions.list.size() == 1);
-    REQUIRE(resource.sourceMap.actions.list[0].method.sourceMap.size() == 1);
-    REQUIRE(resource.sourceMap.actions.list[0].method.sourceMap[0].location == 5);
-    REQUIRE(resource.sourceMap.actions.list[0].method.sourceMap[0].length == 7);
+    REQUIRE(resource.sourceMap.actions.collection.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].method.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].method.sourceMap[0].location == 5);
+    REQUIRE(resource.sourceMap.actions.collection[0].method.sourceMap[0].length == 7);
 }
 
 TEST_CASE("Parse multiple method descriptions", "[resource]")
@@ -181,13 +181,13 @@ TEST_CASE("Parse multiple method descriptions", "[resource]")
     REQUIRE(resource.sourceMap.uriTemplate.sourceMap.size() == 1);
     REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].location == 0);
     REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].length == 5);
-    REQUIRE(resource.sourceMap.actions.list.size() == 2);
-    REQUIRE(resource.sourceMap.actions.list[0].method.sourceMap.size() == 1);
-    REQUIRE(resource.sourceMap.actions.list[0].method.sourceMap[0].location == 5);
-    REQUIRE(resource.sourceMap.actions.list[0].method.sourceMap[0].length == 6);
-    REQUIRE(resource.sourceMap.actions.list[1].method.sourceMap.size() == 1);
-    REQUIRE(resource.sourceMap.actions.list[1].method.sourceMap[0].location == 14);
-    REQUIRE(resource.sourceMap.actions.list[1].method.sourceMap[0].length == 7);
+    REQUIRE(resource.sourceMap.actions.collection.size() == 2);
+    REQUIRE(resource.sourceMap.actions.collection[0].method.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].method.sourceMap[0].location == 5);
+    REQUIRE(resource.sourceMap.actions.collection[0].method.sourceMap[0].length == 6);
+    REQUIRE(resource.sourceMap.actions.collection[1].method.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[1].method.sourceMap[0].location == 14);
+    REQUIRE(resource.sourceMap.actions.collection[1].method.sourceMap[0].length == 7);
 }
 
 TEST_CASE("Parse multiple methods", "[resource]")
@@ -250,16 +250,16 @@ TEST_CASE("Parse multiple methods", "[resource]")
     REQUIRE(resource.sourceMap.uriTemplate.sourceMap.size() == 1);
     REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].location == 0);
     REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].length == 5);
-    REQUIRE(resource.sourceMap.actions.list.size() == 3);
-    REQUIRE(resource.sourceMap.actions.list[0].method.sourceMap.size() == 1);
-    REQUIRE(resource.sourceMap.actions.list[0].method.sourceMap[0].location == 7);
-    REQUIRE(resource.sourceMap.actions.list[0].method.sourceMap[0].length == 7);
-    REQUIRE(resource.sourceMap.actions.list[1].method.sourceMap.size() == 1);
-    REQUIRE(resource.sourceMap.actions.list[1].method.sourceMap[0].location == 63);
-    REQUIRE(resource.sourceMap.actions.list[1].method.sourceMap[0].length == 8);
-    REQUIRE(resource.sourceMap.actions.list[2].method.sourceMap.size() == 1);
-    REQUIRE(resource.sourceMap.actions.list[2].method.sourceMap[0].location == 128);
-    REQUIRE(resource.sourceMap.actions.list[2].method.sourceMap[0].length == 7);
+    REQUIRE(resource.sourceMap.actions.collection.size() == 3);
+    REQUIRE(resource.sourceMap.actions.collection[0].method.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].method.sourceMap[0].location == 7);
+    REQUIRE(resource.sourceMap.actions.collection[0].method.sourceMap[0].length == 7);
+    REQUIRE(resource.sourceMap.actions.collection[1].method.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[1].method.sourceMap[0].location == 63);
+    REQUIRE(resource.sourceMap.actions.collection[1].method.sourceMap[0].length == 8);
+    REQUIRE(resource.sourceMap.actions.collection[2].method.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[2].method.sourceMap[0].location == 128);
+    REQUIRE(resource.sourceMap.actions.collection[2].method.sourceMap[0].length == 7);
 }
 
 TEST_CASE("Parse description with list", "[resource]")
@@ -289,7 +289,7 @@ TEST_CASE("Parse description with list", "[resource]")
     REQUIRE(resource.sourceMap.uriTemplate.sourceMap.size() == 1);
     REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].location == 0);
     REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].length == 5);
-    REQUIRE(resource.sourceMap.actions.list.empty());
+    REQUIRE(resource.sourceMap.actions.collection.empty());
 }
 
 TEST_CASE("Parse resource with a HR", "[resource][block]")
@@ -319,7 +319,7 @@ TEST_CASE("Parse resource with a HR", "[resource][block]")
     REQUIRE(resource.sourceMap.uriTemplate.sourceMap.size() == 1);
     REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].location == 0);
     REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].length == 5);
-    REQUIRE(resource.sourceMap.actions.list.empty());
+    REQUIRE(resource.sourceMap.actions.collection.empty());
 }
 
 TEST_CASE("Parse resource method abbreviation", "[resource]")
@@ -352,10 +352,10 @@ TEST_CASE("Parse resource method abbreviation", "[resource]")
     REQUIRE(resource.sourceMap.uriTemplate.sourceMap.size() == 1);
     REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].location == 0);
     REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].length == 16);
-    REQUIRE(resource.sourceMap.actions.list.size() == 1);
-    REQUIRE(resource.sourceMap.actions.list[0].method.sourceMap.size() == 1);
-    REQUIRE(resource.sourceMap.actions.list[0].method.sourceMap[0].location == 0);
-    REQUIRE(resource.sourceMap.actions.list[0].method.sourceMap[0].length == 16);
+    REQUIRE(resource.sourceMap.actions.collection.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].method.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].method.sourceMap[0].location == 0);
+    REQUIRE(resource.sourceMap.actions.collection[0].method.sourceMap[0].length == 16);
 }
 
 TEST_CASE("Parse resource without name", "[resource]")
@@ -379,7 +379,7 @@ TEST_CASE("Parse resource without name", "[resource]")
     REQUIRE(resource.sourceMap.uriTemplate.sourceMap.size() == 1);
     REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].location == 0);
     REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].length == 12);
-    REQUIRE(resource.sourceMap.actions.list.empty());
+    REQUIRE(resource.sourceMap.actions.collection.empty());
 }
 
 TEST_CASE("Warn about parameters not in URI template", "[resource][source]")
@@ -413,8 +413,8 @@ TEST_CASE("Warn about parameters not in URI template", "[resource][source]")
     REQUIRE(resource.sourceMap.uriTemplate.sourceMap.size() == 1);
     REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].location == 0);
     REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].length == 17);
-    REQUIRE(resource.sourceMap.parameters.list.size() == 1);
-    REQUIRE(resource.sourceMap.actions.list.size() == 1);
+    REQUIRE(resource.sourceMap.parameters.collection.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection.size() == 1);
 }
 
 TEST_CASE("Parse nameless resource with named model", "[resource][model][source]")
@@ -444,8 +444,8 @@ TEST_CASE("Parse nameless resource with named model", "[resource][model][source]
     REQUIRE(resource.sourceMap.model.name.sourceMap.size() == 1);
     REQUIRE(resource.sourceMap.model.name.sourceMap[0].location == 13);
     REQUIRE(resource.sourceMap.model.name.sourceMap[0].length == 13);
-    REQUIRE(resource.sourceMap.parameters.list.empty());
-    REQUIRE(resource.sourceMap.actions.list.empty());
+    REQUIRE(resource.sourceMap.parameters.collection.empty());
+    REQUIRE(resource.sourceMap.actions.collection.empty());
 }
 
 TEST_CASE("Parse nameless resource with nameless model", "[resource][model][source]")
@@ -471,8 +471,8 @@ TEST_CASE("Parse nameless resource with nameless model", "[resource][model][sour
     REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].location == 0);
     REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].length == 11);
     REQUIRE(resource.sourceMap.model.name.sourceMap.empty());
-    REQUIRE(resource.sourceMap.parameters.list.empty());
-    REQUIRE(resource.sourceMap.actions.list.empty());
+    REQUIRE(resource.sourceMap.parameters.collection.empty());
+    REQUIRE(resource.sourceMap.actions.collection.empty());
 }
 
 TEST_CASE("Parse named resource with nameless model", "[resource][model][source]")
@@ -509,8 +509,8 @@ TEST_CASE("Parse named resource with nameless model", "[resource][model][source]
     REQUIRE(resource.sourceMap.uriTemplate.sourceMap.size() == 1);
     REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].location == 0);
     REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].length == 21);
-    REQUIRE(resource.sourceMap.parameters.list.empty());
-    REQUIRE(resource.sourceMap.actions.list.size() == 1);
+    REQUIRE(resource.sourceMap.parameters.collection.empty());
+    REQUIRE(resource.sourceMap.actions.collection.size() == 1);
     REQUIRE(resource.sourceMap.model.name.sourceMap.size() == 1);
     REQUIRE(resource.sourceMap.model.name.sourceMap[0].location == 0);
     REQUIRE(resource.sourceMap.model.name.sourceMap[0].length == 21);
@@ -555,8 +555,8 @@ TEST_CASE("Parse root resource", "[resource]")
     REQUIRE(resource.sourceMap.uriTemplate.sourceMap.size() == 1);
     REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].location == 0);
     REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].length == 15);
-    REQUIRE(resource.sourceMap.parameters.list.empty());
-    REQUIRE(resource.sourceMap.actions.list.empty());
+    REQUIRE(resource.sourceMap.parameters.collection.empty());
+    REQUIRE(resource.sourceMap.actions.collection.empty());
 }
 
 TEST_CASE("Parse resource with invalid URI Tempalte", "[resource]")
@@ -581,8 +581,8 @@ TEST_CASE("Parse resource with invalid URI Tempalte", "[resource]")
     REQUIRE(resource.sourceMap.uriTemplate.sourceMap.size() == 1);
     REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].location == 0);
     REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].length == 26);
-    REQUIRE(resource.sourceMap.parameters.list.empty());
-    REQUIRE(resource.sourceMap.actions.list.empty());
+    REQUIRE(resource.sourceMap.parameters.collection.empty());
+    REQUIRE(resource.sourceMap.actions.collection.empty());
 }
 
 TEST_CASE("Deprecated resource and action headers", "[resource]")
@@ -624,22 +624,22 @@ TEST_CASE("Deprecated resource and action headers", "[resource]")
     REQUIRE(resource.sourceMap.uriTemplate.sourceMap.size() == 1);
     REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].location == 0);
     REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].length == 4);
-    REQUIRE(resource.sourceMap.parameters.list.empty());
-    REQUIRE(resource.sourceMap.headers.list.empty());
-    REQUIRE(resource.sourceMap.actions.list.size() == 1);
-    REQUIRE(resource.sourceMap.actions.list[0].headers.list.empty());
-    REQUIRE(resource.sourceMap.actions.list[0].examples.list.size() == 1);
-    REQUIRE(resource.sourceMap.actions.list[0].examples.list[0].responses.list.size() == 1);
-    REQUIRE(resource.sourceMap.actions.list[0].examples.list[0].responses.list[0].headers.list.size() == 3);
-    REQUIRE(resource.sourceMap.actions.list[0].examples.list[0].responses.list[0].headers.list[0].sourceMap.size() == 1);
-    REQUIRE(resource.sourceMap.actions.list[0].examples.list[0].responses.list[0].headers.list[0].sourceMap[0].location == 19);
-    REQUIRE(resource.sourceMap.actions.list[0].examples.list[0].responses.list[0].headers.list[0].sourceMap[0].length == 20);
-    REQUIRE(resource.sourceMap.actions.list[0].examples.list[0].responses.list[0].headers.list[1].sourceMap.size() == 1);
-    REQUIRE(resource.sourceMap.actions.list[0].examples.list[0].responses.list[0].headers.list[1].sourceMap[0].location == 62);
-    REQUIRE(resource.sourceMap.actions.list[0].examples.list[0].responses.list[0].headers.list[1].sourceMap[0].length == 20);
-    REQUIRE(resource.sourceMap.actions.list[0].examples.list[0].responses.list[0].headers.list[2].sourceMap.size() == 1);
-    REQUIRE(resource.sourceMap.actions.list[0].examples.list[0].responses.list[0].headers.list[2].sourceMap[0].location == 121);
-    REQUIRE(resource.sourceMap.actions.list[0].examples.list[0].responses.list[0].headers.list[2].sourceMap[0].length == 20);
+    REQUIRE(resource.sourceMap.parameters.collection.empty());
+    REQUIRE(resource.sourceMap.headers.collection.empty());
+    REQUIRE(resource.sourceMap.actions.collection.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].headers.collection.empty());
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].responses.collection.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].responses.collection[0].headers.collection.size() == 3);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[0].sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[0].sourceMap[0].location == 19);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[0].sourceMap[0].length == 20);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[1].sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[1].sourceMap[0].location == 62);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[1].sourceMap[0].length == 20);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[2].sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[2].sourceMap[0].location == 121);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[2].sourceMap[0].length == 20);
 }
 
 TEST_CASE("Bug fix for recognition of model as a part of other word or as a quote, issue #92 and #152", "[model]")

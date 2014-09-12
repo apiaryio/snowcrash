@@ -64,10 +64,10 @@ TEST_CASE("Parse canonical resource group", "[resource_group]")
     REQUIRE(resourceGroup.sourceMap.description.sourceMap.size() == 1);
     REQUIRE(resourceGroup.sourceMap.description.sourceMap[0].location == 15);
     REQUIRE(resourceGroup.sourceMap.description.sourceMap[0].length == 14);
-    REQUIRE(resourceGroup.sourceMap.resources.list.size() == 1);
-    REQUIRE(resourceGroup.sourceMap.resources.list[0].name.sourceMap.size() == 1);
-    REQUIRE(resourceGroup.sourceMap.resources.list[0].name.sourceMap[0].location == 29);
-    REQUIRE(resourceGroup.sourceMap.resources.list[0].name.sourceMap[0].length == 32);
+    REQUIRE(resourceGroup.sourceMap.resources.collection.size() == 1);
+    REQUIRE(resourceGroup.sourceMap.resources.collection[0].name.sourceMap.size() == 1);
+    REQUIRE(resourceGroup.sourceMap.resources.collection[0].name.sourceMap[0].location == 29);
+    REQUIRE(resourceGroup.sourceMap.resources.collection[0].name.sourceMap[0].length == 32);
 }
 
 TEST_CASE("Parse resource group with empty resource", "[resource_group]")
@@ -94,10 +94,10 @@ TEST_CASE("Parse resource group with empty resource", "[resource_group]")
     REQUIRE(resourceGroup.sourceMap.description.sourceMap.size() == 1);
     REQUIRE(resourceGroup.sourceMap.description.sourceMap[0].location == 13);
     REQUIRE(resourceGroup.sourceMap.description.sourceMap[0].length == 3);
-    REQUIRE(resourceGroup.sourceMap.resources.list.size() == 1);
-    REQUIRE(resourceGroup.sourceMap.resources.list[0].uriTemplate.sourceMap.size() == 1);
-    REQUIRE(resourceGroup.sourceMap.resources.list[0].uriTemplate.sourceMap[0].location == 16);
-    REQUIRE(resourceGroup.sourceMap.resources.list[0].uriTemplate.sourceMap[0].length == 12);
+    REQUIRE(resourceGroup.sourceMap.resources.collection.size() == 1);
+    REQUIRE(resourceGroup.sourceMap.resources.collection[0].uriTemplate.sourceMap.size() == 1);
+    REQUIRE(resourceGroup.sourceMap.resources.collection[0].uriTemplate.sourceMap[0].location == 16);
+    REQUIRE(resourceGroup.sourceMap.resources.collection[0].uriTemplate.sourceMap[0].length == 12);
 }
 
 TEST_CASE("Parse multiple resource in anonymous group", "[resource_group]")
@@ -125,7 +125,7 @@ TEST_CASE("Parse multiple resource in anonymous group", "[resource_group]")
 
     REQUIRE(resourceGroup.sourceMap.name.sourceMap.empty());
     REQUIRE(resourceGroup.sourceMap.description.sourceMap.empty());
-    REQUIRE(resourceGroup.sourceMap.resources.list.size() == 2);
+    REQUIRE(resourceGroup.sourceMap.resources.collection.size() == 2);
 }
 
 TEST_CASE("Parse multiple resources with payloads", "[resource_group]")
@@ -176,7 +176,7 @@ TEST_CASE("Parse multiple resources with payloads", "[resource_group]")
 
     REQUIRE(resourceGroup.sourceMap.name.sourceMap.empty());
     REQUIRE(resourceGroup.sourceMap.description.sourceMap.empty());
-    REQUIRE(resourceGroup.sourceMap.resources.list.size() == 2);
+    REQUIRE(resourceGroup.sourceMap.resources.collection.size() == 2);
 }
 
 TEST_CASE("Parse multiple resources with the same name", "[resource_group]")
@@ -199,7 +199,7 @@ TEST_CASE("Parse multiple resources with the same name", "[resource_group]")
 
     REQUIRE(resourceGroup.sourceMap.name.sourceMap.empty());
     REQUIRE(resourceGroup.sourceMap.description.sourceMap.empty());
-    REQUIRE(resourceGroup.sourceMap.resources.list.size() == 2);
+    REQUIRE(resourceGroup.sourceMap.resources.collection.size() == 2);
 }
 
 TEST_CASE("Parse resource with list in its description", "[resource_group]")
@@ -230,7 +230,7 @@ TEST_CASE("Parse resource with list in its description", "[resource_group]")
 
     REQUIRE(resourceGroup.sourceMap.name.sourceMap.empty());
     REQUIRE(resourceGroup.sourceMap.description.sourceMap.empty());
-    REQUIRE(resourceGroup.sourceMap.resources.list.size() == 1);
+    REQUIRE(resourceGroup.sourceMap.resources.collection.size() == 1);
 }
 
 TEST_CASE("Parse resource groups with hr in description", "[resource_group]")
@@ -256,7 +256,7 @@ TEST_CASE("Parse resource groups with hr in description", "[resource_group]")
     REQUIRE(resourceGroup.sourceMap.description.sourceMap.size() == 1);
     REQUIRE(resourceGroup.sourceMap.description.sourceMap[0].location == 10);
     REQUIRE(resourceGroup.sourceMap.description.sourceMap[0].length == 6);
-    REQUIRE(resourceGroup.sourceMap.resources.list.empty());
+    REQUIRE(resourceGroup.sourceMap.resources.collection.empty());
 }
 
 TEST_CASE("Make sure method followed by a group does not eat the group", "[resource_group]")
@@ -285,7 +285,7 @@ TEST_CASE("Make sure method followed by a group does not eat the group", "[resou
     REQUIRE(resourceGroup.sourceMap.name.sourceMap[0].location == 0);
     REQUIRE(resourceGroup.sourceMap.name.sourceMap[0].length == 12);
     REQUIRE(resourceGroup.sourceMap.description.sourceMap.empty());
-    REQUIRE(resourceGroup.sourceMap.resources.list.size() == 1);
+    REQUIRE(resourceGroup.sourceMap.resources.collection.size() == 1);
 }
 
 TEST_CASE("Parse resource method abbreviation followed by a foreign method", "[resource_group]")
@@ -314,7 +314,7 @@ TEST_CASE("Parse resource method abbreviation followed by a foreign method", "[r
 
     REQUIRE(resourceGroup.sourceMap.name.sourceMap.empty());
     REQUIRE(resourceGroup.sourceMap.description.sourceMap.empty());
-    REQUIRE(resourceGroup.sourceMap.resources.list.size() == 1);
+    REQUIRE(resourceGroup.sourceMap.resources.collection.size() == 1);
 }
 
 TEST_CASE("Parse resource method abbreviation followed by another", "[resource_group]")
@@ -349,7 +349,7 @@ TEST_CASE("Parse resource method abbreviation followed by another", "[resource_g
 
     REQUIRE(resourceGroup.sourceMap.name.sourceMap.empty());
     REQUIRE(resourceGroup.sourceMap.description.sourceMap.empty());
-    REQUIRE(resourceGroup.sourceMap.resources.list.size() == 2);
-    REQUIRE(resourceGroup.sourceMap.resources.list[0].actions.list.size() == 1);
-    REQUIRE(resourceGroup.sourceMap.resources.list[1].actions.list.size() == 1);
+    REQUIRE(resourceGroup.sourceMap.resources.collection.size() == 2);
+    REQUIRE(resourceGroup.sourceMap.resources.collection[0].actions.collection.size() == 1);
+    REQUIRE(resourceGroup.sourceMap.resources.collection[1].actions.collection.size() == 1);
 }
