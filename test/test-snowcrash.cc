@@ -569,3 +569,45 @@ TEST_CASE("Parse ill-formated header", "[parser][#198][regression]")
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[0].first == "Location");
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[0].second == "new_url");
 }
+
+TEST_CASE("Overshadow parameters", "[parser][#201][regression][parameters]")
+{
+    mdp::ByteBuffer source = \
+    "# /{a,b,c}\n"\
+    "\n"\
+    "## GET\n"\
+    "+ parameters\n"\
+    "    + a ... 1\n"\
+    "    + b ... 2\n"\
+    "    + c ... 3\n"\
+    "\n"\
+    "+ parameters\n"\
+    "    + a ... 4\n"\
+    "\n"\
+    "+ response 200\n";
+    
+    Blueprint blueprint;
+    Report report;
+    
+    parse(source, 0, report, blueprint);
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(report.warnings[0].code == RedefinitionWarning);
+    
+    REQUIRE(blueprint.resourceGroups.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters.size() == 4);
+
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].name == "a");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].description == "1");
+    
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[1].name == "b");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[1].description == "2");
+
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[2].name == "c");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[2].description == "3");
+
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[3].name == "a");
+    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[3].description == "4");
+}

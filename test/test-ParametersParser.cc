@@ -147,9 +147,12 @@ TEST_CASE("Warn about multiple parameters with the same name", "[parameters]")
     REQUIRE(report.warnings.size() == 1);
     REQUIRE(report.warnings[0].code == RedefinitionWarning);
 
-    REQUIRE(parameters.size() == 1);
+    REQUIRE(parameters.size() == 2);
     REQUIRE(parameters[0].name == "id");
-    REQUIRE(parameters[0].exampleValue == "43");
+    REQUIRE(parameters[0].exampleValue == "42");
+
+    REQUIRE(parameters[1].name == "id");
+    REQUIRE(parameters[1].exampleValue == "43");
 }
 
 TEST_CASE("Recognize parameter when there is no description on its signature and remaining description is not a new node", "[parameters]")
