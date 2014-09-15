@@ -23,7 +23,8 @@ extern "C" {
     /** brief Blueprint Parser Options Enums */
     enum sc_blueprint_parser_option {
         SC_RENDER_DESCRIPTIONS_OPTION = (1 << 0),       /// < Render Markdown in description.
-        SC_REQUIRE_BLUEPRINT_NAME_OPTION = (1 << 1)     /// < Treat missing blueprint name as error
+        SC_REQUIRE_BLUEPRINT_NAME_OPTION = (1 << 1),    /// < Treat missing blueprint name as error
+        SC_EXPORT_SORUCEMAP_OPTION = (1 << 2)           /// < Export source maps AST
     };
 
     /** Parameter Use flag */
