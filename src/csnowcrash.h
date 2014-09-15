@@ -12,6 +12,7 @@
 
 #include "CSourceAnnotation.h"
 #include "CBlueprint.h"
+#include "CBlueprintSourcemap.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,7 +30,7 @@ extern "C" {
      *
      *  \this function will allocate `report` and `blueprint`, for deallocation `sc_blueprint_free` and `sc_report_free` should be called.
      */
-    SC_API int sc_c_parse(const char* source, sc_blueprint_parser_options option, sc_report_t** report, sc_blueprint_t** blueprint);
+    SC_API int sc_c_parse(const char* source, sc_blueprint_parser_options option, sc_report_t** report, sc_blueprint_t** blueprint, sc_sm_blueprint_t** sm_blueprint);
 
 #ifdef __cplusplus
 }

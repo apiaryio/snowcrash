@@ -62,6 +62,8 @@
       'sources': [
         'src/CBlueprint.cc',
         'src/CBlueprint.h',
+        'src/CBlueprintSourcemap.cc',
+        'src/CBlueprintSourcemap.h',
         'src/CSourceAnnotation.cc',
         'src/CSourceAnnotation.h',
         'src/HTTP.cc',
@@ -78,8 +80,8 @@
         'src/Signature.h',
         'src/snowcrash.cc',
         'src/snowcrash.h',
-        # 'src/csnowcrash.cc',
-        # 'src/csnowcrash.h',
+        'src/csnowcrash.cc',
+        'src/csnowcrash.h',
         'src/UriTemplateParser.cc',
         'src/UriTemplateParser.h',
         'src/PayloadParser.h',
@@ -146,7 +148,7 @@
         'test/test-UriTemplateParser.cc',
         'test/test-ValuesParser.cc',
         'test/test-Warnings.cc',
-        # 'test/test-csnowcrash.cc',
+        'test/test-csnowcrash.cc',
         'test/test-snowcrash.cc'
       ],
       'dependencies': [
