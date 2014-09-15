@@ -95,8 +95,6 @@ namespace snowcrash {
                     report.warnings.push_back(Warning(ss.str(),
                                                       RedefinitionWarning,
                                                       sourceMap));
-
-                    out.erase(duplicate);
                 }
             }
 
