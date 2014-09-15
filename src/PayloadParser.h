@@ -343,19 +343,19 @@ namespace snowcrash {
         static PayloadSignature payloadSignature(const MarkdownNodeIterator& node) {
 
             mdp::ByteBuffer subject = node->children().front().text;
-            mdp::ByteBuffer subjectFirstLine;
+            mdp::ByteBuffer signature;
             mdp::ByteBuffer remainingContent;
 
-            subjectFirstLine = GetFirstLine(subject, remainingContent);
-            TrimString(subjectFirstLine);
+            signature = GetFirstLine(subject, remainingContent);
+            TrimString(signature);
 
-            if (RegexMatch(subjectFirstLine, RequestRegex))
+            if (RegexMatch(signature, RequestRegex))
                 return RequestPayloadSignature;
 
-            if (RegexMatch(subjectFirstLine, ResponseRegex))
+            if (RegexMatch(signature, ResponseRegex))
                 return ResponsePayloadSignature;
 
-            if (RegexMatch(subjectFirstLine, ModelRegex))
+            if (RegexMatch(signature, ModelRegex))
                 return ModelPayloadSignature;
 
             return NoPayloadSignature;
@@ -516,10 +516,39 @@ namespace snowcrash {
                 }
 
                 model = pd.symbolTable.resourceModels.at(symbol);
-
+                
                 out.description = model.description;
                 out.parameters = model.parameters;
-                out.headers = model.headers;
+                
+                Collection<Header>::const_iterator modelContentType = std::find_if(model.headers.begin(),
+                                                                                   model.headers.end(),
+                                                                                   std::bind2nd(MatchFirstWith<Header, std::string>(),
+                                                                                                HTTPHeaderName::ContentType));
+                
+                bool isPayloadContentType = !out.headers.empty();
+                bool isModelContentType = modelContentType != model.headers.end();
+                
+                if (isPayloadContentType && isModelContentType) {
+                    
+                    // WARN: Ignoring payload content-type, when referencing a model with headers
+                    std::stringstream ss;
+                    
+                    ss << "ignoring additional " << SectionName(pd.sectionContext()) << " header(s), ";
+                    ss << "specify this header(s) in the referenced model definition instead";
+                    
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                    report.warnings.push_back(Warning(ss.str(),
+                                                      IgnoringWarning,
+                                                      sourceMap));
+                }
+
+                if (isPayloadContentType && !isModelContentType) {
+                    out.headers.insert(out.headers.end(), model.headers.begin(), model.headers.end());
+                }
+                else {
+                    out.headers = model.headers;
+                }
+                
                 out.body = model.body;
                 out.schema = model.schema;
 

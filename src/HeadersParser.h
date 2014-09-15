@@ -83,9 +83,13 @@ namespace snowcrash {
                 && !node->children().empty()) {
 
                 mdp::ByteBuffer subject = node->children().front().text;
-                TrimString(subject);
+                mdp::ByteBuffer signature;
+                mdp::ByteBuffer remainingContent;
+                
+                signature = GetFirstLine(subject, remainingContent);
+                TrimString(signature);
 
-                if (RegexMatch(subject, HeadersRegex))
+                if (RegexMatch(signature, HeadersRegex))
                     return HeadersSectionType;
             }
 

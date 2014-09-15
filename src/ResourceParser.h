@@ -109,6 +109,13 @@ namespace snowcrash {
                  sectionType == ModelSectionType)) {
                 
                 CodeBlockUtility::addDanglingAsset(node, pd, sectionType, report, out.model.body);
+
+                // Update model in the symbol table as well
+                ResourceModelSymbolTable::iterator it = pd.symbolTable.resourceModels.find(out.model.name);
+                
+                if (it != pd.symbolTable.resourceModels.end()) {
+                    it->second.body = out.model.body;
+                }
                 
                 return ++MarkdownNodeIterator(node);
             }
