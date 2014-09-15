@@ -9,15 +9,23 @@
 #include "csnowcrash.h"
 #include "snowcrash.h"
 
-int sc_c_parse(const char* source, sc_blueprint_parser_options option, sc_report_t** report, sc_blueprint_t** blueprint)
+int sc_c_parse(const char* source, sc_blueprint_parser_options option, sc_report_t** report, sc_blueprint_t** blueprint, sc_sm_blueprint_t** sm_blueprint)
 {
     snowcrash::Report* t_report = ::new snowcrash::Report;
     snowcrash::Blueprint* t_blueprint = ::new snowcrash::Blueprint;
+    snowcrash::SourceMap<snowcrash::Blueprint>* t_sm_blueprint = ::new snowcrash::SourceMap<snowcrash::Blueprint>;
 
-    int ret = snowcrash::parse(source, option, *t_report, *t_blueprint);
+    snowcrash::ParseResult<snowcrash::Blueprint>* t_parse_result = ::new snowcrash::ParseResult<snowcrash::Blueprint>;
 
-    *blueprint = AS_TYPE(sc_blueprint_t, t_blueprint);
-    *report = AS_TYPE(sc_report_t, t_report);
+    t_parse_result->report = *t_report;
+    t_parse_result->node = *t_blueprint;
+    t_parse_result->sourceMap = *t_sm_blueprint;
+
+    int ret = snowcrash::parse(source, option, *t_parse_result);
+
+    *report = AS_TYPE(sc_report_t, &t_parse_result->report);
+    *blueprint = AS_TYPE(sc_blueprint_t, &t_parse_result->node);
+    *sm_blueprint = AS_TYPE(sc_sm_blueprint_t, &t_parse_result->sourceMap);
 
     return ret;
 }
