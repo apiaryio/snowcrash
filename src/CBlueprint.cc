@@ -10,7 +10,6 @@
 #include "CBlueprint.h"
 #include "snowcrash.h"
 
-
 SC_API sc_blueprint_t* sc_blueprint_new()
 {
     return AS_TYPE(sc_blueprint_t, ::new snowcrash::Blueprint);
@@ -90,16 +89,16 @@ SC_API const char* sc_metadata_value(const sc_metadata_t* metadata)
 
 /*----------------------------------------------------------------------*/
 
-SC_API const sc_resource_groups_collection_t* sc_resource_groups_collection_handle(const sc_blueprint_t* blueprint)
+SC_API const sc_resource_group_collection_t* sc_resource_group_collection_handle(const sc_blueprint_t* blueprint)
 {
     const snowcrash::Blueprint* p = AS_CTYPE(snowcrash::Blueprint, blueprint);
     if (!p)
         return NULL;
 
-    return AS_CTYPE(sc_resource_groups_collection_t, &p->resourceGroups);
+    return AS_CTYPE(sc_resource_group_collection_t, &p->resourceGroups);
 }
 
-SC_API size_t sc_resource_groups_collection_size(const sc_resource_groups_collection_t* resource)
+SC_API size_t sc_resource_group_collection_size(const sc_resource_group_collection_t* resource)
 {
     const snowcrash::ResourceGroups* p = AS_CTYPE(snowcrash::ResourceGroups, resource);
     if (!p)
@@ -110,16 +109,16 @@ SC_API size_t sc_resource_groups_collection_size(const sc_resource_groups_collec
 
 /*----------------------------------------------------------------------*/
 
-SC_API const sc_resource_groups_t* sc_resource_groups_handle(const sc_resource_groups_collection_t* resource, size_t index)
+SC_API const sc_resource_group_t* sc_resource_group_handle(const sc_resource_group_collection_t* resource, size_t index)
 {
     const snowcrash::ResourceGroups* p = AS_CTYPE(snowcrash::ResourceGroups, resource);
     if (!p)
         return NULL;
 
-    return AS_CTYPE(sc_resource_groups_t, &p->at(index));
+    return AS_CTYPE(sc_resource_group_t, &p->at(index));
 }
 
-SC_API const char* sc_resource_groups_name(const sc_resource_groups_t* handle)
+SC_API const char* sc_resource_group_name(const sc_resource_group_t* handle)
 {
     const snowcrash::ResourceGroup* p = AS_CTYPE(snowcrash::ResourceGroup, handle);
     if(!p)
@@ -128,7 +127,7 @@ SC_API const char* sc_resource_groups_name(const sc_resource_groups_t* handle)
     return p->name.c_str();
 }
 
-SC_API const char* sc_resource_groups_description(const sc_resource_groups_t* handle)
+SC_API const char* sc_resource_group_description(const sc_resource_group_t* handle)
 {
     const snowcrash::ResourceGroup* p = AS_CTYPE(snowcrash::ResourceGroup, handle);
     if(!p)
@@ -139,7 +138,7 @@ SC_API const char* sc_resource_groups_description(const sc_resource_groups_t* ha
 
 /*----------------------------------------------------------------------*/
 
-SC_API const sc_resource_collection_t* sc_resource_collection_handle(const sc_resource_groups_t* handle)
+SC_API const sc_resource_collection_t* sc_resource_collection_handle(const sc_resource_group_t* handle)
 {
     const snowcrash::ResourceGroup* p = AS_CTYPE(snowcrash::ResourceGroup, handle);
     if (!p)
@@ -230,7 +229,7 @@ SC_API const sc_payload_t* sc_payload_handle(const sc_payload_collection_t* hand
 {
     const snowcrash::Collection<snowcrash::Payload>::type* p = AS_CTYPE(snowcrash::Collection<snowcrash::Payload>::type, handle);
     if(!p)
-        return 0;
+        return NULL;
 
     return AS_CTYPE(sc_payload_t, &p->at(index));
 }
@@ -324,7 +323,7 @@ SC_API const sc_parameter_t* sc_parameter_handle(const sc_parameter_collection_t
 {
     const snowcrash::Parameters* p = AS_CTYPE(snowcrash::Parameters, handle);
     if(!p)
-        return 0;
+        return NULL;
 
     return AS_CTYPE(sc_parameter_t, &p->at(index));
 }
@@ -411,7 +410,7 @@ SC_API const sc_value_t* sc_value_handle(const sc_value_collection_t* handle, si
     if (!p)
         return NULL;
 
-    return AS_CTYPE( sc_value_t, &p->at(index));
+    return AS_CTYPE(sc_value_t, &p->at(index));
 }
 
 SC_API const char* sc_value_string(const sc_value_t* handle)
@@ -516,7 +515,7 @@ SC_API const sc_action_t* sc_action_handle(const sc_action_collection_t* handle,
 {
     const snowcrash::Actions* p = AS_CTYPE(snowcrash::Actions, handle);
     if(!p)
-        return 0;
+        return NULL;
 
     return AS_CTYPE(sc_action_t, &p->at(index));
 }
@@ -574,7 +573,7 @@ SC_API const sc_transaction_example_t* sc_transaction_example_handle(const sc_tr
 {
     const snowcrash::TransactionExamples* p = AS_CTYPE(snowcrash::TransactionExamples, handle);
     if(!p)
-        return 0;
+        return NULL;
 
     return AS_CTYPE(sc_transaction_example_t, &p->at(index));
 }

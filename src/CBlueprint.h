@@ -45,19 +45,19 @@ extern "C" {
     struct sc_metadata_s;
     typedef struct sc_metadata_s sc_metadata_t;
 
-    /** Array Resource Groups wrapper */
-    struct sc_resource_groups_collection_s;
-    typedef struct sc_resource_groups_collection_s sc_resource_groups_collection_t;
+    /** Array Resource Group Collection wrapper */
+    struct sc_resource_group_collection_s;
+    typedef struct sc_resource_group_collection_s sc_resource_group_collection_t;
 
     /** Class Resource Group wrapper */
-    struct sc_resource_groups_s;
-    typedef struct sc_resource_groups_s sc_resource_groups_t;
+    struct sc_resource_group_s;
+    typedef struct sc_resource_group_s sc_resource_group_t;
 
-    /** Array Resources Collection wrapper */
+    /** Array Resource Collection wrapper */
     struct sc_resource_collection_s;
     typedef struct sc_resource_collection_s sc_resource_collection_t;
 
-    /** Class Resources wrapper */
+    /** Class Resource wrapper */
     struct sc_resource_s;
     typedef struct sc_resource_s sc_resource_t;
 
@@ -148,27 +148,27 @@ extern "C" {
 
     /*----------------------------------------------------------------------*/
 
-    /** \returns Resource Groups array handle */
-    SC_API const sc_resource_groups_collection_t* sc_resource_groups_collection_handle(const sc_blueprint_t* blueprint);
+    /** \returns Resource Group Collection array handle */
+    SC_API const sc_resource_group_collection_t* sc_resource_group_collection_handle(const sc_blueprint_t* blueprint);
 
-    /** \returns size of Resource Groups array */
-    SC_API size_t sc_resource_groups_collection_size(const sc_resource_groups_collection_t* resource);
+    /** \returns size of Resource Group Collection array */
+    SC_API size_t sc_resource_group_collection_size(const sc_resource_group_collection_t* resource);
 
     /*----------------------------------------------------------------------*/
 
-    /** \returns Resource Groups handle */
-    SC_API const sc_resource_groups_t* sc_resource_groups_handle(const sc_resource_groups_collection_t* resource, size_t index);
+    /** \returns Resource Group handle */
+    SC_API const sc_resource_group_t* sc_resource_group_handle(const sc_resource_group_collection_t* resource, size_t index);
 
-    /** \returns Resource Groups name */
-    SC_API const char* sc_resource_groups_name(const sc_resource_groups_t* handle);
+    /** \returns Resource Group name */
+    SC_API const char* sc_resource_group_name(const sc_resource_group_t* handle);
 
-    /** \returns Resource Groups description */
-    SC_API const char* sc_resource_groups_description(const sc_resource_groups_t* handle);
+    /** \returns Resource Group description */
+    SC_API const char* sc_resource_group_description(const sc_resource_group_t* handle);
 
     /*----------------------------------------------------------------------*/
 
     /** \returns Resource array handle */
-    SC_API const sc_resource_collection_t* sc_resource_collection_handle(const sc_resource_groups_t* handle);
+    SC_API const sc_resource_collection_t* sc_resource_collection_handle(const sc_resource_group_t* handle);
 
     /** \returns Resource array size */
     SC_API size_t sc_resource_collection_size(const sc_resource_collection_t* resource);
