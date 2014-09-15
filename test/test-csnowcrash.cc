@@ -45,11 +45,11 @@ TEST_CASE("Parse simple blueprint with C interface", "[cinterface]")
     REQUIRE(std::string(sc_metadata_key(meta)) == "FORMAT" );
     REQUIRE(std::string(sc_metadata_value(meta)) == "1A" );
 
-    const sc_resource_groups_collection_t* res_gr_col = sc_resource_groups_collection_handle(blueprint);
-    const sc_resource_groups_t* res_gr = sc_resource_groups_handle(res_gr_col, 0);
+    const sc_resource_group_collection_t* res_gr_col = sc_resource_group_collection_handle(blueprint);
+    const sc_resource_group_t* res_gr = sc_resource_group_handle(res_gr_col, 0);
 
-    REQUIRE(sc_resource_groups_collection_size(res_gr_col) == 2);
-    REQUIRE(std::string(sc_resource_groups_name(res_gr)) == "");
+    REQUIRE(sc_resource_group_collection_size(res_gr_col) == 2);
+    REQUIRE(std::string(sc_resource_group_name(res_gr)) == "");
 
     const sc_resource_collection_t* re_col = sc_resource_collection_handle(res_gr);
     const sc_resource_t* res = sc_resource_handle(re_col, 0);
@@ -110,11 +110,11 @@ TEST_CASE("Parse blueprint with multiple requests and responses via C interface"
     sc_blueprint_t* blueprint;
     sc_c_parse(blueprintSource.c_str(), SC_RENDER_DESCRIPTIONS_OPTION, &report, &blueprint);
 
-    const sc_resource_groups_collection_t* res_gr_col = sc_resource_groups_collection_handle(blueprint);
-    const sc_resource_groups_t* res_gr = sc_resource_groups_handle(res_gr_col, 0);
+    const sc_resource_group_collection_t* res_gr_col = sc_resource_group_collection_handle(blueprint);
+    const sc_resource_group_t* res_gr = sc_resource_group_handle(res_gr_col, 0);
 
-    REQUIRE(sc_resource_groups_collection_size(res_gr_col) == 1);
-    REQUIRE(std::string(sc_resource_groups_name(res_gr)) == "");
+    REQUIRE(sc_resource_group_collection_size(res_gr_col) == 1);
+    REQUIRE(std::string(sc_resource_group_name(res_gr)) == "");
 
     const sc_resource_collection_t* re_col = sc_resource_collection_handle(res_gr);
     const sc_resource_t* res = sc_resource_handle(re_col, 0);
@@ -132,7 +132,7 @@ TEST_CASE("Parse blueprint with multiple requests and responses via C interface"
 
 }
 
-TEST_CASE("CBlueprint issue on sc_resource_groups_handle", "[cinterface]")
+TEST_CASE("CBlueprint issue on sc_resource_group_handle", "[cinterface]")
 {
     const std::string blueprintSource = \
 "# My API\n"\
@@ -162,14 +162,14 @@ TEST_CASE("CBlueprint issue on sc_resource_groups_handle", "[cinterface]")
     sc_blueprint_t* blueprint;
     sc_c_parse(blueprintSource.c_str(), 0, &report, &blueprint);
 
-    const sc_resource_groups_collection_t* res_gr_col = sc_resource_groups_collection_handle(blueprint);
-    const sc_resource_groups_t* res_gr1 = sc_resource_groups_handle(res_gr_col, 0);
-    const sc_resource_groups_t* res_gr2 = sc_resource_groups_handle(res_gr_col, 1);
+    const sc_resource_group_collection_t* res_gr_col = sc_resource_group_collection_handle(blueprint);
+    const sc_resource_group_t* res_gr1 = sc_resource_group_handle(res_gr_col, 0);
+    const sc_resource_group_t* res_gr2 = sc_resource_group_handle(res_gr_col, 1);
 
-    REQUIRE(sc_resource_groups_collection_size(res_gr_col) == 2);
+    REQUIRE(sc_resource_group_collection_size(res_gr_col) == 2);
 
-    REQUIRE(std::string(sc_resource_groups_name(res_gr1)) == "A");
-    REQUIRE(std::string(sc_resource_groups_name(res_gr2)) == "B");
+    REQUIRE(std::string(sc_resource_group_name(res_gr1)) == "A");
+    REQUIRE(std::string(sc_resource_group_name(res_gr2)) == "B");
 
     const sc_resource_collection_t* res_col1 = sc_resource_collection_handle(res_gr1);
     REQUIRE(sc_resource_collection_size(res_col1) == 1);
