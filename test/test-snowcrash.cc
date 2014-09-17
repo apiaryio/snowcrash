@@ -611,3 +611,21 @@ TEST_CASE("Overshadow parameters", "[parser][#201][regression][parameters]")
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[3].name == "a");
     REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[3].description == "4");
 }
+
+TEST_CASE("Segfault parsing metadata only", "[parser][#205][regression]")
+{
+    mdp::ByteBuffer source = \
+    "FORMAT: 1A : SOJ\n";
+
+    Blueprint blueprint;
+    Report report;
+    
+    parse(source, 0, report, blueprint);
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.empty());
+
+    REQUIRE(blueprint.metadata.size() == 1);
+    REQUIRE(blueprint.metadata[0].first == "FORMAT");
+    REQUIRE(blueprint.metadata[0].second == "1A : SOJ");
+    REQUIRE(blueprint.resourceGroups.empty());
+}

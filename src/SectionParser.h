@@ -43,7 +43,7 @@ namespace snowcrash {
             
             // Signature node
             MarkdownNodeIterator lastCur = cur;
-            cur = SectionProcessor<T>::processSignature(cur, pd, layout, report, out);
+            cur = SectionProcessor<T>::processSignature(cur, collection, pd, layout, report, out);
 
             // Exclusive Nested Sections Layout
             if (layout == ExclusiveNestedSectionLayout) {
@@ -71,7 +71,7 @@ namespace snowcrash {
                   SectionProcessor<T>::isDescriptionNode(cur, pd.sectionContext())) {
                 
                 lastCur = cur;
-                cur = SectionProcessor<T>::processDescription(cur, pd, report, out);
+                cur = SectionProcessor<T>::processDescription(cur, collection, pd, report, out);
                 if (lastCur == cur)
                     return Adapter::nextStartingNode(node, siblings, cur);
             }
@@ -81,7 +81,7 @@ namespace snowcrash {
                   SectionProcessor<T>::isContentNode(cur, pd.sectionContext())) {
                 
                 lastCur = cur;
-                cur = SectionProcessor<T>::processContent(cur, pd, report, out);
+                cur = SectionProcessor<T>::processContent(cur, collection, pd, report, out);
                 if (lastCur == cur)
                     return Adapter::nextStartingNode(node, siblings, cur);
             }

@@ -66,6 +66,7 @@ namespace snowcrash {
         }
 
         static MarkdownNodeIterator processDescription(const MarkdownNodeIterator& node,
+                                                       const MarkdownNodes& siblings,
                                                        SectionParserData& pd,
                                                        Report& report,
                                                        Values& out) {
