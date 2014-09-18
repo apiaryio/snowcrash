@@ -138,7 +138,6 @@
 		BB3DD973174654B8004C4077 /* AssetParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = AssetParser.h; path = src/AssetParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BB3DD974174654FD004C4077 /* test-AssetParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-AssetParser.cc"; path = "test/test-AssetParser.cc"; sourceTree = "<group>"; };
 		BB45781D182326EE00D0293A /* test-Indentation.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-Indentation.cc"; path = "test/test-Indentation.cc"; sourceTree = "<group>"; };
-		BB4843D4174E30CF00F61291 /* Fixture.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Fixture.h; path = test/Fixture.h; sourceTree = "<group>"; };
 		BB50F0BB17D1DB4D0002C363 /* ActionParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = ActionParser.h; path = src/ActionParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BB50F0BC17D1DC9B0002C363 /* test-ActionParser.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = "test-ActionParser.cc"; path = "test/test-ActionParser.cc"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		BB6A9A7F17904C7300B2F283 /* SourceAnnotation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = SourceAnnotation.h; path = src/SourceAnnotation.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
@@ -293,7 +292,6 @@
 		BBFF48B9170B3AF6001E5FB2 /* test-libsnowcrash */ = {
 			isa = PBXGroup;
 			children = (
-				BB4843D4174E30CF00F61291 /* Fixture.h */,
 				BB088F76192D289C003AA95C /* snowcrashtest.h */,
 				BB50F0BC17D1DC9B0002C363 /* test-ActionParser.cc */,
 				BB3DD974174654FD004C4077 /* test-AssetParser.cc */,
