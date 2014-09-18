@@ -468,12 +468,12 @@ namespace snowcrash {
                     return false;
                 }
 
-                if(pd.sectionContext() == ModelSectionType ||
-                   pd.sectionContext() == ModelBodySectionType){
+                if (pd.sectionContext() == ModelSectionType ||
+                    pd.sectionContext() == ModelBodySectionType) {
+
                     out.name = captureGroups[2];
                     mediaType = captureGroups[4];
-                }
-                else{
+                } else {
                     out.name = captureGroups[1];
                     mediaType = captureGroups[3];
                 }

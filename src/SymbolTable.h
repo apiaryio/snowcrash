@@ -49,7 +49,7 @@ namespace snowcrash {
     // Checks whether given source data represents reference to a symbol returning true if so,
     // false otherwise. If source data is represent reference referred symbol name is filled in.
     inline bool GetSymbolReference(const mdp::ByteBuffer& sourceData,
-                                        SymbolName& referredSymbol) {
+                                   SymbolName& referredSymbol) {
         
         CaptureGroups captureGroups;
 

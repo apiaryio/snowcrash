@@ -30,10 +30,10 @@ namespace snowcrash {
     
     /** Action Definition Type */
     enum ActionType {
-        UndefinedActionType,    /// Action type has not been defined
-        DependentActionType,    /// Action isn't fully defined, depends on parents resource URI
-        CompleteActionType,     /// Action is fully defined including its URI
-        NotActionType = -1       /// The subject is not an Action
+        NotActionType = 0,
+        DependentActionType,      /// Action isn't fully defined, depends on parents resource URI
+        CompleteActionType,       /// Action is fully defined including its URI
+        UndefinedActionType = -1
     };
 
     /**
@@ -49,19 +49,11 @@ namespace snowcrash {
                                                      Report& report,
                                                      Action& out) {
 
-            mdp::ByteBuffer signature, remainingContent;
-            CaptureGroups captureGroups;
+            actionHTTPMethodAndName(node, out.method, out.name);
+            TrimString(out.name);
 
-            signature = GetFirstLine(node->text, remainingContent);
-
-            if (RegexCapture(signature, ActionHeaderRegex, captureGroups, 3)) {
-                out.method = captureGroups[1];
-            } else if (RegexCapture(signature, NamedActionHeaderRegex, captureGroups, 3)) {
-                out.name = captureGroups[1];
-                out.method = captureGroups[2];
-
-                TrimString(out.name);
-            }
+            mdp::ByteBuffer remainingContent;
+            GetFirstLine(node->text, remainingContent);
 
             if (!remainingContent.empty()) {
                 out.description += remainingContent;
@@ -372,10 +364,10 @@ namespace snowcrash {
 
         /** Warn about deprecated headers */
         static MarkdownNodeIterator handleDeprecatedHeaders(const MarkdownNodeIterator& node,
-                                            const MarkdownNodes& siblings,
-                                            SectionParserData& pd,
-                                            Report& report,
-                                            Headers& headers) {
+                                                            const MarkdownNodes& siblings,
+                                                            SectionParserData& pd,
+                                                            Report& report,
+                                                            Headers& headers) {
 
             MarkdownNodeIterator cur = HeadersParser::parse(node, siblings, pd, report, headers);
 
@@ -418,26 +410,25 @@ namespace snowcrash {
             return NotActionType;
         }
 
-        /** \return HTTP request method of an action */
-        static mdp::ByteBuffer actionHTTPRequestMethod(const MarkdownNodeIterator& node) {
+        /** \return HTTP request method and name of an action */
+        static void actionHTTPMethodAndName(const MarkdownNodeIterator& node,
+                                            mdp::ByteBuffer& method,
+                                            mdp::ByteBuffer& name) {
             
             CaptureGroups captureGroups;
-            mdp::ByteBuffer subject = node->text;
-            mdp::ByteBuffer method;
+            mdp::ByteBuffer subject, remaining;
             
+            subject = GetFirstLine(node->text, remaining);
             TrimString(subject);
             
             if (RegexCapture(subject, ActionHeaderRegex, captureGroups, 3)) {
-                
                 method = captureGroups[1];
-            }
-            
-            if (RegexCapture(subject, NamedActionHeaderRegex, captureGroups, 3)) {
-                
+            } else if (RegexCapture(subject, NamedActionHeaderRegex, captureGroups, 3)) {
+                name = captureGroups[1];
                 method = captureGroups[2];
             }
             
-            return method;
+            return;
         }
     };
 

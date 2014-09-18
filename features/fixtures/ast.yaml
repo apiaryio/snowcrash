@@ -48,6 +48,10 @@ resourceGroups:
         - name: "<request name>"
           description: "<request description>\n"
           headers:
+          - name: "<header2>"
+            value: "<header2 value>"
+          - name: "<header3>"
+            value: "<header3 value>"
           - name: "Content-Type"
             value: "text/plain"
           - name: "<header4>"
@@ -58,6 +62,10 @@ resourceGroups:
         - name: "200"
           description: "<response description>\n"
           headers:
+          - name: "<header2>"
+            value: "<header2 value>"
+          - name: "<header3>"
+            value: "<header3 value>"
           - name: "Content-Type"
             value: "text/plain"
           - name: "<header5>"

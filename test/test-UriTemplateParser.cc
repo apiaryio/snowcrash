@@ -7,11 +7,9 @@
 //
 
 #include "catch.hpp"
-#include "Fixture.h"
 #include "UriTemplateParser.h"
 
 using namespace snowcrash;
-using namespace snowcrashtest;
 
 TEST_CASE("Parse a valid uri into seperate parts", "[validuriparser][issue][#79]")
 {

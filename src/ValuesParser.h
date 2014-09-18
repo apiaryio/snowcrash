@@ -105,7 +105,7 @@ namespace snowcrash {
                 TrimString(subject);
 
                 if (node->children().size() == 1 &&
-                        !subject.empty()) {
+                    !subject.empty()) {
 
                     return ValueSectionType;
                 }
