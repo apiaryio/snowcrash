@@ -170,7 +170,7 @@
         'libmarkdownparser'
       ]
     },
-	{
+    {
       'target_name': 'perf-libsnowcrash',
       'type': 'executable',
       'include_dirs': [

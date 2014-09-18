@@ -30,10 +30,10 @@ namespace snowcrash {
     
     /** Action Definition Type */
     enum ActionType {
-        UndefinedActionType,    /// Action type has not been defined
-        DependentActionType,    /// Action isn't fully defined, depends on parents resource URI
-        CompleteActionType,     /// Action is fully defined including its URI
-        NotActionType = -1       /// The subject is not an Action
+        NotActionType = 0,
+        DependentActionType,      /// Action isn't fully defined, depends on parents resource URI
+        CompleteActionType,       /// Action is fully defined including its URI
+        UndefinedActionType = -1
     };
 
     /**
@@ -372,10 +372,10 @@ namespace snowcrash {
 
         /** Warn about deprecated headers */
         static MarkdownNodeIterator handleDeprecatedHeaders(const MarkdownNodeIterator& node,
-                                            const MarkdownNodes& siblings,
-                                            SectionParserData& pd,
-                                            Report& report,
-                                            Headers& headers) {
+                                                            const MarkdownNodes& siblings,
+                                                            SectionParserData& pd,
+                                                            Report& report,
+                                                            Headers& headers) {
 
             MarkdownNodeIterator cur = HeadersParser::parse(node, siblings, pd, report, headers);
 
