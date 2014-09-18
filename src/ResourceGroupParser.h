@@ -32,6 +32,7 @@ namespace snowcrash {
     struct SectionProcessor<ResourceGroup> : public SectionProcessorBase<ResourceGroup> {
 
         static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
+                                                     const MarkdownNodes& siblings,
                                                      SectionParserData& pd,
                                                      SectionLayout& layout,
                                                      Report& report,

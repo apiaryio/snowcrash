@@ -48,12 +48,14 @@ namespace snowcrash {
         /**
          *  \brief Process section signature Markdown node
          *  \param node     Node to process
+         *  \param siblings Siblings of the node being processed
          *  \param pd       Section parser state
          *  \param report   Process log report
          *  \param out      Processed output
          *  \return Result of the process operation
          */
         static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
+                                                     const MarkdownNodes& siblings,
                                                      SectionParserData& pd,
                                                      SectionLayout& layout,
                                                      Report& report,
@@ -63,6 +65,7 @@ namespace snowcrash {
 
         /** Process section description Markdown node */
         static MarkdownNodeIterator processDescription(const MarkdownNodeIterator& node,
+                                                       const MarkdownNodes& siblings,
                                                        SectionParserData& pd,
                                                        Report& report,
                                                        T& out) {
@@ -78,6 +81,7 @@ namespace snowcrash {
         
         /** Process section-specific content Markdown node */
         static MarkdownNodeIterator processContent(const MarkdownNodeIterator& node,
+                                                   const MarkdownNodes& siblings,
                                                    SectionParserData& pd,
                                                    Report& report,
                                                    T& out) {

@@ -31,6 +31,7 @@ namespace snowcrash {
     struct SectionProcessor<Blueprint> : public SectionProcessorBase<Blueprint> {
 
         static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
+                                                     const MarkdownNodes& siblings,
                                                      SectionParserData& pd,
                                                      SectionLayout& layout,
                                                      Report& report,
@@ -38,20 +39,26 @@ namespace snowcrash {
 
             MarkdownNodeIterator cur = node;
 
-            while (cur->type == mdp::ParagraphMarkdownNodeType) {
+            while (cur != siblings.end() &&
+                   cur->type == mdp::ParagraphMarkdownNodeType) {
 
                 MetadataCollection metadata;
                 parseMetadata(cur, pd, report, metadata);
 
                 // First block is paragraph and is not metadata (no API name)
                 if (metadata.empty()) {
-                    return processDescription(cur, pd, report, out);
+                    return processDescription(cur, siblings, pd, report, out);
                 } else {
                     out.metadata.insert(out.metadata.end(), metadata.begin(), metadata.end());
                 }
 
                 cur++;
             }
+            
+            // Ideally this parsing metadata should be handled by separate parser
+            // that way the following check would be covered in SectionParser::parse()
+            if (cur == siblings.end())
+                return cur;
 
             if (cur->type == mdp::HeaderMarkdownNodeType) {
 
@@ -68,7 +75,7 @@ namespace snowcrash {
             } else {
 
                 // Any other type of block, add to description
-                return processDescription(cur, pd, report, out);
+                return processDescription(cur, siblings, pd, report, out);
             }
 
             return ++MarkdownNodeIterator(cur);
