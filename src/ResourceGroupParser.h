@@ -103,7 +103,10 @@ namespace snowcrash {
             if (SectionProcessor<Action>::actionType(node) == DependentActionType &&
                 !out.resources.empty()) {
 
-                mdp::ByteBuffer method = SectionProcessor<Action>::actionHTTPRequestMethod(node);
+                mdp::ByteBuffer method;
+                mdp::ByteBuffer name;
+
+                SectionProcessor<Action>::actionHTTPMethodAndName(node, method, name);
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
 
                 // WARN: Unexpected action
