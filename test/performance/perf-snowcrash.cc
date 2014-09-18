@@ -83,8 +83,7 @@ static int testfunc(const std::string& input, double& total, double& mean, doubl
 
 	for (int i = 0; i < TestRunCount; ++i) {
         snowcrash::BlueprintParserOptions options = 0;
-        snowcrash::Report report;
-        snowcrash::Blueprint blueprint;
+        snowcrash::ParseResult<snowcrash::Blueprint> blueprint;
 
 		// Do the test.
 		if (::gettimeofday(&stime, NULL)) {
@@ -92,14 +91,14 @@ static int testfunc(const std::string& input, double& total, double& mean, doubl
 			exit(EXIT_FAILURE);
 		}
         
-        snowcrash::parse(input, options, report, blueprint);
+        snowcrash::parse(input, options, blueprint);
         
 		if (::gettimeofday(&etime, NULL)) {
             std::cerr << "fatal: gettimeofday failed";
 			exit(EXIT_FAILURE);
 		}
 
-        resultCode = report.error.code;
+        resultCode = blueprint.report.error.code;
         
 		// Compute the time taken and add it to the sums.
 		t = (etime.tv_sec - stime.tv_sec) + (etime.tv_usec - stime.tv_usec) / 1000000.0;

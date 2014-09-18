@@ -180,6 +180,7 @@
       'include_dirs': [
         'src',
         'ext/markdown-parser/src',
+        'ext/markdown-parser/ext/sundown/src',
         'cmdline',
         'test',
         'test/performance',
