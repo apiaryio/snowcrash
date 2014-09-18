@@ -11,14 +11,14 @@
 #include "snowcrash.h"
 
 
-SC_API sc_result_t* sc_result_new()
+SC_API sc_report_t* sc_report_new()
 {
-    return AS_TYPE(sc_result_t, ::new snowcrash::Result);
+    return AS_TYPE(sc_report_t, ::new snowcrash::Report);
 }
 
-SC_API void sc_result_free(sc_result_t* result)
+SC_API void sc_report_free(sc_report_t* report)
 {
-    ::delete AS_TYPE(snowcrash::Result, result);
+    ::delete AS_TYPE(snowcrash::Report, report);
 }
 
 /*----------------------------------------------------------------------*/
@@ -33,7 +33,7 @@ SC_API const sc_location_t* sc_location_handler(const sc_source_annotation_t* so
 
 SC_API size_t sc_location_size(const sc_location_t* location)
 {
-    const snowcrash::SourceCharactersBlock* p = AS_CTYPE(snowcrash::SourceCharactersBlock, location);
+    const mdp::CharactersRangeSet* p = AS_CTYPE(mdp::CharactersRangeSet, location);
     if(!p)
         return 0;
     return p->size();
@@ -41,7 +41,7 @@ SC_API size_t sc_location_size(const sc_location_t* location)
 
 SC_API size_t sc_location_length(const sc_location_t* location, size_t index)
 {
-    const snowcrash::SourceCharactersBlock* p = AS_CTYPE(snowcrash::SourceCharactersBlock, location);
+    const mdp::CharactersRangeSet* p = AS_CTYPE(mdp::CharactersRangeSet, location);
     if(!p)
         return 0;
     return p->at(index).length;
@@ -49,7 +49,7 @@ SC_API size_t sc_location_length(const sc_location_t* location, size_t index)
 
 SC_API size_t sc_location_location(const sc_location_t* location, size_t index)
 {
-    const snowcrash::SourceCharactersBlock* p = AS_CTYPE(snowcrash::SourceCharactersBlock, location);
+    const mdp::CharactersRangeSet* p = AS_CTYPE(mdp::CharactersRangeSet, location);
     if(!p)
         return 0;
     return p->at(index).location;
@@ -57,9 +57,9 @@ SC_API size_t sc_location_location(const sc_location_t* location, size_t index)
 
 /*----------------------------------------------------------------------*/
 
-SC_API const sc_error_t* sc_error_handler(const sc_result_t* result)
+SC_API const sc_error_t* sc_error_handler(const sc_report_t* report)
 {
-    const snowcrash::Result* p = AS_CTYPE(snowcrash::Result, result);
+    const snowcrash::Report* p = AS_CTYPE(snowcrash::Report, report);
     if(!p)
         return NULL;
     return AS_CTYPE(sc_error_t, &p->error);
@@ -91,9 +91,9 @@ SC_API int sc_error_ok(const sc_error_t* error)
 
 /*----------------------------------------------------------------------*/
 
-SC_API const sc_warnings_t* sc_warnings_handler(const sc_result_t* result)
+SC_API const sc_warnings_t* sc_warnings_handler(const sc_report_t* report)
 {
-    const snowcrash::Result* p = AS_CTYPE(snowcrash::Result, result);
+    const snowcrash::Report* p = AS_CTYPE(snowcrash::Report, report);
     if(!p)
         return NULL;
     return AS_CTYPE(sc_warnings_t, &p->warnings);

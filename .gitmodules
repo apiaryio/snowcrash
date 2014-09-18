@@ -1,9 +1,9 @@
 [submodule "test/vendor/Catch"]
 	path = test/vendor/Catch
-	url = https://github.com/philsquared/Catch.git
-[submodule "sundown"]
-	path = sundown
-	url = https://github.com/apiaryio/sundown.git
+	url = git://github.com/philsquared/Catch.git
 [submodule "cmdline"]
 	path = cmdline
-	url = https://github.com/apiaryio/cmdline.git
+	url = git://github.com/apiaryio/cmdline.git
+[submodule "ext/markdown-parser"]
+	path = ext/markdown-parser
+	url = git://github.com/apiaryio/markdown-parser.git

@@ -9,664 +9,560 @@
 #ifndef SNOWCRASH_PARSEPAYLOAD_H
 #define SNOWCRASH_PARSEPAYLOAD_H
 
-#include <algorithm>
-#include <sstream>
-#include "BlueprintParserCore.h"
-#include "Blueprint.h"
+#include "SectionParser.h"
 #include "RegexMatch.h"
 #include "AssetParser.h"
-#include "HeaderParser.h"
-#include "DescriptionSectionUtility.h"
-#include "StringUtility.h"
-#include "BlockUtility.h"
+#include "HeadersParser.h"
+#include "ParametersParser.h"
 
 /** Media type in brackets regex */
 #define MEDIA_TYPE "([[:blank:]]*\\(([^\\)]*)\\))"
 
-namespace snowcrashconst {
-    
-    /** Request matching regex */
-    const char* const RequestRegex = "^[[:blank:]]*[Rr]equest" SYMBOL_IDENTIFIER "?" MEDIA_TYPE "?[[:blank:]]*";
-    
-    /** Response matching regex */
-    const char* const ResponseRegex = "^[[:blank:]]*[Rr]esponse([[:blank:][:digit:]]+)?" MEDIA_TYPE "?[[:blank:]]*";
-    
-    /** Object matching regex */
-    const char* const ObjectRegex = "^[[:blank:]]*" SYMBOL_IDENTIFIER "[Oo]bject" MEDIA_TYPE "?[[:blank:]]*$";
-    
-    /** Model matching regex */
-    const char* const  ModelRegex = "^[[:blank:]]*" SYMBOL_IDENTIFIER "?[Mm]odel" MEDIA_TYPE "?[[:blank:]]*";
-}
-
 namespace snowcrash {
-    
-    /** 
-     *  Payload signature 
-     */
+
+    /// Payload signature
     enum PayloadSignature {
-        UndefinedPayloadSignature,  /// < Undefined payload.
-        NoPayloadSignature,         /// < Not a payload.
+        NoPayloadSignature = 0,
         RequestPayloadSignature,    /// < Request payload.
         ResponsePayloadSignature,   /// < Response payload.
-        ObjectPayloadSignature,     /// < Resource object payload.
-        ModelPayloadSignature       /// < Resource Model payload.
+        ModelPayloadSignature,      /// < Resource Model payload.
+        UndefinedPayloadSignature = -1
     };
-    
-    /** 
-     *  \brief  Query the payload signature of a given block.
-     *  \param  begin   The begin of the block to be queried.
-     *  \param  end     The end of the markdown block buffer.
-     *  \param  name    A buffer to retrieve payload name into.
-     *  \param  mediaType   A buffer to retrieve payload media type into.
-     *  \return The %PayloadSignature of the given block.
-     */
-    FORCEINLINE PayloadSignature GetPayloadSignature(const BlockIterator& begin,
-                                                     const BlockIterator& end,
-                                                     Name& name,
-                                                     SourceData& mediaType) {
-        
-        if (begin->type == ListBlockBeginType || begin->type == ListItemBlockBeginType) {
-            
-            BlockIterator cur = ListItemNameBlock(begin, end);
-            if (cur == end)
-                return NoPayloadSignature;
-            
-            if (cur->type != ParagraphBlockType &&
-                cur->type != ListItemBlockEndType)
-                return NoPayloadSignature;
-            
-            std::string content = GetFirstLine(cur->content);
-            
-            CaptureGroups captureGroups;
-            if (RegexCapture(content, snowcrashconst::RequestRegex, captureGroups, 5)) {
-                name = captureGroups[1];
-                TrimString(name);
-                mediaType = captureGroups[3];
-                return RequestPayloadSignature;
-            }
-            else if (RegexCapture(content, snowcrashconst::ResponseRegex, captureGroups, 5)) {
-                name = captureGroups[1];
-                TrimString(name);
-                mediaType = captureGroups[3];
-                return ResponsePayloadSignature;
-            }
-            else if (RegexCapture(content, snowcrashconst::ObjectRegex, captureGroups, 5)) {
-                name = captureGroups[1];
-                TrimString(name);
-                mediaType = captureGroups[3];
-                return ObjectPayloadSignature;
-            }
-            else if (RegexCapture(content, snowcrashconst::ModelRegex, captureGroups, 5)) {
-                name = captureGroups[1];
-                TrimString(name);
-                mediaType = captureGroups[3];
-                return ModelPayloadSignature;
-            }
-        }
 
-        return NoPayloadSignature;
-    }
-    
-    /**
-     *  Returns true if given block has any payload signature, false otherwise.
-     */
-    FORCEINLINE bool HasPayloadSignature(const BlockIterator& begin,
-                                         const BlockIterator& end) {
-        Name name;
-        SourceData mediaType;
-        PayloadSignature signature = GetPayloadSignature(begin, end, name, mediaType);
-        return signature != NoPayloadSignature;
-    }
-    
-    /**
-     *  Retruns true if given block has any payload signature and 
-     *  is written in the abbreviated form. False otherwise.
-     */
-    FORCEINLINE bool HasPayloadAssetSignature(const BlockIterator& begin,
-                                              const BlockIterator& end) {
-        if (!HasPayloadSignature(begin, end))
-            return false;
-        
-        return !HasNestedListBlock(begin, end);
-    }
-    
-    /**
-     *  Classifier of internal list items, payload context.
-     */
-    template <>
-    FORCEINLINE SectionType ClassifyInternaListBlock<Payload>(const BlockIterator& begin,
-                                                          const BlockIterator& end) {
-        
-        AssetSignature asset = GetAssetSignature(begin, end);
-        if (asset == BodyAssetSignature)
-            return BodySectionType;
-        else if (asset == SchemaAssetSignature)
-            return SchemaSectionType;
-        
-        if (HasHeaderSignature(begin, end))
-            return HeadersSectionType;
-        
-        return UndefinedSectionType;
-    }
-    
-    /** Children blocks classifier */
-    template <>
-    FORCEINLINE SectionType ClassifyChildrenListBlock<Payload>(const BlockIterator& begin,
-                                                              const BlockIterator& end) {
-        
-        SectionType type = ClassifyInternaListBlock<Payload>(begin, end);
-        if (type != UndefinedSectionType)
-            return type;
-                
-        return UndefinedSectionType;
-    }
-    
-    /**
-     *  Block Classifier, payload context.
-     */
-    template <>
-    FORCEINLINE SectionType ClassifyBlock<Payload>(const BlockIterator& begin,
-                                                   const BlockIterator& end,
-                                                   const SectionType& context) {
-        
-        if (context == UndefinedSectionType) {
-            
-            Name name;
-            SourceData mediaType;
-            PayloadSignature payload = GetPayloadSignature(begin, end, name, mediaType);
-            if (payload == RequestPayloadSignature) {
+    /** Request matching regex */
+    const char* const RequestRegex = "^[[:blank:]]*[Rr]equest" SYMBOL_IDENTIFIER "?" MEDIA_TYPE "?[[:blank:]]*";
 
-                return (HasNestedListBlock(begin, end)) ? RequestSectionType : RequestBodySectionType;
-            }
-            else if (payload == ResponsePayloadSignature) {
-                
-                return (HasNestedListBlock(begin, end)) ? ResponseSectionType : ResponseBodySectionType;
-            }
-            else if (payload == ObjectPayloadSignature) {
-                
-                return (HasNestedListBlock(begin, end)) ? ObjectSectionType : ObjectBodySectionType;
-            }
-            else if (payload == ModelPayloadSignature) {
-                
-                return (HasNestedListBlock(begin, end)) ? ModelSectionType : ModelBodySectionType;
-            }
+    /** Response matching regex */
+    const char* const ResponseRegex = "^[[:blank:]]*[Rr]esponse([[:blank:][:digit:]]+)?" MEDIA_TYPE "?[[:blank:]]*";
 
-        }
-        else if (context == RequestSectionType ||
-                 context == ResponseSectionType ||
-                 context == ObjectSectionType ||
-                 context == ModelSectionType) {
-            
-            // SectionType closure
-            if (begin->type == ListItemBlockEndType ||
-                begin->type == ListBlockEndType)
-                return UndefinedSectionType;
+    /** Model matching regex */
+    const char* const  ModelRegex = "^[[:blank:]]*(" SYMBOL_IDENTIFIER "[[:blank:]]+)?[Mm]odel" MEDIA_TYPE "?[[:blank:]]*$";
 
-            SectionType listSection = ClassifyInternaListBlock<Payload>(begin, end);
-            if (listSection != UndefinedSectionType)
-                return listSection;
-            
-            // Adjacent list item
-            if (begin->type == ListItemBlockBeginType)
-                return UndefinedSectionType;
-        }
-        else if (context == HeadersSectionType ||
-                 context == BodySectionType ||
-                 context == SchemaSectionType ||
-                 context == ForeignSectionType) {
-
-            // SectionType closure
-            if (begin->type == ListItemBlockEndType ||
-                begin->type == ListBlockEndType)
-                return UndefinedSectionType;
-            
-            SectionType listSection = ClassifyInternaListBlock<Payload>(begin, end);
-            if (listSection != UndefinedSectionType)
-                return listSection;
-            
-            if (HasPayloadAssetSignature(begin, end))
-                return UndefinedSectionType;
-            
-            return ForeignSectionType;
-        }
-        
-        return (context == RequestSectionType ||
-                context == ResponseSectionType ||
-                context == ObjectSectionType ||
-                context == ModelSectionType) ? context : UndefinedSectionType;
-    }
-    
     /**
-     *  Payload section parser.
+     * Payload Section Processor
      */
     template<>
-    struct SectionParser<Payload> {
-        
-        static ParseSectionResult ParseSection(const BlueprintSection& section,
-                                               const BlockIterator& cur,
-                                               BlueprintParserCore& parser,
-                                               Payload& payload) {
-            
-            ParseSectionResult result = std::make_pair(Result(), cur);
+    struct SectionProcessor<Payload> : public SectionProcessorBase<Payload> {
 
-            switch (section.type) {
-                case RequestSectionType:
-                case ResponseSectionType:
-                case ObjectSectionType:
-                case ModelSectionType:
-                    result = HandleDescriptionSectionBlock(section, cur, parser, payload);
-                    break;
-                    
-                case RequestBodySectionType:
-                case ResponseBodySectionType:
-                case ObjectBodySectionType:
-                case ModelBodySectionType:
-                    result = HandlePayloadAsset(section, cur, parser, payload);
-                    break;
-                    
-                case HeadersSectionType:
-                    result = HandleHeaders(section, cur, parser, payload);
-                    break;
-                    
-                case BodySectionType:
-                case SchemaSectionType:
-                    result = HandleAsset(section, cur, parser, payload);
-                    break;
-                    
-                case UndefinedSectionType:
-                    result.second = CloseList(cur, section.bounds.second);
-                    break;
-                    
-                case ForeignSectionType:
-                    result = HandleForeignSection<Payload>(section, cur, parser.sourceData);
-                    break;
-                                        
-                default:
-                    result.first.error = UnexpectedBlockError(section, cur, parser.sourceData);
-                    break;
-            }
-            
-            return result;
-        }
-        
-        static void Finalize(const SectionBounds& bounds,
-                             BlueprintParserCore& parser,
-                             Payload& payload,
-                             Result& result) {}
-        
-        /**
-         *  \brief  Parse Payload's description blocks.
-         *  \param  section The current section's signature.
-         *  \param  cur     The actual position within Markdown block buffer.
-         *  \param  bound   Boundaries of Markdown block buffer.
-         *  \param  parser  A parser's instance.
-         *  \param  payload An output buffer to write overview description into.
-         *  \return A block parser section result.
-         */
-        static ParseSectionResult HandleDescriptionSectionBlock(const BlueprintSection& section,
-                                                                const BlockIterator& cur,
-                                                                BlueprintParserCore& parser,
-                                                                Payload& payload) {
-            
-            ParseSectionResult result = std::make_pair(Result(), cur);
-            BlockIterator sectionCur = cur;
+        static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
+                                                     const MarkdownNodes& siblings,
+                                                     SectionParserData& pd,
+                                                     SectionLayout& layout,
+                                                     Report& report,
+                                                     Payload& out) {
 
-            // Signature
-            if (sectionCur == section.bounds.first) {
+            mdp::ByteBuffer signature, remainingContent;
+            signature = GetFirstLine(node->text, remainingContent);
 
-                ProcessSignature(section, sectionCur, parser.sourceData, result.first, payload);
-                sectionCur = FirstContentBlock(cur, section.bounds.second);
+            parseSignature(node, pd, signature, report, out);
 
-                result.second = ++sectionCur;
-                return result;
-                
-            }
-
-            // Description
-            result = ParseDescriptionBlock<Payload>(section,
-                                                    sectionCur,
-                                                    parser.sourceData,
-                                                    payload);
-            return result;
-
-        }
-        
-        /**
-         *  \brief  Parse an asset.
-         *  \param  section The current section's signature.
-         *  \param  begin   The begin of the block to be parsed.
-         *  \param  end     The end of the markdown block buffer.
-         *  \param  parser  A parser's instance.
-         *  \param  payload An output buffer to save the parsed asset to.
-         *  \return A block parser section result.
-         */
-        static ParseSectionResult HandleAsset(const BlueprintSection& section,
-                                              const BlockIterator& cur,
-                                              BlueprintParserCore& parser,
-                                              Payload& payload) {
-            Asset asset;
-            ParseSectionResult result = AssetParser::Parse(cur, section.bounds.second, section, parser, asset);
-            if (result.first.error.code != Error::OK)
-                return result;
-
-            if (!SetAsset(section.type, asset, payload)) {
-                // WARN: asset already set
-                std::stringstream ss;
-                ss << "ignoring additional " << SectionName(section.type) << " content, content is already defined";
-                
-                BlockIterator nameBlock = ListItemNameBlock(cur, section.bounds.second);
-                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, cur, section.bounds, parser.sourceData);
-                result.first.warnings.push_back(Warning(ss.str(),
-                                                        RedefinitionWarning,
-                                                        sourceBlock));
-            }
-            
-            return result;
-        }
-        
-        /**
-         *  \brief  Parse payload and abbreviated asset.
-         *  \param  section The current section's signature.
-         *  \param  begin   The parsed of the block to be queried.
-         *  \param  end     The end of the markdown block buffer.
-         *  \param  parser  A parser's instance.
-         *  \param  payload An output buffer to save the parsed paylod and asset into.
-         *  \return A block parser section result.
-         */
-        static ParseSectionResult HandlePayloadAsset(const BlueprintSection& section,
-                                                     const BlockIterator& cur,
-                                                     BlueprintParserCore& parser,
-                                                     Payload& payload) {
-            // Try to parse as a Symbol reference
-            SymbolName symbol;
-            SourceDataBlock symbolSourceMap;
-            ParseSectionResult result = ParseSymbolReference(cur, section.bounds, parser, symbol, symbolSourceMap);
-            if (result.first.error.code != Error::OK)
-                return result;
-            
-            if (result.second != cur) {
-                // Process a symbol reference
-                ResourceModelSymbolTable::const_iterator symbolEntry = parser.symbolTable.resourceModels.find(symbol);
-                if (symbolEntry == parser.symbolTable.resourceModels.end()) {
-                    
-                    // ERR: Undefined symbol
-                    std::stringstream ss;
-                    ss << "undefined symbol '" << symbol << "'";
-                    result.first.error = Error(ss.str(),
-                                               SymbolError,
-                                               MapSourceDataBlock(symbolSourceMap, parser.sourceData));
-                    return result;
-                }
-                
-                // Retrieve payload from symbol table
-                payload = symbolEntry->second;
-            }
-            else {
-                // Parse as an asset
-                result = HandleAsset(section, cur, parser, payload);
-            }
-            
-            // Retrieve signature
-            ProcessSignature(section, cur, parser.sourceData, result.first, payload);
-            
-            return result;
-        }
-        
-        /**
-         *  \brief  Parse a symbol reference.
-         *  \param  begin   The begin of the block to be parsed.
-         *  \param  end     The end of the markdown block buffer.
-         *  \param  parser  A parser's instance.
-         *  \param  symbolName  Output buffer to put parsed symbol's name into.
-         *  \param  symbolSourceMap Source map of the parsed symbol reference.
-         *  \return A block parser section result.
-         */
-        static ParseSectionResult ParseSymbolReference(const BlockIterator& cur,
-                                                       const SectionBounds& bounds,
-                                                       BlueprintParserCore& parser,
-                                                       SymbolName& symbolName,
-                                                       SourceDataBlock& symbolSourceMap) {
-            
-            ParseSectionResult result = std::make_pair(Result(), cur);
-            BlockIterator sectionCur = cur;
-            SourceData content;
-            SourceData signature = GetListItemSignature(sectionCur, bounds.second, content);
-            if (!content.empty()) {
-                sectionCur = ListItemNameBlock(sectionCur, bounds.second);
-            }
-            else {
-                sectionCur = FirstContentBlock(cur, bounds.second);
-                if (sectionCur == bounds.second ||
-                    sectionCur->type != ParagraphBlockType)
-                    return result;
-
-                // Try the next block
-                if (++sectionCur == bounds.second ||
-                    sectionCur->type != ParagraphBlockType)
-                    return result;
-                
-                content = sectionCur->content;
-            }
-            
-            TrimString(content);
-            SymbolName symbol;
-            if (!GetSymbolReference(content, symbol))
-                return result;
-            
-            symbolName = symbol;
-            symbolSourceMap = sectionCur->sourceMap;
-            
-            // Close list item
-            BlockIterator endCur = cur;
-            if (endCur->type == ListBlockBeginType)
-                ++endCur;
-            endCur = SkipToClosingBlock(endCur, bounds.second, ListItemBlockBeginType, ListItemBlockEndType);
-            
-            // Check extraneous content
-            if (sectionCur != endCur) {
-                ++sectionCur;
-                for (; sectionCur != endCur; ++sectionCur) {
-
-                    if (sectionCur->type == QuoteBlockBeginType)
-                        sectionCur = SkipToClosingBlock(sectionCur, endCur, QuoteBlockBeginType, QuoteBlockEndType);
-                    
-                    if (sectionCur->type == ListBlockBeginType)
-                        sectionCur = SkipToClosingBlock(sectionCur, endCur, ListBlockBeginType, ListBlockEndType);
-                    
-                    // WARN: ignoring extraneous content after symbol reference
-                    std::stringstream ss;
-                    ss << "ignoring extraneous content after symbol reference";
-                    ss << ", expected symbol reference only e.g. '[" << symbolName << "][]'";
-                    
-                    SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, cur, bounds, parser.sourceData);
-                    result.first.warnings.push_back(Warning(ss.str(),
-                                                            IgnoringWarning,
-                                                            sourceBlock));
-                }
-            }
-            
-            endCur = CloseList(sectionCur, bounds.second);
-            result.second = endCur;
-            
-            return result;
-        }
-        
-        /**
-         *  Retrieve and process payload signature.
-         */
-        static void ProcessSignature(const BlueprintSection& section,
-                                     const BlockIterator& cur,
-                                     const SourceData& sourceData,
-                                     Result& result,
-                                     Payload& payload) {
-            
-            SourceData remainingContent;
-            SourceData signature = GetListItemSignature(cur, section.bounds.second, remainingContent);
-
-            // Capture name & payload type
-            SourceData mediaType;
-            GetPayloadSignature(cur, section.bounds.second, payload.name, mediaType);
-            
-            // Check signature
-            if (!CheckSignature(section, cur, signature, sourceData, result)) {
-                // Clear all readouts
-                payload.name.clear();
-                mediaType.clear();
-                remainingContent.clear();
-            }
-            
-            // Add any extra lines to description unless abbreviated body
-            if (!remainingContent.empty() &&
-                section.type != RequestBodySectionType &&
-                section.type != ResponseBodySectionType) {
-                payload.description += remainingContent;
-            }
-            
             // WARN: missing status code
-            if (payload.name.empty() &&
-                (section.type == ResponseSectionType || section.type == ResponseBodySectionType)) {
-                
-                BlockIterator nameBlock = ListItemNameBlock(cur, section.bounds.second);
-                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, cur, section.bounds, sourceData);
-                result.warnings.push_back(Warning("missing response HTTP status code, assuming 'Response 200'",
-                                                  EmptyDefinitionWarning,
-                                                  sourceBlock));
-                payload.name = "200";
-            }
-            
-            
-            // WARN: Object deprecation
-            if (section.type == ObjectSectionType || section.type == ObjectBodySectionType) {
+            if (out.name.empty() &&
+                (pd.sectionContext() == ResponseSectionType || pd.sectionContext() == ResponseBodySectionType)) {
 
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                report.warnings.push_back(Warning("missing response HTTP status code, assuming 'Response 200'",
+                                                  EmptyDefinitionWarning,
+                                                  sourceMap));
+                out.name = "200";
+            }
+
+            if (!remainingContent.empty()) {
+                if (!isAbbreviated(pd.sectionContext())) {
+                    out.description = remainingContent;
+                } else if (!parseSymbolReference(node, pd, remainingContent, report, out)) {
+
+                    // NOTE: NOT THE CORRECT WAY TO DO THIS
+                    // https://github.com/apiaryio/snowcrash/commit/a7c5868e62df0048a85e2f9aeeb42c3b3e0a2f07#commitcomment-7322085
+                    pd.sectionsContext.push_back(BodySectionType);
+                    CodeBlockUtility::signatureContentAsCodeBlock(node, pd, report, out.body);
+                    pd.sectionsContext.pop_back();
+                }
+            }
+
+            return ++MarkdownNodeIterator(node);
+        }
+
+        static MarkdownNodeIterator processContent(const MarkdownNodeIterator& node,
+                                                   const MarkdownNodes& siblings,
+                                                   SectionParserData& pd,
+                                                   Report& report,
+                                                   Payload& out) {
+
+            mdp::ByteBuffer content;
+
+            if (!out.symbol.empty()) {
+                //WARN: ignoring extraneous content after symbol reference
                 std::stringstream ss;
-                ss << "the 'object' keyword is deprecated and as such it will be removed in a future release, please use the 'model' keyword instead";
-                
-                BlockIterator nameBlock = ListItemNameBlock(cur, section.bounds.second);
-                SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, cur, section.bounds, sourceData);
-                result.warnings.push_back(Warning(ss.str(),
-                                                  DeprecatedWarning,
-                                                  sourceBlock));
+
+                ss << "ignoring extraneous content after symbol reference";
+                ss << ", expected symbol reference only e.g. '[" << out.symbol << "][]'";
+
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                report.warnings.push_back(Warning(ss.str(),
+                                                  IgnoringWarning,
+                                                  sourceMap));
+            } else {
+
+                if (!out.body.empty() ||
+                    node->type != mdp::ParagraphMarkdownNodeType ||
+                    !parseSymbolReference(node, pd, node->text, report, out)) {
+
+                    // NOTE: NOT THE CORRECT WAY TO DO THIS
+                    // https://github.com/apiaryio/snowcrash/commit/a7c5868e62df0048a85e2f9aeeb42c3b3e0a2f07#commitcomment-7322085
+                    pd.sectionsContext.push_back(BodySectionType);
+                    CodeBlockUtility::contentAsCodeBlock(node, pd, report, content);
+                    pd.sectionsContext.pop_back();
+
+                    out.body += content;
+                }
+            }
+
+            return ++MarkdownNodeIterator(node);
+        }
+
+        static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
+                                                         const MarkdownNodes& siblings,
+                                                         SectionParserData& pd,
+                                                         Report& report,
+                                                         Payload& out) {
+
+            switch (pd.sectionContext()) {
+                case HeadersSectionType:
+                    return HeadersParser::parse(node, siblings, pd, report, out.headers);
+
+                case BodySectionType:
+                    if (!out.body.empty()) {
+                        // WARN: Multiple body section
+                        mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                        report.warnings.push_back(Warning("ignoring additional 'body' content, it is already defined",
+                                                           RedefinitionWarning,
+                                                           sourceMap));
+                    }
+
+                    return AssetParser::parse(node, siblings, pd, report, out.body);
+
+                case SchemaSectionType:
+                    if (!out.schema.empty()) {
+                        // WARN: Multiple schema section
+                        mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                        report.warnings.push_back(Warning("ignoring additional 'schema' content, it is already defined",
+                                                           RedefinitionWarning,
+                                                           sourceMap));
+                    }
+
+                    return AssetParser::parse(node, siblings, pd, report, out.schema);
+
+                default:
+                    break;
+            }
+
+            return node;
+        }
+
+        static MarkdownNodeIterator processUnexpectedNode(const MarkdownNodeIterator& node,
+                                                          const MarkdownNodes& siblings,
+                                                          SectionParserData& pd,
+                                                          SectionType& sectionType,
+                                                          Report& report,
+                                                          Payload& out) {
+
+            if ((node->type == mdp::ParagraphMarkdownNodeType ||
+                 node->type == mdp::CodeMarkdownNodeType) &&
+                sectionType == BodySectionType) {
+
+                CodeBlockUtility::addDanglingAsset(node, pd, sectionType, report, out.body);
+                return ++MarkdownNodeIterator(node);
             }
             
-            if (!mediaType.empty()) {
-                Header header = std::make_pair(HTTPHeaderName::ContentType, mediaType);
-                TrimString(header.second);
-                payload.headers.push_back(header);
+            return SectionProcessorBase<Payload>::processUnexpectedNode(node, siblings, pd, sectionType, report, out);
+        }
+
+        static bool isDescriptionNode(const MarkdownNodeIterator& node,
+                                      SectionType sectionType) {
+
+            if (!isAbbreviated(sectionType) &&
+                SectionProcessorBase<Payload>::isDescriptionNode(node, sectionType)) {
+
+                return true;
+            }
+
+            return false;
+        }
+
+        static bool isContentNode(const MarkdownNodeIterator& node,
+                                  SectionType sectionType) {
+
+            if (isAbbreviated(sectionType) &&
+                (SectionKeywordSignature(node) == UndefinedSectionType)) {
+
+                return true;
+            }
+
+            return false;
+        }
+
+        static SectionType sectionType(const MarkdownNodeIterator& node) {
+
+            if (node->type == mdp::ListItemMarkdownNodeType
+                && !node->children().empty()) {
+
+                SectionType nestedType = UndefinedSectionType;
+                PayloadSignature signature = payloadSignature(node);
+
+                if (signature == NoPayloadSignature) {
+                    return UndefinedSectionType;
+                }
+
+                for (MarkdownNodeIterator child = node->children().begin();
+                     child != node->children().end();
+                     ++child) {
+
+                    nestedType = nestedSectionType(child);
+
+                    if (nestedType != UndefinedSectionType) {
+                        return getSectionType(signature, nestedType);
+                    }
+                }
+
+                // Return abbreviated signature
+                return getSectionType(signature, nestedType);
+            }
+
+            return UndefinedSectionType;
+        }
+
+        static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
+
+            SectionType nestedType = UndefinedSectionType;
+
+            // Check if headers section
+            nestedType = SectionProcessor<Headers>::sectionType(node);
+
+            if (nestedType != UndefinedSectionType) {
+                return nestedType;
+            }
+
+            // Check if asset section
+            nestedType = SectionProcessor<Asset>::sectionType(node);
+
+            if (nestedType != UndefinedSectionType) {
+                return nestedType;
+            }
+
+            return UndefinedSectionType;
+        }
+
+        static SectionTypes nestedSectionTypes() {
+            SectionTypes nested, types;
+
+            nested.push_back(HeadersSectionType);
+            nested.push_back(BodySectionType);
+            nested.push_back(SchemaSectionType);
+
+            // Parameters & descendants
+            nested.push_back(ParametersSectionType);
+            types = SectionProcessor<Parameters>::nestedSectionTypes();
+            nested.insert(nested.end(), types.begin(), types.end());
+
+            return nested;
+        }
+
+        static void finalize(const MarkdownNodeIterator& node,
+                             SectionParserData& pd,
+                             Report& report,
+                             Payload& out) {
+
+            bool warnEmptyBody = false;
+
+            mdp::ByteBuffer contentLength;
+            mdp::ByteBuffer transferEncoding;
+
+            SectionType sectionType = pd.sectionContext();
+
+            for (Collection<Header>::const_iterator it = out.headers.begin();
+                 it != out.headers.end();
+                 ++it) {
+
+                if (it->first == HTTPHeaderName::ContentLength) {
+                    contentLength = it->second;
+                }
+
+                if (it->first == HTTPHeaderName::TransferEncoding) {
+                    transferEncoding = it->second;
+                }
+            }
+
+            if ((sectionType == RequestSectionType || sectionType == RequestBodySectionType) && out.body.empty()) {
+
+                // Warn when content-length or transfer-encoding is specified or both headers and body are empty
+                if (out.headers.empty()) {
+                    warnEmptyBody = true;
+                } else {
+                    warnEmptyBody = !contentLength.empty() || !transferEncoding.empty();
+                }
+
+                if (warnEmptyBody) {
+                    // WARN: empty body
+                    std::stringstream ss;
+                    ss << "empty " << SectionName(sectionType) << " " << SectionName(BodySectionType);
+
+                    if (!contentLength.empty()) {
+                        ss << ", expected " << SectionName(BodySectionType) << " for '" << contentLength << "' Content-Length";
+                    } else if (!transferEncoding.empty()) {
+                        ss << ", expected " << SectionName(BodySectionType) << " for '" << transferEncoding << "' Transfer-Encoding";
+                    }
+
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                    report.warnings.push_back(Warning(ss.str(),
+                                                      EmptyDefinitionWarning,
+                                                      sourceMap));
+                }
+            } else if ((sectionType == ResponseSectionType || sectionType == ResponseBodySectionType)) {
+
+                HTTPStatusCode code = 200;
+
+                if (!out.name.empty()) {
+                    std::stringstream(out.name) >> code;
+                }
+
+                StatusCodeTraits statusCodeTraits = GetStatusCodeTrait(code);
+
+                if (!statusCodeTraits.allowBody && !out.body.empty()) {
+                    // WARN: not empty body
+                    std::stringstream ss;
+                    ss << "the " << code << " response MUST NOT include a " << SectionName(BodySectionType);
+
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                    report.warnings.push_back(Warning(ss.str(),
+                                                      EmptyDefinitionWarning,
+                                                      sourceMap));
+                }
             }
         }
-        
-        /** 
-         *  \brief Checks and report invalid signature 
-         *  \return True if signature is correct, false otherwise.
-         */
-        static bool CheckSignature(const BlueprintSection& section,
-                                   const BlockIterator& cur,
-                                   const SourceData& signature,
-                                   const SourceData& sourceData,
-                                   Result& result) {
-            
-            std::string regex;
-            switch (section.type) {
-                    
+
+        /** Resolve payload signature */
+        static PayloadSignature payloadSignature(const MarkdownNodeIterator& node) {
+
+            mdp::ByteBuffer subject = node->children().front().text;
+            mdp::ByteBuffer signature;
+            mdp::ByteBuffer remainingContent;
+
+            signature = GetFirstLine(subject, remainingContent);
+            TrimString(signature);
+
+            if (RegexMatch(signature, RequestRegex))
+                return RequestPayloadSignature;
+
+            if (RegexMatch(signature, ResponseRegex))
+                return ResponsePayloadSignature;
+
+            if (RegexMatch(signature, ModelRegex))
+                return ModelPayloadSignature;
+
+            return NoPayloadSignature;
+        }
+
+        /** Get SectionType from PayloadSignature and nestedSectionType */
+        static SectionType getSectionType(PayloadSignature signature,
+                                          SectionType nestedType) {
+
+            switch (signature) {
+                case RequestPayloadSignature:
+                    return (nestedType != UndefinedSectionType) ? RequestSectionType : RequestBodySectionType;
+
+                case ResponsePayloadSignature:
+                    return (nestedType != UndefinedSectionType) ? ResponseSectionType : ResponseBodySectionType;
+
+                case ModelPayloadSignature:
+                    return (nestedType != UndefinedSectionType) ? ModelSectionType : ModelBodySectionType;
+
+                default:
+                    break;
+            }
+
+            return UndefinedSectionType;
+        }
+
+        /** True if abbreviated section type */
+        static bool isAbbreviated(SectionType sectionType) {
+
+            return (sectionType == RequestBodySectionType ||
+                    sectionType == ResponseBodySectionType ||
+                    sectionType == ModelBodySectionType);
+        }
+
+        /** Given the signature, parse it */
+        static bool parseSignature(const MarkdownNodeIterator& node,
+                                   SectionParserData& pd,
+                                   const mdp::ByteBuffer& signature,
+                                   Report& report,
+                                   Payload& out) {
+
+            const char* regex;
+            mdp::ByteBuffer mediaType;
+            CaptureGroups captureGroups;
+
+            switch (pd.sectionContext()) {
                 case RequestSectionType:
                 case RequestBodySectionType:
-                    regex = snowcrashconst::RequestRegex;
+                    regex = RequestRegex;
                     break;
-                    
-                case ResponseBodySectionType:
+
                 case ResponseSectionType:
-                    regex = snowcrashconst::ResponseRegex;
+                case ResponseBodySectionType:
+                    regex = ResponseRegex;
                     break;
-                    
+
                 case ModelSectionType:
                 case ModelBodySectionType:
-                    regex = snowcrashconst::ModelRegex;
+                    regex = ModelRegex;
                     break;
-                    
+
                 default:
                     return true;
             }
-            
-            CaptureGroups captureGroups;
-            if (RegexCapture(signature, regex, captureGroups) &&
+
+            if (RegexCapture(signature, regex, captureGroups, 5) &&
                 !captureGroups.empty()) {
 
-                std::string target = signature;
-                std::string::size_type pos = target.find(captureGroups[0]);
-                if (pos != std::string::npos)
-                    target.replace(pos, captureGroups[0].length(), std::string());
+                mdp::ByteBuffer target = signature;
+                mdp::ByteBuffer::size_type pos = target.find(captureGroups[0]);
+
+                if (pos != mdp::ByteBuffer::npos) {
+                    target.replace(pos, captureGroups[0].length(), mdp::ByteBuffer());
+                }
 
                 TrimString(target);
+
                 if (!target.empty()) {
                     // WARN: unable to parse payload signature
                     std::stringstream ss;
-                    ss << "unable to parse " << SectionName(section.type) << " signature, expected ";
-        
-                    switch (section.type) {
-                            
+                    ss << "unable to parse " << SectionName(pd.sectionContext()) << " signature, expected ";
+
+                    switch (pd.sectionContext()) {
                         case RequestSectionType:
                         case RequestBodySectionType:
                             ss << "'request [<identifier>] [(<media type>)]'";
                             break;
-                            
+
                         case ResponseBodySectionType:
                         case ResponseSectionType:
                             ss << "'response [<HTTP status code>] [(<media type>)]'";
                             break;
-                            
+
                         case ModelSectionType:
                         case ModelBodySectionType:
                             ss << "'model [(<media type>)]'";
                             break;
-                            
+
                         default:
                             return false;
                     }
-                    
-                    BlockIterator nameBlock = ListItemNameBlock(cur, section.bounds.second);
-                    SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, cur, section.bounds, sourceData);
-                    result.warnings.push_back(Warning(ss.str(),
+
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                    report.warnings.push_back(Warning(ss.str(),
                                                       FormattingWarning,
-                                                      sourceBlock));
-                    
+                                                      sourceMap));
+
                     return false;
                 }
+
+                if (pd.sectionContext() == ModelSectionType ||
+                    pd.sectionContext() == ModelBodySectionType) {
+
+                    out.name = captureGroups[2];
+                    mediaType = captureGroups[4];
+                } else {
+                    out.name = captureGroups[1];
+                    mediaType = captureGroups[3];
+                }
+
+                TrimString(out.name);
+                TrimString(mediaType);
+
+                if (!mediaType.empty()) {
+                    Header header = std::make_pair(HTTPHeaderName::ContentType, mediaType);
+                    out.headers.push_back(header);
+                }
             }
-            
+
             return true;
         }
-        
-        /**
-         *  \brief  Set payload's asset. 
-         *  \return True on success, false when an asset is already set.
-         */
-        static bool SetAsset(const SectionType& sectionType, const Asset& asset, Payload& payload) {
-            
-            if (sectionType == BodySectionType ||
-                sectionType == RequestBodySectionType ||
-                sectionType == ResponseBodySectionType ||
-                sectionType == ModelBodySectionType ||
-                sectionType == ObjectBodySectionType ||
-                sectionType == DanglingBodySectionType) {
-                if (!payload.body.empty())
-                    return false;
 
-                payload.body = asset;
-            }
-            else if (sectionType == SchemaSectionType ||
-                     sectionType == DanglingSchemaSectionType) {
-                if (!payload.schema.empty())
-                    return false;
+        static bool parseSymbolReference(const MarkdownNodeIterator& node,
+                                         SectionParserData& pd,
+                                         mdp::ByteBuffer& source,
+                                         Report& report,
+                                         Payload& out) {
+
+            SymbolName symbol;
+            ResourceModel model;
+
+            TrimString(source);
+
+            if (GetSymbolReference(source, symbol)) {
+                out.symbol = symbol;
+
+                // If symbol doesn't exist
+                if (pd.symbolTable.resourceModels.find(symbol) == pd.symbolTable.resourceModels.end()) {
+
+                    // ERR: Undefined symbol
+                    std::stringstream ss;
+                    ss << "Undefined symbol " << symbol;
+
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                    report.error = Error(ss.str(), SymbolError, sourceMap);
+
+                    return true;
+                }
+
+                model = pd.symbolTable.resourceModels.at(symbol);
                 
-                payload.schema = asset;
+                out.description = model.description;
+                out.parameters = model.parameters;
+                
+                Collection<Header>::const_iterator modelContentType = std::find_if(model.headers.begin(),
+                                                                                   model.headers.end(),
+                                                                                   std::bind2nd(MatchFirstWith<Header, std::string>(),
+                                                                                                HTTPHeaderName::ContentType));
+                
+                bool isPayloadContentType = !out.headers.empty();
+                bool isModelContentType = modelContentType != model.headers.end();
+                
+                if (isPayloadContentType && isModelContentType) {
+                    
+                    // WARN: Ignoring payload content-type, when referencing a model with headers
+                    std::stringstream ss;
+                    
+                    ss << "ignoring additional " << SectionName(pd.sectionContext()) << " header(s), ";
+                    ss << "specify this header(s) in the referenced model definition instead";
+                    
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                    report.warnings.push_back(Warning(ss.str(),
+                                                      IgnoringWarning,
+                                                      sourceMap));
+                }
+
+                if (isPayloadContentType && !isModelContentType) {
+                    out.headers.insert(out.headers.end(), model.headers.begin(), model.headers.end());
+                }
+                else {
+                    out.headers = model.headers;
+                }
+                
+                out.body = model.body;
+                out.schema = model.schema;
+
+                return true;
             }
-            
-            return true;
+
+            return false;
         }
     };
-    
-    /** Payload Parser */
-    typedef BlockParser<Payload, SectionParser<Payload> > PayloadParser;    
+
+    /** Payload Section Parser */
+    typedef SectionParser<Payload, ListSectionAdapter> PayloadParser;
 }
 
 #endif

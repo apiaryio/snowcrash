@@ -11,23 +11,10 @@
 
 #include <string>
 #include <vector>
+#include "ByteBuffer.h"
 
 namespace snowcrash {
     
-    /**
-     *  \brief  A character range within the source code string.
-     */
-    struct SourceCharactersRange {
-        size_t location;
-        size_t length;
-    };
-    
-    /**
-     *  \brief  A block (set of ranges) of source code characters. A character map.
-     *
-     *  NOTE: The block does not have to be continuous.
-     */
-    typedef std::vector<SourceCharactersRange> SourceCharactersBlock;
     
     /**
      *  \brief  A source data annotation.
@@ -68,7 +55,7 @@ namespace snowcrash {
          */
         SourceAnnotation(const std::string& message,
                          int code = OK,
-                         const SourceCharactersBlock& location = SourceCharactersBlock()) {
+                         const mdp::CharactersRangeSet& location = mdp::CharactersRangeSet()) {
             
             this->message = message;
             this->code = code;
@@ -93,7 +80,7 @@ namespace snowcrash {
         }
         
         /** The location of this annotation within the source data buffer. */
-        SourceCharactersBlock location;
+        mdp::CharactersRangeSet location;
         
         /** An annotation code. */
         int code;
@@ -147,20 +134,20 @@ namespace snowcrash {
     typedef std::vector<Warning> Warnings;
     
     /**
-     *  \brief A parsing result Report.
+     *  \brief A parsing report Report.
      *
      *  Result of a source data parsing operation.
      *  Composed of ONE error source annotation
      *  and a set of warning source annotations.
      */
-    struct Result {
+    struct Report {
         
         /**
-         *  \brief Append a result to this one, replacing the error source annotation.
+         *  \brief Append a report to this one, replacing the error source annotation.
          *
          *  NOTE: A binding does not need to wrap this action.
          */
-        Result& operator+=(const Result& rhs) {
+        Report& operator+=(const Report& rhs) {
             error = rhs.error;
             warnings.insert(warnings.end(), rhs.warnings.begin(), rhs.warnings.end());
             return *this;

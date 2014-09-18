@@ -9,339 +9,265 @@
 #ifndef SNOWCRASH_BLUEPRINTPARSER_H
 #define SNOWCRASH_BLUEPRINTPARSER_H
 
-#include <functional>
-#include <sstream>
-#include <iterator>
-#include "Blueprint.h"
-#include "BlueprintParserCore.h"
 #include "ResourceParser.h"
 #include "ResourceGroupParser.h"
-
-namespace snowcrashconst {
-    
-    const char* const ExpectedAPINameMessage = "expected API name, e.g. '# <API Name>'";
-}
+#include "SectionParser.h"
+#include "RegexMatch.h"
+#include "CodeBlockUtility.h"
 
 namespace snowcrash {
 
-    /** Internal list items classifier, Blueprint Context */
-    template <>
-    FORCEINLINE SectionType ClassifyInternaListBlock<Blueprint>(const BlockIterator& begin,
-                                                                const BlockIterator& end) {
-        return UndefinedSectionType;
-    }
-    
-    /** Block Classifier, Blueprint Context */
-    template <>
-    FORCEINLINE SectionType ClassifyBlock<Blueprint>(const BlockIterator& begin,
-                                                     const BlockIterator& end,
-                                                     const SectionType& context) {
-        
-        if (HasResourceGroupSignature(*begin) ||
-            HasResourceSignature(*begin))
-            return ResourceGroupSectionType; // Treat Resource as anonymous resource group
-        
-        return (context == ResourceGroupSectionType) ? UndefinedSectionType : BlueprintSectionType;
-    }
-    
+    const char* const ExpectedAPINameMessage = "expected API name, e.g. '# <API Name>'";
 
-    /** Blueprint SectionType Parser */
+    /** Internal type alias for Collection of Metadata */
+    typedef Collection<Metadata>::type MetadataCollection;
+
+    typedef Collection<Metadata>::iterator MetadataCollectionIterator;
+
+    /**
+     * Blueprint processor
+     */
     template<>
-    struct SectionParser<Blueprint> {
-        
-        static ParseSectionResult ParseSection(const BlueprintSection& section,
-                                               const BlockIterator& cur,
-                                               BlueprintParserCore& parser,
-                                               Blueprint& output) {
-            
-            ParseSectionResult result = std::make_pair(Result(), cur);
-            
-            switch (section.type) {
-                    
-                case BlueprintSectionType:
-                    result = HandleBlueprintDescriptionBlock(section, cur, parser, output);
-                    break;
-                    
-                case ResourceGroupSectionType:
-                    result = HandleResourceGroup(section, cur, parser, output);
-                    break;
-                    
-                default:
-                    result.first.error = UnexpectedBlockError(section, cur, parser.sourceData);
-                    break;
+    struct SectionProcessor<Blueprint> : public SectionProcessorBase<Blueprint> {
+
+        static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
+                                                     const MarkdownNodes& siblings,
+                                                     SectionParserData& pd,
+                                                     SectionLayout& layout,
+                                                     Report& report,
+                                                     Blueprint& out) {
+
+            MarkdownNodeIterator cur = node;
+
+            while (cur != siblings.end() &&
+                   cur->type == mdp::ParagraphMarkdownNodeType) {
+
+                MetadataCollection metadata;
+                parseMetadata(cur, pd, report, metadata);
+
+                // First block is paragraph and is not metadata (no API name)
+                if (metadata.empty()) {
+                    return processDescription(cur, siblings, pd, report, out);
+                } else {
+                    out.metadata.insert(out.metadata.end(), metadata.begin(), metadata.end());
+                }
+
+                cur++;
             }
             
-            return result;
+            // Ideally this parsing metadata should be handled by separate parser
+            // that way the following check would be covered in SectionParser::parse()
+            if (cur == siblings.end())
+                return cur;
+
+            if (cur->type == mdp::HeaderMarkdownNodeType) {
+
+                SectionType nestedType = nestedSectionType(cur);
+
+                // Resources Groups only, parse as exclusive nested sections
+                if (nestedType != UndefinedSectionType) {
+                    layout = ExclusiveNestedSectionLayout;
+                    return cur;
+                }
+
+                out.name = cur->text;
+                TrimString(out.name);
+            } else {
+
+                // Any other type of block, add to description
+                return processDescription(cur, siblings, pd, report, out);
+            }
+
+            return ++MarkdownNodeIterator(cur);
         }
-        
-        static void Finalize(const SectionBounds& bounds,
-                             BlueprintParserCore& parser,
-                             Blueprint& blueprint,
-                             Result& result) {}
-        
-        /**
-         *  \brief  Checks API Blueprint name issues warning or error if name does not exists.
-         *  \param  cur     Cursor to the expected name header block
-         *  \param  blueprint   Blueprint to check.
-         *  \param  parser  A parser's instance.
-         *  \param  result  Check result report.
-         *  \result Returns false if a name is missing AND RequireBlueprintNameOption is set. True otherwise.
-         */
-        static bool CheckBlueprintName(const BlockIterator& cur,
-                                       const Blueprint& blueprint,
-                                       BlueprintParserCore& parser,
-                                       Result& result) {
 
-            if (!blueprint.name.empty())
-                return true;
+        static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
+                                                         const MarkdownNodes& siblings,
+                                                         SectionParserData& pd,
+                                                         Report& report,
+                                                         Blueprint& out) {
 
-            if (parser.options & RequireBlueprintNameOption) {
-                
-                // ERR: No API name specified
-                result.error = Error(snowcrashconst::ExpectedAPINameMessage,
-                                     BusinessError,
-                                     MapSourceDataBlock(cur->sourceMap, parser.sourceData));
-                return false;
+            if (pd.sectionContext() == ResourceGroupSectionType ||
+                pd.sectionContext() == ResourceSectionType) {
+
+                ResourceGroup resourceGroup;
+                MarkdownNodeIterator cur = ResourceGroupParser::parse(node, siblings, pd, report, resourceGroup);
+
+                ResourceGroupIterator duplicate = findResourceGroup(out.resourceGroups, resourceGroup);
+
+                if (duplicate != out.resourceGroups.end()) {
+
+                    // WARN: duplicate resource group
+                    std::stringstream ss;
+
+                    if (resourceGroup.name.empty()) {
+                        ss << "anonymous group";
+                    } else {
+                        ss << "group '" << resourceGroup.name << "'";
+                    }
+
+                    ss << " is already defined";
+
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                    report.warnings.push_back(Warning(ss.str(),
+                                                      DuplicateWarning,
+                                                      sourceMap));
+                }
+
+                out.resourceGroups.push_back(resourceGroup);
+
+                return cur;
             }
 
-            // WARN: No API name specified
-            result.warnings.push_back(Warning(snowcrashconst::ExpectedAPINameMessage,
-                                              APINameWarning,
-                                              MapSourceDataBlock(cur->sourceMap, parser.sourceData)));
+            return node;
+        }
 
+        static SectionType sectionType(const MarkdownNodeIterator& node) {
+
+            return BlueprintSectionType;
+        }
+
+        static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
+
+            SectionType nestedType = UndefinedSectionType;
+
+            // Check if Resource section
+            nestedType = SectionProcessor<Resource>::sectionType(node);
+
+            if (nestedType != UndefinedSectionType) {
+                return nestedType;
+            }
+
+            // Check if ResourceGroup section
+            nestedType = SectionProcessor<ResourceGroup>::sectionType(node);
+
+            if (nestedType != UndefinedSectionType) {
+                return nestedType;
+            }
+
+            return UndefinedSectionType;
+        }
+
+        static SectionTypes nestedSectionTypes() {
+            SectionTypes nested;
+
+            // Resource Group & descendants
+            nested.push_back(ResourceGroupSectionType);
+            SectionTypes types = SectionProcessor<ResourceGroup>::nestedSectionTypes();
+            nested.insert(nested.end(), types.begin(), types.end());
+
+            return nested;
+        }
+
+        static void finalize(const MarkdownNodeIterator& node,
+                             SectionParserData& pd,
+                             Report& report,
+                             Blueprint& out) {
+            
+            if (!out.name.empty())
+                return;
+
+            if (pd.options & RequireBlueprintNameOption) {
+
+                // ERR: No API name specified
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                report.error = Error(ExpectedAPINameMessage,
+                                     BusinessError,
+                                     sourceMap);
+                
+            }
+            else if (!out.description.empty()) {
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                report.warnings.push_back(Warning(ExpectedAPINameMessage,
+                                                  APINameWarning,
+                                                  sourceMap));
+            }
+        }
+
+        static bool isUnexpectedNode(const MarkdownNodeIterator& node,
+                                     SectionType sectionType) {
+            
+            // Since Blueprint is currently top-level node any unprocessed node should be reported
             return true;
         }
-        
-        // Returns true if given block is first block in document
-        // after metadata block, false otherwise.
-        static bool IsFirstBlock(const BlockIterator& cur,
-                                 const SectionBounds& bounds,
-                                 const Blueprint& blueprint) {
-            
-            if (blueprint.metadata.empty())
-                return cur == bounds.first;
-            
-            return std::distance(bounds.first, cur) == 1;
-        }
 
-        static ParseSectionResult HandleBlueprintDescriptionBlock(const BlueprintSection& section,
-                                                                  const BlockIterator& cur,
-                                                                  BlueprintParserCore& parser,
-                                                                  Blueprint& output) {
-            
-            ParseSectionResult result = std::make_pair(Result(), cur);
-            BlockIterator sectionCur(cur);
 
-            // API Name
-            bool isFirstBlock = IsFirstBlock(cur, section.bounds, output);
-            if (isFirstBlock &&
-                sectionCur->type == HeaderBlockType) {
-                
-                output.name = cur->content;
-                
-                // Check ambiguity
-                CheckHeaderBlock<Blueprint>(section, sectionCur, parser.sourceData, result.first);
+        static void parseMetadata(const MarkdownNodeIterator& node,
+                                  SectionParserData& pd,
+                                  Report& report,
+                                  MetadataCollection& out) {
 
-                // Check Name
-                if (!CheckBlueprintName(sectionCur, output, parser, result.first))
-                    return result;
-                
-                result.second = ++sectionCur;
-                return result;
-            }
-            
-            // Metadata
-            if (isFirstBlock &&
-                sectionCur->type == ParagraphBlockType) {
-                
-                result = ParseMetadataBlock(sectionCur, section.bounds, parser, output);
-                if (result.second != sectionCur)
-                    return result;
-            }
-            
-            // Description
-            result = ParseDescriptionBlock<Blueprint>(section, sectionCur, parser.sourceData, output);
-            
-            // Check Name
-            if (isFirstBlock)
-                CheckBlueprintName(sectionCur, output, parser, result.first);
-            
-            return result;
-        }
-        
-        static ParseSectionResult HandleResourceGroup(const BlueprintSection& section,
-                                                      const BlockIterator& cur,
-                                                      BlueprintParserCore& parser,
-                                                      Blueprint& output)
-        {
-            
-            // Mandatory name check
-            ParseSectionResult result = std::make_pair(Result(), cur);
-            if (IsFirstBlock(cur, section.bounds, output) &&
-                !CheckBlueprintName(cur, output, parser, result.first))
-                return result;
-            
-            // Parser resource group
-            ResourceGroup resourceGroup;
-            result = ResourceGroupParser::Parse(cur,
-                                                section.bounds.second,
-                                                section,
-                                                parser,
-                                                resourceGroup);
-
-            if (result.first.error.code != Error::OK)
-                return result;
-            
-            Collection<ResourceGroup>::const_iterator duplicate = FindResourceGroup(parser.blueprint, resourceGroup);
-            if (duplicate != parser.blueprint.resourceGroups.end()) {
-                
-                // WARN: duplicate group
-                std::stringstream ss;
-                if (resourceGroup.name.empty()) {
-                    ss << "anonymous group";
-                }
-                else {
-                    ss << "group '" << resourceGroup.name << "'";
-                }
-                ss << " is already defined";
-                
-                SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, section.bounds.second, section.bounds, parser.sourceData);
-                result.first.warnings.push_back(Warning(ss.str(),
-                                                        DuplicateWarning,
-                                                        sourceBlock));
-            }
-            
-            output.resourceGroups.push_back(resourceGroup); // FIXME: C++11 move
-            return result;
-        }
-        
-
-        static ParseSectionResult ParseMetadataBlock(const BlockIterator& cur,
-                                                     const SectionBounds& bounds,
-                                                     BlueprintParserCore& parser,
-                                                     Blueprint& output) {
-            
-            typedef Collection<Metadata>::type MetadataCollection;
-            typedef Collection<Metadata>::iterator MetadataCollectionIterator;
-            MetadataCollection metadataCollection;
-            
-            ParseSectionResult result = std::make_pair(Result(), cur);
-            SourceData content = cur->content;
+            mdp::ByteBuffer content = node->text;
             TrimStringEnd(content);
-            std::vector<std::string> lines = Split(content, '\n');
-            for (std::vector<std::string>::iterator line = lines.begin();
-                 line != lines.end();
-                 ++line) {
-                
+
+            std::vector<mdp::ByteBuffer> lines = Split(content, '\n');
+
+            for (std::vector<mdp::ByteBuffer>::iterator it = lines.begin();
+                 it != lines.end();
+                 ++it) {
+
                 Metadata metadata;
-                if (KeyValueFromLine(*line, metadata))
-                    metadataCollection.push_back(metadata);
+
+                if (CodeBlockUtility::keyValueFromLine(*it, metadata)) {
+                    out.push_back(metadata);
+                }
             }
-            
-            if (lines.size() == metadataCollection.size()) {
-                
+
+            if (lines.size() == out.size()) {
+
                 // Check duplicates
-                std::vector<std::string> duplicateKeys;
-                for (MetadataCollectionIterator it = metadataCollection.begin();
-                     it != metadataCollection.end();
+                std::vector<mdp::ByteBuffer> duplicateKeys;
+
+                for (MetadataCollectionIterator it = out.begin();
+                     it != out.end();
                      ++it) {
-                    
+
                     MetadataCollectionIterator from = it;
-                    if (++from == metadataCollection.end())
+                    if (++from == out.end())
                         break;
-                    
+
                     MetadataCollectionIterator duplicate = std::find_if(from,
-                                                                        metadataCollection.end(),
+                                                                        out.end(),
                                                                         std::bind2nd(MatchFirsts<Metadata>(), *it));
-                    
-                    if (duplicate != metadataCollection.end() &&
+
+                    if (duplicate != out.end() &&
                         std::find(duplicateKeys.begin(), duplicateKeys.end(), it->first) == duplicateKeys.end()) {
-                        
+
                         duplicateKeys.push_back(it->first);
-                        
-                        // WARN: duplicate metada definition
+
+                        // WARN: duplicate metadata definition
                         std::stringstream ss;
                         ss << "duplicate definition of '" << it->first << "'";
-                        
-                        SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, bounds.second, bounds, parser.sourceData);
-                        result.first.warnings.push_back(Warning(ss.str(),
-                                                                DuplicateWarning,
-                                                                sourceBlock));
+
+                        mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                        report.warnings.push_back(Warning(ss.str(),
+                                                          DuplicateWarning,
+                                                          sourceMap));
                     }
                 }
-                
-                // Insert parsed metadata into output
-                output.metadata.insert(output.metadata.end(),
-                                       metadataCollection.begin(),
-                                       metadataCollection.end());
-                
-                ++result.second;
             }
-            else if (!metadataCollection.empty()) {
+            else if (!out.empty()) {
+
                 // WARN: malformed metadata block
-                SourceCharactersBlock sourceBlock = CharacterMapForBlock(cur, bounds.second, bounds, parser.sourceData);
-                result.first.warnings.push_back(Warning("ignoring possible metadata, expected"
-                                                        " '<key> : <value>', one one per line",
-                                                        FormattingWarning,
-                                                        sourceBlock));
-            }
-            
-            return result;
-        }
-    };
-    
-    typedef BlockParser<Blueprint, SectionParser<Blueprint> > BlueprintParserInner;
-    
-    
-    //
-    // Blueprint Parser
-    //
-    class BlueprintParser {
-    public:
-        // Parse Markdown AST into API Blueprint AST
-        static void Parse(const SourceData& sourceData,
-                          const MarkdownBlock::Stack& source,
-                          BlueprintParserOptions options,
-                          Result& result,
-                          Blueprint& blueprint) {
-            
-            BlueprintParserCore parser(options, sourceData, blueprint);
-            BlueprintSection rootSection(std::make_pair(source.begin(), source.end()));
-            ParseSectionResult sectionResult = BlueprintParserInner::Parse(source.begin(),
-                                                                           source.end(),
-                                                                           rootSection,
-                                                                           parser,
-                                                                           blueprint);
-            result += sectionResult.first;
-            
-#ifdef DEBUG
-            PrintSymbolTable(parser.symbolTable);
-#endif
-            if (result.error.code != Error::OK)
-                return;
-            
-            PostParseCheck(sourceData, source, parser, result);
-        }
-        
-        /** 
-         *  Perform additional post-parsing result checks.
-         *  Mainly to focused on running checking when top-level parser is not executed.
-         */
-        static void PostParseCheck(const SourceData& sourceData,
-                                   const MarkdownBlock::Stack& source,
-                                   BlueprintParserCore& parser,
-                                   Result& result) {
-            
-            if ((parser.options & RequireBlueprintNameOption) &&
-                parser.blueprint.name.empty()){
-                
-                // ERR: No API name specified
-                result.error = Error(snowcrashconst::ExpectedAPINameMessage,
-                                     BusinessError,
-                                     MapSourceDataBlock(MakeSourceDataBlock(0, 0), parser.sourceData));
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                report.warnings.push_back(Warning("ignoring possible metadata, expected '<key> : <value>', one one per line",
+                                                  FormattingWarning,
+                                                  sourceMap));
             }
         }
+
+        /** Finds a resource group inside an resource groups collection */
+        static ResourceGroupIterator findResourceGroup(const ResourceGroups& resourceGroups,
+                                                       const ResourceGroup& resourceGroup) {
+
+            return std::find_if(resourceGroups.begin(),
+                                resourceGroups.end(),
+                                std::bind2nd(MatchName<ResourceGroup>(), resourceGroup));
+        }
     };
+
+    /** Blueprint Parser */
+    typedef SectionParser<Blueprint, BlueprintSectionAdapter> BlueprintParser;
 }
 
 #endif

@@ -9,244 +9,169 @@
 #ifndef SNOWCRASH_PARAMETERSPARSER_H
 #define SNOWCRASH_PARAMETERSPARSER_H
 
-#include <sstream>
-#include "BlueprintParserCore.h"
-#include "Blueprint.h"
+#include "SectionParser.h"
+#include "ParameterParser.h"
 #include "RegexMatch.h"
 #include "StringUtility.h"
-#include "BlockUtility.h"
-#include "ParameterDefinitonParser.h"
+#include "BlueprintUtility.h"
 
-namespace snowcrashconst {
-    
+namespace snowcrash {
+
     /** Parameters matching regex */
     const char* const ParametersRegex = "^[[:blank:]]*[Pp]arameters?[[:blank:]]*$";
 
-    /** Expected parameters content */
-    const char* const ExpectedParametersContent = "a nested list of parameters, one parameter per list item";
-
     /** No parameters specified message */
     const char* const NoParametersMessage = "no parameters specified, expected a nested list of parameters, one parameter per list item";
-}
 
-namespace snowcrash {
-    
-    /** Internal type alias for Collection of Paramaeter */
-    typedef Collection<Parameter>::type ParameterCollection;
+    /** Internal type alias for Collection of Parameter */
+    typedef Collection<Parameter>::type Parameters;
 
-    
-    /** Finds a parameter inside a parameters collection */
-    FORCEINLINE ParameterCollection::iterator FindParameter(ParameterCollection& parameters,
-                                                           const Parameter& parameter) {
-        return std::find_if(parameters.begin(),
-                            parameters.end(),
-                            std::bind2nd(MatchName<Parameter>(), parameter));
-    }
-    
-    /**
-     *  Returns true if given block has parameters signature, false otherwise.
-     */
-    FORCEINLINE bool HasParametersSignature(const BlockIterator& begin,
-                                            const BlockIterator& end) {
-
-        if (begin->type != ListBlockBeginType &&
-            begin->type != ListItemBlockBeginType)
-            return false;
-        
-        SourceData remainingContent;
-        SourceData content = GetListItemSignature(begin, end, remainingContent);
-        TrimString(content);
-        return RegexMatch(content, snowcrashconst::ParametersRegex);
-    }
-    
-    /** Children List Block Classifier, ParameterCollection context. */
-    template <>
-    FORCEINLINE SectionType ClassifyChildrenListBlock<ParameterCollection>(const BlockIterator& begin,
-                                                                           const BlockIterator& end){
-        // TODO:
-        return UndefinedSectionType;
-    }
-    
-    /** Block Classifier, ParameterCollection context. */
-    template <>
-    FORCEINLINE SectionType ClassifyBlock<ParameterCollection>(const BlockIterator& begin,
-                                                           const BlockIterator& end,
-                                                           const SectionType& context) {
-        
-        if (context == UndefinedSectionType) {
-            if (HasParametersSignature(begin, end))
-                return ParametersSectionType;
-        }
-        else if (context == ParametersSectionType) {
-            
-            if (begin->type == ListItemBlockEndType ||
-                begin->type == ListBlockEndType)
-                return UndefinedSectionType;
-            
-            if (HasParameterDefinitionSignature(begin, end))
-                return ParameterDefinitionSectionType;
-            
-            if (begin->type == ListBlockBeginType)
-                return ForeignSectionType; // Foreign nested list-item
-            
-            if (begin->type == ListItemBlockBeginType)
-                return UndefinedSectionType;
-        }
-        else if (context == ParameterDefinitionSectionType ||
-                 context == ForeignSectionType) {
-            
-            if (begin->type == ListItemBlockEndType ||
-                begin->type == ListBlockEndType)
-                return UndefinedSectionType;
-            
-            if (HasParameterDefinitionSignature(begin, end))
-                return ParameterDefinitionSectionType;
-            
-            return ForeignSectionType;
-        }
-        
-        return (context == ParametersSectionType) ? context : UndefinedSectionType;
-    }
+    typedef Collection<Parameter>::iterator ParameterIterator;
 
     /**
-     *  Parameters section parser.
+     * Parameters section processor
      */
     template<>
-    struct SectionParser<ParameterCollection> {
-        
-        static ParseSectionResult ParseSection(const BlueprintSection& section,
-                                               const BlockIterator& cur,
-                                               BlueprintParserCore& parser,
-                                               ParameterCollection& parameters) {
-            
-            ParseSectionResult result = std::make_pair(Result(), cur);
-            switch (section.type) {
-                case ParametersSectionType:
-                    result = HandleParmetersSection(section, cur, parser, parameters);
-                    break;
-                    
-                case ParameterDefinitionSectionType:
-                    result = HandleParmeterDefinitionSection(section, cur, parser, parameters);
-                    break;
-                    
-                case ForeignSectionType:
-                    result = HandleForeignSection<ParameterCollection>(section, cur, parser.sourceData);
-                    break;
-                    
-                case UndefinedSectionType:
-                    result.second = CloseList(cur, section.bounds.second);
-                    break;
-                    
-                default:
-                    result.first.error = UnexpectedBlockError(section, cur, parser.sourceData);
-                    break;
-            }
-            
-            return result;
-        }
-        
-        static void Finalize(const SectionBounds& bounds,
-                             BlueprintParserCore& parser,
-                             ParameterCollection& parameters,
-                             Result& result) {}
-        
-        /**
-         *  \brief  Parse Parameters top-level section blocks.
-         *  \param  section Actual section being parsed.
-         *  \param  cur     The actual position within Markdown block buffer.
-         *  \param  parser  Parser's instance.
-         *  \param  payload An output buffer to write parameters into.
-         *  \return A block parser section result.
-         */
-        static ParseSectionResult HandleParmetersSection(const BlueprintSection& section,
-                                                         const BlockIterator& cur,
-                                                         BlueprintParserCore& parser,
-                                                         ParameterCollection& parameters) {
-            
-            ParseSectionResult result = std::make_pair(Result(), cur);
-            BlockIterator sectionCur = cur;
-            
-            // Signature
-            if (sectionCur == section.bounds.first) {
-                
-                CheckSignatureAdditionalContent(section,
-                                                sectionCur,
-                                                parser.sourceData,
-                                                "'parameters' keyword",
-                                                snowcrashconst::ExpectedParametersContent,
-                                                result.first);
-                result.second = SkipSignatureBlock(sectionCur, section.bounds.second);
-                return result;
-            }
-            
-            // Unexpected description
-            if (sectionCur->type == QuoteBlockBeginType) {
-                sectionCur = SkipToClosingBlock(sectionCur, section.bounds.second, QuoteBlockBeginType, QuoteBlockEndType);
-            }
-            else if (sectionCur->type == ListBlockBeginType) {
-                sectionCur = SkipToClosingBlock(sectionCur, section.bounds.second, ListBlockBeginType, ListItemBlockEndType);
-            }
-            
-            if (!CheckCursor(section, sectionCur, parser.sourceData, result.first))
-                return result;
-            
-            // WARN: on ignoring additional content
-            std::stringstream ss;
-            ss << "ignoring additional content in the 'parameters' definition, expected " << snowcrashconst::ExpectedParametersContent;
-            
-            SourceCharactersBlock sourceBlock = CharacterMapForBlock(sectionCur, cur, section.bounds, parser.sourceData);
-            result.first.warnings.push_back(Warning(ss.str(),
-                                                    IgnoringWarning,
-                                                    sourceBlock));
-            
-            if (sectionCur != section.bounds.second)
-                result.second = ++sectionCur;
+    struct SectionProcessor<Parameters> : public SectionProcessorBase<Parameters> {
 
-            return result;
+        static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
+                                                     const MarkdownNodes& siblings,
+                                                     SectionParserData& pd,
+                                                     SectionLayout& layout,
+                                                     Report& report,
+                                                     Parameters& out) {
+
+            mdp::ByteBuffer remainingContent;
+
+            GetFirstLine(node->text, remainingContent);
+
+            if (!remainingContent.empty()) {
+
+                // WARN: Extra content in parameters section
+                std::stringstream ss;
+                ss << "ignoring additional content after 'parameters' keyword,";
+                ss << " expected a nested list of parameters, one parameter per list item";
+
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                report.warnings.push_back(Warning(ss.str(),
+                                                  IgnoringWarning,
+                                                  sourceMap));
+            }
+
+            return ++MarkdownNodeIterator(node);
         }
-        
-        /** Parse a parameter definition top-level section blocks. */
-        static ParseSectionResult HandleParmeterDefinitionSection(const BlueprintSection& section,
-                                                                  const BlockIterator& cur,
-                                                                  BlueprintParserCore& parser,
-                                                                  ParameterCollection& parameters) {
+
+        static MarkdownNodeIterator processDescription(const MarkdownNodeIterator& node,
+                                                       const MarkdownNodes& siblings,
+                                                       SectionParserData& pd,
+                                                       Report& report,
+                                                       Parameters& out) {
+
+            return node;
+        }
+
+        static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
+                                                         const MarkdownNodes& siblings,
+                                                         SectionParserData& pd,
+                                                         Report& report,
+                                                         Parameters& out) {
+
+            if (pd.sectionContext() != ParameterSectionType) {
+                return node;
+            }
+
             Parameter parameter;
-            ParseSectionResult result = ParameterDefinitionParser::Parse(cur,
-                                                                         section.bounds.second,
-                                                                         section,
-                                                                         parser,
-                                                                         parameter);
-            if (result.first.error.code != Error::OK)
-                return result;
+            ParameterParser::parse(node, siblings, pd, report, parameter);
 
-            // Check duplicates
-            if (!parameters.empty()) {
-                ParameterCollection::iterator duplicate = FindParameter(parameters, parameter);
-                if (duplicate != parameters.end()) {
+            if (!out.empty()) {
+
+                ParameterIterator duplicate = findParameter(out, parameter);
+
+                if (duplicate != out.end()) {
 
                     // WARN: Parameter already defined
                     std::stringstream ss;
                     ss << "overshadowing previous parameter '" << parameter.name << "' definition";
 
-                    BlockIterator nameBlock = ListItemNameBlock(cur, section.bounds.second);
-                    SourceCharactersBlock sourceBlock = CharacterMapForBlock(nameBlock, cur, section.bounds, parser.sourceData);
-                    result.first.warnings.push_back(Warning(ss.str(),
-                                                            RedefinitionWarning,
-                                                            sourceBlock));
-                    
-                    // Erase origan duplicate 
-                    parameters.erase(duplicate);
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                    report.warnings.push_back(Warning(ss.str(),
+                                                      RedefinitionWarning,
+                                                      sourceMap));
                 }
             }
-            
-            parameters.push_back(parameter);
-            
-            return result;
+
+            out.push_back(parameter);
+
+            return ++MarkdownNodeIterator(node);
+        }
+
+        static bool isDescriptionNode(const MarkdownNodeIterator& node,
+                                      SectionType sectionType) {
+
+            return false;
+        }
+
+        static SectionType sectionType(const MarkdownNodeIterator& node) {
+
+            if (node->type == mdp::ListItemMarkdownNodeType
+                && !node->children().empty()) {
+
+                mdp::ByteBuffer remaining, subject = node->children().front().text;
+
+                subject = GetFirstLine(subject, remaining);
+                TrimString(subject);
+
+                if (RegexMatch(subject, ParametersRegex)) {
+                    return ParametersSectionType;
+                }
+            }
+
+            return UndefinedSectionType;
+        }
+
+        static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
+
+            return SectionProcessor<Parameter>::sectionType(node);
+        }
+
+        static SectionTypes nestedSectionTypes() {
+            SectionTypes nested;
+
+            // Parameter & descendants
+            nested.push_back(ParameterSectionType);
+            SectionTypes types = SectionProcessor<Parameter>::nestedSectionTypes();
+            nested.insert(nested.end(), types.begin(), types.end());
+
+            return nested;
+        }
+
+        static void finalize(const MarkdownNodeIterator& node,
+                             SectionParserData& pd,
+                             Report& report,
+                             Parameters& out) {
+
+            if (out.empty()) {
+
+                // WARN: No parameters defined
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                report.warnings.push_back(Warning(NoParametersMessage,
+                                                  FormattingWarning,
+                                                  sourceMap));
+            }
+        }
+
+        /** Finds a parameter inside a parameters collection */
+        static ParameterIterator findParameter(Parameters& parameters,
+                                               const Parameter& parameter) {
+
+            return std::find_if(parameters.begin(),
+                                parameters.end(),
+                                std::bind2nd(MatchName<Parameter>(), parameter));
         }
     };
-    
-    typedef BlockParser<ParameterCollection, SectionParser<ParameterCollection> > ParametersParser;
-}
 
+    /** Parameters Section parser */
+    typedef SectionParser<Parameters, ListSectionAdapter> ParametersParser;
+}
 
 #endif

@@ -6,11 +6,9 @@
 //  Copyright (c) 2013 Apiary Inc. All rights reserved.
 //
 
-#include <iterator>
-#include <iostream>
-#include "catch.hpp"
-#include "Fixture.h"
-#include "Parser.h"
+#include "snowcrash.h"
+#include "snowcrashtest.h"
+#include "ActionParser.h"
 
 using namespace snowcrash;
 using namespace snowcrashtest;
@@ -23,437 +21,330 @@ void ReportDebugMessage(const std::string& msg)
 #endif
 }
 
-TEST_CASE("Correct indentation", "[abbreviated][indentation]")
+TEST_CASE("Correct indentation", "[indentation]")
 {
-    // Blueprint in question:
-    //R"(
-    //# GET /1
-    //+ Response 200
-    //
-    //        { ... }
-    //");
-    const std::string blueprintSource = \
+    mdp::ByteBuffer source = \
     "# GET /1\n"\
     "+ Response 200\n"\
     "\n"\
     "        { ... }\n";
-    
-    Parser parser;
-    Result result;
-    Blueprint blueprint;
-    parser.parse(blueprintSource, 0, result, blueprint);
-    REQUIRE(result.error.code == Error::OK);
-    REQUIRE(result.warnings.empty());
-    
-    REQUIRE(blueprint.resourceGroups.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body == "{ ... }\n");
+
+    Action action;
+    Report report;
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, report, action);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.empty());
+
+    REQUIRE(action.description.empty());
+    REQUIRE(action.examples[0].responses.size() == 1);
+    REQUIRE(action.examples[0].responses[0].name == "200");
+    REQUIRE(action.examples[0].responses[0].body == "{ ... }\n");
 }
 
-TEST_CASE("No Indentation & No Newline", "[abbreviated][indentation]")
+TEST_CASE("No Indentation & No Newline", "[indentation]")
 {
-    // Blueprint in question:
-    //R"(
-    //# GET /1
-    //+ Response 200
-    //{ ... }
-    //");
-    const std::string blueprintSource = \
+    mdp::ByteBuffer source = \
     "# GET /1\n"\
     "+ Response 200\n"\
     "{ ... }\n";
-    
-    Parser parser;
-    Result result;
-    Blueprint blueprint;
-    parser.parse(blueprintSource, 0, result, blueprint);
-    REQUIRE(result.error.code == Error::OK);
-    REQUIRE(result.warnings.size() == 1);
-    REQUIRE(result.warnings[0].code == IndentationWarning);
-    ReportDebugMessage(result.warnings[0].message);
-    
-    REQUIRE(blueprint.resourceGroups.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body == "{ ... }\n");
+
+    Action action;
+    Report report;
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, report, action);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(report.warnings[0].code == IndentationWarning);
+    ReportDebugMessage(report.warnings[0].message);
+
+    REQUIRE(action.description.empty());
+    REQUIRE(action.examples[0].responses.size() == 1);
+    REQUIRE(action.examples[0].responses[0].name == "200");
+    REQUIRE(action.examples[0].responses[0].body == "{ ... }\n\n");
 }
 
-TEST_CASE("No Indentation", "[abbreviated][indentation]")
+TEST_CASE("No Indentation", "[indentation]")
 {
-    // Blueprint in question:
-    //R"(
-    //# GET /1
-    //+ Response 200
-    //
-    //{ ... }
-    //");
-    const std::string blueprintSource = \
+    mdp::ByteBuffer source = \
     "# GET /1\n"\
     "+ Response 200\n"\
     "\n"\
     "{ ... }\n";
-    
-    Parser parser;
-    Result result;
-    Blueprint blueprint;
-    parser.parse(blueprintSource, 0, result, blueprint);
-    REQUIRE(result.error.code == Error::OK);
-    REQUIRE(result.warnings.size() == 1);
-    REQUIRE(result.warnings[0].code == IndentationWarning);
-    ReportDebugMessage(result.warnings[0].message);
-    
-    REQUIRE(blueprint.resourceGroups.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body == "{ ... }\n");
+
+    Action action;
+    Report report;
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, report, action);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(report.warnings[0].code == IndentationWarning);
+    ReportDebugMessage(report.warnings[0].message);
+
+    REQUIRE(action.description.empty());
+    REQUIRE(action.examples[0].responses.size() == 1);
+    REQUIRE(action.examples[0].responses[0].name == "200");
+    REQUIRE(action.examples[0].responses[0].body == "{ ... }\n\n");
 }
 
-TEST_CASE("Poor Indentation & No Newline", "[abbreviated][indentation]")
+TEST_CASE("Poor Indentation & No Newline", "[indentation]")
 {
-    // Blueprint in question:
-    //R"(
-    //# GET /1
-    //+ Response 200
-    //    { ... }
-    //");
-    const std::string blueprintSource = \
+    mdp::ByteBuffer source = \
     "# GET /1\n"\
     "+ Response 200\n"\
     "    { ... }\n";
-    
-    Parser parser;
-    Result result;
-    Blueprint blueprint;
-    parser.parse(blueprintSource, 0, result, blueprint);
-    REQUIRE(result.error.code == Error::OK);
-    REQUIRE(result.warnings.size() == 1);
-    REQUIRE(result.warnings[0].code == IndentationWarning);
-    ReportDebugMessage(result.warnings[0].message);
-    
-    REQUIRE(blueprint.resourceGroups.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body == "{ ... }\n");
+
+    Action action;
+    Report report;
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, report, action);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(report.warnings[0].code == IndentationWarning);
+    ReportDebugMessage(report.warnings[0].message);
+
+    REQUIRE(action.description.empty());
+    REQUIRE(action.examples[0].responses.size() == 1);
+    REQUIRE(action.examples[0].responses[0].name == "200");
+    REQUIRE(action.examples[0].responses[0].body == "{ ... }\n\n");
 }
 
-TEST_CASE("Poor Indentation", "[abbreviated][indentation]")
+TEST_CASE("Poor Indentation", "[indentation]")
 {
-    // Blueprint in question:
-    //R"(
-    //# GET /1
-    //+ Response 200
-    //
-    //    { ... }
-    //");
-    const std::string blueprintSource = \
+    mdp::ByteBuffer source = \
     "# GET /1\n"\
     "+ Response 200\n"\
     "\n"\
     "    { ... }\n";
-    
-    Parser parser;
-    Result result;
-    Blueprint blueprint;
-    parser.parse(blueprintSource, 0, result, blueprint);
-    REQUIRE(result.error.code == Error::OK);
-    REQUIRE(result.warnings.size() == 1);
-    REQUIRE(result.warnings[0].code == IndentationWarning);
-    ReportDebugMessage(result.warnings[0].message);
-    
-    REQUIRE(blueprint.resourceGroups.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body == "{ ... }\n");
+
+    Action action;
+    Report report;
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, report, action);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(report.warnings[0].code == IndentationWarning);
+    ReportDebugMessage(report.warnings[0].message);
+
+    REQUIRE(action.description.empty());
+    REQUIRE(action.examples[0].responses.size() == 1);
+    REQUIRE(action.examples[0].responses[0].name == "200");
+    REQUIRE(action.examples[0].responses[0].body == "{ ... }\n");
 }
 
-TEST_CASE("OK Indentation & No Newline", "[abbreviated][indentation]")
+TEST_CASE("OK Indentation & No Newline", "[indentation]")
 {
-    // Blueprint in question:
-    //R"(
-    //# GET /1
-    //+ Response 200
-    //        { ... }
-    //");
-    const std::string blueprintSource = \
+    mdp::ByteBuffer source = \
     "# GET /1\n"\
     "+ Response 200\n"\
     "        { ... }\n";
-    
-    Parser parser;
-    Result result;
-    Blueprint blueprint;
-    parser.parse(blueprintSource, 0, result, blueprint);
-    REQUIRE(result.error.code == Error::OK);
-    REQUIRE(result.warnings.size() == 1);
-    REQUIRE(result.warnings[0].code == IndentationWarning);
-    ReportDebugMessage(result.warnings[0].message);
-    
-    REQUIRE(blueprint.resourceGroups.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body == "    { ... }\n");
+
+    Action action;
+    Report report;
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, report, action);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(report.warnings[0].code == IndentationWarning);
+    ReportDebugMessage(report.warnings[0].message);
+
+    REQUIRE(action.description.empty());
+    REQUIRE(action.examples[0].responses.size() == 1);
+    REQUIRE(action.examples[0].responses[0].name == "200");
+    REQUIRE(action.examples[0].responses[0].body == "    { ... }\n\n");
 }
 
 TEST_CASE("Full syntax - correct", "[indentation]")
 {
-    // Blueprint in question:
-    //R"(
-    //## GET /1
-    //+ Response 200
-    //    + Body
-    //
-    //            { ... }
-    //");
-    const std::string blueprintSource = \
+    mdp::ByteBuffer source = \
     "## GET /1\n"\
     "+ Response 200\n"\
     "    + Body\n"\
     "\n"\
     "            { ... }\n";
-    Parser parser;
-    Result result;
-    Blueprint blueprint;
-    parser.parse(blueprintSource, 0, result, blueprint);
-    REQUIRE(result.error.code == Error::OK);
-    REQUIRE(result.warnings.empty());
-    
-    REQUIRE(blueprint.resourceGroups.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
-    REQUIRE(!blueprint.resourceGroups[0].resources[0].actions[0].examples.empty());
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body == "{ ... }\n");
+
+    Action action;
+    Report report;
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, report, action);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.empty());
+
+    REQUIRE(action.examples.size() == 1);
+    REQUIRE(action.examples[0].responses.size() == 1);
+    REQUIRE(action.examples[0].responses[0].name == "200");
+    REQUIRE(action.examples[0].responses[0].body == "{ ... }\n");
 }
 
 TEST_CASE("Full syntax - Poor Body Indentation", "[indentation]")
 {
-    // Blueprint in question:
-    //R"(
-    //## GET /1
-    //+ Response 200
-    //+ Body
-    //
-    //        { ... }
-    //");
-    const std::string blueprintSource = \
+    mdp::ByteBuffer source = \
     "## GET /1\n"\
     "+ Response 200\n"\
     "+ Body\n"\
     "\n"\
     "        { ... }\n";
-    
-    Parser parser;
-    Result result;
-    Blueprint blueprint;
-    parser.parse(blueprintSource, 0, result, blueprint);
-    REQUIRE(result.error.code == Error::OK);
-    REQUIRE(result.warnings.size() == 1);
-    REQUIRE(result.warnings[0].code == IgnoringWarning);
-    ReportDebugMessage(result.warnings[0].message);
-    
-    REQUIRE(blueprint.resourceGroups.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
-    REQUIRE(!blueprint.resourceGroups[0].resources[0].actions[0].examples.empty());
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body.empty());
+
+    Action action;
+    Report report;
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, report, action);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(report.warnings[0].code == IgnoringWarning);
+    ReportDebugMessage(report.warnings[0].message);
+
+    REQUIRE(action.examples.size() == 1);
+    REQUIRE(action.examples[0].responses.size() == 1);
+    REQUIRE(action.examples[0].responses[0].name == "200");
+    REQUIRE(action.examples[0].responses[0].body.empty());
 }
 
 TEST_CASE("Full syntax - Poor Body & Body Asset Indentation", "[indentation]")
 {
-    // Blueprint in question:
-    //R"(
-    //## GET /1
-    //+ Response 200
-    //+ Body
-    //
-    //    { ... }
-    //");
-    const std::string blueprintSource = \
+    mdp::ByteBuffer source = \
     "## GET /1\n"\
     "+ Response 200\n"\
     "+ Body\n"\
     "\n"\
     "    { ... }\n";
-    
-    Parser parser;
-    Result result;
-    Blueprint blueprint;
-    parser.parse(blueprintSource, 0, result, blueprint);
-    REQUIRE(result.error.code == Error::OK);
-    REQUIRE(result.warnings.size() == 1);
-    REQUIRE(result.warnings[0].code == IgnoringWarning);
-    ReportDebugMessage(result.warnings[0].message);
-    
-    REQUIRE(blueprint.resourceGroups.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
-    REQUIRE(!blueprint.resourceGroups[0].resources[0].actions[0].examples.empty());
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body.empty());
+
+    Action action;
+    Report report;
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, report, action);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(report.warnings[0].code == IgnoringWarning);
+    ReportDebugMessage(report.warnings[0].message);
+
+    REQUIRE(action.examples.size() == 1);
+    REQUIRE(action.examples[0].responses.size() == 1);
+    REQUIRE(action.examples[0].responses[0].name == "200");
+    REQUIRE(action.examples[0].responses[0].body.empty());
 }
 
 TEST_CASE("Full syntax - Poor Body & Body Asset Indentation & No Newline", "[indentation]")
 {
-    // Blueprint in question:
-    //R"(
-    //## GET /1
-    //+ Response 200
-    //+ Body
-    //    { ... }
-    //");
-    const std::string blueprintSource = \
+    mdp::ByteBuffer source = \
     "## GET /1\n"\
     "+ Response 200\n"\
     "+ Body\n"\
     "    { ... }\n";
-    
-    Parser parser;
-    Result result;
-    Blueprint blueprint;
-    parser.parse(blueprintSource, 0, result, blueprint);
-    REQUIRE(result.error.code == Error::OK);
-    REQUIRE(result.warnings.size() == 1);
-    REQUIRE(result.warnings[0].code == IgnoringWarning);
-    ReportDebugMessage(result.warnings[0].message);
-    
-    REQUIRE(blueprint.resourceGroups.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
-    REQUIRE(!blueprint.resourceGroups[0].resources[0].actions[0].examples.empty());
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body.empty());
+
+    Action action;
+    Report report;
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, report, action);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(report.warnings[0].code == IgnoringWarning);
+    ReportDebugMessage(report.warnings[0].message);
+
+    REQUIRE(action.examples.size() == 1);
+    REQUIRE(action.examples[0].responses.size() == 1);
+    REQUIRE(action.examples[0].responses[0].name == "200");
+    REQUIRE(action.examples[0].responses[0].body.empty());
 }
 
 TEST_CASE("Full syntax - No Indentation", "[indentation]")
 {
-    // Blueprint in question:
-    //R"(
-    //## GET /1
-    //+ Response 200
-    //+ Body
-    //
-    //{ ... }
-    //");
-    const std::string blueprintSource = \
+    mdp::ByteBuffer source = \
     "## GET /1\n"\
     "+ Response 200\n"\
     "+ Body\n"\
     "\n"\
     "{ ... }\n";
-    
-    Parser parser;
-    Result result;
-    Blueprint blueprint;
-    parser.parse(blueprintSource, 0, result, blueprint);
-    REQUIRE(result.error.code == BusinessError);
-    ReportDebugMessage(result.error.message);
-    
-    REQUIRE(result.warnings.size() == 1);
-    REQUIRE(result.warnings[0].code == IgnoringWarning);
-    ReportDebugMessage(result.warnings[0].message);
-    
-    REQUIRE(blueprint.resourceGroups.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
-    REQUIRE(!blueprint.resourceGroups[0].resources[0].actions[0].examples.empty());
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body.empty());
+
+    Action action;
+    Report report;
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, report, action);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 2);
+    REQUIRE(report.warnings[0].code == IgnoringWarning);
+    REQUIRE(report.warnings[1].code == IndentationWarning);
+    ReportDebugMessage(report.warnings[0].message);
+    ReportDebugMessage(report.warnings[1].message);
+
+    REQUIRE(action.examples.size() == 1);
+    REQUIRE(action.examples[0].responses.size() == 1);
+    REQUIRE(action.examples[0].responses[0].name == "200");
+    REQUIRE(action.examples[0].responses[0].body == "{ ... }\n\n");
 }
 
 TEST_CASE("Full syntax - No Indentation & No Newline", "[indentation]")
 {
-    // Blueprint in question:
-    //R"(
-    //## GET /1
-    //+ Response 200
-    //+ Body
-    //{ ... }
-    //");
-    const std::string blueprintSource = \
+    mdp::ByteBuffer source = \
     "## GET /1\n"\
     "+ Response 200\n"\
     "+ Body\n"\
     "{ ... }\n";
-    
-    Parser parser;
-    Result result;
-    Blueprint blueprint;
-    parser.parse(blueprintSource, 0, result, blueprint);
-    REQUIRE(result.error.code == Error::OK);
-    
-    REQUIRE(result.warnings.size() == 1);
-    REQUIRE(result.warnings[0].code == IgnoringWarning);
-    ReportDebugMessage(result.warnings[0].message);
-    
-    REQUIRE(blueprint.resourceGroups.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
-    REQUIRE(!blueprint.resourceGroups[0].resources[0].actions[0].examples.empty());
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body.empty());
+
+    Action action;
+    Report report;
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, report, action);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(report.warnings[0].code == IgnoringWarning);
+    ReportDebugMessage(report.warnings[0].message);
+
+    REQUIRE(action.examples.size() == 1);
+    REQUIRE(action.examples[0].responses.size() == 1);
+    REQUIRE(action.examples[0].responses[0].name == "200");
+    REQUIRE(action.examples[0].responses[0].body.empty());
 }
 
 TEST_CASE("Full syntax - Extra indentation", "[indentation]")
 {
-    // Blueprint in question:
-    //R"(
-    //## GET /1
-    //+ Response 200
-    //
-    //        + Body
-    //
-    //                { ... }
-    //");
-    const std::string blueprintSource = \
+    mdp::ByteBuffer source = \
     "## GET /1\n"\
     "+ Response 200\n"\
     "\n"\
     "        + Body\n"\
     "\n"\
     "                { ... }\n";
-    
-    Parser parser;
-    Result result;
-    Blueprint blueprint;
-    parser.parse(blueprintSource, 0, result, blueprint);
-    REQUIRE(result.error.code == Error::OK);
-    
-    REQUIRE(result.warnings.size() == 1);
-    REQUIRE(result.warnings[0].code == IndentationWarning);
-    ReportDebugMessage(result.warnings[0].message);
-    
-    REQUIRE(blueprint.resourceGroups.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
-    REQUIRE(!blueprint.resourceGroups[0].resources[0].actions[0].examples.empty());
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body == "+ Body\n\n        { ... }\n");
+
+    Action action;
+    Report report;
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, report, action);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(report.warnings[0].code == IndentationWarning);
+    ReportDebugMessage(report.warnings[0].message);
+
+    REQUIRE(action.examples.size() == 1);
+    REQUIRE(action.examples[0].responses.size() == 1);
+    REQUIRE(action.examples[0].responses[0].name == "200");
+    REQUIRE(action.examples[0].responses[0].body == "+ Body\n\n        { ... }\n");
 }
 
+TEST_CASE("No Indentation & No Newline multi-line", "[indentation]")
+{
+    mdp::ByteBuffer source = \
+    "## GET /1\n"\
+    "+ Response 200\n"\
+    "{\n"\
+    "\n"\
+    "    Hello\n"\
+    "}\n";
+    
+    Action action;
+    Report report;
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, report, action);
+    
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 2);
+    REQUIRE(report.warnings[0].code == IndentationWarning);
+    ReportDebugMessage(report.warnings[0].message);
+    
+    REQUIRE(report.warnings[1].code == IndentationWarning);
+    ReportDebugMessage(report.warnings[1].message);
+    
+    REQUIRE(action.examples.size() == 1);
+    REQUIRE(action.examples[0].responses.size() == 1);
+    REQUIRE(action.examples[0].responses[0].name == "200");
+    REQUIRE(action.examples[0].responses[0].body == "{\nHello\n}\n");
+}

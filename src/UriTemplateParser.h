@@ -6,19 +6,16 @@
 //  Copyright (c) 2013 Apiary Inc. All rights reserved.
 //
 
-#ifndef SNOWCRASH_H
-#define SNOWCRASH_H
+#ifndef SNOWCRASH_URITEMPLATEPARSER_H
+#define SNOWCRASH_URITEMPLATEPARSER_H
 
-#include <string>
 #include "Blueprint.h"
-#include "Parser.h"
-
-
+#include "SourceAnnotation.h"
+#include "RegexMatch.h"
 
 #define URI_REGEX "^(http|https|ftp|file)?(://)?([^/]*)?(.*)$"
 #define URI_TEMPLATE_OPERATOR_REGEX "([+|#|.|/|;|?|&])"
 #define URI_TEMPLATE_EXPRESSION_REGEX "^([?|#|+|&]?(([A-Z|a-z|0-9|_|,])*|(%[A-F|a-f|0-9]{2})*)*\\*?)$"
-
 
 namespace snowcrash {
     
@@ -30,7 +27,7 @@ namespace snowcrash {
         std::string host;
         std::string path;
         
-        Result result;
+        Report report;
     };
     
     /**
@@ -69,19 +66,19 @@ namespace snowcrash {
             return false;
         }
                 
-        FORCEINLINE bool ContainsSpaces() {
+        bool ContainsSpaces() {
             return innerExpression.find(" ") != std::string::npos;
         }
 
-        FORCEINLINE bool ContainsAssignment() {
+        bool ContainsAssignment() {
             return innerExpression.find("=") != std::string::npos;
         }
 
-        FORCEINLINE bool ContainsHyphens() {
+        bool ContainsHyphens() {
             return innerExpression.find("-") != std::string::npos;
         }
 
-        FORCEINLINE bool IsInvalidExpressionName() {
+        bool IsInvalidExpressionName() {
             std::string tmpExpression = innerExpression;
             if (tmpExpression.find("..") != std::string::npos) return true;
             
@@ -94,7 +91,7 @@ namespace snowcrash {
             return !RegexMatch(tmpExpression, URI_TEMPLATE_EXPRESSION_REGEX);
         }
 
-        FORCEINLINE bool IsSupportedExpressionType() {
+        bool IsSupportedExpressionType() {
             return isSupported;
         }
     };
@@ -236,7 +233,7 @@ namespace snowcrash {
         *
         *  \param uri        A uri to be parsed.
         */
-        static void parse(const URITemplate& uri, const SourceCharactersBlock& sourceBlock, ParsedURITemplate& result);
+        static void parse(const URITemplate& uri, const mdp::CharactersRangeSet& sourceBlock, ParsedURITemplate& result);
     };
 }
 

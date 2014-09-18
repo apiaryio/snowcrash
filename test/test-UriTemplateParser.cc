@@ -7,11 +7,9 @@
 //
 
 #include "catch.hpp"
-#include "Fixture.h"
 #include "UriTemplateParser.h"
 
 using namespace snowcrash;
-using namespace snowcrashtest;
 
 TEST_CASE("Parse a valid uri into seperate parts", "[validuriparser][issue][#79]")
 {
@@ -20,13 +18,13 @@ TEST_CASE("Parse a valid uri into seperate parts", "[validuriparser][issue][#79]
 
     URITemplateParser parser;
     ParsedURITemplate result;
-    SourceCharactersBlock sourceBlock;
+    mdp::CharactersRangeSet sourceBlock;
 
     parser.parse(uri, sourceBlock, result);
     REQUIRE(result.scheme == "http");
     REQUIRE(result.host == "www.test.com");
     REQUIRE(result.path == "/other/{id}");
-    REQUIRE(result.result.warnings.size() == 0);
+    REQUIRE(result.report.warnings.size() == 0);
 }
 
 TEST_CASE("Parse an invalid uri into seperate parts", "[invaliduriparser][issue][#79]")
@@ -36,13 +34,13 @@ TEST_CASE("Parse an invalid uri into seperate parts", "[invaliduriparser][issue]
 
     URITemplateParser parser;
     ParsedURITemplate result;
-    SourceCharactersBlock sourceBlock;
+    mdp::CharactersRangeSet sourceBlock;
 
     parser.parse(uri, sourceBlock, result);
     REQUIRE(result.scheme == "http");
     REQUIRE(result.host == "www.test.com");
     REQUIRE(result.path == "/other/{id}[2]");
-    REQUIRE(result.result.warnings.size() == 1);
+    REQUIRE(result.report.warnings.size() == 1);
 }
 
 TEST_CASE("Parse uri template for invalid format curly brackets (nested brackets)", "[invalidcurlybracketparsingnested][issue][#78]")
@@ -51,11 +49,11 @@ TEST_CASE("Parse uri template for invalid format curly brackets (nested brackets
     
     URITemplateParser parser;
     ParsedURITemplate result;
-    SourceCharactersBlock sourceBlock;
+    mdp::CharactersRangeSet sourceBlock;
 
     parser.parse(uri, sourceBlock, result);
   
-    REQUIRE(result.result.warnings.size() == 1);
+    REQUIRE(result.report.warnings.size() == 1);
 }
 
 TEST_CASE("Parse uri template for invalid format curly brackets (missing end bracket)", "[invalidcurlybracketparsingmissingendbracket][issue][#78]")
@@ -64,11 +62,11 @@ TEST_CASE("Parse uri template for invalid format curly brackets (missing end bra
 
     URITemplateParser parser;
     ParsedURITemplate result;
-    SourceCharactersBlock sourceBlock;
+    mdp::CharactersRangeSet sourceBlock;
 
     parser.parse(uri, sourceBlock, result);
 
-    REQUIRE(result.result.warnings.size() == 1);
+    REQUIRE(result.report.warnings.size() == 1);
 }
 
 
@@ -79,11 +77,11 @@ TEST_CASE("Parse uri template for supported level one variable expansion", "[sup
 
     URITemplateParser parser;
     ParsedURITemplate result;
-    SourceCharactersBlock sourceBlock;
+    mdp::CharactersRangeSet sourceBlock;
 
     parser.parse(uri, sourceBlock, result);
 
-    REQUIRE(result.result.warnings.size() == 0);
+    REQUIRE(result.report.warnings.size() == 0);
     
 }
 
@@ -93,11 +91,11 @@ TEST_CASE("Parse uri template for supported variables with % encoding and explod
 
     URITemplateParser parser;
     ParsedURITemplate result;
-    SourceCharactersBlock sourceBlock;
+    mdp::CharactersRangeSet sourceBlock;
 
     parser.parse(uri, sourceBlock, result);
 
-    REQUIRE(result.result.warnings.size() == 0);
+    REQUIRE(result.report.warnings.size() == 0);
 
 }
 
@@ -107,11 +105,11 @@ TEST_CASE("Parse uri template for invalid % encoding", "[invalidpercentencoding]
 
     URITemplateParser parser;
     ParsedURITemplate result;
-    SourceCharactersBlock sourceBlock;
+    mdp::CharactersRangeSet sourceBlock;
 
     parser.parse(uri, sourceBlock, result);
 
-    REQUIRE(result.result.warnings.size() == 1);
+    REQUIRE(result.report.warnings.size() == 1);
 
 }
 
@@ -121,11 +119,11 @@ TEST_CASE("Parse uri template for invalid expansion", "[invalidexpression][issue
 
     URITemplateParser parser;
     ParsedURITemplate result;
-    SourceCharactersBlock sourceBlock;
+    mdp::CharactersRangeSet sourceBlock;
 
     parser.parse(uri, sourceBlock, result);
 
-    REQUIRE(result.result.warnings.size() == 2);
+    REQUIRE(result.report.warnings.size() == 2);
 
 }
 
@@ -136,11 +134,11 @@ TEST_CASE("Parse uri template for supported level two fragment expansion", "[sup
 
     URITemplateParser parser;
     ParsedURITemplate result;
-    SourceCharactersBlock sourceBlock;
+    mdp::CharactersRangeSet sourceBlock;
 
     parser.parse(uri, sourceBlock, result);
 
-    REQUIRE(result.result.warnings.size() == 0);
+    REQUIRE(result.report.warnings.size() == 0);
 
 }
 
@@ -150,11 +148,11 @@ TEST_CASE("Parse uri template for supported level three form style query string 
 
     URITemplateParser parser;
     ParsedURITemplate result;
-    SourceCharactersBlock sourceBlock;
+    mdp::CharactersRangeSet sourceBlock;
 
     parser.parse(uri, sourceBlock, result);
 
-    REQUIRE(result.result.warnings.size() == 0);
+    REQUIRE(result.report.warnings.size() == 0);
 
 }
 
@@ -164,11 +162,11 @@ TEST_CASE("Parse uri template for supported level three reserved expansion", "[s
 
     URITemplateParser parser;
     ParsedURITemplate result;
-    SourceCharactersBlock sourceBlock;
+    mdp::CharactersRangeSet sourceBlock;
 
     parser.parse(uri, sourceBlock, result);
 
-    REQUIRE(result.result.warnings.size() == 0);
+    REQUIRE(result.report.warnings.size() == 0);
 
 }
 
@@ -178,11 +176,11 @@ TEST_CASE("Parse uri template for unsupported level three label expansion", "[un
 
     URITemplateParser parser;
     ParsedURITemplate result;
-    SourceCharactersBlock sourceBlock;
+    mdp::CharactersRangeSet sourceBlock;
 
     parser.parse(uri, sourceBlock, result);
 
-    REQUIRE(result.result.warnings.size() == 1);
+    REQUIRE(result.report.warnings.size() == 1);
 
 }
 
@@ -192,11 +190,11 @@ TEST_CASE("Parse uri template for unsupported level three path segment expansion
 
     URITemplateParser parser;
     ParsedURITemplate result;
-    SourceCharactersBlock sourceBlock;
+    mdp::CharactersRangeSet sourceBlock;
 
     parser.parse(uri, sourceBlock, result);
 
-    REQUIRE(result.result.warnings.size() == 1);
+    REQUIRE(result.report.warnings.size() == 1);
 
 }
 
@@ -206,11 +204,11 @@ TEST_CASE("Parse uri template for unsupported level three path style parameter e
 
     URITemplateParser parser;
     ParsedURITemplate result;
-    SourceCharactersBlock sourceBlock;
+    mdp::CharactersRangeSet sourceBlock;
 
     parser.parse(uri, sourceBlock, result);
 
-    REQUIRE(result.result.warnings.size() == 1);
+    REQUIRE(result.report.warnings.size() == 1);
 
 }
 
@@ -220,11 +218,11 @@ TEST_CASE("Parse uri template for supported level three form style query continu
 
     URITemplateParser parser;
     ParsedURITemplate result;
-    SourceCharactersBlock sourceBlock;
+    mdp::CharactersRangeSet sourceBlock;
 
     parser.parse(uri, sourceBlock, result);
 
-    REQUIRE(result.result.warnings.size() == 0);
+    REQUIRE(result.report.warnings.size() == 0);
 
 }
 
@@ -234,12 +232,12 @@ TEST_CASE("Parse uri template for invalid variable name, contains spaces", "[inv
 
     URITemplateParser parser;
     ParsedURITemplate result;
-    SourceCharactersBlock sourceBlock;
+    mdp::CharactersRangeSet sourceBlock;
 
     parser.parse(uri, sourceBlock, result);
 
-    REQUIRE(result.result.warnings.size() == 1);
-    REQUIRE(result.result.warnings[0].message == "URI template expression \"?varone, vartwo\" contains spaces. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters");
+    REQUIRE(result.report.warnings.size() == 1);
+    REQUIRE(result.report.warnings[0].message == "URI template expression \"?varone, vartwo\" contains spaces. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters");
 
 }
 
@@ -249,12 +247,12 @@ TEST_CASE("Parse uri template for invalid variable name, contains hyphens", "[in
 
     URITemplateParser parser;
     ParsedURITemplate result;
-    SourceCharactersBlock sourceBlock;
+    mdp::CharactersRangeSet sourceBlock;
 
     parser.parse(uri, sourceBlock, result);
 
-    REQUIRE(result.result.warnings.size() == 1);
-    REQUIRE(result.result.warnings[0].message == "URI template expression \"?var-one,var-two\" contains hyphens. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters");
+    REQUIRE(result.report.warnings.size() == 1);
+    REQUIRE(result.report.warnings[0].message == "URI template expression \"?var-one,var-two\" contains hyphens. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters");
 
 }
 
@@ -264,12 +262,12 @@ TEST_CASE("Parse uri template for invalid variable name, contains assignment", "
 
     URITemplateParser parser;
     ParsedURITemplate result;
-    SourceCharactersBlock sourceBlock;
+    mdp::CharactersRangeSet sourceBlock;
 
     parser.parse(uri, sourceBlock, result);
 
-    REQUIRE(result.result.warnings.size() == 1);
-    REQUIRE(result.result.warnings[0].message == "URI template expression \"?varone=vartwo\" contains assignment. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters");
+    REQUIRE(result.report.warnings.size() == 1);
+    REQUIRE(result.report.warnings[0].message == "URI template expression \"?varone=vartwo\" contains assignment. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters");
 
 }
 
@@ -279,12 +277,12 @@ TEST_CASE("Parse uri template for invalid variable name, invalid % encoded", "[i
 
     URITemplateParser parser;
     ParsedURITemplate result;
-    SourceCharactersBlock sourceBlock;
+    mdp::CharactersRangeSet sourceBlock;
 
     parser.parse(uri, sourceBlock, result);
 
-    REQUIRE(result.result.warnings.size() == 1);
-    REQUIRE(result.result.warnings[0].message == "URI template expression \"?varone%2z\" contains invalid characters. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters");
+    REQUIRE(result.report.warnings.size() == 1);
+    REQUIRE(result.report.warnings[0].message == "URI template expression \"?varone%2z\" contains invalid characters. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters");
 
 }
 
@@ -294,11 +292,11 @@ TEST_CASE("Parse uri template for variable name containing dot", "[validvariable
 
     URITemplateParser parser;
     ParsedURITemplate result;
-    SourceCharactersBlock sourceBlock;
+    mdp::CharactersRangeSet sourceBlock;
 
     parser.parse(uri, sourceBlock, result);
 
-    REQUIRE(result.result.warnings.size() == 0);
+    REQUIRE(result.report.warnings.size() == 0);
 }
 
 TEST_CASE("Parse uri template for invalid variable name containing multiple contiguous dots", "[invalidvariablenamecontiguousdots][issue][#78]")
@@ -307,11 +305,11 @@ TEST_CASE("Parse uri template for invalid variable name containing multiple cont
 
     URITemplateParser parser;
     ParsedURITemplate result;
-    SourceCharactersBlock sourceBlock;
+    mdp::CharactersRangeSet sourceBlock;
 
     parser.parse(uri, sourceBlock, result);
 
-    REQUIRE(result.result.warnings.size() == 1);
+    REQUIRE(result.report.warnings.size() == 1);
 }
 
 TEST_CASE("Parse uri template for consistent invalid character warning", "[invalidexpressionconsistentinvalidcharacterwarning][issue][#78]")
@@ -322,16 +320,16 @@ TEST_CASE("Parse uri template for consistent invalid character warning", "[inval
     URITemplateParser parser;
     ParsedURITemplate result;
     ParsedURITemplate result2;
-    SourceCharactersBlock sourceBlock;
+    mdp::CharactersRangeSet sourceBlock;
 
     parser.parse(urione, sourceBlock, result);
 
-    REQUIRE(result.result.warnings.size() == 1);
-    REQUIRE(result.result.warnings[0].message == "URI template expression \"$a,b,c\" contains invalid characters. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters");
+    REQUIRE(result.report.warnings.size() == 1);
+    REQUIRE(result.report.warnings[0].message == "URI template expression \"$a,b,c\" contains invalid characters. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters");
 
     parser.parse(urione, sourceBlock, result2);
 
-    REQUIRE(result2.result.warnings.size() == 1);
-    REQUIRE(result2.result.warnings[0].message == "URI template expression \"$a,b,c\" contains invalid characters. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters");
+    REQUIRE(result2.report.warnings.size() == 1);
+    REQUIRE(result2.report.warnings[0].message == "URI template expression \"$a,b,c\" contains invalid characters. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters");
 
 }
