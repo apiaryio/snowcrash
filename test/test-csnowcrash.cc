@@ -159,8 +159,8 @@ TEST_CASE("Parse simple blueprint with C interface", "[cinterface]")
     REQUIRE(sc_source_map_location(sm_header, 0) == 79);
     REQUIRE(sc_source_map_length(sm_header, 0) == 27);
 
-    // sc_sm_blueprint_free(sm_blueprint);
-    // sc_blueprint_free(blueprint);
+    sc_sm_blueprint_free(sm_blueprint);
+    sc_blueprint_free(blueprint);
     sc_report_free(report);
 }
 

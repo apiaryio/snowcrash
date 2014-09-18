@@ -17,15 +17,15 @@ int sc_c_parse(const char* source, sc_blueprint_parser_options option, sc_report
 
     snowcrash::ParseResult<snowcrash::Blueprint>* t_parse_result = ::new snowcrash::ParseResult<snowcrash::Blueprint>;
 
-    t_parse_result->report = *t_report;
-    t_parse_result->node = *t_blueprint;
-    t_parse_result->sourceMap = *t_sm_blueprint;
-
     int ret = snowcrash::parse(source, option, *t_parse_result);
 
-    *report = AS_TYPE(sc_report_t, &t_parse_result->report);
-    *blueprint = AS_TYPE(sc_blueprint_t, &t_parse_result->node);
-    *sm_blueprint = AS_TYPE(sc_sm_blueprint_t, &t_parse_result->sourceMap);
+    *t_report = t_parse_result->report;
+    *t_blueprint = t_parse_result->node;
+    *t_sm_blueprint = t_parse_result->sourceMap;
+
+    *report = AS_TYPE(sc_report_t, t_report);
+    *blueprint = AS_TYPE(sc_blueprint_t, t_blueprint);
+    *sm_blueprint = AS_TYPE(sc_sm_blueprint_t, t_sm_blueprint);
 
     return ret;
 }
