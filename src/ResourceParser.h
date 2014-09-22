@@ -134,11 +134,19 @@ namespace snowcrash {
                 
                 mdp::ByteBuffer content = CodeBlockUtility::addDanglingAsset(node, pd, sectionType, out.report, out.node.model.body);
 
+                if (pd.exportSM() && !content.empty()) {
+                    out.sourceMap.model.body.sourceMap.append(node->sourceMap);
+                }
+
                 // Update model in the symbol table as well
                 ResourceModelSymbolTable::iterator it = pd.symbolTable.resourceModels.find(out.node.model.name);
                 
                 if (it != pd.symbolTable.resourceModels.end()) {
                     it->second.body = out.node.model.body;
+
+                    if (pd.exportSM()) {
+                        pd.symbolSourceMapTable.resourceModels[out.node.model.name].body = out.sourceMap.model.body;
+                    }
                 }
                 
                 return ++MarkdownNodeIterator(node);
