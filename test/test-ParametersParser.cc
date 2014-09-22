@@ -179,12 +179,12 @@ TEST_CASE("Warn about multiple parameters with the same name", "[parameters]")
     REQUIRE(parameters.node[1].name == "id");
     REQUIRE(parameters.node[1].exampleValue == "43");
 
-    REQUIRE(parameters.sourceMap.collection.size() == 1);
+    REQUIRE(parameters.sourceMap.collection.size() == 2);
     REQUIRE(parameters.sourceMap.collection[0].name.sourceMap.size() == 1);
     REQUIRE(parameters.sourceMap.collection[0].name.sourceMap[0].location == 19);
     REQUIRE(parameters.sourceMap.collection[0].name.sourceMap[0].length == 10);
     REQUIRE(parameters.sourceMap.collection[1].name.sourceMap.size() == 1);
-    REQUIRE(parameters.sourceMap.collection[1].name.sourceMap[0].location == 33);
+    REQUIRE(parameters.sourceMap.collection[1].name.sourceMap[0].location == 35);
     REQUIRE(parameters.sourceMap.collection[1].name.sourceMap[0].length == 10);
 }
 

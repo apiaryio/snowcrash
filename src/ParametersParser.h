@@ -91,9 +91,9 @@ namespace snowcrash {
                     ss << "overshadowing previous parameter '" << parameter.node.name << "' definition";
 
                     mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                    report.warnings.push_back(Warning(ss.str(),
-                                                      RedefinitionWarning,
-                                                      sourceMap));
+                    out.report.warnings.push_back(Warning(ss.str(),
+                                                          RedefinitionWarning,
+                                                          sourceMap));
                 }
             }
 

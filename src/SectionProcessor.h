@@ -188,7 +188,7 @@ namespace snowcrash {
                                      SectionType sectionType) {
             
             SectionType keywordSectionType = SectionKeywordSignature(node);
-            SectionTypes nestedTypes = SectionProcessor<T, TSM>::nestedSectionTypes();
+            SectionTypes nestedTypes = SectionProcessor<T>::nestedSectionTypes();
 
             if (std::find(nestedTypes.begin(), nestedTypes.end(), keywordSectionType) != nestedTypes.end()) {
                 return true;
