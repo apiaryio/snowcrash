@@ -605,8 +605,7 @@ namespace snowcrash {
 
                 if (isPayloadContentType && !isModelContentType) {
                     out.node.headers.insert(out.node.headers.end(), model.headers.begin(), model.headers.end());
-                }
-                else {
+                } else {
                     out.node.headers = model.headers;
                 }
                 
@@ -619,9 +618,14 @@ namespace snowcrash {
 
                     out.sourceMap.description = modelSM.description;
                     out.sourceMap.parameters = modelSM.parameters;
-                    out.sourceMap.headers = modelSM.headers;
                     out.sourceMap.body = modelSM.body;
                     out.sourceMap.schema = modelSM.schema;
+
+                    if (isPayloadContentType && !isModelContentType) {
+                        out.sourceMap.headers.collection.insert(out.sourceMap.headers.collection.end(), modelSM.headers.collection.begin(), modelSM.headers.collection.end());
+                    } else {
+                        out.sourceMap.headers = modelSM.headers;
+                    }
                 }
 
                 return true;
