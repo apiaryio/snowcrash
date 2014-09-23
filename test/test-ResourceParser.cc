@@ -753,6 +753,17 @@ TEST_CASE("Dangling transaction example assets", "[resource]")
     REQUIRE(resource.node.actions[0].examples[0].responses.size() == 1);
     REQUIRE(resource.node.actions[0].examples[0].responses[0].name == "200");
     REQUIRE(resource.node.actions[0].examples[0].responses[0].body == "dangling response body\n\n");
+
+    REQUIRE(resource.sourceMap.actions.collection.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].requests.collection.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].requests.collection[0].body.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].requests.collection[0].body.sourceMap[0].location == 29);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].requests.collection[0].body.sourceMap[0].length == 33);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].responses.collection.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].responses.collection[0].body.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].responses.collection[0].body.sourceMap[0].location == 78);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].responses.collection[0].body.sourceMap[0].length == 31);
 }
 
 TEST_CASE("Body list item in description", "[resource][regression][#190]")
@@ -775,4 +786,9 @@ TEST_CASE("Body list item in description", "[resource][regression][#190]")
     
     REQUIRE(resource.node.actions.size() == 1);
     REQUIRE(resource.node.actions[0].description == "Lorem Ipsum\n\n+ Body\n\n    { ... }\n\n");
+
+    REQUIRE(resource.sourceMap.actions.collection.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].description.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].description.sourceMap[0].location == 10);
+    REQUIRE(resource.sourceMap.actions.collection[0].description.sourceMap[0].length == 34);
 }
