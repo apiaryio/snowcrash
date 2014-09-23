@@ -270,7 +270,7 @@ extern "C" {
     SC_API const sc_value_t* sc_value_handle(const sc_value_collection_t* handle, size_t index);
 
     /** \returns Value string */
-    SC_API const char* sc_value_string(const sc_value_t* handle);
+    SC_API const char* sc_value(const sc_value_t* handle);
 
     /*----------------------------------------------------------------------*/
 
