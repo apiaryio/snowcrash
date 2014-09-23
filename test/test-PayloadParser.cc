@@ -653,4 +653,6 @@ TEST_CASE("Report ignoring nested request objects", "[payload][#163][#189]")
     
     REQUIRE(payload.node.headers.size() == 1);
     REQUIRE(payload.node.body.empty());
+
+    REQUIRE(payload.sourceMap.body.sourceMap.empty());
 }

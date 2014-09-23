@@ -363,7 +363,7 @@ TEST_CASE("Resource followed by a complete action", "[resource_group][regression
     
     ParseResult<ResourceGroup> resourceGroup;
     SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source, ResourceGroupSectionType, resourceGroup);
-    
+
     REQUIRE(resourceGroup.report.error.code == Error::OK);
     REQUIRE(resourceGroup.report.warnings.empty());
     
@@ -377,6 +377,22 @@ TEST_CASE("Resource followed by a complete action", "[resource_group][regression
     REQUIRE(resourceGroup.node.resources[1].uriTemplate == "/B");
     REQUIRE(resourceGroup.node.resources[1].actions.size() == 1);
     REQUIRE(resourceGroup.node.resources[1].actions[0].method == "POST");
+
+    REQUIRE(resourceGroup.sourceMap.resources.collection.size() == 2);
+    REQUIRE(resourceGroup.sourceMap.resources.collection[0].name.sourceMap.size() == 1);
+    REQUIRE(resourceGroup.sourceMap.resources.collection[0].name.sourceMap[0].location == 0);
+    REQUIRE(resourceGroup.sourceMap.resources.collection[0].name.sourceMap[0].length == 16);
+    REQUIRE(resourceGroup.sourceMap.resources.collection[0].uriTemplate.sourceMap.size() == 1);
+    REQUIRE(resourceGroup.sourceMap.resources.collection[0].uriTemplate.sourceMap[0].location == 0);
+    REQUIRE(resourceGroup.sourceMap.resources.collection[0].uriTemplate.sourceMap[0].length == 16);
+    REQUIRE(resourceGroup.sourceMap.resources.collection[1].name.sourceMap.empty());
+    REQUIRE(resourceGroup.sourceMap.resources.collection[1].uriTemplate.sourceMap.size() == 1);
+    REQUIRE(resourceGroup.sourceMap.resources.collection[1].uriTemplate.sourceMap[0].location == 16);
+    REQUIRE(resourceGroup.sourceMap.resources.collection[1].uriTemplate.sourceMap[0].length == 10);
+    REQUIRE(resourceGroup.sourceMap.resources.collection[1].actions.collection.size() == 1);
+    REQUIRE(resourceGroup.sourceMap.resources.collection[1].actions.collection[0].method.sourceMap.size() == 1);
+    REQUIRE(resourceGroup.sourceMap.resources.collection[1].actions.collection[0].method.sourceMap[0].location == 16);
+    REQUIRE(resourceGroup.sourceMap.resources.collection[1].actions.collection[0].method.sourceMap[0].length == 10);
 }
 
 TEST_CASE("Too eager complete action processing", "[resource_group][regression][#187]")
@@ -398,4 +414,8 @@ TEST_CASE("Too eager complete action processing", "[resource_group][regression][
     
     REQUIRE(resourceGroup.node.name == "A");
     REQUIRE(resourceGroup.node.description == "```\nGET /A\n```\n\nLorem Ipsum\n");
+
+    REQUIRE(resourceGroup.sourceMap.description.sourceMap.size() == 1);
+    REQUIRE(resourceGroup.sourceMap.description.sourceMap[0].location == 11);
+    REQUIRE(resourceGroup.sourceMap.description.sourceMap[0].length == 28);
 }

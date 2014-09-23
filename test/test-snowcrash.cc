@@ -355,7 +355,6 @@ TEST_CASE("Resource with incorrect URI segfault", "[parser][regression]")
     REQUIRE(blueprint.node.resourceGroups.size() == 1);
     REQUIRE(blueprint.node.resourceGroups[0].name == "A");
     REQUIRE(blueprint.node.resourceGroups[0].description == "## Resource [wronguri]\n\n### Retrieve [GET]\n\n+ Response 200\n\n");
-    
 }
 
 TEST_CASE("Dangling block not recognized", "[parser][regression][#186]")
@@ -457,10 +456,9 @@ TEST_CASE("Ignoring local media type", "[parser][regression][#195]")
     "+ Response 200 (X)\n"\
     "\n"\
     "    [A][]\n";
-
     
     ParseResult<Blueprint> blueprint;
-    parse(source, 0, blueprint);
+    parse(source, ExportSourcemapOption, blueprint);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.size() == 1);
@@ -475,6 +473,16 @@ TEST_CASE("Ignoring local media type", "[parser][regression][#195]")
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers.size() == 1);
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[0].first == "Content-Type");
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[0].second == "Y");
+
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection.size() == 1);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection.size() == 1);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection.size() == 1);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection[0].examples.collection.size() == 1);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection[0].examples.collection[0].responses.collection.size() == 1);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection[0].examples.collection[0].responses.collection[0].headers.collection.size() == 1);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[0].sourceMap.size() == 1);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[0].sourceMap[0].location == 11);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[0].sourceMap[0].length == 11);
 }
 
 TEST_CASE("Using local media type", "[parser][regression][#195]")
@@ -490,9 +498,8 @@ TEST_CASE("Using local media type", "[parser][regression][#195]")
     "\n"\
     "    [A][]\n";
     
-    
     ParseResult<Blueprint> blueprint;
-    parse(source, 0, blueprint);
+    parse(source, ExportSourcemapOption, blueprint);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -506,6 +513,16 @@ TEST_CASE("Using local media type", "[parser][regression][#195]")
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers.size() == 1);
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[0].first == "Content-Type");
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[0].second == "X");
+
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection.size() == 1);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection.size() == 1);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection.size() == 1);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection[0].examples.collection.size() == 1);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection[0].examples.collection[0].responses.collection.size() == 1);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection[0].examples.collection[0].responses.collection[0].headers.collection.size() == 1);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[0].sourceMap.size() == 1);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[0].sourceMap[0].location == 53);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[0].sourceMap[0].length == 18);
 }
 
 TEST_CASE("Parse ill-formated header", "[parser][#198][regression]")
