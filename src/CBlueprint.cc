@@ -413,7 +413,7 @@ SC_API const sc_value_t* sc_value_handle(const sc_value_collection_t* handle, si
     return AS_CTYPE(sc_value_t, &p->at(index));
 }
 
-SC_API const char* sc_value_string(const sc_value_t* handle)
+SC_API const char* sc_value(const sc_value_t* handle)
 {
     const snowcrash::Value* p = AS_CTYPE(snowcrash::Value, handle);
     if(!p)
