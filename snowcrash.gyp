@@ -160,7 +160,7 @@
         'src',
         'src/snowcrash',
         'ext/markdown-parser/src',
-        'cmdline'
+        'ext/cmdline'
       ],
       'sources': [
         'src/snowcrash/snowcrash.cc'
@@ -176,7 +176,7 @@
       'include_dirs': [
         'src',
         'ext/markdown-parser/src',
-        'cmdline',
+        'ext/cmdline',
         'test',
         'test/performance',
       ],
