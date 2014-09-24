@@ -1,8 +1,8 @@
 [submodule "test/vendor/Catch"]
 	path = test/vendor/Catch
 	url = git://github.com/philsquared/Catch.git
-[submodule "cmdline"]
-	path = cmdline
+[submodule "ext/cmdline"]
+	path = ext/cmdline
 	url = git://github.com/apiaryio/cmdline.git
 [submodule "ext/markdown-parser"]
 	path = ext/markdown-parser
