@@ -279,7 +279,8 @@ TEST_CASE("Parse inline payload with symbol reference with extra indentation", "
     SectionParserHelper<Payload, PayloadParser>::parse(source, RequestBodySectionType, report, payload, symbols);
 
     REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 0);
+    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(report.warnings[0].code == IgnoringWarning);
 
     REQUIRE(payload.name.empty());
     REQUIRE(payload.description.empty());
