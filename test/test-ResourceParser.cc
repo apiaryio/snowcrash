@@ -410,6 +410,7 @@ TEST_CASE("Parse model with unrecognised resource", "[resource][model]")
     REQUIRE(resource.actions[0].examples.size() == 1);
     REQUIRE(resource.actions[0].examples[0].responses.size() == 1);
     REQUIRE(resource.actions[0].examples[0].responses[0].name == "200");
+    REQUIRE(resource.actions[0].examples[0].responses[0].body == "[Resource][]\n");
     REQUIRE(resource.actions[0].examples[0].responses[0].description == "");
 }
 

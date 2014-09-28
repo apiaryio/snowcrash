@@ -56,7 +56,7 @@ namespace snowcrash {
                                        Report& report,
                                        mdp::ByteBuffer& content) {
 
-            checkPossibleResources(node,pd,report);
+            checkPossibleResources(node, pd, report);
             
             if (node->type == mdp::CodeMarkdownNodeType) {
                 content += node->text;
@@ -222,7 +222,7 @@ namespace snowcrash {
             if (node->type == mdp::CodeMarkdownNodeType)
                 level--;  // Deduct one level for a code block
 
-            checkPossibleResources(node,pd,report);
+            checkPossibleResources(node, pd, report);
                 
             if (level) {
                 // WARN: Dangling asset
@@ -250,16 +250,16 @@ namespace snowcrash {
 
             TrimString(source);
 
-            if(GetSymbolReference(source, symbol)){
+            if(GetSymbolReference(source, symbol)) {
 
                 std::stringstream ss;
-                ss << "'" << symbol << "' formated but ignored as a reference; ";
-                ss << "in case of being recognize, it have to be called directly after `Responses` or `Requests` and it's expected to be indented by 4 spaces or 1 tab";
+                ss << "Found a possible '" << symbol << "' reference. ";
+                ss << "If it is to be parsed it has to be directly after `Response` or `Request` and it's expected to be indented by 4 spaces or 1 tab";
 
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
                 report.warnings.push_back(Warning(ss.str(),
-                    IgnoringWarning,
-                    sourceMap));
+                                                  IgnoringWarning,
+                                                  sourceMap));
 
                 return true;
             }
