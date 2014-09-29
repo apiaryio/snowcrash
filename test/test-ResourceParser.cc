@@ -381,6 +381,39 @@ TEST_CASE("Parse named resource with nameless model", "[resource][model][source]
     REQUIRE(resource.actions[0].examples[0].responses[0].body == "AAA\n");
 }
 
+TEST_CASE("Parse model with unrecognised resource", "[resource][model]")
+{
+    mdp::ByteBuffer source = \
+    "# Resource [/1]\n\n"\
+    "+ Model (plain/text)\n\n"\
+    "        AAA\n\n"\
+    "## Retrieve a resource [GET]\n\n"\
+    "+ Response 200\n\n"\
+    "    + Headers\n\n"\
+    "            X-Header: A\n\n"\
+    "    + Body\n\n"\
+    "            [Resource][]";
+
+    Resource resource;
+    Report report;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(report.warnings[0].code == IgnoringWarning);
+
+    REQUIRE(resource.model.name == "Resource");
+    REQUIRE(resource.model.body == "AAA\n");
+    REQUIRE(resource.actions.size() == 1);
+    REQUIRE(resource.actions[0].name == "Retrieve a resource");
+    REQUIRE(resource.actions[0].method == "GET");
+    REQUIRE(resource.actions[0].examples.size() == 1);
+    REQUIRE(resource.actions[0].examples[0].responses.size() == 1);
+    REQUIRE(resource.actions[0].examples[0].responses[0].name == "200");
+    REQUIRE(resource.actions[0].examples[0].responses[0].body == "[Resource][]\n");
+    REQUIRE(resource.actions[0].examples[0].responses[0].description == "");
+}
+
 TEST_CASE("Parse named resource with nameless model but reference a non-existing model", "[resource]")
 {
     mdp::ByteBuffer source = \
