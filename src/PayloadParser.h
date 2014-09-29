@@ -74,7 +74,7 @@ namespace snowcrash {
                 if (!isAbbreviated(pd.sectionContext())) {
                     out.node.description = remainingContent;
 
-                    if (pd.exportSM() && !out.node.description.empty()) {
+                    if (pd.exportSourceMap() && !out.node.description.empty()) {
                         out.sourceMap.description.sourceMap.append(node->sourceMap);
                     }
                 } else if (!parseSymbolReference(node, pd, remainingContent, out)) {
@@ -85,7 +85,7 @@ namespace snowcrash {
                     CodeBlockUtility::signatureContentAsCodeBlock(node, pd, out.report, out.node.body);
                     pd.sectionsContext.pop_back();
 
-                    if (pd.exportSM() && !out.node.body.empty()) {
+                    if (pd.exportSourceMap() && !out.node.body.empty()) {
                         out.sourceMap.body.sourceMap.append(node->sourceMap);
                     }
                 }
@@ -126,7 +126,7 @@ namespace snowcrash {
 
                     out.node.body += content;
 
-                    if (pd.exportSM() && !content.empty()) {
+                    if (pd.exportSourceMap() && !content.empty()) {
                         out.sourceMap.body.sourceMap.append(node->sourceMap);
                     }
                 }
@@ -215,7 +215,7 @@ namespace snowcrash {
 
                 mdp::ByteBuffer content = CodeBlockUtility::addDanglingAsset(node, pd, sectionType, out.report, out.node.body);
 
-                if (pd.exportSM() && !content.empty()) {
+                if (pd.exportSourceMap() && !content.empty()) {
                     out.sourceMap.body.sourceMap.append(node->sourceMap);
                 }
 
@@ -526,7 +526,7 @@ namespace snowcrash {
                 TrimString(out.node.name);
                 TrimString(mediaType);
 
-                if (pd.exportSM() && !out.node.name.empty()) {
+                if (pd.exportSourceMap() && !out.node.name.empty()) {
                     out.sourceMap.name.sourceMap = node->sourceMap;
                 }
 
@@ -534,7 +534,7 @@ namespace snowcrash {
                     Header header = std::make_pair(HTTPHeaderName::ContentType, mediaType);
                     out.node.headers.push_back(header);
 
-                    if (pd.exportSM()) {
+                    if (pd.exportSourceMap()) {
                         SourceMap<Header> headerSM;
                         headerSM.sourceMap = node->sourceMap;
                         out.sourceMap.headers.collection.push_back(headerSM);
@@ -559,7 +559,7 @@ namespace snowcrash {
             if (GetSymbolReference(source, symbol)) {
                 out.node.symbol = symbol;
 
-                if (pd.exportSM() && !symbol.empty()) {
+                if (pd.exportSourceMap() && !symbol.empty()) {
                     out.sourceMap.symbol.sourceMap = node->sourceMap;
                 }
 
@@ -612,7 +612,7 @@ namespace snowcrash {
                 out.node.body = model.body;
                 out.node.schema = model.schema;
 
-                if (pd.exportSM()) {
+                if (pd.exportSourceMap()) {
 
                     modelSM = pd.symbolSourceMapTable.resourceModels.at(symbol);
 

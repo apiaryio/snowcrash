@@ -50,7 +50,7 @@ namespace snowcrash {
                 } else {
                     out.node.metadata.insert(out.node.metadata.end(), metadata.node.begin(), metadata.node.end());
 
-                    if (pd.exportSM()) {
+                    if (pd.exportSourceMap()) {
                         out.sourceMap.metadata.collection.insert(out.sourceMap.metadata.collection.end(),
                                                                  metadata.sourceMap.collection.begin(),
                                                                  metadata.sourceMap.collection.end());
@@ -78,7 +78,7 @@ namespace snowcrash {
                 out.node.name = cur->text;
                 TrimString(out.node.name);
 
-                if (pd.exportSM() && !out.node.name.empty()) {
+                if (pd.exportSourceMap() && !out.node.name.empty()) {
                     out.sourceMap.name.sourceMap = cur->sourceMap;
                 }
             } else {
@@ -126,7 +126,7 @@ namespace snowcrash {
 
                 out.node.resourceGroups.push_back(resourceGroup.node);
 
-                if (pd.exportSM()) {
+                if (pd.exportSourceMap()) {
                     out.sourceMap.resourceGroups.collection.push_back(resourceGroup.sourceMap);
                 }
 
@@ -223,7 +223,7 @@ namespace snowcrash {
                 if (CodeBlockUtility::keyValueFromLine(*it, metadata)) {
                     out.node.push_back(metadata);
 
-                    if (pd.exportSM()) {
+                    if (pd.exportSourceMap()) {
                         SourceMap<Metadata> metadataSM;
                         metadataSM.sourceMap = node->sourceMap;
                         out.sourceMap.collection.push_back(metadataSM);

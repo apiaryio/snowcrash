@@ -99,7 +99,7 @@ namespace snowcrash {
 
             out.node.push_back(parameter.node);
 
-            if (pd.exportSM()) {
+            if (pd.exportSourceMap()) {
                 out.sourceMap.collection.push_back(parameter.sourceMap);
             }
 

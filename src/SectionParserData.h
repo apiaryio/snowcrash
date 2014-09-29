@@ -76,7 +76,7 @@ namespace snowcrash {
         }
         
         /** \returns True if exporting source maps */
-        bool exportSM() const {
+        bool exportSourceMap() const {
             return options & ExportSourcemapOption;
         }
 

@@ -141,7 +141,7 @@ namespace snowcrash {
 
                     out.node.push_back(header);
 
-                    if (pd.exportSM()) {
+                    if (pd.exportSourceMap()) {
                         SourceMap<Header> headerSM;
                         headerSM.sourceMap = node->sourceMap;
                         out.sourceMap.collection.push_back(headerSM);
@@ -166,7 +166,7 @@ namespace snowcrash {
             Collection<TransactionExample>::iterator exampleIt = examples.begin();
             Collection<SourceMap<TransactionExample> >::iterator exampleSMIt;
 
-            if (pd.exportSM()) {
+            if (pd.exportSourceMap()) {
                 exampleSMIt = examplesSM.collection.begin();
             }
 
@@ -175,7 +175,7 @@ namespace snowcrash {
                 Collection<Request>::iterator reqIt = exampleIt->requests.begin();
                 Collection<SourceMap<Request> >::iterator reqSMIt;
 
-                if (pd.exportSM()) {
+                if (pd.exportSourceMap()) {
                     reqSMIt = exampleSMIt->requests.collection.begin();
                 }
 
@@ -185,7 +185,7 @@ namespace snowcrash {
                      reqIt->headers.insert(reqIt->headers.begin(), headers.begin(), headers.end());
                      ++reqIt;
 
-                     if (pd.exportSM()) {
+                     if (pd.exportSourceMap()) {
                          reqSMIt->headers.collection.insert(reqSMIt->headers.collection.begin(), headersSM.collection.begin(), headersSM.collection.end());
                          ++reqSMIt;
                      }
@@ -194,7 +194,7 @@ namespace snowcrash {
                 Collection<Response>::iterator resIt = exampleIt->responses.begin();
                 Collection<SourceMap<Response> >::iterator resSMIt;
 
-                if (pd.exportSM()) {
+                if (pd.exportSourceMap()) {
                     resSMIt = exampleSMIt->responses.collection.begin();
                 }
 
@@ -204,7 +204,7 @@ namespace snowcrash {
                     resIt->headers.insert(resIt->headers.begin(), headers.begin(), headers.end());
                     ++resIt;
 
-                    if (pd.exportSM()) {
+                    if (pd.exportSourceMap()) {
                         resSMIt->headers.collection.insert(resSMIt->headers.collection.begin(), headersSM.collection.begin(), headersSM.collection.end());
                         ++resSMIt;
                     }
@@ -212,7 +212,7 @@ namespace snowcrash {
 
                 ++exampleIt;
 
-                if (pd.exportSM()) {
+                if (pd.exportSourceMap()) {
                     ++exampleSMIt;
                 }
             }
