@@ -338,8 +338,8 @@ namespace snowcrash {
 
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
                 out.report.warnings.push_back(Warning(ss.str(),
-                                                            FormattingWarning,
-                                                            sourceMap));
+                                                      FormattingWarning,
+                                                      sourceMap));
 
                 out.node.type.clear();
                 out.node.exampleValue.clear();

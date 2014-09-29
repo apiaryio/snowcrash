@@ -17,7 +17,8 @@ using namespace snowcrash;
  *  \brief  Check source for unsupported character \t & \r
  *  \return True if passed (not found), false otherwise
  */
-static bool CheckSource(const mdp::ByteBuffer& source, Report& report) {
+static bool CheckSource(const mdp::ByteBuffer& source, Report& report)
+{
 
     std::string::size_type pos = source.find("\t");
 
@@ -48,8 +49,8 @@ static bool CheckSource(const mdp::ByteBuffer& source, Report& report) {
 
 int snowcrash::parse(const mdp::ByteBuffer& source,
                      BlueprintParserOptions options,
-                     ParseResult<Blueprint>& out) {
-
+                     ParseResult<Blueprint>& out)
+{
     try {
         
         // Sanity Check
