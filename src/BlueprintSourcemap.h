@@ -38,7 +38,7 @@ namespace snowcrash {
     SOURCE_MAP_COLLECTION(Metadata, MetadataCollection)
 
     /** Source Map of Headers */
-    // SOURCE_MAP_COLLECTION(Header, Headers)
+    // 'Metadata' type is same as 'Header'
 
     /** Source Map of Collection of Parameter values */
     SOURCE_MAP_COLLECTION(Value, Values)
@@ -104,7 +104,7 @@ namespace snowcrash {
     SOURCE_MAP_COLLECTION(Request, Requests)
 
     /** Source Map of Collection of Responses */
-    // SOURCE_MAP_COLLECTION(Response, Responses)
+    // 'Response' type is same as 'Request'
 
     /**
      *  Source Map Structure for an HTTP transaction example.

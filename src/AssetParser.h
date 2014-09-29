@@ -68,11 +68,12 @@ namespace snowcrash {
             mdp::ByteBuffer content;
             CodeBlockUtility::contentAsCodeBlock(node, pd, out.report, content);
 
+            out.node += content;
+
             if (pd.exportSourceMap() && !content.empty()) {
                 out.sourceMap.sourceMap.append(node->sourceMap);
             }
 
-            out.node += content;
             return ++MarkdownNodeIterator(node);
         }
         
