@@ -52,7 +52,7 @@ namespace snowcrash {
             mdp::ByteBuffer remainingContent;
             GetFirstLine(node->text, remainingContent);
 
-            if (pd.exportSM()) {
+            if (pd.exportSourceMap()) {
                 if (!out.node.method.empty()) {
                     out.sourceMap.method.sourceMap = node->sourceMap;
                 }
@@ -65,7 +65,7 @@ namespace snowcrash {
             if (!remainingContent.empty()) {
                 out.node.description += remainingContent;
 
-                if (pd.exportSM()) {
+                if (pd.exportSourceMap()) {
                     out.sourceMap.description.sourceMap.append(node->sourceMap);
                 }
             }
@@ -114,7 +114,7 @@ namespace snowcrash {
 
                         out.node.examples.push_back(transaction);
 
-                        if (pd.exportSM()) {
+                        if (pd.exportSourceMap()) {
                             out.sourceMap.examples.collection.push_back(transactionSM);
                         }
                     }
@@ -123,7 +123,7 @@ namespace snowcrash {
 
                     out.node.examples.back().requests.push_back(payload.node);
 
-                    if (pd.exportSM()) {
+                    if (pd.exportSourceMap()) {
                         out.sourceMap.examples.collection.back().requests.collection.push_back(payload.sourceMap);
                     }
 
@@ -144,7 +144,7 @@ namespace snowcrash {
 
                         out.node.examples.push_back(transaction);
 
-                        if (pd.exportSM()) {
+                        if (pd.exportSourceMap()) {
                             out.sourceMap.examples.collection.push_back(transactionSM);
                         }
                     }
@@ -153,7 +153,7 @@ namespace snowcrash {
 
                     out.node.examples.back().responses.push_back(payload.node);
 
-                    if (pd.exportSM()) {
+                    if (pd.exportSourceMap()) {
                         out.sourceMap.examples.collection.back().responses.collection.push_back(payload.sourceMap);
                     }
 
@@ -207,7 +207,7 @@ namespace snowcrash {
 
                 mdp::ByteBuffer content = CodeBlockUtility::addDanglingAsset(node, pd, sectionType, out.report, out.node.examples.back().responses.back().body);
 
-                if (pd.exportSM() && !content.empty()) {
+                if (pd.exportSourceMap() && !content.empty()) {
                     out.sourceMap.examples.collection.back().responses.collection.back().body.sourceMap.append(node->sourceMap);
                 }
 
@@ -223,7 +223,7 @@ namespace snowcrash {
                 
                 mdp::ByteBuffer content = CodeBlockUtility::addDanglingAsset(node, pd, sectionType, out.report, out.node.examples.back().requests.back().body);
 
-                if (pd.exportSM() && !content.empty()) {
+                if (pd.exportSourceMap() && !content.empty()) {
                     out.sourceMap.examples.collection.back().requests.collection.back().body.sourceMap.append(node->sourceMap);
                 }
 
@@ -321,7 +321,7 @@ namespace snowcrash {
                 SectionProcessor<Headers>::injectDeprecatedHeaders(pd, out.node.headers, out.sourceMap.headers, out.node.examples, out.sourceMap.examples);
                 out.node.headers.clear();
 
-                if (pd.exportSM()) {
+                if (pd.exportSourceMap()) {
                     out.sourceMap.headers.collection.clear();
                 }
             }

@@ -51,7 +51,7 @@ namespace snowcrash {
                 TrimString(out.node.name);
             }
 
-            if (pd.exportSM() && !out.node.name.empty()) {
+            if (pd.exportSourceMap() && !out.node.name.empty()) {
                 out.sourceMap.name.sourceMap = node->sourceMap;
             }
 
@@ -89,7 +89,7 @@ namespace snowcrash {
 
                 out.node.resources.push_back(resource.node);
 
-                if (pd.exportSM()) {
+                if (pd.exportSourceMap()) {
                     out.sourceMap.resources.collection.push_back(resource.sourceMap);
                 }
 

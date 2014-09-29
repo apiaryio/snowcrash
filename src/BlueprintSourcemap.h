@@ -35,13 +35,13 @@ namespace snowcrash {
     };
 
     /** Source Map of Metadata Collection */
-    SOURCE_MAP_COLLECTION(Metadata, MetadataCollection);
+    SOURCE_MAP_COLLECTION(Metadata, MetadataCollection)
 
     /** Source Map of Headers */
-    // SOURCE_MAP_COLLECTION(Header, Headers);
+    // SOURCE_MAP_COLLECTION(Header, Headers)
 
     /** Source Map of Collection of Parameter values */
-    SOURCE_MAP_COLLECTION(Value, Values);
+    SOURCE_MAP_COLLECTION(Value, Values)
 
     /** Source Map Structure for Parameter */
     template<>
@@ -70,7 +70,7 @@ namespace snowcrash {
     };
 
     /** Source Map of Collection of Parameters */
-    SOURCE_MAP_COLLECTION(Parameter, Parameters);
+    SOURCE_MAP_COLLECTION(Parameter, Parameters)
 
     /**
      * Source Map Structure for Payload
@@ -101,10 +101,10 @@ namespace snowcrash {
     };
 
     /** Source Map of Collection of Requests */
-    SOURCE_MAP_COLLECTION(Request, Requests);
+    SOURCE_MAP_COLLECTION(Request, Requests)
 
     /** Source Map of Collection of Responses */
-    // SOURCE_MAP_COLLECTION(Response, Responses);
+    // SOURCE_MAP_COLLECTION(Response, Responses)
 
     /**
      *  Source Map Structure for an HTTP transaction example.
@@ -126,7 +126,7 @@ namespace snowcrash {
     };
 
     /** Source Map of Collection of Transaction examples */
-    SOURCE_MAP_COLLECTION(TransactionExample, TransactionExamples);
+    SOURCE_MAP_COLLECTION(TransactionExample, TransactionExamples)
 
     /**
      *  Source Map Structure for Action
@@ -165,7 +165,7 @@ namespace snowcrash {
     };
 
     /** Source Map of Collection of Actions */
-    SOURCE_MAP_COLLECTION(Action, Actions);
+    SOURCE_MAP_COLLECTION(Action, Actions)
 
     /**
      *  Source Map Structure for API Resource
@@ -207,7 +207,7 @@ namespace snowcrash {
     };
 
     /** Source Map of Collection of Resources */
-    SOURCE_MAP_COLLECTION(Resource, Resources);
+    SOURCE_MAP_COLLECTION(Resource, Resources)
 
     /**
      *  Source Map Structure for Group of API Resources
@@ -226,7 +226,7 @@ namespace snowcrash {
     };
 
     /** Source Map of Collection of Resource groups */
-    SOURCE_MAP_COLLECTION(ResourceGroup, ResourceGroups);
+    SOURCE_MAP_COLLECTION(ResourceGroup, ResourceGroups)
 
     /**
      *  \brief API Blueprint Sourcemap AST

@@ -69,7 +69,7 @@ namespace snowcrash {
             if (!remainingContent.empty()) {
                 out.node.description += "\n" + remainingContent + "\n";
 
-                if (pd.exportSM()) {
+                if (pd.exportSourceMap()) {
                     out.sourceMap.description.sourceMap.append(node->sourceMap);
                 }
             }
@@ -103,7 +103,7 @@ namespace snowcrash {
             // Clear any previous values
             out.node.values.clear();
 
-            if (pd.exportSM()) {
+            if (pd.exportSourceMap()) {
                 out.sourceMap.values.collection.clear();
             }
 
@@ -228,7 +228,7 @@ namespace snowcrash {
                     }
                 }
 
-                if (pd.exportSM()) {
+                if (pd.exportSourceMap()) {
                     if (!out.node.name.empty()) {
                         out.sourceMap.name.sourceMap = node->sourceMap;
                     }
@@ -285,7 +285,7 @@ namespace snowcrash {
                     traits.replace(pos, captureGroups[0].length(), std::string());
                 }
 
-                if (pd.exportSM()) {
+                if (pd.exportSourceMap()) {
                     out.sourceMap.exampleValue.sourceMap = node->sourceMap;
                 }
              }
@@ -303,7 +303,7 @@ namespace snowcrash {
                     traits.replace(pos, captureGroups[0].length(), std::string());
                 }
 
-                if (pd.exportSM()) {
+                if (pd.exportSourceMap()) {
                     out.sourceMap.use.sourceMap = node->sourceMap;
                 }
             }
@@ -321,7 +321,7 @@ namespace snowcrash {
                     traits.replace(pos, captureGroups[0].length(), std::string());
                 }
 
-                if (pd.exportSM()) {
+                if (pd.exportSourceMap()) {
                     out.sourceMap.type.sourceMap = node->sourceMap;
                 }
             }
@@ -345,7 +345,7 @@ namespace snowcrash {
                 out.node.exampleValue.clear();
                 out.node.use = UndefinedParameterUse;
 
-                if (pd.exportSM()) {
+                if (pd.exportSourceMap()) {
                     out.sourceMap.type.sourceMap.clear();
                     out.sourceMap.exampleValue.sourceMap.clear();
                     out.sourceMap.use.sourceMap.clear();

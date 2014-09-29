@@ -56,7 +56,7 @@ namespace snowcrash {
                     out.node.actions.push_back(action.node);
                     layout = RedirectSectionLayout;
 
-                    if (pd.exportSM()) {
+                    if (pd.exportSourceMap()) {
                         out.sourceMap.actions.collection.push_back(action.sourceMap);
                         out.sourceMap.uriTemplate.sourceMap = node->sourceMap;
                     }
@@ -70,7 +70,7 @@ namespace snowcrash {
                 out.node.uriTemplate = captureGroups[2];
             }
 
-            if (pd.exportSM()) {
+            if (pd.exportSourceMap()) {
                 if (!out.node.uriTemplate.empty()) {
                     out.sourceMap.uriTemplate.sourceMap = node->sourceMap;
                 }
@@ -134,7 +134,7 @@ namespace snowcrash {
                 
                 mdp::ByteBuffer content = CodeBlockUtility::addDanglingAsset(node, pd, sectionType, out.report, out.node.model.body);
 
-                if (pd.exportSM() && !content.empty()) {
+                if (pd.exportSourceMap() && !content.empty()) {
                     out.sourceMap.model.body.sourceMap.append(node->sourceMap);
                 }
 
@@ -144,7 +144,7 @@ namespace snowcrash {
                 if (it != pd.symbolTable.resourceModels.end()) {
                     it->second.body = out.node.model.body;
 
-                    if (pd.exportSM()) {
+                    if (pd.exportSourceMap()) {
                         pd.symbolSourceMapTable.resourceModels[out.node.model.name].body = out.sourceMap.model.body;
                     }
                 }
@@ -273,7 +273,7 @@ namespace snowcrash {
 
                 out.node.headers.clear();
 
-                if (pd.exportSM()) {
+                if (pd.exportSourceMap()) {
                     out.sourceMap.headers.collection.clear();
                 }
             }
@@ -311,7 +311,7 @@ namespace snowcrash {
 
             out.node.actions.push_back(action.node);
 
-            if (pd.exportSM()) {
+            if (pd.exportSourceMap()) {
                 out.sourceMap.actions.collection.push_back(action.sourceMap);
             }
 
@@ -334,7 +334,7 @@ namespace snowcrash {
                 checkParametersEligibility(node, pd, parameters.node, out);
                 out.node.parameters.insert(out.node.parameters.end(), parameters.node.begin(), parameters.node.end());
 
-                if (pd.exportSM()) {
+                if (pd.exportSourceMap()) {
                     out.sourceMap.parameters.collection.insert(out.sourceMap.parameters.collection.end(),
                                                                parameters.sourceMap.collection.begin(),
                                                                parameters.sourceMap.collection.end());
@@ -381,7 +381,7 @@ namespace snowcrash {
                 if (!out.node.name.empty()) {
                     model.node.name = out.node.name;
 
-                    if (pd.exportSM()) {
+                    if (pd.exportSourceMap()) {
                         model.sourceMap.name = out.sourceMap.name;
                     }
                 } else {
@@ -404,7 +404,7 @@ namespace snowcrash {
 
                 pd.symbolTable.resourceModels[model.node.name] = model.node;
 
-                if (pd.exportSM()) {
+                if (pd.exportSourceMap()) {
                     pd.symbolSourceMapTable.resourceModels[model.node.name] = model.sourceMap;
                 }
             } else {
@@ -421,7 +421,7 @@ namespace snowcrash {
 
             out.node.model = model.node;
 
-            if (pd.exportSM()) {
+            if (pd.exportSourceMap()) {
                 out.sourceMap.model = model.sourceMap;
             }
 
