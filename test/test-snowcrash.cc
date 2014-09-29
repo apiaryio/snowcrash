@@ -608,3 +608,57 @@ TEST_CASE("Segfault parsing metadata only", "[parser][#205][regression]")
     REQUIRE(blueprint.node.metadata[0].second == "1A : SOJ");
     REQUIRE(blueprint.node.resourceGroups.empty());
 }
+
+TEST_CASE("Don't remove link references", "[parser][#213]")
+{
+    mdp::ByteBuffer source = \
+    "# API\n\n"\
+    "This is [first example][id]\n\n"\
+    "[id]: http://a.com\n\n"\
+    "# Group A\n\n"\
+    "This is [second example][id]\n\n"\
+    "[id]: http://b.com\n\n"\
+    "## /a\n\n"\
+    "This is [third example][id]\n\n"\
+    "[id]: http://c.com\n\n";
+
+    ParseResult<Blueprint> blueprint;
+    parse(source, 0, blueprint);
+
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.empty());
+
+    REQUIRE(blueprint.node.name == "API");
+    REQUIRE(blueprint.node.description == "This is [first example][id]\n\n[id]: http://a.com\n\n");
+    REQUIRE(blueprint.node.resourceGroups.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].name == "A");
+    REQUIRE(blueprint.node.resourceGroups[0].description == "This is [second example][id]\n\n[id]: http://b.com\n\n");
+    REQUIRE(blueprint.node.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].uriTemplate == "/a");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].description == "This is [third example][id]\n\n[id]: http://c.com\n\n");
+}
+
+TEST_CASE("Don't mess up sourcemaps when there are references", "[parser][#213]")
+{
+    mdp::ByteBuffer source = \
+    "# API\n\n"\
+    "[very][] [much][] [reference][]\n\n"\
+    "[very]: http://a.com\n\n"\
+    "[much]: http://b.com\n\n"\
+    "[reference]: http://c.com\n\n"\
+    "# GET /1";
+
+    ParseResult<Blueprint> blueprint;
+    parse(source, ExportSourcemapOption, blueprint);
+
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.size() == 1);
+    REQUIRE(blueprint.report.warnings[0].code == EmptyDefinitionWarning);
+
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection.size() == 1);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection.size() == 1);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection.size() == 1);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection[0].method.sourceMap.size() == 1);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection[0].method.sourceMap[0].location == 111);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection[0].method.sourceMap[0].length == 8);
+}
