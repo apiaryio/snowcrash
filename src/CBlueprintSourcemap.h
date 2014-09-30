@@ -205,6 +205,9 @@ extern "C" {
     /** \returns Payload name source map */
     SC_API const sc_source_map_t* sc_sm_payload_name(const sc_sm_payload_t* handle);
 
+    /** \returns Payload symbol name source map */
+    SC_API const sc_source_map_t* sc_sm_payload_symbol(const sc_sm_payload_t* handle);
+
     /** \returns Payload description source map */
     SC_API const sc_source_map_t* sc_sm_payload_description(const sc_sm_payload_t* handle);
 
