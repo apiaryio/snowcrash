@@ -39,10 +39,8 @@ namespace snowcrash {
             while (cur != siblings.end() &&
                    cur->type == mdp::ParagraphMarkdownNodeType) {
 
-                ParseResult<MetadataCollection> metadata;
+                ParseResult<MetadataCollection> metadata(out.report);
                 parseMetadata(cur, pd, metadata);
-
-                out.report += metadata.report;
 
                 // First block is paragraph and is not metadata (no API name)
                 if (metadata.node.empty()) {
@@ -98,10 +96,8 @@ namespace snowcrash {
             if (pd.sectionContext() == ResourceGroupSectionType ||
                 pd.sectionContext() == ResourceSectionType) {
 
-                ParseResult<ResourceGroup> resourceGroup;
+                ParseResult<ResourceGroup> resourceGroup(out.report);
                 MarkdownNodeIterator cur = ResourceGroupParser::parse(node, siblings, pd, resourceGroup);
-
-                out.report += resourceGroup.report;
 
                 ResourceGroupIterator duplicate = findResourceGroup(out.node.resourceGroups, resourceGroup.node);
 

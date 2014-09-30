@@ -65,10 +65,8 @@ namespace snowcrash {
 
             if (pd.sectionContext() == ResourceSectionType) {
 
-                ParseResult<Resource> resource;
+                ParseResult<Resource> resource(out.report);
                 MarkdownNodeIterator cur = ResourceParser::parse(node, siblings, pd, resource);
-
-                out.report += resource.report;
 
                 ResourceIterator duplicate = SectionProcessor<Resource>::findResource(out.node.resources, resource.node);
                 ResourceIteratorPair globalDuplicate;

@@ -49,10 +49,9 @@ namespace snowcrash {
                 // Make this section an action
                 if (!captureGroups[2].empty()) {
 
-                    ParseResult<Action> action;
+                    ParseResult<Action> action(out.report);
                     MarkdownNodeIterator cur = ActionParser::parse(node, node->parent().children(), pd, action);
 
-                    out.report += action.report;
                     out.node.actions.push_back(action.node);
                     layout = RedirectSectionLayout;
 
@@ -101,17 +100,8 @@ namespace snowcrash {
 
                 case HeadersSectionType:
                 {
-                    ParseResult<Headers> headers;
-                    headers.node = out.node.headers;
-                    headers.sourceMap = out.sourceMap.headers;
-
-                    MarkdownNodeIterator cur = SectionProcessor<Action>::handleDeprecatedHeaders(node, siblings, pd, headers);
-
-                    out.report += headers.report;
-                    out.node.headers = headers.node;
-                    out.sourceMap.headers = headers.sourceMap;
-
-                    return cur;
+                    ParseResult<Headers> headers(out.report, out.node.headers, out.sourceMap.headers);
+                    return SectionProcessor<Action>::handleDeprecatedHeaders(node, siblings, pd, headers);
                 }
 
                 default:
@@ -285,10 +275,9 @@ namespace snowcrash {
                                                   SectionParserData& pd,
                                                   ParseResult<Resource>& out) {
 
-            ParseResult<Action> action;
+            ParseResult<Action> action(out.report);
             MarkdownNodeIterator cur = ActionParser::parse(node, siblings, pd, action);
 
-            out.report += action.report;
             ActionIterator duplicate = SectionProcessor<Action>::findAction(out.node.actions, action.node);
 
             if (duplicate != out.node.actions.end()) {
@@ -324,10 +313,8 @@ namespace snowcrash {
                                                       SectionParserData& pd,
                                                       ParseResult<Resource>& out) {
 
-            ParseResult<Parameters> parameters;
+            ParseResult<Parameters> parameters(out.report);
             MarkdownNodeIterator cur = ParametersParser::parse(node, siblings, pd, parameters);
-
-            out.report += parameters.report;
 
             if (!parameters.node.empty()) {
 
@@ -350,10 +337,8 @@ namespace snowcrash {
                                                  SectionParserData& pd,
                                                  ParseResult<Resource>& out) {
 
-            ParseResult<Payload> model;
+            ParseResult<Payload> model(out.report);
             MarkdownNodeIterator cur = PayloadParser::parse(node, siblings, pd, model);
-
-            out.report += model.report;
 
             // Check whether there isn't a model already
             if (!out.node.model.name.empty()) {
