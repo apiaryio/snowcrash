@@ -254,7 +254,7 @@ namespace snowcrash {
 
                 std::stringstream ss;
                 ss << "found a possible '" << symbol << "' model reference, ";
-                ss << "the reference must be used directly in the " << SectionName(pd.sectionContext()) << " without any additional headers, message-body or message-schema sections";
+                ss << "a reference must be directly in the " << SectionName(pd.sectionContext()) << " section, indented by 4 spaces or 1 tab, without any additional sections";
 
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
                 report.warnings.push_back(Warning(ss.str(),
