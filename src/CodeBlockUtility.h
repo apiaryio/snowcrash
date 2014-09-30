@@ -56,7 +56,7 @@ namespace snowcrash {
                                        Report& report,
                                        mdp::ByteBuffer& content) {
 
-            checkPossibleResources(node, pd, report);
+            checkPossibleReference(node, pd, report);
             
             if (node->type == mdp::CodeMarkdownNodeType) {
                 content += node->text;
@@ -222,7 +222,7 @@ namespace snowcrash {
             if (node->type == mdp::CodeMarkdownNodeType)
                 level--;  // Deduct one level for a code block
 
-            checkPossibleResources(node, pd, report);
+            checkPossibleReference(node, pd, report);
                 
             if (level) {
                 // WARN: Dangling asset
@@ -238,10 +238,10 @@ namespace snowcrash {
         }
 
         /**
-         *  \brief Check for potential resources and warn about not recognizing them
-         *  \return True if code block contains a recognized resource format, false otherwise.
+         *  \brief Check for potential resource model reference and warn about not recognizing them
+         *  \return True if code block contains a resource model reference, false otherwise.
          */
-        static bool checkPossibleResources(const MarkdownNodeIterator& node,
+        static bool checkPossibleReference(const MarkdownNodeIterator& node,
                                            const SectionParserData& pd,
                                            Report& report) {
 
@@ -253,8 +253,8 @@ namespace snowcrash {
             if(GetSymbolReference(source, symbol)) {
 
                 std::stringstream ss;
-                ss << "Found a possible '" << symbol << "' reference. ";
-                ss << "If it is to be parsed it has to be directly after `Response` or `Request` and it's expected to be indented by 4 spaces or 1 tab";
+                ss << "found a possible '" << symbol << "' model reference, ";
+                ss << "a reference must be directly in the " << SectionName(pd.sectionContext()) << " section, indented by 4 spaces or 1 tab, without any additional sections";
 
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
                 report.warnings.push_back(Warning(ss.str(),
