@@ -210,6 +210,9 @@ extern "C" {
     /** \returns Payload name */
     SC_API const char* sc_payload_name(const sc_payload_t* handle);
 
+    /** \returns Payload symbol name */
+    SC_API const char* sc_payload_symbol(const sc_payload_t* handle);
+
     /** \returns Payload description */
     SC_API const char* sc_payload_description(const sc_payload_t* handle);
 
