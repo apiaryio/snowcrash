@@ -66,6 +66,7 @@
 		BBFC8426196C1AFD001A236A /* test-RegexMatch.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB0F42B1731D04900C92465 /* test-RegexMatch.cc */; };
 		BBFC8427196C1B1F001A236A /* test-ResourceParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD5F9DD173578210049BBEE /* test-ResourceParser.cc */; };
 		BBFC842A196C1B2B001A236A /* test-snowcrash.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBFF48C9170B3C49001E5FB2 /* test-snowcrash.cc */; };
+		BBFCD83A19DAEE240073813C /* cmdline.h in Headers */ = {isa = PBXBuildFile; fileRef = BBFCD83919DAEE240073813C /* cmdline.h */; };
 		BBFF48CD170B3EDE001E5FB2 /* snowcrash.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBFF48CC170B3EDE001E5FB2 /* snowcrash.cc */; };
 		BBFF48D2170B4224001E5FB2 /* snowcrash.h in Headers */ = {isa = PBXBuildFile; fileRef = BBFF48D1170B4224001E5FB2 /* snowcrash.h */; };
 		BBFF48D6170C4F30001E5FB2 /* Blueprint.h in Headers */ = {isa = PBXBuildFile; fileRef = BBFF48D4170C4F30001E5FB2 /* Blueprint.h */; };
@@ -141,7 +142,6 @@
 		BB50F0BB17D1DB4D0002C363 /* ActionParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = ActionParser.h; path = src/ActionParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BB50F0BC17D1DC9B0002C363 /* test-ActionParser.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = "test-ActionParser.cc"; path = "test/test-ActionParser.cc"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		BB6A9A7F17904C7300B2F283 /* SourceAnnotation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = SourceAnnotation.h; path = src/SourceAnnotation.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
-		BB810F771779AB2F00B89CD8 /* cmdline.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = cmdline.h; path = cmdline/cmdline.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BB8C3E611923D45700EF36FA /* SectionProcessor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SectionProcessor.h; path = src/SectionProcessor.h; sourceTree = "<group>"; };
 		BB8C3E621923D6FE00EF36FA /* SectionParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SectionParser.h; path = src/SectionParser.h; sourceTree = "<group>"; };
 		BB8C3E641923D83C00EF36FA /* Section.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Section.h; path = src/Section.h; sourceTree = "<group>"; };
@@ -193,6 +193,7 @@
 		BBFC8417196C0C0F001A236A /* UriTemplateParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UriTemplateParser.h; path = src/UriTemplateParser.h; sourceTree = "<group>"; };
 		BBFC8421196C0C27001A236A /* test-csnowcrash.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-csnowcrash.cc"; path = "test/test-csnowcrash.cc"; sourceTree = "<group>"; };
 		BBFC8422196C0C27001A236A /* test-UriTemplateParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-UriTemplateParser.cc"; path = "test/test-UriTemplateParser.cc"; sourceTree = "<group>"; };
+		BBFCD83919DAEE240073813C /* cmdline.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cmdline.h; path = ext/cmdline/cmdline.h; sourceTree = "<group>"; };
 		BBFF4898170B34E6001E5FB2 /* libsnowcrash.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libsnowcrash.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BBFF48C0170B3C30001E5FB2 /* test-libsnowcrash */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "test-libsnowcrash"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BBFF48C9170B3C49001E5FB2 /* test-snowcrash.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-snowcrash.cc"; path = "test/test-snowcrash.cc"; sourceTree = "<group>"; };
@@ -260,7 +261,7 @@
 		BB810F781779AB5400B89CD8 /* cmdline */ = {
 			isa = PBXGroup;
 			children = (
-				BB810F771779AB2F00B89CD8 /* cmdline.h */,
+				BBFCD83919DAEE240073813C /* cmdline.h */,
 			);
 			name = cmdline;
 			sourceTree = "<group>";
@@ -377,6 +378,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BBFF48D2170B4224001E5FB2 /* snowcrash.h in Headers */,
+				BBFCD83A19DAEE240073813C /* cmdline.h in Headers */,
 				BBFF48D6170C4F30001E5FB2 /* Blueprint.h in Headers */,
 				BBD73564192ED417009FE09E /* HeadersParser.h in Headers */,
 				BBCC855F19542DA100B99E90 /* ValuesParser.h in Headers */,
