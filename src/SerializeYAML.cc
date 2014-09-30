@@ -280,10 +280,15 @@ static void serialize(const Payload& payload, size_t level, bool array, std::ost
         os << "- ";
     else
         os << "  ";
-    
+
     // Name
     serialize(SerializeKey::Name, payload.name, 0, os);
-    
+
+    // Symbol
+    if (!payload.symbol.empty()) {
+        serialize(SerializeKey::Symbol, payload.symbol, level, os);
+    }
+
     // Description
     serialize(SerializeKey::Description, payload.description, level, os);
     
@@ -315,6 +320,11 @@ static void serialize(const SourceMap<Payload>& payload, size_t level, bool arra
 
     // Name
     serialize(SerializeKey::Name, payload.name, 0, os);
+
+    // Symbol
+    if (!payload.symbol.sourceMap.empty()) {
+        serialize(SerializeKey::Symbol, payload.symbol, level, os);
+    }
 
     // Description
     serialize(SerializeKey::Description, payload.description, level, os);

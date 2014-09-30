@@ -469,10 +469,16 @@ static void serialize(const Collection<SourceMap<Header> >::type& headers, size_
 static void serialize(const Payload& payload, size_t level, std::ostream &os)
 {
     os << "{\n";
-    
+
     // Name
     serialize(SerializeKey::Name, payload.name, level + 1, false, os);
     os << NewLineItemBlock;
+
+    // Symbol
+    if (!payload.symbol.empty()) {
+            serialize(SerializeKey::Symbol, payload.symbol, level + 1, false, os);
+            os << NewLineItemBlock;
+    }
 
     // Description
     serialize(SerializeKey::Description, payload.description, level + 1, false, os);
@@ -506,6 +512,12 @@ static void serialize(const SourceMap<Payload>& payload, size_t level, std::ostr
     // Name
     serialize(SerializeKey::Name, payload.name, level + 1, false, os);
     os << NewLineItemBlock;
+
+    // Symbol
+    if (!payload.symbol.sourceMap.empty()) {
+        serialize(SerializeKey::Symbol, payload.symbol, level + 1, false, os);
+        os << NewLineItemBlock;
+    }
 
     // Description
     serialize(SerializeKey::Description, payload.description, level + 1, false, os);
