@@ -105,6 +105,7 @@ We love **Windows** too! Please refer to [Building on Windows](https://github.co
 Snow Crash bindings in other languages:
 
 - [Protagonist](https://github.com/apiaryio/protagonist) (Node.js)
+- [RedSnow](https://github.com/apiaryio/redsnow) (Ruby)
 - [Snow Crash .NET](https://github.com/brutski/snowcrash-dot-net-wrapper) (.NET)
 
 
