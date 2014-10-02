@@ -164,56 +164,60 @@ namespace snowcrash {
                                             SourceMap<TransactionExamples>& examplesSM) {
 
             Collection<TransactionExample>::iterator exampleIt = examples.begin();
-            Collection<SourceMap<TransactionExample> >::iterator exampleSMIt;
+            Collection<SourceMap<TransactionExample> >::iterator exampleSourceMapIt;
 
             if (pd.exportSourceMap()) {
-                exampleSMIt = examplesSM.collection.begin();
+                exampleSourceMapIt = examplesSM.collection.begin();
             }
 
             while (exampleIt != examples.end()) {
 
-                Collection<Request>::iterator reqIt = exampleIt->requests.begin();
-                Collection<SourceMap<Request> >::iterator reqSMIt;
+                Collection<Request>::iterator requestIt = exampleIt->requests.begin();
+                Collection<SourceMap<Request> >::iterator requestSourceMapIt;
 
                 if (pd.exportSourceMap()) {
-                    reqSMIt = exampleSMIt->requests.collection.begin();
+                    requestSourceMapIt = exampleSourceMapIt->requests.collection.begin();
                 }
 
                 // Requests
-                while (reqIt != exampleIt->requests.end()) {
+                while (requestIt != exampleIt->requests.end()) {
 
-                     reqIt->headers.insert(reqIt->headers.begin(), headers.begin(), headers.end());
-                     ++reqIt;
+                     requestIt->headers.insert(requestIt->headers.begin(), headers.begin(), headers.end());
+                     ++requestIt;
 
                      if (pd.exportSourceMap()) {
-                         reqSMIt->headers.collection.insert(reqSMIt->headers.collection.begin(), headersSM.collection.begin(), headersSM.collection.end());
-                         ++reqSMIt;
+                         requestSourceMapIt->headers.collection.insert(requestSourceMapIt->headers.collection.begin(),
+                                                                       headersSM.collection.begin(),
+                                                                       headersSM.collection.end());
+                         ++requestSourceMapIt;
                      }
                 }
 
-                Collection<Response>::iterator resIt = exampleIt->responses.begin();
-                Collection<SourceMap<Response> >::iterator resSMIt;
+                Collection<Response>::iterator responseIt = exampleIt->responses.begin();
+                Collection<SourceMap<Response> >::iterator responseSourceMapIt;
 
                 if (pd.exportSourceMap()) {
-                    resSMIt = exampleSMIt->responses.collection.begin();
+                    responseSourceMapIt = exampleSourceMapIt->responses.collection.begin();
                 }
 
                 // Responses
-                while(resIt != exampleIt->responses.end()) {
+                while(responseIt != exampleIt->responses.end()) {
 
-                    resIt->headers.insert(resIt->headers.begin(), headers.begin(), headers.end());
-                    ++resIt;
+                    responseIt->headers.insert(responseIt->headers.begin(), headers.begin(), headers.end());
+                    ++responseIt;
 
                     if (pd.exportSourceMap()) {
-                        resSMIt->headers.collection.insert(resSMIt->headers.collection.begin(), headersSM.collection.begin(), headersSM.collection.end());
-                        ++resSMIt;
+                        responseSourceMapIt->headers.collection.insert(responseSourceMapIt->headers.collection.begin(),
+                                                                       headersSM.collection.begin(),
+                                                                       headersSM.collection.end());
+                        ++responseSourceMapIt;
                     }
                 }
 
                 ++exampleIt;
 
                 if (pd.exportSourceMap()) {
-                    ++exampleSMIt;
+                    ++exampleSourceMapIt;
                 }
             }
         }
