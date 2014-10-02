@@ -252,6 +252,7 @@ SC_API const char* sc_payload_name(const sc_payload_t* handle)
     return p->name.c_str();
 }
 
+/** TODO: Need to change this to use the "Reference" data structure */
 SC_API const char* sc_payload_symbol(const sc_payload_t* handle)
 {
     const snowcrash::Payload* p = AS_CTYPE(snowcrash::Payload, handle);

@@ -38,6 +38,8 @@ namespace snowcrash {
     struct SerializeKey {
         static const std::string ASTVersion;
         static const std::string Metadata;
+        static const std::string Reference;
+        static const std::string Id;
         static const std::string Name;
         static const std::string Description;
         static const std::string ResourceGroups;
@@ -51,7 +53,6 @@ namespace snowcrash {
         static const std::string Method;
         static const std::string Requests;
         static const std::string Responses;
-        static const std::string Symbol;
         static const std::string Body;
         static const std::string Schema;
         static const std::string Headers;

@@ -121,7 +121,9 @@
                     },
                     {
                       "name": "201",
-                      "symbol": "<resource name>",
+                      "reference": {
+                        "id": "<resource name>"
+                      },
                       "description": "<resource model description>",
                       "headers": [
                         {

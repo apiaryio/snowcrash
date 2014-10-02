@@ -17,6 +17,8 @@ using namespace snowcrash;
 
 const std::string SerializeKey::ASTVersion = "_version";
 const std::string SerializeKey::Metadata = "metadata";
+const std::string SerializeKey::Reference = "reference";
+const std::string SerializeKey::Id = "id";
 const std::string SerializeKey::Name = "name";
 const std::string SerializeKey::Description = "description";
 const std::string SerializeKey::ResourceGroups = "resourceGroups";
@@ -29,7 +31,6 @@ const std::string SerializeKey::Method = "method";
 const std::string SerializeKey::Examples = "examples";
 const std::string SerializeKey::Requests = "requests";
 const std::string SerializeKey::Responses = "responses";
-const std::string SerializeKey::Symbol = "symbol";
 const std::string SerializeKey::Body = "body";
 const std::string SerializeKey::Schema = "schema";
 const std::string SerializeKey::Headers = "headers";

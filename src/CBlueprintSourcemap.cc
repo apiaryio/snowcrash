@@ -272,6 +272,7 @@ SC_API const sc_source_map_t* sc_sm_payload_name(const sc_sm_payload_t* handle)
     return AS_CTYPE(sc_source_map_t, &p->name.sourceMap);
 }
 
+/** TODO: Need to change this to use the "Reference" data structure */
 SC_API const sc_source_map_t* sc_sm_payload_symbol(const sc_sm_payload_t* handle)
 {
     const snowcrash::SourceMap<snowcrash::Payload>* p = AS_CTYPE(snowcrash::SourceMap<snowcrash::Payload>, handle);

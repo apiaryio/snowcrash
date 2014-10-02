@@ -474,10 +474,16 @@ static void serialize(const Payload& payload, size_t level, std::ostream &os)
     serialize(SerializeKey::Name, payload.name, level + 1, false, os);
     os << NewLineItemBlock;
 
-    // Symbol
+    // Symbol Reference
     if (!payload.symbol.empty()) {
-            serialize(SerializeKey::Symbol, payload.symbol, level + 1, false, os);
-            os << NewLineItemBlock;
+        indent(level + 1, os);
+        os << "\"" << SerializeKey::Reference << "\": {\n";
+
+        serialize(SerializeKey::Id, payload.symbol, level + 2, false, os);
+
+        os << "\n";
+        indent(level + 1, os);
+        os << "}" << NewLineItemBlock;
     }
 
     // Description
@@ -513,9 +519,9 @@ static void serialize(const SourceMap<Payload>& payload, size_t level, std::ostr
     serialize(SerializeKey::Name, payload.name, level + 1, false, os);
     os << NewLineItemBlock;
 
-    // Symbol
+    // Symbol Reference
     if (!payload.symbol.sourceMap.empty()) {
-        serialize(SerializeKey::Symbol, payload.symbol, level + 1, false, os);
+        serialize(SerializeKey::Reference, payload.symbol, level + 1, false, os);
         os << NewLineItemBlock;
     }
 
