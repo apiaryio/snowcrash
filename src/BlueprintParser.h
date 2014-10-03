@@ -291,8 +291,8 @@ namespace snowcrash {
                  ++resourceGroupIterator) {
 
                 for (Resources::iterator resourcesItrator = resourceGroupIterator->resources.begin();
-                    resourcesItrator != resourceGroupIterator->resources.end();
-                    ++resourcesItrator) {
+                     resourcesItrator != resourceGroupIterator->resources.end();
+                     ++resourcesItrator) {
 
                     if(resourcesItrator->model.reference.state == Reference::StatePending) {
 
@@ -301,16 +301,16 @@ namespace snowcrash {
                     }
 
                     for (Actions::iterator actionIterator = resourcesItrator->actions.begin();
-                        actionIterator != resourcesItrator->actions.end();
-                        ++actionIterator) {
+                         actionIterator != resourcesItrator->actions.end();
+                         ++actionIterator) {
 
                         for (TransactionExamples::iterator transactionExampleItrator = actionIterator->examples.begin();
-                            transactionExampleItrator != actionIterator->examples.end();
-                            ++transactionExampleItrator) {
+                             transactionExampleItrator != actionIterator->examples.end();
+                             ++transactionExampleItrator) {
 
                             for (Requests::iterator requestItrator = transactionExampleItrator->requests.begin();
-                                requestItrator != transactionExampleItrator->requests.end();
-                                ++requestItrator) {
+                                 requestItrator != transactionExampleItrator->requests.end();
+                                 ++requestItrator) {
 
                                 if(requestItrator->reference.state == Reference::StatePending) {
 
@@ -321,8 +321,8 @@ namespace snowcrash {
                             }
 
                             for (Responses::iterator responseItrator = transactionExampleItrator->responses.begin();
-                                responseItrator != transactionExampleItrator->responses.end();
-                                ++responseItrator) {
+                                 responseItrator != transactionExampleItrator->responses.end();
+                                 ++responseItrator) {
 
                                 if(responseItrator->reference.state == Reference::StatePending) {
 
@@ -331,15 +331,10 @@ namespace snowcrash {
                                 }
 
                             }
-
                         }
-
                     }
-
                 }
-
             }
-
         }
 
         /** Resolve pending resources */
@@ -356,7 +351,7 @@ namespace snowcrash {
                 std::stringstream ss;
                 ss << "Undefined symbol " << source->reference.identifier.name;
 
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(source->reference.source->sourceMap, pd.sourceData);
                 out.report.error = Error(ss.str(), SymbolError, sourceMap);
 
                 source->reference.state = Reference::StateUnresolved;
@@ -370,9 +365,9 @@ namespace snowcrash {
                 source->parameters = model.parameters;
 
                 HeaderIterator modelContentType = std::find_if(model.headers.begin(),
-                    model.headers.end(),
-                    std::bind2nd(MatchFirstWith<Header, std::string>(),
-                    HTTPHeaderName::ContentType));
+                                                               model.headers.end(),
+                                                               std::bind2nd(MatchFirstWith<Header, std::string>(),
+                                                               HTTPHeaderName::ContentType));
 
                 bool isPayloadContentType = !source->headers.empty();
                 bool isModelContentType = modelContentType != model.headers.end();
@@ -385,10 +380,10 @@ namespace snowcrash {
                     ss << "ignoring additional " << SectionName(pd.sectionContext()) << " header(s), ";
                     ss << "specify this header(s) in the referenced model definition instead";
 
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(source->reference.source->sourceMap, pd.sourceData);
                     out.report.warnings.push_back(Warning(ss.str(),
-                        IgnoringWarning,
-                        sourceMap));
+                                                  IgnoringWarning,
+                                                  sourceMap));
                 }
 
                 if (isPayloadContentType && !isModelContentType) {
