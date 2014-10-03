@@ -91,7 +91,7 @@ int main(int argc, const char *argv[])
 
     argumentParser.add<std::string>(OutputArgument, 'o', "save output AST into file", false);
     argumentParser.add<std::string>(FormatArgument, 'f', "output AST format", false, "yaml", cmdline::oneof<std::string>("yaml", "json"));
-    argumentParser.add(SourcemapArgument, 's', "export sourcemap AST");
+    argumentParser.add<std::string>(SourcemapArgument, 's', "export sourcemap AST into file", false);
     // TODO: argumentParser.add("render", 'r', "render markdown descriptions");
     argumentParser.add("help", 'h', "display this help message");
     argumentParser.add(VersionArgument, 'v', "print Snow Crash version");
@@ -147,15 +147,19 @@ int main(int argc, const char *argv[])
     if (!argumentParser.exist(ValidateArgument)) {
         
         std::stringstream outputStream;
+        std::stringstream sourcemapOutputStream;
 
         if (argumentParser.get<std::string>(FormatArgument) == "json") {
             SerializeJSON(blueprint.node, outputStream);
+            SerializeSourceMapJSON(blueprint.sourceMap, sourcemapOutputStream);
         }
         else if (argumentParser.get<std::string>(FormatArgument) == "yaml") {
             SerializeYAML(blueprint.node, outputStream);
+            SerializeSourceMapYAML(blueprint.sourceMap, sourcemapOutputStream);
         }
         
         std::string outputFileName = argumentParser.get<std::string>(OutputArgument);
+        std::string sourcemapOutputFileName = argumentParser.get<std::string>(SourcemapArgument);
 
         if (!outputFileName.empty()) {
             // Serialize to file
@@ -173,6 +177,20 @@ int main(int argc, const char *argv[])
         else {
             // Serialize to stdout
             std::cout << outputStream.rdbuf();
+        }
+        
+        if (!sourcemapOutputFileName.empty()) {
+            // Serialize to file
+            std::ofstream sourcemapOutputFileStream;
+            sourcemapOutputFileStream.open(sourcemapOutputFileName.c_str());
+            
+            if (!sourcemapOutputFileStream.is_open()) {
+                std::cerr << "fatal: unable to write to file '" << sourcemapOutputFileName << "'\n";
+                exit(EXIT_FAILURE);
+            }
+            
+            sourcemapOutputFileStream << sourcemapOutputStream.rdbuf();
+            sourcemapOutputFileStream.close();
         }
     }
 
