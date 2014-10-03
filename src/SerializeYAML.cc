@@ -39,7 +39,7 @@ static std::string NormalizeStringValue(const std::string& value, bool& needsQuo
 
 
 /** Insert array item mark */
-static void ArrayItemLeadIn(size_t level, std::ostream &os)
+static void ArrayItemLeadIn(size_t level, std::ostream &os, bool withTrailingSpace = true)
 {
     if (level < 1)
         return;
@@ -47,7 +47,11 @@ static void ArrayItemLeadIn(size_t level, std::ostream &os)
     for (size_t i = 0; i < level - 1; ++i)
         os << "  ";
 
-    os << "- ";
+    os << "-";
+
+    if (withTrailingSpace) {
+        os << " ";
+    }
 }
 
 /** Serialize key value pair */
@@ -88,31 +92,35 @@ static void serialize(const SourceMapBase& set, size_t level, std::ostream &os)
 {
     if (!set.sourceMap.empty()) {
         size_t i = 0;
+        os << std::endl;
 
         for (mdp::RangeSet<mdp::BytesRange>::const_iterator it = set.sourceMap.begin(); it != set.sourceMap.end(); ++i, ++it) {
 
+            ArrayItemLeadIn(level, os, false);
+            os << "\n";
             ArrayItemLeadIn(level + 1, os);
-            os << " - " << it->location << "\n";
-            ArrayItemLeadIn(level + 2, os);
+            os << it->location << "\n";
+            ArrayItemLeadIn(level + 1, os);
             os << it->length << "\n";
         }
     } else {
-        os << "[]";
+        os << " []\n";
     }
 }
 
 /** Serialize a key and source map value into output stream. */
-static void serialize(const std::string& key, const SourceMapBase& value, size_t level, std::ostream &os)
+static void serialize(const std::string& key, const SourceMapBase& value, size_t level, std::ostream &os, bool keyLevelIsZero = false)
 {
     if (key.empty())
         return;
 
-    for (size_t i = 0; i < level; ++i)
-        os << "  ";
+    if (!keyLevelIsZero) {
+        for (size_t i = 0; i < level; ++i)
+            os << "  ";
+    }
 
-    os << key << ": ";
+    os << key << ":";
     serialize(value, level + 1, os);
-    os << "\n";
 }
 
 /** Serializes source map collection */
@@ -123,10 +131,10 @@ static void serializeSourceMapCollection(const Collection<SourceMap<KeyValuePair
          ++it) {
 
         // Array item
-        ArrayItemLeadIn(level + 1, os);
+        ArrayItemLeadIn(level + 1, os, false);
 
         // Source Map
-        serialize(*it, level + 1, os);
+        serialize(*it, level + 2, os);
     }
 }
 
@@ -212,15 +220,13 @@ static void serialize(const Parameters& parameters, size_t level, std::ostream &
         // Values
         serialize(SerializeKey::Values, std::string(), level + 1, os);
         
-        if (!it->values.empty()) {
-            for (Collection<Value>::const_iterator val_it = it->values.begin();
-                 val_it != it->values.end();
-                 ++val_it) {
+        for (Collection<Value>::const_iterator val_it = it->values.begin();
+             val_it != it->values.end();
+             ++val_it) {
 
-                ArrayItemLeadIn(level + 2, os);
+            ArrayItemLeadIn(level + 2, os);
                 
-                serialize(SerializeKey::Value, *val_it, 0, os);
-            }
+            serialize(SerializeKey::Value, *val_it, 0, os);
         }
     }
 }
@@ -236,7 +242,7 @@ static void serialize(const Collection<SourceMap<Parameter> >::type& parameters,
         ArrayItemLeadIn(level + 1, os);
 
         // Key / name
-        serialize(SerializeKey::Name, it->name, 0, os);
+        serialize(SerializeKey::Name, it->name, level + 1, os, true);
 
         // Description
         serialize(SerializeKey::Description, it->description, level + 1, os);
@@ -256,15 +262,15 @@ static void serialize(const Collection<SourceMap<Parameter> >::type& parameters,
         // Values
         serialize(SerializeKey::Values, std::string(), level + 1, os);
 
-        if (!it->values.collection.empty()) {
-            for (Collection<SourceMap<Value> >::const_iterator val_it = it->values.collection.begin();
-                 val_it != it->values.collection.end();
-                 ++val_it) {
+        for (Collection<SourceMap<Value> >::const_iterator val_it = it->values.collection.begin();
+             val_it != it->values.collection.end();
+             ++val_it) {
 
-                ArrayItemLeadIn(level + 2, os);
+            // Array item
+            ArrayItemLeadIn(level + 2, os);
 
-                serialize(SerializeKey::Value, *val_it, 0, os);
-            }
+            // Source Map
+            serialize(*val_it, level + 3, os);
         }
     }
 }
@@ -320,7 +326,7 @@ static void serialize(const SourceMap<Payload>& payload, size_t level, bool arra
         os << "  ";
 
     // Name
-    serialize(SerializeKey::Name, payload.name, 0, os);
+    serialize(SerializeKey::Name, payload.name, level, os, true);
 
     // Symbol Reference
     if (!payload.symbol.sourceMap.empty()) {
@@ -386,7 +392,7 @@ static void serialize(const SourceMap<TransactionExample>& example, std::ostream
     os << "      - ";   // indent 4
 
     // Name
-    serialize(SerializeKey::Name, example.name, 0, os);
+    serialize(SerializeKey::Name, example.name, 4, os, true);
 
     // Description
     serialize(SerializeKey::Description, example.description, 4, os);
@@ -455,7 +461,7 @@ static void serialize(const SourceMap<Action>& action, std::ostream &os)
     os << "    - ";   // indent 3
 
     // Name
-    serialize(SerializeKey::Name, action.name, 0, os);
+    serialize(SerializeKey::Name, action.name, 3, os, true);
 
     // Description
     serialize(SerializeKey::Description, action.description, 3, os);
@@ -528,7 +534,7 @@ static void serialize(const SourceMap<Resource>& resource, std::ostream &os)
     os << "  - ";   // indent 2
 
     // Name
-    serialize(SerializeKey::Name, resource.name, 0, os);
+    serialize(SerializeKey::Name, resource.name, 2, os, true);
 
     // Description
     serialize(SerializeKey::Description, resource.description, 2, os);
@@ -593,7 +599,7 @@ static void serialize(const SourceMap<ResourceGroup>& group, std::ostream &os)
     os << "- ";   // indent 1
 
     // Name
-    serialize(SerializeKey::Name, group.name, 0, os);
+    serialize(SerializeKey::Name, group.name, 1, os, true);
 
     // Description
     serialize(SerializeKey::Description, group.description, 1, os);
@@ -641,7 +647,7 @@ static void serialize(const Blueprint& blueprint, std::ostream &os)
     }
 }
 
-/** Serialize Blueprint */
+/** Serialize Blueprint source map */
 static void serialize(const SourceMap<Blueprint>& blueprint, std::ostream &os)
 {
     // Metadata

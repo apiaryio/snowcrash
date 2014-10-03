@@ -131,6 +131,7 @@ static void serialize(const SourceMapBase& set, size_t level, std::ostream &os)
             os << "[" << it->location << ", " << it->length << "]";
         }
 
+        os << std::endl;
         indent(level, os);
     }
 
@@ -157,7 +158,7 @@ static void serialize(const std::string& key, const SourceMapBase& value, size_t
     serialize(key, os);
     os << ": ";
 
-    serialize(value, level + 1, os);
+    serialize(value, level, os);
 
     if (object) {
         os << "\n";
@@ -401,6 +402,8 @@ static void serialize(const Collection<SourceMap<Parameter> >::type& parameters,
                 os << "\n";
                 size_t j = 0;
 
+                indent(level + 3, os);
+
                 for (Collection<SourceMap<Value> >::const_iterator val_it = it->values.collection.begin();
                      val_it != it->values.collection.end();
                      ++j, ++val_it) {
@@ -408,7 +411,7 @@ static void serialize(const Collection<SourceMap<Parameter> >::type& parameters,
                     if (j > 0 && j < it->values.collection.size())
                         os << NewLineItemBlock;
 
-                    serialize(SerializeKey::Value, *val_it, level + 3, true, os);
+                    serialize(*val_it, level + 3, os);
                 }
 
                 os << "\n";
