@@ -8,6 +8,7 @@
 
 #include "snowcrashtest.h"
 #include "ResourceParser.h"
+#include "snowcrash.h"
 
 using namespace snowcrash;
 using namespace snowcrashtest;
@@ -527,11 +528,11 @@ TEST_CASE("Parse named resource with nameless model but reference a non-existing
     "+ Response 200\n\n"\
     "    [Post][]\n";
 
-    ParseResult<Resource> resource;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource);
+    ParseResult<Blueprint> blueprint;
+    parse(source, 0, blueprint);
 
-    REQUIRE(resource.report.error.code == SymbolError);
-    REQUIRE(resource.report.warnings.empty());
+    REQUIRE(blueprint.report.error.code == SymbolError);
+    REQUIRE(blueprint.report.warnings.empty());
 }
 
 TEST_CASE("Parse root resource", "[resource]")

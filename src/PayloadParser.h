@@ -101,12 +101,12 @@ namespace snowcrash {
 
             mdp::ByteBuffer content;
 
-            if (!out.node.symbol.empty()) {
+            if (!out.node.reference.identifier.name.empty()) {
                 //WARN: ignoring extraneous content after symbol reference
                 std::stringstream ss;
 
                 ss << "ignoring extraneous content after symbol reference";
-                ss << ", expected symbol reference only e.g. '[" << out.node.symbol << "][]'";
+                ss << ", expected symbol reference only e.g. '[" << out.node.reference.identifier.name << "][]'";
 
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
                 out.report.warnings.push_back(Warning(ss.str(),
@@ -536,30 +536,29 @@ namespace snowcrash {
             TrimString(source);
 
             if (GetSymbolReference(source, symbol)) {
-                out.node.symbol = symbol;
 
                 if (pd.exportSourceMap() && !symbol.empty()) {
                     out.sourceMap.symbol.sourceMap = node->sourceMap;
                 }
 
+                out.node.reference.identifier.name = symbol;
+                out.node.reference.source = node;
+
                 // If symbol doesn't exist
                 if (pd.symbolTable.resourceModels.find(symbol) == pd.symbolTable.resourceModels.end()) {
 
-                    // ERR: Undefined symbol
-                    std::stringstream ss;
-                    ss << "Undefined symbol " << symbol;
-
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                    out.report.error = Error(ss.str(), SymbolError, sourceMap);
+                    out.node.reference.state = Reference::StatePending;
 
                     return true;
                 }
 
                 model = pd.symbolTable.resourceModels.at(symbol);
+
+                out.node.reference.state = Reference::StateResolved;
                 
                 out.node.description = model.description;
                 out.node.parameters = model.parameters;
-                
+
                 HeaderIterator modelContentType = std::find_if(model.headers.begin(),
                                                                model.headers.end(),
                                                                std::bind2nd(MatchFirstWith<Header, std::string>(),
