@@ -299,3 +299,94 @@ TEST_CASE("CBlueprint issue on sc_resource_group_handle", "[cinterface]")
     const sc_resource_collection_t* res_col2 = sc_resource_collection_handle(res_gr2);
     REQUIRE(sc_resource_collection_size(res_col2) == 2);
 }
+
+TEST_CASE("Parse blueprint with multiple reference via C interface", "[cinterface]")
+{
+    const std::string blueprintSource = \
+    "#api name\n\n"\
+    "# Resource 1 [/1]\n"\
+    "+ Model (text/plain)\n\n"\
+    "        `resource model` 1\n\n"\
+    "# Resource 2 [/2]\n"\
+    "## Retrieve [GET]\n\n"\
+    "+ Response 200\n\n"\
+    "    [Resource 1][]\n\n"\
+    "# Resource 3 [/3]\n"\
+    "## Retrieve [GET]\n\n"\
+    "+ Response 200\n\n"\
+    "    [Resource 4][]\n\n"\
+    "# Resource 4 [/4]\n"\
+    "+ Model (text/plain)\n\n"\
+    "        `resource model` 4\n";
+
+    sc_report_t* report;
+    sc_blueprint_t* blueprint;
+    sc_sm_blueprint_t* sm_blueprint;
+
+    sc_c_parse(blueprintSource.c_str(), 0, &report, &blueprint, &sm_blueprint);
+
+    const sc_resource_group_collection_t* res_gr_col = sc_resource_group_collection_handle(blueprint);
+    REQUIRE(sc_resource_group_collection_size(res_gr_col) == 1);
+
+    const sc_resource_group_t* res_gr = sc_resource_group_handle(res_gr_col, 0);
+    REQUIRE(std::string(sc_resource_group_name(res_gr)) == "");
+
+    const sc_resource_collection_t* sm_res_gr_col = sc_resource_collection_handle(res_gr);
+    REQUIRE(sc_resource_collection_size(sm_res_gr_col) == 4);
+
+    const sc_resource_t *res = sc_resource_handle(sm_res_gr_col, 1);
+    REQUIRE(std::string(sc_resource_uritemplate(res)) == "/2");
+    REQUIRE(std::string(sc_resource_name(res)) == "Resource 2");
+
+    const sc_action_collection_t* action_col = sc_action_collection_handle(res);
+    REQUIRE(sc_action_collection_size(action_col) == 1);
+
+    const sc_action_t* action = sc_action_handle(action_col, 0);
+    REQUIRE(std::string(sc_action_httpmethod(action)) == "GET");
+    REQUIRE(std::string(sc_action_name(action)) == "Retrieve");
+
+    const sc_transaction_example_collection_t* example_col = sc_transaction_example_collection_handle(action);
+    REQUIRE(sc_transaction_example_collection_size(example_col) == 1);
+
+    const sc_transaction_example_t* example = sc_transaction_example_handle(example_col, 0);
+    REQUIRE(std::string(sc_transaction_example_name(example)) == "");
+
+    const sc_payload_collection_t* response_col = sc_payload_collection_handle_responses(example);
+    REQUIRE(sc_payload_collection_size(response_col) == 1);
+
+    const sc_payload_t* response = sc_payload_handle(response_col, 0);
+    REQUIRE(std::string(sc_payload_name(response)) == "200");
+    REQUIRE(std::string(sc_payload_body(response)) == "`resource model` 1\n");
+
+    const sc_reference_t* reference = sc_reference_handle_payload(response);
+    REQUIRE(std::string(sc_reference_identifier(reference)) == "Resource 1");
+    REQUIRE(sc_reference_reference_state(reference) == 2);
+
+    res = sc_resource_handle(sm_res_gr_col, 2);
+    REQUIRE(std::string(sc_resource_uritemplate(res)) == "/3");
+    REQUIRE(std::string(sc_resource_name(res)) == "Resource 3");
+
+    action_col = sc_action_collection_handle(res);
+    REQUIRE(sc_action_collection_size(action_col) == 1);
+
+    action = sc_action_handle(action_col, 0);
+    REQUIRE(std::string(sc_action_httpmethod(action)) == "GET");
+    REQUIRE(std::string(sc_action_name(action)) == "Retrieve");
+
+    example_col = sc_transaction_example_collection_handle(action);
+    REQUIRE(sc_transaction_example_collection_size(example_col) == 1);
+
+    example = sc_transaction_example_handle(example_col, 0);
+    REQUIRE(std::string(sc_transaction_example_name(example)) == "");
+
+    response_col = sc_payload_collection_handle_responses(example);
+    REQUIRE(sc_payload_collection_size(response_col) == 1);
+
+    response = sc_payload_handle(response_col, 0);
+    REQUIRE(std::string(sc_payload_name(response)) == "200");
+    REQUIRE(std::string(sc_payload_body(response)) == "`resource model` 4\n");
+
+    reference = sc_reference_handle_payload(response);
+    REQUIRE(std::string(sc_reference_identifier(reference)) == "Resource 4");
+    REQUIRE(sc_reference_reference_state(reference) == 2);
+}
