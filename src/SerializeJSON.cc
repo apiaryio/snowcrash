@@ -475,11 +475,11 @@ static void serialize(const Payload& payload, size_t level, std::ostream &os)
     os << NewLineItemBlock;
 
     // Symbol Reference
-    if (!payload.reference.identifier.name.empty()) {
+    if (!payload.reference.identifier.empty()) {
         indent(level + 1, os);
         os << "\"" << SerializeKey::Reference << "\": {\n";
 
-        serialize(SerializeKey::Id, payload.reference.identifier.name, level + 2, false, os);
+        serialize(SerializeKey::Id, payload.reference.identifier, level + 2, false, os);
 
         os << "\n";
         indent(level + 1, os);

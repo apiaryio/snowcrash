@@ -259,7 +259,7 @@ SC_API const char* sc_payload_symbol(const sc_payload_t* handle)
     if (!p)
         return "";
 
-    return p->reference.identifier.name.c_str();
+    return p->reference.identifier.c_str();
 }
 
 SC_API const char* sc_payload_description(const sc_payload_t* handle)

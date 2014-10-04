@@ -101,12 +101,12 @@ namespace snowcrash {
 
             mdp::ByteBuffer content;
 
-            if (!out.node.reference.identifier.name.empty()) {
+            if (!out.node.reference.identifier.empty()) {
                 //WARN: ignoring extraneous content after symbol reference
                 std::stringstream ss;
 
                 ss << "ignoring extraneous content after symbol reference";
-                ss << ", expected symbol reference only e.g. '[" << out.node.reference.identifier.name << "][]'";
+                ss << ", expected symbol reference only e.g. '[" << out.node.reference.identifier << "][]'";
 
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
                 out.report.warnings.push_back(Warning(ss.str(),
@@ -541,8 +541,8 @@ namespace snowcrash {
                     out.sourceMap.symbol.sourceMap = node->sourceMap;
                 }
 
-                out.node.reference.identifier.name = symbol;
-                out.node.reference.source = node;
+                out.node.reference.identifier = symbol;
+                out.node.reference.node = node;
 
                 // If symbol doesn't exist
                 if (pd.symbolTable.resourceModels.find(symbol) == pd.symbolTable.resourceModels.end()) {

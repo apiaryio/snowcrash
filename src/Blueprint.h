@@ -132,18 +132,6 @@ namespace snowcrash {
     /** Reference */
     struct Reference {
 
-        /** Symbol identifier */
-        struct Identifier {
-
-            typedef int Type;
-
-            /** Symbol name */
-            SymbolName name;
-
-            /** Type of the identifier*/
-            Type type;
-        };
-
         /** Reference Resolution State */
         enum State {
             StateUnresolved,    // Reference unresolved (undefined)
@@ -152,10 +140,10 @@ namespace snowcrash {
         };
 
         /** Identifier */
-        Identifier identifier;
+        std::string identifier;
 
         /** Markdown AST reference source node (for source map) */
-        mdp::MarkdownNodeIterator source;
+        mdp::MarkdownNodeIterator node;
 
         /** Reference resolution state */
         State state;

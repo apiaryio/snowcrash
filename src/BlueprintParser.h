@@ -294,12 +294,6 @@ namespace snowcrash {
                      resourcesItrator != resourceGroupIterator->resources.end();
                      ++resourcesItrator) {
 
-                    if(resourcesItrator->model.reference.state == Reference::StatePending) {
-
-                        resolvePendingResources(&resourcesItrator->model, node, pd, out);
-
-                    }
-
                     for (Actions::iterator actionIterator = resourcesItrator->actions.begin();
                          actionIterator != resourcesItrator->actions.end();
                          ++actionIterator) {
@@ -314,10 +308,8 @@ namespace snowcrash {
 
                                 if(requestItrator->reference.state == Reference::StatePending) {
 
-                                    resolvePendingResources(&(*requestItrator), node, pd, out);
-
+                                    resolvePendingSymbols(&(*requestItrator), node, pd, out);
                                 }
-
                             }
 
                             for (Responses::iterator responseItrator = transactionExampleItrator->responses.begin();
@@ -326,10 +318,8 @@ namespace snowcrash {
 
                                 if(responseItrator->reference.state == Reference::StatePending) {
 
-                                    resolvePendingResources(&(*responseItrator), node,pd, out);
-
+                                    resolvePendingSymbols(&(*responseItrator), node,pd, out);
                                 }
-
                             }
                         }
                     }
@@ -338,26 +328,26 @@ namespace snowcrash {
         }
 
         /** Resolve pending resources */
-        static void resolvePendingResources(Payload *source,
+        static void resolvePendingSymbols(Payload *source,
                                             const MarkdownNodeIterator& node,
                                             SectionParserData& pd,
                                             ParseResult<Blueprint>& out) {
 
             ResourceModel model;
 
-            if (pd.symbolTable.resourceModels.find(source->reference.identifier.name) == pd.symbolTable.resourceModels.end()) {
+            if (pd.symbolTable.resourceModels.find(source->reference.identifier) == pd.symbolTable.resourceModels.end()) {
 
                 // ERR: Undefined symbol
                 std::stringstream ss;
-                ss << "Undefined symbol " << source->reference.identifier.name;
+                ss << "Undefined symbol " << source->reference.identifier;
 
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(source->reference.source->sourceMap, pd.sourceData);
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(source->reference.node->sourceMap, pd.sourceData);
                 out.report.error = Error(ss.str(), SymbolError, sourceMap);
 
                 source->reference.state = Reference::StateUnresolved;
             }
             else {
-                model = pd.symbolTable.resourceModels.at(source->reference.identifier.name);
+                model = pd.symbolTable.resourceModels.at(source->reference.identifier);
 
                 source->reference.state = Reference::StateResolved;
 
@@ -380,7 +370,7 @@ namespace snowcrash {
                     ss << "ignoring additional " << SectionName(pd.sectionContext()) << " header(s), ";
                     ss << "specify this header(s) in the referenced model definition instead";
 
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(source->reference.source->sourceMap, pd.sourceData);
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(source->reference.node->sourceMap, pd.sourceData);
                     out.report.warnings.push_back(Warning(ss.str(),
                                                   IgnoringWarning,
                                                   sourceMap));
