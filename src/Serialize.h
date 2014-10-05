@@ -64,6 +64,7 @@ namespace snowcrash {
         static const std::string Default;
         static const std::string Example;
         static const std::string Values;
+        static const std::string Resolved;
 
     };
 }

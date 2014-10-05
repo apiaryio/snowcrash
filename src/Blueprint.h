@@ -133,11 +133,17 @@ namespace snowcrash {
     struct Reference {
 
         /** Reference Resolution State */
-        enum State {
+        enum ReferenceState {
             StateUnresolved,    // Reference unresolved (undefined)
             StatePending,       // Reference resolution pending
             StateResolved       // Reference resolved successfully
         };
+
+        /** Reference Type */
+        typedef int ReferenceType;
+
+        /** Type */
+        ReferenceType type;
 
         /** Identifier */
         std::string identifier;
@@ -146,7 +152,7 @@ namespace snowcrash {
         mdp::MarkdownNodeIterator node;
 
         /** Reference resolution state */
-        State state;
+        ReferenceState state;
     };
     
     /**

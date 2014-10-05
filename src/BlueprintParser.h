@@ -302,23 +302,25 @@ namespace snowcrash {
                              transactionExampleItrator != actionIterator->examples.end();
                              ++transactionExampleItrator) {
 
-                            for (Requests::iterator requestItrator = transactionExampleItrator->requests.begin();
-                                 requestItrator != transactionExampleItrator->requests.end();
-                                 ++requestItrator) {
+                            for (Requests::iterator requestIterator = transactionExampleItrator->requests.begin();
+                                 requestIterator != transactionExampleItrator->requests.end();
+                                 ++requestIterator) {
 
-                                if(requestItrator->reference.state == Reference::StatePending) {
+                                if(!requestIterator->reference.identifier.empty() &&
+                                    requestIterator->reference.state == Reference::StatePending) {
 
-                                    resolvePendingSymbols(&(*requestItrator), node, pd, out);
+                                    resolvePendingSymbols(&(*requestIterator), node, pd, out);
                                 }
                             }
 
-                            for (Responses::iterator responseItrator = transactionExampleItrator->responses.begin();
-                                 responseItrator != transactionExampleItrator->responses.end();
-                                 ++responseItrator) {
+                            for (Responses::iterator responseIterator = transactionExampleItrator->responses.begin();
+                                 responseIterator != transactionExampleItrator->responses.end();
+                                 ++responseIterator) {
 
-                                if(responseItrator->reference.state == Reference::StatePending) {
+                                if(!responseIterator->reference.identifier.empty() &&
+                                    responseIterator->reference.state == Reference::StatePending) {
 
-                                    resolvePendingSymbols(&(*responseItrator), node,pd, out);
+                                    resolvePendingSymbols(&(*responseIterator), node, pd, out);
                                 }
                             }
                         }
@@ -372,8 +374,8 @@ namespace snowcrash {
 
                     mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(source->reference.node->sourceMap, pd.sourceData);
                     out.report.warnings.push_back(Warning(ss.str(),
-                                                  IgnoringWarning,
-                                                  sourceMap));
+                                                          IgnoringWarning,
+                                                          sourceMap));
                 }
 
                 if (isPayloadContentType && !isModelContentType) {

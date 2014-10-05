@@ -74,7 +74,8 @@ resourceGroups:
           schema: "<response schema>\n"
         - name: "201"
           reference:
-            id: "<resource name>"
+          - id: "<resource name>"
+            resolved: true
           description: "<resource model description>"
           headers:
           - name: "<header2>"
