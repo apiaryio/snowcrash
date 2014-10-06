@@ -529,24 +529,23 @@ TEST_CASE("Parse model with unrecognised resource", "[resource][model]")
     "    + Body\n\n"\
     "            [Resource][]";
 
-    Resource resource;
-    Report report;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+    ParseResult<Resource> resource;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
-    REQUIRE(report.warnings[0].code == IgnoringWarning);
+    REQUIRE(resource.report.error.code == Error::OK);
+    REQUIRE(resource.report.warnings.size() == 1);
+    REQUIRE(resource.report.warnings[0].code == IgnoringWarning);
 
-    REQUIRE(resource.model.name == "Resource");
-    REQUIRE(resource.model.body == "AAA\n");
-    REQUIRE(resource.actions.size() == 1);
-    REQUIRE(resource.actions[0].name == "Retrieve a resource");
-    REQUIRE(resource.actions[0].method == "GET");
-    REQUIRE(resource.actions[0].examples.size() == 1);
-    REQUIRE(resource.actions[0].examples[0].responses.size() == 1);
-    REQUIRE(resource.actions[0].examples[0].responses[0].name == "200");
-    REQUIRE(resource.actions[0].examples[0].responses[0].body == "[Resource][]\n");
-    REQUIRE(resource.actions[0].examples[0].responses[0].description == "");
+    REQUIRE(resource.node.model.name == "Resource");
+    REQUIRE(resource.node.model.body == "AAA\n");
+    REQUIRE(resource.node.actions.size() == 1);
+    REQUIRE(resource.node.actions[0].name == "Retrieve a resource");
+    REQUIRE(resource.node.actions[0].method == "GET");
+    REQUIRE(resource.node.actions[0].examples.size() == 1);
+    REQUIRE(resource.node.actions[0].examples[0].responses.size() == 1);
+    REQUIRE(resource.node.actions[0].examples[0].responses[0].name == "200");
+    REQUIRE(resource.node.actions[0].examples[0].responses[0].body == "[Resource][]\n");
+    REQUIRE(resource.node.actions[0].examples[0].responses[0].description == "");
 }
 
 TEST_CASE("Parse named resource with nameless model but reference a non-existing model", "[resource]")
