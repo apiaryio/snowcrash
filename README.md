@@ -27,7 +27,7 @@ Other systems refer to [build notes](#build).
 ```c++
 #include "snowcrash.h"
 
-snowcrash::SourceData blueprint = R"(
+mdp::ByteBuffer blueprint = R"(
 # My API
 ## GET /message
 + Response 200 (text/plain)
