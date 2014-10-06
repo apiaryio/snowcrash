@@ -55,7 +55,7 @@ $ cat << 'EOF' > blueprint.apib
 EOF
 
 $ snowcrash blueprint.apib 
-_version: 2.0
+_version: 2.1
 metadata:
 name: "My API"
  ...
