@@ -17,10 +17,10 @@
 #include "RegexMatch.h"
 
 namespace snowcrash {
-    
+
     /** Nameless resource matching regex */
     const char* const ResourceHeaderRegex = "^[[:blank:]]*(" HTTP_REQUEST_METHOD "[[:blank:]]+)?" URI_TEMPLATE "$";
-    
+
     /** Named resource matching regex */
     const char* const NamedResourceHeaderRegex = "^[[:blank:]]*" SYMBOL_IDENTIFIER "[[:blank:]]+\\[" URI_TEMPLATE "]$";
 
@@ -110,18 +110,18 @@ namespace snowcrash {
 
             return node;
         }
-        
+
         static MarkdownNodeIterator processUnexpectedNode(const MarkdownNodeIterator& node,
                                                           const MarkdownNodes& siblings,
                                                           SectionParserData& pd,
                                                           SectionType& sectionType,
                                                           ParseResult<Resource>& out) {
-            
+
             if ((node->type == mdp::ParagraphMarkdownNodeType ||
                  node->type == mdp::CodeMarkdownNodeType) &&
                 (sectionType == ModelBodySectionType ||
                  sectionType == ModelSectionType)) {
-                
+
                 mdp::ByteBuffer content = CodeBlockUtility::addDanglingAsset(node, pd, sectionType, out.report, out.node.model.body);
 
                 if (pd.exportSourceMap() && !content.empty()) {
@@ -130,7 +130,7 @@ namespace snowcrash {
 
                 // Update model in the symbol table as well
                 ResourceModelSymbolTable::iterator it = pd.symbolTable.resourceModels.find(out.node.model.name);
-                
+
                 if (it != pd.symbolTable.resourceModels.end()) {
                     it->second.body = out.node.model.body;
 
@@ -138,20 +138,20 @@ namespace snowcrash {
                         pd.symbolSourceMapTable.resourceModels[out.node.model.name].body = out.sourceMap.model.body;
                     }
                 }
-                
+
                 return ++MarkdownNodeIterator(node);
             }
-            
+
             return SectionProcessorBase<Resource>::processUnexpectedNode(node, siblings, pd, sectionType, out);
         }
-        
+
         static bool isDescriptionNode(const MarkdownNodeIterator& node,
                                       SectionType sectionType) {
-            
+
             if (SectionProcessor<Action>::actionType(node) == CompleteActionType) {
                 return false;
             }
-                
+
             return SectionProcessorBase<Resource>::isDescriptionNode(node, sectionType);
         }
 
@@ -205,12 +205,12 @@ namespace snowcrash {
             nestedType = SectionProcessor<Action>::sectionType(node);
 
             if (nestedType == ActionSectionType) {
-                
+
                 // Do not consider complete actions as nested
                 mdp::ByteBuffer method;
                 if (SectionProcessor<Action>::actionType(node) == CompleteActionType)
                     return UndefinedSectionType;
-                
+
                 return nestedType;
             }
 

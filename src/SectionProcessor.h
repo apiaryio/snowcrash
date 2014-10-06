@@ -14,13 +14,13 @@
 #include "Signature.h"
 
 namespace snowcrash {
-    
+
     using mdp::MarkdownNode;
     using mdp::MarkdownNodes;
     using mdp::MarkdownNodeIterator;
-    
+
     typedef Collection<SectionType>::type SectionTypes;
-    
+
     /**
      *  Layout of the section being parsed
      */
@@ -56,7 +56,7 @@ namespace snowcrash {
      */
     template<typename T>
     struct SectionProcessor;
-    
+
     /**
      *  \brief  Section Processor Base
      *
@@ -104,7 +104,7 @@ namespace snowcrash {
 
             return ++MarkdownNodeIterator(node);
         }
-        
+
         /** Process section-specific content Markdown node */
         static MarkdownNodeIterator processContent(const MarkdownNodeIterator& node,
                                                    const MarkdownNodes& siblings,
@@ -113,7 +113,7 @@ namespace snowcrash {
 
             return ++MarkdownNodeIterator(node);
         }
-        
+
         /**
          *  \brief Process nested sections Markdown node(s)
          *  \param node     Node to process
@@ -129,7 +129,7 @@ namespace snowcrash {
 
             return node;
         }
-        
+
         /** Process unexpected Markdown node */
         static MarkdownNodeIterator processUnexpectedNode(const MarkdownNodeIterator& node,
                                                           const MarkdownNodes& siblings,
@@ -160,7 +160,7 @@ namespace snowcrash {
                              SectionParserData& pd,
                              ParseResult<T>& out) {
         }
-        
+
         /** \return True if the node is a section description node */
         static bool isDescriptionNode(const MarkdownNodeIterator& node,
                                       SectionType sectionType) {
@@ -197,14 +197,14 @@ namespace snowcrash {
         /** \return True if the node is unexpected in the current context */
         static bool isUnexpectedNode(const MarkdownNodeIterator& node,
                                      SectionType sectionType) {
-            
+
             SectionType keywordSectionType = SectionKeywordSignature(node);
             SectionTypes nestedTypes = SectionProcessor<T>::nestedSectionTypes();
 
             if (std::find(nestedTypes.begin(), nestedTypes.end(), keywordSectionType) != nestedTypes.end()) {
                 return true;
             }
-            
+
             return (keywordSectionType == UndefinedSectionType);
         }
 
@@ -217,13 +217,13 @@ namespace snowcrash {
         static SectionType sectionType(const MarkdownNodeIterator& node) {
             return UndefinedSectionType;
         }
-        
+
         /** \return Nested %SectionType of the node */
         static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
             return UndefinedSectionType;
         }
     };
-    
+
     /**
      *  Default Section Processor
      */

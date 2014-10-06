@@ -18,7 +18,7 @@
 #define URI_TEMPLATE_EXPRESSION_REGEX "^([?|#|+|&]?(([A-Z|a-z|0-9|_|,])*|(%[A-F|a-f|0-9]{2})*)*\\*?)$"
 
 namespace snowcrash {
-    
+
     /**
     *  \brief URI template parse result.
     */
@@ -26,10 +26,10 @@ namespace snowcrash {
         std::string scheme;
         std::string host;
         std::string path;
-        
+
         Report report;
     };
-    
+
     /**
     *  \brief URI template expression.
     */
@@ -59,13 +59,13 @@ namespace snowcrash {
         }
 
         std::string unsupportedWarningText;
-        
+
         snowcrash::Expression innerExpression;
-        
+
         virtual bool IsExpressionType() const {
             return false;
         }
-                
+
         bool ContainsSpaces() {
             return innerExpression.find(" ") != std::string::npos;
         }
@@ -81,11 +81,11 @@ namespace snowcrash {
         bool IsInvalidExpressionName() {
             std::string tmpExpression = innerExpression;
             if (tmpExpression.find("..") != std::string::npos) return true;
-            
+
             size_t start_pos = 0;
             while ((start_pos = tmpExpression.find(".", start_pos)) != std::string::npos) {
                 tmpExpression.replace(start_pos, 1, "_");
-                start_pos++; 
+                start_pos++;
             }
 
             return !RegexMatch(tmpExpression, URI_TEMPLATE_EXPRESSION_REGEX);
@@ -193,7 +193,7 @@ namespace snowcrash {
             return innerExpression.substr(0, 1) == ";";
         }
     };
-   
+
     /**
     *  \brief level three form style query continuation expansion URI template expression.
     */

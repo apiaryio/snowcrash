@@ -13,7 +13,7 @@ const int snowcrash::SourceAnnotation::OK = 0;
 
 using namespace snowcrash;
 
-/** 
+/**
  *  \brief  Check source for unsupported character \t & \r
  *  \return True if passed (not found), false otherwise
  */
@@ -23,7 +23,7 @@ static bool CheckSource(const mdp::ByteBuffer& source, Report& report)
     std::string::size_type pos = source.find("\t");
 
     if (pos != std::string::npos) {
-        
+
         mdp::BytesRangeSet rangeSet;
         rangeSet.push_back(mdp::BytesRange(pos, 1));
         report.error = Error("the use of tab(s) '\\t' in source data isn't currently supported, please contact makers",
@@ -31,7 +31,7 @@ static bool CheckSource(const mdp::ByteBuffer& source, Report& report)
                              mdp::BytesRangeSetToCharactersRangeSet(rangeSet, source));
         return false;
     }
-    
+
     pos = source.find("\r");
 
     if (pos != std::string::npos) {
@@ -43,7 +43,7 @@ static bool CheckSource(const mdp::ByteBuffer& source, Report& report)
                              mdp::BytesRangeSetToCharactersRangeSet(rangeSet, source));
         return false;
     }
-    
+
     return true;
 }
 
@@ -52,11 +52,11 @@ int snowcrash::parse(const mdp::ByteBuffer& source,
                      ParseResult<Blueprint>& out)
 {
     try {
-        
+
         // Sanity Check
         if (!CheckSource(source, out.report))
             return out.report.error.code;
-        
+
         // Do nothing if blueprint is empty
         if (source.empty())
             return out.report.error.code;
@@ -73,13 +73,13 @@ int snowcrash::parse(const mdp::ByteBuffer& source,
         BlueprintParser::parse(markdownAST.children().begin(), markdownAST.children(), pd, out);
     }
     catch (const std::exception& e) {
-        
+
         std::stringstream ss;
         ss << "parser exception: '" << e.what() << "'";
         out.report.error = Error(ss.str(), 1);
     }
     catch (...) {
-        
+
         out.report.error = Error("parser exception has occured", 1);
     }
 

@@ -12,7 +12,7 @@
 #include <string>
 
 namespace snowcrash {
-    
+
     /**
      *  API Blueprint Sections Types.
      */
@@ -39,7 +39,7 @@ namespace snowcrash {
         ValuesSectionType,              /// < Value enumeration
         ValueSectionType                /// < One Value
     };
-    
+
     /** \return Human readable name for given %SectionType */
     extern std::string SectionName(const SectionType& section);
 }

@@ -46,13 +46,13 @@ TEST_CASE("Parse an invalid uri into seperate parts", "[invaliduriparser][issue]
 TEST_CASE("Parse uri template for invalid format curly brackets (nested brackets)", "[invalidcurlybracketparsingnested][issue][#78]")
 {
     const snowcrash::URI uri = "http://www.test.com/{id{}}";
-    
+
     URITemplateParser parser;
     ParsedURITemplate result;
     mdp::CharactersRangeSet sourceBlock;
 
     parser.parse(uri, sourceBlock, result);
-  
+
     REQUIRE(result.report.warnings.size() == 1);
 }
 
@@ -80,7 +80,7 @@ TEST_CASE("Parse uri template for supported level one variable expansion", "[sup
     parser.parse(uri, sourceBlock, result);
 
     REQUIRE(result.report.warnings.size() == 0);
-    
+
 }
 
 TEST_CASE("Parse uri template for supported variables with % encoding and explode modifier", "[supportedpercentencodedvariablesandexplodemodifier][issue][#78]")

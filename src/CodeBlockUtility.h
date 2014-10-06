@@ -14,9 +14,9 @@
 #include "StringUtility.h"
 
 namespace snowcrash {
-    
+
     struct CodeBlockUtility {
-        
+
         /**
          *  \brief Expected indentation level of a code block.
          *
@@ -30,21 +30,21 @@ namespace snowcrash {
                 type == ResourceGroupSectionType ||
                 type == ResourceSectionType ||
                 type == ActionSectionType) {
-                
+
                 return 1;
             }
             else if (type == RequestBodySectionType ||
                      type == ResponseBodySectionType ||
                      type == ModelBodySectionType) {
-                
+
                 return 2;
             }
             else {
-                
+
                 return 3;
             }
         }
-        
+
         /**
          *  \brief  Retrieve the textual content of a Markdown node as if it was a code block.
          *  \param  pd      Parser status
@@ -57,14 +57,14 @@ namespace snowcrash {
                                        mdp::ByteBuffer& content) {
 
             checkPossibleReference(node, pd, report);
-            
+
             if (node->type == mdp::CodeMarkdownNodeType) {
                 content += node->text;
 
                 checkExcessiveIndentation(node, pd, report);
                 return;
             }
-            
+
             // Other blocks, process & warn
             content += mdp::MapBytesRangeSet(node->sourceMap, pd.sourceData);
 
@@ -79,25 +79,25 @@ namespace snowcrash {
 
             ss << " is expected to be a pre-formatted code block, every of its line indented by exactly ";
             ss << level * 4 << " spaces or " << level << " tabs";
-            
+
             mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
             report.warnings.push_back(Warning(ss.str(),
                                               IndentationWarning,
                                               sourceMap));
         }
-        
+
         /** \brief  Retrieve the textual content of a signature markdown */
         static void signatureContentAsCodeBlock(const MarkdownNodeIterator& node,
                                                 const SectionParserData& pd,
                                                 Report& report,
                                                 mdp::ByteBuffer& content) {
-            
+
             mdp::ByteBuffer remainingContent;
             GetFirstLine(node->text, remainingContent);
-            
+
             if (remainingContent.empty())
                 return;
-            
+
             content += remainingContent;
             content += "\n";
 
@@ -114,13 +114,13 @@ namespace snowcrash {
             ss << " is expected to be a pre-formatted code block, separate it by a newline and ";
             ss << "indent every of its line by ";
             ss << level * 4 << " spaces or " << level << " tabs";
-            
+
             mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
             report.warnings.push_back(Warning(ss.str(),
                                               IndentationWarning,
                                               sourceMap));
         }
-        
+
         /**
          *  \brief Check for potential excessive indentation of a list section
          *  \return True if code block contains a recognized list section, false otherwise.
@@ -128,7 +128,7 @@ namespace snowcrash {
         static bool checkExcessiveIndentation(const MarkdownNodeIterator& node,
                                               const SectionParserData& pd,
                                               Report& report) {
-            
+
             // Check for possible superfluous indentation of a recognized list items.
             mdp::ByteBuffer r;
             mdp::ByteBuffer line = GetFirstLine(node->text, r);
@@ -138,11 +138,11 @@ namespace snowcrash {
             if (line.empty() ||
                 (line[0] != '-' && line[0] != '+' && line[0] != '*'))
                 return false;
-            
+
             // Skip leading Markdown list item mark
             std::string signature = line.substr(1, std::string::npos);
             TrimStringStart(signature);
-            
+
             SectionType type = RecognizeCodeBlockFirstLine(signature);
 
             if (type != UndefinedSectionType) {
@@ -172,7 +172,7 @@ namespace snowcrash {
                                                   IndentationWarning,
                                                   sourceMap));
             }
-            
+
             return false;
         }
 
@@ -184,15 +184,15 @@ namespace snowcrash {
          */
         static bool keyValueFromLine(const mdp::ByteBuffer& line,
                                     KeyValuePair& keyValuePair) {
-            
+
             std::vector<std::string> rawMetadata = SplitOnFirst(line, ':');
             if (rawMetadata.size() != 2)
                 return false;
-            
+
             keyValuePair = std::make_pair(rawMetadata[0], rawMetadata[1]);
             TrimString(keyValuePair.first);
             TrimString(keyValuePair.second);
-            
+
             return (!keyValuePair.first.empty() && !keyValuePair.second.empty());
         }
 
@@ -218,14 +218,14 @@ namespace snowcrash {
 
             TwoNewLines(asset);
             out += asset;
-            
+
             size_t level = CodeBlockUtility::codeBlockIndentationLevel(sectionType);
 
             if (node->type == mdp::CodeMarkdownNodeType)
                 level--;  // Deduct one level for a code block
 
             checkPossibleReference(node, pd, report);
-                
+
             if (level) {
                 // WARN: Dangling asset
                 std::stringstream ss;

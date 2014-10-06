@@ -360,16 +360,16 @@ TEST_CASE("Resource followed by a complete action", "[resource_group][regression
     "# Resource [/A]\n"\
     "# POST /B\n"\
     "+ Response 201\n";
-    
+
     ParseResult<ResourceGroup> resourceGroup;
     SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source, ResourceGroupSectionType, resourceGroup);
 
     REQUIRE(resourceGroup.report.error.code == Error::OK);
     REQUIRE(resourceGroup.report.warnings.empty());
-    
+
     REQUIRE(resourceGroup.node.name.empty());
     REQUIRE(resourceGroup.node.description.empty());
-    
+
     REQUIRE(resourceGroup.node.resources.size() == 2);
     REQUIRE(resourceGroup.node.resources[0].name == "Resource");
     REQUIRE(resourceGroup.node.resources[0].uriTemplate == "/A");
@@ -405,13 +405,13 @@ TEST_CASE("Too eager complete action processing", "[resource_group][regression][
     "```\n"\
     "\n"\
     "Lorem Ipsum\n";
-    
+
     ParseResult<ResourceGroup> resourceGroup;
     SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source, ResourceGroupSectionType, resourceGroup);
 
     REQUIRE(resourceGroup.report.error.code == Error::OK);
     REQUIRE(resourceGroup.report.warnings.empty());
-    
+
     REQUIRE(resourceGroup.node.name == "A");
     REQUIRE(resourceGroup.node.description == "```\nGET /A\n```\n\nLorem Ipsum\n");
 

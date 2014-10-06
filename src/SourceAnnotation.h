@@ -14,8 +14,8 @@
 #include "ByteBuffer.h"
 
 namespace snowcrash {
-    
-    
+
+
     /**
      *  \brief  A source data annotation.
      *
@@ -23,30 +23,30 @@ namespace snowcrash {
      *  annotation code and an optional message.
      */
     struct SourceAnnotation {
-        
+
         /**
          *  \brief Default annotation code representing success.
          */
         static const int OK;
-        
+
         /**
          *  \brief  %SourceAnnotation default constructor.
          *
          *  Creates an empty annotation with the default annotation code.
          */
         SourceAnnotation() : code(OK) {}
-        
+
         /**
          *  \brief  %SourceAnnotation copy constructor.
          *  \param  rhs  An annotation to be copied.
          */
         SourceAnnotation(const SourceAnnotation& rhs) {
-            
+
             this->message = rhs.message;
             this->code = rhs.code;
             this->location = rhs.location;
         }
-        
+
         /**
          *  \brief  %SourceAnnotation constructor.
          *  \param  message     An annotation message.
@@ -56,18 +56,18 @@ namespace snowcrash {
         SourceAnnotation(const std::string& message,
                          int code = OK,
                          const mdp::CharactersRangeSet& location = mdp::CharactersRangeSet()) {
-            
+
             this->message = message;
             this->code = code;
-            
+
             this->location.clear();
             if (!location.empty())
                 this->location.assign(location.begin(), location.end());
         }
-        
+
         /** \brief  %SourceAnnotation destructor. */
         ~SourceAnnotation() {}
-        
+
         /**
          *  \brief  %SourceAnnotation assignment operator
          *  \param  rhs  An annotation to be assigned to this annotation.
@@ -78,22 +78,22 @@ namespace snowcrash {
             this->location = rhs.location;
             return *this;
         }
-        
+
         /** The location of this annotation within the source data buffer. */
         mdp::CharactersRangeSet location;
-        
+
         /** An annotation code. */
         int code;
-        
+
         /** A annotation message. */
         std::string message;
     };
-    
+
     /**
      *  Error source annotation.
      */
     typedef SourceAnnotation Error;
-    
+
     /**
      *  Error codes
      */
@@ -103,12 +103,12 @@ namespace snowcrash {
         BusinessError = 2,
         SymbolError = 3
     };
-    
+
     /**
      *  Warning source annotation.
      */
     typedef SourceAnnotation Warning;
-    
+
     /**
      *  Warning codes
      */
@@ -127,12 +127,12 @@ namespace snowcrash {
         AmbiguityWarning = 11,
         URIWarning = 12
     };
-    
+
     /**
      *  A set of warning source annotations.
      */
     typedef std::vector<Warning> Warnings;
-    
+
     /**
      *  \brief A parsing report Report.
      *
@@ -141,7 +141,7 @@ namespace snowcrash {
      *  and a set of warning source annotations.
      */
     struct Report {
-        
+
         /**
          *  \brief Append a report to this one, replacing the error source annotation.
          *
@@ -152,10 +152,10 @@ namespace snowcrash {
             warnings.insert(warnings.end(), rhs.warnings.begin(), rhs.warnings.end());
             return *this;
         }
-        
+
         /** Result error source annotation */
         Error error;
-        
+
         /** Result warning source annotations */
         Warnings warnings;
     };

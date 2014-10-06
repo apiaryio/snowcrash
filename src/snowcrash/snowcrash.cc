@@ -37,15 +37,15 @@ enum SerializationFormat {
 void PrintAnnotation(const std::string& prefix, const snowcrash::SourceAnnotation& annotation)
 {
     std::cerr << prefix;
-    
+
     if (annotation.code != SourceAnnotation::OK) {
         std::cerr << " (" << annotation.code << ") ";
     }
-    
+
     if (!annotation.message.empty()) {
         std::cerr << " " << annotation.message;
     }
-    
+
     if (!annotation.location.empty()) {
         for (mdp::CharactersRangeSet::const_iterator it = annotation.location.begin();
              it != annotation.location.end();
@@ -54,7 +54,7 @@ void PrintAnnotation(const std::string& prefix, const snowcrash::SourceAnnotatio
             std::cerr << it->location << ":" << it->length;
         }
     }
-    
+
     std::cerr << std::endl;
 }
 
@@ -96,15 +96,15 @@ int main(int argc, const char *argv[])
     argumentParser.add("help", 'h', "display this help message");
     argumentParser.add(VersionArgument, 'v', "print Snow Crash version");
     argumentParser.add(ValidateArgument, 'l', "validate input only, do not print AST");
-    
+
     argumentParser.parse_check(argc, argv);
-    
+
     // Check arguments
     if (argumentParser.rest().size() > 1) {
         std::cerr << "one input file expected, got " << argumentParser.rest().size() << std::endl;
         exit(EXIT_FAILURE);
     }
-    
+
     // Version query
     if (argumentParser.exist(VersionArgument)) {
         std::cout << SNOWCRASH_VERSION_STRING << std::endl;
@@ -127,7 +127,7 @@ int main(int argc, const char *argv[])
             std::cerr << "fatal: unable to open input file '" << inputFileName << "'\n";
             exit(EXIT_FAILURE);
         }
-        
+
         inputStream << inputFileStream.rdbuf();
         inputFileStream.close();
     }
@@ -145,7 +145,7 @@ int main(int argc, const char *argv[])
 
     // Output
     if (!argumentParser.exist(ValidateArgument)) {
-        
+
         std::stringstream outputStream;
         std::stringstream sourcemapOutputStream;
 
@@ -157,7 +157,7 @@ int main(int argc, const char *argv[])
             SerializeYAML(blueprint.node, outputStream);
             SerializeSourceMapYAML(blueprint.sourceMap, sourcemapOutputStream);
         }
-        
+
         std::string outputFileName = argumentParser.get<std::string>(OutputArgument);
         std::string sourcemapOutputFileName = argumentParser.get<std::string>(SourcemapArgument);
 
@@ -170,7 +170,7 @@ int main(int argc, const char *argv[])
                 std::cerr << "fatal: unable to write to file '" <<  outputFileName << "'\n";
                 exit(EXIT_FAILURE);
             }
-            
+
             outputFileStream << outputStream.rdbuf();
             outputFileStream.close();
         }
@@ -178,17 +178,17 @@ int main(int argc, const char *argv[])
             // Serialize to stdout
             std::cout << outputStream.rdbuf();
         }
-        
+
         if (!sourcemapOutputFileName.empty()) {
             // Serialize to file
             std::ofstream sourcemapOutputFileStream;
             sourcemapOutputFileStream.open(sourcemapOutputFileName.c_str());
-            
+
             if (!sourcemapOutputFileStream.is_open()) {
                 std::cerr << "fatal: unable to write to file '" << sourcemapOutputFileName << "'\n";
                 exit(EXIT_FAILURE);
             }
-            
+
             sourcemapOutputFileStream << sourcemapOutputStream.rdbuf();
             sourcemapOutputFileStream.close();
         }

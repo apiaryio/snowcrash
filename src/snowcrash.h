@@ -22,12 +22,12 @@
  *  For Snow Crash users, this is the only interface to use.
  *
  *  For binding writers, this is the point to start wrapping.
- *  Refer to https://github.com/apiaryio/snowcrash/wiki/Writing-a-binding 
+ *  Refer to https://github.com/apiaryio/snowcrash/wiki/Writing-a-binding
  *  for details on how to write a Snow Crash binding.
  */
 
 namespace snowcrash {
-    
+
     /**
      *  \brief Parse the source data into a blueprint abstract source tree (AST).
      *

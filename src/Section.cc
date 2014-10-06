@@ -16,26 +16,26 @@ std::string snowcrash::SectionName(const SectionType& section) {
         case ModelSectionType:
         case ModelBodySectionType:
             return "model";
-            
+
         case RequestSectionType:
         case RequestBodySectionType:
             return "request";
-            
+
         case ResponseSectionType:
         case ResponseBodySectionType:
             return "response";
-            
+
         case BodySectionType:
         case DanglingBodySectionType:
             return "message-body";
-            
+
         case SchemaSectionType:
         case DanglingSchemaSectionType:
             return "message-schema";
-            
+
         case HeadersSectionType:
             return "headers";
-            
+
         default:
             return "section";
     }

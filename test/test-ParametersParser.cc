@@ -242,7 +242,7 @@ TEST_CASE("Parentheses in parameter example ", "[parameters][issue][#109]")
 
     ParseResult<Parameters> parameters;
     SectionParserHelper<Parameters, ParametersParser>::parse(source, ParametersSectionType, parameters);
-    
+
     REQUIRE(parameters.report.error.code == Error::OK);
     REQUIRE(parameters.report.warnings.empty());
 
@@ -273,7 +273,7 @@ TEST_CASE("Percentage encoded characters in parameter name ", "[parameters][perc
     ParseResult<Blueprint> blueprint;
     parse(source, 0, blueprint);
 
-    
+
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
 

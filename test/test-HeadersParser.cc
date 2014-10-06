@@ -28,7 +28,7 @@ TEST_CASE("recognize headers signature", "[headers]")
     mdp::MarkdownParser markdownParser;
     mdp::MarkdownNode markdownAST;
     markdownParser.parse(HeadersFixture, markdownAST);
-    
+
     REQUIRE(!markdownAST.children().empty());
     SectionType sectionType = SectionProcessor<Headers>::sectionType(markdownAST.children().begin());
     REQUIRE(sectionType == HeadersSectionType);

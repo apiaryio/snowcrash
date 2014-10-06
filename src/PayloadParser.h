@@ -200,7 +200,7 @@ namespace snowcrash {
 
                 return ++MarkdownNodeIterator(node);
             }
-            
+
             return SectionProcessorBase<Payload>::processUnexpectedNode(node, siblings, pd, sectionType, out);
         }
 
@@ -556,26 +556,26 @@ namespace snowcrash {
                 }
 
                 model = pd.symbolTable.resourceModels.at(symbol);
-                
+
                 out.node.description = model.description;
                 out.node.parameters = model.parameters;
-                
+
                 HeaderIterator modelContentType = std::find_if(model.headers.begin(),
                                                                model.headers.end(),
                                                                std::bind2nd(MatchFirstWith<Header, std::string>(),
                                                                             HTTPHeaderName::ContentType));
-                
+
                 bool isPayloadContentType = !out.node.headers.empty();
                 bool isModelContentType = modelContentType != model.headers.end();
-                
+
                 if (isPayloadContentType && isModelContentType) {
-                    
+
                     // WARN: Ignoring payload content-type, when referencing a model with headers
                     std::stringstream ss;
-                    
+
                     ss << "ignoring additional " << SectionName(pd.sectionContext()) << " header(s), ";
                     ss << "specify this header(s) in the referenced model definition instead";
-                    
+
                     mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
                     out.report.warnings.push_back(Warning(ss.str(),
                                                           IgnoringWarning,
@@ -587,7 +587,7 @@ namespace snowcrash {
                 } else {
                     out.node.headers = model.headers;
                 }
-                
+
                 out.node.body = model.body;
                 out.node.schema = model.schema;
 

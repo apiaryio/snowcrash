@@ -57,7 +57,7 @@ namespace snowcrash {
 
                 cur++;
             }
-            
+
             // Ideally this parsing metadata should be handled by separate parser
             // that way the following check would be covered in SectionParser::parse()
             if (cur == siblings.end())
@@ -172,7 +172,7 @@ namespace snowcrash {
         static void finalize(const MarkdownNodeIterator& node,
                              SectionParserData& pd,
                              ParseResult<Blueprint>& out) {
-            
+
             if (!out.node.name.empty())
                 return;
 
@@ -183,7 +183,7 @@ namespace snowcrash {
                 out.report.error = Error(ExpectedAPINameMessage,
                                          BusinessError,
                                          sourceMap);
-                
+
             }
             else if (!out.node.description.empty()) {
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
@@ -195,7 +195,7 @@ namespace snowcrash {
 
         static bool isUnexpectedNode(const MarkdownNodeIterator& node,
                                      SectionType sectionType) {
-            
+
             // Since Blueprint is currently top-level node any unprocessed node should be reported
             return true;
         }
