@@ -34,16 +34,16 @@ namespace snowcrashconst {
 namespace snowcrash {
     
     // Resource Object Symbol
-    typedef std::pair<SymbolName, ResourceModel> ResourceModelSymbol;
+    typedef std::pair<Identifier, ResourceModel> ResourceModelSymbol;
 
     // Resource Object Symbol source map
-    typedef std::pair<SymbolName, SourceMap<ResourceModel> > ResourceModelSymbolSourceMap;
+    typedef std::pair<Identifier, SourceMap<ResourceModel> > ResourceModelSymbolSourceMap;
 
     // Resource Object Symbol Table
-    typedef std::map<SymbolName, ResourceModel> ResourceModelSymbolTable;
+    typedef std::map<Identifier, ResourceModel> ResourceModelSymbolTable;
     
     // Reesource Object Symbol Table source map
-    typedef std::map<SymbolName, SourceMap<ResourceModel> > ResourceModelSymbolSourceMapTable;
+    typedef std::map<Identifier, SourceMap<ResourceModel> > ResourceModelSymbolSourceMapTable;
 
     struct SymbolTable {
         
@@ -60,7 +60,7 @@ namespace snowcrash {
     // Checks whether given source data represents reference to a symbol returning true if so,
     // false otherwise. If source data is represent reference referred symbol name is filled in.
     inline bool GetSymbolReference(const mdp::ByteBuffer& sourceData,
-                                   SymbolName& referredSymbol) {
+                                   Identifier& referredSymbol) {
         
         CaptureGroups captureGroups;
 
