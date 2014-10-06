@@ -29,7 +29,8 @@ TEST_CASE("recognize explicit body signature", "[asset]")
     markdownParser.parse(BodyAssetFixture, markdownAST);
     
     REQUIRE(!markdownAST.children().empty());
-    REQUIRE(SectionProcessor<Asset>::sectionType(markdownAST.children().begin()) == BodySectionType);
+    SectionType sectionType = SectionProcessor<Asset>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == BodySectionType);
 }
 
 TEST_CASE("recognize body with content on signature", "[asset]")
@@ -43,7 +44,8 @@ TEST_CASE("recognize body with content on signature", "[asset]")
     markdownParser.parse(source, markdownAST);
 
     REQUIRE(!markdownAST.children().empty());
-    REQUIRE(SectionProcessor<Asset>::sectionType(markdownAST.children().begin()) == BodySectionType);
+    SectionType sectionType = SectionProcessor<Asset>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == BodySectionType);
 }
 
 TEST_CASE("recognize schema signature", "[asset]")
@@ -53,29 +55,36 @@ TEST_CASE("recognize schema signature", "[asset]")
     markdownParser.parse(SchemaAssetFixture, markdownAST);
     
     REQUIRE(!markdownAST.children().empty());
-    REQUIRE(SectionProcessor<Asset>::sectionType(markdownAST.children().begin()) == SchemaSectionType);
+    SectionType sectionType = SectionProcessor<Asset>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == SchemaSectionType);
 }
 
 TEST_CASE("parse body asset", "[asset]")
 {
-    Asset asset;
-    Report report;
-    SectionParserHelper<Asset, AssetParser>::parse(BodyAssetFixture, BodySectionType, report, asset);
+    ParseResult<Asset> asset;
+    SectionParserHelper<Asset, AssetParser>::parse(BodyAssetFixture, BodySectionType, asset);
     
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
-    REQUIRE(asset == "Lorem Ipsum\n");
+    REQUIRE(asset.report.error.code == Error::OK);
+    REQUIRE(asset.report.warnings.empty());
+    REQUIRE(asset.node == "Lorem Ipsum\n");
+
+    REQUIRE(asset.sourceMap.sourceMap.size() == 1);
+    REQUIRE(asset.sourceMap.sourceMap[0].location == 12);
+    REQUIRE(asset.sourceMap.sourceMap[0].length == 16);
 }
 
 TEST_CASE("parse schema asset", "[asset]")
 {
-    Asset asset;
-    Report report;
-    SectionParserHelper<Asset, AssetParser>::parse(SchemaAssetFixture, SchemaSectionType, report, asset);
+    ParseResult<Asset> asset;
+    SectionParserHelper<Asset, AssetParser>::parse(SchemaAssetFixture, SchemaSectionType, asset);
     
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
-    REQUIRE(asset == "Dolor Sit Amet\n");
+    REQUIRE(asset.report.error.code == Error::OK);
+    REQUIRE(asset.report.warnings.empty());
+    REQUIRE(asset.node == "Dolor Sit Amet\n");
+
+    REQUIRE(asset.sourceMap.sourceMap.size() == 1);
+    REQUIRE(asset.sourceMap.sourceMap[0].location == 14);
+    REQUIRE(asset.sourceMap.sourceMap[0].length == 19);
 }
 
 TEST_CASE("Foreign block inside", "[asset]")
@@ -85,14 +94,19 @@ TEST_CASE("Foreign block inside", "[asset]")
     "\n"\
     "    Hello World!\n";
     
-    Asset asset;
-    Report report;
-    SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, report, asset);
+    ParseResult<Asset> asset;
+    SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, asset);
     
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
-    REQUIRE(report.warnings[0].code == IndentationWarning);
-    REQUIRE(asset == "Lorem Ipsum\nHello World!\n");
+    REQUIRE(asset.report.error.code == Error::OK);
+    REQUIRE(asset.report.warnings.size() == 1);
+    REQUIRE(asset.report.warnings[0].code == IndentationWarning);
+    REQUIRE(asset.node == "Lorem Ipsum\nHello World!\n");
+
+    REQUIRE(asset.sourceMap.sourceMap.size() == 2);
+    REQUIRE(asset.sourceMap.sourceMap[0].location == 12);
+    REQUIRE(asset.sourceMap.sourceMap[0].length == 17);
+    REQUIRE(asset.sourceMap.sourceMap[1].location == 33);
+    REQUIRE(asset.sourceMap.sourceMap[1].length == 13);
 }
 
 TEST_CASE("Nested list block inside", "[asset]")
@@ -102,14 +116,19 @@ TEST_CASE("Nested list block inside", "[asset]")
     "\n"\
     "    + Hello World!\n";
     
-    Asset asset;
-    Report report;
-    SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, report, asset);
+    ParseResult<Asset> asset;
+    SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, asset);
     
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
-    REQUIRE(report.warnings[0].code == IndentationWarning);
-    REQUIRE(asset == "Lorem Ipsum\n+ Hello World!\n");
+    REQUIRE(asset.report.error.code == Error::OK);
+    REQUIRE(asset.report.warnings.size() == 1);
+    REQUIRE(asset.report.warnings[0].code == IndentationWarning);
+    REQUIRE(asset.node == "Lorem Ipsum\n+ Hello World!\n");
+
+    REQUIRE(asset.sourceMap.sourceMap.size() == 2);
+    REQUIRE(asset.sourceMap.sourceMap[0].location == 12);
+    REQUIRE(asset.sourceMap.sourceMap[0].length == 16);
+    REQUIRE(asset.sourceMap.sourceMap[1].location == 33);
+    REQUIRE(asset.sourceMap.sourceMap[1].length == 15);
 }
 
 TEST_CASE("Multiline signature", "[asset]")
@@ -120,14 +139,21 @@ TEST_CASE("Multiline signature", "[asset]")
     "\n"\
     "        Hello World!\n";
     
-    Asset asset;
-    Report report;
-    SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, report, asset);
+    ParseResult<Asset> asset;
+    SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, asset);
     
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
-    REQUIRE(report.warnings[0].code == IndentationWarning);
-    REQUIRE(asset == "Multiline Signature Content\nHello World!\n");
+    REQUIRE(asset.report.error.code == Error::OK);
+    REQUIRE(asset.report.warnings.size() == 1);
+    REQUIRE(asset.report.warnings[0].code == IndentationWarning);
+    REQUIRE(asset.node == "Multiline Signature Content\nHello World!\n");
+
+    REQUIRE(asset.sourceMap.sourceMap.size() == 3);
+    REQUIRE(asset.sourceMap.sourceMap[0].location == 2);
+    REQUIRE(asset.sourceMap.sourceMap[0].length == 5);
+    REQUIRE(asset.sourceMap.sourceMap[1].location == 9);
+    REQUIRE(asset.sourceMap.sourceMap[1].length == 29);
+    REQUIRE(asset.sourceMap.sourceMap[2].location == 42);
+    REQUIRE(asset.sourceMap.sourceMap[2].length == 17);
 }
 
 TEST_CASE("Multiple blocks", "[asset]")
@@ -141,15 +167,22 @@ TEST_CASE("Multiple blocks", "[asset]")
     "\n"\
     "    Block 3\n";
     
-    Asset asset;
-    Report report;
-    SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, report, asset);
+    ParseResult<Asset> asset;
+    SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, asset);
     
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 2);
-    REQUIRE(report.warnings[0].code == IndentationWarning);
-    REQUIRE(report.warnings[1].code == IndentationWarning);
-    REQUIRE(asset == "Block 1\n\nBlock 2\nBlock 3\n");
+    REQUIRE(asset.report.error.code == Error::OK);
+    REQUIRE(asset.report.warnings.size() == 2);
+    REQUIRE(asset.report.warnings[0].code == IndentationWarning);
+    REQUIRE(asset.report.warnings[1].code == IndentationWarning);
+    REQUIRE(asset.node == "Block 1\n\nBlock 2\nBlock 3\n");
+
+    REQUIRE(asset.sourceMap.sourceMap.size() == 3);
+    REQUIRE(asset.sourceMap.sourceMap[0].location == 12);
+    REQUIRE(asset.sourceMap.sourceMap[0].length == 9);
+    REQUIRE(asset.sourceMap.sourceMap[1].location == 25);
+    REQUIRE(asset.sourceMap.sourceMap[1].length == 13);
+    REQUIRE(asset.sourceMap.sourceMap[2].location == 42);
+    REQUIRE(asset.sourceMap.sourceMap[2].length == 8);
 }
 
 TEST_CASE("Extra spaces before signature", "[asset]")
@@ -159,13 +192,16 @@ TEST_CASE("Extra spaces before signature", "[asset]")
     "\n"\
     "        Lorem Ipsum\n";
     
-    Asset asset;
-    Report report;
-    SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, report, asset);
+    ParseResult<Asset> asset;
+    SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, asset);
     
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
-    REQUIRE(asset == "Lorem Ipsum\n");
+    REQUIRE(asset.report.error.code == Error::OK);
+    REQUIRE(asset.report.warnings.empty());
+    REQUIRE(asset.node == "Lorem Ipsum\n");
+
+    REQUIRE(asset.sourceMap.sourceMap.size() == 1);
+    REQUIRE(asset.sourceMap.sourceMap[0].location == 14);
+    REQUIRE(asset.sourceMap.sourceMap[0].length == 16);
 }
 
 TEST_CASE("Asset parser greediness", "[asset]")
@@ -175,11 +211,14 @@ TEST_CASE("Asset parser greediness", "[asset]")
     "\n"\
     "+ Another Block\n";
     
-    Asset asset;
-    Report report;
-    SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, report, asset);
+    ParseResult<Asset> asset;
+    SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, asset);
     
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
-    REQUIRE(asset == "Lorem Ipsum\n");
+    REQUIRE(asset.report.error.code == Error::OK);
+    REQUIRE(asset.report.warnings.empty());
+    REQUIRE(asset.node == "Lorem Ipsum\n");
+
+    REQUIRE(asset.sourceMap.sourceMap.size() == 1);
+    REQUIRE(asset.sourceMap.sourceMap[0].location == 12);
+    REQUIRE(asset.sourceMap.sourceMap[0].length == 16);
 }

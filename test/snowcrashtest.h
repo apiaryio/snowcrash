@@ -15,24 +15,28 @@
 
 namespace snowcrashtest {
 
-    typedef std::vector<snowcrash::ResourceModelSymbol> Symbols;
+    struct Symbols {
+
+        std::vector<snowcrash::ResourceModelSymbol> models;
+        std::vector<snowcrash::ResourceModelSymbolSourceMap> modelsSM;
+
+    };
 
     template <typename T, typename PARSER>
     struct SectionParserHelper {
 
         static void parse(const mdp::ByteBuffer& source,
                           snowcrash::SectionType type,
-                          snowcrash::Report& report,
-                          T& output,
+                          snowcrash::ParseResult<T>& out,
                           const Symbols& symbols = Symbols(),
                           const snowcrash::BlueprintParserOptions& opts = 0,
-                          snowcrash::Blueprint* bp = NULL) {
+                          snowcrash::ParseResult<snowcrash::Blueprint>* bp = NULL) {
 
             mdp::MarkdownParser markdownParser;
             mdp::MarkdownNode markdownAST;
 
-            snowcrash::Blueprint blueprint;
-            snowcrash::Blueprint* bppointer;
+            snowcrash::ParseResult<snowcrash::Blueprint> blueprint;
+            snowcrash::ParseResult<snowcrash::Blueprint>* bppointer;
 
             markdownParser.parse(source, markdownAST);
 
@@ -44,17 +48,42 @@ namespace snowcrashtest {
                 bppointer = bp;
             }
 
-            snowcrash::SectionParserData pd(opts, source, *bppointer);
+            // Export source maps
+            snowcrash::BlueprintParserOptions options = opts | snowcrash::ExportSourcemapOption;
+
+            snowcrash::SectionParserData pd(options, source, bppointer->node);
 
             pd.sectionsContext.push_back(type);
 
-            pd.symbolTable.resourceModels.insert(symbols.begin(), symbols.end());
+            pd.symbolTable.resourceModels.insert(symbols.models.begin(), symbols.models.end());
+            pd.symbolSourceMapTable.resourceModels.insert(symbols.modelsSM.begin(), symbols.modelsSM.end());
 
             PARSER::parse(markdownAST.children().begin(),
                           markdownAST.children(),
                           pd,
-                          report,
-                          output);
+                          out);
+        }
+    };
+
+    struct SymbolHelper {
+
+        /** Builds a Symbols entry for testing purposes */
+        static void buildSymbol(mdp::ByteBuffer name,
+                                Symbols& symbols) {
+
+            snowcrash::ResourceModel model;
+            snowcrash::SourceMap<snowcrash::ResourceModel> modelSM;
+            mdp::BytesRangeSet sourcemap;
+
+            sourcemap.push_back(mdp::BytesRange(0, 1));
+
+            model.description = "Foo";
+            model.body = "Bar";
+            symbols.models.push_back(snowcrash::ResourceModelSymbol(name, model));
+
+            modelSM.description.sourceMap = sourcemap;
+            modelSM.body.sourceMap = sourcemap;
+            symbols.modelsSM.push_back(snowcrash::ResourceModelSymbolSourceMap(name, modelSM));
         }
     };
 }

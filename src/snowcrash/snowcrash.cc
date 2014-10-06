@@ -21,6 +21,7 @@ using snowcrash::Error;
 static const std::string OutputArgument = "output";
 static const std::string FormatArgument = "format";
 static const std::string RenderArgument = "render";
+static const std::string SourcemapArgument = "sourcemap";
 static const std::string ValidateArgument = "validate";
 static const std::string VersionArgument = "version";
 
@@ -81,13 +82,16 @@ int main(int argc, const char *argv[])
 
     argumentParser.set_program_name("snowcrash");
     std::stringstream ss;
+
     ss << "<input file>\n\n";
     ss << "API Blueprint Parser\n";
     ss << "If called without <input file>, 'snowcrash' will listen on stdin.\n";
+
     argumentParser.footer(ss.str());
 
     argumentParser.add<std::string>(OutputArgument, 'o', "save output AST into file", false);
     argumentParser.add<std::string>(FormatArgument, 'f', "output AST format", false, "yaml", cmdline::oneof<std::string>("yaml", "json"));
+    argumentParser.add<std::string>(SourcemapArgument, 's', "export sourcemap AST into file", false);
     // TODO: argumentParser.add("render", 'r', "render markdown descriptions");
     argumentParser.add("help", 'h', "display this help message");
     argumentParser.add(VersionArgument, 'v', "print Snow Crash version");
@@ -118,6 +122,7 @@ int main(int argc, const char *argv[])
         std::ifstream inputFileStream;
         std::string inputFileName = argumentParser.rest().front();
         inputFileStream.open(inputFileName.c_str());
+
         if (!inputFileStream.is_open()) {
             std::cerr << "fatal: unable to open input file '" << inputFileName << "'\n";
             exit(EXIT_FAILURE);
@@ -127,29 +132,40 @@ int main(int argc, const char *argv[])
         inputFileStream.close();
     }
 
-    // Parse
+    // Initialize
     snowcrash::BlueprintParserOptions options = 0;  // Or snowcrash::RequireBlueprintNameOption
-    snowcrash::Report report;
-    snowcrash::Blueprint blueprint;
-    snowcrash::parse(inputStream.str(), options, report, blueprint);
+    snowcrash::ParseResult<snowcrash::Blueprint> blueprint;
+
+    if (argumentParser.exist(SourcemapArgument)) {
+        options |= snowcrash::ExportSourcemapOption;
+    }
+
+    // Parse
+    snowcrash::parse(inputStream.str(), options, blueprint);
 
     // Output
     if (!argumentParser.exist(ValidateArgument)) {
         
         std::stringstream outputStream;
+        std::stringstream sourcemapOutputStream;
 
         if (argumentParser.get<std::string>(FormatArgument) == "json") {
-            SerializeJSON(blueprint, outputStream);
+            SerializeJSON(blueprint.node, outputStream);
+            SerializeSourceMapJSON(blueprint.sourceMap, sourcemapOutputStream);
         }
         else if (argumentParser.get<std::string>(FormatArgument) == "yaml") {
-            SerializeYAML(blueprint, outputStream);
+            SerializeYAML(blueprint.node, outputStream);
+            SerializeSourceMapYAML(blueprint.sourceMap, sourcemapOutputStream);
         }
         
         std::string outputFileName = argumentParser.get<std::string>(OutputArgument);
+        std::string sourcemapOutputFileName = argumentParser.get<std::string>(SourcemapArgument);
+
         if (!outputFileName.empty()) {
             // Serialize to file
             std::ofstream outputFileStream;
             outputFileStream.open(outputFileName.c_str());
+
             if (!outputFileStream.is_open()) {
                 std::cerr << "fatal: unable to write to file '" <<  outputFileName << "'\n";
                 exit(EXIT_FAILURE);
@@ -162,9 +178,23 @@ int main(int argc, const char *argv[])
             // Serialize to stdout
             std::cout << outputStream.rdbuf();
         }
+        
+        if (!sourcemapOutputFileName.empty()) {
+            // Serialize to file
+            std::ofstream sourcemapOutputFileStream;
+            sourcemapOutputFileStream.open(sourcemapOutputFileName.c_str());
+            
+            if (!sourcemapOutputFileStream.is_open()) {
+                std::cerr << "fatal: unable to write to file '" << sourcemapOutputFileName << "'\n";
+                exit(EXIT_FAILURE);
+            }
+            
+            sourcemapOutputFileStream << sourcemapOutputStream.rdbuf();
+            sourcemapOutputFileStream.close();
+        }
     }
 
     // report
-    PrintReport(report);
-    return report.error.code;
+    PrintReport(blueprint.report);
+    return blueprint.report.error.code;
 }

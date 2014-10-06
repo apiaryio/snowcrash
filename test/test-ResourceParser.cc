@@ -34,48 +34,80 @@ TEST_CASE("Resource block classifier", "[resource]")
 {
     mdp::MarkdownParser markdownParser;
     mdp::MarkdownNode markdownAST;
+    SectionType sectionType;
     markdownParser.parse(ResourceFixture, markdownAST);
 
     REQUIRE(!markdownAST.children().empty());
-    REQUIRE(SectionProcessor<Resource>::sectionType(markdownAST.children().begin()) == ResourceSectionType);
+    sectionType = SectionProcessor<Resource>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == ResourceSectionType);
 
     // Nameless resource: "/resource"
     markdownAST.children().front().text = "/resource";
-    REQUIRE(SectionProcessor<Resource>::sectionType(markdownAST.children().begin()) == ResourceSectionType);
+    sectionType = SectionProcessor<Resource>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == ResourceSectionType);
 
     // Keyword "group"
     markdownAST.children().front().text = "Group A";
-    REQUIRE(SectionProcessor<Resource>::sectionType(markdownAST.children().begin()) == UndefinedSectionType);
+    sectionType = SectionProcessor<Resource>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == UndefinedSectionType);
 
     // Resource Method
     markdownAST.children().front().text = "GET /resource";
-    REQUIRE(SectionProcessor<Resource>::sectionType(markdownAST.children().begin()) == ResourceSectionType);
+    sectionType = SectionProcessor<Resource>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == ResourceSectionType);
 }
 
 TEST_CASE("Parse resource", "[resource]")
 {
-    Resource resource;
-    Report report;
-    SectionParserHelper<Resource, ResourceParser>::parse(ResourceFixture, ResourceSectionType, report, resource);
+    ParseResult<Resource> resource;
+    SectionParserHelper<Resource, ResourceParser>::parse(ResourceFixture, ResourceSectionType, resource);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(resource.report.error.code == Error::OK);
+    REQUIRE(resource.report.warnings.empty());
 
-    REQUIRE(resource.name == "My Resource");
-    REQUIRE(resource.uriTemplate == "/resource/{id}{?limit}");
-    REQUIRE(resource.description == "Awesome description\n\n");
-    REQUIRE(resource.headers.empty());
+    REQUIRE(resource.node.name == "My Resource");
+    REQUIRE(resource.node.uriTemplate == "/resource/{id}{?limit}");
+    REQUIRE(resource.node.description == "Awesome description\n\n");
+    REQUIRE(resource.node.headers.empty());
 
-    REQUIRE(resource.model.name == "Resource");
-    REQUIRE(resource.model.body == "X.O.\n");
+    REQUIRE(resource.node.model.name == "Resource");
+    REQUIRE(resource.node.model.body == "X.O.\n");
 
-    REQUIRE(resource.parameters.size() == 2);
-    REQUIRE(resource.parameters[0].name == "id");
-    REQUIRE(resource.parameters[0].description == "Lorem ipsum\n");
-    REQUIRE(resource.parameters[1].name == "limit");
+    REQUIRE(resource.node.parameters.size() == 2);
+    REQUIRE(resource.node.parameters[0].name == "id");
+    REQUIRE(resource.node.parameters[0].description == "Lorem ipsum\n");
+    REQUIRE(resource.node.parameters[1].name == "limit");
 
-    REQUIRE(resource.actions.size() == 1);
-    REQUIRE(resource.actions.front().method == "GET");
+    REQUIRE(resource.node.actions.size() == 1);
+    REQUIRE(resource.node.actions.front().method == "GET");
+
+    REQUIRE(resource.sourceMap.name.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.name.sourceMap[0].location == 0);
+    REQUIRE(resource.sourceMap.name.sourceMap[0].length == 40);
+    REQUIRE(resource.sourceMap.description.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.description.sourceMap[0].location == 40);
+    REQUIRE(resource.sourceMap.description.sourceMap[0].length == 21);
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].location == 0);
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].length == 40);
+    REQUIRE(resource.sourceMap.headers.collection.size() == 0);
+    REQUIRE(resource.sourceMap.parameters.collection.size() == 2);
+    REQUIRE(resource.sourceMap.parameters.collection[0].name.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.parameters.collection[0].name.sourceMap[0].location == 125);
+    REQUIRE(resource.sourceMap.parameters.collection[0].name.sourceMap[0].length == 40);
+    REQUIRE(resource.sourceMap.parameters.collection[1].name.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.parameters.collection[1].name.sourceMap[0].location == 271);
+    REQUIRE(resource.sourceMap.parameters.collection[1].name.sourceMap[0].length == 6);
+    REQUIRE(resource.sourceMap.model.name.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.model.name.sourceMap[0].location == 63);
+    REQUIRE(resource.sourceMap.model.name.sourceMap[0].length == 29);
+    REQUIRE(resource.sourceMap.model.body.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.model.body.sourceMap[0].location == 96);
+    REQUIRE(resource.sourceMap.model.body.sourceMap[0].length == 9);
+    REQUIRE(resource.sourceMap.actions.collection.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].method.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].method.sourceMap[0].location == 278);
+    REQUIRE(resource.sourceMap.actions.collection[0].method.sourceMap[0].length == 20);
 }
 
 TEST_CASE("Parse partially defined resource", "[resource]")
@@ -86,28 +118,37 @@ TEST_CASE("Parse partially defined resource", "[resource]")
     "+ Request\n"\
     "p1\n";
 
-    Resource resource;
-    Report report;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+    ParseResult<Resource> resource;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 2); // no response & preformatted asset
-    REQUIRE(report.warnings[0].code == IndentationWarning);
-    REQUIRE(report.warnings[1].code == EmptyDefinitionWarning);
+    REQUIRE(resource.report.error.code == Error::OK);
+    REQUIRE(resource.report.warnings.size() == 2); // no response & preformatted asset
+    REQUIRE(resource.report.warnings[0].code == IndentationWarning);
+    REQUIRE(resource.report.warnings[1].code == EmptyDefinitionWarning);
 
-    REQUIRE(resource.name.empty());
-    REQUIRE(resource.uriTemplate == "/1");
-    REQUIRE(resource.description.empty());
-    REQUIRE(resource.model.name.empty());
-    REQUIRE(resource.model.body.empty());
-    REQUIRE(resource.actions.size() == 1);
-    REQUIRE(resource.actions.front().method == "GET");
-    REQUIRE(resource.actions.front().description.empty());
-    REQUIRE(!resource.actions.front().examples.empty());
-    REQUIRE(resource.actions.front().examples.front().requests.size() == 1);
-    REQUIRE(resource.actions.front().examples.front().requests.front().name.empty());
-    REQUIRE(resource.actions.front().examples.front().requests.front().description.empty());
-    REQUIRE(resource.actions.front().examples.front().requests.front().body == "p1\n\n");
+    REQUIRE(resource.node.name.empty());
+    REQUIRE(resource.node.uriTemplate == "/1");
+    REQUIRE(resource.node.description.empty());
+    REQUIRE(resource.node.model.name.empty());
+    REQUIRE(resource.node.model.body.empty());
+    REQUIRE(resource.node.actions.size() == 1);
+    REQUIRE(resource.node.actions.front().method == "GET");
+    REQUIRE(resource.node.actions.front().description.empty());
+    REQUIRE(!resource.node.actions.front().examples.empty());
+    REQUIRE(resource.node.actions.front().examples.front().requests.size() == 1);
+    REQUIRE(resource.node.actions.front().examples.front().requests.front().name.empty());
+    REQUIRE(resource.node.actions.front().examples.front().requests.front().description.empty());
+    REQUIRE(resource.node.actions.front().examples.front().requests.front().body == "p1\n\n");
+
+    REQUIRE(resource.sourceMap.name.sourceMap.empty());
+    REQUIRE(resource.sourceMap.description.sourceMap.empty());
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].location == 0);
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].length == 5);
+    REQUIRE(resource.sourceMap.actions.collection.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].method.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].method.sourceMap[0].location == 5);
+    REQUIRE(resource.sourceMap.actions.collection[0].method.sourceMap[0].length == 7);
 }
 
 TEST_CASE("Parse multiple method descriptions", "[resource]")
@@ -119,22 +160,34 @@ TEST_CASE("Parse multiple method descriptions", "[resource]")
     "# POST\n"\
     "p2\n";
 
-    Resource resource;
-    Report report;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+    ParseResult<Resource> resource;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 2); // 2x no response
+    REQUIRE(resource.report.error.code == Error::OK);
+    REQUIRE(resource.report.warnings.size() == 2); // 2x no response
 
-    REQUIRE(resource.uriTemplate == "/1");
-    REQUIRE(resource.description.empty());
-    REQUIRE(resource.model.name.empty());
-    REQUIRE(resource.model.body.empty());
-    REQUIRE(resource.actions.size() == 2);
-    REQUIRE(resource.actions[0].method == "GET");
-    REQUIRE(resource.actions[0].description == "p1\n");
-    REQUIRE(resource.actions[1].method == "POST");
-    REQUIRE(resource.actions[1].description == "p2\n");
+    REQUIRE(resource.node.uriTemplate == "/1");
+    REQUIRE(resource.node.description.empty());
+    REQUIRE(resource.node.model.name.empty());
+    REQUIRE(resource.node.model.body.empty());
+    REQUIRE(resource.node.actions.size() == 2);
+    REQUIRE(resource.node.actions[0].method == "GET");
+    REQUIRE(resource.node.actions[0].description == "p1\n");
+    REQUIRE(resource.node.actions[1].method == "POST");
+    REQUIRE(resource.node.actions[1].description == "p2\n");
+
+    REQUIRE(resource.sourceMap.name.sourceMap.empty());
+    REQUIRE(resource.sourceMap.description.sourceMap.empty());
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].location == 0);
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].length == 5);
+    REQUIRE(resource.sourceMap.actions.collection.size() == 2);
+    REQUIRE(resource.sourceMap.actions.collection[0].method.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].method.sourceMap[0].location == 5);
+    REQUIRE(resource.sourceMap.actions.collection[0].method.sourceMap[0].length == 6);
+    REQUIRE(resource.sourceMap.actions.collection[1].method.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[1].method.sourceMap[0].location == 14);
+    REQUIRE(resource.sourceMap.actions.collection[1].method.sourceMap[0].length == 7);
 }
 
 TEST_CASE("Parse multiple methods", "[resource]")
@@ -156,43 +209,57 @@ TEST_CASE("Parse multiple methods", "[resource]")
     "## PUT\n"\
     "E\n";
 
-    Resource resource;
-    Report report;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+    ParseResult<Resource> resource;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 2); // empty reuqest asset & no response
+    REQUIRE(resource.report.error.code == Error::OK);
+    REQUIRE(resource.report.warnings.size() == 2); // empty reuqest asset & no response
 
-    REQUIRE(resource.uriTemplate == "/1");
-    REQUIRE(resource.description == "A\n");
-    REQUIRE(resource.model.name.empty());
-    REQUIRE(resource.model.body.empty());
-    REQUIRE(resource.actions.size() == 3);
+    REQUIRE(resource.node.uriTemplate == "/1");
+    REQUIRE(resource.node.description == "A\n");
+    REQUIRE(resource.node.model.name.empty());
+    REQUIRE(resource.node.model.body.empty());
+    REQUIRE(resource.node.actions.size() == 3);
 
-    REQUIRE(resource.actions[0].method == "GET");
-    REQUIRE(resource.actions[0].description == "B\n");
-    REQUIRE(resource.actions[0].examples.size() == 1);
-    REQUIRE(resource.actions[0].examples[0].requests.empty());
-    REQUIRE(resource.actions[0].examples[0].responses.size() == 1);
-    REQUIRE(resource.actions[0].examples[0].responses[0].name == "200");
-    REQUIRE(resource.actions[0].examples[0].responses[0].description.empty());
-    REQUIRE(resource.actions[0].examples[0].responses[0].body == "Code 1\n");
+    REQUIRE(resource.node.actions[0].method == "GET");
+    REQUIRE(resource.node.actions[0].description == "B\n");
+    REQUIRE(resource.node.actions[0].examples.size() == 1);
+    REQUIRE(resource.node.actions[0].examples[0].requests.empty());
+    REQUIRE(resource.node.actions[0].examples[0].responses.size() == 1);
+    REQUIRE(resource.node.actions[0].examples[0].responses[0].name == "200");
+    REQUIRE(resource.node.actions[0].examples[0].responses[0].description.empty());
+    REQUIRE(resource.node.actions[0].examples[0].responses[0].body == "Code 1\n");
 
-    REQUIRE(resource.actions[1].method == "POST");
-    REQUIRE(resource.actions[1].description == "C\n");
-    REQUIRE(resource.actions[1].examples.size() == 1);
-    REQUIRE(resource.actions[1].examples[0].requests.size() == 1);
-    REQUIRE(resource.actions[1].examples[0].requests[0].name == "D");
-    REQUIRE(resource.actions[1].examples[0].requests[0].description.empty());
-    REQUIRE(resource.actions[1].examples[0].requests[0].description.empty());
-    REQUIRE(resource.actions[1].examples[0].responses.size() == 1);
-    REQUIRE(resource.actions[1].examples[0].responses[0].name == "200");
-    REQUIRE(resource.actions[1].examples[0].responses[0].description.empty());
-    REQUIRE(resource.actions[1].examples[0].responses[0].body == "{}\n");
+    REQUIRE(resource.node.actions[1].method == "POST");
+    REQUIRE(resource.node.actions[1].description == "C\n");
+    REQUIRE(resource.node.actions[1].examples.size() == 1);
+    REQUIRE(resource.node.actions[1].examples[0].requests.size() == 1);
+    REQUIRE(resource.node.actions[1].examples[0].requests[0].name == "D");
+    REQUIRE(resource.node.actions[1].examples[0].requests[0].description.empty());
+    REQUIRE(resource.node.actions[1].examples[0].requests[0].description.empty());
+    REQUIRE(resource.node.actions[1].examples[0].responses.size() == 1);
+    REQUIRE(resource.node.actions[1].examples[0].responses[0].name == "200");
+    REQUIRE(resource.node.actions[1].examples[0].responses[0].description.empty());
+    REQUIRE(resource.node.actions[1].examples[0].responses[0].body == "{}\n");
 
-    REQUIRE(resource.actions[2].method == "PUT");
-    REQUIRE(resource.actions[2].description == "E\n");
-    REQUIRE(resource.actions[2].examples.empty());
+    REQUIRE(resource.node.actions[2].method == "PUT");
+    REQUIRE(resource.node.actions[2].description == "E\n");
+    REQUIRE(resource.node.actions[2].examples.empty());
+
+    REQUIRE(resource.sourceMap.name.sourceMap.empty());
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].location == 0);
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].length == 5);
+    REQUIRE(resource.sourceMap.actions.collection.size() == 3);
+    REQUIRE(resource.sourceMap.actions.collection[0].method.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].method.sourceMap[0].location == 7);
+    REQUIRE(resource.sourceMap.actions.collection[0].method.sourceMap[0].length == 7);
+    REQUIRE(resource.sourceMap.actions.collection[1].method.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[1].method.sourceMap[0].location == 63);
+    REQUIRE(resource.sourceMap.actions.collection[1].method.sourceMap[0].length == 8);
+    REQUIRE(resource.sourceMap.actions.collection[2].method.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[2].method.sourceMap[0].location == 128);
+    REQUIRE(resource.sourceMap.actions.collection[2].method.sourceMap[0].length == 7);
 }
 
 TEST_CASE("Parse description with list", "[resource]")
@@ -203,18 +270,26 @@ TEST_CASE("Parse description with list", "[resource]")
     "+ B\n\n"\
     "p1\n";
 
-    Resource resource;
-    Report report;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+    ParseResult<Resource> resource;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(resource.report.error.code == Error::OK);
+    REQUIRE(resource.report.warnings.empty());
 
-    REQUIRE(resource.uriTemplate == "/1");
-    REQUIRE(resource.description == "+ A\n\n+ B\n\np1\n");
-    REQUIRE(resource.model.name.empty());
-    REQUIRE(resource.model.body.empty());
-    REQUIRE(resource.actions.empty());
+    REQUIRE(resource.node.uriTemplate == "/1");
+    REQUIRE(resource.node.description == "+ A\n\n+ B\n\np1\n");
+    REQUIRE(resource.node.model.name.empty());
+    REQUIRE(resource.node.model.body.empty());
+    REQUIRE(resource.node.actions.empty());
+
+    REQUIRE(resource.sourceMap.name.sourceMap.empty());
+    REQUIRE(resource.sourceMap.description.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.description.sourceMap[0].location == 5);
+    REQUIRE(resource.sourceMap.description.sourceMap[0].length == 12);
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].location == 0);
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].length == 5);
+    REQUIRE(resource.sourceMap.actions.collection.empty());
 }
 
 TEST_CASE("Parse resource with a HR", "[resource][block]")
@@ -225,18 +300,26 @@ TEST_CASE("Parse resource with a HR", "[resource][block]")
     "---\n"\
     "B\n";
 
-    Resource resource;
-    Report report;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+    ParseResult<Resource> resource;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(resource.report.error.code == Error::OK);
+    REQUIRE(resource.report.warnings.empty());
 
-    REQUIRE(resource.uriTemplate == "/1");
-    REQUIRE(resource.description == "A\n---\n\nB\n");
-    REQUIRE(resource.model.name.empty());
-    REQUIRE(resource.model.body.empty());
-    REQUIRE(resource.actions.empty());
+    REQUIRE(resource.node.uriTemplate == "/1");
+    REQUIRE(resource.node.description == "A\n---\n\nB\n");
+    REQUIRE(resource.node.model.name.empty());
+    REQUIRE(resource.node.model.body.empty());
+    REQUIRE(resource.node.actions.empty());
+
+    REQUIRE(resource.sourceMap.name.sourceMap.empty());
+    REQUIRE(resource.sourceMap.description.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.description.sourceMap[0].location == 5);
+    REQUIRE(resource.sourceMap.description.sourceMap[0].length == 8);
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].location == 0);
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].length == 5);
+    REQUIRE(resource.sourceMap.actions.collection.empty());
 }
 
 TEST_CASE("Parse resource method abbreviation", "[resource]")
@@ -248,40 +331,55 @@ TEST_CASE("Parse resource method abbreviation", "[resource]")
     "    + Body\n\n"\
     "            {}\n";
 
-    Resource resource;
-    Report report;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+    ParseResult<Resource> resource;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(resource.report.error.code == Error::OK);
+    REQUIRE(resource.report.warnings.empty());
 
-    REQUIRE(resource.name.empty());
-    REQUIRE(resource.uriTemplate == "/resource");
-    REQUIRE(resource.actions.size() == 1);
-    REQUIRE(resource.actions[0].method == "GET");
-    REQUIRE(resource.actions[0].description == "Description\n");
+    REQUIRE(resource.node.name.empty());
+    REQUIRE(resource.node.uriTemplate == "/resource");
+    REQUIRE(resource.node.actions.size() == 1);
+    REQUIRE(resource.node.actions[0].method == "GET");
+    REQUIRE(resource.node.actions[0].description == "Description\n");
 
-    REQUIRE(resource.actions[0].examples[0].responses.size() == 1);
-    REQUIRE(resource.actions[0].examples[0].responses[0].description.empty());
-    REQUIRE(resource.actions[0].examples[0].responses[0].body == "{}\n");
+    REQUIRE(resource.node.actions[0].examples[0].responses.size() == 1);
+    REQUIRE(resource.node.actions[0].examples[0].responses[0].description.empty());
+    REQUIRE(resource.node.actions[0].examples[0].responses[0].body == "{}\n");
+
+    REQUIRE(resource.sourceMap.name.sourceMap.empty());
+    REQUIRE(resource.sourceMap.description.sourceMap.empty());
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].location == 0);
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].length == 16);
+    REQUIRE(resource.sourceMap.actions.collection.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].method.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].method.sourceMap[0].location == 0);
+    REQUIRE(resource.sourceMap.actions.collection[0].method.sourceMap[0].length == 16);
 }
 
 TEST_CASE("Parse resource without name", "[resource]")
 {
     mdp::ByteBuffer source = "# /resource\n";
 
-    Resource resource;
-    Report report;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+    ParseResult<Resource> resource;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(resource.report.error.code == Error::OK);
+    REQUIRE(resource.report.warnings.empty());
 
-    REQUIRE(resource.uriTemplate == "/resource");
-    REQUIRE(resource.name.empty());
-    REQUIRE(resource.model.name.empty());
-    REQUIRE(resource.model.body.empty());
-    REQUIRE(resource.actions.size() == 0);
+    REQUIRE(resource.node.uriTemplate == "/resource");
+    REQUIRE(resource.node.name.empty());
+    REQUIRE(resource.node.model.name.empty());
+    REQUIRE(resource.node.model.body.empty());
+    REQUIRE(resource.node.actions.size() == 0);
+
+    REQUIRE(resource.sourceMap.name.sourceMap.empty());
+    REQUIRE(resource.sourceMap.description.sourceMap.empty());
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].location == 0);
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].length == 12);
+    REQUIRE(resource.sourceMap.actions.collection.empty());
 }
 
 TEST_CASE("Warn about parameters not in URI template", "[resource][source]")
@@ -296,20 +394,27 @@ TEST_CASE("Warn about parameters not in URI template", "[resource][source]")
     "    + id\n\n"\
     "+ Response 204\n\n";
 
-    Resource resource;
-    Report report;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+    ParseResult<Resource> resource;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 2);
-    REQUIRE(report.warnings[0].code == LogicalErrorWarning);
-    REQUIRE(report.warnings[1].code == LogicalErrorWarning);
+    REQUIRE(resource.report.error.code == Error::OK);
+    REQUIRE(resource.report.warnings.size() == 2);
+    REQUIRE(resource.report.warnings[0].code == LogicalErrorWarning);
+    REQUIRE(resource.report.warnings[1].code == LogicalErrorWarning);
 
-    REQUIRE(resource.parameters.size() == 1);
-    REQUIRE(resource.parameters[0].name == "olive");
-    REQUIRE(resource.actions.size() == 1);
-    REQUIRE(resource.actions[0].examples.size() == 1);
-    REQUIRE(resource.actions[0].examples[0].responses.size() == 1);
+    REQUIRE(resource.node.parameters.size() == 1);
+    REQUIRE(resource.node.parameters[0].name == "olive");
+    REQUIRE(resource.node.actions.size() == 1);
+    REQUIRE(resource.node.actions[0].examples.size() == 1);
+    REQUIRE(resource.node.actions[0].examples[0].responses.size() == 1);
+
+    REQUIRE(resource.sourceMap.name.sourceMap.empty());
+    REQUIRE(resource.sourceMap.description.sourceMap.empty());
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].location == 0);
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].length == 17);
+    REQUIRE(resource.sourceMap.parameters.collection.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection.size() == 1);
 }
 
 TEST_CASE("Parse nameless resource with named model", "[resource][model][source]")
@@ -321,16 +426,26 @@ TEST_CASE("Parse nameless resource with named model", "[resource][model][source]
     "        AAA\n"\
     "\n";
 
-    Resource resource;
-    Report report;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+    ParseResult<Resource> resource;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(resource.report.error.code == Error::OK);
+    REQUIRE(resource.report.warnings.empty());
 
-    REQUIRE(resource.model.name == "Super");
-    REQUIRE(resource.model.body == "AAA\n");
-    REQUIRE(resource.actions.empty());
+    REQUIRE(resource.node.model.name == "Super");
+    REQUIRE(resource.node.model.body == "AAA\n");
+    REQUIRE(resource.node.actions.empty());
+
+    REQUIRE(resource.sourceMap.name.sourceMap.empty());
+    REQUIRE(resource.sourceMap.description.sourceMap.empty());
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].location == 0);
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].length == 11);
+    REQUIRE(resource.sourceMap.model.name.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.model.name.sourceMap[0].location == 13);
+    REQUIRE(resource.sourceMap.model.name.sourceMap[0].length == 13);
+    REQUIRE(resource.sourceMap.parameters.collection.empty());
+    REQUIRE(resource.sourceMap.actions.collection.empty());
 }
 
 TEST_CASE("Parse nameless resource with nameless model", "[resource][model][source]")
@@ -342,14 +457,22 @@ TEST_CASE("Parse nameless resource with nameless model", "[resource][model][sour
     "        AAA\n"\
     "\n";
 
-    Resource resource;
-    Report report;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+    ParseResult<Resource> resource;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource);
 
-    REQUIRE(report.error.code == SymbolError);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(resource.report.error.code == SymbolError);
+    REQUIRE(resource.report.warnings.empty());
 
-    REQUIRE(resource.model.name.empty());
+    REQUIRE(resource.node.model.name.empty());
+
+    REQUIRE(resource.sourceMap.name.sourceMap.empty());
+    REQUIRE(resource.sourceMap.description.sourceMap.empty());
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].location == 0);
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].length == 11);
+    REQUIRE(resource.sourceMap.model.name.sourceMap.empty());
+    REQUIRE(resource.sourceMap.parameters.collection.empty());
+    REQUIRE(resource.sourceMap.actions.collection.empty());
 }
 
 TEST_CASE("Parse named resource with nameless model", "[resource][model][source]")
@@ -363,22 +486,34 @@ TEST_CASE("Parse named resource with nameless model", "[resource][model][source]
     "+ Response 200\n\n"\
     "    [Message][]\n\n";
 
-    Resource resource;
-    Report report;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+    ParseResult<Resource> resource;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(resource.report.error.code == Error::OK);
+    REQUIRE(resource.report.warnings.empty());
 
-    REQUIRE(resource.model.name == "Message");
-    REQUIRE(resource.model.body == "AAA\n");
-    REQUIRE(resource.actions.size() == 1);
-    REQUIRE(resource.actions[0].name == "Retrieve a message");
-    REQUIRE(resource.actions[0].method == "GET");
-    REQUIRE(resource.actions[0].examples.size() == 1);
-    REQUIRE(resource.actions[0].examples[0].responses.size() == 1);
-    REQUIRE(resource.actions[0].examples[0].responses[0].name == "200");
-    REQUIRE(resource.actions[0].examples[0].responses[0].body == "AAA\n");
+    REQUIRE(resource.node.model.name == "Message");
+    REQUIRE(resource.node.model.body == "AAA\n");
+    REQUIRE(resource.node.actions.size() == 1);
+    REQUIRE(resource.node.actions[0].name == "Retrieve a message");
+    REQUIRE(resource.node.actions[0].method == "GET");
+    REQUIRE(resource.node.actions[0].examples.size() == 1);
+    REQUIRE(resource.node.actions[0].examples[0].responses.size() == 1);
+    REQUIRE(resource.node.actions[0].examples[0].responses[0].name == "200");
+    REQUIRE(resource.node.actions[0].examples[0].responses[0].body == "AAA\n");
+
+    REQUIRE(resource.sourceMap.name.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.name.sourceMap[0].location == 0);
+    REQUIRE(resource.sourceMap.name.sourceMap[0].length == 21);
+    REQUIRE(resource.sourceMap.description.sourceMap.empty());
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].location == 0);
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].length == 21);
+    REQUIRE(resource.sourceMap.parameters.collection.empty());
+    REQUIRE(resource.sourceMap.actions.collection.size() == 1);
+    REQUIRE(resource.sourceMap.model.name.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.model.name.sourceMap[0].location == 0);
+    REQUIRE(resource.sourceMap.model.name.sourceMap[0].length == 21);
 }
 
 TEST_CASE("Parse model with unrecognised resource", "[resource][model]")
@@ -394,24 +529,23 @@ TEST_CASE("Parse model with unrecognised resource", "[resource][model]")
     "    + Body\n\n"\
     "            [Resource][]";
 
-    Resource resource;
-    Report report;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+    ParseResult<Resource> resource;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
-    REQUIRE(report.warnings[0].code == IgnoringWarning);
+    REQUIRE(resource.report.error.code == Error::OK);
+    REQUIRE(resource.report.warnings.size() == 1);
+    REQUIRE(resource.report.warnings[0].code == IgnoringWarning);
 
-    REQUIRE(resource.model.name == "Resource");
-    REQUIRE(resource.model.body == "AAA\n");
-    REQUIRE(resource.actions.size() == 1);
-    REQUIRE(resource.actions[0].name == "Retrieve a resource");
-    REQUIRE(resource.actions[0].method == "GET");
-    REQUIRE(resource.actions[0].examples.size() == 1);
-    REQUIRE(resource.actions[0].examples[0].responses.size() == 1);
-    REQUIRE(resource.actions[0].examples[0].responses[0].name == "200");
-    REQUIRE(resource.actions[0].examples[0].responses[0].body == "[Resource][]\n");
-    REQUIRE(resource.actions[0].examples[0].responses[0].description == "");
+    REQUIRE(resource.node.model.name == "Resource");
+    REQUIRE(resource.node.model.body == "AAA\n");
+    REQUIRE(resource.node.actions.size() == 1);
+    REQUIRE(resource.node.actions[0].name == "Retrieve a resource");
+    REQUIRE(resource.node.actions[0].method == "GET");
+    REQUIRE(resource.node.actions[0].examples.size() == 1);
+    REQUIRE(resource.node.actions[0].examples[0].responses.size() == 1);
+    REQUIRE(resource.node.actions[0].examples[0].responses[0].name == "200");
+    REQUIRE(resource.node.actions[0].examples[0].responses[0].body == "[Resource][]\n");
+    REQUIRE(resource.node.actions[0].examples[0].responses[0].description == "");
 }
 
 TEST_CASE("Parse named resource with nameless model but reference a non-existing model", "[resource]")
@@ -425,45 +559,62 @@ TEST_CASE("Parse named resource with nameless model but reference a non-existing
     "+ Response 200\n\n"\
     "    [Post][]\n";
 
-    Resource resource;
-    Report report;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+    ParseResult<Resource> resource;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource);
 
-    REQUIRE(report.error.code == SymbolError);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(resource.report.error.code == SymbolError);
+    REQUIRE(resource.report.warnings.empty());
 }
 
 TEST_CASE("Parse root resource", "[resource]")
 {
     mdp::ByteBuffer source = "# API Root [/]\n";
 
-    Resource resource;
-    Report report;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+    ParseResult<Resource> resource;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(resource.report.error.code == Error::OK);
+    REQUIRE(resource.report.warnings.empty());
 
-    REQUIRE(resource.name == "API Root");
-    REQUIRE(resource.uriTemplate == "/");
-    REQUIRE(resource.actions.empty());
+    REQUIRE(resource.node.name == "API Root");
+    REQUIRE(resource.node.uriTemplate == "/");
+    REQUIRE(resource.node.actions.empty());
+
+    REQUIRE(resource.sourceMap.name.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.name.sourceMap[0].location == 0);
+    REQUIRE(resource.sourceMap.name.sourceMap[0].length == 15);
+    REQUIRE(resource.sourceMap.description.sourceMap.empty());
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].location == 0);
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].length == 15);
+    REQUIRE(resource.sourceMap.parameters.collection.empty());
+    REQUIRE(resource.sourceMap.actions.collection.empty());
 }
 
 TEST_CASE("Parse resource with invalid URI Tempalte", "[resource]")
 {
     mdp::ByteBuffer source = "# Resource [/id{? limit}]\n";
     
-    Resource resource;
-    Report report;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+    ParseResult<Resource> resource;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource);
     
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
-    REQUIRE(report.warnings[0].code == URIWarning);
+    REQUIRE(resource.report.error.code == Error::OK);
+    REQUIRE(resource.report.warnings.size() == 1);
+    REQUIRE(resource.report.warnings[0].code == URIWarning);
     
-    REQUIRE(resource.name == "Resource");
-    REQUIRE(resource.uriTemplate == "/id{? limit}");
-    REQUIRE(resource.actions.empty());
+    REQUIRE(resource.node.name == "Resource");
+    REQUIRE(resource.node.uriTemplate == "/id{? limit}");
+    REQUIRE(resource.node.actions.empty());
+
+    REQUIRE(resource.sourceMap.name.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.name.sourceMap[0].location == 0);
+    REQUIRE(resource.sourceMap.name.sourceMap[0].length == 26);
+    REQUIRE(resource.sourceMap.description.sourceMap.empty());
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].location == 0);
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].length == 26);
+    REQUIRE(resource.sourceMap.parameters.collection.empty());
+    REQUIRE(resource.sourceMap.actions.collection.empty());
 }
 
 TEST_CASE("Deprecated resource and action headers", "[resource]")
@@ -479,30 +630,51 @@ TEST_CASE("Deprecated resource and action headers", "[resource]")
     "    + Headers\n\n"\
     "            header3: value3\n\n";
 
-    Resource resource;
-    Report report;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+    ParseResult<Resource> resource;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 2);
-    REQUIRE(report.warnings[0].code == DeprecatedWarning);
-    REQUIRE(report.warnings[1].code == DeprecatedWarning);
+    REQUIRE(resource.report.error.code == Error::OK);
+    REQUIRE(resource.report.warnings.size() == 2);
+    REQUIRE(resource.report.warnings[0].code == DeprecatedWarning);
+    REQUIRE(resource.report.warnings[1].code == DeprecatedWarning);
 
-    REQUIRE(resource.headers.empty());
-    REQUIRE(resource.actions.size() == 1);
-    REQUIRE(resource.actions[0].headers.empty());
-    REQUIRE(resource.actions[0].examples.size() == 1);
-    REQUIRE(resource.actions[0].examples[0].responses.size() == 1);
-    REQUIRE(resource.actions[0].examples[0].responses[0].headers.size() == 3);
-    REQUIRE(resource.actions[0].examples[0].responses[0].headers[0].first == "header1");
-    REQUIRE(resource.actions[0].examples[0].responses[0].headers[0].second == "value1");
-    REQUIRE(resource.actions[0].examples[0].responses[0].headers[1].first == "header2");
-    REQUIRE(resource.actions[0].examples[0].responses[0].headers[1].second == "value2");
-    REQUIRE(resource.actions[0].examples[0].responses[0].headers[2].first == "header3");
-    REQUIRE(resource.actions[0].examples[0].responses[0].headers[2].second == "value3");
+    REQUIRE(resource.node.headers.empty());
+    REQUIRE(resource.node.actions.size() == 1);
+    REQUIRE(resource.node.actions[0].headers.empty());
+    REQUIRE(resource.node.actions[0].examples.size() == 1);
+    REQUIRE(resource.node.actions[0].examples[0].responses.size() == 1);
+    REQUIRE(resource.node.actions[0].examples[0].responses[0].headers.size() == 3);
+    REQUIRE(resource.node.actions[0].examples[0].responses[0].headers[0].first == "header1");
+    REQUIRE(resource.node.actions[0].examples[0].responses[0].headers[0].second == "value1");
+    REQUIRE(resource.node.actions[0].examples[0].responses[0].headers[1].first == "header2");
+    REQUIRE(resource.node.actions[0].examples[0].responses[0].headers[1].second == "value2");
+    REQUIRE(resource.node.actions[0].examples[0].responses[0].headers[2].first == "header3");
+    REQUIRE(resource.node.actions[0].examples[0].responses[0].headers[2].second == "value3");
+
+    REQUIRE(resource.sourceMap.name.sourceMap.empty());
+    REQUIRE(resource.sourceMap.description.sourceMap.empty());
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].location == 0);
+    REQUIRE(resource.sourceMap.uriTemplate.sourceMap[0].length == 4);
+    REQUIRE(resource.sourceMap.parameters.collection.empty());
+    REQUIRE(resource.sourceMap.headers.collection.empty());
+    REQUIRE(resource.sourceMap.actions.collection.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].headers.collection.empty());
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].responses.collection.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].responses.collection[0].headers.collection.size() == 3);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[0].sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[0].sourceMap[0].location == 19);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[0].sourceMap[0].length == 20);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[1].sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[1].sourceMap[0].location == 62);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[1].sourceMap[0].length == 20);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[2].sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[2].sourceMap[0].location == 121);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[2].sourceMap[0].length == 20);
 }
 
-TEST_CASE("bug fix for recognition of model as a part of other word or as a quote, issue #92 and #152", "[model]")
+TEST_CASE("Bug fix for recognition of model as a part of other word or as a quote, issue #92 and #152", "[model]")
 {
     mdp::ByteBuffer source = \
     "## Resource [/resource]\n"\
@@ -512,15 +684,14 @@ TEST_CASE("bug fix for recognition of model as a part of other word or as a quot
     "- Single data model for all exchange data\n"\
     "- `model`\n";
 
-    Resource resource;
-    Report report;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+    ParseResult<Resource> resource;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 0);
+    REQUIRE(resource.report.error.code == Error::OK);
+    REQUIRE(resource.report.warnings.size() == 0);
 
-    REQUIRE(resource.name == "Resource");
-    REQUIRE(resource.description == "### Attributes\n\n- A\n\n- Cmodel\n\n- Single data model for all exchange data\n\n- `model`\n");
+    REQUIRE(resource.node.name == "Resource");
+    REQUIRE(resource.node.description == "### Attributes\n\n- A\n\n- Cmodel\n\n- Single data model for all exchange data\n\n- `model`\n");
 }
 
 TEST_CASE("Parse resource with multi-word named model", "[resource][model]")
@@ -531,16 +702,15 @@ TEST_CASE("Parse resource with multi-word named model", "[resource][model]")
     "+ a really good name Model (text/plain)\n\n"\
     "        body of the `model`\n";
 
-    Resource resource;
-    Report report;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+    ParseResult<Resource> resource;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(resource.report.error.code == Error::OK);
+    REQUIRE(resource.report.warnings.empty());
 
-    REQUIRE(resource.model.name == "a really good name");
-    REQUIRE(resource.model.body == "body of the `model`\n");
-    REQUIRE(resource.actions.empty());
+    REQUIRE(resource.node.model.name == "a really good name");
+    REQUIRE(resource.node.model.body == "body of the `model`\n");
+    REQUIRE(resource.node.actions.empty());
 }
 
 TEST_CASE("Dangling transaction example assets", "[resource]")
@@ -560,29 +730,39 @@ TEST_CASE("Dangling transaction example assets", "[resource]")
     "dangling response body\n"\
     "```\n";
     
-    Resource resource;
-    Report report;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+    ParseResult<Resource> resource;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource);
     
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 3);
-    REQUIRE(report.warnings[0].code == EmptyDefinitionWarning);
-    REQUIRE(report.warnings[1].code == IndentationWarning);
-    REQUIRE(report.warnings[2].code == IndentationWarning);
+    REQUIRE(resource.report.error.code == Error::OK);
+    REQUIRE(resource.report.warnings.size() == 3);
+    REQUIRE(resource.report.warnings[0].code == EmptyDefinitionWarning);
+    REQUIRE(resource.report.warnings[1].code == IndentationWarning);
+    REQUIRE(resource.report.warnings[2].code == IndentationWarning);
     
-    REQUIRE(resource.name == "A");
-    REQUIRE(resource.uriTemplate == "/a");
-    REQUIRE(resource.actions.size() == 1);
+    REQUIRE(resource.node.name == "A");
+    REQUIRE(resource.node.uriTemplate == "/a");
+    REQUIRE(resource.node.actions.size() == 1);
     
-    REQUIRE(resource.actions[0].method == "GET");
-    REQUIRE(resource.actions[0].examples.size() == 1);
-    REQUIRE(resource.actions[0].examples[0].requests.size() == 1);
-    REQUIRE(resource.actions[0].examples[0].requests[0].name == "A");
-    REQUIRE(resource.actions[0].examples[0].requests[0].body == "dangling request body\n\n");
+    REQUIRE(resource.node.actions[0].method == "GET");
+    REQUIRE(resource.node.actions[0].examples.size() == 1);
+    REQUIRE(resource.node.actions[0].examples[0].requests.size() == 1);
+    REQUIRE(resource.node.actions[0].examples[0].requests[0].name == "A");
+    REQUIRE(resource.node.actions[0].examples[0].requests[0].body == "dangling request body\n\n");
     
-    REQUIRE(resource.actions[0].examples[0].responses.size() == 1);
-    REQUIRE(resource.actions[0].examples[0].responses[0].name == "200");
-    REQUIRE(resource.actions[0].examples[0].responses[0].body == "dangling response body\n\n");
+    REQUIRE(resource.node.actions[0].examples[0].responses.size() == 1);
+    REQUIRE(resource.node.actions[0].examples[0].responses[0].name == "200");
+    REQUIRE(resource.node.actions[0].examples[0].responses[0].body == "dangling response body\n\n");
+
+    REQUIRE(resource.sourceMap.actions.collection.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].requests.collection.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].requests.collection[0].body.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].requests.collection[0].body.sourceMap[0].location == 29);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].requests.collection[0].body.sourceMap[0].length == 33);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].responses.collection.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].responses.collection[0].body.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].responses.collection[0].body.sourceMap[0].location == 78);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].responses.collection[0].body.sourceMap[0].length == 31);
 }
 
 TEST_CASE("Body list item in description", "[resource][regression][#190]")
@@ -597,13 +777,17 @@ TEST_CASE("Body list item in description", "[resource][regression][#190]")
     "\n"\
     "+ Response 200\n";
     
-    Resource resource;
-    Report report;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, report, resource);
+    ParseResult<Resource> resource;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource);
     
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(resource.report.error.code == Error::OK);
+    REQUIRE(resource.report.warnings.empty());
     
-    REQUIRE(resource.actions.size() == 1);
-    REQUIRE(resource.actions[0].description == "Lorem Ipsum\n\n+ Body\n\n    { ... }\n\n");
+    REQUIRE(resource.node.actions.size() == 1);
+    REQUIRE(resource.node.actions[0].description == "Lorem Ipsum\n\n+ Body\n\n    { ... }\n\n");
+
+    REQUIRE(resource.sourceMap.actions.collection.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].description.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].description.sourceMap[0].location == 10);
+    REQUIRE(resource.sourceMap.actions.collection[0].description.sourceMap[0].length == 34);
 }

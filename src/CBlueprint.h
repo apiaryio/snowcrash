@@ -23,7 +23,8 @@ extern "C" {
     /** brief Blueprint Parser Options Enums */
     enum sc_blueprint_parser_option {
         SC_RENDER_DESCRIPTIONS_OPTION = (1 << 0),       /// < Render Markdown in description.
-        SC_REQUIRE_BLUEPRINT_NAME_OPTION = (1 << 1)     /// < Treat missing blueprint name as error
+        SC_REQUIRE_BLUEPRINT_NAME_OPTION = (1 << 1),    /// < Treat missing blueprint name as error
+        SC_EXPORT_SORUCEMAP_OPTION = (1 << 2)           /// < Export source maps AST
     };
 
     /** Parameter Use flag */
@@ -45,19 +46,19 @@ extern "C" {
     struct sc_metadata_s;
     typedef struct sc_metadata_s sc_metadata_t;
 
-    /** Array Resource Groups wrapper */
-    struct sc_resource_groups_collection_s;
-    typedef struct sc_resource_groups_collection_s sc_resource_groups_collection_t;
+    /** Array Resource Group Collection wrapper */
+    struct sc_resource_group_collection_s;
+    typedef struct sc_resource_group_collection_s sc_resource_group_collection_t;
 
     /** Class Resource Group wrapper */
-    struct sc_resource_groups_s;
-    typedef struct sc_resource_groups_s sc_resource_groups_t;
+    struct sc_resource_group_s;
+    typedef struct sc_resource_group_s sc_resource_group_t;
 
-    /** Array Resources Collection wrapper */
+    /** Array Resource Collection wrapper */
     struct sc_resource_collection_s;
     typedef struct sc_resource_collection_s sc_resource_collection_t;
 
-    /** Class Resources wrapper */
+    /** Class Resource wrapper */
     struct sc_resource_s;
     typedef struct sc_resource_s sc_resource_t;
 
@@ -97,14 +98,6 @@ extern "C" {
     struct sc_value_s;
     typedef struct sc_value_s sc_value_t;
 
-    /** Array Header wrapper */
-    struct sc_header_collection_s;
-    typedef struct sc_header_collection_s sc_header_collection_t;
-
-    /** class Header wrapper */
-    struct sc_header_s;
-    typedef struct sc_header_s sc_header_t;
-
     /** Array Action wrapper */
     struct sc_action_collection_s;
     typedef struct sc_action_collection_s sc_action_collection_t;
@@ -123,10 +116,10 @@ extern "C" {
 
     /*----------------------------------------------------------------------*/
 
-    /** \returns pointer to allocated Blueprint*/
+    /** \returns pointer to allocated Blueprint */
     SC_API sc_blueprint_t* sc_blueprint_new();
 
-    /** \deallocate Blueprint from pointer*/
+    /** \deallocate Blueprint from pointer */
     SC_API void sc_blueprint_free(sc_blueprint_t* blueprint);
 
     /** \returns Blueprint name */
@@ -137,7 +130,7 @@ extern "C" {
 
     /*----------------------------------------------------------------------*/
 
-    /** \returns Metadata Handle */
+    /** \returns Metadata array handle */
     SC_API const sc_metadata_collection_t* sc_metadata_collection_handle(const sc_blueprint_t* blueprint);
 
     /** \returns size of Metadata array */
@@ -156,34 +149,34 @@ extern "C" {
 
     /*----------------------------------------------------------------------*/
 
-    /** \returns Resource Groups Array Handle */
-    SC_API const sc_resource_groups_collection_t* sc_resource_groups_collection_handle(const sc_blueprint_t* blueprint);
+    /** \returns Resource Group Collection array handle */
+    SC_API const sc_resource_group_collection_t* sc_resource_group_collection_handle(const sc_blueprint_t* blueprint);
 
-    /** \returns size of Resource Groups array */
-    SC_API size_t sc_resource_groups_collection_size(const sc_resource_groups_collection_t* resource);
-
-    /*----------------------------------------------------------------------*/
-
-    /** \returns Resource Groups Handle */
-    SC_API const sc_resource_groups_t* sc_resource_groups_handle(const sc_resource_groups_collection_t* resource, size_t index);
-
-    /** \returns Resource Groups name */
-    SC_API const char* sc_resource_groups_name(const sc_resource_groups_t* handle);
-
-    /** \returns Resource Groups Description */
-    SC_API const char* sc_resource_groups_description(const sc_resource_groups_t* handle);
+    /** \returns size of Resource Group Collection array */
+    SC_API size_t sc_resource_group_collection_size(const sc_resource_group_collection_t* resource);
 
     /*----------------------------------------------------------------------*/
 
-    /** \returns Resource Array Handle */
-    SC_API const sc_resource_collection_t* sc_resource_collection_handle(const sc_resource_groups_t* handle);
+    /** \returns Resource Group handle */
+    SC_API const sc_resource_group_t* sc_resource_group_handle(const sc_resource_group_collection_t* resource, size_t index);
 
-    /** \returns Resource array size*/
+    /** \returns Resource Group name */
+    SC_API const char* sc_resource_group_name(const sc_resource_group_t* handle);
+
+    /** \returns Resource Group description */
+    SC_API const char* sc_resource_group_description(const sc_resource_group_t* handle);
+
+    /*----------------------------------------------------------------------*/
+
+    /** \returns Resource array handle */
+    SC_API const sc_resource_collection_t* sc_resource_collection_handle(const sc_resource_group_t* handle);
+
+    /** \returns Resource array size */
     SC_API size_t sc_resource_collection_size(const sc_resource_collection_t* resource);
 
     /*----------------------------------------------------------------------*/
 
-    /** \returns Resource Handle */
+    /** \returns Resource handle */
     SC_API const sc_resource_t* sc_resource_handle(const sc_resource_collection_t* resource, size_t index);
 
     /** \returns Resource URITemplate */
@@ -197,25 +190,28 @@ extern "C" {
 
     /*----------------------------------------------------------------------*/
 
-    /** \returns Payload Collection handle from TransactionExample for requests*/
+    /** \returns Payload Collection array handle from TransactionExample for requests*/
     SC_API const sc_payload_collection_t* sc_payload_collection_handle_requests(const sc_transaction_example_t* handle);
 
-    /** \returns Payload Collection handle from TransactionExample for responses*/
+    /** \returns Payload Collection array handle from TransactionExample for responses*/
     SC_API const sc_payload_collection_t* sc_payload_collection_handle_responses(const sc_transaction_example_t* handle);
 
-    /** \returns Payload Collection size */
+    /** \returns Payload Collection array size */
     SC_API size_t sc_payload_collection_size(const sc_payload_collection_t* handle);
 
     /*----------------------------------------------------------------------*/
 
-    /** \returns Payload at `index` Handle*/
+    /** \returns Payload at `index` handle */
     SC_API const sc_payload_t* sc_payload_handle(const sc_payload_collection_t* handle, size_t index);
 
-    /** \returns Payload Handle from resource*/
+    /** \returns Payload handle from resource */
     SC_API const sc_payload_t* sc_payload_handle_resource(const sc_resource_t* handle);
 
     /** \returns Payload name */
     SC_API const char* sc_payload_name(const sc_payload_t* handle);
+
+    /** \returns Payload symbol name */
+    SC_API const char* sc_payload_symbol(const sc_payload_t* handle);
 
     /** \returns Payload description */
     SC_API const char* sc_payload_description(const sc_payload_t* handle);
@@ -228,13 +224,13 @@ extern "C" {
 
     /*----------------------------------------------------------------------*/
 
-    /** \returns Parameter Collection handle from Payload*/
+    /** \returns Parameter Collection handle from Payload */
     SC_API const sc_parameter_collection_t* sc_parameter_collection_handle_payload(const sc_payload_t* handle);
 
-    /** \returns Parameter Collection handle from Resource*/
+    /** \returns Parameter Collection handle from Resource */
     SC_API const sc_parameter_collection_t* sc_parameter_collection_handle_resource(const sc_resource_t* handle);
 
-    /** \returns Parameter Collection handle from Action*/
+    /** \returns Parameter Collection handle from Action */
     SC_API const sc_parameter_collection_t* sc_parameter_collection_handle_action(const sc_action_t* handle);
 
     /** \returns Parameter Collection size */
@@ -251,24 +247,24 @@ extern "C" {
     /** \returns Parameter description */
     SC_API const char* sc_parameter_description(const sc_parameter_t* handle);
 
-    /** \returns Parameter Type */
+    /** \returns Parameter type */
     SC_API const char* sc_parameter_type(const sc_parameter_t* handle);
 
-    /** \returns Parameter Parameter Use */
+    /** \returns Parameter use */
     SC_API sc_parameter_use sc_parameter_parameter_use(const sc_parameter_t* handle);
 
-    /** \returns Parameter Default Value */
+    /** \returns Parameter default value */
     SC_API const char* sc_parameter_default_value(const sc_parameter_t* handle);
 
-    /** \returns Parameter Example Value */
+    /** \returns Parameter example value */
     SC_API const char* sc_parameter_example_value(const sc_parameter_t* handle);
 
     /*----------------------------------------------------------------------*/
 
-    /** \returns Value Collection handle */
+    /** \returns Value Collection array handle */
     SC_API const sc_value_collection_t* sc_value_collection_handle(const sc_parameter_t* handle);
 
-    /** \returns Value Collection size */
+    /** \returns Value Collection array size */
     SC_API size_t sc_value_collection_size(const sc_value_collection_t* handle);
 
     /*----------------------------------------------------------------------*/
@@ -277,20 +273,20 @@ extern "C" {
     SC_API const sc_value_t* sc_value_handle(const sc_value_collection_t* handle, size_t index);
 
     /** \returns Value string */
-    SC_API const char* sc_value_string(const sc_value_t* handle);
+    SC_API const char* sc_value(const sc_value_t* handle);
 
     /*----------------------------------------------------------------------*/
 
-    /** \returns Header Collection handle from Payload*/
+    /** \returns Header Collection array handle from Payload */
     SC_API const sc_header_collection_t* sc_header_collection_handle_payload(const sc_payload_t* handle);
 
-    /** \returns Header Collection handle from Resource*/
+    /** \returns Header Collection array handle from Resource */
     SC_API const sc_header_collection_t* sc_header_collection_handle_resource(const sc_resource_t* handle);
 
-    /** \returns Header Collection handle from Action*/
+    /** \returns Header Collection array handle from Action */
     SC_API const sc_header_collection_t* sc_header_collection_handle_action(const sc_action_t* handle);
 
-    /** \returns Header Collection size */
+    /** \returns Header Collection array size */
     SC_API size_t sc_header_collection_size(const sc_header_collection_t* handle);
 
     /*----------------------------------------------------------------------*/
@@ -306,10 +302,10 @@ extern "C" {
 
     /*----------------------------------------------------------------------*/
 
-    /** \returns Action Collection handle */
+    /** \returns Action Collection array handle */
     SC_API const sc_action_collection_t* sc_action_collection_handle(const sc_resource_t* handle);
 
-    /** \returns Action Collection size */
+    /** \returns Action Collection array size */
     SC_API size_t sc_action_collection_size(const sc_action_collection_t* handle);
 
     /*----------------------------------------------------------------------*/
@@ -323,15 +319,15 @@ extern "C" {
     /** \returns Action name */
     SC_API const char* sc_action_name(const sc_action_t* handle);
 
-    /** \returns Action Description */
+    /** \returns Action description */
     SC_API const char* sc_action_description(const sc_action_t* handle);
 
     /*----------------------------------------------------------------------*/
 
-    /** \returns Transaction Example Collection handle */
+    /** \returns Transaction Example Collection array handle */
     SC_API const sc_transaction_example_collection_t* sc_transaction_example_collection_handle(const sc_action_t* handle);
 
-    /** \returns Transaction Example Collection size */
+    /** \returns Transaction Example Collection array size */
     SC_API size_t sc_transaction_example_collection_size(const sc_transaction_example_collection_t* handle);
 
     /*----------------------------------------------------------------------*/
@@ -342,7 +338,7 @@ extern "C" {
     /** \returns Transaction Example name */
     SC_API const char* sc_transaction_example_name(const sc_transaction_example_t* handle);
 
-    /** \returns Transaction Example Description */
+    /** \returns Transaction Example description */
     SC_API const char* sc_transaction_example_description(const sc_transaction_example_t* handle);
 
     /*----------------------------------------------------------------------*/

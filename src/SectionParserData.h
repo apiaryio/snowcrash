@@ -9,7 +9,7 @@
 #ifndef SNOWCRASH_SECTIONPARSERDATA_H
 #define SNOWCRASH_SECTIONPARSERDATA_H
 
-#include "Blueprint.h"
+#include "BlueprintSourcemap.h"
 #include "Section.h"
 #include "SymbolTable.h"
 
@@ -22,7 +22,8 @@ namespace snowcrash {
      */
     enum BlueprintParserOption {
         RenderDescriptionsOption = (1 << 0),    /// < Render Markdown in description.
-        RequireBlueprintNameOption = (1 << 1)   /// < Treat missing blueprint name as error
+        RequireBlueprintNameOption = (1 << 1),  /// < Treat missing blueprint name as error
+        ExportSourcemapOption = (1 << 2)        /// < Export source maps AST
     };
     
     typedef unsigned int BlueprintParserOptions;
@@ -44,6 +45,9 @@ namespace snowcrash {
         /** Symbol Table */
         SymbolTable symbolTable;
         
+        /** Symbol Table Sourcemap */
+        SymbolSourceMapTable symbolSourceMapTable;
+
         /** Source Data */
         const mdp::ByteBuffer& sourceData;
         
@@ -71,6 +75,11 @@ namespace snowcrash {
                 return sectionsContext[size-2];
         }
         
+        /** \returns True if exporting source maps */
+        bool exportSourceMap() const {
+            return options & ExportSourcemapOption;
+        }
+
     private:
         SectionParserData();
         SectionParserData(const SectionParserData&);

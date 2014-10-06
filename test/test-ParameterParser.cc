@@ -27,28 +27,57 @@ TEST_CASE("Recognize parameter definition signature", "[parameter]")
     markdownParser.parse(ParameterFixture, markdownAST);
 
     REQUIRE(!markdownAST.children().empty());
-    REQUIRE(SectionProcessor<Parameter>::sectionType(markdownAST.children().begin()) == ParameterSectionType);
+    SectionType sectionType = SectionProcessor<Parameter>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == ParameterSectionType);
 }
 
 TEST_CASE("Parse canonical parameter definition", "[parameter]")
 {
-    Parameter parameter;
-    Report report;
-    SectionParserHelper<Parameter, ParameterParser>::parse(ParameterFixture, ParameterSectionType, report, parameter);
+    ParseResult<Parameter> parameter;
+    SectionParserHelper<Parameter, ParameterParser>::parse(ParameterFixture, ParameterSectionType, parameter);
 
-    REQUIRE(report.error.code == Error::OK);
-    CHECK(report.warnings.empty());
+    REQUIRE(parameter.report.error.code == Error::OK);
+    CHECK(parameter.report.warnings.empty());
 
-    REQUIRE(parameter.name == "id");
-    REQUIRE(parameter.description == "Lorem ipsum\n");
-    REQUIRE(parameter.type == "number");
-    REQUIRE(parameter.use == OptionalParameterUse);
-    REQUIRE(parameter.defaultValue == "1234");
-    REQUIRE(parameter.exampleValue == "0000");
-    REQUIRE(parameter.values.size() == 3);
-    REQUIRE(parameter.values[0] == "1234");
-    REQUIRE(parameter.values[1] == "0000");
-    REQUIRE(parameter.values[2] == "beef");
+    REQUIRE(parameter.node.name == "id");
+    REQUIRE(parameter.node.description == "Lorem ipsum\n");
+    REQUIRE(parameter.node.type == "number");
+    REQUIRE(parameter.node.use == OptionalParameterUse);
+    REQUIRE(parameter.node.defaultValue == "1234");
+    REQUIRE(parameter.node.exampleValue == "0000");
+    REQUIRE(parameter.node.values.size() == 3);
+    REQUIRE(parameter.node.values[0] == "1234");
+    REQUIRE(parameter.node.values[1] == "0000");
+    REQUIRE(parameter.node.values[2] == "beef");
+
+    REQUIRE(parameter.sourceMap.name.sourceMap.size() == 1);
+    REQUIRE(parameter.sourceMap.name.sourceMap[0].location == 2);
+    REQUIRE(parameter.sourceMap.name.sourceMap[0].length == 40);
+    REQUIRE(parameter.sourceMap.type.sourceMap.size() == 1);
+    REQUIRE(parameter.sourceMap.type.sourceMap[0].location == 2);
+    REQUIRE(parameter.sourceMap.type.sourceMap[0].length == 40);
+    REQUIRE(parameter.sourceMap.defaultValue.sourceMap.size() == 1);
+    REQUIRE(parameter.sourceMap.defaultValue.sourceMap[0].location == 2);
+    REQUIRE(parameter.sourceMap.defaultValue.sourceMap[0].length == 40);
+    REQUIRE(parameter.sourceMap.exampleValue.sourceMap.size() == 1);
+    REQUIRE(parameter.sourceMap.exampleValue.sourceMap[0].location == 2);
+    REQUIRE(parameter.sourceMap.exampleValue.sourceMap[0].length == 40);
+    REQUIRE(parameter.sourceMap.description.sourceMap.size() == 1);
+    REQUIRE(parameter.sourceMap.description.sourceMap[0].location == 46);
+    REQUIRE(parameter.sourceMap.description.sourceMap[0].length == 12);
+    REQUIRE(parameter.sourceMap.use.sourceMap.size() == 1);
+    REQUIRE(parameter.sourceMap.use.sourceMap[0].location == 2);
+    REQUIRE(parameter.sourceMap.use.sourceMap[0].length == 40);
+    REQUIRE(parameter.sourceMap.values.collection.size() == 3);
+    REQUIRE(parameter.sourceMap.values.collection[0].sourceMap.size() == 1);
+    REQUIRE(parameter.sourceMap.values.collection[0].sourceMap[0].location == 80);
+    REQUIRE(parameter.sourceMap.values.collection[0].sourceMap[0].length == 9);
+    REQUIRE(parameter.sourceMap.values.collection[1].sourceMap.size() == 1);
+    REQUIRE(parameter.sourceMap.values.collection[1].sourceMap[0].location == 97);
+    REQUIRE(parameter.sourceMap.values.collection[1].sourceMap[0].length == 9);
+    REQUIRE(parameter.sourceMap.values.collection[2].sourceMap.size() == 1);
+    REQUIRE(parameter.sourceMap.values.collection[2].sourceMap[0].location == 114);
+    REQUIRE(parameter.sourceMap.values.collection[2].sourceMap[0].length == 9);
 }
 
 TEST_CASE("Warn when re-setting the values attribute", "[parameter]")
@@ -60,17 +89,26 @@ TEST_CASE("Warn when re-setting the values attribute", "[parameter]")
     "    + Values\n"\
     "        + `Hello`\n";
 
-    Parameter parameter;
-    Report report;
-    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
+    ParseResult<Parameter> parameter;
+    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, parameter);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
-    REQUIRE(report.warnings[0].code == RedefinitionWarning);
+    REQUIRE(parameter.report.error.code == Error::OK);
+    REQUIRE(parameter.report.warnings.size() == 1);
+    REQUIRE(parameter.report.warnings[0].code == RedefinitionWarning);
 
-    REQUIRE(parameter.name == "id");
-    REQUIRE(parameter.values.size() == 1);
-    REQUIRE(parameter.values[0] == "Hello");
+    REQUIRE(parameter.node.name == "id");
+    REQUIRE(parameter.node.values.size() == 1);
+    REQUIRE(parameter.node.values[0] == "Hello");
+    REQUIRE(parameter.node.use == UndefinedParameterUse);
+
+    REQUIRE(parameter.sourceMap.name.sourceMap.size() == 1);
+    REQUIRE(parameter.sourceMap.name.sourceMap[0].location == 2);
+    REQUIRE(parameter.sourceMap.name.sourceMap[0].length == 3);
+    REQUIRE(parameter.sourceMap.values.collection.size() == 1);
+    REQUIRE(parameter.sourceMap.values.collection[0].sourceMap.size() == 1);
+    REQUIRE(parameter.sourceMap.values.collection[0].sourceMap[0].location == 56);
+    REQUIRE(parameter.sourceMap.values.collection[0].sourceMap[0].length == 10);
+    REQUIRE(parameter.sourceMap.use.sourceMap.size() == 0);
 }
 
 TEST_CASE("Warn when there are no values in the values attribute", "[parameter]")
@@ -79,91 +117,144 @@ TEST_CASE("Warn when there are no values in the values attribute", "[parameter]"
     "+ id\n"\
     "    + Values\n";
 
-    Parameter parameter;
-    Report report;
-    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
+    ParseResult<Parameter> parameter;
+    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, parameter);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
-    REQUIRE(report.warnings[0].code == EmptyDefinitionWarning);
+    REQUIRE(parameter.report.error.code == Error::OK);
+    REQUIRE(parameter.report.warnings.size() == 1);
+    REQUIRE(parameter.report.warnings[0].code == EmptyDefinitionWarning);
 
-    REQUIRE(parameter.name == "id");
-    REQUIRE(parameter.values.empty());
+    REQUIRE(parameter.node.name == "id");
+    REQUIRE(parameter.node.values.empty());
 }
 
 TEST_CASE("Parse full abbreviated syntax", "[parameter]")
 {
     mdp::ByteBuffer source = "+ limit = `20` (optional, number, `42`) ... This is a limit\n";
 
-    Parameter parameter;
-    Report report;
-    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
+    ParseResult<Parameter> parameter;
+    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, parameter);
 
-    REQUIRE(report.error.code == Error::OK);
-    CHECK(report.warnings.empty());
+    REQUIRE(parameter.report.error.code == Error::OK);
+    CHECK(parameter.report.warnings.empty());
 
-    REQUIRE(parameter.name == "limit");
-    REQUIRE(parameter.description == "This is a limit" );
-    REQUIRE(parameter.defaultValue == "20");
-    REQUIRE(parameter.exampleValue == "42");
-    REQUIRE(parameter.type == "number");
-    REQUIRE(parameter.use == OptionalParameterUse);
-    REQUIRE(parameter.values.empty());
+    REQUIRE(parameter.node.name == "limit");
+    REQUIRE(parameter.node.description == "This is a limit" );
+    REQUIRE(parameter.node.defaultValue == "20");
+    REQUIRE(parameter.node.exampleValue == "42");
+    REQUIRE(parameter.node.type == "number");
+    REQUIRE(parameter.node.use == OptionalParameterUse);
+    REQUIRE(parameter.node.values.empty());
+
+    REQUIRE(parameter.sourceMap.name.sourceMap.size() == 1);
+    REQUIRE(parameter.sourceMap.name.sourceMap[0].location == 2);
+    REQUIRE(parameter.sourceMap.name.sourceMap[0].length == 58);
+    REQUIRE(parameter.sourceMap.type.sourceMap.size() == 1);
+    REQUIRE(parameter.sourceMap.type.sourceMap[0].location == 2);
+    REQUIRE(parameter.sourceMap.type.sourceMap[0].length == 58);
+    REQUIRE(parameter.sourceMap.defaultValue.sourceMap.size() == 1);
+    REQUIRE(parameter.sourceMap.defaultValue.sourceMap[0].location == 2);
+    REQUIRE(parameter.sourceMap.defaultValue.sourceMap[0].length == 58);
+    REQUIRE(parameter.sourceMap.exampleValue.sourceMap.size() == 1);
+    REQUIRE(parameter.sourceMap.exampleValue.sourceMap[0].location == 2);
+    REQUIRE(parameter.sourceMap.exampleValue.sourceMap[0].length == 58);
+    REQUIRE(parameter.sourceMap.description.sourceMap.size() == 1);
+    REQUIRE(parameter.sourceMap.description.sourceMap[0].location == 2);
+    REQUIRE(parameter.sourceMap.description.sourceMap[0].length == 58);
+    REQUIRE(parameter.sourceMap.use.sourceMap.size() == 1);
+    REQUIRE(parameter.sourceMap.use.sourceMap[0].location == 2);
+    REQUIRE(parameter.sourceMap.use.sourceMap[0].length == 58);
+    REQUIRE(parameter.sourceMap.values.collection.empty());
 }
 
 TEST_CASE("Warn on error in  abbreviated syntax attribute bracket", "[parameter]")
 {
     mdp::ByteBuffer source = "+ limit (string1, string2, string3) ... This is a limit\n";
 
-    Parameter parameter;
-    Report report;
-    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
+    ParseResult<Parameter> parameter;
+    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, parameter);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
-    REQUIRE(report.warnings[0].code == FormattingWarning);
+    REQUIRE(parameter.report.error.code == Error::OK);
+    REQUIRE(parameter.report.warnings.size() == 1);
+    REQUIRE(parameter.report.warnings[0].code == FormattingWarning);
 
-    REQUIRE(parameter.name == "limit");
-    REQUIRE(parameter.description == "This is a limit" );
-    REQUIRE(parameter.defaultValue.empty());
-    REQUIRE(parameter.exampleValue.empty());
-    REQUIRE(parameter.type.empty());
-    REQUIRE(parameter.use == UndefinedParameterUse);
-    REQUIRE(parameter.values.empty());
+    REQUIRE(parameter.node.name == "limit");
+    REQUIRE(parameter.node.description == "This is a limit" );
+    REQUIRE(parameter.node.defaultValue.empty());
+    REQUIRE(parameter.node.exampleValue.empty());
+    REQUIRE(parameter.node.type.empty());
+    REQUIRE(parameter.node.use == UndefinedParameterUse);
+    REQUIRE(parameter.node.values.empty());
+
+    REQUIRE(parameter.sourceMap.name.sourceMap.size() == 1);
+    REQUIRE(parameter.sourceMap.name.sourceMap[0].location == 2);
+    REQUIRE(parameter.sourceMap.name.sourceMap[0].length == 54);
+    REQUIRE(parameter.sourceMap.type.sourceMap.empty());
+    REQUIRE(parameter.sourceMap.defaultValue.sourceMap.empty());
+    REQUIRE(parameter.sourceMap.exampleValue.sourceMap.empty());
+    REQUIRE(parameter.sourceMap.description.sourceMap.size() == 1);
+    REQUIRE(parameter.sourceMap.description.sourceMap[0].location == 2);
+    REQUIRE(parameter.sourceMap.description.sourceMap[0].length == 54);
+    REQUIRE(parameter.sourceMap.use.sourceMap.empty());
+    REQUIRE(parameter.sourceMap.values.collection.empty());
 }
 
 TEST_CASE("Warn about required vs default clash", "[parameter]")
 {
     mdp::ByteBuffer source = "+ id = `42` (required)\n";
 
-    Parameter parameter;
-    Report report;
-    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
+    ParseResult<Parameter> parameter;
+    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, parameter);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
-    REQUIRE(report.warnings[0].code == LogicalErrorWarning);
+    REQUIRE(parameter.report.error.code == Error::OK);
+    REQUIRE(parameter.report.warnings.size() == 1);
+    REQUIRE(parameter.report.warnings[0].code == LogicalErrorWarning);
 
-    REQUIRE(parameter.name == "id");
-    REQUIRE(parameter.use == RequiredParameterUse);
-    REQUIRE(parameter.defaultValue == "42");
+    REQUIRE(parameter.node.name == "id");
+    REQUIRE(parameter.node.use == RequiredParameterUse);
+    REQUIRE(parameter.node.defaultValue == "42");
+
+    REQUIRE(parameter.sourceMap.name.sourceMap.size() == 1);
+    REQUIRE(parameter.sourceMap.name.sourceMap[0].location == 2);
+    REQUIRE(parameter.sourceMap.name.sourceMap[0].length == 21);
+    REQUIRE(parameter.sourceMap.type.sourceMap.empty());
+    REQUIRE(parameter.sourceMap.defaultValue.sourceMap.size() == 1);
+    REQUIRE(parameter.sourceMap.defaultValue.sourceMap[0].location == 2);
+    REQUIRE(parameter.sourceMap.defaultValue.sourceMap[0].length == 21);
+    REQUIRE(parameter.sourceMap.exampleValue.sourceMap.empty());
+    REQUIRE(parameter.sourceMap.description.sourceMap.empty());
+    REQUIRE(parameter.sourceMap.use.sourceMap.size() == 1);
+    REQUIRE(parameter.sourceMap.use.sourceMap[0].location == 2);
+    REQUIRE(parameter.sourceMap.use.sourceMap[0].length == 21);
+    REQUIRE(parameter.sourceMap.values.collection.empty());
 }
 
 TEST_CASE("Warn about implicit required vs default clash", "[parameter_definition][source]")
 {
     mdp::ByteBuffer source = "+ id = `42`\n";
 
-    Parameter parameter;
-    Report report;
-    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
+    ParseResult<Parameter> parameter;
+    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, parameter);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
-    REQUIRE(report.warnings[0].code == LogicalErrorWarning);
+    REQUIRE(parameter.report.error.code == Error::OK);
+    REQUIRE(parameter.report.warnings.size() == 1);
+    REQUIRE(parameter.report.warnings[0].code == LogicalErrorWarning);
 
-    REQUIRE(parameter.name == "id");
-    REQUIRE(parameter.use == UndefinedParameterUse);
-    REQUIRE(parameter.defaultValue == "42");
+    REQUIRE(parameter.node.name == "id");
+    REQUIRE(parameter.node.use == UndefinedParameterUse);
+    REQUIRE(parameter.node.defaultValue == "42");
+
+    REQUIRE(parameter.sourceMap.name.sourceMap.size() == 1);
+    REQUIRE(parameter.sourceMap.name.sourceMap[0].location == 2);
+    REQUIRE(parameter.sourceMap.name.sourceMap[0].length == 10);
+    REQUIRE(parameter.sourceMap.type.sourceMap.empty());
+    REQUIRE(parameter.sourceMap.defaultValue.sourceMap.size() == 1);
+    REQUIRE(parameter.sourceMap.defaultValue.sourceMap[0].location == 2);
+    REQUIRE(parameter.sourceMap.defaultValue.sourceMap[0].length == 10);
+    REQUIRE(parameter.sourceMap.exampleValue.sourceMap.empty());
+    REQUIRE(parameter.sourceMap.description.sourceMap.empty());
+    REQUIRE(parameter.sourceMap.use.sourceMap.empty());
+    REQUIRE(parameter.sourceMap.values.collection.empty());
 }
 
 TEST_CASE("Unrecognized 'values' keyword", "[parameter]")
@@ -173,17 +264,30 @@ TEST_CASE("Unrecognized 'values' keyword", "[parameter]")
     "    + Values:\n"\
     "        + `lorem`\n";
 
-    Parameter parameter;
-    Report report;
-    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
+    ParseResult<Parameter> parameter;
+    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, parameter);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(parameter.report.error.code == Error::OK);
+    REQUIRE(parameter.report.warnings.empty());
 
-    REQUIRE(parameter.name == "param");
-    REQUIRE(parameter.description == "+ Values:\n    + `lorem`\n");
-    REQUIRE(parameter.use == UndefinedParameterUse);
-    REQUIRE(parameter.values.empty());
+    REQUIRE(parameter.node.name == "param");
+    REQUIRE(parameter.node.description == "+ Values:\n    + `lorem`\n");
+    REQUIRE(parameter.node.use == UndefinedParameterUse);
+    REQUIRE(parameter.node.values.empty());
+
+    REQUIRE(parameter.sourceMap.name.sourceMap.size() == 1);
+    REQUIRE(parameter.sourceMap.name.sourceMap[0].location == 2);
+    REQUIRE(parameter.sourceMap.name.sourceMap[0].length == 6);
+    REQUIRE(parameter.sourceMap.type.sourceMap.empty());
+    REQUIRE(parameter.sourceMap.defaultValue.sourceMap.empty());
+    REQUIRE(parameter.sourceMap.exampleValue.sourceMap.empty());
+    REQUIRE(parameter.sourceMap.description.sourceMap.size() == 2);
+    REQUIRE(parameter.sourceMap.description.sourceMap[0].location == 12);
+    REQUIRE(parameter.sourceMap.description.sourceMap[0].length == 10);
+    REQUIRE(parameter.sourceMap.description.sourceMap[1].location == 26);
+    REQUIRE(parameter.sourceMap.description.sourceMap[1].length == 14);
+    REQUIRE(parameter.sourceMap.use.sourceMap.empty());
+    REQUIRE(parameter.sourceMap.values.collection.empty());
 }
 
 TEST_CASE("warn missing example item in values", "[parameter]")
@@ -193,17 +297,21 @@ TEST_CASE("warn missing example item in values", "[parameter]")
     "    + Values\n"\
     "        + `Value2`\n";
 
-    Parameter parameter;
-    Report report;
-    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
+    ParseResult<Parameter> parameter;
+    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, parameter);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
-    REQUIRE(report.warnings[0].code == LogicalErrorWarning);
+    REQUIRE(parameter.report.error.code == Error::OK);
+    REQUIRE(parameter.report.warnings.size() == 1);
+    REQUIRE(parameter.report.warnings[0].code == LogicalErrorWarning);
 
-    REQUIRE(parameter.name == "id");
-    REQUIRE(parameter.exampleValue == "Value1");
-    REQUIRE(parameter.defaultValue == "Value2");
+    REQUIRE(parameter.node.name == "id");
+    REQUIRE(parameter.node.exampleValue == "Value1");
+    REQUIRE(parameter.node.defaultValue == "Value2");
+
+    REQUIRE(parameter.sourceMap.values.collection.size() == 1);
+    REQUIRE(parameter.sourceMap.values.collection[0].sourceMap.size() == 1);
+    REQUIRE(parameter.sourceMap.values.collection[0].sourceMap[0].location == 66);
+    REQUIRE(parameter.sourceMap.values.collection[0].sourceMap[0].length == 11);
 }
 
 TEST_CASE("warn missing default value in values", "[parameter]")
@@ -213,48 +321,76 @@ TEST_CASE("warn missing default value in values", "[parameter]")
     "    + Values\n"\
     "        + `Value2`\n";
 
-    Parameter parameter;
-    Report report;
-    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
+    ParseResult<Parameter> parameter;
+    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, parameter);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
-    REQUIRE(report.warnings[0].code == LogicalErrorWarning);
+    REQUIRE(parameter.report.error.code == Error::OK);
+    REQUIRE(parameter.report.warnings.size() == 1);
+    REQUIRE(parameter.report.warnings[0].code == LogicalErrorWarning);
 
-    REQUIRE(parameter.name == "id");
-    REQUIRE(parameter.exampleValue == "Value2");
-    REQUIRE(parameter.defaultValue == "Value1");
+    REQUIRE(parameter.node.name == "id");
+    REQUIRE(parameter.node.exampleValue == "Value2");
+    REQUIRE(parameter.node.defaultValue == "Value1");
+
+    REQUIRE(parameter.sourceMap.values.collection.size() == 1);
+    REQUIRE(parameter.sourceMap.values.collection[0].sourceMap.size() == 1);
+    REQUIRE(parameter.sourceMap.values.collection[0].sourceMap[0].location == 66);
+    REQUIRE(parameter.sourceMap.values.collection[0].sourceMap[0].length == 11);
 }
 
 TEST_CASE("Parse parameters with dot in its name", "[parameter]")
 {
     mdp::ByteBuffer source = "+ product.id ... Hello\n";
 
-    Parameter parameter;
-    Report report;
-    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
+    ParseResult<Parameter> parameter;
+    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, parameter);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(parameter.report.error.code == Error::OK);
+    REQUIRE(parameter.report.warnings.empty());
 
-    REQUIRE(parameter.name == "product.id");
-    REQUIRE(parameter.description == "Hello");
+    REQUIRE(parameter.node.name == "product.id");
+    REQUIRE(parameter.node.description == "Hello");
+
+    REQUIRE(parameter.sourceMap.name.sourceMap.size() == 1);
+    REQUIRE(parameter.sourceMap.name.sourceMap[0].location == 2);
+    REQUIRE(parameter.sourceMap.name.sourceMap[0].length == 21);
+    REQUIRE(parameter.sourceMap.type.sourceMap.empty());
+    REQUIRE(parameter.sourceMap.defaultValue.sourceMap.empty());
+    REQUIRE(parameter.sourceMap.exampleValue.sourceMap.empty());
+    REQUIRE(parameter.sourceMap.description.sourceMap.size() == 1);
+    REQUIRE(parameter.sourceMap.description.sourceMap[0].location == 2);
+    REQUIRE(parameter.sourceMap.description.sourceMap[0].length == 21);
+    REQUIRE(parameter.sourceMap.use.sourceMap.empty());
+    REQUIRE(parameter.sourceMap.values.collection.empty());
 }
 
 TEST_CASE("Parentheses in parameter description", "[parameter]")
 {
     mdp::ByteBuffer source = "+ id (string) ... lorem (ipsum)\n";
 
-    Parameter parameter;
-    Report report;
-    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
+    ParseResult<Parameter> parameter;
+    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, parameter);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(parameter.report.error.code == Error::OK);
+    REQUIRE(parameter.report.warnings.empty());
 
-    REQUIRE(parameter.name == "id");
-    REQUIRE(parameter.type == "string");
-    REQUIRE(parameter.description == "lorem (ipsum)");
+    REQUIRE(parameter.node.name == "id");
+    REQUIRE(parameter.node.type == "string");
+    REQUIRE(parameter.node.description == "lorem (ipsum)");
+
+    REQUIRE(parameter.sourceMap.name.sourceMap.size() == 1);
+    REQUIRE(parameter.sourceMap.name.sourceMap[0].location == 2);
+    REQUIRE(parameter.sourceMap.name.sourceMap[0].length == 30);
+    REQUIRE(parameter.sourceMap.type.sourceMap.size() == 1);
+    REQUIRE(parameter.sourceMap.type.sourceMap[0].location == 2);
+    REQUIRE(parameter.sourceMap.type.sourceMap[0].length == 30);
+    REQUIRE(parameter.sourceMap.defaultValue.sourceMap.empty());
+    REQUIRE(parameter.sourceMap.exampleValue.sourceMap.empty());
+    REQUIRE(parameter.sourceMap.description.sourceMap.size() == 1);
+    REQUIRE(parameter.sourceMap.description.sourceMap[0].location == 2);
+    REQUIRE(parameter.sourceMap.description.sourceMap[0].length == 30);
+    REQUIRE(parameter.sourceMap.use.sourceMap.empty());
+    REQUIRE(parameter.sourceMap.values.collection.empty());
 }
 
 TEST_CASE("Parameter with additional description", "[parameter]")
@@ -263,16 +399,31 @@ TEST_CASE("Parameter with additional description", "[parameter]")
     "+ id (string) ... lorem (ipsum)\n\n"\
     "  Additional description";
 
-    Parameter parameter;
-    Report report;
-    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
+    ParseResult<Parameter> parameter;
+    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, parameter);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(parameter.report.error.code == Error::OK);
+    REQUIRE(parameter.report.warnings.empty());
 
-    REQUIRE(parameter.name == "id");
-    REQUIRE(parameter.type == "string");
-    REQUIRE(parameter.description == "lorem (ipsum)\n\nAdditional description");
+    REQUIRE(parameter.node.name == "id");
+    REQUIRE(parameter.node.type == "string");
+    REQUIRE(parameter.node.description == "lorem (ipsum)\n\nAdditional description");
+
+    REQUIRE(parameter.sourceMap.name.sourceMap.size() == 1);
+    REQUIRE(parameter.sourceMap.name.sourceMap[0].location == 2);
+    REQUIRE(parameter.sourceMap.name.sourceMap[0].length == 31);
+    REQUIRE(parameter.sourceMap.type.sourceMap.size() == 1);
+    REQUIRE(parameter.sourceMap.type.sourceMap[0].location == 2);
+    REQUIRE(parameter.sourceMap.type.sourceMap[0].length == 31);
+    REQUIRE(parameter.sourceMap.defaultValue.sourceMap.empty());
+    REQUIRE(parameter.sourceMap.exampleValue.sourceMap.empty());
+    REQUIRE(parameter.sourceMap.description.sourceMap.size() == 2);
+    REQUIRE(parameter.sourceMap.description.sourceMap[0].location == 2);
+    REQUIRE(parameter.sourceMap.description.sourceMap[0].length == 31);
+    REQUIRE(parameter.sourceMap.description.sourceMap[1].location == 35);
+    REQUIRE(parameter.sourceMap.description.sourceMap[1].length == 22);
+    REQUIRE(parameter.sourceMap.use.sourceMap.empty());
+    REQUIRE(parameter.sourceMap.values.collection.empty());
 }
 
 TEST_CASE("Parameter with additional description as continuation of signature", "[parameter]")
@@ -281,16 +432,31 @@ TEST_CASE("Parameter with additional description as continuation of signature", 
     "+ id (string) ... lorem (ipsum)\n"\
     "  Additional description\n";
 
-    Parameter parameter;
-    Report report;
-    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
+    ParseResult<Parameter> parameter;
+    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, parameter);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(parameter.report.error.code == Error::OK);
+    REQUIRE(parameter.report.warnings.empty());
 
-    REQUIRE(parameter.name == "id");
-    REQUIRE(parameter.type == "string");
-    REQUIRE(parameter.description == "lorem (ipsum)\nAdditional description\n\n");
+    REQUIRE(parameter.node.name == "id");
+    REQUIRE(parameter.node.type == "string");
+    REQUIRE(parameter.node.description == "lorem (ipsum)\nAdditional description\n\n");
+
+    REQUIRE(parameter.sourceMap.name.sourceMap.size() == 1);
+    REQUIRE(parameter.sourceMap.name.sourceMap[0].location == 0);
+    REQUIRE(parameter.sourceMap.name.sourceMap[0].length == 57);
+    REQUIRE(parameter.sourceMap.type.sourceMap.size() == 1);
+    REQUIRE(parameter.sourceMap.type.sourceMap[0].location == 0);
+    REQUIRE(parameter.sourceMap.type.sourceMap[0].length == 57);
+    REQUIRE(parameter.sourceMap.defaultValue.sourceMap.empty());
+    REQUIRE(parameter.sourceMap.exampleValue.sourceMap.empty());
+    REQUIRE(parameter.sourceMap.description.sourceMap.size() == 2);
+    REQUIRE(parameter.sourceMap.description.sourceMap[0].location == 0);
+    REQUIRE(parameter.sourceMap.description.sourceMap[0].length == 57);
+    REQUIRE(parameter.sourceMap.description.sourceMap[1].location == 0);
+    REQUIRE(parameter.sourceMap.description.sourceMap[1].length == 57);
+    REQUIRE(parameter.sourceMap.use.sourceMap.empty());
+    REQUIRE(parameter.sourceMap.values.collection.empty());
 }
 
 TEST_CASE("Parameter with list in description", "[parameter]")
@@ -301,14 +467,33 @@ TEST_CASE("Parameter with list in description", "[parameter]")
     "  + Ut pulvinar\n"\
     "  + Mauris condimentum\n";
 
-    Parameter parameter;
-    Report report;
-    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, report, parameter);
+    ParseResult<Parameter> parameter;
+    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, parameter);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(parameter.report.error.code == Error::OK);
+    REQUIRE(parameter.report.warnings.empty());
 
-    REQUIRE(parameter.name == "id");
-    REQUIRE(parameter.type == "string");
-    REQUIRE(parameter.description == "lorem (ipsum)\ndolor sit amet\n\n+ Ut pulvinar\n\n+ Mauris condimentum\n");
+    REQUIRE(parameter.node.name == "id");
+    REQUIRE(parameter.node.type == "string");
+    REQUIRE(parameter.node.description == "lorem (ipsum)\ndolor sit amet\n\n+ Ut pulvinar\n\n+ Mauris condimentum\n");;
+
+    REQUIRE(parameter.sourceMap.name.sourceMap.size() == 2);
+    REQUIRE(parameter.sourceMap.name.sourceMap[0].location == 2);
+    REQUIRE(parameter.sourceMap.name.sourceMap[0].length == 40);
+    REQUIRE(parameter.sourceMap.name.sourceMap[1].location == 44);
+    REQUIRE(parameter.sourceMap.name.sourceMap[1].length == 15);
+    REQUIRE(parameter.sourceMap.description.sourceMap.size() == 6);
+    REQUIRE(parameter.sourceMap.description.sourceMap[0].location == 2);
+    REQUIRE(parameter.sourceMap.description.sourceMap[0].length == 40);
+    REQUIRE(parameter.sourceMap.description.sourceMap[1].location == 44);
+    REQUIRE(parameter.sourceMap.description.sourceMap[1].length == 15);
+    REQUIRE(parameter.sourceMap.description.sourceMap[2].location == 2);
+    REQUIRE(parameter.sourceMap.description.sourceMap[2].length == 40);
+    REQUIRE(parameter.sourceMap.description.sourceMap[3].location == 44);
+    REQUIRE(parameter.sourceMap.description.sourceMap[3].length == 15);
+    REQUIRE(parameter.sourceMap.description.sourceMap[4].location == 62);
+    REQUIRE(parameter.sourceMap.description.sourceMap[4].length == 14);
+    REQUIRE(parameter.sourceMap.description.sourceMap[5].location == 78);
+    REQUIRE(parameter.sourceMap.description.sourceMap[5].length == 21);
+    REQUIRE(parameter.sourceMap.values.collection.empty());
 }

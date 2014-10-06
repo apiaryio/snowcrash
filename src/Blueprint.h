@@ -80,7 +80,16 @@ namespace snowcrash {
      *  E.g. "Content-Type: application/json"
      */
     typedef KeyValuePair Header;
+
+    /** Metadata Collection */
+    typedef Collection<Metadata>::type MetadataCollection;
+
+    /** Headers */
+    typedef Collection<Header>::type Headers;
     
+    /** Collection of Parameter Values */
+    typedef Collection<Value>::type Values;
+
     /** Parameter Use flag */
     enum ParameterUse {
         UndefinedParameterUse,
@@ -110,8 +119,11 @@ namespace snowcrash {
         Value exampleValue;
         
         /** Enumeration of possible values */
-        Collection<Value>::type values;
+        Values values;
     };
+
+    /** Source Map of Collection of Parameters */
+    typedef Collection<Parameter>::type Parameters;
 
     /** Name of a symbol */
     typedef std::string SymbolName;
@@ -128,10 +140,10 @@ namespace snowcrash {
         Description description;
         
         /** Payload-specific Parameters */
-        Collection<Parameter>::type parameters;
+        Parameters parameters;
         
         /** Payload-specific Headers */
-        Collection<Header>::type headers;
+        Headers headers;
         
         /** Body */
         Asset body;
@@ -157,6 +169,12 @@ namespace snowcrash {
      */
     typedef Payload Response;
     
+    /** Collection of Requests */
+    typedef Collection<Request>::type Requests;
+
+    /** Collection of Responses */
+    typedef Collection<Response>::type Responses;
+
     /**
      *  An HTTP transaction example.
      */
@@ -169,12 +187,15 @@ namespace snowcrash {
         Description description;
         
         /** Requests */
-        Collection<Request>::type requests;
+        Requests requests;
         
         /** Responses */
-        Collection<Response>::type responses;
+        Responses responses;
     };
     
+    /** Collection of Transaction examples */
+    typedef Collection<TransactionExample>::type TransactionExamples;
+
     /**
      *  Action
      */
@@ -190,7 +211,7 @@ namespace snowcrash {
         Description description;
         
         /** Action-specific Parameters */
-        Collection<Parameter>::type parameters;
+        Parameters parameters;
         
         /** 
          *  \brief Action-specific HTTP headers
@@ -204,12 +225,15 @@ namespace snowcrash {
          *  
          *  Use respective payload's header collection instead.
          */
-        DEPRECATED Collection<Header>::type headers;
+        DEPRECATED Headers headers;
         
         /** Transactions examples */
-        Collection<TransactionExample>::type examples;
+        TransactionExamples examples;
     };
     
+    /** Collection of Actions */
+    typedef Collection<Action>::type Actions;
+
     /**
      *  API Resource
      */
@@ -228,7 +252,7 @@ namespace snowcrash {
         ResourceModel model;
         
         /** Parameters */
-        Collection<Parameter>::type parameters;
+        Parameters parameters;
         
         /**
          *  \brief Resource-specific HTTP Headers
@@ -242,12 +266,15 @@ namespace snowcrash {
          *
          *  Use respective payload's header collection instead.
          */
-        DEPRECATED Collection<Header>::type headers;
+        DEPRECATED Headers headers;
         
         /** A set of Actions specified for this Resource */
-        Collection<Action>::type actions;
+        Actions actions;
     };
     
+    /** Collection of Resources */
+    typedef Collection<Resource>::type Resources;
+
     /**
      *  Group of API Resources
      */
@@ -260,8 +287,11 @@ namespace snowcrash {
         Description description;
         
         /** Resources */
-        Collection<Resource>::type resources;
+        Resources resources;
     };
+
+    /** Collection of Resource groups */
+    typedef Collection<ResourceGroup>::type ResourceGroups;
 
     /** 
      *  \brief API Blueprint AST
@@ -272,7 +302,7 @@ namespace snowcrash {
     struct Blueprint {
         
         /** Metadata */
-        Collection<Metadata>::type metadata;
+        MetadataCollection metadata;
         
         /** The API Name */
         Name name;
@@ -281,7 +311,7 @@ namespace snowcrash {
         Description description;
         
         /** The set of API Resource Groups */
-        Collection<ResourceGroup>::type resourceGroups;
+        ResourceGroups resourceGroups;
     };
 }
 

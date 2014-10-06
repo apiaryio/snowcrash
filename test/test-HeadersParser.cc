@@ -30,39 +30,58 @@ TEST_CASE("recognize headers signature", "[headers]")
     markdownParser.parse(HeadersFixture, markdownAST);
     
     REQUIRE(!markdownAST.children().empty());
-    REQUIRE(SectionProcessor<Headers>::sectionType(markdownAST.children().begin()) == HeadersSectionType);
+    SectionType sectionType = SectionProcessor<Headers>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == HeadersSectionType);
 }
 
 TEST_CASE("parse headers fixture", "[headers]")
 {
-    Headers headers;
-    Report report;
-    SectionParserHelper<Headers, HeadersParser>::parse(HeadersFixture, HeadersSectionType, report, headers);
+    ParseResult<Headers> headers;
+    SectionParserHelper<Headers, HeadersParser>::parse(HeadersFixture, HeadersSectionType, headers);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(headers.report.error.code == Error::OK);
+    REQUIRE(headers.report.warnings.empty());
 
-    REQUIRE(headers.size() == 2);
-    REQUIRE(headers[0].first == "Content-Type");
-    REQUIRE(headers[0].second == "application/json");
-    REQUIRE(headers[1].first == "X-My-Header");
-    REQUIRE(headers[1].second == "Hello World!");
+    REQUIRE(headers.node.size() == 2);
+    REQUIRE(headers.node[0].first == "Content-Type");
+    REQUIRE(headers.node[0].second == "application/json");
+    REQUIRE(headers.node[1].first == "X-My-Header");
+    REQUIRE(headers.node[1].second == "Hello World!");
+
+    REQUIRE(headers.sourceMap.collection.size() == 2);
+    REQUIRE(headers.sourceMap.collection[0].sourceMap.size() == 2);
+    REQUIRE(headers.sourceMap.collection[0].sourceMap[0].location == 15);
+    REQUIRE(headers.sourceMap.collection[0].sourceMap[0].length == 35);
+    REQUIRE(headers.sourceMap.collection[0].sourceMap[1].location == 54);
+    REQUIRE(headers.sourceMap.collection[0].sourceMap[1].length == 30);
+    REQUIRE(headers.sourceMap.collection[1].sourceMap.size() == 2);
+    REQUIRE(headers.sourceMap.collection[1].sourceMap[0].location == 15);
+    REQUIRE(headers.sourceMap.collection[1].sourceMap[0].length == 35);
+    REQUIRE(headers.sourceMap.collection[1].sourceMap[1].location == 54);
+    REQUIRE(headers.sourceMap.collection[1].sourceMap[1].length == 30);
 }
 
 TEST_CASE("parse headers fixture with no empty line between signature and content", "[headers]")
 {
-    Headers headers;
-    Report report;
-    SectionParserHelper<Headers, HeadersParser>::parse(HeadersSignatureContentFixture, HeadersSectionType, report, headers);
+    ParseResult<Headers> headers;
+    SectionParserHelper<Headers, HeadersParser>::parse(HeadersSignatureContentFixture, HeadersSectionType, headers);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1); // content in signature
+    REQUIRE(headers.report.error.code == Error::OK);
+    REQUIRE(headers.report.warnings.size() == 1); // content in signature
 
-    REQUIRE(headers.size() == 2);
-    REQUIRE(headers[0].first == "Content-Type");
-    REQUIRE(headers[0].second == "application/json");
-    REQUIRE(headers[1].first == "X-My-Header");
-    REQUIRE(headers[1].second == "Hello World!");
+    REQUIRE(headers.node.size() == 2);
+    REQUIRE(headers.node[0].first == "Content-Type");
+    REQUIRE(headers.node[0].second == "application/json");
+    REQUIRE(headers.node[1].first == "X-My-Header");
+    REQUIRE(headers.node[1].second == "Hello World!");
+
+    REQUIRE(headers.sourceMap.collection.size() == 2);
+    REQUIRE(headers.sourceMap.collection[0].sourceMap.size() == 1);
+    REQUIRE(headers.sourceMap.collection[0].sourceMap[0].location == 0);
+    REQUIRE(headers.sourceMap.collection[0].sourceMap[0].length == 83);
+    REQUIRE(headers.sourceMap.collection[1].sourceMap.size() == 1);
+    REQUIRE(headers.sourceMap.collection[1].sourceMap[0].location == 0);
+    REQUIRE(headers.sourceMap.collection[1].sourceMap[0].length == 83);
 }
 
 TEST_CASE("parse malformed headers fixture", "[headers]")
@@ -70,18 +89,33 @@ TEST_CASE("parse malformed headers fixture", "[headers]")
     mdp::ByteBuffer source = HeadersFixture;
     source += "        X-Custom-Header:\n";
 
-    Headers headers;
-    Report report;
-    SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, report, headers);
+    ParseResult<Headers> headers;
+    SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1); // malformed header
+    REQUIRE(headers.report.error.code == Error::OK);
+    REQUIRE(headers.report.warnings.size() == 1); // malformed header
 
-    REQUIRE(headers.size() == 2);
-    REQUIRE(headers[0].first == "Content-Type");
-    REQUIRE(headers[0].second == "application/json");
-    REQUIRE(headers[1].first == "X-My-Header");
-    REQUIRE(headers[1].second == "Hello World!");
+    REQUIRE(headers.node.size() == 2);
+    REQUIRE(headers.node[0].first == "Content-Type");
+    REQUIRE(headers.node[0].second == "application/json");
+    REQUIRE(headers.node[1].first == "X-My-Header");
+    REQUIRE(headers.node[1].second == "Hello World!");
+
+    REQUIRE(headers.sourceMap.collection.size() == 2);
+    REQUIRE(headers.sourceMap.collection[0].sourceMap.size() == 3);
+    REQUIRE(headers.sourceMap.collection[0].sourceMap[0].location == 15);
+    REQUIRE(headers.sourceMap.collection[0].sourceMap[0].length == 35);
+    REQUIRE(headers.sourceMap.collection[0].sourceMap[1].location == 54);
+    REQUIRE(headers.sourceMap.collection[0].sourceMap[1].length == 30);
+    REQUIRE(headers.sourceMap.collection[0].sourceMap[2].location == 88);
+    REQUIRE(headers.sourceMap.collection[0].sourceMap[2].length == 21);
+    REQUIRE(headers.sourceMap.collection[1].sourceMap.size() == 3);
+    REQUIRE(headers.sourceMap.collection[1].sourceMap[0].location == 15);
+    REQUIRE(headers.sourceMap.collection[1].sourceMap[0].length == 35);
+    REQUIRE(headers.sourceMap.collection[1].sourceMap[1].location == 54);
+    REQUIRE(headers.sourceMap.collection[1].sourceMap[1].length == 30);
+    REQUIRE(headers.sourceMap.collection[1].sourceMap[2].location == 88);
+    REQUIRE(headers.sourceMap.collection[1].sourceMap[2].length == 21);
 }
 
 TEST_CASE("Parse header section composed of multiple blocks", "[headers]")
@@ -101,32 +135,42 @@ TEST_CASE("Parse header section composed of multiple blocks", "[headers]")
     source += "    B : 100\n\n";
     source += "        X-My-Header: 42\n";
 
-    Headers headers;
-    Report report;
-    SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, report, headers);
+    ParseResult<Headers> headers;
+    SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1); // not a code block
+    REQUIRE(headers.report.error.code == Error::OK);
+    REQUIRE(headers.report.warnings.size() == 1); // not a code block
 
-    REQUIRE(headers.size() == 3);
-    REQUIRE(headers[0].first == "Content-Type");
-    REQUIRE(headers[0].second == "text/plain");
-    REQUIRE(headers[1].first == "B");
-    REQUIRE(headers[1].second == "100");
-    REQUIRE(headers[2].first == "X-My-Header");
-    REQUIRE(headers[2].second == "42");
+    REQUIRE(headers.node.size() == 3);
+    REQUIRE(headers.node[0].first == "Content-Type");
+    REQUIRE(headers.node[0].second == "text/plain");
+    REQUIRE(headers.node[1].first == "B");
+    REQUIRE(headers.node[1].second == "100");
+    REQUIRE(headers.node[2].first == "X-My-Header");
+    REQUIRE(headers.node[2].second == "42");
+
+    REQUIRE(headers.sourceMap.collection.size() == 3);
+    REQUIRE(headers.sourceMap.collection[0].sourceMap.size() == 1);
+    REQUIRE(headers.sourceMap.collection[0].sourceMap[0].location == 15);
+    REQUIRE(headers.sourceMap.collection[0].sourceMap[0].length == 33);
+    REQUIRE(headers.sourceMap.collection[1].sourceMap.size() == 1);
+    REQUIRE(headers.sourceMap.collection[1].sourceMap[0].location == 52);
+    REQUIRE(headers.sourceMap.collection[1].sourceMap[0].length == 9);
+    REQUIRE(headers.sourceMap.collection[2].sourceMap.size() == 1);
+    REQUIRE(headers.sourceMap.collection[2].sourceMap[0].location == 65);
+    REQUIRE(headers.sourceMap.collection[2].sourceMap[0].length == 20);
 }
 
 TEST_CASE("Parse header section with missing headers", "[headers]")
 {
     mdp::ByteBuffer source = "+ Headers\n\n";
 
-    Headers headers;
-    Report report;
-    SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, report, headers);
+    ParseResult<Headers> headers;
+    SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1); // no headers
+    REQUIRE(headers.report.error.code == Error::OK);
+    REQUIRE(headers.report.warnings.size() == 1); // no headers
 
-    REQUIRE(headers.size() == 0);
+    REQUIRE(headers.node.size() == 0);
+    REQUIRE(headers.sourceMap.collection.size() == 0);
 }

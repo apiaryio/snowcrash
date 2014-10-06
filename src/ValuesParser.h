@@ -18,9 +18,6 @@
 
 namespace snowcrash {
 
-    /** Parameter Values */
-    typedef Collection<Value>::type Values; // TODO: Move this into core later
-
     /** Parameter Values matching regex */
     const char* const ValuesRegex = "^[[:blank:]]*[Vv]alues[[:blank:]]*$";
 
@@ -33,8 +30,7 @@ namespace snowcrash {
         static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
                                                          const MarkdownNodes& siblings,
                                                          SectionParserData& pd,
-                                                         Report& report,
-                                                         Values& out) {
+                                                         ParseResult<Values>& out) {
 
             if (pd.sectionContext() == ValueSectionType) {
 
@@ -44,7 +40,13 @@ namespace snowcrash {
                 RegexCapture(content, PARAMETER_VALUE, captureGroups);
 
                 if (captureGroups.size() > 1) {
-                    out.push_back(captureGroups[1]);
+                    out.node.push_back(captureGroups[1]);
+
+                    if (pd.exportSourceMap()) {
+                        SourceMap<Value> valueSM;
+                        valueSM.sourceMap = node->sourceMap;
+                        out.sourceMap.collection.push_back(valueSM);
+                    }
                 } else {
                     TrimString(content);
 
@@ -54,9 +56,9 @@ namespace snowcrash {
                     ss << ", expected '`" << content << "`'";
 
                     mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                    report.warnings.push_back(Warning(ss.str(),
-                                                      IgnoringWarning,
-                                                      sourceMap));
+                    out.report.warnings.push_back(Warning(ss.str(),
+                                                          IgnoringWarning,
+                                                          sourceMap));
                 }
 
                 return ++MarkdownNodeIterator(node);
@@ -68,8 +70,7 @@ namespace snowcrash {
         static MarkdownNodeIterator processDescription(const MarkdownNodeIterator& node,
                                                        const MarkdownNodes& siblings,
                                                        SectionParserData& pd,
-                                                       Report& report,
-                                                       Values& out) {
+                                                       ParseResult<Values>& out) {
 
             return node;
         }

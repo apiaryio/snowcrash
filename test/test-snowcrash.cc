@@ -17,18 +17,16 @@ TEST_CASE("Parse empty blueprint", "[parser]")
 {
     mdp::ByteBuffer source = "";
 
-    Blueprint blueprint;
-    Report report;
+    ParseResult<Blueprint> blueprint;
+    parse(source, 0, blueprint);
 
-    parse(source, 0, report, blueprint);
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.empty());
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
-
-    REQUIRE(blueprint.metadata.empty());
-    REQUIRE(blueprint.name.empty());
-    REQUIRE(blueprint.description.empty());
-    REQUIRE(blueprint.resourceGroups.empty());
+    REQUIRE(blueprint.node.metadata.empty());
+    REQUIRE(blueprint.node.name.empty());
+    REQUIRE(blueprint.node.description.empty());
+    REQUIRE(blueprint.node.resourceGroups.empty());
 }
 
 TEST_CASE("Parse simple blueprint", "[parser]")
@@ -42,19 +40,17 @@ TEST_CASE("Parse simple blueprint", "[parser]")
     "            Text\n\n"\
     "            { ... }\n";
 
-    Blueprint blueprint;
-    Report report;
+    ParseResult<Blueprint> blueprint;
+    parse(source, 0, blueprint);
 
-    parse(source, 0, report, blueprint);
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.empty());
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(blueprint.node.name == "Snowcrash API");
+    REQUIRE(blueprint.node.description.empty());
+    REQUIRE(blueprint.node.resourceGroups.size() == 1);
 
-    REQUIRE(blueprint.name == "Snowcrash API");
-    REQUIRE(blueprint.description.empty());
-    REQUIRE(blueprint.resourceGroups.size() == 1);
-
-    ResourceGroup& resourceGroup = blueprint.resourceGroups.front();
+    ResourceGroup& resourceGroup = blueprint.node.resourceGroups.front();
     REQUIRE(resourceGroup.name.empty());
     REQUIRE(resourceGroup.description.empty());
     REQUIRE(resourceGroup.resources.size() == 1);
@@ -77,25 +73,21 @@ TEST_CASE("Parse simple blueprint", "[parser]")
 
 TEST_CASE("Parse blueprint with unsupported characters", "[parser]")
 {
-    Blueprint blueprint1;
-    Report report1;
+    ParseResult<Blueprint> blueprint1;
+    parse("hello\t", 0, blueprint1);
 
-    parse("hello\t", 0, report1, blueprint1);
+    REQUIRE(blueprint1.report.error.code != Error::OK);
+    REQUIRE(blueprint1.report.error.location.size() == 1);
+    REQUIRE(blueprint1.report.error.location[0].location == 5);
+    REQUIRE(blueprint1.report.error.location[0].length == 1);
 
-    REQUIRE(report1.error.code != Error::OK);
-    REQUIRE(report1.error.location.size() == 1);
-    REQUIRE(report1.error.location[0].location == 5);
-    REQUIRE(report1.error.location[0].length == 1);
+    ParseResult<Blueprint> blueprint2;
+    parse("sun\n\rsalt\n\r", 0, blueprint2);
 
-    Blueprint blueprint2;
-    Report report2;
-
-    snowcrash::parse("sun\n\rsalt\n\r", 0, report2, blueprint2);
-
-    REQUIRE(report2.error.code != Error::OK);
-    REQUIRE(report2.error.location.size() == 1);
-    REQUIRE(report2.error.location[0].location == 4);
-    REQUIRE(report2.error.location[0].length == 1);
+    REQUIRE(blueprint2.report.error.code != Error::OK);
+    REQUIRE(blueprint2.report.error.location.size() == 1);
+    REQUIRE(blueprint2.report.error.location[0].location == 4);
+    REQUIRE(blueprint2.report.error.location[0].length == 1);
 }
 
 TEST_CASE("Do not report duplicate response when media type differs", "[method][#14]")
@@ -107,13 +99,12 @@ TEST_CASE("Do not report duplicate response when media type differs", "[method][
     "+ Response 200 (text/plain)\n\n"\
     "        Hello.\n";
 
-    Blueprint blueprint;
-    Report report;
+    ParseResult<Blueprint> blueprint;
 
-    parse(source, 0, report, blueprint);
+    parse(source, 0, blueprint);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.empty());
 }
 
 TEST_CASE("Support description ending with an list item", "[parser][#8]")
@@ -124,22 +115,20 @@ TEST_CASE("Support description ending with an list item", "[parser][#8]")
     "+ Response 200\n\n"\
     "        ...\n";
 
-    Blueprint blueprint;
-    Report report;
+    ParseResult<Blueprint> blueprint;
+    parse(source, 0, blueprint);
 
-    parse(source, 0, report, blueprint);
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.empty());
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
-
-    REQUIRE(blueprint.resourceGroups.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description == "+ a description item\n");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body == "...\n");
+    REQUIRE(blueprint.node.resourceGroups.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].description == "+ a description item\n");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body == "...\n");
 }
 
 TEST_CASE("Invalid ‘warning: empty body asset’ for certain status codes", "[parser][#13]")
@@ -148,22 +137,20 @@ TEST_CASE("Invalid ‘warning: empty body asset’ for certain status codes", "[
     "# GET /1\n"\
     "+ Response 304\n";
 
-    Blueprint blueprint;
-    Report report;
+    ParseResult<Blueprint> blueprint;
+    parse(source, 0, blueprint);
 
-    parse(source, 0, report, blueprint);
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.empty());
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
-
-    REQUIRE(blueprint.resourceGroups.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "304");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body.empty());
+    REQUIRE(blueprint.node.resourceGroups.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].description.empty());
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "304");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body.empty());
 }
 
 TEST_CASE("SIGTERM parsing blueprint", "[parser][#45]")
@@ -186,13 +173,11 @@ TEST_CASE("SIGTERM parsing blueprint", "[parser][#45]")
     "# J\n"\
     "> K";
 
-    Blueprint blueprint;
-    Report report;
+    ParseResult<Blueprint> blueprint;
+    parse(source, 0, blueprint);
 
-    parse(source, 0, report, blueprint);
-
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 4);
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.size() == 4);
 }
 
 TEST_CASE("Parse adjacent asset blocks", "[parser][#9]")
@@ -208,24 +193,22 @@ TEST_CASE("Parse adjacent asset blocks", "[parser][#9]")
     "\n"\
     "        Not found\n";
 
-    Blueprint blueprint;
-    Report report;
+    ParseResult<Blueprint> blueprint;
+    parse(source, 0, blueprint);
 
-    parse(source, 0, report, blueprint);
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.size() == 2);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 2);
-
-    REQUIRE(blueprint.resourceGroups.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 2);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body == "asset\n\npre\n\n");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[1].name == "404");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[1].body == "Not found\n");
+    REQUIRE(blueprint.node.resourceGroups.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].description.empty());
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 2);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body == "asset\n\npre\n\n");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[1].name == "404");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[1].body == "Not found\n");
 }
 
 TEST_CASE("Parse adjacent asset list blocks", "[parser][#9]")
@@ -235,22 +218,20 @@ TEST_CASE("Parse adjacent asset list blocks", "[parser][#9]")
     "+ response 200\n"\
     "+ list\n";
 
-    Blueprint blueprint;
-    Report report;
+    ParseResult<Blueprint> blueprint;
+    parse(source, 0, blueprint);
 
-    parse(source, 0, report, blueprint);
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.size() == 1);
+    REQUIRE(blueprint.report.warnings[0].code == IgnoringWarning);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
-    REQUIRE(report.warnings[0].code == IgnoringWarning);
-
-    REQUIRE(blueprint.resourceGroups.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body.empty());
+    REQUIRE(blueprint.node.resourceGroups.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].description.empty());
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body.empty());
 }
 
 TEST_CASE("Parse adjacent nested asset blocks", "[parser][#9]")
@@ -265,23 +246,21 @@ TEST_CASE("Parse adjacent nested asset blocks", "[parser][#9]")
     "    B\n"\
     "C\n";
 
-    Blueprint blueprint;
-    Report report;
+    ParseResult<Blueprint> blueprint;
+    parse(source, 0, blueprint);
 
-    parse(source, 0, report, blueprint);
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.size() == 2);
+    REQUIRE(blueprint.report.warnings[0].code == IndentationWarning);
+    REQUIRE(blueprint.report.warnings[1].code == IndentationWarning);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 2);
-    REQUIRE(report.warnings[0].code == IndentationWarning);
-    REQUIRE(report.warnings[1].code == IndentationWarning);
-
-    REQUIRE(blueprint.resourceGroups.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].description.empty());
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body == "A\nB\nC\n\n");
+    REQUIRE(blueprint.node.resourceGroups.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].description.empty());
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body == "A\nB\nC\n\n");
 }
 
 TEST_CASE("Exception while parsing a blueprint with leading empty space", "[regression][parser]")
@@ -290,13 +269,12 @@ TEST_CASE("Exception while parsing a blueprint with leading empty space", "[regr
     "\n"\
     "# PUT /branch\n";
     
-    Blueprint blueprint;
-    Report report;
+    ParseResult<Blueprint> blueprint;
     
-    REQUIRE_NOTHROW(parse(source, 0, report, blueprint));
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
-    REQUIRE(report.warnings[0].code == EmptyDefinitionWarning);
+    REQUIRE_NOTHROW(parse(source, 0, blueprint));
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.size() == 1);
+    REQUIRE(blueprint.report.warnings[0].code == EmptyDefinitionWarning);
 }
 
 TEST_CASE("Invalid source map without closing newline", "[regression][parser]")
@@ -304,63 +282,56 @@ TEST_CASE("Invalid source map without closing newline", "[regression][parser]")
     mdp::ByteBuffer source = \
     "# PUT /branch";
     
-    Blueprint blueprint;
-    Report report;
+    ParseResult<Blueprint> blueprint;
     
-    REQUIRE_NOTHROW(parse(source, 0, report, blueprint));
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
-    REQUIRE(report.warnings[0].code == EmptyDefinitionWarning);
-    REQUIRE(report.warnings[0].location.size() == 1);
-    REQUIRE(report.warnings[0].location[0].location == 0);
-    REQUIRE(report.warnings[0].location[0].length == 13);
+    REQUIRE_NOTHROW(parse(source, 0, blueprint));
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.size() == 1);
+    REQUIRE(blueprint.report.warnings[0].code == EmptyDefinitionWarning);
+    REQUIRE(blueprint.report.warnings[0].location.size() == 1);
+    REQUIRE(blueprint.report.warnings[0].location[0].location == 0);
+    REQUIRE(blueprint.report.warnings[0].location[0].length == 13);
 }
 
 TEST_CASE("Warn about missing API name if there is an API description", "[parser][regression]")
 {
-    mdp::ByteBuffer source = \
+    mdp::ByteBuffer source1 = \
     "Hello World\n";
     
-    Blueprint blueprint;
-    Report report;
+    ParseResult<Blueprint> blueprint1;
+    parse(source1, 0, blueprint1);
     
-    parse(source, 0, report, blueprint);
+    REQUIRE(blueprint1.report.error.code == Error::OK);
+    REQUIRE(blueprint1.report.warnings.size() == 1);
+    REQUIRE(blueprint1.report.warnings[0].code == APINameWarning);
     
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
-    REQUIRE(report.warnings[0].code == APINameWarning);
-    
-    REQUIRE(blueprint.name.empty());
-    REQUIRE(blueprint.description == "Hello World\n");
-    REQUIRE(blueprint.resourceGroups.empty());
+    REQUIRE(blueprint1.node.name.empty());
+    REQUIRE(blueprint1.node.description == "Hello World\n");
+    REQUIRE(blueprint1.node.resourceGroups.empty());
     
     mdp::ByteBuffer source2 = \
     "# API\n"\
     "Hello World\n";
     
-    Blueprint blueprint2;
-    Report report2;
+    ParseResult<Blueprint> blueprint2;
+    parse(source2, 0, blueprint2);
     
-    parse(source2, 0, report2, blueprint2);
+    REQUIRE(blueprint2.report.error.code == Error::OK);
+    REQUIRE(blueprint2.report.warnings.empty());
     
-    REQUIRE(report2.error.code == Error::OK);
-    REQUIRE(report2.warnings.empty());
-    
-    REQUIRE(blueprint2.name == "API");
-    REQUIRE(blueprint2.description == "Hello World\n");
-    REQUIRE(blueprint2.resourceGroups.empty());
+    REQUIRE(blueprint2.node.name == "API");
+    REQUIRE(blueprint2.node.description == "Hello World\n");
+    REQUIRE(blueprint2.node.resourceGroups.empty());
 
     mdp::ByteBuffer source3 = \
     "# POST /1\n"\
     "+ Response 201";
     
-    Blueprint blueprint3;
-    Report report3;
+    ParseResult<Blueprint> blueprint3;
+    parse(source3, 0, blueprint3);
     
-    parse(source3, 0, report3, blueprint3);
-    
-    REQUIRE(report3.error.code == Error::OK);
-    REQUIRE(report3.warnings.empty());
+    REQUIRE(blueprint3.report.error.code == Error::OK);
+    REQUIRE(blueprint3.report.warnings.empty());
 }
 
 TEST_CASE("Resource with incorrect URI segfault", "[parser][regression]")
@@ -372,20 +343,18 @@ TEST_CASE("Resource with incorrect URI segfault", "[parser][regression]")
     "+ Response 200\n"\
     "\n";
     
-    Blueprint blueprint;
-    Report report;
+    ParseResult<Blueprint> blueprint;
+    parse(source, 0, blueprint);
+
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.empty());
     
-    parse(source, 0, report, blueprint);
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(blueprint.node.name.empty());
+    REQUIRE(blueprint.node.description.empty());
     
-    REQUIRE(blueprint.name.empty());
-    REQUIRE(blueprint.description.empty());
-    
-    REQUIRE(blueprint.resourceGroups.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].name == "A");
-    REQUIRE(blueprint.resourceGroups[0].description == "## Resource [wronguri]\n\n### Retrieve [GET]\n\n+ Response 200\n\n");
-    
+    REQUIRE(blueprint.node.resourceGroups.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].name == "A");
+    REQUIRE(blueprint.node.resourceGroups[0].description == "## Resource [wronguri]\n\n### Retrieve [GET]\n\n+ Response 200\n\n");
 }
 
 TEST_CASE("Dangling block not recognized", "[parser][regression][#186]")
@@ -398,22 +367,21 @@ TEST_CASE("Dangling block not recognized", "[parser][regression][#186]")
     "    { ... }\n"\
     "```\n";
     
-    Blueprint blueprint;
-    Report report;
+    ParseResult<Blueprint> blueprint;
+    parse(source, 0, blueprint);
+
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.size() == 1);
+    REQUIRE(blueprint.report.warnings[0].code == IndentationWarning);
     
-    parse(source, 0, report, blueprint);
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
-    REQUIRE(report.warnings[0].code == IndentationWarning);
+    REQUIRE(blueprint.node.name.empty());
+    REQUIRE(blueprint.node.description.empty());
     
-    REQUIRE(blueprint.name.empty());
-    REQUIRE(blueprint.description.empty());
-    
-    REQUIRE(blueprint.resourceGroups.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].name == "A");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].uriTemplate == "/a");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].model.body == "    { ... }\n\n");
+    REQUIRE(blueprint.node.resourceGroups.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].name == "A");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].uriTemplate == "/a");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].model.body == "    { ... }\n\n");
 }
 
 TEST_CASE("Ignoring block recovery", "[parser][regression][#188]")
@@ -428,21 +396,20 @@ TEST_CASE("Ignoring block recovery", "[parser][regression][#188]")
     "\n"\
     "### Remove a Note [DELETE]\n";
     
-    Blueprint blueprint;
-    Report report;
+    ParseResult<Blueprint> blueprint;
+    parse(source, 0, blueprint);
+
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.size() == 2);
+    REQUIRE(blueprint.report.warnings[0].code == IgnoringWarning);
+    REQUIRE(blueprint.report.warnings[1].code == EmptyDefinitionWarning);
     
-    parse(source, 0, report, blueprint);
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 2);
-    REQUIRE(report.warnings[0].code == IgnoringWarning);
-    REQUIRE(report.warnings[1].code == EmptyDefinitionWarning);
-    
-    REQUIRE(blueprint.resourceGroups.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].name == "Note");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].name == "Remove a Note");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].method == "DELETE");
+    REQUIRE(blueprint.node.resourceGroups.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].name == "Note");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].name == "Remove a Note");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].method == "DELETE");
 }
 
 TEST_CASE("Ignoring dangling model assets", "[parser][regression][#196]")
@@ -458,24 +425,23 @@ TEST_CASE("Ignoring dangling model assets", "[parser][regression][#196]")
     "\n"\
     "    [A][]\n";
     
-    Blueprint blueprint;
-    Report report;
-    
-    parse(source, 0, report, blueprint);
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
-    REQUIRE(report.warnings[0].code == IndentationWarning);
+    ParseResult<Blueprint> blueprint;
+    parse(source, 0, blueprint);
 
-    REQUIRE(blueprint.resourceGroups.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources.size() == 2);
-    REQUIRE(blueprint.resourceGroups[0].resources[1].name.empty());
-    REQUIRE(blueprint.resourceGroups[0].resources[1].uriTemplate == "/B");
-    REQUIRE(blueprint.resourceGroups[0].resources[1].actions.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[1].actions[0].method == "POST");
-    REQUIRE(blueprint.resourceGroups[0].resources[1].actions[0].examples.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[1].actions[0].examples[0].responses.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[1].actions[0].examples[0].responses[0].name == "200");
-    REQUIRE(blueprint.resourceGroups[0].resources[1].actions[0].examples[0].responses[0].body == "{ A }\n\n");
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.size() == 1);
+    REQUIRE(blueprint.report.warnings[0].code == IndentationWarning);
+
+    REQUIRE(blueprint.node.resourceGroups.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources.size() == 2);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[1].name.empty());
+    REQUIRE(blueprint.node.resourceGroups[0].resources[1].uriTemplate == "/B");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[1].actions.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[1].actions[0].method == "POST");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[1].actions[0].examples.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[1].actions[0].examples[0].responses.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[1].actions[0].examples[0].responses[0].name == "200");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[1].actions[0].examples[0].responses[0].body == "{ A }\n\n");
 }
 
 TEST_CASE("Ignoring local media type", "[parser][regression][#195]")
@@ -490,25 +456,33 @@ TEST_CASE("Ignoring local media type", "[parser][regression][#195]")
     "+ Response 200 (X)\n"\
     "\n"\
     "    [A][]\n";
+    
+    ParseResult<Blueprint> blueprint;
+    parse(source, ExportSourcemapOption, blueprint);
 
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.size() == 1);
+    REQUIRE(blueprint.report.warnings[0].code == IgnoringWarning);
     
-    Blueprint blueprint;
-    Report report;
-    
-    parse(source, 0, report, blueprint);
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
-    REQUIRE(report.warnings[0].code == IgnoringWarning);
-    
-    REQUIRE(blueprint.resourceGroups.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[0].first == "Content-Type");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[0].second == "Y");
+    REQUIRE(blueprint.node.resourceGroups.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[0].first == "Content-Type");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[0].second == "Y");
+
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection.size() == 1);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection.size() == 1);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection.size() == 1);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection[0].examples.collection.size() == 1);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection[0].examples.collection[0].responses.collection.size() == 1);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection[0].examples.collection[0].responses.collection[0].headers.collection.size() == 1);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[0].sourceMap.size() == 1);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[0].sourceMap[0].location == 11);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[0].sourceMap[0].length == 11);
 }
 
 TEST_CASE("Using local media type", "[parser][regression][#195]")
@@ -524,23 +498,31 @@ TEST_CASE("Using local media type", "[parser][regression][#195]")
     "\n"\
     "    [A][]\n";
     
+    ParseResult<Blueprint> blueprint;
+    parse(source, ExportSourcemapOption, blueprint);
+
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.empty());
     
-    Blueprint blueprint;
-    Report report;
-    
-    parse(source, 0, report, blueprint);
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
-    
-    REQUIRE(blueprint.resourceGroups.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[0].first == "Content-Type");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[0].second == "X");
+    REQUIRE(blueprint.node.resourceGroups.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[0].first == "Content-Type");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[0].second == "X");
+
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection.size() == 1);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection.size() == 1);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection.size() == 1);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection[0].examples.collection.size() == 1);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection[0].examples.collection[0].responses.collection.size() == 1);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection[0].examples.collection[0].responses.collection[0].headers.collection.size() == 1);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[0].sourceMap.size() == 1);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[0].sourceMap[0].location == 53);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[0].sourceMap[0].length == 18);
 }
 
 TEST_CASE("Parse ill-formated header", "[parser][#198][regression]")
@@ -551,23 +533,22 @@ TEST_CASE("Parse ill-formated header", "[parser][#198][regression]")
     "    + Header\n"\
     "        Location: new_url\n";
     
-    Blueprint blueprint;
-    Report report;
+    ParseResult<Blueprint> blueprint;
+    parse(source, 0, blueprint);
+
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.size() == 1);
+    REQUIRE(blueprint.report.warnings[0].code == IndentationWarning);
     
-    parse(source, 0, report, blueprint);
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
-    REQUIRE(report.warnings[0].code == IndentationWarning);
-    
-    REQUIRE(blueprint.resourceGroups.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[0].first == "Location");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[0].second == "new_url");
+    REQUIRE(blueprint.node.resourceGroups.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[0].first == "Location");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[0].second == "new_url");
 }
 
 TEST_CASE("Overshadow parameters", "[parser][#201][regression][parameters]")
@@ -586,30 +567,29 @@ TEST_CASE("Overshadow parameters", "[parser][#201][regression][parameters]")
     "\n"\
     "+ response 200\n";
     
-    Blueprint blueprint;
-    Report report;
-    
-    parse(source, 0, report, blueprint);
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
-    REQUIRE(report.warnings[0].code == RedefinitionWarning);
-    
-    REQUIRE(blueprint.resourceGroups.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions.size() == 1);
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters.size() == 4);
+    ParseResult<Blueprint> blueprint;
+    parse(source, 0, blueprint);
 
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].name == "a");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[0].description == "1");
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.size() == 1);
+    REQUIRE(blueprint.report.warnings[0].code == RedefinitionWarning);
     
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[1].name == "b");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[1].description == "2");
+    REQUIRE(blueprint.node.resourceGroups.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].parameters.size() == 4);
 
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[2].name == "c");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[2].description == "3");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].parameters[0].name == "a");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].parameters[0].description == "1");
+    
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].parameters[1].name == "b");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].parameters[1].description == "2");
 
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[3].name == "a");
-    REQUIRE(blueprint.resourceGroups[0].resources[0].actions[0].parameters[3].description == "4");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].parameters[2].name == "c");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].parameters[2].description == "3");
+
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].parameters[3].name == "a");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].parameters[3].description == "4");
 }
 
 TEST_CASE("Segfault parsing metadata only", "[parser][#205][regression]")
@@ -617,15 +597,68 @@ TEST_CASE("Segfault parsing metadata only", "[parser][#205][regression]")
     mdp::ByteBuffer source = \
     "FORMAT: 1A : SOJ\n";
 
-    Blueprint blueprint;
-    Report report;
-    
-    parse(source, 0, report, blueprint);
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    ParseResult<Blueprint> blueprint;
+    parse(source, 0, blueprint);
 
-    REQUIRE(blueprint.metadata.size() == 1);
-    REQUIRE(blueprint.metadata[0].first == "FORMAT");
-    REQUIRE(blueprint.metadata[0].second == "1A : SOJ");
-    REQUIRE(blueprint.resourceGroups.empty());
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.empty());
+
+    REQUIRE(blueprint.node.metadata.size() == 1);
+    REQUIRE(blueprint.node.metadata[0].first == "FORMAT");
+    REQUIRE(blueprint.node.metadata[0].second == "1A : SOJ");
+    REQUIRE(blueprint.node.resourceGroups.empty());
+}
+
+TEST_CASE("Don't remove link references", "[parser][#213]")
+{
+    mdp::ByteBuffer source = \
+    "# API\n\n"\
+    "This is [first example][id]\n\n"\
+    "[id]: http://a.com\n\n"\
+    "# Group A\n\n"\
+    "This is [second example][id]\n\n"\
+    "[id]: http://b.com\n\n"\
+    "## /a\n\n"\
+    "This is [third example][id]\n\n"\
+    "[id]: http://c.com\n\n";
+
+    ParseResult<Blueprint> blueprint;
+    parse(source, 0, blueprint);
+
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.empty());
+
+    REQUIRE(blueprint.node.name == "API");
+    REQUIRE(blueprint.node.description == "This is [first example][id]\n\n[id]: http://a.com\n\n");
+    REQUIRE(blueprint.node.resourceGroups.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].name == "A");
+    REQUIRE(blueprint.node.resourceGroups[0].description == "This is [second example][id]\n\n[id]: http://b.com\n\n");
+    REQUIRE(blueprint.node.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].uriTemplate == "/a");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].description == "This is [third example][id]\n\n[id]: http://c.com\n\n");
+}
+
+TEST_CASE("Don't mess up sourcemaps when there are references", "[parser][#213]")
+{
+    mdp::ByteBuffer source = \
+    "# API\n\n"\
+    "[very][] [much][] [reference][]\n\n"\
+    "[very]: http://a.com\n\n"\
+    "[much]: http://b.com\n\n"\
+    "[reference]: http://c.com\n\n"\
+    "# GET /1";
+
+    ParseResult<Blueprint> blueprint;
+    parse(source, ExportSourcemapOption, blueprint);
+
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.size() == 1);
+    REQUIRE(blueprint.report.warnings[0].code == EmptyDefinitionWarning);
+
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection.size() == 1);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection.size() == 1);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection.size() == 1);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection[0].method.sourceMap.size() == 1);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection[0].method.sourceMap[0].location == 111);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection[0].method.sourceMap[0].length == 8);
 }

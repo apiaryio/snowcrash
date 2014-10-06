@@ -20,9 +20,6 @@ namespace snowcrash {
     /** Headers matching regex */
     const char* const HeadersRegex = "^[[:blank:]]*[Hh]eaders?[[:blank:]]*$";
 
-    /** Internal type alias for collection of HTTP headers */
-    typedef Collection<Header>::type Headers;
-
     /** Header Iterator in its containment group */
     typedef Collection<Header>::const_iterator HeaderIterator;
     
@@ -36,13 +33,12 @@ namespace snowcrash {
                                                      const MarkdownNodes& siblings,
                                                      SectionParserData& pd,
                                                      SectionLayout& layout,
-                                                     Report& report,
-                                                     Headers& out) {
+                                                     ParseResult<Headers>& out) {
 
             mdp::ByteBuffer content;
-            CodeBlockUtility::signatureContentAsCodeBlock(node, pd, report, content);
+            CodeBlockUtility::signatureContentAsCodeBlock(node, pd, out.report, content);
 
-            headersFromContent(node, content, pd, report, out);
+            headersFromContent(node, content, pd, out);
 
             return ++MarkdownNodeIterator(node);
         }
@@ -50,21 +46,20 @@ namespace snowcrash {
         static MarkdownNodeIterator processDescription(const MarkdownNodeIterator& node,
                                                        const MarkdownNodes& siblings,
                                                        SectionParserData& pd,
-                                                       Report& report,
-                                                       Headers& out) {
+                                                       ParseResult<Headers>& out) {
+
             return node;
         }
 
         static MarkdownNodeIterator processContent(const MarkdownNodeIterator& node,
                                                    const MarkdownNodes& siblings,
                                                    SectionParserData& pd,
-                                                   Report& report,
-                                                   Headers& out) {
+                                                   ParseResult<Headers>& out) {
 
             mdp::ByteBuffer content;
-            CodeBlockUtility::contentAsCodeBlock(node, pd, report, content);
+            CodeBlockUtility::contentAsCodeBlock(node, pd, out.report, content);
 
-            headersFromContent(node, content, pd, report, out);
+            headersFromContent(node, content, pd, out);
 
             return ++MarkdownNodeIterator(node);
         }
@@ -101,16 +96,15 @@ namespace snowcrash {
 
         static void finalize(const MarkdownNodeIterator& node,
                              SectionParserData& pd,
-                             Report& report,
-                             Headers& out) {
+                             ParseResult<Headers>& out) {
 
-            if (out.empty()) {
+            if (out.node.empty()) {
 
                 // WARN: No headers defined
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                report.warnings.push_back(Warning("no headers specified",
-                                                  FormattingWarning,
-                                                  sourceMap));
+                out.report.warnings.push_back(Warning("no headers specified",
+                                                      FormattingWarning,
+                                                      sourceMap));
             }
         }
 
@@ -118,13 +112,14 @@ namespace snowcrash {
         static void headersFromContent(const MarkdownNodeIterator& node,
                                        const mdp::ByteBuffer& content,
                                        SectionParserData& pd,
-                                       Report& report,
-                                       Headers& headers) {
+                                       ParseResult<Headers>& out) {
+
             std::vector<std::string> lines = Split(content, '\n');
 
             for (std::vector<std::string>::iterator line = lines.begin();
                  line != lines.end();
                  ++line) {
+
                 if (TrimString(*line).empty()) {
                     continue;
                 }
@@ -132,51 +127,97 @@ namespace snowcrash {
                 Header header;
 
                 if (CodeBlockUtility::keyValueFromLine(*line, header)) {
-                    if (findHeader(headers, header) != headers.end()) {
+                    if (findHeader(out.node, header) != out.node.end()) {
                         // WARN: duplicate header on this level
                         std::stringstream ss;
 
                         ss << "duplicate definition of '" << header.first << "' header";
 
                         mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                        report.warnings.push_back(Warning(ss.str(),
-                                                          DuplicateWarning,
-                                                          sourceMap));
+                        out.report.warnings.push_back(Warning(ss.str(),
+                                                              DuplicateWarning,
+                                                              sourceMap));
                     }
 
-                    headers.push_back(header);
+                    out.node.push_back(header);
+
+                    if (pd.exportSourceMap()) {
+                        SourceMap<Header> headerSM;
+                        headerSM.sourceMap = node->sourceMap;
+                        out.sourceMap.collection.push_back(headerSM);
+                    }
                 } else {
                     // WARN: unable to parse header
                     mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                    report.warnings.push_back(Warning("unable to parse HTTP header, expected '<header name> : <header value>', one header per line",
-                                                      FormattingWarning,
-                                                      sourceMap));
+                    out.report.warnings.push_back(Warning("unable to parse HTTP header, expected '<header name> : <header value>', one header per line",
+                                                          FormattingWarning,
+                                                          sourceMap));
                 }
             }
         }
 
         /** Inject headers into transaction examples requests and responses */
-        static void injectDeprecatedHeaders(const Headers& headers,
-                                            Collection<TransactionExample>::type& examples) {
+        static void injectDeprecatedHeaders(SectionParserData& pd,
+                                            const Headers& headers,
+                                            const SourceMap<Headers>& headersSM,
+                                            TransactionExamples& examples,
+                                            SourceMap<TransactionExamples>& examplesSM) {
 
-            for (Collection<TransactionExample>::iterator exampleIt = examples.begin();
-                 exampleIt != examples.end();
-                 ++exampleIt) {
+            Collection<TransactionExample>::iterator exampleIt = examples.begin();
+            Collection<SourceMap<TransactionExample> >::iterator exampleSourceMapIt;
+
+            if (pd.exportSourceMap()) {
+                exampleSourceMapIt = examplesSM.collection.begin();
+            }
+
+            while (exampleIt != examples.end()) {
+
+                Collection<Request>::iterator requestIt = exampleIt->requests.begin();
+                Collection<SourceMap<Request> >::iterator requestSourceMapIt;
+
+                if (pd.exportSourceMap()) {
+                    requestSourceMapIt = exampleSourceMapIt->requests.collection.begin();
+                }
 
                 // Requests
-                for (Collection<Request>::iterator reqIt = exampleIt->requests.begin();
-                     reqIt != exampleIt->requests.end();
-                     ++reqIt) {
+                while (requestIt != exampleIt->requests.end()) {
 
-                     reqIt->headers.insert(reqIt->headers.begin(), headers.begin(), headers.end());
+                     requestIt->headers.insert(requestIt->headers.begin(), headers.begin(), headers.end());
+                     ++requestIt;
+
+                     if (pd.exportSourceMap()) {
+                         requestSourceMapIt->headers.collection.insert(requestSourceMapIt->headers.collection.begin(),
+                                                                       headersSM.collection.begin(),
+                                                                       headersSM.collection.end());
+                         ++requestSourceMapIt;
+                     }
+                }
+
+                Collection<Response>::iterator responseIt = exampleIt->responses.begin();
+                Collection<SourceMap<Response> >::iterator responseSourceMapIt;
+
+                if (pd.exportSourceMap()) {
+                    responseSourceMapIt = exampleSourceMapIt->responses.collection.begin();
                 }
 
                 // Responses
-                for (Collection<Response>::iterator resIt = exampleIt->responses.begin();
-                     resIt != exampleIt->responses.end();
-                     ++resIt) {
+                while(responseIt != exampleIt->responses.end()) {
 
-                    resIt->headers.insert(resIt->headers.begin(), headers.begin(), headers.end());
+                    responseIt->headers.insert(responseIt->headers.begin(), headers.begin(), headers.end());
+                    ++responseIt;
+
+                    if (pd.exportSourceMap()) {
+                        responseSourceMapIt->headers.collection.insert(responseSourceMapIt->headers.collection.begin(),
+                                                                       headersSM.collection.begin(),
+                                                                       headersSM.collection.end());
+                        ++responseSourceMapIt;
+                    }
+                }
+
+                ++exampleIt;
+
+                if (pd.exportSourceMap()) {
+                    ++exampleSourceMapIt;
                 }
             }
         }
@@ -184,6 +225,7 @@ namespace snowcrash {
         /** Finds a header in its containment group by its key (first) */
         static HeaderIterator findHeader(const Headers& headers,
                                          const Header& header) {
+
             return std::find_if(headers.begin(),
                                 headers.end(),
                                 std::bind2nd(MatchFirsts<Header>(), header));

@@ -40,32 +40,40 @@ namespace snowcrash {
                                                      const MarkdownNodes& siblings,
                                                      SectionParserData& pd,
                                                      SectionLayout& layout,
-                                                     Report& report,
-                                                     Asset& out) {
+                                                     ParseResult<Asset>& out) {
             
-            out = "";
-            CodeBlockUtility::signatureContentAsCodeBlock(node, pd, report, out);
+            out.node = "";
+            CodeBlockUtility::signatureContentAsCodeBlock(node, pd, out.report, out.node);
+
+            if (pd.exportSourceMap() && !out.node.empty()) {
+                out.sourceMap.sourceMap.append(node->sourceMap);
+            }
+
             return ++MarkdownNodeIterator(node);
         }
         
         static MarkdownNodeIterator processDescription(const MarkdownNodeIterator& node,
                                                        const MarkdownNodes& siblings,
                                                        SectionParserData& pd,
-                                                       Report& report,
-                                                       Asset& out) {
+                                                       ParseResult<Asset>& out) {
+
             return node;
         }
 
         static MarkdownNodeIterator processContent(const MarkdownNodeIterator& node,
                                                    const MarkdownNodes& siblings,
                                                    SectionParserData& pd,
-                                                   Report& report,
-                                                   Asset& out) {
-            
+                                                   ParseResult<Asset>& out) {
             
             mdp::ByteBuffer content;
-            CodeBlockUtility::contentAsCodeBlock(node, pd, report, content);
-            out += content;
+            CodeBlockUtility::contentAsCodeBlock(node, pd, out.report, content);
+
+            out.node += content;
+
+            if (pd.exportSourceMap() && !content.empty()) {
+                out.sourceMap.sourceMap.append(node->sourceMap);
+            }
+
             return ++MarkdownNodeIterator(node);
         }
         

@@ -22,39 +22,65 @@ TEST_CASE("Method block classifier", "[action]")
 {
     mdp::MarkdownParser markdownParser;
     mdp::MarkdownNode markdownAST;
+    SectionType sectionType;
     markdownParser.parse(ActionFixture, markdownAST);
 
     REQUIRE(!markdownAST.children().empty());
-    REQUIRE(SectionProcessor<Action>::sectionType(markdownAST.children().begin()) == ActionSectionType);
+    sectionType = SectionProcessor<Action>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == ActionSectionType);
 
     // Nameless method
     markdownAST.children().front().text = "GET";
     REQUIRE(!markdownAST.children().empty());
-    REQUIRE(SectionProcessor<Action>::sectionType(markdownAST.children().begin()) == ActionSectionType);
+    sectionType = SectionProcessor<Action>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == ActionSectionType);
 }
 
 TEST_CASE("Parsing action", "[action]")
 {
-    Action action;
-    Report report;
-    SectionParserHelper<Action, ActionParser>::parse(ActionFixture, ActionSectionType, report, action);
+    ParseResult<Action> action;
+    SectionParserHelper<Action, ActionParser>::parse(ActionFixture, ActionSectionType, action);
 
-    REQUIRE(report.error.code == Error::OK);
-    CHECK(report.warnings.empty());
+    REQUIRE(action.report.error.code == Error::OK);
+    CHECK(action.report.warnings.empty());
 
-    REQUIRE(action.name == "My Method");
-    REQUIRE(action.method == "GET");
-    REQUIRE(action.description == "Method Description\n\n");
+    REQUIRE(action.node.name == "My Method");
+    REQUIRE(action.node.method == "GET");
+    REQUIRE(action.node.description == "Method Description\n\n");
 
-    REQUIRE(action.examples.size() == 1);
-    REQUIRE(action.examples.front().requests.size() == 0);
-    REQUIRE(action.examples.front().responses.size() == 1);
+    REQUIRE(action.node.examples.size() == 1);
+    REQUIRE(action.node.examples.front().requests.size() == 0);
+    REQUIRE(action.node.examples.front().responses.size() == 1);
 
-    REQUIRE(action.examples.front().responses[0].name == "200");
-    REQUIRE(action.examples.front().responses[0].body == "OK.\n");
-    REQUIRE(action.examples.front().responses[0].headers.size() == 1);
-    REQUIRE(action.examples.front().responses[0].headers[0].first == "Content-Type");
-    REQUIRE(action.examples.front().responses[0].headers[0].second == "text/plain");
+    REQUIRE(action.node.examples.front().responses[0].name == "200");
+    REQUIRE(action.node.examples.front().responses[0].body == "OK.\n");
+    REQUIRE(action.node.examples.front().responses[0].headers.size() == 1);
+    REQUIRE(action.node.examples.front().responses[0].headers[0].first == "Content-Type");
+    REQUIRE(action.node.examples.front().responses[0].headers[0].second == "text/plain");
+
+    REQUIRE(action.sourceMap.name.sourceMap.size() == 1);
+    REQUIRE(action.sourceMap.name.sourceMap[0].location == 0);
+    REQUIRE(action.sourceMap.name.sourceMap[0].length == 19);
+    REQUIRE(action.sourceMap.method.sourceMap.size() == 1);
+    REQUIRE(action.sourceMap.method.sourceMap[0].location == 0);
+    REQUIRE(action.sourceMap.method.sourceMap[0].length == 19);
+    REQUIRE(action.sourceMap.description.sourceMap.size() == 1);
+    REQUIRE(action.sourceMap.description.sourceMap[0].location == 19);
+    REQUIRE(action.sourceMap.description.sourceMap[0].length == 20);
+    REQUIRE(action.sourceMap.examples.collection.size() == 1);
+    REQUIRE(action.sourceMap.examples.collection[0].requests.collection.size() == 0);
+    REQUIRE(action.sourceMap.examples.collection[0].responses.collection.size() == 1);
+
+    REQUIRE(action.sourceMap.examples.collection[0].responses.collection[0].body.sourceMap.size() == 1);
+    REQUIRE(action.sourceMap.examples.collection[0].responses.collection[0].body.sourceMap[0].location == 72);
+    REQUIRE(action.sourceMap.examples.collection[0].responses.collection[0].body.sourceMap[0].length == 7);
+    REQUIRE(action.sourceMap.examples.collection[0].responses.collection[0].name.sourceMap.size() == 1);
+    REQUIRE(action.sourceMap.examples.collection[0].responses.collection[0].name.sourceMap[0].location == 41);
+    REQUIRE(action.sourceMap.examples.collection[0].responses.collection[0].name.sourceMap[0].length == 27);
+    REQUIRE(action.sourceMap.examples.collection[0].responses.collection[0].headers.collection.size() == 1);
+    REQUIRE(action.sourceMap.examples.collection[0].responses.collection[0].headers.collection[0].sourceMap.size() == 1);
+    REQUIRE(action.sourceMap.examples.collection[0].responses.collection[0].headers.collection[0].sourceMap[0].location == 41);
+    REQUIRE(action.sourceMap.examples.collection[0].responses.collection[0].headers.collection[0].sourceMap[0].length == 27);
 }
 
 TEST_CASE("Parse Action description with list", "[action]")
@@ -66,19 +92,29 @@ TEST_CASE("Parse Action description with list", "[action]")
     "+ B\n"\
     "+ Response 204\n";
 
-    Action action;
-    Report report;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, report, action);
+    ParseResult<Action> action;
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
 
-    REQUIRE(report.error.code == Error::OK);
-    CHECK(report.warnings.empty());
+    REQUIRE(action.report.error.code == Error::OK);
+    CHECK(action.report.warnings.empty());
 
-    REQUIRE(action.method == "GET");
-    REQUIRE(action.description == "Small Description\n\n+ A\n\n+ B\n");
+    REQUIRE(action.node.method == "GET");
+    REQUIRE(action.node.description == "Small Description\n\n+ A\n\n+ B\n");
 
-    REQUIRE(action.examples.size() == 1);
-    REQUIRE(action.examples.front().responses.size() == 1);
-    REQUIRE(action.examples.front().requests.empty());
+    REQUIRE(action.node.examples.size() == 1);
+    REQUIRE(action.node.examples.front().responses.size() == 1);
+    REQUIRE(action.node.examples.front().requests.empty());
+
+    REQUIRE(action.sourceMap.name.sourceMap.empty());
+    REQUIRE(action.sourceMap.method.sourceMap.size() == 1);
+    REQUIRE(action.sourceMap.method.sourceMap[0].location == 0);
+    REQUIRE(action.sourceMap.method.sourceMap[0].length == 6);
+    REQUIRE(action.sourceMap.description.sourceMap.size() == 1);
+    REQUIRE(action.sourceMap.description.sourceMap[0].location == 6);
+    REQUIRE(action.sourceMap.description.sourceMap[0].length == 26);
+    REQUIRE(action.sourceMap.examples.collection.size() == 1);
+    REQUIRE(action.sourceMap.examples.collection[0].requests.collection.size() == 0);
+    REQUIRE(action.sourceMap.examples.collection[0].responses.collection.size() == 1);
 }
 
 TEST_CASE("Parse method with multiple requests and responses", "[action]")
@@ -102,50 +138,58 @@ TEST_CASE("Parse method with multiple requests and responses", "[action]")
     "  + Body\n\n"\
     "            J\n\n";
 
-    Action action;
-    Report report;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, report, action);
+    ParseResult<Action> action;
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1); // warn responses with the same name
+    REQUIRE(action.report.error.code == Error::OK);
+    REQUIRE(action.report.warnings.size() == 1); // warn responses with the same name
 
-    REQUIRE(action.name.empty());
-    REQUIRE(action.method == "PUT");
-    REQUIRE(action.description.empty());
-    REQUIRE(action.parameters.empty());
+    REQUIRE(action.node.name.empty());
+    REQUIRE(action.node.method == "PUT");
+    REQUIRE(action.node.description.empty());
+    REQUIRE(action.node.parameters.empty());
 
-    REQUIRE(action.examples.size() == 1);
-    REQUIRE(action.examples.front().requests.size() == 2);
+    REQUIRE(action.node.examples.size() == 1);
+    REQUIRE(action.node.examples.front().requests.size() == 2);
 
-    REQUIRE(action.examples.front().requests[0].name == "A");
-    REQUIRE(action.examples.front().requests[0].description == "B");
-    REQUIRE(action.examples.front().requests[0].body == "C\n");
-    REQUIRE(action.examples.front().requests[0].schema.empty());
-    REQUIRE(action.examples.front().requests[0].parameters.empty());
-    REQUIRE(action.examples.front().requests[0].headers.empty());
+    REQUIRE(action.node.examples.front().requests[0].name == "A");
+    REQUIRE(action.node.examples.front().requests[0].description == "B");
+    REQUIRE(action.node.examples.front().requests[0].body == "C\n");
+    REQUIRE(action.node.examples.front().requests[0].schema.empty());
+    REQUIRE(action.node.examples.front().requests[0].parameters.empty());
+    REQUIRE(action.node.examples.front().requests[0].headers.empty());
 
-    REQUIRE(action.examples.front().requests[1].name == "D");
-    REQUIRE(action.examples.front().requests[1].description == "E");
-    REQUIRE(action.examples.front().requests[1].body == "F\n");
-    REQUIRE(action.examples.front().requests[1].schema.empty());
-    REQUIRE(action.examples.front().requests[1].parameters.empty());
-    REQUIRE(action.examples.front().requests[1].headers.empty());
+    REQUIRE(action.node.examples.front().requests[1].name == "D");
+    REQUIRE(action.node.examples.front().requests[1].description == "E");
+    REQUIRE(action.node.examples.front().requests[1].body == "F\n");
+    REQUIRE(action.node.examples.front().requests[1].schema.empty());
+    REQUIRE(action.node.examples.front().requests[1].parameters.empty());
+    REQUIRE(action.node.examples.front().requests[1].headers.empty());
 
-    REQUIRE(action.examples.front().responses.size() == 2);
+    REQUIRE(action.node.examples.front().responses.size() == 2);
 
-    REQUIRE(action.examples.front().responses[0].name == "200");
-    REQUIRE(action.examples.front().responses[0].description == "G");
-    REQUIRE(action.examples.front().responses[0].body == "H\n");
-    REQUIRE(action.examples.front().responses[0].schema.empty());
-    REQUIRE(action.examples.front().responses[0].parameters.empty());
-    REQUIRE(action.examples.front().responses[0].headers.empty());
+    REQUIRE(action.node.examples.front().responses[0].name == "200");
+    REQUIRE(action.node.examples.front().responses[0].description == "G");
+    REQUIRE(action.node.examples.front().responses[0].body == "H\n");
+    REQUIRE(action.node.examples.front().responses[0].schema.empty());
+    REQUIRE(action.node.examples.front().responses[0].parameters.empty());
+    REQUIRE(action.node.examples.front().responses[0].headers.empty());
 
-    REQUIRE(action.examples.front().responses[1].name == "200");
-    REQUIRE(action.examples.front().responses[1].description == "I");
-    REQUIRE(action.examples.front().responses[1].body == "J\n");
-    REQUIRE(action.examples.front().responses[1].schema.empty());
-    REQUIRE(action.examples.front().responses[1].parameters.empty());
-    REQUIRE(action.examples.front().responses[1].headers.empty());
+    REQUIRE(action.node.examples.front().responses[1].name == "200");
+    REQUIRE(action.node.examples.front().responses[1].description == "I");
+    REQUIRE(action.node.examples.front().responses[1].body == "J\n");
+    REQUIRE(action.node.examples.front().responses[1].schema.empty());
+    REQUIRE(action.node.examples.front().responses[1].parameters.empty());
+    REQUIRE(action.node.examples.front().responses[1].headers.empty());
+
+    REQUIRE(action.sourceMap.name.sourceMap.empty());
+    REQUIRE(action.sourceMap.method.sourceMap.size() == 1);
+    REQUIRE(action.sourceMap.method.sourceMap[0].location == 0);
+    REQUIRE(action.sourceMap.method.sourceMap[0].length == 6);
+    REQUIRE(action.sourceMap.description.sourceMap.empty());
+    REQUIRE(action.sourceMap.examples.collection.size() == 1);
+    REQUIRE(action.sourceMap.examples.collection[0].requests.collection.size() == 2);
+    REQUIRE(action.sourceMap.examples.collection[0].responses.collection.size() == 2);
 }
 
 TEST_CASE("Parse method with multiple incomplete requests", "[action][blocks]")
@@ -157,35 +201,43 @@ TEST_CASE("Parse method with multiple incomplete requests", "[action][blocks]")
     "  C\n"\
     "+ Response 200\n";
 
-    Action action;
-    Report report;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, report, action);
+    ParseResult<Action> action;
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 2); // empty asset & preformatted asset
-    REQUIRE(report.warnings[0].code == EmptyDefinitionWarning);
-    REQUIRE(report.warnings[1].code == IndentationWarning);
+    REQUIRE(action.report.error.code == Error::OK);
+    REQUIRE(action.report.warnings.size() == 2); // empty asset & preformatted asset
+    REQUIRE(action.report.warnings[0].code == EmptyDefinitionWarning);
+    REQUIRE(action.report.warnings[1].code == IndentationWarning);
 
-    REQUIRE(action.name.empty());
-    REQUIRE(action.method == "GET");
-    REQUIRE(action.description.empty());
-    REQUIRE(action.parameters.empty());
+    REQUIRE(action.node.name.empty());
+    REQUIRE(action.node.method == "GET");
+    REQUIRE(action.node.description.empty());
+    REQUIRE(action.node.parameters.empty());
 
-    REQUIRE(action.examples.front().requests.size() == 2);
-    REQUIRE(action.examples.front().requests[0].name == "A");
-    REQUIRE(action.examples.front().requests[0].body.empty());
-    REQUIRE(action.examples.front().requests[0].schema.empty());
-    REQUIRE(action.examples.front().requests[0].parameters.empty());
-    REQUIRE(action.examples.front().requests[0].headers.empty());
+    REQUIRE(action.node.examples.front().requests.size() == 2);
+    REQUIRE(action.node.examples.front().requests[0].name == "A");
+    REQUIRE(action.node.examples.front().requests[0].body.empty());
+    REQUIRE(action.node.examples.front().requests[0].schema.empty());
+    REQUIRE(action.node.examples.front().requests[0].parameters.empty());
+    REQUIRE(action.node.examples.front().requests[0].headers.empty());
 
-    REQUIRE(action.examples.front().requests[1].name == "B");
-    REQUIRE(action.examples.front().requests[1].description.empty());
-    REQUIRE(action.examples.front().requests[1].body == "C\n\n");
-    REQUIRE(action.examples.front().requests[1].schema.empty());
-    REQUIRE(action.examples.front().requests[1].parameters.empty());
-    REQUIRE(action.examples.front().requests[1].headers.empty());
+    REQUIRE(action.node.examples.front().requests[1].name == "B");
+    REQUIRE(action.node.examples.front().requests[1].description.empty());
+    REQUIRE(action.node.examples.front().requests[1].body == "C\n\n");
+    REQUIRE(action.node.examples.front().requests[1].schema.empty());
+    REQUIRE(action.node.examples.front().requests[1].parameters.empty());
+    REQUIRE(action.node.examples.front().requests[1].headers.empty());
 
-    REQUIRE(action.examples.front().responses.size() == 1);
+    REQUIRE(action.node.examples.front().responses.size() == 1);
+
+    REQUIRE(action.sourceMap.name.sourceMap.empty());
+    REQUIRE(action.sourceMap.method.sourceMap.size() == 1);
+    REQUIRE(action.sourceMap.method.sourceMap[0].location == 0);
+    REQUIRE(action.sourceMap.method.sourceMap[0].length == 9);
+    REQUIRE(action.sourceMap.description.sourceMap.empty());
+    REQUIRE(action.sourceMap.examples.collection.size() == 1);
+    REQUIRE(action.sourceMap.examples.collection[0].requests.collection.size() == 2);
+    REQUIRE(action.sourceMap.examples.collection[0].responses.collection.size() == 1);
 }
 
 TEST_CASE("Parse method with foreign item", "[action]")
@@ -198,26 +250,35 @@ TEST_CASE("Parse method with foreign item", "[action]")
     "+ Bar\n"\
     "+ Response 200\n";
 
-    Action action;
-    Report report;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, report, action);
+    ParseResult<Action> action;
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
-    REQUIRE(report.warnings[0].code == IgnoringWarning);
+    REQUIRE(action.report.error.code == Error::OK);
+    REQUIRE(action.report.warnings.size() == 1);
+    REQUIRE(action.report.warnings[0].code == IgnoringWarning);
 
-    REQUIRE(action.name.empty());
-    REQUIRE(action.method == "MKCOL");
-    REQUIRE(action.description.empty());
-    REQUIRE(action.parameters.empty());
+    REQUIRE(action.node.name.empty());
+    REQUIRE(action.node.method == "MKCOL");
+    REQUIRE(action.node.description.empty());
+    REQUIRE(action.node.parameters.empty());
 
-    REQUIRE(action.examples.size() == 1);
-    REQUIRE(action.examples.front().requests.size() == 1);
-    REQUIRE(action.examples.front().requests[0].name.empty());
-    REQUIRE(action.examples.front().requests[0].body == "Foo\n");
-    REQUIRE(action.examples.front().requests[0].schema.empty());
-    REQUIRE(action.examples.front().requests[0].parameters.empty());
-    REQUIRE(action.examples.front().requests[0].headers.empty());
+    REQUIRE(action.node.examples.size() == 1);
+    REQUIRE(action.node.examples.front().requests.size() == 1);
+    REQUIRE(action.node.examples.front().requests[0].name.empty());
+    REQUIRE(action.node.examples.front().requests[0].body == "Foo\n");
+    REQUIRE(action.node.examples.front().requests[0].schema.empty());
+    REQUIRE(action.node.examples.front().requests[0].parameters.empty());
+    REQUIRE(action.node.examples.front().requests[0].headers.empty());
+    REQUIRE(action.node.examples.front().responses.size() == 1);
+
+    REQUIRE(action.sourceMap.name.sourceMap.empty());
+    REQUIRE(action.sourceMap.method.sourceMap.size() == 1);
+    REQUIRE(action.sourceMap.method.sourceMap[0].location == 0);
+    REQUIRE(action.sourceMap.method.sourceMap[0].length == 8);
+    REQUIRE(action.sourceMap.description.sourceMap.empty());
+    REQUIRE(action.sourceMap.examples.collection.size() == 1);
+    REQUIRE(action.sourceMap.examples.collection[0].requests.collection.size() == 1);
+    REQUIRE(action.sourceMap.examples.collection[0].responses.collection.size() == 1);
 }
 
 TEST_CASE("Parse method with a HR", "[action]")
@@ -228,33 +289,47 @@ TEST_CASE("Parse method with a HR", "[action]")
     "---\n"\
     "B\n";
 
-    Action action;
-    Report report;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, report, action);
+    ParseResult<Action> action;
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1); // no response
+    REQUIRE(action.report.error.code == Error::OK);
+    REQUIRE(action.report.warnings.size() == 1); // no response
 
-    REQUIRE(action.name.empty());
-    REQUIRE(action.method == "PATCH");
-    REQUIRE(action.description == "A\n---\n\nB\n");
-    REQUIRE(action.examples.empty());
+    REQUIRE(action.node.name.empty());
+    REQUIRE(action.node.method == "PATCH");
+    REQUIRE(action.node.description == "A\n---\n\nB\n");
+    REQUIRE(action.node.examples.empty());
+
+    REQUIRE(action.sourceMap.name.sourceMap.empty());
+    REQUIRE(action.sourceMap.method.sourceMap.size() == 1);
+    REQUIRE(action.sourceMap.method.sourceMap[0].location == 0);
+    REQUIRE(action.sourceMap.method.sourceMap[0].length == 12);
+    REQUIRE(action.sourceMap.description.sourceMap.size() == 1);
+    REQUIRE(action.sourceMap.description.sourceMap[0].location == 12);
+    REQUIRE(action.sourceMap.description.sourceMap[0].length == 8);
+    REQUIRE(action.sourceMap.examples.collection.size() == 0);
 }
 
 TEST_CASE("Parse method without name", "[action]")
 {
     mdp::ByteBuffer source = "# GET";
 
-    Action action;
-    Report report;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, report, action);
+    ParseResult<Action> action;
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1); // no response
+    REQUIRE(action.report.error.code == Error::OK);
+    REQUIRE(action.report.warnings.size() == 1); // no response
 
-    REQUIRE(action.name.empty());
-    REQUIRE(action.method == "GET");
-    REQUIRE(action.description.empty());
+    REQUIRE(action.node.name.empty());
+    REQUIRE(action.node.method == "GET");
+    REQUIRE(action.node.description.empty());
+
+    REQUIRE(action.sourceMap.name.sourceMap.empty());
+    REQUIRE(action.sourceMap.method.sourceMap.size() == 1);
+    REQUIRE(action.sourceMap.method.sourceMap[0].location == 0);
+    REQUIRE(action.sourceMap.method.sourceMap[0].length == 5);
+    REQUIRE(action.sourceMap.description.sourceMap.empty());
+    REQUIRE(action.sourceMap.examples.collection.size() == 0);
 }
 
 TEST_CASE("Parse action with parameters", "[action]")
@@ -267,20 +342,32 @@ TEST_CASE("Parse action with parameters", "[action]")
     "+ Response 204\n"\
     "\n";
 
-    Action action;
-    Report report;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, report, action);
+    ParseResult<Action> action;
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(action.report.error.code == Error::OK);
+    REQUIRE(action.report.warnings.empty());
 
-    REQUIRE(action.parameters.size() == 1);
-    REQUIRE(action.parameters[0].name == "id");
-    REQUIRE(action.parameters[0].description == "Resource Id");
-    REQUIRE(action.parameters[0].type == "number");
-    REQUIRE(action.parameters[0].defaultValue.empty());
-    REQUIRE(action.parameters[0].exampleValue == "42");
-    REQUIRE(action.parameters[0].values.empty());
+    REQUIRE(action.node.parameters.size() == 1);
+    REQUIRE(action.node.parameters[0].name == "id");
+    REQUIRE(action.node.parameters[0].description == "Resource Id");
+    REQUIRE(action.node.parameters[0].type == "number");
+    REQUIRE(action.node.parameters[0].defaultValue.empty());
+    REQUIRE(action.node.parameters[0].exampleValue == "42");
+    REQUIRE(action.node.parameters[0].values.empty());
+
+    REQUIRE(action.sourceMap.name.sourceMap.empty());
+    REQUIRE(action.sourceMap.method.sourceMap.size() == 1);
+    REQUIRE(action.sourceMap.method.sourceMap[0].location == 0);
+    REQUIRE(action.sourceMap.method.sourceMap[0].length == 21);
+    REQUIRE(action.sourceMap.description.sourceMap.empty());
+    REQUIRE(action.sourceMap.parameters.collection.size() == 1);
+    REQUIRE(action.sourceMap.parameters.collection[0].name.sourceMap.size() == 1);
+    REQUIRE(action.sourceMap.parameters.collection[0].name.sourceMap[0].location == 40);
+    REQUIRE(action.sourceMap.parameters.collection[0].name.sourceMap[0].length == 44);
+    REQUIRE(action.sourceMap.examples.collection.size() == 1);
+    REQUIRE(action.sourceMap.examples.collection[0].requests.collection.size() == 0);
+    REQUIRE(action.sourceMap.examples.collection[0].responses.collection.size() == 1);
 }
 
 TEST_CASE("Give a warning when 2xx CONNECT has a body", "[action]")
@@ -290,17 +377,25 @@ TEST_CASE("Give a warning when 2xx CONNECT has a body", "[action]")
     "+ Response 201\n\n"\
     "        {}\n\n";
 
-    Action action;
-    Report report;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, report, action);
+    ParseResult<Action> action;
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(action.report.error.code == Error::OK);
+    REQUIRE(action.report.warnings.size() == 1);
 
-    REQUIRE(action.method == "CONNECT");
-    REQUIRE(action.examples.size() == 1);
-    REQUIRE(action.examples[0].responses.size() == 1);
-    REQUIRE(action.examples[0].responses[0].body == "{}\n");
+    REQUIRE(action.node.method == "CONNECT");
+    REQUIRE(action.node.examples.size() == 1);
+    REQUIRE(action.node.examples[0].responses.size() == 1);
+    REQUIRE(action.node.examples[0].responses[0].body == "{}\n");
+
+    REQUIRE(action.sourceMap.name.sourceMap.empty());
+    REQUIRE(action.sourceMap.method.sourceMap.size() == 1);
+    REQUIRE(action.sourceMap.method.sourceMap[0].location == 0);
+    REQUIRE(action.sourceMap.method.sourceMap[0].length == 13);
+    REQUIRE(action.sourceMap.description.sourceMap.empty());
+    REQUIRE(action.sourceMap.examples.collection.size() == 1);
+    REQUIRE(action.sourceMap.examples.collection[0].requests.collection.size() == 0);
+    REQUIRE(action.sourceMap.examples.collection[0].responses.collection.size() == 1);
 }
 
 TEST_CASE("Give a warning when response to HEAD has a body", "[action]")
@@ -310,18 +405,26 @@ TEST_CASE("Give a warning when response to HEAD has a body", "[action]")
     "+ Response 200\n\n"\
     "        {}\n\n";
 
-    Action action;
-    Report report;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, report, action);
+    ParseResult<Action> action;
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
-    REQUIRE(report.warnings[0].code == EmptyDefinitionWarning);
+    REQUIRE(action.report.error.code == Error::OK);
+    REQUIRE(action.report.warnings.size() == 1);
+    REQUIRE(action.report.warnings[0].code == EmptyDefinitionWarning);
 
-    REQUIRE(action.method == "HEAD");
-    REQUIRE(action.examples.size() == 1);
-    REQUIRE(action.examples[0].responses.size() == 1);
-    REQUIRE(action.examples[0].responses[0].body == "{}\n");
+    REQUIRE(action.node.method == "HEAD");
+    REQUIRE(action.node.examples.size() == 1);
+    REQUIRE(action.node.examples[0].responses.size() == 1);
+    REQUIRE(action.node.examples[0].responses[0].body == "{}\n");
+
+    REQUIRE(action.sourceMap.name.sourceMap.empty());
+    REQUIRE(action.sourceMap.method.sourceMap.size() == 1);
+    REQUIRE(action.sourceMap.method.sourceMap[0].location == 0);
+    REQUIRE(action.sourceMap.method.sourceMap[0].length == 10);
+    REQUIRE(action.sourceMap.description.sourceMap.empty());
+    REQUIRE(action.sourceMap.examples.collection.size() == 1);
+    REQUIRE(action.sourceMap.examples.collection[0].requests.collection.size() == 0);
+    REQUIRE(action.sourceMap.examples.collection[0].responses.collection.size() == 1);
 }
 
 TEST_CASE("Missing 'LINK' HTTP request method", "[action]")
@@ -330,16 +433,24 @@ TEST_CASE("Missing 'LINK' HTTP request method", "[action]")
     "# LINK /1\n"\
     "+ Response 204\n\n";
 
-    Action action;
-    Report report;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, report, action);
+    ParseResult<Action> action;
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.empty());
+    REQUIRE(action.report.error.code == Error::OK);
+    REQUIRE(action.report.warnings.empty());
 
-    REQUIRE(action.examples.size() == 1);
-    REQUIRE(action.examples[0].requests.empty());
-    REQUIRE(action.examples[0].responses.size() == 1);
+    REQUIRE(action.node.examples.size() == 1);
+    REQUIRE(action.node.examples[0].requests.empty());
+    REQUIRE(action.node.examples[0].responses.size() == 1);
+
+    REQUIRE(action.sourceMap.name.sourceMap.empty());
+    REQUIRE(action.sourceMap.method.sourceMap.size() == 1);
+    REQUIRE(action.sourceMap.method.sourceMap[0].location == 0);
+    REQUIRE(action.sourceMap.method.sourceMap[0].length == 10);
+    REQUIRE(action.sourceMap.description.sourceMap.empty());
+    REQUIRE(action.sourceMap.examples.collection.size() == 1);
+    REQUIRE(action.sourceMap.examples.collection[0].requests.collection.size() == 0);
+    REQUIRE(action.sourceMap.examples.collection[0].responses.collection.size() == 1);
 }
 
 TEST_CASE("Warn when request is not followed by a response", "[action]")
@@ -354,17 +465,27 @@ TEST_CASE("Warn when request is not followed by a response", "[action]")
     "\n"\
     "        A\n";
 
-    Action action;
-    Report report;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, report, action);
+    ParseResult<Action> action;
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
 
-    REQUIRE(report.error.code == Error::OK);
-    REQUIRE(report.warnings.size() == 1);
-    REQUIRE(report.warnings[0].code == EmptyDefinitionWarning);
+    REQUIRE(action.report.error.code == Error::OK);
+    REQUIRE(action.report.warnings.size() == 1);
+    REQUIRE(action.report.warnings[0].code == EmptyDefinitionWarning);
 
-    REQUIRE(action.examples.size() == 2);
-    REQUIRE(action.examples[0].requests.size() == 0);
-    REQUIRE(action.examples[0].responses.size() == 1);
-    REQUIRE(action.examples[1].requests.size() == 1);
-    REQUIRE(action.examples[1].responses.size() == 0);
+    REQUIRE(action.node.examples.size() == 2);
+    REQUIRE(action.node.examples[0].requests.size() == 0);
+    REQUIRE(action.node.examples[0].responses.size() == 1);
+    REQUIRE(action.node.examples[1].requests.size() == 1);
+    REQUIRE(action.node.examples[1].responses.size() == 0);
+
+    REQUIRE(action.sourceMap.name.sourceMap.empty());
+    REQUIRE(action.sourceMap.method.sourceMap.size() == 1);
+    REQUIRE(action.sourceMap.method.sourceMap[0].location == 0);
+    REQUIRE(action.sourceMap.method.sourceMap[0].length == 9);
+    REQUIRE(action.sourceMap.description.sourceMap.empty());
+    REQUIRE(action.sourceMap.examples.collection.size() == 2);
+    REQUIRE(action.sourceMap.examples.collection[0].requests.collection.size() == 0);
+    REQUIRE(action.sourceMap.examples.collection[0].responses.collection.size() == 1);
+    REQUIRE(action.sourceMap.examples.collection[1].requests.collection.size() == 1);
+    REQUIRE(action.sourceMap.examples.collection[1].responses.collection.size() == 0);
 }
