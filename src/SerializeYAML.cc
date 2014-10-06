@@ -185,6 +185,25 @@ static void serialize(const Headers& headers, size_t level, std::ostream &os)
     serializeKeyValueCollection(headers, level, os);
 }
 
+/** Serialize Reference */
+static void serialize(const Reference& reference, size_t level, std::ostream &os)
+{
+    if (reference.id.empty()) {
+        return;
+    }
+
+    serialize(SerializeKey::Reference, "", level - 1, os);
+
+    // ID
+    serialize(SerializeKey::Id, reference.id, level, os);
+
+    // Type
+    if (reference.type == Reference::SymbolReference) {
+
+        serialize(SerializeKey::Type, "symbol", level, os);
+    }
+}
+
 /** Serialize Headers source map */
 static void serialize(const Collection<SourceMap<Header> >::type& headers, size_t level, std::ostream &os)
 {
@@ -290,11 +309,8 @@ static void serialize(const Payload& payload, size_t level, bool array, std::ost
     // Name
     serialize(SerializeKey::Name, payload.name, 0, os);
 
-    // Symbol Reference
-    if (!payload.reference.id.empty()) {
-        serialize(SerializeKey::Reference, "", level, os);
-        serialize(SerializeKey::Id, payload.reference.id, level + 1, os);
-    }
+    // Reference
+    serialize(payload.reference, level + 1, os);
 
     // Description
     serialize(SerializeKey::Description, payload.description, level, os);

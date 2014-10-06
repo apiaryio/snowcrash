@@ -465,6 +465,35 @@ static void serialize(const Collection<SourceMap<Header> >::type& headers, size_
 }
 
 /**
+ * \brief Serialize a reference into output stream.
+ * \param reference A reference to serialize.
+ * \param os An output stream to serialize into.
+ */
+static void serialize(const Reference& reference, size_t level, std::ostream &os)
+{
+
+    if (!reference.id.empty()) {
+
+        indent(level, os);
+        os << "\"" << SerializeKey::Reference << "\": {\n";
+
+        serialize(SerializeKey::Id, reference.id, level + 1, false, os);
+
+        if (reference.type == Reference::SymbolReference) {
+
+            os << NewLineItemBlock;
+            serialize(SerializeKey::Type, "symbol", level + 1, false, os);
+            os << "\n";
+        }
+
+        indent(level, os);
+        os << "}";
+
+        os << NewLineItemBlock;
+    }
+}
+
+/**
  * \brief Serialize a payload into output stream.
  * \param payload   A payload to serialize.
  * \param os    An output stream to serialize into.
@@ -477,17 +506,8 @@ static void serialize(const Payload& payload, size_t level, std::ostream &os)
     serialize(SerializeKey::Name, payload.name, level + 1, false, os);
     os << NewLineItemBlock;
 
-    // Symbol Reference
-    if (!payload.reference.id.empty()) {
-        indent(level + 1, os);
-        os << "\"" << SerializeKey::Reference << "\": {\n";
-
-        serialize(SerializeKey::Id, payload.reference.id, level + 2, false, os);
-
-        os << "\n";
-        indent(level + 1, os);
-        os << "}" << NewLineItemBlock;
-    }
+    // Reference
+    serialize(payload.reference, level + 1, os);
 
     // Description
     serialize(SerializeKey::Description, payload.description, level + 1, false, os);

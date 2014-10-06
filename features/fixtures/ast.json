@@ -122,7 +122,8 @@
                     {
                       "name": "201",
                       "reference": {
-                        "id": "<resource name>"
+                        "id": "<resource name>",
+                        "type": "symbol"
                       },
                       "description": "<resource model description>",
                       "headers": [

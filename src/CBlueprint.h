@@ -34,11 +34,11 @@ extern "C" {
         SC_REQUIRED_PARAMETER_USE
     } sc_parameter_use;
 
-    typedef enum sc_reference_state {
+    typedef enum sc_reference_type_t {
         SC_STATE_UNRESOLVED,
         SC_STATE_PENDING,
         SC_STATE_RESOLVED
-    } sc_reference_state;
+    } sc_reference_type_t;
 
     /** Class Blueprint wrapper */
     struct sc_blueprint_s;
@@ -238,7 +238,7 @@ extern "C" {
     SC_API const char* sc_reference_identifier(const sc_reference_t* handle);
 
     /** \returns Reference identifier */
-    SC_API sc_reference_state sc_reference_reference_state(const sc_reference_t* handle);
+    SC_API sc_reference_type_t sc_reference_type(const sc_reference_t* handle);
 
     /*----------------------------------------------------------------------*/
 

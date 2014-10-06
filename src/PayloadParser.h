@@ -537,15 +537,15 @@ namespace snowcrash {
 
             if (GetSymbolReference(source, symbol)) {
 
-                if (pd.exportSourceMap() && !symbol.empty()) {
-                    out.sourceMap.symbol.sourceMap = node->sourceMap;
-                }
-
                 out.node.reference.id = symbol;
                 out.node.reference.meta.node = node;
                 out.node.reference.type = Reference::SymbolReference;
 
-                // If symbol doesn't exist
+                if (pd.exportSourceMap() && !symbol.empty()) {
+                    out.sourceMap.symbol.sourceMap = node->sourceMap;
+                }
+
+                // If symbol has not been defined yet in symbol table
                 if (pd.symbolTable.resourceModels.find(symbol) == pd.symbolTable.resourceModels.end()) {
 
                     out.node.reference.meta.state = Reference::StatePending;

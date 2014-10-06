@@ -284,45 +284,45 @@ namespace snowcrash {
         }
 
         /** check for lazy referencing */
-        static void checkLazyReferencing (const MarkdownNodeIterator& node,
-                                          SectionParserData& pd,
-                                          ParseResult<Blueprint>& out) {
+        static void checkLazyReferencing(const MarkdownNodeIterator& node,
+                                         SectionParserData& pd,
+                                         ParseResult<Blueprint>& out) {
 
             for (ResourceGroups::iterator resourceGroupIterator = out.node.resourceGroups.begin();
                  resourceGroupIterator != out.node.resourceGroups.end();
                  ++resourceGroupIterator) {
 
-                for (Resources::iterator resourcesItrator = resourceGroupIterator->resources.begin();
-                     resourcesItrator != resourceGroupIterator->resources.end();
-                     ++resourcesItrator) {
+                for (Resources::iterator resourceIterator = resourceGroupIterator->resources.begin();
+                     resourceIterator != resourceGroupIterator->resources.end();
+                     ++resourceIterator) {
 
-                    for (Actions::iterator actionIterator = resourcesItrator->actions.begin();
-                         actionIterator != resourcesItrator->actions.end();
+                    for (Actions::iterator actionIterator = resourceIterator->actions.begin();
+                         actionIterator != resourceIterator->actions.end();
                          ++actionIterator) {
 
-                        for (TransactionExamples::iterator transactionExampleItrator = actionIterator->examples.begin();
-                             transactionExampleItrator != actionIterator->examples.end();
-                             ++transactionExampleItrator) {
+                        for (TransactionExamples::iterator transactionExampleIterator = actionIterator->examples.begin();
+                             transactionExampleIterator != actionIterator->examples.end();
+                             ++transactionExampleIterator) {
 
-                            for (Requests::iterator requestIterator = transactionExampleItrator->requests.begin();
-                                 requestIterator != transactionExampleItrator->requests.end();
+                            for (Requests::iterator requestIterator = transactionExampleIterator->requests.begin();
+                                 requestIterator != transactionExampleIterator->requests.end();
                                  ++requestIterator) {
 
                                 if(!requestIterator->reference.id.empty() &&
                                     requestIterator->reference.meta.state == Reference::StatePending) {
 
-                                    resolvePendingSymbols(&(*requestIterator), node, pd, out);
+                                    resolvePendingSymbols(*requestIterator, node, pd, out);
                                 }
                             }
 
-                            for (Responses::iterator responseIterator = transactionExampleItrator->responses.begin();
-                                 responseIterator != transactionExampleItrator->responses.end();
+                            for (Responses::iterator responseIterator = transactionExampleIterator->responses.begin();
+                                 responseIterator != transactionExampleIterator->responses.end();
                                  ++responseIterator) {
 
                                 if(!responseIterator->reference.id.empty() &&
                                     responseIterator->reference.meta.state == Reference::StatePending) {
 
-                                    resolvePendingSymbols(&(*responseIterator), node, pd, out);
+                                    resolvePendingSymbols(*responseIterator, node, pd, out);
                                 }
                             }
                         }
@@ -332,38 +332,38 @@ namespace snowcrash {
         }
 
         /** Resolve pending resources */
-        static void resolvePendingSymbols(Payload *source,
-                                            const MarkdownNodeIterator& node,
-                                            SectionParserData& pd,
-                                            ParseResult<Blueprint>& out) {
+        static void resolvePendingSymbols(Payload& payload,
+                                          const MarkdownNodeIterator& node,
+                                          SectionParserData& pd,
+                                          ParseResult<Blueprint>& out) {
 
             ResourceModel model;
 
-            if (pd.symbolTable.resourceModels.find(source->reference.id) == pd.symbolTable.resourceModels.end()) {
+            if (pd.symbolTable.resourceModels.find(payload.reference.id) == pd.symbolTable.resourceModels.end()) {
 
                 // ERR: Undefined symbol
                 std::stringstream ss;
-                ss << "Undefined symbol " << source->reference.id;
+                ss << "Undefined symbol " << payload.reference.id;
 
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(source->reference.meta.node->sourceMap, pd.sourceData);
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(payload.reference.meta.node->sourceMap, pd.sourceData);
                 out.report.error = Error(ss.str(), SymbolError, sourceMap);
 
-                source->reference.meta.state = Reference::StateUnresolved;
+                payload.reference.meta.state = Reference::StateUnresolved;
             }
             else {
-                model = pd.symbolTable.resourceModels.at(source->reference.id);
+                model = pd.symbolTable.resourceModels.at(payload.reference.id);
 
-                source->reference.meta.state = Reference::StateResolved;
+                payload.reference.meta.state = Reference::StateResolved;
 
-                source->description = model.description;
-                source->parameters = model.parameters;
+                payload.description = model.description;
+                payload.parameters = model.parameters;
 
                 HeaderIterator modelContentType = std::find_if(model.headers.begin(),
                                                                model.headers.end(),
                                                                std::bind2nd(MatchFirstWith<Header, std::string>(),
-                                                               HTTPHeaderName::ContentType));
+                                                                            HTTPHeaderName::ContentType));
 
-                bool isPayloadContentType = !source->headers.empty();
+                bool isPayloadContentType = !payload.headers.empty();
                 bool isModelContentType = modelContentType != model.headers.end();
 
                 if (isPayloadContentType && isModelContentType) {
@@ -374,20 +374,20 @@ namespace snowcrash {
                     ss << "ignoring additional " << SectionName(pd.sectionContext()) << " header(s), ";
                     ss << "specify this header(s) in the referenced model definition instead";
 
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(source->reference.meta.node->sourceMap, pd.sourceData);
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(payload.reference.meta.node->sourceMap, pd.sourceData);
                     out.report.warnings.push_back(Warning(ss.str(),
                                                           IgnoringWarning,
                                                           sourceMap));
                 }
 
                 if (isPayloadContentType && !isModelContentType) {
-                    source->headers.insert(source->headers.end(), model.headers.begin(), model.headers.end());
+                    payload.headers.insert(payload.headers.end(), model.headers.begin(), model.headers.end());
                 } else {
-                    source->headers = model.headers;
+                    payload.headers = model.headers;
                 }
 
-                source->body = model.body;
-                source->schema = model.schema;
+                payload.body = model.body;
+                payload.schema = model.schema;
             }
         }
     };

@@ -135,14 +135,14 @@ namespace snowcrash {
 
         /** Reference Resolution State */
         enum State {
-            StateUnresolved, // Reference unresolved (undefined)
-            StatePending, // Reference resolution pending
-            StateResolved // Reference resolved successfully
+            StateUnresolved,    // Reference unresolved (undefined)
+            StatePending,       // Reference resolution pending
+            StateResolved       // Reference resolved successfully
         };
 
         /** Reference Type */
         enum ReferenceType {
-            SymbolReference
+            SymbolReference     // Reference as symbol
         };
 
         /** Identifier */
