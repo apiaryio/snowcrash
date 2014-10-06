@@ -13,6 +13,7 @@
 #include <string>
 #include <utility>
 #include "Platform.h"
+#include "MarkdownNode.h"
 
 /**
  *  API Blueprint Abstract Syntax Tree
@@ -126,8 +127,43 @@ namespace snowcrash {
     typedef Collection<Parameter>::type Parameters;
 
     /** Name of a symbol */
-    typedef std::string SymbolName;
 
+    typedef std::string Identifier;
+
+    /** Reference */
+    struct Reference {
+
+        /** Reference Resolution State */
+        enum State {
+            StateUnresolved, // Reference unresolved (undefined)
+            StatePending, // Reference resolution pending
+            StateResolved // Reference resolved successfully
+        };
+
+        /** Reference Type */
+        enum ReferenceType {
+            SymbolReference
+        };
+
+        /** Identifier */
+        Identifier id;
+
+        /** Type */
+        ReferenceType type;
+
+        struct ReferenceMetadata {
+
+            /** Markdown AST reference source node (for source map) */
+            mdp::MarkdownNodeIterator node;
+
+            /** Reference resolution state */
+            State state;
+        };
+
+        /** Metadata for the reference */
+        ReferenceMetadata meta;
+    };
+    
     /**
      *  Payload
      */
@@ -151,8 +187,8 @@ namespace snowcrash {
         /** Schema */
         Asset schema;
 
-        /** Symbol */
-        SymbolName symbol;
+        /** Reference */
+        Reference reference;
     };
 
     /** Resource Model */
