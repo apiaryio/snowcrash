@@ -252,16 +252,6 @@ SC_API const char* sc_payload_name(const sc_payload_t* handle)
     return p->name.c_str();
 }
 
-/** TODO: Need to change this to use the "Reference" data structure */
-SC_API const char* sc_payload_symbol(const sc_payload_t* handle)
-{
-    const snowcrash::Payload* p = AS_CTYPE(snowcrash::Payload, handle);
-    if (!p)
-        return "";
-
-    return p->reference.id.c_str();
-}
-
 SC_API const char* sc_payload_description(const sc_payload_t* handle)
 {
     const snowcrash::Payload* p = AS_CTYPE(snowcrash::Payload, handle);
@@ -287,6 +277,35 @@ SC_API const char* sc_payload_schema(const sc_payload_t* handle)
         return "";
 
     return p->schema.c_str();
+}
+
+/*----------------------------------------------------------------------*/
+
+SC_API const sc_reference_t* sc_reference_handle_payload(const sc_payload_t* handle)
+{
+    const snowcrash::Payload* p = AS_CTYPE(snowcrash::Payload, handle);
+    if(!p)
+        return NULL;
+
+    return AS_CTYPE(sc_reference_t, &p->reference);
+}
+
+SC_API const char* sc_reference_identifier(const sc_reference_t* handle)
+{
+    const snowcrash::Reference* p = AS_CTYPE(snowcrash::Reference, handle);
+    if (!p)
+        return "";
+
+    return p->id.c_str();
+}
+
+SC_API sc_reference_state sc_reference_reference_state(const sc_reference_t* handle)
+{
+    const snowcrash::Reference* p = AS_CTYPE(snowcrash::Reference, handle);
+    if (!p)
+        return SC_STATE_UNRESOLVED;
+
+    return (sc_reference_state)p->meta.state;
 }
 
 /*----------------------------------------------------------------------*/
