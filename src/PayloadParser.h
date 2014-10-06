@@ -101,12 +101,12 @@ namespace snowcrash {
 
             mdp::ByteBuffer content;
 
-            if (!out.node.reference.identifier.empty()) {
+            if (!out.node.reference.id.empty()) {
                 //WARN: ignoring extraneous content after symbol reference
                 std::stringstream ss;
 
                 ss << "ignoring extraneous content after symbol reference";
-                ss << ", expected symbol reference only e.g. '[" << out.node.reference.identifier << "][]'";
+                ss << ", expected symbol reference only e.g. '[" << out.node.reference.id << "][]'";
 
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
                 out.report.warnings.push_back(Warning(ss.str(),
@@ -529,7 +529,7 @@ namespace snowcrash {
                                          mdp::ByteBuffer& source,
                                          ParseResult<Payload>& out) {
 
-            SymbolName symbol;
+            Identifier symbol;
             ResourceModel model;
             SourceMap<ResourceModel> modelSM;
 
@@ -541,20 +541,20 @@ namespace snowcrash {
                     out.sourceMap.symbol.sourceMap = node->sourceMap;
                 }
 
-                out.node.reference.identifier = symbol;
-                out.node.reference.node = node;
+                out.node.reference.id = symbol;
+                out.node.reference.meta.node = node;
 
                 // If symbol doesn't exist
                 if (pd.symbolTable.resourceModels.find(symbol) == pd.symbolTable.resourceModels.end()) {
 
-                    out.node.reference.state = Reference::StatePending;
+                    out.node.reference.meta.state = Reference::StatePending;
 
                     return true;
                 }
 
                 model = pd.symbolTable.resourceModels.at(symbol);
 
-                out.node.reference.state = Reference::StateResolved;
+                out.node.reference.meta.state = Reference::StateResolved;
                 
                 out.node.description = model.description;
                 out.node.parameters = model.parameters;

@@ -127,32 +127,43 @@ namespace snowcrash {
     typedef Collection<Parameter>::type Parameters;
 
     /** Name of a symbol */
-    typedef std::string SymbolName;
+    typedef std::string Identifier;
 
     /** Reference */
     struct Reference {
 
         /** Reference Resolution State */
-        enum ReferenceState {
+        enum State {
             StateUnresolved,    // Reference unresolved (undefined)
             StatePending,       // Reference resolution pending
             StateResolved       // Reference resolved successfully
         };
 
         /** Reference Type */
-        typedef int ReferenceType;
+        enum ReferenceType {
+            SymbolReference
+        };
+
+        /** Identifier */
+        Identifier id;
 
         /** Type */
         ReferenceType type;
 
-        /** Identifier */
-        std::string identifier;
-
         /** Markdown AST reference source node (for source map) */
-        mdp::MarkdownNodeIterator node;
+        //mdp::MarkdownNodeIterator node;
 
-        /** Reference resolution state */
-        ReferenceState state;
+        struct ReferenceMetadata {
+
+            /** Markdown AST reference source node (for source map) */
+            mdp::MarkdownNodeIterator node;
+
+            /** Reference resolution state */
+            State state;
+        };
+
+        /** Metadata for the reference */
+        ReferenceMetadata meta;
     };
     
     /**

@@ -306,8 +306,8 @@ namespace snowcrash {
                                  requestIterator != transactionExampleItrator->requests.end();
                                  ++requestIterator) {
 
-                                if(!requestIterator->reference.identifier.empty() &&
-                                    requestIterator->reference.state == Reference::StatePending) {
+                                if(!requestIterator->reference.id.empty() &&
+                                    requestIterator->reference.meta.state == Reference::StatePending) {
 
                                     resolvePendingSymbols(&(*requestIterator), node, pd, out);
                                 }
@@ -317,8 +317,8 @@ namespace snowcrash {
                                  responseIterator != transactionExampleItrator->responses.end();
                                  ++responseIterator) {
 
-                                if(!responseIterator->reference.identifier.empty() &&
-                                    responseIterator->reference.state == Reference::StatePending) {
+                                if(!responseIterator->reference.id.empty() &&
+                                    responseIterator->reference.meta.state == Reference::StatePending) {
 
                                     resolvePendingSymbols(&(*responseIterator), node, pd, out);
                                 }
@@ -337,21 +337,21 @@ namespace snowcrash {
 
             ResourceModel model;
 
-            if (pd.symbolTable.resourceModels.find(source->reference.identifier) == pd.symbolTable.resourceModels.end()) {
+            if (pd.symbolTable.resourceModels.find(source->reference.id) == pd.symbolTable.resourceModels.end()) {
 
                 // ERR: Undefined symbol
                 std::stringstream ss;
-                ss << "Undefined symbol " << source->reference.identifier;
+                ss << "Undefined symbol " << source->reference.id;
 
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(source->reference.node->sourceMap, pd.sourceData);
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(source->reference.meta.node->sourceMap, pd.sourceData);
                 out.report.error = Error(ss.str(), SymbolError, sourceMap);
 
-                source->reference.state = Reference::StateUnresolved;
+                source->reference.meta.state = Reference::StateUnresolved;
             }
             else {
-                model = pd.symbolTable.resourceModels.at(source->reference.identifier);
+                model = pd.symbolTable.resourceModels.at(source->reference.id);
 
-                source->reference.state = Reference::StateResolved;
+                source->reference.meta.state = Reference::StateResolved;
 
                 source->description = model.description;
                 source->parameters = model.parameters;
@@ -372,7 +372,7 @@ namespace snowcrash {
                     ss << "ignoring additional " << SectionName(pd.sectionContext()) << " header(s), ";
                     ss << "specify this header(s) in the referenced model definition instead";
 
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(source->reference.node->sourceMap, pd.sourceData);
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(source->reference.meta.node->sourceMap, pd.sourceData);
                     out.report.warnings.push_back(Warning(ss.str(),
                                                           IgnoringWarning,
                                                           sourceMap));

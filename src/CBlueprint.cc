@@ -296,7 +296,7 @@ SC_API const char* sc_reference_identifier(const sc_reference_t* handle)
     if (!p)
         return "";
 
-    return p->identifier.c_str();
+    return p->id.c_str();
 }
 
 SC_API sc_reference_state sc_reference_reference_state(const sc_reference_t* handle)
@@ -305,7 +305,7 @@ SC_API sc_reference_state sc_reference_reference_state(const sc_reference_t* han
     if (!p)
         return SC_STATE_UNRESOLVED;
 
-    return (sc_reference_state)p->state;
+    return (sc_reference_state)p->meta.state;
 }
 
 /*----------------------------------------------------------------------*/
