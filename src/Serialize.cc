@@ -42,7 +42,6 @@ const std::string SerializeKey::Required = "required";
 const std::string SerializeKey::Default = "default";
 const std::string SerializeKey::Example = "example";
 const std::string SerializeKey::Values = "values";
-const std::string SerializeKey::Resolved = "resolved";
 
 std::string snowcrash::EscapeNewlines(const std::string& input)
 {

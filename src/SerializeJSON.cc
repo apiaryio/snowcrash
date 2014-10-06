@@ -475,9 +475,6 @@ static void serialize(const Reference& reference, size_t level, std::ostream &os
         os << "\"" << SerializeKey::Reference << "\": {\n";
 
         serialize(SerializeKey::Id, reference.identifier, level + 1, false, os);
-        os << NewLineItemBlock;
-
-        serialize(SerializeKey::Resolved, (reference.state == Reference::StateResolved), level + 1, os);
         os << "\n";
 
         indent(level, os);
