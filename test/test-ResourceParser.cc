@@ -549,6 +549,46 @@ TEST_CASE("Parse model with unrecognised resource", "[resource][model]")
     REQUIRE(resource.node.actions[0].examples[0].responses[0].description == "");
 }
 
+TEST_CASE("Parse named resource with lazy referencing", "[resource][model]")
+{
+    mdp::ByteBuffer source = \
+    "#api name\n\n"\
+    "# Resource 1 [/1]\n"\
+    "## Retrieve [GET]\n\n"\
+    "+ Response 200\n\n"\
+    "    [Resource 2][]\n\n"\
+    "# Resource 2 [/2]\n"\
+    "+ Model (text/plain)\n\n"\
+    "        `resource model` 2\n";
+
+    ParseResult<Blueprint> blueprint;
+    parse(source, 0, blueprint);
+
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.empty());
+
+    REQUIRE(blueprint.node.name == "api name");
+    REQUIRE(blueprint.node.description == "");
+
+    REQUIRE(blueprint.node.resourceGroups.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources.size() == 2);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].uriTemplate == "/1");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].name == "Resource 1");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].name == "Resource 1");
+
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].method == "GET");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].name == "Retrieve");
+
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body == "`resource model` 2\n");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[0].first == "Content-Type");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[0].second == "text/plain");
+}
+
 TEST_CASE("Parse named resource with nameless model but reference a non-existing model", "[resource]")
 {
     mdp::ByteBuffer source = \
