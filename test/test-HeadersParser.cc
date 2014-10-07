@@ -174,3 +174,37 @@ TEST_CASE("Parse header section with missing headers", "[headers]")
     REQUIRE(headers.node.size() == 0);
     REQUIRE(headers.sourceMap.collection.size() == 0);
 }
+
+TEST_CASE("Headers parses should return warning on multiple definition of same headers", "[headers]")
+{
+    const mdp::ByteBuffer source = \
+    "+ Headers\n"\
+    "\n"\
+    "        Content-Type: application/json\n"\
+    "        Content-Type: application/json\n";
+
+    ParseResult<Headers> headers;
+    SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
+
+    REQUIRE(headers.report.error.code == Error::OK);
+    REQUIRE(headers.report.warnings.size() == 1); // no headers
+
+    REQUIRE(headers.node.size() == 2);
+}
+
+TEST_CASE("Parse header section with more same headers Set-Cookie and Link - there should not be warning", "[headers]")
+{
+    const mdp::ByteBuffer source = \
+    "+ Headers\n"\
+    "\n"\
+    "        Set-Cookie: abcd\n"\
+    "        Set-Cookie: kockaprede\n";
+
+    ParseResult<Headers> headers;
+    SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
+
+    REQUIRE(headers.report.error.code == Error::OK);
+    REQUIRE(headers.report.warnings.size() == 0); // no headers
+
+    REQUIRE(headers.node.size() == 2);
+}
