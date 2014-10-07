@@ -234,9 +234,9 @@ namespace snowcrash {
         typedef std::vector<std::string> HeadersKeyCollection;
         /** Get collection of allowed keywords - workarround due to C++98 restriction - static initialization of vector */
         static const HeadersKeyCollection& getAllowedMultipleDefinitions() {
-            static const char* keys[] = {
-                "Set-Cookie",
-                "Link",
+            static std::string keys[] = {
+                HTTPHeaderName::SetCookie,
+                HTTPHeaderName::Link,
             };
 
             static const HeadersKeyCollection allowedMultipleDefinitions(keys, keys + (sizeof(keys)/sizeof(keys[0])));
