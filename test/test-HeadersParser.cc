@@ -187,9 +187,9 @@ TEST_CASE("Headers parses should return warning on multiple definition of same h
     SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
 
     REQUIRE(headers.report.error.code == Error::OK);
-    REQUIRE(headers.report.warnings.size() == 1); // no headers
+    REQUIRE(headers.report.warnings.size() == 1); // one warning due to multiple declaration same header
 
-    REQUIRE(headers.node.size() == 2);
+    REQUIRE(headers.node.size() == 2); 
 }
 
 TEST_CASE("Parse header section with more same headers Set-Cookie and Link - there should not be warning", "[headers]")
@@ -204,7 +204,7 @@ TEST_CASE("Parse header section with more same headers Set-Cookie and Link - the
     SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
 
     REQUIRE(headers.report.error.code == Error::OK);
-    REQUIRE(headers.report.warnings.size() == 0); // no headers
+    REQUIRE(headers.report.warnings.size() == 0); // no warning - multiple definition, but from allowed set
 
     REQUIRE(headers.node.size() == 2);
 }
