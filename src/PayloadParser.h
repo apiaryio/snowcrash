@@ -542,7 +542,7 @@ namespace snowcrash {
                 out.node.reference.type = Reference::SymbolReference;
 
                 if (pd.exportSourceMap() && !symbol.empty()) {
-                    out.sourceMap.symbol.sourceMap = node->sourceMap;
+                    out.sourceMap.reference.sourceMap = node->sourceMap;
                 }
 
                 // If symbol has not been defined yet in symbol table

@@ -472,25 +472,42 @@ static void serialize(const Collection<SourceMap<Header> >::type& headers, size_
 static void serialize(const Reference& reference, size_t level, std::ostream &os)
 {
 
-    if (!reference.id.empty()) {
+    if (reference.id.empty()) {
+        return;
+    }
 
-        indent(level, os);
-        os << "\"" << SerializeKey::Reference << "\": {\n";
+    indent(level, os);
+    os << "\"" << SerializeKey::Reference << "\": {\n";
 
-        serialize(SerializeKey::Id, reference.id, level + 1, false, os);
+    serialize(SerializeKey::Id, reference.id, level + 1, false, os);
 
-        if (reference.type == Reference::SymbolReference) {
-
-            os << NewLineItemBlock;
-            serialize(SerializeKey::Type, "symbol", level + 1, false, os);
-            os << "\n";
-        }
-
-        indent(level, os);
-        os << "}";
+    if (reference.type == Reference::SymbolReference) {
 
         os << NewLineItemBlock;
+        serialize(SerializeKey::Type, "symbol", level + 1, false, os);
+        os << "\n";
     }
+
+    indent(level, os);
+    os << "}";
+
+    os << NewLineItemBlock;
+}
+
+/**
+ * \brief Serialize a reference source map into output stream.
+ * \param reference A reference source map to serialize.
+ * \param os An output stream to serialize into.
+ */
+static void serialize(const SourceMap<Reference>& reference, size_t level, std::ostream &os)
+{
+
+    if (reference.sourceMap.empty()) {
+        return;
+    }
+
+    serialize(SerializeKey::Reference, reference, level, false, os);
+    os << NewLineItemBlock;
 }
 
 /**
@@ -543,10 +560,7 @@ static void serialize(const SourceMap<Payload>& payload, size_t level, std::ostr
     os << NewLineItemBlock;
 
     // Symbol Reference
-    if (!payload.symbol.sourceMap.empty()) {
-        serialize(SerializeKey::Reference, payload.symbol, level + 1, false, os);
-        os << NewLineItemBlock;
-    }
+    serialize(payload.reference, level + 1, os);
 
     // Description
     serialize(SerializeKey::Description, payload.description, level + 1, false, os);

@@ -359,8 +359,8 @@ TEST_CASE("Parse blueprint with multiple reference via C interface", "[cinterfac
     REQUIRE(std::string(sc_payload_body(response)) == "`resource model` 1\n");
 
     const sc_reference_t* reference = sc_reference_handle_payload(response);
-    REQUIRE(std::string(sc_reference_identifier(reference)) == "Resource 1");
-    REQUIRE(sc_reference_type(reference) == 2);
+    REQUIRE(std::string(sc_reference_id(reference)) == "Resource 1");
+    REQUIRE(sc_reference_type(reference) == 0);
 
     res = sc_resource_handle(sm_res_gr_col, 2);
     REQUIRE(std::string(sc_resource_uritemplate(res)) == "/3");
@@ -387,6 +387,6 @@ TEST_CASE("Parse blueprint with multiple reference via C interface", "[cinterfac
     REQUIRE(std::string(sc_payload_body(response)) == "`resource model` 4\n");
 
     reference = sc_reference_handle_payload(response);
-    REQUIRE(std::string(sc_reference_identifier(reference)) == "Resource 4");
-    REQUIRE(sc_reference_type(reference) == 2);
+    REQUIRE(std::string(sc_reference_id(reference)) == "Resource 4");
+    REQUIRE(sc_reference_type(reference) == 0);
 }

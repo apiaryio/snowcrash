@@ -35,9 +35,7 @@ extern "C" {
     } sc_parameter_use;
 
     typedef enum sc_reference_type_t {
-        SC_STATE_UNRESOLVED,
-        SC_STATE_PENDING,
-        SC_STATE_RESOLVED
+        SC_TYPE_SYMBOL_REFERENCE
     } sc_reference_type_t;
 
     /** Class Blueprint wrapper */
@@ -235,7 +233,7 @@ extern "C" {
     SC_API const sc_reference_t* sc_reference_handle_payload(const sc_payload_t* handle);
 
     /** \returns Reference identifier */
-    SC_API const char* sc_reference_identifier(const sc_reference_t* handle);
+    SC_API const char* sc_reference_id(const sc_reference_t* handle);
 
     /** \returns Reference identifier */
     SC_API sc_reference_type_t sc_reference_type(const sc_reference_t* handle);

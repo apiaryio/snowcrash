@@ -290,7 +290,7 @@ SC_API const sc_reference_t* sc_reference_handle_payload(const sc_payload_t* han
     return AS_CTYPE(sc_reference_t, &p->reference);
 }
 
-SC_API const char* sc_reference_identifier(const sc_reference_t* handle)
+SC_API const char* sc_reference_id(const sc_reference_t* handle)
 {
     const snowcrash::Reference* p = AS_CTYPE(snowcrash::Reference, handle);
     if (!p)
@@ -303,9 +303,9 @@ SC_API sc_reference_type_t sc_reference_type(const sc_reference_t* handle)
 {
     const snowcrash::Reference* p = AS_CTYPE(snowcrash::Reference, handle);
     if (!p)
-        return SC_STATE_UNRESOLVED;
+        return (sc_reference_type_t)0;
 
-    return (sc_reference_type_t)p->meta.state;
+    return (sc_reference_type_t)p->type;
 }
 
 /*----------------------------------------------------------------------*/

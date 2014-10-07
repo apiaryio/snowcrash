@@ -288,41 +288,72 @@ namespace snowcrash {
                                          SectionParserData& pd,
                                          ParseResult<Blueprint>& out) {
 
+            Collection<SourceMap<ResourceGroup> >::iterator resourceGroupsSourceMapIterator;
+            Collection<SourceMap<Resource> >::iterator resourceSourceMapIterator;
+            Collection<SourceMap<Action> >::iterator actionSourceMapIterator;
+            Collection<SourceMap<TransactionExample> >::iterator exampleSourceMapIterator;
+            Collection<SourceMap<Request> >::iterator requestSourceMapIterator;
+            Collection<SourceMap<Response> >::iterator responseSourceMapIterator;
+
+            bool exportSourceMap = pd.exportSourceMap();
+
+            resourceGroupsSourceMapIterator = out.sourceMap.resourceGroups.collection.begin();
+
             for (ResourceGroups::iterator resourceGroupIterator = out.node.resourceGroups.begin();
                  resourceGroupIterator != out.node.resourceGroups.end();
-                 ++resourceGroupIterator) {
+                 ++resourceGroupIterator, exportSourceMap ? ++resourceGroupsSourceMapIterator : resourceGroupsSourceMapIterator) {
+
+                if (exportSourceMap) {
+                    resourceSourceMapIterator = resourceGroupsSourceMapIterator->resources.collection.begin();
+                }
 
                 for (Resources::iterator resourceIterator = resourceGroupIterator->resources.begin();
                      resourceIterator != resourceGroupIterator->resources.end();
-                     ++resourceIterator) {
+                     ++resourceIterator, exportSourceMap ? ++resourceSourceMapIterator : resourceSourceMapIterator) {
+
+                    if (exportSourceMap) {
+                        actionSourceMapIterator = resourceSourceMapIterator->actions.collection.begin();
+                    }
 
                     for (Actions::iterator actionIterator = resourceIterator->actions.begin();
                          actionIterator != resourceIterator->actions.end();
-                         ++actionIterator) {
+                         ++actionIterator, exportSourceMap ? ++actionSourceMapIterator : actionSourceMapIterator) {
+
+                        if (exportSourceMap) {
+                            exampleSourceMapIterator = actionSourceMapIterator->examples.collection.begin();
+                        }
 
                         for (TransactionExamples::iterator transactionExampleIterator = actionIterator->examples.begin();
                              transactionExampleIterator != actionIterator->examples.end();
-                             ++transactionExampleIterator) {
+                             ++transactionExampleIterator, exportSourceMap ? ++exampleSourceMapIterator : exampleSourceMapIterator) {
+
+                            if (exportSourceMap) {
+                                requestSourceMapIterator = exampleSourceMapIterator->requests.collection.begin();
+                            }
 
                             for (Requests::iterator requestIterator = transactionExampleIterator->requests.begin();
                                  requestIterator != transactionExampleIterator->requests.end();
-                                 ++requestIterator) {
+                                 ++requestIterator, exportSourceMap ? ++requestSourceMapIterator : requestSourceMapIterator) {
 
-                                if(!requestIterator->reference.id.empty() &&
+                                if (!requestIterator->reference.id.empty() &&
                                     requestIterator->reference.meta.state == Reference::StatePending) {
 
-                                    resolvePendingSymbols(*requestIterator, node, pd, out);
+                                    resolvePendingSymbols(*requestIterator, node, pd, out, requestSourceMapIterator);
                                 }
+                            }
+
+                            if (exportSourceMap) {
+                                responseSourceMapIterator = exampleSourceMapIterator->responses.collection.begin();
                             }
 
                             for (Responses::iterator responseIterator = transactionExampleIterator->responses.begin();
                                  responseIterator != transactionExampleIterator->responses.end();
-                                 ++responseIterator) {
+                                 ++responseIterator, exportSourceMap ? ++responseSourceMapIterator : responseSourceMapIterator) {
 
-                                if(!responseIterator->reference.id.empty() &&
+                                if (!responseIterator->reference.id.empty() &&
                                     responseIterator->reference.meta.state == Reference::StatePending) {
 
-                                    resolvePendingSymbols(*responseIterator, node, pd, out);
+                                    resolvePendingSymbols(*responseIterator, node, pd, out, responseSourceMapIterator);
                                 }
                             }
                         }
@@ -335,8 +366,10 @@ namespace snowcrash {
         static void resolvePendingSymbols(Payload& payload,
                                           const MarkdownNodeIterator& node,
                                           SectionParserData& pd,
-                                          ParseResult<Blueprint>& out) {
+                                          ParseResult<Blueprint>& out,
+                                          Collection<SourceMap<Payload> >::iterator SMiterator) {
 
+            SourceMap<ResourceModel> modelSM;
             ResourceModel model;
 
             if (pd.symbolTable.resourceModels.find(payload.reference.id) == pd.symbolTable.resourceModels.end()) {
@@ -388,6 +421,22 @@ namespace snowcrash {
 
                 payload.body = model.body;
                 payload.schema = model.schema;
+
+                if (pd.exportSourceMap()) {
+
+                    modelSM = pd.symbolSourceMapTable.resourceModels.at(payload.reference.id);
+
+                    SMiterator->description = modelSM.description;
+                    SMiterator->parameters = modelSM.parameters;
+                    SMiterator->body = modelSM.body;
+                    SMiterator->schema = modelSM.schema;
+
+                    if (isPayloadContentType && !isModelContentType) {
+                        SMiterator->headers.collection.insert(SMiterator->headers.collection.end(), modelSM.headers.collection.begin(), modelSM.headers.collection.end());
+                    } else {
+                        SMiterator->headers = modelSM.headers;
+                    }
+                }
             }
         }
     };
