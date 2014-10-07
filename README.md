@@ -27,21 +27,21 @@ Other systems refer to [build notes](#build).
 ```c++
 #include "snowcrash.h"
 
-snowcrash::SourceData blueprint = R"(
+mdp::ByteBuffer blueprint = R"(
 # My API
 ## GET /message
 + Response 200 (text/plain)
 
         Hello World!
 )";
-snowcrash::Report report;
-snowcrash::Blueprint ast;
-snowcrash::parse(blueprint, 0, report, ast);
 
-std::cout << "API Name: " << ast.name << std::endl;
+snowcrash::ParseResult<snowcrash::Blueprint> ast;
+snowcrash::parse(blueprint, 0, ast);
+
+std::cout << "API Name: " << ast.node.name << std::endl;
 ```
 
-Refer to [`Blueprint.h`](src/Blueprint.h) for the details about the Snow Crash AST. See [Snow Crash bindings](#bindings) for using the library in **other languages**. 
+Refer to [`Blueprint.h`](src/Blueprint.h) for the details about the Snow Crash AST and [`BlueprintSourcemap.h`](src/BlueprintSourcemap.h) for details about Source Maps tree. See [Snow Crash bindings](#bindings) for using the library in **other languages**.
 
 ### Command line tool
 
