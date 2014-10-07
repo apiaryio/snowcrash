@@ -644,14 +644,14 @@ TEST_CASE("Report ignoring nested request objects", "[payload][#163][#189]")
     "    + Request (application/x-www-form-urlencoded)\n"\
     "\n"\
     "            Hello World\n";
-    
+
     ParseResult<Payload> payload;
     SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, payload);
-    
+
     REQUIRE(payload.report.error.code == Error::OK);
     REQUIRE(payload.report.warnings.size() == 1);
     REQUIRE(payload.report.warnings[0].code == IgnoringWarning);
-    
+
     REQUIRE(payload.node.headers.size() == 1);
     REQUIRE(payload.node.body.empty());
 

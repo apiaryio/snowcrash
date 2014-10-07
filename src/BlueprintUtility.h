@@ -15,7 +15,7 @@
 #include "HTTP.h"
 
 namespace snowcrash {
-    
+
     /**
      *  \brief Pair firsts matching predicate.
      *
@@ -27,7 +27,7 @@ namespace snowcrash {
             return left.first == right.first;
         }
     };
-    
+
     /**
      *  \brief Matches a pair's first against a value.
      */
@@ -37,7 +37,7 @@ namespace snowcrash {
             return left.first == right;
         }
     };
-    
+
     /**  A name matching predicate. */
     template <class T>
     struct MatchName : std::binary_function<T, T, bool> {
@@ -45,7 +45,7 @@ namespace snowcrash {
             return first.name == second.name;
         }
     };
-    
+
     /**
      *  \brief  Payload matching predicate.
      *
@@ -53,11 +53,11 @@ namespace snowcrash {
      */
     struct MatchPayload : std::binary_function<Payload, Payload, bool> {
         bool operator()(const first_argument_type& left, const second_argument_type& right) const {
-            
+
 
             if (left.name != right.name)
                 return false;
-            
+
             // Resolve left content type
             Collection<Header>::const_iterator header;
 
@@ -70,7 +70,7 @@ namespace snowcrash {
 
             if (header != left.headers.end())
                 leftContentType = header->second;
-            
+
             // Resolve right content type
             header = std::find_if(right.headers.begin(),
                                   right.headers.end(),
@@ -81,18 +81,18 @@ namespace snowcrash {
 
             if (header != right.headers.end())
                 rightContentType = header->second;
-            
+
             return leftContentType == rightContentType;
         }
     };
-    
+
     /** URI matching predicate. */
     struct MatchResource : std::binary_function<Resource, Resource, bool> {
         bool operator()(const first_argument_type& first, const second_argument_type& second) const {
             return first.uriTemplate == second.uriTemplate;
         }
     };
-    
+
     /**  Action matching predicate. */
     template <class T>
     struct MatchAction : std::binary_function<T, T, bool> {

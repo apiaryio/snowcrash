@@ -15,7 +15,7 @@
 #define AST_SERIALIZATION_VERSION "2.1"
 
 namespace snowcrash {
-    
+
     /**
      *  \brief  Escape new lines in input string.
      *  \param  input   A string to escape its new lines.
@@ -24,14 +24,14 @@ namespace snowcrash {
      *  This function replaces all occurences of "\n" with "\\n".
      */
     std::string EscapeNewlines(const std::string& input);
-    
+
     /**
      *  \brief  Escape every double quote in input string.
      *  \param  input   A string to escape its double quotes.
      *  \return A new string with double quotes escaped.
      */
     std::string EscapeDoubleQuotes(const std::string& input);
-    
+
     /**
      *  AST entities serialization keys
      */

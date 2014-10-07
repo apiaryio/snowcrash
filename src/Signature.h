@@ -14,7 +14,7 @@
 
 namespace snowcrash {
 
-    /** 
+    /**
      *  \brief Query whether a node has keyword-defined signature.
      *  \param node     A Markdown AST node to check.
      *  \return Type of the node if it has a recognized keyword signature, UndefinedType otherwise

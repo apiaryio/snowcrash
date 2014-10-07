@@ -21,4 +21,4 @@ namespace snowcrash {
     void SerializeSourceMapJSON(const snowcrash::SourceMap<snowcrash::Blueprint>& blueprint, std::ostream &os);
 }
 
-#endif 
+#endif

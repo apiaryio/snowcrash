@@ -39,13 +39,13 @@ namespace snowcrash {
 
     /** Additonal Parameter Traits Type matching regex */
     const char* const AdditionalTraitsTypeRegex = CSV_LEADINOUT "([^,]*)" CSV_LEADINOUT;
-    
+
     /** Parameter Values matching regex */
     const char* const ParameterValuesRegex = "^[[:blank:]]*[Vv]alues[[:blank:]]*$";
 
     /** Values expected content */
     const char* const ExpectedValuesContent = "nested list of possible parameter values, one element per list item e.g. '`value`'";
-    
+
     /** Parameter description delimiter */
     const std::string DescriptionIdentifier = "...";
 
@@ -172,10 +172,10 @@ namespace snowcrash {
             CaptureGroups captureGroups;
 
             if (isValidParameterSignature(signature)) {
-                
+
                 mdp::ByteBuffer innerSignature = signature;
                 innerSignature = TrimString(innerSignature);
-                
+
                 size_t firstSpace = innerSignature.find(" ");
 
                 if (firstSpace == std::string::npos) {
@@ -196,7 +196,7 @@ namespace snowcrash {
                         innerSignature = innerSignature.substr(0, descriptionPos);
                         innerSignature = TrimString(innerSignature);
                     }
-                    
+
                     size_t attributesPos = innerSignature.find("(");
 
                     if (attributesPos != std::string::npos) {
@@ -212,7 +212,7 @@ namespace snowcrash {
                             innerSignature = TrimString(innerSignature);
                         }
                     }
-                    
+
                     if (innerSignature.length() > 0) {
                         // Remove =
                         out.node.defaultValue = innerSignature;
@@ -395,23 +395,23 @@ namespace snowcrash {
                                                       sourceMap));
             }
         }
-        
+
         /** Determine if a signature is a valid parameter*/
         static bool isValidParameterSignature(const mdp::ByteBuffer& signature) {
-            
+
             mdp::ByteBuffer innerSignature = signature;
             innerSignature = TrimString(innerSignature);
-            
+
             if (innerSignature.length() == 0) {
                 return false; // Empty string, invalid
             }
-            
+
             size_t firstSpace = innerSignature.find(" ");
 
             if (firstSpace == std::string::npos) {
                 return RegexMatch(innerSignature, "^" PARAMETER_IDENTIFIER "$");
             }
-            
+
             std::string paramName = innerSignature.substr(0, firstSpace);
 
             if (!RegexMatch(paramName, "^" PARAMETER_IDENTIFIER "$")) {
@@ -427,7 +427,7 @@ namespace snowcrash {
                 innerSignature = innerSignature.substr(0, descriptionPos);
                 innerSignature = TrimString(innerSignature);
             }
-            
+
             size_t attributesPos = innerSignature.find("(");
 
             if (attributesPos != std::string::npos) {
@@ -441,11 +441,11 @@ namespace snowcrash {
                 innerSignature = innerSignature.substr(0, attributesPos);
                 innerSignature = TrimString(innerSignature);
             }
-            
+
             if (innerSignature.length() == 0) {
                 return true;
             }
-            
+
             if (innerSignature.substr(0,1) == "=") {
                 innerSignature = innerSignature.substr(1);
                 innerSignature = TrimString(innerSignature);
@@ -458,7 +458,7 @@ namespace snowcrash {
                     return true;
                 }
             }
-            
+
             return false;
         }
 

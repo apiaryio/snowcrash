@@ -13,7 +13,7 @@
 #include "Blueprint.h"
 
 /**
- *  \brief HTTP Methods 
+ *  \brief HTTP Methods
  *
  *  Technical note: Using preprocessor macro instead of strict
  *  defined type due to C++98 string concatenation limitations.
@@ -21,7 +21,7 @@
  */
 #define HTTP_REQUEST_METHOD "(GET|POST|PUT|DELETE|OPTIONS|PATCH|PROPPATCH|LOCK|UNLOCK|COPY|MOVE|MKCOL|HEAD|LINK|UNLINK|CONNECT)"
 
-/** 
+/**
  *  \brief URI Template.
  *
  *  See previous technical note (using macro).
@@ -29,7 +29,7 @@
 #define URI_TEMPLATE "(/.*)"
 
 namespace snowcrash {
-    
+
     /**
      *  Selected HTTP Header names.
      */
@@ -57,9 +57,9 @@ namespace snowcrash {
      *  Traits of a HTTP response.
      */
     struct HTTPResponseTraits {
-        
+
         bool allowBody; /// < Response body is allowed.
-        
+
         HTTPResponseTraits() : allowBody(true) {}
     };
 
@@ -86,7 +86,7 @@ namespace snowcrash {
         HTTPStatusCode code;
         StatusCodeTraits() : code(0) {}
     };
-    
+
     /**
      *  \brief  Retrieve response traits for given HTTP method.
      *  \param  method  HTTP method to retrieve traits for.

@@ -594,14 +594,14 @@ TEST_CASE("Parse root resource", "[resource]")
 TEST_CASE("Parse resource with invalid URI Tempalte", "[resource]")
 {
     mdp::ByteBuffer source = "# Resource [/id{? limit}]\n";
-    
+
     ParseResult<Resource> resource;
     SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource);
-    
+
     REQUIRE(resource.report.error.code == Error::OK);
     REQUIRE(resource.report.warnings.size() == 1);
     REQUIRE(resource.report.warnings[0].code == URIWarning);
-    
+
     REQUIRE(resource.node.name == "Resource");
     REQUIRE(resource.node.uriTemplate == "/id{? limit}");
     REQUIRE(resource.node.actions.empty());
@@ -729,26 +729,26 @@ TEST_CASE("Dangling transaction example assets", "[resource]")
     "```\n"\
     "dangling response body\n"\
     "```\n";
-    
+
     ParseResult<Resource> resource;
     SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource);
-    
+
     REQUIRE(resource.report.error.code == Error::OK);
     REQUIRE(resource.report.warnings.size() == 3);
     REQUIRE(resource.report.warnings[0].code == EmptyDefinitionWarning);
     REQUIRE(resource.report.warnings[1].code == IndentationWarning);
     REQUIRE(resource.report.warnings[2].code == IndentationWarning);
-    
+
     REQUIRE(resource.node.name == "A");
     REQUIRE(resource.node.uriTemplate == "/a");
     REQUIRE(resource.node.actions.size() == 1);
-    
+
     REQUIRE(resource.node.actions[0].method == "GET");
     REQUIRE(resource.node.actions[0].examples.size() == 1);
     REQUIRE(resource.node.actions[0].examples[0].requests.size() == 1);
     REQUIRE(resource.node.actions[0].examples[0].requests[0].name == "A");
     REQUIRE(resource.node.actions[0].examples[0].requests[0].body == "dangling request body\n\n");
-    
+
     REQUIRE(resource.node.actions[0].examples[0].responses.size() == 1);
     REQUIRE(resource.node.actions[0].examples[0].responses[0].name == "200");
     REQUIRE(resource.node.actions[0].examples[0].responses[0].body == "dangling response body\n\n");
@@ -776,13 +776,13 @@ TEST_CASE("Body list item in description", "[resource][regression][#190]")
     "    { ... }\n"\
     "\n"\
     "+ Response 200\n";
-    
+
     ParseResult<Resource> resource;
     SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource);
-    
+
     REQUIRE(resource.report.error.code == Error::OK);
     REQUIRE(resource.report.warnings.empty());
-    
+
     REQUIRE(resource.node.actions.size() == 1);
     REQUIRE(resource.node.actions[0].description == "Lorem Ipsum\n\n+ Body\n\n    { ... }\n\n");
 

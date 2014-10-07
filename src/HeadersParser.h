@@ -22,13 +22,13 @@ namespace snowcrash {
 
     /** Header Iterator in its containment group */
     typedef Collection<Header>::const_iterator HeaderIterator;
-    
+
     /**
      *  Headers Section Processor
      */
     template<>
     struct SectionProcessor<Headers> : public SectionProcessorBase<Headers> {
-        
+
         static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
                                                      const MarkdownNodes& siblings,
                                                      SectionParserData& pd,
@@ -42,7 +42,7 @@ namespace snowcrash {
 
             return ++MarkdownNodeIterator(node);
         }
-        
+
         static MarkdownNodeIterator processDescription(const MarkdownNodeIterator& node,
                                                        const MarkdownNodes& siblings,
                                                        SectionParserData& pd,
@@ -63,18 +63,18 @@ namespace snowcrash {
 
             return ++MarkdownNodeIterator(node);
         }
-        
+
         static bool isDescriptionNode(const MarkdownNodeIterator& node,
                                       SectionType sectionType) {
             return false;
         }
-        
+
         static bool isContentNode(const MarkdownNodeIterator& node,
                                   SectionType sectionType) {
 
             return (SectionKeywordSignature(node) == UndefinedSectionType);
         }
-        
+
         static SectionType sectionType(const MarkdownNodeIterator& node) {
 
             if (node->type == mdp::ListItemMarkdownNodeType
@@ -83,7 +83,7 @@ namespace snowcrash {
                 mdp::ByteBuffer subject = node->children().front().text;
                 mdp::ByteBuffer signature;
                 mdp::ByteBuffer remainingContent;
-                
+
                 signature = GetFirstLine(subject, remainingContent);
                 TrimString(signature);
 

@@ -53,7 +53,7 @@ static Expressions GetUriTemplateExpressions(const URITemplate& uriTemplate) {
     Expressions expressions;
     size_t expressionStartPos = 0;
     size_t expressionEndPos = 0;
-    
+
     while (expressionStartPos != std::string::npos && expressionEndPos != std::string::npos && expressionStartPos < uriTemplate.length()) {
         expressionStartPos = uriTemplate.find("{", expressionStartPos);
         expressionEndPos = uriTemplate.find("}", expressionStartPos);
@@ -105,12 +105,12 @@ static ClassifiedExpression ClassifyExpression(const Expression& expression) {
     }
 
     FormStyleQueryContinuationExpression formStyleQueryContinuationExpression(expression);
-    if (formStyleQueryContinuationExpression.IsExpressionType()) { 
+    if (formStyleQueryContinuationExpression.IsExpressionType()) {
         return formStyleQueryContinuationExpression;
     }
 
     UndefinedExpression undefinedExpression(expression);
-    
+
     return undefinedExpression;
 }
 
@@ -131,7 +131,7 @@ void URITemplateParser::parse(const URITemplate& uri, const mdp::CharactersRange
             result.report.warnings.push_back(Warning("The URI template contains mismatched expression brackets", URIWarning, sourceBlock));
             return;
         }
-       
+
         if (HasNestedCurlyBrackets(result.path)) {
             result.report.warnings.push_back(Warning("The URI template contains nested expression brackets", URIWarning, sourceBlock));
             return;
@@ -172,7 +172,7 @@ void URITemplateParser::parse(const URITemplate& uri, const mdp::CharactersRange
                     result.report.warnings.push_back(Warning(ss.str(), URIWarning, sourceBlock));
                     hasIllegalCharacters = true;
                 }
-               
+
                 if (!hasIllegalCharacters) {
                     if (classifiedExpression.IsInvalidExpressionName()) {
                         std::stringstream ss;

@@ -268,9 +268,9 @@ TEST_CASE("Exception while parsing a blueprint with leading empty space", "[regr
     mdp::ByteBuffer source = \
     "\n"\
     "# PUT /branch\n";
-    
+
     ParseResult<Blueprint> blueprint;
-    
+
     REQUIRE_NOTHROW(parse(source, 0, blueprint));
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.size() == 1);
@@ -281,9 +281,9 @@ TEST_CASE("Invalid source map without closing newline", "[regression][parser]")
 {
     mdp::ByteBuffer source = \
     "# PUT /branch";
-    
+
     ParseResult<Blueprint> blueprint;
-    
+
     REQUIRE_NOTHROW(parse(source, 0, blueprint));
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.size() == 1);
@@ -297,28 +297,28 @@ TEST_CASE("Warn about missing API name if there is an API description", "[parser
 {
     mdp::ByteBuffer source1 = \
     "Hello World\n";
-    
+
     ParseResult<Blueprint> blueprint1;
     parse(source1, 0, blueprint1);
-    
+
     REQUIRE(blueprint1.report.error.code == Error::OK);
     REQUIRE(blueprint1.report.warnings.size() == 1);
     REQUIRE(blueprint1.report.warnings[0].code == APINameWarning);
-    
+
     REQUIRE(blueprint1.node.name.empty());
     REQUIRE(blueprint1.node.description == "Hello World\n");
     REQUIRE(blueprint1.node.resourceGroups.empty());
-    
+
     mdp::ByteBuffer source2 = \
     "# API\n"\
     "Hello World\n";
-    
+
     ParseResult<Blueprint> blueprint2;
     parse(source2, 0, blueprint2);
-    
+
     REQUIRE(blueprint2.report.error.code == Error::OK);
     REQUIRE(blueprint2.report.warnings.empty());
-    
+
     REQUIRE(blueprint2.node.name == "API");
     REQUIRE(blueprint2.node.description == "Hello World\n");
     REQUIRE(blueprint2.node.resourceGroups.empty());
@@ -326,10 +326,10 @@ TEST_CASE("Warn about missing API name if there is an API description", "[parser
     mdp::ByteBuffer source3 = \
     "# POST /1\n"\
     "+ Response 201";
-    
+
     ParseResult<Blueprint> blueprint3;
     parse(source3, 0, blueprint3);
-    
+
     REQUIRE(blueprint3.report.error.code == Error::OK);
     REQUIRE(blueprint3.report.warnings.empty());
 }
@@ -342,16 +342,16 @@ TEST_CASE("Resource with incorrect URI segfault", "[parser][regression]")
     "### Retrieve [GET]\n"\
     "+ Response 200\n"\
     "\n";
-    
+
     ParseResult<Blueprint> blueprint;
     parse(source, 0, blueprint);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
-    
+
     REQUIRE(blueprint.node.name.empty());
     REQUIRE(blueprint.node.description.empty());
-    
+
     REQUIRE(blueprint.node.resourceGroups.size() == 1);
     REQUIRE(blueprint.node.resourceGroups[0].name == "A");
     REQUIRE(blueprint.node.resourceGroups[0].description == "## Resource [wronguri]\n\n### Retrieve [GET]\n\n+ Response 200\n\n");
@@ -366,17 +366,17 @@ TEST_CASE("Dangling block not recognized", "[parser][regression][#186]")
     "```js\n"\
     "    { ... }\n"\
     "```\n";
-    
+
     ParseResult<Blueprint> blueprint;
     parse(source, 0, blueprint);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.size() == 1);
     REQUIRE(blueprint.report.warnings[0].code == IndentationWarning);
-    
+
     REQUIRE(blueprint.node.name.empty());
     REQUIRE(blueprint.node.description.empty());
-    
+
     REQUIRE(blueprint.node.resourceGroups.size() == 1);
     REQUIRE(blueprint.node.resourceGroups[0].resources.size() == 1);
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].name == "A");
@@ -395,7 +395,7 @@ TEST_CASE("Ignoring block recovery", "[parser][regression][#188]")
     "+ Response 200\n"\
     "\n"\
     "### Remove a Note [DELETE]\n";
-    
+
     ParseResult<Blueprint> blueprint;
     parse(source, 0, blueprint);
 
@@ -403,7 +403,7 @@ TEST_CASE("Ignoring block recovery", "[parser][regression][#188]")
     REQUIRE(blueprint.report.warnings.size() == 2);
     REQUIRE(blueprint.report.warnings[0].code == IgnoringWarning);
     REQUIRE(blueprint.report.warnings[1].code == EmptyDefinitionWarning);
-    
+
     REQUIRE(blueprint.node.resourceGroups.size() == 1);
     REQUIRE(blueprint.node.resourceGroups[0].resources.size() == 1);
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].name == "Note");
@@ -424,7 +424,7 @@ TEST_CASE("Ignoring dangling model assets", "[parser][regression][#196]")
     "+ Response 200\n"\
     "\n"\
     "    [A][]\n";
-    
+
     ParseResult<Blueprint> blueprint;
     parse(source, 0, blueprint);
 
@@ -456,14 +456,14 @@ TEST_CASE("Ignoring local media type", "[parser][regression][#195]")
     "+ Response 200 (X)\n"\
     "\n"\
     "    [A][]\n";
-    
+
     ParseResult<Blueprint> blueprint;
     parse(source, ExportSourcemapOption, blueprint);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.size() == 1);
     REQUIRE(blueprint.report.warnings[0].code == IgnoringWarning);
-    
+
     REQUIRE(blueprint.node.resourceGroups.size() == 1);
     REQUIRE(blueprint.node.resourceGroups[0].resources.size() == 1);
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions.size() == 1);
@@ -497,13 +497,13 @@ TEST_CASE("Using local media type", "[parser][regression][#195]")
     "+ Response 200 (X)\n"\
     "\n"\
     "    [A][]\n";
-    
+
     ParseResult<Blueprint> blueprint;
     parse(source, ExportSourcemapOption, blueprint);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
-    
+
     REQUIRE(blueprint.node.resourceGroups.size() == 1);
     REQUIRE(blueprint.node.resourceGroups[0].resources.size() == 1);
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions.size() == 1);
@@ -532,14 +532,14 @@ TEST_CASE("Parse ill-formated header", "[parser][#198][regression]")
     "+ Response 200\n"\
     "    + Header\n"\
     "        Location: new_url\n";
-    
+
     ParseResult<Blueprint> blueprint;
     parse(source, 0, blueprint);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.size() == 1);
     REQUIRE(blueprint.report.warnings[0].code == IndentationWarning);
-    
+
     REQUIRE(blueprint.node.resourceGroups.size() == 1);
     REQUIRE(blueprint.node.resourceGroups[0].resources.size() == 1);
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions.size() == 1);
@@ -566,14 +566,14 @@ TEST_CASE("Overshadow parameters", "[parser][#201][regression][parameters]")
     "    + a ... 4\n"\
     "\n"\
     "+ response 200\n";
-    
+
     ParseResult<Blueprint> blueprint;
     parse(source, 0, blueprint);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.size() == 1);
     REQUIRE(blueprint.report.warnings[0].code == RedefinitionWarning);
-    
+
     REQUIRE(blueprint.node.resourceGroups.size() == 1);
     REQUIRE(blueprint.node.resourceGroups[0].resources.size() == 1);
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions.size() == 1);
@@ -581,7 +581,7 @@ TEST_CASE("Overshadow parameters", "[parser][#201][regression][parameters]")
 
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].parameters[0].name == "a");
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].parameters[0].description == "1");
-    
+
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].parameters[1].name == "b");
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].parameters[1].description == "2");
 

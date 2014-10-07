@@ -317,18 +317,18 @@ TEST_CASE("No Indentation & No Newline multi-line", "[indentation]")
     "\n"\
     "    Hello\n"\
     "}\n";
-    
+
     ParseResult<Action> action;
     SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
-    
+
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.size() == 2);
     REQUIRE(action.report.warnings[0].code == IndentationWarning);
     ReportDebugMessage(action.report.warnings[0].message);
-    
+
     REQUIRE(action.report.warnings[1].code == IndentationWarning);
     ReportDebugMessage(action.report.warnings[1].message);
-    
+
     REQUIRE(action.node.examples.size() == 1);
     REQUIRE(action.node.examples[0].responses.size() == 1);
     REQUIRE(action.node.examples[0].responses[0].name == "200");

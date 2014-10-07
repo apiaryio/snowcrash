@@ -13,7 +13,7 @@
 #include "BlueprintSourcemap.h"
 
 namespace snowcrash {
-    
+
     // Naive YAML serialization to ostream
     void SerializeYAML(const snowcrash::Blueprint& blueprint, std::ostream &os);
 

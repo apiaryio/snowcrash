@@ -35,15 +35,15 @@ TEST_CASE("Blueprint block classifier", "[blueprint]")
     // meta: verse
     sectionType = SectionProcessor<Blueprint>::sectionType(markdownAST.children().begin());
     REQUIRE(sectionType == BlueprintSectionType);
-    
+
     // # Snowcrash API
     sectionType = SectionProcessor<Blueprint>::sectionType(markdownAST.children().begin() + 1);
     REQUIRE(sectionType == BlueprintSectionType);
-    
+
     // ## Character
     sectionType = SectionProcessor<Blueprint>::sectionType(markdownAST.children().begin() + 2);
     REQUIRE(sectionType == BlueprintSectionType);
-    
+
     // Uncle Enzo
     sectionType = SectionProcessor<Blueprint>::sectionType(markdownAST.children().begin() + 3);
     REQUIRE(sectionType == BlueprintSectionType);

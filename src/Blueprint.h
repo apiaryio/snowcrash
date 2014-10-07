@@ -22,36 +22,36 @@
  */
 
 namespace snowcrash {
-    
+
     /** Name of a an API Blueprint entity. */
     typedef std::string Name;
 
-    /** 
+    /**
      *  \brief An API Blueprint entity Description.
      *
-     *  Depending on parser setting the description might be 
+     *  Depending on parser setting the description might be
      *  rendered HTML from Markdown or raw Markdown.
      */
     typedef std::string Description;
-    
+
     /** URI */
     typedef std::string URI;
-    
+
     /** URI template */
     typedef std::string URITemplate;
-    
+
     /** HTTP Method */
     typedef std::string HTTPMethod;
 
     /** Parameter Type */
     typedef std::string Type;
-    
+
     /** Parameter Value */
     typedef std::string Value;
 
     /** A generic key - value pair */
     typedef std::pair<std::string, std::string> KeyValuePair;
-    
+
     /**
      * Default Container for collections.
      *
@@ -63,18 +63,18 @@ namespace snowcrash {
         typedef typename std::vector<T>::iterator iterator;
         typedef typename std::vector<T>::const_iterator const_iterator;
     };
-    
+
     /** An asset data */
     typedef std::string Asset;
 
-    /** 
+    /**
      *  \brief Metadata key-value pair,
      *
      *  E.g. "HOST: http://acme.com"
      */
     typedef KeyValuePair Metadata;
 
-    /** 
+    /**
      *  \brief  Header key-value pair.
      *
      *  E.g. "Content-Type: application/json"
@@ -86,7 +86,7 @@ namespace snowcrash {
 
     /** Headers */
     typedef Collection<Header>::type Headers;
-    
+
     /** Collection of Parameter Values */
     typedef Collection<Value>::type Values;
 
@@ -96,28 +96,28 @@ namespace snowcrash {
         OptionalParameterUse,
         RequiredParameterUse
     };
-    
+
     /** Parameter */
     struct Parameter {
-        
+
         /** Parameter Name */
         Name name;
-        
+
         /** Parameter Description */
         Description description;
-        
+
         /** Type */
         Type type;
-        
+
         /** Required flag */
         ParameterUse use;
-        
+
         /** Default Value, applicable only when `required == false` */
         Value defaultValue;
-        
+
         /** Example Value */
         Value exampleValue;
-        
+
         /** Enumeration of possible values */
         Values values;
     };
@@ -127,48 +127,48 @@ namespace snowcrash {
 
     /** Name of a symbol */
     typedef std::string SymbolName;
-    
+
     /**
      *  Payload
      */
     struct Payload {
-        
+
         /** A Payload Name */
         Name name;
-        
+
         /** Payload Description */
         Description description;
-        
+
         /** Payload-specific Parameters */
         Parameters parameters;
-        
+
         /** Payload-specific Headers */
         Headers headers;
-        
+
         /** Body */
         Asset body;
-        
+
         /** Schema */
         Asset schema;
 
         /** Symbol */
         SymbolName symbol;
     };
-    
+
     /** Resource Model */
     typedef Payload ResourceModel;
-    
+
     /** Request */
     typedef Payload Request;
-    
-    /** 
+
+    /**
      *  \brief Response
      *
      *  A payload returned in a response to an action.
      *  Payload's name represents the HTTP status code.
      */
     typedef Payload Response;
-    
+
     /** Collection of Requests */
     typedef Collection<Request>::type Requests;
 
@@ -179,20 +179,20 @@ namespace snowcrash {
      *  An HTTP transaction example.
      */
     struct TransactionExample {
-        
+
         /** An example name */
         Name name;
-        
+
         /** Description */
         Description description;
-        
+
         /** Requests */
         Requests requests;
-        
+
         /** Responses */
         Responses responses;
     };
-    
+
     /** Collection of Transaction examples */
     typedef Collection<TransactionExample>::type TransactionExamples;
 
@@ -200,37 +200,37 @@ namespace snowcrash {
      *  Action
      */
     struct Action {
-        
+
         /** HTTP method */
         HTTPMethod method;
-        
+
         /** An Action name */
         Name name;
-        
+
         /** Description */
         Description description;
-        
+
         /** Action-specific Parameters */
         Parameters parameters;
-        
-        /** 
+
+        /**
          *  \brief Action-specific HTTP headers
          *
          *  DEPRECATION WARNING:
          *  --------------------
          *
          *  This AST node is build for deprecated API Blueprint syntax
-         *  and as such it will be removed in a future version of 
-         *  Snow Crash. 
-         *  
+         *  and as such it will be removed in a future version of
+         *  Snow Crash.
+         *
          *  Use respective payload's header collection instead.
          */
         DEPRECATED Headers headers;
-        
+
         /** Transactions examples */
         TransactionExamples examples;
     };
-    
+
     /** Collection of Actions */
     typedef Collection<Action>::type Actions;
 
@@ -238,22 +238,22 @@ namespace snowcrash {
      *  API Resource
      */
     struct Resource {
-        
+
         /** URI template */
         URITemplate uriTemplate;
-        
+
         /** A Resource Name */
         Name name;
-        
+
         /** Description of the resource */
         Description description;
-        
+
         /** Model representing this Resource */
         ResourceModel model;
-        
+
         /** Parameters */
         Parameters parameters;
-        
+
         /**
          *  \brief Resource-specific HTTP Headers
          *
@@ -267,11 +267,11 @@ namespace snowcrash {
          *  Use respective payload's header collection instead.
          */
         DEPRECATED Headers headers;
-        
+
         /** A set of Actions specified for this Resource */
         Actions actions;
     };
-    
+
     /** Collection of Resources */
     typedef Collection<Resource>::type Resources;
 
@@ -279,13 +279,13 @@ namespace snowcrash {
      *  Group of API Resources
      */
     struct ResourceGroup {
-        
+
         /** A Group Name */
         Name name;
-        
+
         /** Group description */
         Description description;
-        
+
         /** Resources */
         Resources resources;
     };
@@ -293,23 +293,23 @@ namespace snowcrash {
     /** Collection of Resource groups */
     typedef Collection<ResourceGroup>::type ResourceGroups;
 
-    /** 
+    /**
      *  \brief API Blueprint AST
      *
      *  This is top-level (or root if you prefer) of API Blueprint abstract syntax tree.
      *  Start reading a parsed API here.
      */
     struct Blueprint {
-        
+
         /** Metadata */
         MetadataCollection metadata;
-        
+
         /** The API Name */
         Name name;
 
         /** An API Overview description */
         Description description;
-        
+
         /** The set of API Resource Groups */
         ResourceGroups resourceGroups;
     };

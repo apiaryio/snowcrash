@@ -33,18 +33,18 @@ namespace snowcrash {
         s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::not1(std::ptr_fun(isSpace))));
         return s;
     }
-    
+
     // Trim string from end
     inline std::string& TrimStringEnd(std::string &s) {
         s.erase(std::find_if(s.rbegin(), s.rend(), std::not1(std::ptr_fun(isSpace))).base(), s.end());
         return s;
     }
-    
+
     // Trim both ends of string
     inline std::string& TrimString(std::string &s) {
         return TrimStringStart(TrimStringEnd(s));
     }
-    
+
     // Split string by delim
     inline std::vector<std::string>& Split(const std::string& s, char delim, std::vector<std::string>& elems) {
         std::stringstream ss(s);
@@ -54,14 +54,14 @@ namespace snowcrash {
         }
         return elems;
     }
-    
-    // Split string by delim    
+
+    // Split string by delim
     inline std::vector<std::string> Split(const std::string& s, char delim) {
         std::vector<std::string> elems;
         Split(s, delim, elems);
         return elems;
     }
-    
+
     // Split string on the first occurrence of delim
     inline std::vector<std::string> SplitOnFirst(const std::string& s, char delim) {
         std::string::size_type pos = s.find(delim);
@@ -75,7 +75,7 @@ namespace snowcrash {
         }
         return elems;
     }
-    
+
     // Make sure last two characters are newlines
     inline std::string& TwoNewLines(std::string& s) {
 
@@ -108,10 +108,10 @@ namespace snowcrash {
         }
         return target;
     }
-    
+
     /**
      *  \brief  Extract the first line from a string.
-     *  
+     *
      *  \param  s   Subject of the extraction
      *  \param  r   Remaining content aftert the extraction
      *  \return First line from the subject string
