@@ -207,4 +207,8 @@ TEST_CASE("Parse header section with more same headers Set-Cookie and Link - the
     REQUIRE(headers.report.warnings.size() == 0); // no warning - multiple definition, but from allowed set
 
     REQUIRE(headers.node.size() == 2);
+    REQUIRE(headers.node[0].first == "Set-Cookie");
+    REQUIRE(headers.node[0].second == "abcd");
+    REQUIRE(headers.node[1].first == "Set-Cookie");
+    REQUIRE(headers.node[1].second == "kockaprede");
 }
