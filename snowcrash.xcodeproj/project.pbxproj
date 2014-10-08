@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4070F30419E4C30A004892C8 /* BlueprintSourcemap.h in Headers */ = {isa = PBXBuildFile; fileRef = 4070F30119E4C30A004892C8 /* BlueprintSourcemap.h */; };
+		4070F30519E4C30A004892C8 /* CBlueprintSourcemap.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4070F30219E4C30A004892C8 /* CBlueprintSourcemap.cc */; };
+		4070F30619E4C30A004892C8 /* CBlueprintSourcemap.h in Headers */ = {isa = PBXBuildFile; fileRef = 4070F30319E4C30A004892C8 /* CBlueprintSourcemap.h */; };
 		BB05B9D81804493500243E1B /* perf-snowcrash.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB05B9D71804493500243E1B /* perf-snowcrash.cc */; };
 		BB05B9D918044C8200243E1B /* libsnowcrash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBFF4898170B34E6001E5FB2 /* libsnowcrash.a */; };
 		BB088F78192D7901003AA95C /* SectionParserData.h in Headers */ = {isa = PBXBuildFile; fileRef = BB088F77192D7901003AA95C /* SectionParserData.h */; };
@@ -127,6 +130,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		4070F30119E4C30A004892C8 /* BlueprintSourcemap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BlueprintSourcemap.h; path = src/BlueprintSourcemap.h; sourceTree = "<group>"; };
+		4070F30219E4C30A004892C8 /* CBlueprintSourcemap.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CBlueprintSourcemap.cc; path = src/CBlueprintSourcemap.cc; sourceTree = "<group>"; };
+		4070F30319E4C30A004892C8 /* CBlueprintSourcemap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CBlueprintSourcemap.h; path = src/CBlueprintSourcemap.h; sourceTree = "<group>"; };
 		BB03DC6417D3717B00C51E52 /* ParametersParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = ParametersParser.h; path = src/ParametersParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BB03DC6517D3718D00C51E52 /* test-ParametersParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-ParametersParser.cc"; path = "test/test-ParametersParser.cc"; sourceTree = "<group>"; };
 		BB05B9CE180448E300243E1B /* perf-libsnowcrash */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "perf-libsnowcrash"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -325,9 +331,12 @@
 				BB3DD973174654B8004C4077 /* AssetParser.h */,
 				BBFF48D4170C4F30001E5FB2 /* Blueprint.h */,
 				BBA91DC0171D402600649B05 /* BlueprintParser.h */,
+				4070F30119E4C30A004892C8 /* BlueprintSourcemap.h */,
 				BB92D892178EFA370098A63C /* BlueprintUtility.h */,
 				BBFC840F196C0C0F001A236A /* CBlueprint.cc */,
 				BBFC8410196C0C0F001A236A /* CBlueprint.h */,
+				4070F30219E4C30A004892C8 /* CBlueprintSourcemap.cc */,
+				4070F30319E4C30A004892C8 /* CBlueprintSourcemap.h */,
 				BBC2D85E18301FEC00FBCEA7 /* CodeBlockUtility.h */,
 				BBFC8411196C0C0F001A236A /* csnowcrash.cc */,
 				BBFC8412196C0C0F001A236A /* csnowcrash.h */,
@@ -391,9 +400,11 @@
 				BBC2D85F18301FEC00FBCEA7 /* CodeBlockUtility.h in Headers */,
 				BB8C3E631923D6FE00EF36FA /* SectionParser.h in Headers */,
 				BBD5F9CE17353CE00049BBEE /* ResourceParser.h in Headers */,
+				4070F30419E4C30A004892C8 /* BlueprintSourcemap.h in Headers */,
 				BBE57061173927870086CE22 /* PayloadParser.h in Headers */,
 				BBFC841D196C0C0F001A236A /* CSourceAnnotation.h in Headers */,
 				BB8C3E651923D83C00EF36FA /* Section.h in Headers */,
+				4070F30619E4C30A004892C8 /* CBlueprintSourcemap.h in Headers */,
 				BBE53561174132B100BCA7AD /* Serialize.h in Headers */,
 				BBCC855E19542DA100B99E90 /* ParameterParser.h in Headers */,
 				BBE53562174132B100BCA7AD /* SerializeJSON.h in Headers */,
@@ -529,6 +540,7 @@
 			files = (
 				BBFC841A196C0C0F001A236A /* csnowcrash.cc in Sources */,
 				BBFF48CD170B3EDE001E5FB2 /* snowcrash.cc in Sources */,
+				4070F30519E4C30A004892C8 /* CBlueprintSourcemap.cc in Sources */,
 				BB92D891178EF7C10098A63C /* HTTP.cc in Sources */,
 				BB8C3E7419241C1600EF36FA /* Section.cc in Sources */,
 				BBE53564174132B100BCA7AD /* Serialize.cc in Sources */,
