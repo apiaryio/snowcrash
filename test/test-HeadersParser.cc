@@ -175,7 +175,7 @@ TEST_CASE("Parse header section with missing headers", "[headers]")
     REQUIRE(headers.sourceMap.collection.size() == 0);
 }
 
-TEST_CASE("Headers parses should return warning on multiple definition of same headers", "[headers]")
+TEST_CASE("Headers parses should return warning on multiple definition of same headers", "[headers][issue][#75]")
 {
     const mdp::ByteBuffer source = \
     "+ Headers\n"\
@@ -192,7 +192,7 @@ TEST_CASE("Headers parses should return warning on multiple definition of same h
     REQUIRE(headers.node.size() == 2); 
 }
 
-TEST_CASE("Parse header section with more same headers Set-Cookie and Link - there should not be warning", "[headers]")
+TEST_CASE("Parse header section with more same headers Set-Cookie and Link - there should not be warning", "[headers][issue][#75]")
 {
     const mdp::ByteBuffer source = \
     "+ Headers\n"\
