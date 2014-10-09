@@ -288,7 +288,7 @@ namespace snowcrash {
                                          SectionParserData& pd,
                                          ParseResult<Blueprint>& out) {
 
-            Collection<SourceMap<ResourceGroup> >::iterator resourceGroupsSourceMapIterator;
+            Collection<SourceMap<ResourceGroup> >::iterator resourceGroupSourceMapIterator;
             Collection<SourceMap<Resource> >::iterator resourceSourceMapIterator;
             Collection<SourceMap<Action> >::iterator actionSourceMapIterator;
             Collection<SourceMap<TransactionExample> >::iterator exampleSourceMapIterator;
@@ -297,14 +297,14 @@ namespace snowcrash {
 
             bool exportSourceMap = pd.exportSourceMap();
 
-            resourceGroupsSourceMapIterator = out.sourceMap.resourceGroups.collection.begin();
+            resourceGroupSourceMapIterator = out.sourceMap.resourceGroups.collection.begin();
 
             for (ResourceGroups::iterator resourceGroupIterator = out.node.resourceGroups.begin();
                  resourceGroupIterator != out.node.resourceGroups.end();
-                 ++resourceGroupIterator, exportSourceMap ? ++resourceGroupsSourceMapIterator : resourceGroupsSourceMapIterator) {
+                 ++resourceGroupIterator, exportSourceMap ? ++resourceGroupSourceMapIterator : resourceGroupSourceMapIterator) {
 
                 if (exportSourceMap) {
-                    resourceSourceMapIterator = resourceGroupsSourceMapIterator->resources.collection.begin();
+                    resourceSourceMapIterator = resourceGroupSourceMapIterator->resources.collection.begin();
                 }
 
                 for (Resources::iterator resourceIterator = resourceGroupIterator->resources.begin();
@@ -338,7 +338,7 @@ namespace snowcrash {
                                 if (!requestIterator->reference.id.empty() &&
                                     requestIterator->reference.meta.state == Reference::StatePending) {
 
-                                    resolvePendingSymbols(*requestIterator, node, pd, out, requestSourceMapIterator);
+                                    resolvePendingSymbols(*requestIterator, *requestSourceMapIterator, node, pd, out);
                                 }
                             }
 
@@ -353,7 +353,7 @@ namespace snowcrash {
                                 if (!responseIterator->reference.id.empty() &&
                                     responseIterator->reference.meta.state == Reference::StatePending) {
 
-                                    resolvePendingSymbols(*responseIterator, node, pd, out, responseSourceMapIterator);
+                                    resolvePendingSymbols(*responseIterator, *responseSourceMapIterator, node, pd, out);
                                 }
                             }
                         }
@@ -364,13 +364,10 @@ namespace snowcrash {
 
         /** Resolve pending resources */
         static void resolvePendingSymbols(Payload& payload,
+                                          SourceMap<Payload>& sourceMap,
                                           const MarkdownNodeIterator& node,
                                           SectionParserData& pd,
-                                          ParseResult<Blueprint>& out,
-                                          Collection<SourceMap<Payload> >::iterator SMiterator) {
-
-            SourceMap<ResourceModel> modelSM;
-            ResourceModel model;
+                                          ParseResult<Blueprint>& out) {
 
             if (pd.symbolTable.resourceModels.find(payload.reference.id) == pd.symbolTable.resourceModels.end()) {
 
@@ -384,59 +381,10 @@ namespace snowcrash {
                 payload.reference.meta.state = Reference::StateUnresolved;
             }
             else {
-                model = pd.symbolTable.resourceModels.at(payload.reference.id);
 
                 payload.reference.meta.state = Reference::StateResolved;
 
-                payload.description = model.description;
-                payload.parameters = model.parameters;
-
-                HeaderIterator modelContentType = std::find_if(model.headers.begin(),
-                                                               model.headers.end(),
-                                                               std::bind2nd(MatchFirstWith<Header, std::string>(),
-                                                                            HTTPHeaderName::ContentType));
-
-                bool isPayloadContentType = !payload.headers.empty();
-                bool isModelContentType = modelContentType != model.headers.end();
-
-                if (isPayloadContentType && isModelContentType) {
-
-                    // WARN: Ignoring payload content-type, when referencing a model with headers
-                    std::stringstream ss;
-
-                    ss << "ignoring additional " << SectionName(pd.sectionContext()) << " header(s), ";
-                    ss << "specify this header(s) in the referenced model definition instead";
-
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(payload.reference.meta.node->sourceMap, pd.sourceData);
-                    out.report.warnings.push_back(Warning(ss.str(),
-                                                          IgnoringWarning,
-                                                          sourceMap));
-                }
-
-                if (isPayloadContentType && !isModelContentType) {
-                    payload.headers.insert(payload.headers.end(), model.headers.begin(), model.headers.end());
-                } else {
-                    payload.headers = model.headers;
-                }
-
-                payload.body = model.body;
-                payload.schema = model.schema;
-
-                if (pd.exportSourceMap()) {
-
-                    modelSM = pd.symbolSourceMapTable.resourceModels.at(payload.reference.id);
-
-                    SMiterator->description = modelSM.description;
-                    SMiterator->parameters = modelSM.parameters;
-                    SMiterator->body = modelSM.body;
-                    SMiterator->schema = modelSM.schema;
-
-                    if (isPayloadContentType && !isModelContentType) {
-                        SMiterator->headers.collection.insert(SMiterator->headers.collection.end(), modelSM.headers.collection.begin(), modelSM.headers.collection.end());
-                    } else {
-                        SMiterator->headers = modelSM.headers;
-                    }
-                }
+                SectionProcessor<Payload>::assignSymbolToPayload(pd, payload, out.report, sourceMap);
             }
         }
     };

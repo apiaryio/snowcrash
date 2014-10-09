@@ -530,8 +530,6 @@ namespace snowcrash {
                                          const ParseResultRef<Payload>& out) {
 
             Identifier symbol;
-            ResourceModel model;
-            SourceMap<ResourceModel> modelSM;
 
             TrimString(source);
 
@@ -553,64 +551,74 @@ namespace snowcrash {
                     return true;
                 }
 
-                model = pd.symbolTable.resourceModels.at(symbol);
-         
                 out.node.reference.meta.state = Reference::StateResolved;
 
-                out.node.description = model.description;
-                out.node.parameters = model.parameters;
-
-                HeaderIterator modelContentType = std::find_if(model.headers.begin(),
-                                                               model.headers.end(),
-                                                               std::bind2nd(MatchFirstWith<Header, std::string>(),
-                                                                            HTTPHeaderName::ContentType));
-
-                bool isPayloadContentType = !out.node.headers.empty();
-                bool isModelContentType = modelContentType != model.headers.end();
-
-                if (isPayloadContentType && isModelContentType) {
-
-                    // WARN: Ignoring payload content-type, when referencing a model with headers
-                    std::stringstream ss;
-
-                    ss << "ignoring additional " << SectionName(pd.sectionContext()) << " header(s), ";
-                    ss << "specify this header(s) in the referenced model definition instead";
-
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                    out.report.warnings.push_back(Warning(ss.str(),
-                                                          IgnoringWarning,
-                                                          sourceMap));
-                }
-
-                if (isPayloadContentType && !isModelContentType) {
-                    out.node.headers.insert(out.node.headers.end(), model.headers.begin(), model.headers.end());
-                } else {
-                    out.node.headers = model.headers;
-                }
-
-                out.node.body = model.body;
-                out.node.schema = model.schema;
-
-                if (pd.exportSourceMap()) {
-
-                    modelSM = pd.symbolSourceMapTable.resourceModels.at(symbol);
-
-                    out.sourceMap.description = modelSM.description;
-                    out.sourceMap.parameters = modelSM.parameters;
-                    out.sourceMap.body = modelSM.body;
-                    out.sourceMap.schema = modelSM.schema;
-
-                    if (isPayloadContentType && !isModelContentType) {
-                        out.sourceMap.headers.collection.insert(out.sourceMap.headers.collection.end(), modelSM.headers.collection.begin(), modelSM.headers.collection.end());
-                    } else {
-                        out.sourceMap.headers = modelSM.headers;
-                    }
-                }
+                assignSymbolToPayload(pd, out.node, out.report, out.sourceMap);
 
                 return true;
             }
 
             return false;
+        }
+
+        static void assignSymbolToPayload(SectionParserData& pd,
+                                          Payload& node,
+                                          Report& report,
+                                          SourceMap<Payload>& sourceMap) {
+
+            SourceMap<ResourceModel> modelSM;
+            ResourceModel model = pd.symbolTable.resourceModels.at(node.reference.id);
+
+
+            node.description = model.description;
+            node.parameters = model.parameters;
+
+            HeaderIterator modelContentType = std::find_if(model.headers.begin(),
+                                                           model.headers.end(),
+                                                           std::bind2nd(MatchFirstWith<Header, std::string>(),
+                                                                        HTTPHeaderName::ContentType));
+
+            bool isPayloadContentType = !node.headers.empty();
+            bool isModelContentType = modelContentType != model.headers.end();
+
+            if (isPayloadContentType && isModelContentType) {
+
+                // WARN: Ignoring payload content-type, when referencing a model with headers
+                std::stringstream ss;
+
+                ss << "ignoring additional " << SectionName(pd.sectionContext()) << " header(s), ";
+                ss << "specify this header(s) in the referenced model definition instead";
+
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node.reference.meta.node->sourceMap, pd.sourceData);
+                report.warnings.push_back(Warning(ss.str(),
+                                                  IgnoringWarning,
+                                                  sourceMap));
+            }
+
+            if (isPayloadContentType && !isModelContentType) {
+                node.headers.insert(node.headers.end(), model.headers.begin(), model.headers.end());
+            } else {
+                node.headers = model.headers;
+            }
+
+            node.body = model.body;
+            node.schema = model.schema;
+
+            if (pd.exportSourceMap()) {
+
+                modelSM = pd.symbolSourceMapTable.resourceModels.at(node.reference.id);
+
+                sourceMap.description = modelSM.description;
+                sourceMap.parameters = modelSM.parameters;
+                sourceMap.body = modelSM.body;
+                sourceMap.schema = modelSM.schema;
+
+                if (isPayloadContentType && !isModelContentType) {
+                    sourceMap.headers.collection.insert(sourceMap.headers.collection.end(), modelSM.headers.collection.begin(), modelSM.headers.collection.end());
+                } else {
+                    sourceMap.headers = modelSM.headers;
+                }
+            }
         }
 
         /**
