@@ -338,7 +338,7 @@ namespace snowcrash {
                                 if (!requestIterator->reference.id.empty() &&
                                     requestIterator->reference.meta.state == Reference::StatePending) {
 
-                                    resolvePendingSymbols(*requestIterator, *requestSourceMapIterator, node, pd, out);
+                                    resolvePendingSymbols(node, pd, out, *requestIterator, *requestSourceMapIterator);
                                 }
                             }
 
@@ -353,7 +353,7 @@ namespace snowcrash {
                                 if (!responseIterator->reference.id.empty() &&
                                     responseIterator->reference.meta.state == Reference::StatePending) {
 
-                                    resolvePendingSymbols(*responseIterator, *responseSourceMapIterator, node, pd, out);
+                                    resolvePendingSymbols(node, pd, out, *responseIterator, *responseSourceMapIterator);
                                 }
                             }
                         }
@@ -363,11 +363,11 @@ namespace snowcrash {
         }
 
         /** Resolve pending resources */
-        static void resolvePendingSymbols(Payload& payload,
-                                          SourceMap<Payload>& sourceMap,
-                                          const MarkdownNodeIterator& node,
+        static void resolvePendingSymbols(const MarkdownNodeIterator& node,
                                           SectionParserData& pd,
-                                          ParseResult<Blueprint>& out) {
+                                          ParseResult<Blueprint>& out,
+                                          Payload& payload,
+                                          SourceMap<Payload>& sourceMap) {
 
             if (pd.symbolTable.resourceModels.find(payload.reference.id) == pd.symbolTable.resourceModels.end()) {
 
