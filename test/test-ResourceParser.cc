@@ -549,7 +549,7 @@ TEST_CASE("Parse model with unrecognised resource", "[resource][model]")
     REQUIRE(resource.node.actions[0].examples[0].responses[0].description == "");
 }
 
-TEST_CASE("Parse named resource with lazy referencing", "[resource][model]")
+TEST_CASE("Parse named resource with lazy referencing", "[resource][model][issue][#84]")
 {
     mdp::ByteBuffer source = \
     "#api name\n\n"\
@@ -562,7 +562,7 @@ TEST_CASE("Parse named resource with lazy referencing", "[resource][model]")
     "        `resource model` 2\n";
 
     ParseResult<Blueprint> blueprint;
-    parse(source, 0, blueprint);
+    parse(source, ExportSourcemapOption, blueprint);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -587,6 +587,18 @@ TEST_CASE("Parse named resource with lazy referencing", "[resource][model]")
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers.size() == 1);
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[0].first == "Content-Type");
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[0].second == "text/plain");
+
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].reference.id == "Resource 2");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].reference.type == Reference::SymbolReference);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].reference.meta.state == Reference::StateResolved);
+
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[0].sourceMap.size() == 1);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[0].sourceMap[0].length == 20);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[0].sourceMap[0].location == 104);
+
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection[0].examples.collection[0].responses.collection[0].reference.sourceMap.size() == 1);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection[0].examples.collection[0].responses.collection[0].reference.sourceMap[0].length == 15);
+    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection[0].examples.collection[0].responses.collection[0].reference.sourceMap[0].location == 68);
 }
 
 TEST_CASE("Parse named resource with nameless model but reference a non-existing model", "[resource]")
