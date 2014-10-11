@@ -82,7 +82,7 @@ static int testfunc(const std::string& input, double& total, double& mean, doubl
 	int resultCode = snowcrash::Error::OK;
 
 	for (int i = 0; i < TestRunCount; ++i) {
-        snowcrash::BlueprintParserOptions options = 0;
+        snowcrash::BlueprintParserOptions options = snowcrash::ExportSourcemapOption;
         snowcrash::ParseResult<snowcrash::Blueprint> blueprint;
 
 		// Do the test.
