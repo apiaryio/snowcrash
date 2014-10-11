@@ -49,7 +49,7 @@ static bool CheckSource(const mdp::ByteBuffer& source, Report& report)
 
 int snowcrash::parse(const mdp::ByteBuffer& source,
                      BlueprintParserOptions options,
-                     ParseResult<Blueprint>& out)
+                     const ParseResultRef<Blueprint>& out)
 {
     try {
 

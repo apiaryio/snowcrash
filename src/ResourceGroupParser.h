@@ -33,7 +33,7 @@ namespace snowcrash {
                                                      const MarkdownNodes& siblings,
                                                      SectionParserData& pd,
                                                      SectionLayout& layout,
-                                                     ParseResult<ResourceGroup>& out) {
+                                                     const ParseResultRef<ResourceGroup>& out) {
 
             MarkdownNodeIterator cur = node;
             SectionType nestedType = nestedSectionType(cur);
@@ -61,11 +61,12 @@ namespace snowcrash {
         static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
                                                          const MarkdownNodes& siblings,
                                                          SectionParserData& pd,
-                                                         ParseResult<ResourceGroup>& out) {
+                                                         const ParseResultRef<ResourceGroup>& out) {
 
             if (pd.sectionContext() == ResourceSectionType) {
 
-                ParseResult<Resource> resource(out.report);
+                IntermediateParseResult<Resource> resource(out.report);
+
                 MarkdownNodeIterator cur = ResourceParser::parse(node, siblings, pd, resource);
 
                 ResourceIterator duplicate = SectionProcessor<Resource>::findResource(out.node.resources, resource.node);
@@ -101,7 +102,7 @@ namespace snowcrash {
                                                           const MarkdownNodes& siblings,
                                                           SectionParserData& pd,
                                                           SectionType& lastSectionType,
-                                                          ParseResult<ResourceGroup>& out) {
+                                                          const ParseResultRef<ResourceGroup>& out) {
 
             if (SectionProcessor<Action>::actionType(node) == DependentActionType &&
                 !out.node.resources.empty()) {

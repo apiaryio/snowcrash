@@ -30,7 +30,7 @@ namespace snowcrash {
         static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
                                                          const MarkdownNodes& siblings,
                                                          SectionParserData& pd,
-                                                         ParseResult<Values>& out) {
+                                                         const ParseResultRef<Values>& out) {
 
             if (pd.sectionContext() == ValueSectionType) {
 
@@ -70,7 +70,7 @@ namespace snowcrash {
         static MarkdownNodeIterator processDescription(const MarkdownNodeIterator& node,
                                                        const MarkdownNodes& siblings,
                                                        SectionParserData& pd,
-                                                       ParseResult<Values>& out) {
+                                                       const ParseResultRef<Values>& out) {
 
             return node;
         }

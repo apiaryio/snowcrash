@@ -33,7 +33,7 @@ namespace snowcrash {
                                                      const MarkdownNodes& siblings,
                                                      SectionParserData& pd,
                                                      SectionLayout& layout,
-                                                     ParseResult<Headers>& out) {
+                                                     const ParseResultRef<Headers>& out) {
 
             mdp::ByteBuffer content;
             CodeBlockUtility::signatureContentAsCodeBlock(node, pd, out.report, content);
@@ -46,7 +46,7 @@ namespace snowcrash {
         static MarkdownNodeIterator processDescription(const MarkdownNodeIterator& node,
                                                        const MarkdownNodes& siblings,
                                                        SectionParserData& pd,
-                                                       ParseResult<Headers>& out) {
+                                                       const ParseResultRef<Headers>& out) {
 
             return node;
         }
@@ -54,7 +54,7 @@ namespace snowcrash {
         static MarkdownNodeIterator processContent(const MarkdownNodeIterator& node,
                                                    const MarkdownNodes& siblings,
                                                    SectionParserData& pd,
-                                                   ParseResult<Headers>& out) {
+                                                   const ParseResultRef<Headers>& out) {
 
             mdp::ByteBuffer content;
             CodeBlockUtility::contentAsCodeBlock(node, pd, out.report, content);
@@ -96,7 +96,7 @@ namespace snowcrash {
 
         static void finalize(const MarkdownNodeIterator& node,
                              SectionParserData& pd,
-                             ParseResult<Headers>& out) {
+                             const ParseResultRef<Headers>& out) {
 
             if (out.node.empty()) {
 
@@ -112,7 +112,7 @@ namespace snowcrash {
         static void headersFromContent(const MarkdownNodeIterator& node,
                                        const mdp::ByteBuffer& content,
                                        SectionParserData& pd,
-                                       ParseResult<Headers>& out) {
+                                       const ParseResultRef<Headers>& out) {
 
             std::vector<std::string> lines = Split(content, '\n');
 

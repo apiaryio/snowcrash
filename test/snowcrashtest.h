@@ -27,7 +27,7 @@ namespace snowcrashtest {
 
         static void parse(const mdp::ByteBuffer& source,
                           snowcrash::SectionType type,
-                          snowcrash::ParseResult<T>& out,
+                          const snowcrash::ParseResultRef<T>& out,
                           const Symbols& symbols = Symbols(),
                           const snowcrash::BlueprintParserOptions& opts = 0,
                           snowcrash::ParseResult<snowcrash::Blueprint>* bp = NULL) {

@@ -40,7 +40,7 @@ namespace snowcrash {
                                                      const MarkdownNodes& siblings,
                                                      SectionParserData& pd,
                                                      SectionLayout& layout,
-                                                     ParseResult<Asset>& out) {
+                                                     const ParseResultRef<Asset>& out) {
 
             out.node = "";
             CodeBlockUtility::signatureContentAsCodeBlock(node, pd, out.report, out.node);
@@ -55,7 +55,7 @@ namespace snowcrash {
         static MarkdownNodeIterator processDescription(const MarkdownNodeIterator& node,
                                                        const MarkdownNodes& siblings,
                                                        SectionParserData& pd,
-                                                       ParseResult<Asset>& out) {
+                                                       const ParseResultRef<Asset>& out) {
 
             return node;
         }
@@ -63,7 +63,7 @@ namespace snowcrash {
         static MarkdownNodeIterator processContent(const MarkdownNodeIterator& node,
                                                    const MarkdownNodes& siblings,
                                                    SectionParserData& pd,
-                                                   ParseResult<Asset>& out) {
+                                                   const ParseResultRef<Asset>& out) {
 
             mdp::ByteBuffer content;
             CodeBlockUtility::contentAsCodeBlock(node, pd, out.report, content);

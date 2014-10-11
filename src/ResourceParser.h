@@ -37,7 +37,7 @@ namespace snowcrash {
                                                      const MarkdownNodes& siblings,
                                                      SectionParserData& pd,
                                                      SectionLayout& layout,
-                                                     ParseResult<Resource>& out) {
+                                                     const ParseResultRef<Resource>& out) {
 
             CaptureGroups captureGroups;
 
@@ -49,7 +49,8 @@ namespace snowcrash {
                 // Make this section an action
                 if (!captureGroups[2].empty()) {
 
-                    ParseResult<Action> action(out.report);
+                    IntermediateParseResult<Action> action(out.report);
+
                     MarkdownNodeIterator cur = ActionParser::parse(node, node->parent().children(), pd, action);
 
                     out.node.actions.push_back(action.node);
@@ -85,7 +86,7 @@ namespace snowcrash {
         static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
                                                          const MarkdownNodes& siblings,
                                                          SectionParserData& pd,
-                                                         ParseResult<Resource>& out) {
+                                                         const ParseResultRef<Resource>& out) {
 
             switch (pd.sectionContext()) {
                 case ActionSectionType:
@@ -100,7 +101,7 @@ namespace snowcrash {
 
                 case HeadersSectionType:
                 {
-                    ParseResult<Headers> headers(out.report, out.node.headers, out.sourceMap.headers);
+                    ParseResultRef<Headers> headers(out.report, out.node.headers, out.sourceMap.headers);
                     return SectionProcessor<Action>::handleDeprecatedHeaders(node, siblings, pd, headers);
                 }
 
@@ -115,7 +116,7 @@ namespace snowcrash {
                                                           const MarkdownNodes& siblings,
                                                           SectionParserData& pd,
                                                           SectionType& sectionType,
-                                                          ParseResult<Resource>& out) {
+                                                          const ParseResultRef<Resource>& out) {
 
             if ((node->type == mdp::ParagraphMarkdownNodeType ||
                  node->type == mdp::CodeMarkdownNodeType) &&
@@ -233,7 +234,7 @@ namespace snowcrash {
 
         static void finalize(const MarkdownNodeIterator& node,
                              SectionParserData& pd,
-                             ParseResult<Resource>& out) {
+                             const ParseResultRef<Resource>& out) {
 
             if (!out.node.uriTemplate.empty()) {
 
@@ -273,9 +274,10 @@ namespace snowcrash {
         static MarkdownNodeIterator processAction(const MarkdownNodeIterator& node,
                                                   const MarkdownNodes& siblings,
                                                   SectionParserData& pd,
-                                                  ParseResult<Resource>& out) {
+                                                  const ParseResultRef<Resource>& out) {
 
-            ParseResult<Action> action(out.report);
+            IntermediateParseResult<Action> action(out.report);
+
             MarkdownNodeIterator cur = ActionParser::parse(node, siblings, pd, action);
 
             ActionIterator duplicate = SectionProcessor<Action>::findAction(out.node.actions, action.node);
@@ -311,9 +313,10 @@ namespace snowcrash {
         static MarkdownNodeIterator processParameters(const MarkdownNodeIterator& node,
                                                       const MarkdownNodes& siblings,
                                                       SectionParserData& pd,
-                                                      ParseResult<Resource>& out) {
+                                                      const ParseResultRef<Resource>& out) {
 
-            ParseResult<Parameters> parameters(out.report);
+            IntermediateParseResult<Parameters> parameters(out.report);
+
             MarkdownNodeIterator cur = ParametersParser::parse(node, siblings, pd, parameters);
 
             if (!parameters.node.empty()) {
@@ -335,9 +338,10 @@ namespace snowcrash {
         static MarkdownNodeIterator processModel(const MarkdownNodeIterator& node,
                                                  const MarkdownNodes& siblings,
                                                  SectionParserData& pd,
-                                                 ParseResult<Resource>& out) {
+                                                 const ParseResultRef<Resource>& out) {
 
-            ParseResult<Payload> model(out.report);
+            IntermediateParseResult<Payload> model(out.report);
+
             MarkdownNodeIterator cur = PayloadParser::parse(node, siblings, pd, model);
 
             // Check whether there isn't a model already
@@ -417,7 +421,7 @@ namespace snowcrash {
         static void checkParametersEligibility(const MarkdownNodeIterator& node,
                                                const SectionParserData& pd,
                                                Parameters& parameters,
-                                               ParseResult<Resource>& out) {
+                                               const ParseResultRef<Resource>& out) {
 
             for (ParameterIterator it = parameters.begin();
                  it != parameters.end();

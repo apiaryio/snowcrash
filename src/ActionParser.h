@@ -44,7 +44,7 @@ namespace snowcrash {
                                                      const MarkdownNodes& siblings,
                                                      SectionParserData& pd,
                                                      SectionLayout& layout,
-                                                     ParseResult<Action>& out) {
+                                                     const ParseResultRef<Action>& out) {
 
             actionHTTPMethodAndName(node, out.node.method, out.node.name);
             TrimString(out.node.name);
@@ -76,7 +76,7 @@ namespace snowcrash {
         static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
                                                          const MarkdownNodes& siblings,
                                                          SectionParserData& pd,
-                                                         ParseResult<Action>& out) {
+                                                         const ParseResultRef<Action>& out) {
 
             SectionType sectionType = pd.sectionContext();
             MarkdownNodeIterator cur = node;
@@ -87,14 +87,15 @@ namespace snowcrash {
             switch (sectionType) {
                 case ParametersSectionType:
                 {
-                    ParseResult<Parameters> parameters(out.report, out.node.parameters, out.sourceMap.parameters);
+                    ParseResultRef<Parameters> parameters(out.report, out.node.parameters, out.sourceMap.parameters);
                     return ParametersParser::parse(node, siblings, pd, parameters);
                 }
 
                 case RequestSectionType:
                 case RequestBodySectionType:
                 {
-                    ParseResult<Payload> payload(out.report);
+                    IntermediateParseResult<Payload> payload(out.report);
+
                     cur = PayloadParser::parse(node, siblings, pd, payload);
 
                     if (out.node.examples.empty() || !out.node.examples.back().responses.empty()) {
@@ -122,7 +123,8 @@ namespace snowcrash {
                 case ResponseSectionType:
                 case ResponseBodySectionType:
                 {
-                    ParseResult<Payload> payload(out.report);
+                    IntermediateParseResult<Payload> payload(out.report);
+
                     cur = PayloadParser::parse(node, siblings, pd, payload);
 
                     if (out.node.examples.empty()) {
@@ -149,7 +151,7 @@ namespace snowcrash {
 
                 case HeadersSectionType:
                 {
-                    ParseResult<Headers> headers(out.report, out.node.headers, out.sourceMap.headers);
+                    ParseResultRef<Headers> headers(out.report, out.node.headers, out.sourceMap.headers);
                     return SectionProcessor<Action>::handleDeprecatedHeaders(node, siblings, pd, headers);
                 }
 
@@ -174,7 +176,7 @@ namespace snowcrash {
                                                           const MarkdownNodes& siblings,
                                                           SectionParserData& pd,
                                                           SectionType& sectionType,
-                                                          ParseResult<Action>& out) {
+                                                          const ParseResultRef<Action>& out) {
 
             if ((node->type == mdp::ParagraphMarkdownNodeType ||
                  node->type == mdp::CodeMarkdownNodeType) &&
@@ -292,7 +294,7 @@ namespace snowcrash {
 
         static void finalize(const MarkdownNodeIterator& node,
                              SectionParserData& pd,
-                             ParseResult<Action>& out) {
+                             const ParseResultRef<Action>& out) {
 
             if (!out.node.headers.empty()) {
 
@@ -343,7 +345,7 @@ namespace snowcrash {
         static void checkPayload(SectionType sectionType,
                                  const mdp::CharactersRangeSet sourceMap,
                                  const Payload& payload,
-                                 ParseResult<Action>& out) {
+                                 const ParseResultRef<Action>& out) {
 
             if (isPayloadDuplicate(sectionType, payload, out.node.examples.back())) {
 
@@ -418,7 +420,7 @@ namespace snowcrash {
         static MarkdownNodeIterator handleDeprecatedHeaders(const MarkdownNodeIterator& node,
                                                             const MarkdownNodes& siblings,
                                                             SectionParserData& pd,
-                                                            ParseResult<Headers>& out) {
+                                                            const ParseResultRef<Headers>& out) {
 
             MarkdownNodeIterator cur = HeadersParser::parse(node, siblings, pd, out);
 
