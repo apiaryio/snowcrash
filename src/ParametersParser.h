@@ -76,7 +76,7 @@ namespace snowcrash {
             }
 
             IntermediateParseResult<Parameter> parameter(out.report);
-            
+
             ParameterParser::parse(node, siblings, pd, parameter);
 
             if (!out.node.empty()) {

@@ -50,7 +50,7 @@ namespace snowcrash {
                 if (!captureGroups[2].empty()) {
 
                     IntermediateParseResult<Action> action(out.report);
-                    
+
                     MarkdownNodeIterator cur = ActionParser::parse(node, node->parent().children(), pd, action);
 
                     out.node.actions.push_back(action.node);
@@ -277,7 +277,7 @@ namespace snowcrash {
                                                   const ParseResultRef<Resource>& out) {
 
             IntermediateParseResult<Action> action(out.report);
-            
+
             MarkdownNodeIterator cur = ActionParser::parse(node, siblings, pd, action);
 
             ActionIterator duplicate = SectionProcessor<Action>::findAction(out.node.actions, action.node);
@@ -316,7 +316,7 @@ namespace snowcrash {
                                                       const ParseResultRef<Resource>& out) {
 
             IntermediateParseResult<Parameters> parameters(out.report);
-            
+
             MarkdownNodeIterator cur = ParametersParser::parse(node, siblings, pd, parameters);
 
             if (!parameters.node.empty()) {

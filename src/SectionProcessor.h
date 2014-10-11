@@ -39,15 +39,15 @@ namespace snowcrash {
      */
     template<typename T>
     struct ParseResult {
-        
+
         ParseResult(const Report& report_ = Report())
         : report(report_) {}
-        
+
         Report report;           /// Parser's report
         T node;                  /// Parsed AST node
         SourceMap<T> sourceMap;  /// Parsed AST node source map
     };
-    
+
     /**
      *  \brief Partial product of parsing.
      *
@@ -57,10 +57,10 @@ namespace snowcrash {
      */
     template<typename T>
     struct IntermediateParseResult {
-        
+
         explicit IntermediateParseResult(Report& report_)
         : report(report_) {}
-        
+
         Report& report;
         T node;
         SourceMap<T> sourceMap;
@@ -76,17 +76,17 @@ namespace snowcrash {
 
         ParseResultRef(ParseResult<T>& parseResult)
         : report(parseResult.report), node(parseResult.node), sourceMap(parseResult.sourceMap) {}
-        
+
         ParseResultRef(IntermediateParseResult<T>& parseResult)
         : report(parseResult.report), node(parseResult.node), sourceMap(parseResult.sourceMap) {}
-        
+
         ParseResultRef(Report& report_, T& node_, SourceMap<T>& sourceMap_)
         : report(report_), node(node_), sourceMap(sourceMap_) {}
-        
+
         Report& report;
         T& node;
         SourceMap<T>& sourceMap;
-        
+
     private:
         ParseResultRef();
     };

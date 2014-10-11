@@ -16,7 +16,7 @@ int sc_c_parse(const char* source, sc_blueprint_parser_options option, sc_report
     Report* resultReport = ::new snowcrash::Report;
     Blueprint* resultblueprint = ::new snowcrash::Blueprint;
     SourceMap<snowcrash::Blueprint>* resultSourceMap = ::new SourceMap<snowcrash::Blueprint>;
-    
+
     ParseResultRef<Blueprint> result(*resultReport, *resultblueprint, *resultSourceMap);
 
     int ret = snowcrash::parse(source, option, result);

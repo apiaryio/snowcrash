@@ -95,7 +95,7 @@ namespace snowcrash {
                 case RequestBodySectionType:
                 {
                     IntermediateParseResult<Payload> payload(out.report);
-                    
+
                     cur = PayloadParser::parse(node, siblings, pd, payload);
 
                     if (out.node.examples.empty() || !out.node.examples.back().responses.empty()) {
@@ -124,7 +124,7 @@ namespace snowcrash {
                 case ResponseBodySectionType:
                 {
                     IntermediateParseResult<Payload> payload(out.report);
-                    
+
                     cur = PayloadParser::parse(node, siblings, pd, payload);
 
                     if (out.node.examples.empty()) {
