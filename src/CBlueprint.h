@@ -34,6 +34,10 @@ extern "C" {
         SC_REQUIRED_PARAMETER_USE
     } sc_parameter_use;
 
+    typedef enum sc_reference_type_t {
+        SC_TYPE_SYMBOL_REFERENCE
+    } sc_reference_type_t;
+
     /** Class Blueprint wrapper */
     struct sc_blueprint_s;
     typedef struct sc_blueprint_s sc_blueprint_t;
@@ -69,6 +73,10 @@ extern "C" {
     /** Array Payload Collection wrapper */
     struct sc_payload_collection_s;
     typedef struct sc_payload_collection_s sc_payload_collection_t;
+
+    /** Class Reference wrapper */
+    struct sc_reference_s;
+    typedef struct sc_reference_s sc_reference_t;
 
     /** Class Payload wrapper */
     struct sc_payload_s;
@@ -210,9 +218,6 @@ extern "C" {
     /** \returns Payload name */
     SC_API const char* sc_payload_name(const sc_payload_t* handle);
 
-    /** \returns Payload symbol name */
-    SC_API const char* sc_payload_symbol(const sc_payload_t* handle);
-
     /** \returns Payload description */
     SC_API const char* sc_payload_description(const sc_payload_t* handle);
 
@@ -221,6 +226,17 @@ extern "C" {
 
     /** \returns Payload schema */
     SC_API const char* sc_payload_schema(const sc_payload_t* handle);
+
+    /*----------------------------------------------------------------------*/
+
+    /** \returns Reference handle from payload */
+    SC_API const sc_reference_t* sc_reference_handle_payload(const sc_payload_t* handle);
+
+    /** \returns Reference identifier */
+    SC_API const char* sc_reference_id(const sc_reference_t* handle);
+
+    /** \returns Reference identifier */
+    SC_API sc_reference_type_t sc_reference_type(const sc_reference_t* handle);
 
     /*----------------------------------------------------------------------*/
 

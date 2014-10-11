@@ -275,6 +275,35 @@ static void serialize(const Collection<SourceMap<Parameter> >::type& parameters,
     }
 }
 
+/** Serialize Reference */
+static void serialize(const Reference& reference, size_t level, std::ostream &os)
+{
+    if (reference.id.empty()) {
+        return;
+    }
+
+    serialize(SerializeKey::Reference, "", level - 1, os);
+
+    // ID
+    serialize(SerializeKey::Id, reference.id, level, os);
+
+    // Type
+    if (reference.type == Reference::SymbolReference) {
+
+        serialize(SerializeKey::Type, "symbol", level, os);
+    }
+}
+
+/** Serialize Reference source map */
+static void serialize(const SourceMap<Reference>& reference, size_t level, std::ostream &os)
+{
+    if (reference.sourceMap.empty()) {
+        return;
+    }
+
+    serialize(SerializeKey::Reference, reference, level - 1, os);
+}
+
 /** Serialize Payload */
 static void serialize(const Payload& payload, size_t level, bool array, std::ostream &os)
 {
@@ -290,11 +319,8 @@ static void serialize(const Payload& payload, size_t level, bool array, std::ost
     // Name
     serialize(SerializeKey::Name, payload.name, 0, os);
 
-    // Symbol Reference
-    if (!payload.symbol.empty()) {
-        serialize(SerializeKey::Reference, "", level, os);
-        serialize(SerializeKey::Id, payload.symbol, level + 1, os);
-    }
+    // Reference
+    serialize(payload.reference, level + 1, os);
 
     // Description
     serialize(SerializeKey::Description, payload.description, level, os);
@@ -328,10 +354,8 @@ static void serialize(const SourceMap<Payload>& payload, size_t level, bool arra
     // Name
     serialize(SerializeKey::Name, payload.name, level, os, true);
 
-    // Symbol Reference
-    if (!payload.symbol.sourceMap.empty()) {
-        serialize(SerializeKey::Reference, payload.symbol, level, os);
-    }
+    // Reference
+    serialize(payload.reference, level + 1, os);
 
     // Description
     serialize(SerializeKey::Description, payload.description, level, os);

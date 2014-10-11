@@ -97,7 +97,7 @@ namespace snowcrash {
         SourceMap<Asset> schema;
 
         /** Source Map of Symbol */
-        SourceMap<SymbolName> symbol;
+        SourceMap<Reference> reference;
     };
 
     /** Source Map of Collection of Requests */

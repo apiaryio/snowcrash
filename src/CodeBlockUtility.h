@@ -250,7 +250,7 @@ namespace snowcrash {
                                            Report& report) {
 
             mdp::ByteBuffer source = node->text;
-            SymbolName symbol;
+            Identifier symbol;
 
             TrimString(source);
 

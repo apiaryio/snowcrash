@@ -53,6 +53,10 @@ extern "C" {
     struct sc_sm_resource_model_s;
     typedef struct sc_sm_resource_model_s sc_sm_resource_model_t;
 
+    /** Class Reference source map wrapper */
+    struct sc_sm_reference_s;
+    typedef struct sc_sm_reference_s sc_sm_reference_t;
+
     /** Array Payload Collection source map wrapper */
     struct sc_sm_payload_collection_s;
     typedef struct sc_sm_payload_collection_s sc_sm_payload_collection_t;
@@ -205,9 +209,6 @@ extern "C" {
     /** \returns Payload name source map */
     SC_API const sc_source_map_t* sc_sm_payload_name(const sc_sm_payload_t* handle);
 
-    /** \returns Payload symbol name source map */
-    SC_API const sc_source_map_t* sc_sm_payload_symbol(const sc_sm_payload_t* handle);
-
     /** \returns Payload description source map */
     SC_API const sc_source_map_t* sc_sm_payload_description(const sc_sm_payload_t* handle);
 
@@ -216,6 +217,14 @@ extern "C" {
 
     /** \returns Payload schema source map */
     SC_API const sc_source_map_t* sc_sm_payload_schema(const sc_sm_payload_t* handle);
+
+    /*----------------------------------------------------------------------*/
+
+    /** \returns Reference source map handle */
+    SC_API const sc_sm_reference_t* sc_sm_reference_handle(const sc_sm_payload_t* handle);
+
+    /** \returns Reference identifier source map */
+    SC_API const sc_source_map_t* sc_sm_reference(const sc_sm_reference_t* handle);
 
     /*----------------------------------------------------------------------*/
 

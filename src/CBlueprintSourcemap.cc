@@ -272,16 +272,6 @@ SC_API const sc_source_map_t* sc_sm_payload_name(const sc_sm_payload_t* handle)
     return AS_CTYPE(sc_source_map_t, &p->name.sourceMap);
 }
 
-/** TODO: Need to change this to use the "Reference" data structure */
-SC_API const sc_source_map_t* sc_sm_payload_symbol(const sc_sm_payload_t* handle)
-{
-    const snowcrash::SourceMap<snowcrash::Payload>* p = AS_CTYPE(snowcrash::SourceMap<snowcrash::Payload>, handle);
-    if (!p)
-        return NULL;
-
-    return AS_CTYPE(sc_source_map_t, &p->symbol.sourceMap);
-}
-
 SC_API const sc_source_map_t* sc_sm_payload_description(const sc_sm_payload_t* handle)
 {
     const snowcrash::SourceMap<snowcrash::Payload>* p = AS_CTYPE(snowcrash::SourceMap<snowcrash::Payload>, handle);
@@ -307,6 +297,26 @@ SC_API const sc_source_map_t* sc_sm_payload_schema(const sc_sm_payload_t* handle
         return NULL;
 
     return AS_CTYPE(sc_source_map_t, &p->schema.sourceMap);
+}
+
+/*----------------------------------------------------------------------*/
+
+SC_API const sc_sm_reference_t* sc_sm_reference_handle(const sc_sm_payload_t* handle)
+{
+    const snowcrash::SourceMap<snowcrash::Payload>* p = AS_CTYPE(snowcrash::SourceMap<snowcrash::Payload>, handle);
+    if(!p)
+        return NULL;
+
+    return AS_CTYPE(sc_sm_reference_t, &p->reference);
+}
+
+SC_API const sc_source_map_t* sc_sm_reference(const sc_sm_reference_t* handle)
+{
+    const snowcrash::SourceMap<snowcrash::Reference>* p = AS_CTYPE(snowcrash::SourceMap<snowcrash::Reference>, handle);
+    if (!p)
+        return NULL;
+
+    return AS_CTYPE(sc_source_map_t, &p->sourceMap);
 }
 
 /*----------------------------------------------------------------------*/
