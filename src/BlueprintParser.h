@@ -286,7 +286,7 @@ namespace snowcrash {
         /** check for lazy referencing */
         static void checkLazyReferencing(const MarkdownNodeIterator& node,
                                          SectionParserData& pd,
-                                         ParseResult<Blueprint>& out) {
+                                         const ParseResultRef<Blueprint>& out) {
 
             Collection<SourceMap<ResourceGroup> >::iterator resourceGroupSourceMapIterator;
             Collection<SourceMap<Resource> >::iterator resourceSourceMapIterator;
@@ -365,7 +365,7 @@ namespace snowcrash {
         /** Resolve pending resources */
         static void resolvePendingSymbols(const MarkdownNodeIterator& node,
                                           SectionParserData& pd,
-                                          ParseResult<Blueprint>& out,
+                                          const ParseResultRef<Blueprint>& out,
                                           Payload& payload,
                                           SourceMap<Payload>& sourceMap) {
 
