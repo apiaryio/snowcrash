@@ -34,7 +34,7 @@ namespace snowcrash {
         static MarkdownNodeIterator parse(const MarkdownNodeIterator& node,
                                           const MarkdownNodes& siblings,
                                           SectionParserData& pd,
-                                          ParseResult<T>& out) {
+                                          const ParseResultRef<T>& out) {
 
             SectionLayout layout = DefaultSectionLayout;
             MarkdownNodeIterator cur = Adapter::startingNode(node);
@@ -100,7 +100,7 @@ namespace snowcrash {
         static MarkdownNodeIterator parseNestedSections(const MarkdownNodeIterator& node,
                                                         const MarkdownNodes& collection,
                                                         SectionParserData& pd,
-                                                        ParseResult<T>& out) {
+                                                        const ParseResultRef<T>& out) {
 
             MarkdownNodeIterator cur = node;
             MarkdownNodeIterator lastCur = cur;

@@ -31,24 +31,64 @@ namespace snowcrash {
     };
 
     /**
-     * Compound product of parsing a node
+     *  \brief Complete compound product of parsing
+     *
+     *  This structure owns all of the product data. As such
+     *  it shouldn't be used internally unless there is a need
+     *  for storing complete parser data. See %IntermediateParseResult.
      */
     template<typename T>
     struct ParseResult {
-        ParseResult(Report& report_,
-                    T& node_,
-                    SourceMap<T>& sourceMap_)
+        
+        ParseResult(const Report& report_ = Report())
+        : report(report_) {}
+        
+        Report report;           /// Parser's report
+        T node;                  /// Parsed AST node
+        SourceMap<T> sourceMap;  /// Parsed AST node source map
+    };
+    
+    /**
+     *  \brief Partial product of parsing.
+     *
+     *  This structure owns the node being parsed and its source map.
+     *  Unlike %ParseResult it relies on shared parser report data making it
+     *  ideal for holding temporary results while parsing items of a collection.
+     */
+    template<typename T>
+    struct IntermediateParseResult {
+        
+        explicit IntermediateParseResult(Report& report_)
+        : report(report_) {}
+        
+        Report& report;
+        T node;
+        SourceMap<T> sourceMap;
+    };
+
+    /**
+     *  \brief Reference wrapper for parsing data product
+     *
+     *  Reference wrapper for %ParseResult and %IntermediateParseResult.
+     */
+    template<typename T>
+    struct ParseResultRef {
+
+        ParseResultRef(ParseResult<T>& parseResult)
+        : report(parseResult.report), node(parseResult.node), sourceMap(parseResult.sourceMap) {}
+        
+        ParseResultRef(IntermediateParseResult<T>& parseResult)
+        : report(parseResult.report), node(parseResult.node), sourceMap(parseResult.sourceMap) {}
+        
+        ParseResultRef(Report& report_, T& node_, SourceMap<T>& sourceMap_)
         : report(report_), node(node_), sourceMap(sourceMap_) {}
-
-        ParseResult(Report& report_)
-        : report(report_), node(*(new T)), sourceMap(*(new SourceMap<T>)) {}
-
-        ParseResult()
-        : report(*(new Report)), node(*(new T)), sourceMap(*(new SourceMap<T>)) {}
-
-        Report& report;           /// Parser's report
-        T& node;                  /// Parsed AST node
-        SourceMap<T>& sourceMap;  /// Parsed AST node source map
+        
+        Report& report;
+        T& node;
+        SourceMap<T>& sourceMap;
+        
+    private:
+        ParseResultRef();
     };
 
     /*
@@ -79,7 +119,7 @@ namespace snowcrash {
                                                      const MarkdownNodes& siblings,
                                                      SectionParserData& pd,
                                                      SectionLayout& layout,
-                                                     ParseResult<T>& out) {
+                                                     const ParseResultRef<T>& out) {
 
             return ++MarkdownNodeIterator(node);
         }
@@ -88,7 +128,7 @@ namespace snowcrash {
         static MarkdownNodeIterator processDescription(const MarkdownNodeIterator& node,
                                                        const MarkdownNodes& siblings,
                                                        SectionParserData& pd,
-                                                       ParseResult<T>& out) {
+                                                       const ParseResultRef<T>& out) {
 
             if (!out.node.description.empty()) {
                 TwoNewLines(out.node.description);
@@ -109,7 +149,7 @@ namespace snowcrash {
         static MarkdownNodeIterator processContent(const MarkdownNodeIterator& node,
                                                    const MarkdownNodes& siblings,
                                                    SectionParserData& pd,
-                                                   ParseResult<T>& out) {
+                                                   const ParseResultRef<T>& out) {
 
             return ++MarkdownNodeIterator(node);
         }
@@ -125,7 +165,7 @@ namespace snowcrash {
         static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
                                                          const MarkdownNodes& siblings,
                                                          SectionParserData& pd,
-                                                         ParseResult<T>& out) {
+                                                         const ParseResultRef<T>& out) {
 
             return node;
         }
@@ -135,7 +175,7 @@ namespace snowcrash {
                                                           const MarkdownNodes& siblings,
                                                           SectionParserData& pd,
                                                           SectionType& lastSectionType,
-                                                          ParseResult<T>& out) {
+                                                          const ParseResultRef<T>& out) {
 
             // WARN: Ignoring unexpected node
             std::stringstream ss;
@@ -158,7 +198,7 @@ namespace snowcrash {
         /** Final validation after processing */
         static void finalize(const MarkdownNodeIterator& node,
                              SectionParserData& pd,
-                             ParseResult<T>& out) {
+                             const ParseResultRef<T>& out) {
         }
 
         /** \return True if the node is a section description node */

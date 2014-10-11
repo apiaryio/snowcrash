@@ -36,7 +36,7 @@ namespace snowcrash {
                                                      const MarkdownNodes& siblings,
                                                      SectionParserData& pd,
                                                      SectionLayout& layout,
-                                                     ParseResult<Parameters>& out) {
+                                                     const ParseResultRef<Parameters>& out) {
 
             mdp::ByteBuffer remainingContent;
 
@@ -61,7 +61,7 @@ namespace snowcrash {
         static MarkdownNodeIterator processDescription(const MarkdownNodeIterator& node,
                                                        const MarkdownNodes& siblings,
                                                        SectionParserData& pd,
-                                                       ParseResult<Parameters>& out) {
+                                                       const ParseResultRef<Parameters>& out) {
 
             return node;
         }
@@ -69,13 +69,14 @@ namespace snowcrash {
         static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
                                                          const MarkdownNodes& siblings,
                                                          SectionParserData& pd,
-                                                         ParseResult<Parameters>& out) {
+                                                         const ParseResultRef<Parameters>& out) {
 
             if (pd.sectionContext() != ParameterSectionType) {
                 return node;
             }
 
-            ParseResult<Parameter> parameter(out.report);
+            IntermediateParseResult<Parameter> parameter(out.report);
+            
             ParameterParser::parse(node, siblings, pd, parameter);
 
             if (!out.node.empty()) {
@@ -146,7 +147,7 @@ namespace snowcrash {
 
         static void finalize(const MarkdownNodeIterator& node,
                              SectionParserData& pd,
-                             ParseResult<Parameters>& out) {
+                             const ParseResultRef<Parameters>& out) {
 
             if (out.node.empty()) {
 

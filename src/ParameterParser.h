@@ -59,7 +59,7 @@ namespace snowcrash {
                                                      const MarkdownNodes& siblings,
                                                      SectionParserData& pd,
                                                      SectionLayout& layout,
-                                                     ParseResult<Parameter>& out) {
+                                                     const ParseResultRef<Parameter>& out) {
 
             mdp::ByteBuffer signature, remainingContent;
             signature = GetFirstLine(node->text, remainingContent);
@@ -81,7 +81,7 @@ namespace snowcrash {
         static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
                                                          const MarkdownNodes& siblings,
                                                          SectionParserData& pd,
-                                                         ParseResult<Parameter>& out) {
+                                                         const ParseResultRef<Parameter>& out) {
 
             if (pd.sectionContext() != ValuesSectionType) {
                 return node;
@@ -107,7 +107,7 @@ namespace snowcrash {
                 out.sourceMap.values.collection.clear();
             }
 
-            ParseResult<Values> values(out.report, out.node.values, out.sourceMap.values);
+            ParseResultRef<Values> values(out.report, out.node.values, out.sourceMap.values);
             ValuesParser::parse(node, siblings, pd, values);
 
             if (out.node.values.empty()) {
@@ -163,7 +163,7 @@ namespace snowcrash {
         static void parseSignature(const mdp::MarkdownNodeIterator& node,
                                    SectionParserData& pd,
                                    mdp::ByteBuffer& signature,
-                                   ParseResult<Parameter>& out) {
+                                   const ParseResultRef<Parameter>& out) {
 
             out.node.use = UndefinedParameterUse;
 
@@ -264,7 +264,7 @@ namespace snowcrash {
         static void parseAdditionalTraits(const mdp::MarkdownNodeIterator& node,
                                           SectionParserData& pd,
                                           mdp::ByteBuffer& traits,
-                                          ParseResult<Parameter>& out) {
+                                          const ParseResultRef<Parameter>& out) {
 
             TrimString(traits);
 
@@ -351,7 +351,7 @@ namespace snowcrash {
 
         static void checkExampleAndDefaultValue(const mdp::MarkdownNodeIterator& node,
                                                 SectionParserData& pd,
-                                                ParseResult<Parameter>& out) {
+                                                const ParseResultRef<Parameter>& out) {
 
             bool isExampleFound = false;
             bool isDefaultFound = false;

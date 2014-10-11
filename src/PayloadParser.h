@@ -52,7 +52,7 @@ namespace snowcrash {
                                                      const MarkdownNodes& siblings,
                                                      SectionParserData& pd,
                                                      SectionLayout& layout,
-                                                     ParseResult<Payload>& out) {
+                                                     const ParseResultRef<Payload>& out) {
 
             mdp::ByteBuffer signature, remainingContent;
             signature = GetFirstLine(node->text, remainingContent);
@@ -97,7 +97,7 @@ namespace snowcrash {
         static MarkdownNodeIterator processContent(const MarkdownNodeIterator& node,
                                                    const MarkdownNodes& siblings,
                                                    SectionParserData& pd,
-                                                   ParseResult<Payload>& out) {
+                                                   const ParseResultRef<Payload>& out) {
 
             mdp::ByteBuffer content;
 
@@ -138,12 +138,12 @@ namespace snowcrash {
         static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
                                                          const MarkdownNodes& siblings,
                                                          SectionParserData& pd,
-                                                         ParseResult<Payload>& out) {
+                                                         const ParseResultRef<Payload>& out) {
 
             switch (pd.sectionContext()) {
                 case HeadersSectionType:
                 {
-                    ParseResult<Headers> headers(out.report, out.node.headers, out.sourceMap.headers);
+                    ParseResultRef<Headers> headers(out.report, out.node.headers, out.sourceMap.headers);
                     return HeadersParser::parse(node, siblings, pd, headers);
                 }
 
@@ -157,7 +157,7 @@ namespace snowcrash {
                                                               sourceMap));
                     }
 
-                    ParseResult<Asset> asset(out.report, out.node.body, out.sourceMap.body);
+                    ParseResultRef<Asset> asset(out.report, out.node.body, out.sourceMap.body);
                     return AssetParser::parse(node, siblings, pd, asset);
                 }
 
@@ -171,7 +171,7 @@ namespace snowcrash {
                                                               sourceMap));
                     }
 
-                    ParseResult<Asset> asset(out.report, out.node.schema, out.sourceMap.schema);
+                    ParseResultRef<Asset> asset(out.report, out.node.schema, out.sourceMap.schema);
                     return AssetParser::parse(node, siblings, pd, asset);
                 }
 
@@ -186,7 +186,7 @@ namespace snowcrash {
                                                           const MarkdownNodes& siblings,
                                                           SectionParserData& pd,
                                                           SectionType& sectionType,
-                                                          ParseResult<Payload>& out) {
+                                                          const ParseResultRef<Payload>& out) {
 
             if ((node->type == mdp::ParagraphMarkdownNodeType ||
                  node->type == mdp::CodeMarkdownNodeType) &&
@@ -296,7 +296,7 @@ namespace snowcrash {
 
         static void finalize(const MarkdownNodeIterator& node,
                              SectionParserData& pd,
-                             ParseResult<Payload>& out) {
+                             const ParseResultRef<Payload>& out) {
 
             bool warnEmptyBody = false;
 
@@ -421,7 +421,7 @@ namespace snowcrash {
         static bool parseSignature(const MarkdownNodeIterator& node,
                                    SectionParserData& pd,
                                    const mdp::ByteBuffer& signature,
-                                   ParseResult<Payload>& out) {
+                                   const ParseResultRef<Payload>& out) {
 
             const char* regex;
             mdp::ByteBuffer mediaType;
@@ -527,7 +527,7 @@ namespace snowcrash {
         static bool parseSymbolReference(const MarkdownNodeIterator& node,
                                          SectionParserData& pd,
                                          mdp::ByteBuffer& source,
-                                         ParseResult<Payload>& out) {
+                                         const ParseResultRef<Payload>& out) {
 
             SymbolName symbol;
             ResourceModel model;

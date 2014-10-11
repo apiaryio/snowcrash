@@ -32,14 +32,15 @@ namespace snowcrash {
                                                      const MarkdownNodes& siblings,
                                                      SectionParserData& pd,
                                                      SectionLayout& layout,
-                                                     ParseResult<Blueprint>& out) {
+                                                     const ParseResultRef<Blueprint>& out) {
 
             MarkdownNodeIterator cur = node;
 
             while (cur != siblings.end() &&
                    cur->type == mdp::ParagraphMarkdownNodeType) {
 
-                ParseResult<MetadataCollection> metadata(out.report);
+                IntermediateParseResult<MetadataCollection> metadata(out.report);
+
                 parseMetadata(cur, pd, metadata);
 
                 // First block is paragraph and is not metadata (no API name)
@@ -91,12 +92,13 @@ namespace snowcrash {
         static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
                                                          const MarkdownNodes& siblings,
                                                          SectionParserData& pd,
-                                                         ParseResult<Blueprint>& out) {
+                                                         const ParseResultRef<Blueprint>& out) {
 
             if (pd.sectionContext() == ResourceGroupSectionType ||
                 pd.sectionContext() == ResourceSectionType) {
 
-                ParseResult<ResourceGroup> resourceGroup(out.report);
+                IntermediateParseResult<ResourceGroup> resourceGroup(out.report);
+                
                 MarkdownNodeIterator cur = ResourceGroupParser::parse(node, siblings, pd, resourceGroup);
 
                 ResourceGroupIterator duplicate = findResourceGroup(out.node.resourceGroups, resourceGroup.node);
@@ -171,7 +173,7 @@ namespace snowcrash {
 
         static void finalize(const MarkdownNodeIterator& node,
                              SectionParserData& pd,
-                             ParseResult<Blueprint>& out) {
+                             const ParseResultRef<Blueprint>& out) {
 
             if (!out.node.name.empty())
                 return;
@@ -203,7 +205,7 @@ namespace snowcrash {
 
         static void parseMetadata(const MarkdownNodeIterator& node,
                                   SectionParserData& pd,
-                                  ParseResult<MetadataCollection>& out) {
+                                  const ParseResultRef<MetadataCollection>& out) {
 
             mdp::ByteBuffer content = node->text;
             TrimStringEnd(content);
