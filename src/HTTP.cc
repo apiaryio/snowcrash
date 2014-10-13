@@ -15,6 +15,9 @@ const std::string HTTPHeaderName::ContentLength = "Content-Length";
 const std::string HTTPHeaderName::ContentType = "Content-Type";
 const std::string HTTPHeaderName::TransferEncoding = "Transfer-Encoding";
 
+const std::string HTTPHeaderName::SetCookie = "Set-Cookie";
+const std::string HTTPHeaderName::Link = "Link";
+
 const std::string HTTPMethodName::Head = "HEAD";
 const std::string HTTPMethodName::Connect = "CONNECT";
 

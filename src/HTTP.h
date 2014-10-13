@@ -38,6 +38,9 @@ namespace snowcrash {
         static const std::string ContentLength;
         static const std::string ContentType;
         static const std::string TransferEncoding;
+
+        static const std::string SetCookie;
+        static const std::string Link;
     };
 
     /**

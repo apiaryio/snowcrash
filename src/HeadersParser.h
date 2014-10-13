@@ -127,7 +127,7 @@ namespace snowcrash {
                 Header header;
 
                 if (CodeBlockUtility::keyValueFromLine(*line, header)) {
-                    if (findHeader(out.node, header) != out.node.end()) {
+                    if (findHeader(out.node, header) != out.node.end() && !isAllowedMultipleDefinition(header)) {
                         // WARN: duplicate header on this level
                         std::stringstream ss;
 
@@ -229,6 +229,26 @@ namespace snowcrash {
             return std::find_if(headers.begin(),
                                 headers.end(),
                                 std::bind2nd(MatchFirsts<Header>(), header));
+        }
+
+        typedef std::vector<std::string> HeadersKeyCollection;
+        /** Get collection of allowed keywords - workarround due to C++98 restriction - static initialization of vector */
+        static const HeadersKeyCollection& getAllowedMultipleDefinitions() {
+            static std::string keys[] = {
+                HTTPHeaderName::SetCookie,
+                HTTPHeaderName::Link,
+            };
+
+            static const HeadersKeyCollection allowedMultipleDefinitions(keys, keys + (sizeof(keys)/sizeof(keys[0])));
+            return allowedMultipleDefinitions;
+        }
+
+        /** Check if Header name has allowed multiple definitions */
+        static bool isAllowedMultipleDefinition(const Header& header) {
+              const HeadersKeyCollection& keys = getAllowedMultipleDefinitions();
+              return std::find_if(keys.begin(),
+                                  keys.end(),
+                                  std::bind1st(MatchFirstWith<Header, std::string>(), header)) != keys.end();
         }
     };
 

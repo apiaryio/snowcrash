@@ -174,3 +174,41 @@ TEST_CASE("Parse header section with missing headers", "[headers]")
     REQUIRE(headers.node.size() == 0);
     REQUIRE(headers.sourceMap.collection.size() == 0);
 }
+
+TEST_CASE("Headers parses should return warning on multiple definition of same headers", "[headers][issue][#75]")
+{
+    const mdp::ByteBuffer source = \
+    "+ Headers\n"\
+    "\n"\
+    "        Content-Type: application/json\n"\
+    "        Content-Type: application/json\n";
+
+    ParseResult<Headers> headers;
+    SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
+
+    REQUIRE(headers.report.error.code == Error::OK);
+    REQUIRE(headers.report.warnings.size() == 1); // one warning due to multiple declaration same header
+
+    REQUIRE(headers.node.size() == 2); 
+}
+
+TEST_CASE("Parse header section with more same headers Set-Cookie and Link - there should not be warning", "[headers][issue][#75]")
+{
+    const mdp::ByteBuffer source = \
+    "+ Headers\n"\
+    "\n"\
+    "        Set-Cookie: abcd\n"\
+    "        Set-Cookie: kockaprede\n";
+
+    ParseResult<Headers> headers;
+    SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
+
+    REQUIRE(headers.report.error.code == Error::OK);
+    REQUIRE(headers.report.warnings.size() == 0); // no warning - multiple definition, but from allowed set
+
+    REQUIRE(headers.node.size() == 2);
+    REQUIRE(headers.node[0].first == "Set-Cookie");
+    REQUIRE(headers.node[0].second == "abcd");
+    REQUIRE(headers.node[1].first == "Set-Cookie");
+    REQUIRE(headers.node[1].second == "kockaprede");
+}
