@@ -95,6 +95,7 @@
         'src/CodeBlockUtility.h',
         'src/HeadersParser.h',
         'src/ModelTable.h',
+        'src/MSON.h',
         'src/ParameterParser.h',
         'src/ParametersParser.h',
         'src/Platform.h',

@@ -11,6 +11,7 @@
 
 #include "BlueprintSourcemap.h"
 #include "ModelTable.h"
+#include "MSON.h"
 #include "Section.h"
 
 namespace snowcrash {
