@@ -9,7 +9,7 @@
 #ifndef SNOWCRASH_MSON_H
 #define SNOWCRASH_MSON_H
 
-#include <vector>
+#include <deque>
 #include <string>
 #include "Platform.h"
 #include "Markdown.h"
@@ -23,21 +23,27 @@
 
 namespace mson {
 
+    /** Literal */
+    typedef std::string Literal;
+
     /** A simple or actual value */
     struct Value {
 
         /** Literal value */
-        std::string literal;
+        Literal literal;
 
         /** Flag to denote variable value */
         bool variable;
     };
 
+    /** Collection of values */
+    typedef std::deque<Value> Values;
+
     /** Type symbol (identifier) */
     struct Symbol {
 
         /** Name of the symbol */
-        std::string literal;
+        Literal literal;
 
         /** Flag to denote variable type name */
         bool variable;
@@ -64,6 +70,9 @@ namespace mson {
         Symbol symbol;
     };
 
+    /** Collection of type names */
+    typedef std::deque<TypeName> TypeNames;
+
     /** Attribute of a type */
     enum TypeAttribute {
         RequiredTypeAttribute = (1 << 0),  // The type is required
@@ -83,7 +92,7 @@ namespace mson {
         TypeName name;
 
         /** Array of nested types */
-        std::vector<TypeName> nestedTypes;
+        TypeNames nestedTypes;
     };
 
     /** Definition of an instance of a type */
@@ -100,7 +109,7 @@ namespace mson {
     struct ValueDefinition {
 
         /** List of values */
-        std::vector<Value> values;
+        Values values;
 
         /** Type of the values */
         TypeDefinition typedefinition;
@@ -108,6 +117,9 @@ namespace mson {
 
     /** Forward Declaration for member type */
     struct MemberType;
+
+    /** Collection of member types */
+    typedef std::deque<MemberType> MemberTypes;
 
     /** Type of a type section */
     enum TypeSectionType {
@@ -118,25 +130,28 @@ namespace mson {
         DefaultTypeSectionType           // Default member types
     };
 
-    /** Content of a type section */
-    struct TypeSectionContent {
-
-        /** EITHER Block description */
-        mdp::ByteBuffer description;
-
-        /** OR Array of member types */
-        std::vector<MemberType> members;
-    };
-
     /** Section of a type */
     struct TypeSection {
 
         /** Denotes the type of the section */
         TypeSectionType type;
 
-        /** Content of the section */
+        /** Content of the type section */
+        struct TypeSectionContent {
+
+            /** EITHER Block description */
+            mdp::ByteBuffer description;
+
+            /** OR Array of member types */
+            std::auto_ptr<MemberTypes> members;
+
+        };
+
         TypeSectionContent content;
     };
+
+    /** Collection of type sections */
+    typedef std::deque<TypeSection> TypeSections;
 
     /** User-define named type */
     struct NamedType {
@@ -148,7 +163,7 @@ namespace mson {
         TypeDefinition base;
 
         /** List of named type's sections */
-        std::vector<TypeSection> sections;
+        TypeSections sections;
     };
 
     /** Individual member of an array or enum structure */
@@ -161,14 +176,14 @@ namespace mson {
         ValueDefinition valueDefinition;
 
         /** List of member type's sections */
-        std::vector<TypeSection> sections;
+        TypeSections sections;
     };
 
     /** Name of a property member */
     struct PropertyName {
 
         /** EITHER Literal name of the property */
-        std::string literal;
+        Literal literal;
 
         /** OR Variable name of the property */
         ValueDefinition variable;
@@ -192,7 +207,7 @@ namespace mson {
     struct OneOf {
 
         /** List of mutually exclusive member types */
-        std::vector<MemberType> members;
+        std::auto_ptr<MemberTypes> members;
     };
 
     /** Type of a member type */
@@ -204,21 +219,6 @@ namespace mson {
         OneOfMemberType       // One of
     };
 
-    struct MemberTypeContent {
-
-        /** Property member */
-        PropertyMember property;
-
-        /** Value member */
-        ValueMember value;
-
-        /** Mixin member */
-        Mixin mixin;
-
-        /** One of member */
-        OneOf oneOf;
-    };
-
     /** Member type of a structure */
     struct MemberType {
 
@@ -226,6 +226,22 @@ namespace mson {
         MemberTypeType type;
 
         /** Content of the member type */
+        struct MemberTypeContent {
+
+            /** EITHER Property member */
+            PropertyMember property;
+
+            /** OR Value member */
+            ValueMember value;
+
+            /** OR Mixin member */
+            Mixin mixin;
+            
+            /** OR One of member */
+            OneOf oneOf;
+
+        };
+
         MemberTypeContent content;
     };
 }
