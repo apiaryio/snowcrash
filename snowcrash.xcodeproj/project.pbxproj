@@ -10,6 +10,7 @@
 		4070F30419E4C30A004892C8 /* BlueprintSourcemap.h in Headers */ = {isa = PBXBuildFile; fileRef = 4070F30119E4C30A004892C8 /* BlueprintSourcemap.h */; };
 		4070F30519E4C30A004892C8 /* CBlueprintSourcemap.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4070F30219E4C30A004892C8 /* CBlueprintSourcemap.cc */; };
 		4070F30619E4C30A004892C8 /* CBlueprintSourcemap.h in Headers */ = {isa = PBXBuildFile; fileRef = 4070F30319E4C30A004892C8 /* CBlueprintSourcemap.h */; };
+		40A1EE0B19EC0A0B00DB894A /* MSON.h in Headers */ = {isa = PBXBuildFile; fileRef = 40A1EE0A19EC0A0B00DB894A /* MSON.h */; };
 		BB05B9D81804493500243E1B /* perf-snowcrash.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB05B9D71804493500243E1B /* perf-snowcrash.cc */; };
 		BB05B9D918044C8200243E1B /* libsnowcrash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBFF4898170B34E6001E5FB2 /* libsnowcrash.a */; };
 		BB088F78192D7901003AA95C /* SectionParserData.h in Headers */ = {isa = PBXBuildFile; fileRef = BB088F77192D7901003AA95C /* SectionParserData.h */; };
@@ -133,6 +134,7 @@
 		4070F30119E4C30A004892C8 /* BlueprintSourcemap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BlueprintSourcemap.h; path = src/BlueprintSourcemap.h; sourceTree = "<group>"; };
 		4070F30219E4C30A004892C8 /* CBlueprintSourcemap.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CBlueprintSourcemap.cc; path = src/CBlueprintSourcemap.cc; sourceTree = "<group>"; };
 		4070F30319E4C30A004892C8 /* CBlueprintSourcemap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CBlueprintSourcemap.h; path = src/CBlueprintSourcemap.h; sourceTree = "<group>"; };
+		40A1EE0A19EC0A0B00DB894A /* MSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MSON.h; path = src/MSON.h; sourceTree = "<group>"; };
 		BB03DC6417D3717B00C51E52 /* ParametersParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = ParametersParser.h; path = src/ParametersParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BB03DC6517D3718D00C51E52 /* test-ParametersParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-ParametersParser.cc"; path = "test/test-ParametersParser.cc"; sourceTree = "<group>"; };
 		BB05B9CE180448E300243E1B /* perf-libsnowcrash */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "perf-libsnowcrash"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -345,6 +347,7 @@
 				BBD73563192ED417009FE09E /* HeadersParser.h */,
 				BB92D890178EF7C10098A63C /* HTTP.cc */,
 				BB92D88F178EF4160098A63C /* HTTP.h */,
+				40A1EE0A19EC0A0B00DB894A /* MSON.h */,
 				BBCC855C19542DA100B99E90 /* ParameterParser.h */,
 				BB03DC6417D3717B00C51E52 /* ParametersParser.h */,
 				BBE5705F173927870086CE22 /* PayloadParser.h */,
@@ -399,6 +402,7 @@
 				BBFC8419196C0C0F001A236A /* CBlueprint.h in Headers */,
 				BBC2D85F18301FEC00FBCEA7 /* CodeBlockUtility.h in Headers */,
 				BB8C3E631923D6FE00EF36FA /* SectionParser.h in Headers */,
+				40A1EE0B19EC0A0B00DB894A /* MSON.h in Headers */,
 				BBD5F9CE17353CE00049BBEE /* ResourceParser.h in Headers */,
 				4070F30419E4C30A004892C8 /* BlueprintSourcemap.h in Headers */,
 				BBE57061173927870086CE22 /* PayloadParser.h in Headers */,
