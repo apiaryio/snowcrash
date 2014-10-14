@@ -23,6 +23,9 @@
 
 namespace mson {
 
+    /** Markdown */
+    typedef mdp::ByteBuffer Markdown;
+
     /** Literal */
     typedef std::string Literal;
 
@@ -133,24 +136,27 @@ namespace mson {
     /** Section of a type */
     struct TypeSection {
 
-        /** Denotes the type of the section */
-        TypeSectionType type;
-
         /** Content of the type section */
         struct TypeSectionContent {
 
             /** EITHER Block description */
-            mdp::ByteBuffer description;
+            Markdown description;
 
             /** OR Array of member types */
             MemberTypes& members();
             const MemberTypes& members() const;
+
+            /** Checks if member types are present */
             bool hasMembers() const;
 
         private:
             std::auto_ptr<MemberTypes> m_members;
         };
 
+        /** Denotes the type of the section */
+        TypeSectionType type;
+
+        /** Content of the type section */
         TypeSectionContent content;
     };
 
@@ -174,7 +180,7 @@ namespace mson {
     struct ValueMember {
 
         /** Inline description */
-        mdp::ByteBuffer description;
+        Markdown description;
 
         /** Definition of member's value */
         ValueDefinition valueDefinition;
@@ -213,6 +219,8 @@ namespace mson {
         /** List of mutually exclusive member types */
         MemberTypes& members();
         const MemberTypes& members() const;
+
+        /** Checks if member types are present */
         bool hasMembers() const;
 
     private:
@@ -231,9 +239,6 @@ namespace mson {
     /** Member type of a structure */
     struct MemberType {
 
-        /** Type of the member type */
-        MemberTypeType type;
-
         /** Content of the member type */
         struct MemberTypeContent {
 
@@ -245,11 +250,15 @@ namespace mson {
 
             /** OR Mixin member */
             Mixin mixin;
-            
+
             /** OR One of member */
             OneOf oneOf;
         };
 
+        /** Type of the member type */
+        MemberTypeType type;
+
+        /** Content of the member type */
         MemberTypeContent content;
     };
 }
