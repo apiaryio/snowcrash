@@ -96,6 +96,7 @@
         'src/HeadersParser.h',
         'src/ModelTable.h',
         'src/MSON.h',
+        'src/MSONSectionProcessor.h',
         'src/ParameterParser.h',
         'src/ParametersParser.h',
         'src/Platform.h',
