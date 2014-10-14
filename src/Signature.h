@@ -32,6 +32,20 @@ namespace snowcrash {
 namespace scpl {
 
     /**
+     * \brief Signature data after parsing section using signature traits
+     */
+    struct Signature {
+
+        mdp::ByteBuffer identifier;       // Signature Identifier
+        mdp::ByteBuffer values;           // Signature Values string
+
+        // TODO: Attributes
+
+        mdp::ByteBuffer content;          // Signature content before newline character
+        mdp::ByteBuffer remainingContent; // Signature content after newline character
+    };
+
+    /**
      * \brief Traits characteristics of a section signature
      *
      * Traits describe identifier defined or value/type defined signatures.
