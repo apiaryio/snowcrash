@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		402FC56219ED2E8D006D7A86 /* MSONSectionProcessor.h in Headers */ = {isa = PBXBuildFile; fileRef = 402FC56119ED2E8D006D7A86 /* MSONSectionProcessor.h */; };
 		4070F30419E4C30A004892C8 /* BlueprintSourcemap.h in Headers */ = {isa = PBXBuildFile; fileRef = 4070F30119E4C30A004892C8 /* BlueprintSourcemap.h */; };
 		4070F30519E4C30A004892C8 /* CBlueprintSourcemap.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4070F30219E4C30A004892C8 /* CBlueprintSourcemap.cc */; };
 		4070F30619E4C30A004892C8 /* CBlueprintSourcemap.h in Headers */ = {isa = PBXBuildFile; fileRef = 4070F30319E4C30A004892C8 /* CBlueprintSourcemap.h */; };
@@ -131,6 +132,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		402FC56119ED2E8D006D7A86 /* MSONSectionProcessor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MSONSectionProcessor.h; path = src/MSONSectionProcessor.h; sourceTree = "<group>"; };
 		4070F30119E4C30A004892C8 /* BlueprintSourcemap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BlueprintSourcemap.h; path = src/BlueprintSourcemap.h; sourceTree = "<group>"; };
 		4070F30219E4C30A004892C8 /* CBlueprintSourcemap.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CBlueprintSourcemap.cc; path = src/CBlueprintSourcemap.cc; sourceTree = "<group>"; };
 		4070F30319E4C30A004892C8 /* CBlueprintSourcemap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CBlueprintSourcemap.h; path = src/CBlueprintSourcemap.h; sourceTree = "<group>"; };
@@ -348,6 +350,7 @@
 				BB92D890178EF7C10098A63C /* HTTP.cc */,
 				BB92D88F178EF4160098A63C /* HTTP.h */,
 				40A1EE0A19EC0A0B00DB894A /* MSON.h */,
+				402FC56119ED2E8D006D7A86 /* MSONSectionProcessor.h */,
 				BBCC855C19542DA100B99E90 /* ParameterParser.h */,
 				BB03DC6417D3717B00C51E52 /* ParametersParser.h */,
 				BBE5705F173927870086CE22 /* PayloadParser.h */,
@@ -392,6 +395,7 @@
 				BBFF48D2170B4224001E5FB2 /* snowcrash.h in Headers */,
 				BBFCD83A19DAEE240073813C /* cmdline.h in Headers */,
 				BBFF48D6170C4F30001E5FB2 /* Blueprint.h in Headers */,
+				402FC56219ED2E8D006D7A86 /* MSONSectionProcessor.h in Headers */,
 				BBD73564192ED417009FE09E /* HeadersParser.h in Headers */,
 				BBCC855F19542DA100B99E90 /* ValuesParser.h in Headers */,
 				BBA91DC2171D402600649B05 /* BlueprintParser.h in Headers */,
