@@ -29,4 +29,37 @@ namespace snowcrash {
     extern SectionType RecognizeCodeBlockFirstLine(const mdp::ByteBuffer& subject);
 }
 
+namespace scpl {
+
+    /**
+     * \brief Traits characteristics of a section signature
+     *
+     * Traits describe identifier defined or value/type defined signatures.
+     */
+    struct SignatureTraits {
+
+        enum Trait {
+            IdentifierTrait = (1 << 0), // Expect an Identifier in the signature
+            ValuesTrait     = (1 << 1), // Expect a (list of) Value in the signature
+            AttributesTrait = (1 << 2), // Expect Type definition in the signature
+            ContentTrait    = (1 << 3)  // Expect inline description in the signature
+        };
+
+        typedef unsigned int Traits;
+
+        const bool identifierTrait;
+        const bool valuesTrait;
+        const bool attributesTrait;
+        const bool contentTrait;
+
+        SignatureTraits(Traits traits_ = 0)
+        :
+        identifierTrait(traits_ & IdentifierTrait),
+        valuesTrait(traits_ & ValuesTrait),
+        attributesTrait(traits_ & AttributesTrait),
+        contentTrait(traits_ & ContentTrait)
+        {}
+    };
+}
+
 #endif
