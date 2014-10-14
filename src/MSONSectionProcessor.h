@@ -11,7 +11,7 @@
 
 #include "SectionProcessor.h"
 
-namespace mson {
+namespace scpl {
 
     using mdp::MarkdownNode;
     using mdp::MarkdownNodes;
@@ -21,7 +21,7 @@ namespace mson {
      * Forward Declarations
      */
     template<typename T>
-    struct SectionProcessor;
+    struct MSONSectionProcessor;
 
     /**
      * \brief  MSON Section Processor Base
@@ -29,14 +29,14 @@ namespace mson {
      * Defines default behaviours for Section Processor interface for MSON
      */
     template<typename T>
-    struct SectionProcessorBase : public snowcrash::SectionProcessorBase<T> {
+    struct MSONSectionProcessorBase : public snowcrash::SectionProcessorBase<T> {
 
         /**
          * \brief Signature traits of the MSON section
          */
-        static scpl::SignatureTraits signatureTraits() {
+        static SignatureTraits signatureTraits() {
 
-            scpl::SignatureTraits signatureTraits(0);
+            SignatureTraits signatureTraits(0);
             return signatureTraits;
         };
 
@@ -49,15 +49,38 @@ namespace mson {
                                                      snowcrash::SectionLayout& layout,
                                                      const snowcrash::ParseResultRef<T>& out) {
 
+            Signature signature;
+
+            mdp::ByteBuffer subject;
+            subject = snowcrash::GetFirstLine(node->text, signature.remainingContent);
+
+            snowcrash::TrimString(subject);
+
+            // Get the signature traits of the section
+            SignatureTraits signatureTraits = MSONSectionProcessor<T>::signatureTraits();
+
+            // Do section specific logic using the signature data
+            MSONSectionProcessor<T>::finalizeSignature(node, pd, signature, out);
+
             return ++MarkdownNodeIterator(node);
-        }
+        };
+
+        /**
+         * \brief Use the signature data to do MSON section specific logic
+         *
+         * \param signature Signature data
+         */
+        static void finalizeSignature(const MarkdownNodeIterator& node,
+                                      snowcrash::SectionParserData& pd,
+                                      const Signature& signature,
+                                      const snowcrash::ParseResultRef<T>& out) {};
     };
 
     /**
-     * Default Section Processor
+     * Default MSON Section Processor
      */
     template<typename T>
-    struct SectionProcessor : public SectionProcessorBase<T> {
+    struct MSONSectionProcessor : public MSONSectionProcessorBase<T> {
     };
 }
 
