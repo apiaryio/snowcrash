@@ -32,6 +32,15 @@ namespace mson {
     struct SectionProcessorBase : public snowcrash::SectionProcessorBase<T> {
 
         /**
+         * \brief Signature traits of the MSON section
+         */
+        static scpl::SignatureTraits signatureTraits() {
+
+            scpl::SignatureTraits signatureTraits(0);
+            return signatureTraits;
+        };
+
+        /**
          * \brief Process MSON section signature markdown node
          */
         static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
