@@ -12,7 +12,7 @@
 #include <deque>
 #include <string>
 #include "Platform.h"
-#include "Markdown.h"
+#include "MarkdownParser.h"
 
 /**
  * MSON Abstract Syntax Tree
@@ -143,8 +143,12 @@ namespace mson {
             mdp::ByteBuffer description;
 
             /** OR Array of member types */
-            std::auto_ptr<MemberTypes> members;
+            MemberTypes& members();
+            const MemberTypes& members() const;
+            bool hasMembers() const;
 
+        private:
+            std::auto_ptr<MemberTypes> m_members;
         };
 
         TypeSectionContent content;
@@ -207,7 +211,12 @@ namespace mson {
     struct OneOf {
 
         /** List of mutually exclusive member types */
-        std::auto_ptr<MemberTypes> members;
+        MemberTypes& members();
+        const MemberTypes& members() const;
+        bool hasMembers() const;
+
+    private:
+        std::auto_ptr<MemberTypes> m_members;
     };
 
     /** Type of a member type */
@@ -239,7 +248,6 @@ namespace mson {
             
             /** OR One of member */
             OneOf oneOf;
-
         };
 
         MemberTypeContent content;
