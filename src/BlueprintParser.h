@@ -283,83 +283,137 @@ namespace snowcrash {
                                 std::bind2nd(MatchName<ResourceGroup>(), resourceGroup));
         }
 
-        /** check for lazy referencing */
+        /** Checks both blueprint and source map AST to resolve references with `Pending` state (Lazy referencing)*/
         static void checkLazyReferencing(const MarkdownNodeIterator& node,
                                          SectionParserData& pd,
                                          const ParseResultRef<Blueprint>& out) {
 
             Collection<SourceMap<ResourceGroup> >::iterator resourceGroupSourceMapIterator;
-            Collection<SourceMap<Resource> >::iterator resourceSourceMapIterator;
-            Collection<SourceMap<Action> >::iterator actionSourceMapIterator;
-            Collection<SourceMap<TransactionExample> >::iterator exampleSourceMapIterator;
-            Collection<SourceMap<Request> >::iterator requestSourceMapIterator;
-            Collection<SourceMap<Response> >::iterator responseSourceMapIterator;
 
-            bool exportSourceMap = pd.exportSourceMap();
-
-            resourceGroupSourceMapIterator = out.sourceMap.resourceGroups.collection.begin();
+            if (pd.exportSourceMap()) {
+                resourceGroupSourceMapIterator = out.sourceMap.resourceGroups.collection.begin();
+            }
 
             for (ResourceGroups::iterator resourceGroupIterator = out.node.resourceGroups.begin();
                  resourceGroupIterator != out.node.resourceGroups.end();
-                 ++resourceGroupIterator, exportSourceMap ? ++resourceGroupSourceMapIterator : resourceGroupSourceMapIterator) {
+                 ++resourceGroupIterator, pd.exportSourceMap() ? ++resourceGroupSourceMapIterator : resourceGroupSourceMapIterator) {
 
-                if (exportSourceMap) {
-                    resourceSourceMapIterator = resourceGroupSourceMapIterator->resources.collection.begin();
+                checkResourceLazyReferencing(*resourceGroupIterator, *resourceGroupSourceMapIterator, node, pd, out);
+            }
+        }
+
+        /** Traverses Resource Collection to resolve references with `Pending` state (Lazy referencing)*/
+        static void checkResourceLazyReferencing(ResourceGroup& resourceGroup,
+                                                 SourceMap<ResourceGroup>& resourceGroupSourceMap,
+                                                 const MarkdownNodeIterator& node,
+                                                 SectionParserData& pd,
+                                                 const ParseResultRef<Blueprint>& out) {
+
+            Collection<SourceMap<Resource> >::iterator resourceSourceMapIterator;
+
+            if (pd.exportSourceMap()) {
+                resourceSourceMapIterator = resourceGroupSourceMap.resources.collection.begin();
+            }
+
+            for (Resources::iterator resourceIterator = resourceGroup.resources.begin();
+                 resourceIterator != resourceGroup.resources.end();
+                 ++resourceIterator, pd.exportSourceMap() ? ++resourceSourceMapIterator : resourceSourceMapIterator) {
+
+                checkActionLazyReferencing(*resourceIterator, *resourceSourceMapIterator, node, pd, out);
+            }
+        }
+
+        /** Traverses Action Collection to resolve references with `Pending` state (Lazy referencing)*/
+        static void checkActionLazyReferencing(Resource& resource,
+                                               SourceMap<Resource>& resourceSourceMap,
+                                               const MarkdownNodeIterator& node,
+                                               SectionParserData& pd,
+                                               const ParseResultRef<Blueprint>& out) {
+
+            Collection<SourceMap<Action> >::iterator actionSourceMapIterator;
+
+            if (pd.exportSourceMap()) {
+                actionSourceMapIterator = resourceSourceMap.actions.collection.begin();
+            }
+
+            for (Actions::iterator actionIterator = resource.actions.begin();
+                 actionIterator != resource.actions.end();
+                 ++actionIterator, pd.exportSourceMap() ? ++actionSourceMapIterator : actionSourceMapIterator) {
+
+                checkExampleLazyReferencing(*actionIterator, *actionSourceMapIterator, node, pd, out);
+            }
+        }
+
+        /** Traverses Transaction Example Collection AST to resolve references with `Pending` state (Lazy referencing)*/
+        static void checkExampleLazyReferencing(Action& action,
+                                                SourceMap<Action>& actionSourceMap,
+                                                const MarkdownNodeIterator& node,
+                                                SectionParserData& pd,
+                                                const ParseResultRef<Blueprint>& out) {
+
+            Collection<SourceMap<TransactionExample> >::iterator exampleSourceMapIterator;
+
+            if (pd.exportSourceMap()) {
+                exampleSourceMapIterator = actionSourceMap.examples.collection.begin();
+            }
+
+            for (TransactionExamples::iterator transactionExampleIterator = action.examples.begin();
+                 transactionExampleIterator != action.examples.end();
+                 ++transactionExampleIterator, pd.exportSourceMap() ? ++exampleSourceMapIterator : exampleSourceMapIterator) {
+
+                checkRequestLazyReferencing(*transactionExampleIterator, *exampleSourceMapIterator, node, pd, out);
+                checkResponseLazyReferencing(*transactionExampleIterator, *exampleSourceMapIterator, node, pd, out);
+            }
+        }
+
+        /** Traverses Request Collection to resolve references with `Pending` state (Lazy referencing)*/
+        static void checkRequestLazyReferencing(TransactionExample& transactionExample,
+                                                SourceMap<TransactionExample>& transactionExampleSourceMap,
+                                                const MarkdownNodeIterator& node,
+                                                SectionParserData& pd,
+                                                const ParseResultRef<Blueprint>& out) {
+
+            Collection<SourceMap<Request> >::iterator requestSourceMapIterator;
+
+            if (pd.exportSourceMap()) {
+                requestSourceMapIterator = transactionExampleSourceMap.requests.collection.begin();
+            }
+
+            for (Requests::iterator requestIterator = transactionExample.requests.begin();
+                 requestIterator != transactionExample.requests.end();
+                 ++requestIterator, pd.exportSourceMap() ? ++requestSourceMapIterator : requestSourceMapIterator) {
+
+                if (!requestIterator->reference.id.empty() &&
+                    requestIterator->reference.meta.state == Reference::StatePending) {
+
+                    ParseResultRef<Payload> payload(out.report, *requestIterator, *requestSourceMapIterator);
+                    resolvePendingSymbols(node, pd, payload);
                 }
+            }
+        }
 
-                for (Resources::iterator resourceIterator = resourceGroupIterator->resources.begin();
-                     resourceIterator != resourceGroupIterator->resources.end();
-                     ++resourceIterator, exportSourceMap ? ++resourceSourceMapIterator : resourceSourceMapIterator) {
+        /** Traverses Response Collection to resolve references with `Pending` state (Lazy referencing)*/
+        static void checkResponseLazyReferencing(TransactionExample& transactionExample,
+                                                 SourceMap<TransactionExample>& transactionExampleSourceMap,
+                                                 const MarkdownNodeIterator& node,
+                                                 SectionParserData& pd,
+                                                 const ParseResultRef<Blueprint>& out) {
 
-                    if (exportSourceMap) {
-                        actionSourceMapIterator = resourceSourceMapIterator->actions.collection.begin();
-                    }
+            Collection<SourceMap<Response> >::iterator responseSourceMapIterator;
 
-                    for (Actions::iterator actionIterator = resourceIterator->actions.begin();
-                         actionIterator != resourceIterator->actions.end();
-                         ++actionIterator, exportSourceMap ? ++actionSourceMapIterator : actionSourceMapIterator) {
+            if (pd.exportSourceMap()) {
+                responseSourceMapIterator = transactionExampleSourceMap.responses.collection.begin();
+            }
 
-                        if (exportSourceMap) {
-                            exampleSourceMapIterator = actionSourceMapIterator->examples.collection.begin();
-                        }
+            for (Responses::iterator responseIterator = transactionExample.responses.begin();
+                 responseIterator != transactionExample.responses.end();
+                 ++responseIterator, pd.exportSourceMap() ? ++responseSourceMapIterator : responseSourceMapIterator) {
 
-                        for (TransactionExamples::iterator transactionExampleIterator = actionIterator->examples.begin();
-                             transactionExampleIterator != actionIterator->examples.end();
-                             ++transactionExampleIterator, exportSourceMap ? ++exampleSourceMapIterator : exampleSourceMapIterator) {
+                if (!responseIterator->reference.id.empty() &&
+                    responseIterator->reference.meta.state == Reference::StatePending) {
 
-                            if (exportSourceMap) {
-                                requestSourceMapIterator = exampleSourceMapIterator->requests.collection.begin();
-                            }
-
-                            for (Requests::iterator requestIterator = transactionExampleIterator->requests.begin();
-                                 requestIterator != transactionExampleIterator->requests.end();
-                                 ++requestIterator, exportSourceMap ? ++requestSourceMapIterator : requestSourceMapIterator) {
-
-                                if (!requestIterator->reference.id.empty() &&
-                                    requestIterator->reference.meta.state == Reference::StatePending) {
-
-                                    ParseResultRef<Payload> payload(out.report, *requestIterator, *requestSourceMapIterator);
-                                    resolvePendingSymbols(node, pd, payload);
-                                }
-                            }
-
-                            if (exportSourceMap) {
-                                responseSourceMapIterator = exampleSourceMapIterator->responses.collection.begin();
-                            }
-
-                            for (Responses::iterator responseIterator = transactionExampleIterator->responses.begin();
-                                 responseIterator != transactionExampleIterator->responses.end();
-                                 ++responseIterator, exportSourceMap ? ++responseSourceMapIterator : responseSourceMapIterator) {
-
-                                if (!responseIterator->reference.id.empty() &&
-                                    responseIterator->reference.meta.state == Reference::StatePending) {
-
-                                    ParseResultRef<Payload> payload(out.report, *responseIterator, *responseSourceMapIterator);
-                                    resolvePendingSymbols(node, pd, payload);
-                                }
-                            }
-                        }
-                    }
+                    ParseResultRef<Payload> payload(out.report, *responseIterator, *responseSourceMapIterator);
+                    resolvePendingSymbols(node, pd, payload);
                 }
             }
         }

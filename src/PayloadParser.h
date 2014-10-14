@@ -524,6 +524,7 @@ namespace snowcrash {
             return true;
         }
 
+        /** Given the reference id as source, parse the reference */
         static bool parseSymbolReference(const MarkdownNodeIterator& node,
                                          SectionParserData& pd,
                                          mdp::ByteBuffer& source,
@@ -561,6 +562,7 @@ namespace snowcrash {
             return false;
         }
 
+        /** Assigns reference from reference id, into the node */
         static void assignSymbolToPayload(SectionParserData& pd,
                                           const ParseResultRef<Payload>& out) {
 

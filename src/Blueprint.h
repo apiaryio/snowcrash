@@ -126,8 +126,7 @@ namespace snowcrash {
     /** Source Map of Collection of Parameters */
     typedef Collection<Parameter>::type Parameters;
 
-    /** Name of a symbol */
-
+    /** Identifier(name) of Reference */
     typedef std::string Identifier;
 
     /** Reference */

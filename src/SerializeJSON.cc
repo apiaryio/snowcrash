@@ -480,13 +480,7 @@ static void serialize(const Reference& reference, size_t level, std::ostream &os
     os << "\"" << SerializeKey::Reference << "\": {\n";
 
     serialize(SerializeKey::Id, reference.id, level + 1, false, os);
-
-    if (reference.type == Reference::SymbolReference) {
-
-        os << NewLineItemBlock;
-        serialize(SerializeKey::Type, "symbol", level + 1, false, os);
-        os << "\n";
-    }
+    os << "\n";
 
     indent(level, os);
     os << "}";
