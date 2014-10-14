@@ -175,7 +175,7 @@ namespace snowcrash {
                              SectionParserData& pd,
                              const ParseResultRef<Blueprint>& out) {
      
-            checkLazyReferencing(node, pd, out);
+            checkLazyReferencing(pd, out);
 
             if (!out.node.name.empty())
                 return;
@@ -283,9 +283,12 @@ namespace snowcrash {
                                 std::bind2nd(MatchName<ResourceGroup>(), resourceGroup));
         }
 
-        /** Checks both blueprint and source map AST to resolve references with `Pending` state (Lazy referencing)*/
-        static void checkLazyReferencing(const MarkdownNodeIterator& node,
-                                         SectionParserData& pd,
+        /**
+         *  \brief  Checks both blueprint and source map AST to resolve references with `Pending` state (Lazy referencing)
+         *  \param  pd       Section parser state
+         *  \param  out      Processed output
+         */
+        static void checkLazyReferencing(SectionParserData& pd,
                                          const ParseResultRef<Blueprint>& out) {
 
             Collection<SourceMap<ResourceGroup> >::iterator resourceGroupSourceMapIterator;
@@ -298,14 +301,13 @@ namespace snowcrash {
                  resourceGroupIterator != out.node.resourceGroups.end();
                  ++resourceGroupIterator, pd.exportSourceMap() ? ++resourceGroupSourceMapIterator : resourceGroupSourceMapIterator) {
 
-                checkResourceLazyReferencing(*resourceGroupIterator, *resourceGroupSourceMapIterator, node, pd, out);
+                checkResourceLazyReferencing(*resourceGroupIterator, *resourceGroupSourceMapIterator, pd, out);
             }
         }
 
-        /** Traverses Resource Collection to resolve references with `Pending` state (Lazy referencing)*/
+        /** Traverses Resource Collection to resolve references with `Pending` state (Lazy referencing) */
         static void checkResourceLazyReferencing(ResourceGroup& resourceGroup,
                                                  SourceMap<ResourceGroup>& resourceGroupSourceMap,
-                                                 const MarkdownNodeIterator& node,
                                                  SectionParserData& pd,
                                                  const ParseResultRef<Blueprint>& out) {
 
@@ -319,14 +321,13 @@ namespace snowcrash {
                  resourceIterator != resourceGroup.resources.end();
                  ++resourceIterator, pd.exportSourceMap() ? ++resourceSourceMapIterator : resourceSourceMapIterator) {
 
-                checkActionLazyReferencing(*resourceIterator, *resourceSourceMapIterator, node, pd, out);
+                checkActionLazyReferencing(*resourceIterator, *resourceSourceMapIterator, pd, out);
             }
         }
 
-        /** Traverses Action Collection to resolve references with `Pending` state (Lazy referencing)*/
+        /** Traverses Action Collection to resolve references with `Pending` state (Lazy referencing) */
         static void checkActionLazyReferencing(Resource& resource,
                                                SourceMap<Resource>& resourceSourceMap,
-                                               const MarkdownNodeIterator& node,
                                                SectionParserData& pd,
                                                const ParseResultRef<Blueprint>& out) {
 
@@ -340,14 +341,13 @@ namespace snowcrash {
                  actionIterator != resource.actions.end();
                  ++actionIterator, pd.exportSourceMap() ? ++actionSourceMapIterator : actionSourceMapIterator) {
 
-                checkExampleLazyReferencing(*actionIterator, *actionSourceMapIterator, node, pd, out);
+                checkExampleLazyReferencing(*actionIterator, *actionSourceMapIterator, pd, out);
             }
         }
 
-        /** Traverses Transaction Example Collection AST to resolve references with `Pending` state (Lazy referencing)*/
+        /** Traverses Transaction Example Collection AST to resolve references with `Pending` state (Lazy referencing) */
         static void checkExampleLazyReferencing(Action& action,
                                                 SourceMap<Action>& actionSourceMap,
-                                                const MarkdownNodeIterator& node,
                                                 SectionParserData& pd,
                                                 const ParseResultRef<Blueprint>& out) {
 
@@ -361,15 +361,14 @@ namespace snowcrash {
                  transactionExampleIterator != action.examples.end();
                  ++transactionExampleIterator, pd.exportSourceMap() ? ++exampleSourceMapIterator : exampleSourceMapIterator) {
 
-                checkRequestLazyReferencing(*transactionExampleIterator, *exampleSourceMapIterator, node, pd, out);
-                checkResponseLazyReferencing(*transactionExampleIterator, *exampleSourceMapIterator, node, pd, out);
+                checkRequestLazyReferencing(*transactionExampleIterator, *exampleSourceMapIterator, pd, out);
+                checkResponseLazyReferencing(*transactionExampleIterator, *exampleSourceMapIterator, pd, out);
             }
         }
 
-        /** Traverses Request Collection to resolve references with `Pending` state (Lazy referencing)*/
+        /** Traverses Request Collection to resolve references with `Pending` state (Lazy referencing) */
         static void checkRequestLazyReferencing(TransactionExample& transactionExample,
                                                 SourceMap<TransactionExample>& transactionExampleSourceMap,
-                                                const MarkdownNodeIterator& node,
                                                 SectionParserData& pd,
                                                 const ParseResultRef<Blueprint>& out) {
 
@@ -387,15 +386,14 @@ namespace snowcrash {
                     requestIterator->reference.meta.state == Reference::StatePending) {
 
                     ParseResultRef<Payload> payload(out.report, *requestIterator, *requestSourceMapIterator);
-                    resolvePendingSymbols(node, pd, payload);
+                    resolvePendingSymbols(pd, payload);
                 }
             }
         }
 
-        /** Traverses Response Collection to resolve references with `Pending` state (Lazy referencing)*/
+        /** Traverses Response Collection to resolve references with `Pending` state (Lazy referencing) */
         static void checkResponseLazyReferencing(TransactionExample& transactionExample,
                                                  SourceMap<TransactionExample>& transactionExampleSourceMap,
-                                                 const MarkdownNodeIterator& node,
                                                  SectionParserData& pd,
                                                  const ParseResultRef<Blueprint>& out) {
 
@@ -413,14 +411,17 @@ namespace snowcrash {
                     responseIterator->reference.meta.state == Reference::StatePending) {
 
                     ParseResultRef<Payload> payload(out.report, *responseIterator, *responseSourceMapIterator);
-                    resolvePendingSymbols(node, pd, payload);
+                    resolvePendingSymbols(pd, payload);
                 }
             }
         }
 
-        /** Resolve pending resources */
-        static void resolvePendingSymbols(const MarkdownNodeIterator& node,
-                                          SectionParserData& pd,
+        /**
+         *  \brief  Resolve pending references
+         *  \param  pd       Section parser state
+         *  \param  out      Processed output
+         */
+        static void resolvePendingSymbols(SectionParserData& pd,
                                           const ParseResultRef<Payload>& out) {
 
             if (pd.symbolTable.resourceModels.find(out.node.reference.id) == pd.symbolTable.resourceModels.end()) {
@@ -437,7 +438,7 @@ namespace snowcrash {
             else {
 
                 out.node.reference.meta.state = Reference::StateResolved;
-                SectionProcessor<Payload>::assignSymbolToPayload(pd, out);
+                SectionProcessor<Payload>::assingReferredPayload(pd, out);
             }
         }
     };

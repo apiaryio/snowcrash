@@ -524,7 +524,7 @@ namespace snowcrash {
             return true;
         }
 
-        /** Given the reference id as source, parse the reference */
+        /** Given the reference id(name), initializes reference of the payload accordingly(if possible resolve it) */
         static bool parseSymbolReference(const MarkdownNodeIterator& node,
                                          SectionParserData& pd,
                                          mdp::ByteBuffer& source,
@@ -554,7 +554,7 @@ namespace snowcrash {
 
                 out.node.reference.meta.state = Reference::StateResolved;
 
-                assignSymbolToPayload(pd, out);
+                assingReferredPayload(pd, out);
 
                 return true;
             }
@@ -562,8 +562,12 @@ namespace snowcrash {
             return false;
         }
 
-        /** Assigns reference from reference id, into the node */
-        static void assignSymbolToPayload(SectionParserData& pd,
+        /**
+         *  \brief  Assigns the reference, referred as reference id(name), into the payload
+         *  \param  pd       Section parser state
+         *  \param  out      Processed output
+         */
+        static void assingReferredPayload(SectionParserData& pd,
                                           const ParseResultRef<Payload>& out) {
 
             SourceMap<ResourceModel> modelSM;
