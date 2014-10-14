@@ -338,7 +338,8 @@ namespace snowcrash {
                                 if (!requestIterator->reference.id.empty() &&
                                     requestIterator->reference.meta.state == Reference::StatePending) {
 
-                                    resolvePendingSymbols(node, pd, out, *requestIterator, *requestSourceMapIterator);
+                                    ParseResultRef<Payload> payload(out.report, *requestIterator, *requestSourceMapIterator);
+                                    resolvePendingSymbols(node, pd, payload);
                                 }
                             }
 
@@ -353,7 +354,8 @@ namespace snowcrash {
                                 if (!responseIterator->reference.id.empty() &&
                                     responseIterator->reference.meta.state == Reference::StatePending) {
 
-                                    resolvePendingSymbols(node, pd, out, *responseIterator, *responseSourceMapIterator);
+                                    ParseResultRef<Payload> payload(out.report, *responseIterator, *responseSourceMapIterator);
+                                    resolvePendingSymbols(node, pd, payload);
                                 }
                             }
                         }
@@ -365,26 +367,23 @@ namespace snowcrash {
         /** Resolve pending resources */
         static void resolvePendingSymbols(const MarkdownNodeIterator& node,
                                           SectionParserData& pd,
-                                          const ParseResultRef<Blueprint>& out,
-                                          Payload& payload,
-                                          SourceMap<Payload>& sourceMap) {
+                                          const ParseResultRef<Payload>& out) {
 
-            if (pd.symbolTable.resourceModels.find(payload.reference.id) == pd.symbolTable.resourceModels.end()) {
+            if (pd.symbolTable.resourceModels.find(out.node.reference.id) == pd.symbolTable.resourceModels.end()) {
 
                 // ERR: Undefined symbol
                 std::stringstream ss;
-                ss << "Undefined symbol " << payload.reference.id;
+                ss << "Undefined symbol " << out.node.reference.id;
 
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(payload.reference.meta.node->sourceMap, pd.sourceData);
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(out.node.reference.meta.node->sourceMap, pd.sourceData);
                 out.report.error = Error(ss.str(), SymbolError, sourceMap);
 
-                payload.reference.meta.state = Reference::StateUnresolved;
+                out.node.reference.meta.state = Reference::StateUnresolved;
             }
             else {
 
-                payload.reference.meta.state = Reference::StateResolved;
-
-                SectionProcessor<Payload>::assignSymbolToPayload(pd, payload, out.report, sourceMap);
+                out.node.reference.meta.state = Reference::StateResolved;
+                SectionProcessor<Payload>::assignSymbolToPayload(pd, out);
             }
         }
     };
