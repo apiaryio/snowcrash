@@ -146,6 +146,7 @@
         'test/test-ResourceParser.cc',
         'test/test-ResourceGroupParser.cc',
         'test/test-SectionParser.cc',
+        'test/test-Signature.cc',
         'test/test-StringUtility.cc',
         'test/test-SymbolIdentifier.cc',
         'test/test-UriTemplateParser.cc',
