@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		402FC56219ED2E8D006D7A86 /* MSONSectionProcessor.h in Headers */ = {isa = PBXBuildFile; fileRef = 402FC56119ED2E8D006D7A86 /* MSONSectionProcessor.h */; };
+		4056BE0B19EE98C5003AC26C /* test-Signature.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4056BE0A19EE98C5003AC26C /* test-Signature.cc */; };
 		4070F30419E4C30A004892C8 /* BlueprintSourcemap.h in Headers */ = {isa = PBXBuildFile; fileRef = 4070F30119E4C30A004892C8 /* BlueprintSourcemap.h */; };
 		4070F30519E4C30A004892C8 /* CBlueprintSourcemap.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4070F30219E4C30A004892C8 /* CBlueprintSourcemap.cc */; };
 		4070F30619E4C30A004892C8 /* CBlueprintSourcemap.h in Headers */ = {isa = PBXBuildFile; fileRef = 4070F30319E4C30A004892C8 /* CBlueprintSourcemap.h */; };
@@ -133,6 +134,7 @@
 
 /* Begin PBXFileReference section */
 		402FC56119ED2E8D006D7A86 /* MSONSectionProcessor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MSONSectionProcessor.h; path = src/MSONSectionProcessor.h; sourceTree = "<group>"; };
+		4056BE0A19EE98C5003AC26C /* test-Signature.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-Signature.cc"; path = "test/test-Signature.cc"; sourceTree = "<group>"; };
 		4070F30119E4C30A004892C8 /* BlueprintSourcemap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BlueprintSourcemap.h; path = src/BlueprintSourcemap.h; sourceTree = "<group>"; };
 		4070F30219E4C30A004892C8 /* CBlueprintSourcemap.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CBlueprintSourcemap.cc; path = src/CBlueprintSourcemap.cc; sourceTree = "<group>"; };
 		4070F30319E4C30A004892C8 /* CBlueprintSourcemap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CBlueprintSourcemap.h; path = src/CBlueprintSourcemap.h; sourceTree = "<group>"; };
@@ -318,6 +320,7 @@
 				BBB127871999700E0041E9AE /* test-ResourceGroupParser.cc */,
 				BBD5F9DD173578210049BBEE /* test-ResourceParser.cc */,
 				BBCC856619543A4D00B99E90 /* test-SectionParser.cc */,
+				4056BE0A19EE98C5003AC26C /* test-Signature.cc */,
 				BBFF48C9170B3C49001E5FB2 /* test-snowcrash.cc */,
 				BBCC04E518A51AA800C65A08 /* test-SymbolIdentifier.cc */,
 				BB1865C81764DB8A00756B18 /* test-SymbolTable.cc */,
@@ -552,6 +555,7 @@
 				BB92D891178EF7C10098A63C /* HTTP.cc in Sources */,
 				BB8C3E7419241C1600EF36FA /* Section.cc in Sources */,
 				BBE53564174132B100BCA7AD /* Serialize.cc in Sources */,
+				4056BE0B19EE98C5003AC26C /* test-Signature.cc in Sources */,
 				BBCC856919545FCE00B99E90 /* Signature.cc in Sources */,
 				BBE53565174132B100BCA7AD /* SerializeJSON.cc in Sources */,
 				BBFC8418196C0C0F001A236A /* CBlueprint.cc in Sources */,

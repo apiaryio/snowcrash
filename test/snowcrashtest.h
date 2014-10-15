@@ -83,6 +83,37 @@ namespace snowcrashtest {
             symbols.modelsSM.push_back(snowcrash::ResourceModelSymbolSourceMap(name, modelSM));
         }
     };
+
+    /**
+     * \brief Helper to test signature parsing. Uses Blueprint as dummy type.
+     */
+    struct SignatureParserHelper {
+
+        static scpl::Signature parse(const mdp::ByteBuffer& source,
+                                     const snowcrash::ParseResultRef<snowcrash::Blueprint>& out,
+                                     const scpl::SignatureTraits::Traits traits) {
+
+            mdp::MarkdownParser markdownParser;
+            mdp::MarkdownNode markdownAST;
+
+            snowcrash::ParseResult<snowcrash::Blueprint> blueprint;
+            snowcrash::ParseResult<snowcrash::Blueprint>* bppointer;
+
+            markdownParser.parse(source, markdownAST);
+            REQUIRE(!markdownAST.children().empty());
+
+            bppointer = &blueprint;
+            snowcrash::SectionParserData pd(0, source, bppointer->node);
+
+            scpl::Signature signature;
+            scpl::SignatureTraits signatureTraits(traits);
+
+            signature = scpl::MSONSectionProcessorBase<snowcrash::Blueprint>
+                            ::parseSignature(markdownAST.children().begin(), pd, signatureTraits, out);
+
+            return signature;
+        }
+    };
 }
 
 #endif
