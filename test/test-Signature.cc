@@ -43,7 +43,7 @@ TEST_CASE("Escaped property signature parsing", "[signature]")
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
 
-    REQUIRE(signature.identifier == "*id*(data):3");
+    REQUIRE(signature.identifier == "`*id*(data):3`");
     REQUIRE(signature.values.size() == 1);
     REQUIRE(signature.values[0] == "42");
     REQUIRE(signature.attributes.size() == 2);
@@ -65,7 +65,7 @@ TEST_CASE("Mutliline signature parsing", "[signature]")
     REQUIRE(signature.values.empty());
     REQUIRE(signature.attributes.empty());
     REQUIRE(signature.content.empty());
-    REQUIRE(signature.remainingContent == "Line 2\nLine 3\n");
+    REQUIRE(signature.remainingContent == "Line 2\nLine 3");
 }
 
 TEST_CASE("Identifier only signature parsing", "[signature]")
@@ -78,6 +78,102 @@ TEST_CASE("Identifier only signature parsing", "[signature]")
 
     REQUIRE(signature.identifier == "id");
     REQUIRE(signature.values.empty());
+    REQUIRE(signature.attributes.empty());
+    REQUIRE(signature.content.empty());
+    REQUIRE(signature.remainingContent.empty());
+}
+
+TEST_CASE("Identifier enclosed by asterisk", "[signature]")
+{
+    ParseResult<Blueprint> blueprint;
+    scpl::Signature signature = SignatureParserHelper::parse("*rel (Custom String)* (object)", blueprint, 15);
+
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.empty());
+
+    REQUIRE(signature.identifier == "*rel (Custom String)*");
+    REQUIRE(signature.values.empty());
+    REQUIRE(signature.attributes.size() == 1);
+    REQUIRE(signature.attributes[0] == "object");
+    REQUIRE(signature.content.empty());
+    REQUIRE(signature.remainingContent.empty());
+}
+
+TEST_CASE("Identifier enclosed by underscore", "[signature]")
+{
+    ParseResult<Blueprint> blueprint;
+    scpl::Signature signature = SignatureParserHelper::parse("_rel (*Custom* String)_ (object)", blueprint, 15);
+
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.empty());
+
+    REQUIRE(signature.identifier == "_rel (*Custom* String)_");
+    REQUIRE(signature.values.empty());
+    REQUIRE(signature.attributes.size() == 1);
+    REQUIRE(signature.attributes[0] == "object");
+    REQUIRE(signature.content.empty());
+    REQUIRE(signature.remainingContent.empty());
+}
+
+TEST_CASE("Identifier enclosed by backticks", "[signature]")
+{
+    ParseResult<Blueprint> blueprint;
+    scpl::Signature signature = SignatureParserHelper::parse("```username `is` g``ood``` (object)", blueprint, 15);
+
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.empty());
+
+    REQUIRE(signature.identifier == "```username `is` g``ood```");
+    REQUIRE(signature.values.empty());
+    REQUIRE(signature.attributes.size() == 1);
+    REQUIRE(signature.attributes[0] == "object");
+    REQUIRE(signature.content.empty());
+    REQUIRE(signature.remainingContent.empty());
+}
+
+TEST_CASE("Identifier enclosing not completed", "[signature]")
+{
+    ParseResult<Blueprint> blueprint;
+    scpl::Signature signature = SignatureParserHelper::parse("_rel (object)", blueprint, 15);
+
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.empty());
+
+    REQUIRE(signature.identifier == "_rel");
+    REQUIRE(signature.values.empty());
+    REQUIRE(signature.attributes.size() == 1);
+    REQUIRE(signature.attributes[0] == "object");
+    REQUIRE(signature.content.empty());
+    REQUIRE(signature.remainingContent.empty());
+}
+
+TEST_CASE("Extra space content after identifier enclosure", "[signature]")
+{
+    ParseResult<Blueprint> blueprint;
+    scpl::Signature signature = SignatureParserHelper::parse("`a`   : 42", blueprint, 15);
+
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.empty());
+
+    REQUIRE(signature.identifier == "`a`");
+    REQUIRE(signature.values.size() == 1);
+    REQUIRE(signature.values[0] == "42");
+    REQUIRE(signature.attributes.empty());
+    REQUIRE(signature.content.empty());
+    REQUIRE(signature.remainingContent.empty());
+}
+
+TEST_CASE("Extra non-space content after identifier enclosure", "[signature]")
+{
+    ParseResult<Blueprint> blueprint;
+    scpl::Signature signature = SignatureParserHelper::parse("`a`b : 42", blueprint, 15);
+
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.size() == 1);
+
+    REQUIRE(signature.identifier == "`a`");
+    REQUIRE(signature.values.size() == 1);
+    REQUIRE(signature.values[0] == "42");
     REQUIRE(signature.attributes.empty());
     REQUIRE(signature.content.empty());
     REQUIRE(signature.remainingContent.empty());
