@@ -39,7 +39,7 @@ namespace scpl {
         mdp::ByteBuffer identifier;       // Signature Identifier
         mdp::ByteBuffer values;           // Signature Values string
 
-        // TODO: Attributes
+        std::vector<mdp::ByteBuffer> attributes; // Signature attributes
 
         mdp::ByteBuffer content;          // Signature content before newline character
         mdp::ByteBuffer remainingContent; // Signature content after newline character
