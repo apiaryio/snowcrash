@@ -85,11 +85,23 @@ namespace scpl {
 
             snowcrash::TrimString(subject);
 
+            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+
             if (traits.identifierTrait) {
-                parseIdentifier(subject, signature);
+                parseSignatureIdentifier(sourceMap, out.report, subject, signature);
             }
 
-            // TODO: Other traits
+            if (traits.valuesTrait) {
+                parseSignatureValues(sourceMap, out.report, subject, signature);
+            }
+
+            if (traits.attributesTrait) {
+                parseSignatureAttributes(sourceMap, out.report, subject, signature);
+            }
+
+            if (traits.contentTrait) {
+                parseSignatureContent(sourceMap, out.report, subject, signature);
+            }
 
             return signature;
         };
@@ -110,8 +122,107 @@ namespace scpl {
         /**
          * \brief Parse the identifier from the signature
          */
-        static void parseIdentifier(const mdp::ByteBuffer& subject,
-                                    const Signature& out) {
+        static void parseSignatureIdentifier(const mdp::CharactersRangeSet sourceMap,
+                                             snowcrash::Report& report,
+                                             mdp::ByteBuffer& subject,
+                                             Signature& out) {
+
+            size_t end;
+            bool isEnclosed = false;
+
+            // If the identifier is enclosed, retrieve it
+            if (subject[0] == '*' || subject[0] == '_') {
+                end = subject.substr(1).find(subject[0]);
+
+                if (end != std::string::npos) {
+                    isEnclosed = true;
+                    end = end + 2;
+
+                    out.identifier = subject.substr(0, end);
+                }
+            } else if (subject[0] == '`') {
+                int levels = 1;
+
+                while (subject[levels] == '`') {
+                    levels++;
+                }
+
+                end = subject.substr(levels).find(subject.substr(0, levels));
+
+                if (end != std::string::npos) {
+                    isEnclosed = true;
+                    end = end + (2 * levels);
+
+                    out.identifier = subject.substr(0, end);
+                }
+            }
+
+            // Remove the enclosed identifier part
+            if (isEnclosed) {
+                subject = subject.substr(end);
+                snowcrash::TrimString(subject);
+            }
+
+            end = subject.find_first_of(':');
+
+            if (end == std::string::npos) {
+                end = subject.find_first_of('(');
+
+                if (end == std::string::npos) {
+                    end = subject.find_first_of('-');
+
+                    if (end == std::string::npos) {
+                        end = subject.length();
+                    }
+                }
+            }
+
+            if (end > 1) {
+                if (isEnclosed) {
+
+                    // WARN: Extraneous content after enclosed identifier
+                    report.warnings.push_back(snowcrash::Warning("identifier not formatted correctly",
+                                                                 snowcrash::FormattingWarning,
+                                                                 sourceMap));
+                } else {
+                    out.identifier = subject.substr(0, end);
+                    snowcrash::TrimString(out.identifier);
+                }
+            }
+
+            subject = subject.substr(end);
+            snowcrash::TrimString(subject);
+        };
+
+        /**
+         * \brief Parse the values from the signature
+         */
+        static void parseSignatureValues(const mdp::CharactersRangeSet sourceMap,
+                                         snowcrash::Report& report,
+                                         mdp::ByteBuffer& subject,
+                                         Signature& out) {
+
+            // TODO: Logic
+        };
+
+        /**
+         * \brief Parse the attributes from the signature
+         */
+        static void parseSignatureAttributes(const mdp::CharactersRangeSet sourceMap,
+                                             snowcrash::Report& report,
+                                             mdp::ByteBuffer& subject,
+                                             Signature& out) {
+
+            // TODO: Logic
+        };
+
+        /**
+         * \brief Parse the content from the signature
+         */
+        static void parseSignatureContent(const mdp::CharactersRangeSet sourceMap,
+                                          snowcrash::Report& report,
+                                          mdp::ByteBuffer& subject,
+                                          Signature& out) {
 
             // TODO: Logic
         };
