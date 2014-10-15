@@ -286,12 +286,6 @@ static void serialize(const Reference& reference, size_t level, std::ostream &os
 
     // ID
     serialize(SerializeKey::Id, reference.id, level, os);
-
-    // Type
-    if (reference.type == Reference::SymbolReference) {
-
-        serialize(SerializeKey::Type, "symbol", level, os);
-    }
 }
 
 /** Serialize Reference source map */

@@ -524,6 +524,7 @@ namespace snowcrash {
             return true;
         }
 
+        /** Given the reference id(name), initializes reference of the payload accordingly(if possible resolve it) */
         static bool parseSymbolReference(const MarkdownNodeIterator& node,
                                          SectionParserData& pd,
                                          mdp::ByteBuffer& source,
@@ -553,7 +554,7 @@ namespace snowcrash {
 
                 out.node.reference.meta.state = Reference::StateResolved;
 
-                assignSymbolToPayload(pd, out.node, out.report, out.sourceMap);
+                assingReferredPayload(pd, out);
 
                 return true;
             }
@@ -561,24 +562,27 @@ namespace snowcrash {
             return false;
         }
 
-        static void assignSymbolToPayload(SectionParserData& pd,
-                                          Payload& node,
-                                          Report& report,
-                                          SourceMap<Payload>& sourceMap) {
+        /**
+         *  \brief  Assigns the reference, referred as reference id(name), into the payload
+         *  \param  pd       Section parser state
+         *  \param  out      Processed output
+         */
+        static void assingReferredPayload(SectionParserData& pd,
+                                          const ParseResultRef<Payload>& out) {
 
             SourceMap<ResourceModel> modelSM;
-            ResourceModel model = pd.symbolTable.resourceModels.at(node.reference.id);
+            ResourceModel model = pd.symbolTable.resourceModels.at(out.node.reference.id);
 
 
-            node.description = model.description;
-            node.parameters = model.parameters;
+            out.node.description = model.description;
+            out.node.parameters = model.parameters;
 
             HeaderIterator modelContentType = std::find_if(model.headers.begin(),
                                                            model.headers.end(),
                                                            std::bind2nd(MatchFirstWith<Header, std::string>(),
                                                                         HTTPHeaderName::ContentType));
 
-            bool isPayloadContentType = !node.headers.empty();
+            bool isPayloadContentType = !out.node.headers.empty();
             bool isModelContentType = modelContentType != model.headers.end();
 
             if (isPayloadContentType && isModelContentType) {
@@ -589,34 +593,34 @@ namespace snowcrash {
                 ss << "ignoring additional " << SectionName(pd.sectionContext()) << " header(s), ";
                 ss << "specify this header(s) in the referenced model definition instead";
 
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node.reference.meta.node->sourceMap, pd.sourceData);
-                report.warnings.push_back(Warning(ss.str(),
-                                                  IgnoringWarning,
-                                                  sourceMap));
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(out.node.reference.meta.node->sourceMap, pd.sourceData);
+                out.report.warnings.push_back(Warning(ss.str(),
+                                                      IgnoringWarning,
+                                                      sourceMap));
             }
 
             if (isPayloadContentType && !isModelContentType) {
-                node.headers.insert(node.headers.end(), model.headers.begin(), model.headers.end());
+                out.node.headers.insert(out.node.headers.end(), model.headers.begin(), model.headers.end());
             } else {
-                node.headers = model.headers;
+                out.node.headers = model.headers;
             }
 
-            node.body = model.body;
-            node.schema = model.schema;
+            out.node.body = model.body;
+            out.node.schema = model.schema;
 
             if (pd.exportSourceMap()) {
 
-                modelSM = pd.symbolSourceMapTable.resourceModels.at(node.reference.id);
+                modelSM = pd.symbolSourceMapTable.resourceModels.at(out.node.reference.id);
 
-                sourceMap.description = modelSM.description;
-                sourceMap.parameters = modelSM.parameters;
-                sourceMap.body = modelSM.body;
-                sourceMap.schema = modelSM.schema;
+                out.sourceMap.description = modelSM.description;
+                out.sourceMap.parameters = modelSM.parameters;
+                out.sourceMap.body = modelSM.body;
+                out.sourceMap.schema = modelSM.schema;
 
                 if (isPayloadContentType && !isModelContentType) {
-                    sourceMap.headers.collection.insert(sourceMap.headers.collection.end(), modelSM.headers.collection.begin(), modelSM.headers.collection.end());
+                    out.sourceMap.headers.collection.insert(out.sourceMap.headers.collection.end(), modelSM.headers.collection.begin(), modelSM.headers.collection.end());
                 } else {
-                    sourceMap.headers = modelSM.headers;
+                    out.sourceMap.headers = modelSM.headers;
                 }
             }
         }
