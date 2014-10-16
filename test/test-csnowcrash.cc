@@ -247,6 +247,10 @@ TEST_CASE("Parse blueprint with multiple requests and responses via C interface"
 
     REQUIRE(sc_transaction_example_collection_size(trans_col) == 2);
     REQUIRE(sc_sm_transaction_example_collection_size(sm_trans_col) == 2);
+
+    sc_sm_blueprint_free(sm_blueprint);
+    sc_blueprint_free(blueprint);
+    sc_report_free(report);
 }
 
 TEST_CASE("CBlueprint issue on sc_resource_group_handle", "[cinterface]")
@@ -298,6 +302,10 @@ TEST_CASE("CBlueprint issue on sc_resource_group_handle", "[cinterface]")
 
     const sc_resource_collection_t* res_col2 = sc_resource_collection_handle(res_gr2);
     REQUIRE(sc_resource_collection_size(res_col2) == 2);
+
+    sc_sm_blueprint_free(sm_blueprint);
+    sc_blueprint_free(blueprint);
+    sc_report_free(report);
 }
 
 TEST_CASE("Parse blueprint with multiple reference via C interface", "[cinterface]")
@@ -389,4 +397,8 @@ TEST_CASE("Parse blueprint with multiple reference via C interface", "[cinterfac
     reference = sc_reference_handle_payload(response);
     REQUIRE(std::string(sc_reference_id(reference)) == "Resource 4");
     REQUIRE(sc_reference_type(reference) == 0);
+
+    sc_sm_blueprint_free(sm_blueprint);
+    sc_blueprint_free(blueprint);
+    sc_report_free(report);
 }
