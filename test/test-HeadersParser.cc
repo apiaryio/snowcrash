@@ -212,3 +212,45 @@ TEST_CASE("Parse header section with more same headers Set-Cookie and Link - the
     REQUIRE(headers.node[1].first == "Set-Cookie");
     REQUIRE(headers.node[1].second == "kockaprede");
 }
+
+TEST_CASE("Headers Filed Name should be case insensitive", "[headers][issue][#230]")
+{
+    const mdp::ByteBuffer source = \
+    "+ Headers\n"\
+    "\n"\
+    "        Content-Type: application/json\n"\
+    "        content-type: application/json\n";
+
+    ParseResult<Headers> headers;
+    SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
+
+    REQUIRE(headers.report.error.code == Error::OK);
+    REQUIRE(headers.report.warnings.size() == 1); // one warning - multiple definitions w/ different case sensitivity
+
+    REQUIRE(headers.node.size() == 2);
+    REQUIRE(headers.node[0].first == "Content-Type");
+    REQUIRE(headers.node[0].second == "application/json");
+    REQUIRE(headers.node[1].first == "content-type");
+    REQUIRE(headers.node[1].second == "application/json");
+}
+
+TEST_CASE("Aditional test for Header name insenstivity combined with allowed multiple headers", "[headers][issue][#230]")
+{
+    const mdp::ByteBuffer source = \
+    "+ Headers\n"\
+    "\n"\
+    "        Set-cookie: abcd\n"\
+    "        Set-Cookie: kockaprede\n";
+
+    ParseResult<Headers> headers;
+    SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
+
+    REQUIRE(headers.report.error.code == Error::OK);
+    REQUIRE(headers.report.warnings.size() == 0); // no warning - multiple definition, but from allowed set
+
+    REQUIRE(headers.node.size() == 2);
+    REQUIRE(headers.node[0].first == "Set-cookie");
+    REQUIRE(headers.node[0].second == "abcd");
+    REQUIRE(headers.node[1].first == "Set-Cookie");
+    REQUIRE(headers.node[1].second == "kockaprede");
+}

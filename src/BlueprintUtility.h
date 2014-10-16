@@ -21,20 +21,20 @@ namespace snowcrash {
      *
      *  Two pairs are a match if their %first matches.
      */
-    template <class T>
+    template <class T, class Predicate = std::equal_to<typename T::first_type> >
     struct MatchFirsts : std::binary_function<T, T, bool> {
         bool operator()(const T& left, const T& right) const {
-            return left.first == right.first;
+            return Predicate()(left.first, right.first);
         }
     };
 
     /**
      *  \brief Matches a pair's first against a value.
      */
-    template <class T, class R>
+    template <class T, class R = typename T::first_type, class Predicate = std::equal_to<R> >
     struct MatchFirstWith : std::binary_function<T, R, bool> {
         bool operator()(const T& left, const R& right) const {
-            return left.first == right;
+            return Predicate()(left.first, right);
         }
     };
 

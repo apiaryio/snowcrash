@@ -124,6 +124,68 @@ namespace snowcrash {
             r = elem.back();
         return elem.front();
     }
+
+
+    /**
+     *  \brief  compare equality  - allow compare diferent types
+     *
+     *  \return true if args era equal
+     */
+    struct IsEqual {
+        template<typename T1, typename T2>
+            bool operator()(const T1& a1, const T2& a2) const {
+                return a1 == a2;
+            }
+    };
+
+    /**
+     *  \brief  compare equality - character are compare case insensitive
+     *
+     *  \return true if args era equal
+     */
+    struct IsIEqual {
+        template<typename T1, typename T2>
+            bool operator()(const T1& a1, const T2& a2) const {
+                return std::tolower(a1) == std::tolower(a2);
+            }
+    };
+
+    /**
+     *  \brief  compare containers equality 
+     *
+     *  \requirements 
+     *    - both containers must support methods ::length(), ::begin(), ::end()
+     *    - both containers must be iterable
+     *    - both containers must contain comparable types
+     *
+     *  \param arg1, arg2 - containers to compare
+     *  \param predicate - testing equality
+     *
+     *  \return true if containers contains same content
+     */
+
+    template <typename T1, typename T2, typename Predicate>
+    inline bool MatchContainers(const T1& arg1, const T2& arg2, const Predicate& predicate) {
+        if (arg1.length() != arg2.length()) {
+            return false;
+        }
+        return std::equal(arg1.begin(), arg1.end(), arg2.begin(), predicate);
+    }
+    
+    template <typename T>
+    struct Equal : std::binary_function<T, T, bool> {
+        bool operator()(const T& left, const T& right) const {
+            return MatchContainers(left, right, IsEqual());
+        }
+    };
+
+    template <typename T>
+    struct IEqual : std::binary_function<T, T, bool> {
+        bool operator()(const T& left, const T& right) const {
+            return MatchContainers(left, right, IsIEqual());
+        }
+    };
+
 }
 
 #endif
