@@ -299,9 +299,13 @@ namespace snowcrash {
 
             for (ResourceGroups::iterator resourceGroupIterator = out.node.resourceGroups.begin();
                  resourceGroupIterator != out.node.resourceGroups.end();
-                 ++resourceGroupIterator, pd.exportSourceMap() ? ++resourceGroupSourceMapIterator : resourceGroupSourceMapIterator) {
+                 ++resourceGroupIterator) {
 
                 checkResourceLazyReferencing(*resourceGroupIterator, resourceGroupSourceMapIterator, pd, out);
+
+                if (pd.exportSourceMap()) {
+                    resourceGroupSourceMapIterator++;
+                }
             }
         }
 
@@ -319,9 +323,13 @@ namespace snowcrash {
 
             for (Resources::iterator resourceIterator = resourceGroup.resources.begin();
                  resourceIterator != resourceGroup.resources.end();
-                 ++resourceIterator, pd.exportSourceMap() ? ++resourceSourceMapIterator : resourceSourceMapIterator) {
+                 ++resourceIterator) {
 
                 checkActionLazyReferencing(*resourceIterator, resourceSourceMapIterator, pd, out);
+
+                if (pd.exportSourceMap()) {
+                    resourceSourceMapIterator++;
+                }
             }
         }
 
@@ -339,9 +347,13 @@ namespace snowcrash {
 
             for (Actions::iterator actionIterator = resource.actions.begin();
                  actionIterator != resource.actions.end();
-                 ++actionIterator, pd.exportSourceMap() ? ++actionSourceMapIterator : actionSourceMapIterator) {
+                 ++actionIterator) {
 
                 checkExampleLazyReferencing(*actionIterator, actionSourceMapIterator, pd, out);
+
+                if (pd.exportSourceMap()) {
+                    actionSourceMapIterator++;
+                }
             }
         }
 
@@ -359,10 +371,14 @@ namespace snowcrash {
 
             for (TransactionExamples::iterator transactionExampleIterator = action.examples.begin();
                  transactionExampleIterator != action.examples.end();
-                 ++transactionExampleIterator, pd.exportSourceMap() ? ++exampleSourceMapIterator : exampleSourceMapIterator) {
+                 ++transactionExampleIterator) {
 
                 checkRequestLazyReferencing(*transactionExampleIterator, exampleSourceMapIterator, pd, out);
                 checkResponseLazyReferencing(*transactionExampleIterator, exampleSourceMapIterator, pd, out);
+
+                if (pd.exportSourceMap()) {
+                    exampleSourceMapIterator++;
+                }
             }
         }
 
@@ -380,7 +396,7 @@ namespace snowcrash {
 
             for (Requests::iterator requestIterator = transactionExample.requests.begin();
                  requestIterator != transactionExample.requests.end();
-                 ++requestIterator, pd.exportSourceMap() ? ++requestSourceMapIterator : requestSourceMapIterator) {
+                 ++requestIterator) {
 
                 if (!requestIterator->reference.id.empty() &&
                     requestIterator->reference.meta.state == Reference::StatePending) {
@@ -396,6 +412,10 @@ namespace snowcrash {
                         ParseResultRef<Payload> payload(out.report, *requestIterator, tempSourceMap);
                         resolvePendingSymbols(pd, payload);
                     }
+                }
+
+                if (pd.exportSourceMap()) {
+                    requestSourceMapIterator++;
                 }
             }
         }
@@ -414,7 +434,7 @@ namespace snowcrash {
 
             for (Responses::iterator responseIterator = transactionExample.responses.begin();
                  responseIterator != transactionExample.responses.end();
-                 ++responseIterator, pd.exportSourceMap() ? ++responseSourceMapIterator : responseSourceMapIterator) {
+                 ++responseIterator) {
 
                 if (!responseIterator->reference.id.empty() &&
                     responseIterator->reference.meta.state == Reference::StatePending) {
@@ -430,6 +450,10 @@ namespace snowcrash {
                         ParseResultRef<Payload> payload(out.report, *responseIterator, tempSourceMap);
                         resolvePendingSymbols(pd, payload);
                     }
+                }
+
+                if (pd.exportSourceMap()) {
+                    responseSourceMapIterator++;
                 }
             }
         }
