@@ -31,6 +31,12 @@ namespace scpl {
     template<typename T>
     struct MSONSectionProcessorBase : public snowcrash::SectionProcessorBase<T> {
 
+        static const char EscapeCharacter = '`';
+        static const char ValuesDelimiter = ':';
+        static const char ValueDelimiter = ',';
+        static const char AttributesDelimiter = '(';
+        static const char ContentDelimiter = '-';
+
         /**
          * \brief Signature traits of the MSON section
          *
@@ -79,27 +85,50 @@ namespace scpl {
                                         const snowcrash::ParseResultRef<T>& out) {
 
             Signature signature;
-
             mdp::ByteBuffer subject;
-            subject = snowcrash::GetFirstLine(node->text, signature.remainingContent);
 
+            subject = snowcrash::GetFirstLine(node->text, signature.remainingContent);
             snowcrash::TrimString(subject);
 
             mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
 
-            if (traits.identifierTrait) {
+            if (!subject.empty() &&
+                subject[0] == ContentDelimiter) {
+
+                // WARN: Signature is starting with a content
+                out.report.warnings.push_back(snowcrash::Warning("signature should not start with a content",
+                                                                 snowcrash::FormattingWarning,
+                                                                 sourceMap));
+            }
+
+            if (traits.identifierTrait &&
+                !subject.empty()) {
+
                 parseSignatureIdentifier(sourceMap, out.report, subject, signature);
             }
 
-            if (traits.valuesTrait) {
+            // Make sure values exist
+            if (traits.valuesTrait &&
+                !subject.empty() &&
+                subject[0] != AttributesDelimiter) {
+
+                // When subject starts with values, add a ':' for easy processing
+                if (!traits.identifierTrait) {
+                    subject = ValuesDelimiter + subject;
+                }
+
                 parseSignatureValues(sourceMap, out.report, subject, signature);
             }
 
-            if (traits.attributesTrait) {
+            if (traits.attributesTrait &&
+                !subject.empty()) {
+
                 parseSignatureAttributes(sourceMap, out.report, subject, signature);
             }
 
-            if (traits.contentTrait) {
+            if (traits.contentTrait &&
+                !subject.empty()) {
+
                 parseSignatureContent(sourceMap, out.report, subject, signature);
             }
 
@@ -121,6 +150,11 @@ namespace scpl {
 
         /**
          * \brief Parse the identifier from the signature
+         *
+         * \param sourceMap Source map of the node
+         * \param report Parse Report
+         * \param subject Signature of the section that needs to be parsed
+         * \param out Signature data structure
          */
         static void parseSignatureIdentifier(const mdp::CharactersRangeSet sourceMap,
                                              snowcrash::Report& report,
@@ -139,37 +173,30 @@ namespace scpl {
                     end = end + 2;
 
                     out.identifier = subject.substr(0, end);
+                    subject = subject.substr(end);
                 }
-            } else if (subject[0] == '`') {
-                int levels = 1;
+            } else if (subject[0] == EscapeCharacter) {
 
-                while (subject[levels] == '`') {
-                    levels++;
-                }
+                mdp::ByteBuffer escapedString = retrieveEscaped(subject, 0);
 
-                end = subject.substr(levels).find(subject.substr(0, levels));
-
-                if (end != std::string::npos) {
+                if (!escapedString.empty()) {
                     isEnclosed = true;
-                    end = end + (2 * levels);
-
-                    out.identifier = subject.substr(0, end);
+                    out.identifier = escapedString;
                 }
             }
 
-            // Remove the enclosed identifier part
             if (isEnclosed) {
-                subject = subject.substr(end);
                 snowcrash::TrimString(subject);
             }
 
-            end = subject.find_first_of(':');
+            // Look for next part of the signature section
+            end = subject.find_first_of(ValuesDelimiter);
 
             if (end == std::string::npos) {
-                end = subject.find_first_of('(');
+                end = subject.find_first_of(AttributesDelimiter);
 
                 if (end == std::string::npos) {
-                    end = subject.find_first_of('-');
+                    end = subject.find_first_of(ContentDelimiter);
 
                     if (end == std::string::npos) {
                         end = subject.length();
@@ -177,6 +204,7 @@ namespace scpl {
                 }
             }
 
+            // Retrieve the identifier if not done above
             if (end > 1) {
                 if (isEnclosed) {
 
@@ -188,6 +216,14 @@ namespace scpl {
                     out.identifier = subject.substr(0, end);
                     snowcrash::TrimString(out.identifier);
                 }
+            }
+
+            if (out.identifier.empty()) {
+
+                // WARN: Empty identifier
+                report.warnings.push_back(snowcrash::Warning("empty identifier",
+                                                             snowcrash::EmptyDefinitionWarning,
+                                                             sourceMap));
             }
 
             subject = subject.substr(end);
@@ -202,7 +238,70 @@ namespace scpl {
                                          mdp::ByteBuffer& subject,
                                          Signature& out) {
 
-            // TODO: Logic
+            if (subject[0] == ValuesDelimiter) {
+                subject = subject.substr(1);
+                snowcrash::TrimString(subject);
+
+                size_t i = 0;
+                mdp::ByteBuffer value;
+
+                // Traverse over the string
+                while (i < subject.length()) {
+
+                    if (subject[i] == EscapeCharacter) {
+
+                        // If escaped string, retrieve it and cut it from subject
+                        mdp::ByteBuffer escapedString = retrieveEscaped(subject, i);
+
+                        value += escapedString;
+                        i = 0;
+                    } else if (subject[i] == ValueDelimiter) {
+
+                        // If found value delimiter, add the value and cut it from subject
+                        subject = subject.substr(i + 1);
+                        snowcrash::TrimString(subject);
+
+                        snowcrash::TrimString(value);
+                        out.values.push_back(value);
+
+                        value = "";
+                        i = 0;
+                    } else if (subject[i] == AttributesDelimiter ||
+                               subject[i] == ContentDelimiter) {
+
+                        // If values section ends, cut it from subject
+                        subject = subject.substr(i);
+                        i = 0;
+                        break;
+                    } else {
+
+                        value += subject[i];
+                        i++;
+                    }
+                }
+
+                // Add the value at the end of values section if present
+                snowcrash::TrimString(value);
+
+                if (!value.empty()) {
+                    out.values.push_back(value);
+                }
+
+                // If the subject ended with the values, cut the last value from the subject
+                if (i == subject.length()) {
+                    subject = "";
+                }
+
+                if (out.values.empty()) {
+
+                    // WARN: Empty identifier
+                    report.warnings.push_back(snowcrash::Warning("empty values",
+                                                                 snowcrash::EmptyDefinitionWarning,
+                                                                 sourceMap));
+                }
+
+                snowcrash::TrimString(subject);
+            }
         };
 
         /**
@@ -213,7 +312,13 @@ namespace scpl {
                                              mdp::ByteBuffer& subject,
                                              Signature& out) {
 
-            // TODO: Logic
+            if (subject[0] == AttributesDelimiter) {
+                subject = subject.substr(1);
+
+
+
+                snowcrash::TrimString(subject);
+            }
         };
 
         /**
@@ -224,7 +329,42 @@ namespace scpl {
                                           mdp::ByteBuffer& subject,
                                           Signature& out) {
 
-            // TODO: Logic
+            if (subject[0] == ContentDelimiter) {
+                subject = subject.substr(1);
+
+
+
+                snowcrash::TrimString(subject);
+            }
+        };
+
+        /**
+         * \brief Retrieve strings enclosed by matching backticks
+         *
+         * \param subject Signature of the section that needs to be parsed
+         * \param begin Character index representing the beginning of the escaped string
+         *
+         * \return Returns the escaped string, new subject will be from the end of the escaped string
+         *
+         * \example (begin = 1, subject = "a```b```cd") ----> (return = "```b```", subject = "cd")
+         */
+        static mdp::ByteBuffer retrieveEscaped(mdp::ByteBuffer& subject,
+                                               const size_t begin) {
+
+            size_t levels = begin, end;
+
+            // Get the level of the backticks
+            while (subject[levels] ==  EscapeCharacter) {
+                levels++;
+            }
+
+            end = subject.substr(levels).find(subject.substr(begin, levels - begin));
+            end = end + (2 * levels) - begin;
+
+            mdp::ByteBuffer escapedString = subject.substr(begin, end - begin);
+            subject = subject.substr(end);
+
+            return escapedString;
         };
     };
 
