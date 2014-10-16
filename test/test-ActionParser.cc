@@ -39,7 +39,7 @@ TEST_CASE("Method block classifier", "[action]")
 TEST_CASE("Parsing action", "[action]")
 {
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(ActionFixture, ActionSectionType, action);
+    SectionParserHelper<Action, ActionParser>::parse(ActionFixture, ActionSectionType, action, ExportSourcemapOption);
 
     REQUIRE(action.report.error.code == Error::OK);
     CHECK(action.report.warnings.empty());
@@ -93,7 +93,7 @@ TEST_CASE("Parse Action description with list", "[action]")
     "+ Response 204\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action, ExportSourcemapOption);
 
     REQUIRE(action.report.error.code == Error::OK);
     CHECK(action.report.warnings.empty());
@@ -139,7 +139,7 @@ TEST_CASE("Parse method with multiple requests and responses", "[action]")
     "            J\n\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action, ExportSourcemapOption);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.size() == 1); // warn responses with the same name
@@ -202,7 +202,7 @@ TEST_CASE("Parse method with multiple incomplete requests", "[action][blocks]")
     "+ Response 200\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action, ExportSourcemapOption);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.size() == 2); // empty asset & preformatted asset
@@ -251,7 +251,7 @@ TEST_CASE("Parse method with foreign item", "[action]")
     "+ Response 200\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action, ExportSourcemapOption);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.size() == 1);
@@ -290,7 +290,7 @@ TEST_CASE("Parse method with a HR", "[action]")
     "B\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action, ExportSourcemapOption);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.size() == 1); // no response
@@ -315,7 +315,7 @@ TEST_CASE("Parse method without name", "[action]")
     mdp::ByteBuffer source = "# GET";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action, ExportSourcemapOption);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.size() == 1); // no response
@@ -343,7 +343,7 @@ TEST_CASE("Parse action with parameters", "[action]")
     "\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action, ExportSourcemapOption);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.empty());
@@ -378,7 +378,7 @@ TEST_CASE("Give a warning when 2xx CONNECT has a body", "[action]")
     "        {}\n\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action, ExportSourcemapOption);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.size() == 1);
@@ -406,7 +406,7 @@ TEST_CASE("Give a warning when response to HEAD has a body", "[action]")
     "        {}\n\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action, ExportSourcemapOption);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.size() == 1);
@@ -434,7 +434,7 @@ TEST_CASE("Missing 'LINK' HTTP request method", "[action]")
     "+ Response 204\n\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action, ExportSourcemapOption);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.empty());
@@ -466,7 +466,7 @@ TEST_CASE("Warn when request is not followed by a response", "[action]")
     "        A\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action, ExportSourcemapOption);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.size() == 1);
