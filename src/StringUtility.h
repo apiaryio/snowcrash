@@ -165,24 +165,24 @@ namespace snowcrash {
      */
 
     template <typename T1, typename T2, typename Predicate>
-    inline bool ContainersMatch(const T1& arg1, const T2& arg2, const Predicate& predicate) {
+    inline bool MatchContainers(const T1& arg1, const T2& arg2, const Predicate& predicate) {
         if (arg1.length() != arg2.length()) {
             return false;
         }
         return std::equal(arg1.begin(), arg1.end(), arg2.begin(), predicate);
     }
     
-    template <class T>
+    template <typename T>
     struct Equal : std::binary_function<T, T, bool> {
         bool operator()(const T& left, const T& right) const {
-            return ContainersMatch(left,right,IsEqual());
+            return MatchContainers(left, right, IsEqual());
         }
     };
 
-    template <class T>
+    template <typename T>
     struct IEqual : std::binary_function<T, T, bool> {
         bool operator()(const T& left, const T& right) const {
-            return ContainersMatch(left,right,IsIEqual());
+            return MatchContainers(left, right, IsIEqual());
         }
     };
 

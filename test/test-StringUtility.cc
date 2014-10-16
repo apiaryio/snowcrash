@@ -42,14 +42,14 @@ TEST_CASE("templates for compare equality", "[utility]")
 
 TEST_CASE("container comparation", "[utility]"){
 
-    REQUIRE(ContainersMatch(std::string("abc"), std::string("abc"), IsEqual()));
+    REQUIRE(MatchContainers(std::string("abc"), std::string("abc"), IsEqual()));
 
-    REQUIRE_FALSE(ContainersMatch(std::string("ABC"), std::string("abc"), IsEqual()));
+    REQUIRE_FALSE(MatchContainers(std::string("ABC"), std::string("abc"), IsEqual()));
 
-    REQUIRE(ContainersMatch(std::string("abc"), std::string("abc"), IsIEqual()));
-    REQUIRE(ContainersMatch(std::string("abc"), std::string("ABC"), IsIEqual()));
+    REQUIRE(MatchContainers(std::string("abc"), std::string("abc"), IsIEqual()));
+    REQUIRE(MatchContainers(std::string("abc"), std::string("ABC"), IsIEqual()));
 
-    REQUIRE_FALSE(ContainersMatch(std::string("def"), std::string("ABC"), IsIEqual()));
+    REQUIRE_FALSE(MatchContainers(std::string("def"), std::string("ABC"), IsIEqual()));
 }
 
 TEST_CASE("comapare string", "[utility]"){
