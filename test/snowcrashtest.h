@@ -28,8 +28,8 @@ namespace snowcrashtest {
         static void parse(const mdp::ByteBuffer& source,
                           snowcrash::SectionType type,
                           const snowcrash::ParseResultRef<T>& out,
-                          const Symbols& symbols = Symbols(),
                           const snowcrash::BlueprintParserOptions& opts = 0,
+                          const Symbols& symbols = Symbols(),
                           snowcrash::ParseResult<snowcrash::Blueprint>* bp = NULL) {
 
             mdp::MarkdownParser markdownParser;
@@ -48,10 +48,7 @@ namespace snowcrashtest {
                 bppointer = bp;
             }
 
-            // Export source maps
-            snowcrash::BlueprintParserOptions options = opts | snowcrash::ExportSourcemapOption;
-
-            snowcrash::SectionParserData pd(options, source, bppointer->node);
+            snowcrash::SectionParserData pd(opts, source, bppointer->node);
 
             pd.sectionsContext.push_back(type);
 

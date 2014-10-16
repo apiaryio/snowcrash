@@ -85,7 +85,7 @@ TEST_CASE("recognize empty body response signature as non-abbreviated", "[payloa
 TEST_CASE("Parse request payload", "[payload]")
 {
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(RequestFixture, RequestSectionType, payload);
+    SectionParserHelper<Payload, PayloadParser>::parse(RequestFixture, RequestSectionType, payload, ExportSourcemapOption);
 
     REQUIRE(payload.report.error.code == Error::OK);
     CHECK(payload.report.warnings.empty());
@@ -126,7 +126,7 @@ TEST_CASE("Parse request payload", "[payload]")
 TEST_CASE("Parse abbreviated payload body", "[payload]")
 {
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(ResponseBodyFixture, ResponseBodySectionType, payload);
+    SectionParserHelper<Payload, PayloadParser>::parse(ResponseBodyFixture, ResponseBodySectionType, payload, ExportSourcemapOption);
 
     REQUIRE(payload.report.error.code == Error::OK);
     CHECK(payload.report.warnings.empty());
@@ -158,7 +158,7 @@ TEST_CASE("Parse abbreviated inline payload body", "[payload]")
     source += "  B\n";
 
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestBodySectionType, payload);
+    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestBodySectionType, payload, ExportSourcemapOption);
 
     REQUIRE(payload.report.error.code == Error::OK);
     CHECK(payload.report.warnings.size() == 1); // preformatted code block
@@ -203,7 +203,7 @@ TEST_CASE("Parse payload description with list", "[payload]")
     "            {}\n";
 
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, payload);
+    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, payload, ExportSourcemapOption);
 
     REQUIRE(payload.report.error.code == Error::OK);
     CHECK(payload.report.warnings.empty());
@@ -246,7 +246,7 @@ TEST_CASE("Parse payload with foreign list item", "[payload]")
     "    + Bar\n";
 
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, payload);
+    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, payload, ExportSourcemapOption);
 
     REQUIRE(payload.report.error.code == Error::OK);
     CHECK(payload.report.warnings.size() == 1); // dangling block
@@ -285,7 +285,7 @@ TEST_CASE("Parse payload with dangling body", "[payload]")
     source += "    Bar\n";
 
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, payload);
+    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, payload, ExportSourcemapOption);
 
     REQUIRE(payload.report.error.code == Error::OK);
     REQUIRE(payload.report.warnings.size() == 1); // dangling block
@@ -315,7 +315,7 @@ TEST_CASE("Parse inline payload with symbol reference", "[payload]")
     SymbolHelper::buildSymbol("Symbol", symbols);
 
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(SymbolFixture, RequestBodySectionType, payload, symbols);
+    SectionParserHelper<Payload, PayloadParser>::parse(SymbolFixture, RequestBodySectionType, payload, ExportSourcemapOption, symbols);
 
     REQUIRE(payload.report.error.code == Error::OK);
     REQUIRE(payload.report.warnings.size() == 0);
@@ -348,7 +348,7 @@ TEST_CASE("Parse inline payload with symbol reference with extra indentation", "
     SymbolHelper::buildSymbol("Symbol", symbols);
 
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestBodySectionType, payload, symbols);
+    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestBodySectionType, payload, ExportSourcemapOption, symbols);
 
     REQUIRE(payload.report.error.code == Error::OK);
     REQUIRE(payload.report.warnings.size() == 1);
@@ -379,7 +379,7 @@ TEST_CASE("Parse inline payload with symbol reference with foreign content", "[p
     SymbolHelper::buildSymbol("Symbol", symbols);
 
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestBodySectionType, payload, symbols);
+    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestBodySectionType, payload, ExportSourcemapOption, symbols);
 
     REQUIRE(payload.report.error.code == Error::OK);
     REQUIRE(payload.report.warnings.size() == 1); // ignoring foreign entry
@@ -415,7 +415,7 @@ TEST_CASE("Parse named model", "[payload]")
     source += "        Hello World!\n";
 
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, ModelBodySectionType, payload);
+    SectionParserHelper<Payload, PayloadParser>::parse(source, ModelBodySectionType, payload, ExportSourcemapOption);
 
     REQUIRE(payload.report.error.code == Error::OK);
     REQUIRE(payload.report.warnings.empty());
@@ -456,7 +456,7 @@ TEST_CASE("Parse nameless model", "[payload]")
     source += "        Hello World!\n";
 
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, ModelBodySectionType, payload);
+    SectionParserHelper<Payload, PayloadParser>::parse(source, ModelBodySectionType, payload, ExportSourcemapOption);
 
     REQUIRE(payload.report.error.code == Error::OK);
     REQUIRE(payload.report.warnings.empty());
@@ -504,7 +504,7 @@ TEST_CASE("Warn on malformed payload signature", "[payload]")
     source += "            Hello World!\n";
 
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, payload);
+    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, payload, ExportSourcemapOption);
 
     REQUIRE(payload.report.error.code == Error::OK);
     REQUIRE(payload.report.warnings.size() == 1);
@@ -541,7 +541,7 @@ TEST_CASE("Give a warning of empty message body for requests with certain header
     "            Content-Length: 100\n";
 
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, payload);
+    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, payload, ExportSourcemapOption);
 
     REQUIRE(payload.report.error.code == Error::OK);
     REQUIRE(payload.report.warnings.size() == 1);
@@ -594,7 +594,7 @@ TEST_CASE("Give a warning when 100 response has a body", "[payload]")
 TEST_CASE("Empty body section should shouldn't be parsed as description", "[payload]")
 {
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(EmptyBodyFixture, ResponseSectionType, payload);
+    SectionParserHelper<Payload, PayloadParser>::parse(EmptyBodyFixture, ResponseSectionType, payload, ExportSourcemapOption);
 
     REQUIRE(payload.report.error.code == Error::OK);
     REQUIRE(payload.report.warnings.empty());
@@ -614,7 +614,7 @@ TEST_CASE("Parameters section should be taken as a description node", "[payload]
     "            {}\n";
 
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, ResponseSectionType, payload);
+    SectionParserHelper<Payload, PayloadParser>::parse(source, ResponseSectionType, payload, ExportSourcemapOption);
 
     REQUIRE(payload.report.error.code == Error::OK);
     REQUIRE(payload.report.warnings.empty());
@@ -654,6 +654,4 @@ TEST_CASE("Report ignoring nested request objects", "[payload][#163][#189]")
 
     REQUIRE(payload.node.headers.size() == 1);
     REQUIRE(payload.node.body.empty());
-
-    REQUIRE(payload.sourceMap.body.sourceMap.empty());
 }

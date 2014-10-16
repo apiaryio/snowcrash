@@ -34,7 +34,7 @@ TEST_CASE("Recognize parameter definition signature", "[parameter]")
 TEST_CASE("Parse canonical parameter definition", "[parameter]")
 {
     ParseResult<Parameter> parameter;
-    SectionParserHelper<Parameter, ParameterParser>::parse(ParameterFixture, ParameterSectionType, parameter);
+    SectionParserHelper<Parameter, ParameterParser>::parse(ParameterFixture, ParameterSectionType, parameter, ExportSourcemapOption);
 
     REQUIRE(parameter.report.error.code == Error::OK);
     CHECK(parameter.report.warnings.empty());
@@ -90,7 +90,7 @@ TEST_CASE("Warn when re-setting the values attribute", "[parameter]")
     "        + `Hello`\n";
 
     ParseResult<Parameter> parameter;
-    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, parameter);
+    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, parameter, ExportSourcemapOption);
 
     REQUIRE(parameter.report.error.code == Error::OK);
     REQUIRE(parameter.report.warnings.size() == 1);
@@ -133,7 +133,7 @@ TEST_CASE("Parse full abbreviated syntax", "[parameter]")
     mdp::ByteBuffer source = "+ limit = `20` (optional, number, `42`) ... This is a limit\n";
 
     ParseResult<Parameter> parameter;
-    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, parameter);
+    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, parameter, ExportSourcemapOption);
 
     REQUIRE(parameter.report.error.code == Error::OK);
     CHECK(parameter.report.warnings.empty());
@@ -172,7 +172,7 @@ TEST_CASE("Warn on error in  abbreviated syntax attribute bracket", "[parameter]
     mdp::ByteBuffer source = "+ limit (string1, string2, string3) ... This is a limit\n";
 
     ParseResult<Parameter> parameter;
-    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, parameter);
+    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, parameter, ExportSourcemapOption);
 
     REQUIRE(parameter.report.error.code == Error::OK);
     REQUIRE(parameter.report.warnings.size() == 1);
@@ -204,7 +204,7 @@ TEST_CASE("Warn about required vs default clash", "[parameter]")
     mdp::ByteBuffer source = "+ id = `42` (required)\n";
 
     ParseResult<Parameter> parameter;
-    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, parameter);
+    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, parameter, ExportSourcemapOption);
 
     REQUIRE(parameter.report.error.code == Error::OK);
     REQUIRE(parameter.report.warnings.size() == 1);
@@ -234,7 +234,7 @@ TEST_CASE("Warn about implicit required vs default clash", "[parameter_definitio
     mdp::ByteBuffer source = "+ id = `42`\n";
 
     ParseResult<Parameter> parameter;
-    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, parameter);
+    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, parameter, ExportSourcemapOption);
 
     REQUIRE(parameter.report.error.code == Error::OK);
     REQUIRE(parameter.report.warnings.size() == 1);
@@ -265,7 +265,7 @@ TEST_CASE("Unrecognized 'values' keyword", "[parameter]")
     "        + `lorem`\n";
 
     ParseResult<Parameter> parameter;
-    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, parameter);
+    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, parameter, ExportSourcemapOption);
 
     REQUIRE(parameter.report.error.code == Error::OK);
     REQUIRE(parameter.report.warnings.empty());
@@ -298,7 +298,7 @@ TEST_CASE("warn missing example item in values", "[parameter]")
     "        + `Value2`\n";
 
     ParseResult<Parameter> parameter;
-    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, parameter);
+    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, parameter, ExportSourcemapOption);
 
     REQUIRE(parameter.report.error.code == Error::OK);
     REQUIRE(parameter.report.warnings.size() == 1);
@@ -322,7 +322,7 @@ TEST_CASE("warn missing default value in values", "[parameter]")
     "        + `Value2`\n";
 
     ParseResult<Parameter> parameter;
-    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, parameter);
+    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, parameter, ExportSourcemapOption);
 
     REQUIRE(parameter.report.error.code == Error::OK);
     REQUIRE(parameter.report.warnings.size() == 1);
@@ -343,7 +343,7 @@ TEST_CASE("Parse parameters with dot in its name", "[parameter]")
     mdp::ByteBuffer source = "+ product.id ... Hello\n";
 
     ParseResult<Parameter> parameter;
-    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, parameter);
+    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, parameter, ExportSourcemapOption);
 
     REQUIRE(parameter.report.error.code == Error::OK);
     REQUIRE(parameter.report.warnings.empty());
@@ -369,7 +369,7 @@ TEST_CASE("Parentheses in parameter description", "[parameter]")
     mdp::ByteBuffer source = "+ id (string) ... lorem (ipsum)\n";
 
     ParseResult<Parameter> parameter;
-    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, parameter);
+    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, parameter, ExportSourcemapOption);
 
     REQUIRE(parameter.report.error.code == Error::OK);
     REQUIRE(parameter.report.warnings.empty());
@@ -400,7 +400,7 @@ TEST_CASE("Parameter with additional description", "[parameter]")
     "  Additional description";
 
     ParseResult<Parameter> parameter;
-    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, parameter);
+    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, parameter, ExportSourcemapOption);
 
     REQUIRE(parameter.report.error.code == Error::OK);
     REQUIRE(parameter.report.warnings.empty());
@@ -433,7 +433,7 @@ TEST_CASE("Parameter with additional description as continuation of signature", 
     "  Additional description\n";
 
     ParseResult<Parameter> parameter;
-    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, parameter);
+    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, parameter, ExportSourcemapOption);
 
     REQUIRE(parameter.report.error.code == Error::OK);
     REQUIRE(parameter.report.warnings.empty());
@@ -468,7 +468,7 @@ TEST_CASE("Parameter with list in description", "[parameter]")
     "  + Mauris condimentum\n";
 
     ParseResult<Parameter> parameter;
-    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, parameter);
+    SectionParserHelper<Parameter, ParameterParser>::parse(source, ParameterSectionType, parameter, ExportSourcemapOption);
 
     REQUIRE(parameter.report.error.code == Error::OK);
     REQUIRE(parameter.report.warnings.empty());

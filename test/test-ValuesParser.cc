@@ -33,7 +33,7 @@ TEST_CASE("Recognize values signature", "[values]")
 TEST_CASE("Parse canonical values", "[values]")
 {
     ParseResult<Values> values;
-    SectionParserHelper<Values, ValuesParser>::parse(ValuesFixture, ValuesSectionType, values);
+    SectionParserHelper<Values, ValuesParser>::parse(ValuesFixture, ValuesSectionType, values, ExportSourcemapOption);
 
     REQUIRE(values.report.error.code == Error::OK);
     CHECK(values.report.warnings.empty());
@@ -63,7 +63,7 @@ TEST_CASE("Warn superfluous content in values attribute", "[values]")
     "    + `Hello`\n";
 
     ParseResult<Values> values;
-    SectionParserHelper<Values, ValuesParser>::parse(source, ValuesSectionType, values);
+    SectionParserHelper<Values, ValuesParser>::parse(source, ValuesSectionType, values, ExportSourcemapOption);
 
     REQUIRE(values.report.error.code == Error::OK);
     REQUIRE(values.report.warnings.size() == 1);
@@ -87,7 +87,7 @@ TEST_CASE("Warn about illegal entities in values attribute", "[values]")
     "    + `Hi`\n";
 
     ParseResult<Values> values;
-    SectionParserHelper<Values, ValuesParser>::parse(source, ValuesSectionType, values);
+    SectionParserHelper<Values, ValuesParser>::parse(source, ValuesSectionType, values, ExportSourcemapOption);
 
     REQUIRE(values.report.error.code == Error::OK);
     REQUIRE(values.report.warnings.size() == 1);

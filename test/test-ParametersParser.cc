@@ -37,7 +37,10 @@ TEST_CASE("Recognize Parameters section block", "[parameters]")
 TEST_CASE("Parse canonical parameters", "[parameters]")
 {
     ParseResult<Parameters> parameters;
-    SectionParserHelper<Parameters, ParametersParser>::parse(ParametersFixture, ParametersSectionType, parameters);
+    SectionParserHelper<Parameters, ParametersParser>::parse(ParametersFixture,
+                                                             ParametersSectionType,
+                                                             parameters,
+                                                             ExportSourcemapOption);
 
     REQUIRE(parameters.report.error.code == Error::OK);
     REQUIRE(parameters.report.warnings.empty());
@@ -84,7 +87,10 @@ TEST_CASE("Parse illegal parameter among legal ones", "[parameters]")
     "    + OK-2\n";
 
     ParseResult<Parameters> parameters;
-    SectionParserHelper<Parameters, ParametersParser>::parse(source, ParametersSectionType, parameters);
+    SectionParserHelper<Parameters, ParametersParser>::parse(source,
+                                                             ParametersSectionType,
+                                                             parameters,
+                                                             ExportSourcemapOption);
 
     REQUIRE(parameters.report.error.code == Error::OK);
     REQUIRE(parameters.report.warnings.size() == 1);
@@ -115,7 +121,10 @@ TEST_CASE("Warn about additional content in parameters section", "[parameters]")
     "    + id\n";
 
     ParseResult<Parameters> parameters;
-    SectionParserHelper<Parameters, ParametersParser>::parse(source, ParametersSectionType, parameters);
+    SectionParserHelper<Parameters, ParametersParser>::parse(source,
+                                                             ParametersSectionType,
+                                                             parameters,
+                                                             ExportSourcemapOption);
 
     REQUIRE(parameters.report.error.code == Error::OK);
     REQUIRE(parameters.report.warnings.size() == 1);
@@ -140,7 +149,10 @@ TEST_CASE("Warn about additional content block in parameters section", "[paramet
     "    + id\n";
 
     ParseResult<Parameters> parameters;
-    SectionParserHelper<Parameters, ParametersParser>::parse(source, ParametersSectionType, parameters);
+    SectionParserHelper<Parameters, ParametersParser>::parse(source,
+                                                             ParametersSectionType,
+                                                             parameters,
+                                                             ExportSourcemapOption);
 
     REQUIRE(parameters.report.error.code == Error::OK);
     REQUIRE(parameters.report.warnings.size() == 1);
@@ -165,7 +177,10 @@ TEST_CASE("Warn about multiple parameters with the same name", "[parameters]")
     "    + id (`43`)\n";
 
     ParseResult<Parameters> parameters;
-    SectionParserHelper<Parameters, ParametersParser>::parse(source, ParametersSectionType, parameters);
+    SectionParserHelper<Parameters, ParametersParser>::parse(source,
+                                                             ParametersSectionType,
+                                                             parameters,
+                                                             ExportSourcemapOption);
 
     REQUIRE(parameters.report.error.code == Error::OK);
     REQUIRE(parameters.report.warnings.size() == 1);
@@ -202,7 +217,10 @@ TEST_CASE("Recognize parameter when there is no description on its signature and
     "            + `vent`";
 
     ParseResult<Parameters> parameters;
-    SectionParserHelper<Parameters, ParametersParser>::parse(source, ParametersSectionType, parameters);
+    SectionParserHelper<Parameters, ParametersParser>::parse(source,
+                                                             ParametersSectionType,
+                                                             parameters,
+                                                             ExportSourcemapOption);
 
     REQUIRE(parameters.report.error.code == Error::OK);
     REQUIRE(parameters.report.warnings.empty());
