@@ -577,13 +577,13 @@ namespace snowcrash {
             out.node.description = model.description;
             out.node.parameters = model.parameters;
 
-            HeaderIterator modelContentType = std::find_if(model.headers.begin(),
-                                                           model.headers.end(),
-                                                           std::bind2nd(MatchFirstWith<Header, std::string>(),
-                                                                        HTTPHeaderName::ContentType));
+            HeaderIterator modelContentTypeIt = std::find_if(model.headers.begin(),
+                                                             model.headers.end(),
+                                                             std::bind2nd(MatchFirstWith<Header, std::string>(),
+                                                                          HTTPHeaderName::ContentType));
 
             bool isPayloadContentType = !out.node.headers.empty();
-            bool isModelContentType = modelContentType != model.headers.end();
+            bool isModelContentType = modelContentTypeIt != model.headers.end();
 
             if (isPayloadContentType && isModelContentType) {
 
