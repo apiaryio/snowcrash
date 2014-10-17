@@ -11,7 +11,7 @@
 
 #include <stdexcept>
 #include "SectionProcessor.h"
-#include "MSONSectionProcessor.h"
+#include "SignatureSectionProcessor.h"
 
 #define ADAPTER_MISMATCH_ERR std::logic_error("mismatched adapter and node type")
 

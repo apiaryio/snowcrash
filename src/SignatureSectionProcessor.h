@@ -1,13 +1,13 @@
 //
-//  MSONSectionProcessor.h
+//  SignatureSectionProcessor.h
 //  snowcrash
 //
 //  Created by Pavan Kumar Sunkara on 10/14/14.
 //  Copyright (c) 2014 Apiary Inc. All rights reserved.
 //
 
-#ifndef SNOWCRASH_MSONSECTIONPROCESSOR_H
-#define SNOWCRASH_MSONSECTIONPROCESSOR_H
+#ifndef SNOWCRASH_SIGNATURESECTIONPROCESSOR_H
+#define SNOWCRASH_SIGNATURESECTIONPROCESSOR_H
 
 #include "SectionProcessor.h"
 
@@ -21,15 +21,15 @@ namespace scpl {
      * Forward Declarations
      */
     template<typename T>
-    struct MSONSectionProcessor;
+    struct SignatureSectionProcessor;
 
     /**
-     * \brief  MSON Section Processor Base
+     * \brief Signature Section Processor Base
      *
-     * Defines default behaviours for Section Processor interface for MSON
+     * Defines default behaviours for Section Processor interface for Signature sections
      */
     template<typename T>
-    struct MSONSectionProcessorBase : public snowcrash::SectionProcessorBase<T> {
+    struct SignatureSectionProcessorBase : public snowcrash::SectionProcessorBase<T> {
 
         static const char EscapeCharacter = '`';
         static const char ValuesDelimiter = ':';
@@ -38,9 +38,9 @@ namespace scpl {
         static const char ContentDelimiter = '-';
 
         /**
-         * \brief Signature traits of the MSON section
+         * \brief Signature traits of the section
          *
-         * \return Signature traits given for MSON section
+         * \return Signature traits given for section
          */
         static SignatureTraits signatureTraits() {
 
@@ -49,7 +49,7 @@ namespace scpl {
         };
 
         /**
-         * \brief Process MSON section signature markdown node (Default)
+         * \brief Process section signature markdown node (Default)
          */
         static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
                                                      const MarkdownNodes& siblings,
@@ -58,19 +58,19 @@ namespace scpl {
                                                      const snowcrash::ParseResultRef<T>& out) {
 
             // Get the signature traits of the section
-            SignatureTraits signatureTraits = MSONSectionProcessor<T>::signatureTraits();
+            SignatureTraits signatureTraits = SignatureSectionProcessor<T>::signatureTraits();
 
             // Parse Signature
-            Signature signature = MSONSectionProcessor<T>::parseSignature(node, pd, signatureTraits, out);
+            Signature signature = SignatureSectionProcessor<T>::parseSignature(node, pd, signatureTraits, out);
 
             // Do section specific logic using the signature data
-            MSONSectionProcessor<T>::finalizeSignature(node, pd, signature, out);
+            SignatureSectionProcessor<T>::finalizeSignature(node, pd, signature, out);
 
             return ++MarkdownNodeIterator(node);
         };
 
         /**
-         * \brief Parse MSON section signature markdown node
+         * \brief Parse section signature markdown node
          *
          * \param node Markdown node
          * \param pd Section Parser data
@@ -91,15 +91,6 @@ namespace scpl {
             snowcrash::TrimString(subject);
 
             mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-
-            if (!subject.empty() &&
-                subject[0] == ContentDelimiter) {
-
-                // WARN: Signature is starting with a content
-                out.report.warnings.push_back(snowcrash::Warning("signature should not start with a content",
-                                                                 snowcrash::FormattingWarning,
-                                                                 sourceMap));
-            }
 
             if (traits.identifierTrait &&
                 !subject.empty()) {
@@ -128,16 +119,20 @@ namespace scpl {
             }
 
             if (traits.contentTrait &&
-                !subject.empty()) {
+                !subject.empty() &&
+                subject[0] == ContentDelimiter) {
 
-                parseSignatureContent(sourceMap, out.report, subject, signature);
+                subject = subject.substr(1);
+                snowcrash::TrimString(subject);
+
+                signature.content = subject;
             }
 
             return signature;
         };
 
         /**
-         * \brief Use the signature data to do MSON section specific logic
+         * \brief Use the signature data to do section specific logic
          *
          * \param node Markdown node
          * \param pd Section Parser data
@@ -172,7 +167,7 @@ namespace scpl {
                 subject[0] == '_' ||
                 subject[0] == EscapeCharacter) {
 
-                mdp::ByteBuffer escapedString = retrieveEscaped(subject, 0, subject[0]);
+                mdp::ByteBuffer escapedString = snowcrash::RetrieveEscaped(subject, 0, subject[0]);
 
                 if (!escapedString.empty()) {
                     isEnclosed = true;
@@ -244,7 +239,7 @@ namespace scpl {
                     if (subject[i] == EscapeCharacter) {
 
                         // If escaped string, retrieve it and cut it from subject
-                        mdp::ByteBuffer escapedString = retrieveEscaped(subject, i);
+                        mdp::ByteBuffer escapedString = snowcrash::RetrieveEscaped(subject, i);
 
                         value += escapedString;
                         i = 0;
@@ -287,7 +282,7 @@ namespace scpl {
 
                 if (out.values.empty()) {
 
-                    // WARN: Empty identifier
+                    // WARN: Empty values
                     report.warnings.push_back(snowcrash::Warning("empty values",
                                                                  snowcrash::EmptyDefinitionWarning,
                                                                  sourceMap));
@@ -365,7 +360,7 @@ namespace scpl {
                 if (subject[i] == EscapeCharacter) {
 
                     // If escaped string, retrieve it and cut it from subject
-                    mdp::ByteBuffer escapedString = retrieveEscaped(subject, i);
+                    mdp::ByteBuffer escapedString = snowcrash::RetrieveEscaped(subject, i);
 
                     returnString += escapedString;
                     i = 0;
@@ -401,67 +396,13 @@ namespace scpl {
 
             return returnString;
         }
-
-        /**
-         * \brief Parse the content from the signature
-         */
-        static void parseSignatureContent(const mdp::CharactersRangeSet sourceMap,
-                                          snowcrash::Report& report,
-                                          mdp::ByteBuffer& subject,
-                                          Signature& out) {
-
-            if (subject[0] == ContentDelimiter) {
-                subject = subject.substr(1);
-                snowcrash::TrimString(subject);
-
-
-
-                snowcrash::TrimString(subject);
-            }
-        };
-
-        /**
-         * \brief Retrieve strings enclosed by matching backticks
-         *
-         * \param subject Signature of the section that needs to be parsed
-         * \param begin Character index representing the beginning of the escaped string
-         * \param escapeChar Character used to escape the string
-         *
-         * \return Returns the escaped string, new subject will be from the end of the escaped string
-         *
-         * \example (begin = 1, escapeChar = "`", subject = "a```b```cd") ----> (return = "```b```", subject = "cd")
-         */
-        static mdp::ByteBuffer retrieveEscaped(mdp::ByteBuffer& subject,
-                                               const size_t begin,
-                                               const char escapeChar = EscapeCharacter) {
-
-            size_t levels = 0, end;
-
-            // Get the level of the backticks
-            while (subject[levels + begin] == escapeChar) {
-                levels++;
-            }
-
-            end = subject.substr(levels + begin).find(subject.substr(begin, levels));
-
-            if (end == std::string::npos) {
-                return "";
-            }
-
-            end = end + (2 * levels) + begin;
-
-            mdp::ByteBuffer escapedString = subject.substr(begin, end - begin);
-            subject = subject.substr(end);
-
-            return escapedString;
-        };
     };
 
     /**
-     * Default MSON Section Processor
+     * Default Signature Section Processor
      */
     template<typename T>
-    struct MSONSectionProcessor : public MSONSectionProcessorBase<T> {
+    struct SignatureSectionProcessor : public SignatureSectionProcessorBase<T> {
     };
 }
 
