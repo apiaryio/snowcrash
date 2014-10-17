@@ -125,7 +125,6 @@ namespace snowcrash {
         return elem.front();
     }
 
-
     /**
      *  \brief  compare equality  - allow compare diferent types
      *
@@ -171,7 +170,7 @@ namespace snowcrash {
         }
         return std::equal(arg1.begin(), arg1.end(), arg2.begin(), predicate);
     }
-    
+
     template <typename T>
     struct Equal : std::binary_function<T, T, bool> {
         bool operator()(const T& left, const T& right) const {
@@ -186,6 +185,41 @@ namespace snowcrash {
         }
     };
 
+    /**
+     * \brief Retrieve strings enclosed by matching backticks
+     *
+     * \param subject Signature of the section that needs to be parsed
+     * \param begin Character index representing the beginning of the escaped string
+     * \param escapeChar Character used to escape the string
+     *
+     * \return Returns the escaped string, new subject will be from the end of the escaped string
+     *
+     * \example (begin = 1, escapeChar = "`", subject = "a```b```cd") ----> (return = "```b```", subject = "cd")
+     */
+    inline std::string RetrieveEscaped(std::string& subject,
+                                       const size_t begin,
+                                       const char escapeChar = '`') {
+
+        size_t levels = 0, end;
+
+        // Get the level of the backticks
+        while (subject[levels + begin] == escapeChar) {
+            levels++;
+        }
+
+        end = subject.substr(levels + begin).find(subject.substr(begin, levels));
+
+        if (end == std::string::npos) {
+            return "";
+        }
+
+        end = end + (2 * levels) + begin;
+
+        std::string escapedString = subject.substr(begin, end - begin);
+        subject = subject.substr(end);
+
+        return escapedString;
+    }
 }
 
 #endif
