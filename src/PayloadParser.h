@@ -298,71 +298,14 @@ namespace snowcrash {
                              SectionParserData& pd,
                              const ParseResultRef<Payload>& out) {
 
-            bool warnEmptyBody = false;
-
-            mdp::ByteBuffer contentLength;
-            mdp::ByteBuffer transferEncoding;
-
             SectionType sectionType = pd.sectionContext();
 
-            for (HeaderIterator it = out.node.headers.begin();
-                 it != out.node.headers.end();
-                 ++it) {
+            if (sectionType == RequestSectionType || sectionType == RequestBodySectionType) {
 
-                if (it->first == HTTPHeaderName::ContentLength) {
-                    contentLength = it->second;
-                }
+                checkRequest(node, pd, out);
+            } else if (sectionType == ResponseSectionType || sectionType == ResponseBodySectionType) {
 
-                if (it->first == HTTPHeaderName::TransferEncoding) {
-                    transferEncoding = it->second;
-                }
-            }
-
-            if ((sectionType == RequestSectionType || sectionType == RequestBodySectionType) && out.node.body.empty()) {
-
-                // Warn when content-length or transfer-encoding is specified or both headers and body are empty
-                if (out.node.headers.empty()) {
-                    warnEmptyBody = true;
-                } else {
-                    warnEmptyBody = !contentLength.empty() || !transferEncoding.empty();
-                }
-
-                if (warnEmptyBody) {
-                    // WARN: empty body
-                    std::stringstream ss;
-                    ss << "empty " << SectionName(sectionType) << " " << SectionName(BodySectionType);
-
-                    if (!contentLength.empty()) {
-                        ss << ", expected " << SectionName(BodySectionType) << " for '" << contentLength << "' Content-Length";
-                    } else if (!transferEncoding.empty()) {
-                        ss << ", expected " << SectionName(BodySectionType) << " for '" << transferEncoding << "' Transfer-Encoding";
-                    }
-
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                    out.report.warnings.push_back(Warning(ss.str(),
-                                                          EmptyDefinitionWarning,
-                                                          sourceMap));
-                }
-            } else if ((sectionType == ResponseSectionType || sectionType == ResponseBodySectionType)) {
-
-                HTTPStatusCode code = 200;
-
-                if (!out.node.name.empty()) {
-                    std::stringstream(out.node.name) >> code;
-                }
-
-                StatusCodeTraits statusCodeTraits = GetStatusCodeTrait(code);
-
-                if (!statusCodeTraits.allowBody && !out.node.body.empty()) {
-                    // WARN: not empty body
-                    std::stringstream ss;
-                    ss << "the " << code << " response MUST NOT include a " << SectionName(BodySectionType);
-
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                    out.report.warnings.push_back(Warning(ss.str(),
-                                                          EmptyDefinitionWarning,
-                                                          sourceMap));
-                }
+                checkResponse(node, pd, out);
             }
         }
 
@@ -622,6 +565,96 @@ namespace snowcrash {
                 } else {
                     out.sourceMap.headers = modelSM.headers;
                 }
+            }
+        }
+
+        /**
+         *  \brief  Checks request given as out
+         *  \param  node     Markdown node
+         *  \param  pd       Section parser state
+         *  \param  out      Processed output
+         */
+        static void checkRequest(const MarkdownNodeIterator& node,
+                                 SectionParserData& pd,
+                                 const ParseResultRef<Payload>& out) {
+
+            bool warnEmptyBody = false;
+
+            mdp::ByteBuffer contentLength;
+            mdp::ByteBuffer transferEncoding;
+
+            for (HeaderIterator it = out.node.headers.begin();
+                 it != out.node.headers.end();
+                 ++it) {
+
+                if (it->first == HTTPHeaderName::ContentLength) {
+                    contentLength = it->second;
+                }
+
+                if (it->first == HTTPHeaderName::TransferEncoding) {
+                    transferEncoding = it->second;
+                }
+            }
+
+            if (out.node.body.empty() && out.node.reference.meta.state != Reference::StatePending) {
+
+                // Warn when content-length or transfer-encoding is specified or both headers and body are empty
+                if (out.node.headers.empty()) {
+                    warnEmptyBody = true;
+                } else {
+                    warnEmptyBody = !contentLength.empty() || !transferEncoding.empty();
+                }
+
+                if (warnEmptyBody) {
+
+                    // WARN: empty body
+                    std::stringstream ss;
+                    ss << "empty " << SectionName(RequestSectionType) << " " << SectionName(BodySectionType);
+
+                    if (!contentLength.empty()) {
+                        ss << ", expected " << SectionName(BodySectionType) << " for '" << contentLength << "' Content-Length";
+                    } else if (!transferEncoding.empty()) {
+                        ss << ", expected " << SectionName(BodySectionType) << " for '" << transferEncoding << "' Transfer-Encoding";
+                    }
+
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                    out.report.warnings.push_back(Warning(ss.str(),
+                                                          EmptyDefinitionWarning,
+                                                          sourceMap));
+                }
+            }
+        }
+
+        /**
+         *  \brief  Checks response given as out
+         *  \param  node     Markdown node
+         *  \param  pd       Section parser state
+         *  \param  out      Processed output
+         */
+        static void checkResponse(const MarkdownNodeIterator& node,
+                                  SectionParserData& pd,
+                                  const ParseResultRef<Payload>& out) {
+
+            HTTPStatusCode code = 200;
+
+            if (!out.node.name.empty()) {
+                std::stringstream(out.node.name) >> code;
+            }
+
+            StatusCodeTraits statusCodeTraits = GetStatusCodeTrait(code);
+
+            if (!statusCodeTraits.allowBody &&
+                !out.node.body.empty() &&
+                out.node.reference.meta.state != Reference::StatePending) {
+
+                // WARN: not empty body
+                std::stringstream ss;
+                ss << "the " << code << " response MUST NOT include a " << SectionName(BodySectionType);
+
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                out.report.warnings.push_back(Warning(ss.str(),
+                                                      EmptyDefinitionWarning,
+                                                      sourceMap));
             }
         }
 
