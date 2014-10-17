@@ -592,13 +592,16 @@ TEST_CASE("Parse named resource with lazy referencing", "[resource][model][issue
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].reference.type == Reference::SymbolReference);
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].reference.meta.state == Reference::StateResolved);
 
-    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[0].sourceMap.size() == 1);
-    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[0].sourceMap[0].length == 20);
-    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[0].sourceMap[0].location == 104);
+    SourceMap<Resources> resourcesSourceMap = blueprint.sourceMap.resourceGroups.collection[0].resources;
+    SourceMap<TransactionExamples> examplesSourceMap = resourcesSourceMap.collection[0].actions.collection[0].examples;
 
-    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection[0].examples.collection[0].responses.collection[0].reference.sourceMap.size() == 1);
-    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection[0].examples.collection[0].responses.collection[0].reference.sourceMap[0].length == 15);
-    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection[0].actions.collection[0].examples.collection[0].responses.collection[0].reference.sourceMap[0].location == 68);
+    REQUIRE(examplesSourceMap.collection[0].responses.collection[0].headers.collection[0].sourceMap.size() == 1);
+    REQUIRE(examplesSourceMap.collection[0].responses.collection[0].headers.collection[0].sourceMap[0].length == 20);
+    REQUIRE(examplesSourceMap.collection[0].responses.collection[0].headers.collection[0].sourceMap[0].location == 104);
+
+    REQUIRE(examplesSourceMap.collection[0].responses.collection[0].reference.sourceMap.size() == 1);
+    REQUIRE(examplesSourceMap.collection[0].responses.collection[0].reference.sourceMap[0].length == 15);
+    REQUIRE(examplesSourceMap.collection[0].responses.collection[0].reference.sourceMap[0].location == 68);
 }
 
 TEST_CASE("Parse named resource with nameless model but reference a non-existing model", "[resource]")
