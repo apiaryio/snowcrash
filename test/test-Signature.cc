@@ -411,3 +411,39 @@ TEST_CASE("Unescaped array element signature parsing", "[signature]")
     REQUIRE(signature.content == "numbers");
     REQUIRE(signature.remainingContent.empty());
 }
+
+TEST_CASE("Escaped attributes signature parsing", "[signature]")
+{
+    ParseResult<Blueprint> blueprint;
+    scpl::Signature signature = SignatureParserHelper::parse( "1 (`optio)nal, array` , fixed)", blueprint, 14);
+
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.empty());
+
+    REQUIRE(signature.identifier.empty());
+    REQUIRE(signature.values.size() == 1);
+    REQUIRE(signature.values[0] == "1");
+    REQUIRE(signature.attributes.size() == 2);
+    REQUIRE(signature.attributes[0] == "`optio)nal, array`");
+    REQUIRE(signature.attributes[1] == "fixed");
+    REQUIRE(signature.content.empty());
+    REQUIRE(signature.remainingContent.empty());
+}
+
+TEST_CASE("Attributes with many brackets signature parsing", "[signature]")
+{
+    ParseResult<Blueprint> blueprint;
+    scpl::Signature signature = SignatureParserHelper::parse( "1 ([op(t[io]na)l, p][], [A](http://a.com))", blueprint, 14);
+
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.empty());
+
+    REQUIRE(signature.identifier.empty());
+    REQUIRE(signature.values.size() == 1);
+    REQUIRE(signature.values[0] == "1");
+    REQUIRE(signature.attributes.size() == 2);
+    REQUIRE(signature.attributes[0] == "[op(t[io]na)l, p][]");
+    REQUIRE(signature.attributes[1] == "[A](http://a.com)");
+    REQUIRE(signature.content.empty());
+    REQUIRE(signature.remainingContent.empty());
+}

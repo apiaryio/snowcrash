@@ -112,7 +112,7 @@ namespace scpl {
                 !subject.empty() &&
                 subject[0] != AttributesDelimiter) {
 
-                // When subject starts with values, add a ':' for easy processing
+                // When subject starts with values, add a ':' for easier processing
                 if (!traits.identifierTrait) {
                     subject = ValuesDelimiter + subject;
                 }
@@ -306,19 +306,101 @@ namespace scpl {
                                              Signature& out) {
 
             if (subject[0] == AttributesDelimiter) {
-                subject = subject.substr(1);
-                snowcrash::TrimString(subject);
 
-                size_t i = 0;
-                mdp::ByteBuffer value;
+                bool attributesNotFinished = true;
 
-                while (i < subject.length()) {
-                    i++;
-                }
+                // While there are attributes still left
+                do {
+                    // Retrieve attribute
+                    mdp::ByteBuffer attribute = recursiveBracketMatch(subject, 0, ')', true);
+                    size_t length = attribute.size();
+
+                    // If the last char is not a comma, attributes are finished
+                    if (attribute[length - 1] != ',') {
+                        attributesNotFinished = false;
+                    } else {
+                        attribute = attribute.substr(0, length - 1);
+
+                        // For easier processing
+                        subject = "(" + subject;
+                    }
+
+                    snowcrash::TrimString(attribute);
+
+                    if (!attribute.empty()) {
+                        out.attributes.push_back(attribute);
+                    }
+                } while (attributesNotFinished);
 
                 snowcrash::TrimString(subject);
             }
         };
+
+        /**
+         * \brief Find the matching bracket while doing the same for nested brackets and return
+         *        the string until there while also cutting the signature that needs to be parsed
+         *
+         * \param subject The signature section that needs to be parsed
+         * \param begin Character index representing the beginning of the bracket that needs to be matched
+         * \param endBracket The type of bracket that needs to be matched
+         * \param splitByComma If this is true, we need to return when we find a non-nested comma
+         *
+         * \return String inside the given brackets. If not splitting by comma, append the brackets too
+         */
+        static mdp::ByteBuffer recursiveBracketMatch(mdp::ByteBuffer& subject,
+                                                     size_t begin,
+                                                     const char endBracket,
+                                                     const bool splitByComma = false) {
+
+            size_t i = begin + 1;
+            mdp::ByteBuffer returnString;
+
+            // Append the beginning bracket
+            if (!splitByComma) {
+                returnString += subject[begin];
+            }
+
+            while (i < subject.length()) {
+
+                if (subject[i] == EscapeCharacter) {
+
+                    // If escaped string, retrieve it and cut it from subject
+                    mdp::ByteBuffer escapedString = retrieveEscaped(subject, i);
+
+                    returnString += escapedString;
+                    i = 0;
+                } else if (subject[i] == '[') {
+
+                    returnString += recursiveBracketMatch(subject, i, ']');
+                    i = 0;
+                } else if (subject[i] == '(') {
+
+                    returnString += recursiveBracketMatch(subject, i, ')');
+                    i = 0;
+                } else if (subject[i] == endBracket) {
+
+                    // Append the ending bracket
+                    if (!splitByComma) {
+                        returnString += subject[i];
+                    }
+
+                    subject = subject.substr(i + 1);
+                    break;
+                } else if (splitByComma && subject[i] == ',') {
+
+                    // Return when encountering comma
+                    returnString += subject[i];
+                    subject = subject.substr(i + 1);
+                    break;
+                } else {
+
+                    returnString += subject[i];
+                    i++;
+                }
+            }
+
+            return returnString;
+        }
 
         /**
          * \brief Parse the content from the signature
@@ -330,6 +412,7 @@ namespace scpl {
 
             if (subject[0] == ContentDelimiter) {
                 subject = subject.substr(1);
+                snowcrash::TrimString(subject);
 
 
 
