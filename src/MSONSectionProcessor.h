@@ -121,7 +121,8 @@ namespace scpl {
             }
 
             if (traits.attributesTrait &&
-                !subject.empty()) {
+                !subject.empty() &&
+                subject[0] != ContentDelimiter) {
 
                 parseSignatureAttributes(sourceMap, out.report, subject, signature);
             }
@@ -161,23 +162,17 @@ namespace scpl {
                                              mdp::ByteBuffer& subject,
                                              Signature& out) {
 
+            snowcrash::TrimString(subject);
+
             size_t end;
             bool isEnclosed = false;
 
             // If the identifier is enclosed, retrieve it
-            if (subject[0] == '*' || subject[0] == '_') {
-                end = subject.substr(1).find(subject[0]);
+            if (subject[0] == '*' ||
+                subject[0] == '_' ||
+                subject[0] == EscapeCharacter) {
 
-                if (end != std::string::npos) {
-                    isEnclosed = true;
-                    end = end + 2;
-
-                    out.identifier = subject.substr(0, end);
-                    subject = subject.substr(end);
-                }
-            } else if (subject[0] == EscapeCharacter) {
-
-                mdp::ByteBuffer escapedString = retrieveEscaped(subject, 0);
+                mdp::ByteBuffer escapedString = retrieveEscaped(subject, 0, subject[0]);
 
                 if (!escapedString.empty()) {
                     isEnclosed = true;
@@ -185,9 +180,7 @@ namespace scpl {
                 }
             }
 
-            if (isEnclosed) {
-                snowcrash::TrimString(subject);
-            }
+            snowcrash::TrimString(subject);
 
             // Look for next part of the signature section
             end = subject.find_first_of(ValuesDelimiter);
@@ -314,8 +307,14 @@ namespace scpl {
 
             if (subject[0] == AttributesDelimiter) {
                 subject = subject.substr(1);
+                snowcrash::TrimString(subject);
 
+                size_t i = 0;
+                mdp::ByteBuffer value;
 
+                while (i < subject.length()) {
+                    i++;
+                }
 
                 snowcrash::TrimString(subject);
             }
@@ -343,23 +342,30 @@ namespace scpl {
          *
          * \param subject Signature of the section that needs to be parsed
          * \param begin Character index representing the beginning of the escaped string
+         * \param escapeChar Character used to escape the string
          *
          * \return Returns the escaped string, new subject will be from the end of the escaped string
          *
-         * \example (begin = 1, subject = "a```b```cd") ----> (return = "```b```", subject = "cd")
+         * \example (begin = 1, escapeChar = "`", subject = "a```b```cd") ----> (return = "```b```", subject = "cd")
          */
         static mdp::ByteBuffer retrieveEscaped(mdp::ByteBuffer& subject,
-                                               const size_t begin) {
+                                               const size_t begin,
+                                               const char escapeChar = EscapeCharacter) {
 
-            size_t levels = begin, end;
+            size_t levels = 0, end;
 
             // Get the level of the backticks
-            while (subject[levels] ==  EscapeCharacter) {
+            while (subject[levels + begin] == escapeChar) {
                 levels++;
             }
 
-            end = subject.substr(levels).find(subject.substr(begin, levels - begin));
-            end = end + (2 * levels) - begin;
+            end = subject.substr(levels + begin).find(subject.substr(begin, levels));
+
+            if (end == std::string::npos) {
+                return "";
+            }
+
+            end = end + (2 * levels) + begin;
 
             mdp::ByteBuffer escapedString = subject.substr(begin, end - begin);
             subject = subject.substr(end);
