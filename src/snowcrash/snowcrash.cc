@@ -24,6 +24,7 @@ static const std::string RenderArgument = "render";
 static const std::string SourcemapArgument = "sourcemap";
 static const std::string ValidateArgument = "validate";
 static const std::string VersionArgument = "version";
+static const std::string AnnotationByLineArgument = "annotation-line";
 
 /// \enum Snow Crash AST output format.
 enum SerializationFormat {
@@ -31,10 +32,61 @@ enum SerializationFormat {
     JSONSerializationFormat
 };
 
+/// \brief Convert character index mapping to line and column number
+/// \param source, Source sting
+/// \param range Character index mapping as input
+/// \param fromLine Starting line number as output
+/// \param fromColumn Starting character number as output
+/// \param toLine Ending line number as output
+/// \param toColumn Ending character number as output
+void getLineFromMap(const std::string source,
+                    const mdp::Range range,
+                    size_t& fromLine,
+                    size_t& fromColumn,
+                    size_t& toLine,
+                    size_t& toColumn)
+{
+
+    fromLine = 1;
+    fromColumn = 1;
+
+    // Finds starting line and column position
+    for (int i = 0 ; i < range.location ; i++) {
+
+        fromColumn++;
+
+        if(source[i] == '\n') {
+
+            fromLine++;
+            fromColumn = 1;
+        }
+    }
+
+    toLine = fromLine;
+    toColumn = fromColumn;
+
+    // Finds ending line and column position
+    for (int i = range.location ; i < (range.location + range.length - 1) ; i++) {
+
+        toColumn++;
+
+        if(source[i] == '\n') {
+
+            toLine++;
+            toColumn = 1;
+        }
+    }
+}
+
 /// \brief Print Markdown source annotation.
 /// \param prefix A string prefix for the annotation
 /// \param annotation An annotation to print
-void PrintAnnotation(const std::string& prefix, const snowcrash::SourceAnnotation& annotation)
+/// \param source Source sting
+/// \param showAnnotationByLine True if the annotations needs to be printed by line and column number
+void PrintAnnotation(const std::string& prefix,
+                     const snowcrash::SourceAnnotation& annotation,
+                     const std::string source,
+                     const bool showAnnotationByLine)
 {
     std::cerr << prefix;
 
@@ -50,8 +102,22 @@ void PrintAnnotation(const std::string& prefix, const snowcrash::SourceAnnotatio
         for (mdp::CharactersRangeSet::const_iterator it = annotation.location.begin();
              it != annotation.location.end();
              ++it) {
-            std::cerr << ((it == annotation.location.begin()) ? " :" : ";");
-            std::cerr << it->location << ":" << it->length;
+
+            if (showAnnotationByLine) {
+
+                std::cerr << ((it == annotation.location.begin()) ? " :" : ";");
+
+                size_t fromLine, fromColumn, toLine, toColumn;
+                getLineFromMap(source, *it, fromLine, fromColumn, toLine, toColumn);
+
+                std::cerr << " on line " << fromLine << ", column " << fromColumn;
+                std::cerr << " - line " << toLine << ", column " << toColumn;
+            }
+            else {
+
+                std::cerr << ((it == annotation.location.begin()) ? " :" : ";");
+                std::cerr << it->location << ":" << it->length;
+            }
         }
     }
 
@@ -60,7 +126,11 @@ void PrintAnnotation(const std::string& prefix, const snowcrash::SourceAnnotatio
 
 /// \brief Print parser report to stderr.
 /// \param report A parser report to print
-void PrintReport(const snowcrash::Report& report)
+/// \param source Source sting
+/// \param showAnnotationByLine True if the annotations needs to be printed by line and column number
+void PrintReport(const snowcrash::Report& report,
+                 const std::string source,
+                 const bool showAnnotationByLine)
 {
     std::cerr << std::endl;
 
@@ -68,17 +138,18 @@ void PrintReport(const snowcrash::Report& report)
         std::cerr << "OK.\n";
     }
     else {
-        PrintAnnotation("error:", report.error);
+        PrintAnnotation("error:", report.error, source, showAnnotationByLine);
     }
 
     for (snowcrash::Warnings::const_iterator it = report.warnings.begin(); it != report.warnings.end(); ++it) {
-        PrintAnnotation("warning:", *it);
+        PrintAnnotation("warning:", *it, source, showAnnotationByLine);
     }
 }
 
 int main(int argc, const char *argv[])
 {
     cmdline::parser argumentParser;
+    bool showAnnotationByLine = false;
 
     argumentParser.set_program_name("snowcrash");
     std::stringstream ss;
@@ -96,6 +167,7 @@ int main(int argc, const char *argv[])
     argumentParser.add("help", 'h', "display this help message");
     argumentParser.add(VersionArgument, 'v', "print Snow Crash version");
     argumentParser.add(ValidateArgument, 'l', "validate input only, do not print AST");
+    argumentParser.add(AnnotationByLineArgument, 'a', "report the annotation, according to line and column number");
 
     argumentParser.parse_check(argc, argv);
 
@@ -130,6 +202,11 @@ int main(int argc, const char *argv[])
 
         inputStream << inputFileStream.rdbuf();
         inputFileStream.close();
+    }
+
+    // check if annotation map should be reported by line and column number
+    if (argumentParser.exist(AnnotationByLineArgument)) {
+        showAnnotationByLine = true;
     }
 
     // Initialize
@@ -195,6 +272,6 @@ int main(int argc, const char *argv[])
     }
 
     // report
-    PrintReport(blueprint.report);
+    PrintReport(blueprint.report, inputStream.str(), showAnnotationByLine);
     return blueprint.report.error.code;
 }
