@@ -26,19 +26,21 @@ static const std::string ValidateArgument = "validate";
 static const std::string VersionArgument = "version";
 static const std::string AnnotationByLineArgument = "annotation-line";
 
-/// \enum Snow Crash AST output format.
+/** enum Snow Crash AST output format. */
 enum SerializationFormat {
     YAMLSerializationFormat,
     JSONSerializationFormat
 };
 
-/// \brief Convert character index mapping to line and column number
-/// \param source, Source sting
-/// \param range Character index mapping as input
-/// \param fromLine Starting line number as output
-/// \param fromColumn Starting character number as output
-/// \param toLine Ending line number as output
-/// \param toColumn Ending character number as output
+/**
+ *  \brief Convert character index mapping to line and column number
+ *  \param source, Source sting
+ *  \param range Character index mapping as input
+ *  \param fromLine Starting line number as output
+ *  \param fromColumn Starting character number as output
+ *  \param toLine Ending line number as output
+ *  \param toColumn Ending character number as output
+ */
 void getLineFromMap(const std::string source,
                     const mdp::Range range,
                     size_t& fromLine,
@@ -78,16 +80,19 @@ void getLineFromMap(const std::string source,
     }
 }
 
-/// \brief Print Markdown source annotation.
-/// \param prefix A string prefix for the annotation
-/// \param annotation An annotation to print
-/// \param source Source sting
-/// \param showAnnotationByLine True if the annotations needs to be printed by line and column number
+/**
+ *  \brief Print Markdown source annotation.
+ *  \param prefix A string prefix for the annotation
+ *  \param annotation An annotation to print
+ *  \param source Source sting
+ *  \param showAnnotationByLine True if the annotations needs to be printed by line and column number
+ */
 void PrintAnnotation(const std::string& prefix,
                      const snowcrash::SourceAnnotation& annotation,
                      const std::string source,
                      const bool showAnnotationByLine)
 {
+
     std::cerr << prefix;
 
     if (annotation.code != SourceAnnotation::OK) {
@@ -99,6 +104,7 @@ void PrintAnnotation(const std::string& prefix,
     }
 
     if (!annotation.location.empty()) {
+
         for (mdp::CharactersRangeSet::const_iterator it = annotation.location.begin();
              it != annotation.location.end();
              ++it) {
@@ -124,14 +130,17 @@ void PrintAnnotation(const std::string& prefix,
     std::cerr << std::endl;
 }
 
-/// \brief Print parser report to stderr.
-/// \param report A parser report to print
-/// \param source Source sting
-/// \param showAnnotationByLine True if the annotations needs to be printed by line and column number
+/**
+ *  \brief Print parser report to stderr.
+ *  \param report A parser report to print
+ *  \param source Source sting
+ *  \param showAnnotationByLine True if the annotations needs to be printed by line and column number
+ */
 void PrintReport(const snowcrash::Report& report,
                  const std::string source,
                  const bool showAnnotationByLine)
 {
+
     std::cerr << std::endl;
 
     if (report.error.code == Error::OK) {
@@ -148,17 +157,19 @@ void PrintReport(const snowcrash::Report& report,
 
 int main(int argc, const char *argv[])
 {
+
     cmdline::parser argumentParser;
+    std::stringstream inputStream;
     bool showAnnotationByLine = false;
+    std::stringstream footerStream;
 
     argumentParser.set_program_name("snowcrash");
-    std::stringstream ss;
 
-    ss << "<input file>\n\n";
-    ss << "API Blueprint Parser\n";
-    ss << "If called without <input file>, 'snowcrash' will listen on stdin.\n";
+    footerStream << "<input file>\n\n";
+    footerStream << "API Blueprint Parser\n";
+    footerStream << "If called without <input file>, 'snowcrash' will listen on stdin.\n";
 
-    argumentParser.footer(ss.str());
+    argumentParser.footer(footerStream.str());
 
     argumentParser.add<std::string>(OutputArgument, 'o', "save output AST into file", false);
     argumentParser.add<std::string>(FormatArgument, 'f', "output AST format", false, "yaml", cmdline::oneof<std::string>("yaml", "json"));
@@ -173,29 +184,34 @@ int main(int argc, const char *argv[])
 
     // Check arguments
     if (argumentParser.rest().size() > 1) {
+
         std::cerr << "one input file expected, got " << argumentParser.rest().size() << std::endl;
         exit(EXIT_FAILURE);
     }
 
     // Version query
     if (argumentParser.exist(VersionArgument)) {
+
         std::cout << SNOWCRASH_VERSION_STRING << std::endl;
         exit(EXIT_SUCCESS);
     }
 
     // Input
-    std::stringstream inputStream;
     if (argumentParser.rest().empty()) {
+
         // Read stdin
         inputStream << std::cin.rdbuf();
     }
     else {
+
         // Read from file
         std::ifstream inputFileStream;
         std::string inputFileName = argumentParser.rest().front();
+
         inputFileStream.open(inputFileName.c_str());
 
         if (!inputFileStream.is_open()) {
+
             std::cerr << "fatal: unable to open input file '" << inputFileName << "'\n";
             exit(EXIT_FAILURE);
         }
@@ -227,10 +243,12 @@ int main(int argc, const char *argv[])
         std::stringstream sourcemapOutputStream;
 
         if (argumentParser.get<std::string>(FormatArgument) == "json") {
+
             SerializeJSON(blueprint.node, outputStream);
             SerializeSourceMapJSON(blueprint.sourceMap, sourcemapOutputStream);
         }
         else if (argumentParser.get<std::string>(FormatArgument) == "yaml") {
+
             SerializeYAML(blueprint.node, outputStream);
             SerializeSourceMapYAML(blueprint.sourceMap, sourcemapOutputStream);
         }
@@ -239,11 +257,13 @@ int main(int argc, const char *argv[])
         std::string sourcemapOutputFileName = argumentParser.get<std::string>(SourcemapArgument);
 
         if (!outputFileName.empty()) {
+
             // Serialize to file
             std::ofstream outputFileStream;
             outputFileStream.open(outputFileName.c_str());
 
             if (!outputFileStream.is_open()) {
+
                 std::cerr << "fatal: unable to write to file '" <<  outputFileName << "'\n";
                 exit(EXIT_FAILURE);
             }
@@ -252,16 +272,19 @@ int main(int argc, const char *argv[])
             outputFileStream.close();
         }
         else {
+
             // Serialize to stdout
             std::cout << outputStream.rdbuf();
         }
 
         if (!sourcemapOutputFileName.empty()) {
+
             // Serialize to file
             std::ofstream sourcemapOutputFileStream;
             sourcemapOutputFileStream.open(sourcemapOutputFileName.c_str());
 
             if (!sourcemapOutputFileStream.is_open()) {
+
                 std::cerr << "fatal: unable to write to file '" << sourcemapOutputFileName << "'\n";
                 exit(EXIT_FAILURE);
             }
@@ -273,5 +296,6 @@ int main(int argc, const char *argv[])
 
     // report
     PrintReport(blueprint.report, inputStream.str(), showAnnotationByLine);
+
     return blueprint.report.error.code;
 }
