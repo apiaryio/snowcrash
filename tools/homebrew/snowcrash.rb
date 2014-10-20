@@ -2,7 +2,7 @@ require 'formula'
 
 class Snowcrash < Formula
   homepage 'http://apiblueprint.org'
-  head 'https://github.com/apiaryio/snowcrash.git', :tag => 'v0.15.1'
+  head 'https://github.com/apiaryio/snowcrash.git', :tag => 'v0.16.0'
 
   def install
     system "./configure"
