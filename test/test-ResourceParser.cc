@@ -604,6 +604,104 @@ TEST_CASE("Parse named resource with lazy referencing", "[resource][model][issue
     REQUIRE(examplesSourceMap.collection[0].responses.collection[0].reference.sourceMap[0].location == 68);
 }
 
+TEST_CASE("Parse named resource with lazy referencing with both response and request", "[resource][model]")
+{
+    mdp::ByteBuffer source = \
+    "# API\n"\
+    "\n"\
+    "# Collection of Items [/items]\n"\
+    "+ Model (application/json)\n"\
+    "\n"\
+    "        [ { item 1 }, { item 2 } ]\n"\
+    "\n"\
+    "## Create New Item [POST]\n"\
+    "+ Request\n"\
+    "\n"\
+    "    [Item][]\n"\
+    "\n"\
+    "+ Response 200\n"\
+    "\n"\
+    "    [Collection of Items][]\n"\
+    "\n"\
+    "# Item [/items/{id}]\n"\
+    "+ Model (application/json)\n"\
+    "\n"\
+    "        { item }\n";
+
+    ParseResult<Blueprint> blueprint;
+    parse(source, 0, blueprint);
+
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.empty());
+
+    REQUIRE(blueprint.node.name == "API");
+    REQUIRE(blueprint.node.description == "");
+
+    REQUIRE(blueprint.node.resourceGroups.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources.size() == 2);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].uriTemplate == "/items");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].name == "Collection of Items");
+
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].method == "POST");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].name == "Create New Item");
+
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].requests.size() == 1);
+
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].requests[0].name == "");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].requests[0].body == "{ item }\n");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].requests[0].headers.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].requests[0].headers[0].first == "Content-Type");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].requests[0].headers[0].second == "application/json");
+
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].requests[0].reference.id == "Item");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].requests[0].reference.type == Reference::SymbolReference);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].requests[0].reference.meta.state == Reference::StateResolved);
+
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body == "[ { item 1 }, { item 2 } ]\n");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers.size() == 1);
+
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].reference.id == "Collection of Items");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].reference.type == Reference::SymbolReference);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].reference.meta.state == Reference::StateResolved);
+}
+
+TEST_CASE("Expect to have a warning when 100 responce's reference has a body", "[resource][model]")
+{
+    mdp::ByteBuffer source = \
+    "# API\n"\
+    "\n"\
+    "# Collection of Items [/items]\n"\
+    "+ Model (application/json)\n"\
+    "\n"\
+    "        [ { item 1 }, { item 2 } ]\n"\
+    "\n"\
+    "## Create New Item [POST]\n"\
+    "+ Request\n"\
+    "\n"\
+    "    [Collection of Items][]\n"\
+    "\n"\
+    "+ Response 100\n"\
+    "\n"\
+    "    [Item][]\n"\
+    "\n"\
+    "# Item [/items/{id}]\n"\
+    "+ Model (application/json)\n"\
+    "\n"\
+    "        { item }\n";
+
+    ParseResult<Blueprint> blueprint;
+    parse(source, 0, blueprint);
+
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.size() == 1);
+
+    REQUIRE(blueprint.report.warnings[0].code == EmptyDefinitionWarning);
+}
+
 TEST_CASE("Parse named resource with nameless model but reference a non-existing model", "[resource]")
 {
     mdp::ByteBuffer source = \

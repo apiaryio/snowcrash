@@ -405,12 +405,14 @@ namespace snowcrash {
 
                         ParseResultRef<Payload> payload(out.report, *requestIt, *requestSourceMapIt);
                         resolvePendingSymbols(pd, payload);
+                        SectionProcessor<Payload>::checkRequest(requestIt->reference.meta.node, pd, payload);
                     }
                     else {
 
                         SourceMap<Payload> tempSourceMap;
                         ParseResultRef<Payload> payload(out.report, *requestIt, tempSourceMap);
                         resolvePendingSymbols(pd, payload);
+                        SectionProcessor<Payload>::checkRequest(requestIt->reference.meta.node, pd, payload);
                     }
                 }
 
@@ -443,12 +445,14 @@ namespace snowcrash {
 
                         ParseResultRef<Payload> payload(out.report, *responseIt, *responseSourceMapIt);
                         resolvePendingSymbols(pd, payload);
+                        SectionProcessor<Payload>::checkResponse(responseIt->reference.meta.node, pd, payload);
                     }
                     else {
 
                         SourceMap<Payload> tempSourceMap;
                         ParseResultRef<Payload> payload(out.report, *responseIt, tempSourceMap);
                         resolvePendingSymbols(pd, payload);
+                        SectionProcessor<Payload>::checkResponse(responseIt->reference.meta.node, pd, payload);
                     }
                 }
 
