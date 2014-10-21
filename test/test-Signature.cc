@@ -17,10 +17,19 @@ static const mdp::ByteBuffer EscapedElementSignatureFixture = "`*42*(data):3` (n
 using namespace snowcrash;
 using namespace snowcrashtest;
 
+static const scpl::SignatureTraits::Traits PropertyMemberTypeTraits = scpl::SignatureTraits::IdentifierTrait |
+                                                                      scpl::SignatureTraits::ValuesTrait |
+                                                                      scpl::SignatureTraits::AttributesTrait |
+                                                                      scpl::SignatureTraits::ContentTrait;
+
+static const scpl::SignatureTraits::Traits ElementMemberTypeTraits = scpl::SignatureTraits::ValuesTrait |
+                                                                     scpl::SignatureTraits::AttributesTrait |
+                                                                     scpl::SignatureTraits::ContentTrait;
+
 TEST_CASE("Property signature parsing", "[signature]")
 {
     ParseResult<Blueprint> blueprint;
-    scpl::Signature signature = SignatureParserHelper::parse(PropertySignatureFixture, blueprint, 15);
+    scpl::Signature signature = SignatureParserHelper::parse(PropertySignatureFixture, blueprint, PropertyMemberTypeTraits);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -38,7 +47,7 @@ TEST_CASE("Property signature parsing", "[signature]")
 TEST_CASE("Escaped property signature parsing", "[signature]")
 {
     ParseResult<Blueprint> blueprint;
-    scpl::Signature signature = SignatureParserHelper::parse(EscapedPropertySignatureFixture, blueprint, 15);
+    scpl::Signature signature = SignatureParserHelper::parse(EscapedPropertySignatureFixture, blueprint, PropertyMemberTypeTraits);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -53,10 +62,10 @@ TEST_CASE("Escaped property signature parsing", "[signature]")
     REQUIRE(signature.remainingContent.empty());
 }
 
-TEST_CASE("Mutliline signature parsing", "[signature]")
+TEST_CASE("Multiline signature parsing", "[signature]")
 {
     ParseResult<Blueprint> blueprint;
-    scpl::Signature signature = SignatureParserHelper::parse("id\nLine 2\nLine 3\n", blueprint, 15);
+    scpl::Signature signature = SignatureParserHelper::parse("id\nLine 2\nLine 3\n", blueprint, PropertyMemberTypeTraits);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -71,7 +80,7 @@ TEST_CASE("Mutliline signature parsing", "[signature]")
 TEST_CASE("Identifier only signature parsing", "[signature]")
 {
     ParseResult<Blueprint> blueprint;
-    scpl::Signature signature = SignatureParserHelper::parse("id", blueprint, 15);
+    scpl::Signature signature = SignatureParserHelper::parse("id", blueprint, PropertyMemberTypeTraits);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -86,7 +95,7 @@ TEST_CASE("Identifier only signature parsing", "[signature]")
 TEST_CASE("Identifier enclosed by asterisk", "[signature]")
 {
     ParseResult<Blueprint> blueprint;
-    scpl::Signature signature = SignatureParserHelper::parse("*rel (Custom String)* (object)", blueprint, 15);
+    scpl::Signature signature = SignatureParserHelper::parse("*rel (Custom String)* (object)", blueprint, PropertyMemberTypeTraits);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -102,7 +111,7 @@ TEST_CASE("Identifier enclosed by asterisk", "[signature]")
 TEST_CASE("Identifier enclosed by underscore", "[signature]")
 {
     ParseResult<Blueprint> blueprint;
-    scpl::Signature signature = SignatureParserHelper::parse("_rel (*Custom* String)_ (object)", blueprint, 15);
+    scpl::Signature signature = SignatureParserHelper::parse("_rel (*Custom* String)_ (object)", blueprint, PropertyMemberTypeTraits);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -118,7 +127,7 @@ TEST_CASE("Identifier enclosed by underscore", "[signature]")
 TEST_CASE("Identifier enclosed by backticks", "[signature]")
 {
     ParseResult<Blueprint> blueprint;
-    scpl::Signature signature = SignatureParserHelper::parse("```username `is` g``ood``` (object)", blueprint, 15);
+    scpl::Signature signature = SignatureParserHelper::parse("```username `is` g``ood``` (object)", blueprint, PropertyMemberTypeTraits);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -134,7 +143,7 @@ TEST_CASE("Identifier enclosed by backticks", "[signature]")
 TEST_CASE("Identifier enclosing not completed", "[signature]")
 {
     ParseResult<Blueprint> blueprint;
-    scpl::Signature signature = SignatureParserHelper::parse("_rel (object)", blueprint, 15);
+    scpl::Signature signature = SignatureParserHelper::parse("_rel (object)", blueprint, PropertyMemberTypeTraits);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -150,7 +159,7 @@ TEST_CASE("Identifier enclosing not completed", "[signature]")
 TEST_CASE("Extra space content after identifier enclosure", "[signature]")
 {
     ParseResult<Blueprint> blueprint;
-    scpl::Signature signature = SignatureParserHelper::parse("`a`   : 42", blueprint, 15);
+    scpl::Signature signature = SignatureParserHelper::parse("`a`   : 42", blueprint, PropertyMemberTypeTraits);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -166,7 +175,7 @@ TEST_CASE("Extra space content after identifier enclosure", "[signature]")
 TEST_CASE("Extra non-space content after identifier enclosure", "[signature]")
 {
     ParseResult<Blueprint> blueprint;
-    scpl::Signature signature = SignatureParserHelper::parse("`a`b : 42", blueprint, 15);
+    scpl::Signature signature = SignatureParserHelper::parse("`a`b : 42", blueprint, PropertyMemberTypeTraits);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.size() == 1);
@@ -182,7 +191,7 @@ TEST_CASE("Extra non-space content after identifier enclosure", "[signature]")
 TEST_CASE("Identifier description signature parsing", "[signature]")
 {
     ParseResult<Blueprint> blueprint;
-    scpl::Signature signature = SignatureParserHelper::parse("id - a good - info", blueprint, 15);
+    scpl::Signature signature = SignatureParserHelper::parse("id - a good - info", blueprint, PropertyMemberTypeTraits);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -197,7 +206,7 @@ TEST_CASE("Identifier description signature parsing", "[signature]")
 TEST_CASE("Identifier value signature parsing", "[signature]")
 {
     ParseResult<Blueprint> blueprint;
-    scpl::Signature signature = SignatureParserHelper::parse("id : a good data", blueprint, 15);
+    scpl::Signature signature = SignatureParserHelper::parse("id : a good data", blueprint, PropertyMemberTypeTraits);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -213,7 +222,7 @@ TEST_CASE("Identifier value signature parsing", "[signature]")
 TEST_CASE("Identifier attributes signature parsing", "[signature]")
 {
     ParseResult<Blueprint> blueprint;
-    scpl::Signature signature = SignatureParserHelper::parse("id (number)", blueprint, 15);
+    scpl::Signature signature = SignatureParserHelper::parse("id (number)", blueprint, PropertyMemberTypeTraits);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -229,7 +238,7 @@ TEST_CASE("Identifier attributes signature parsing", "[signature]")
 TEST_CASE("Element signature parsing", "[signature]")
 {
     ParseResult<Blueprint> blueprint;
-    scpl::Signature signature = SignatureParserHelper::parse(ElementSignatureFixture, blueprint, 14);
+    scpl::Signature signature = SignatureParserHelper::parse(ElementSignatureFixture, blueprint, ElementMemberTypeTraits);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -246,7 +255,7 @@ TEST_CASE("Element signature parsing", "[signature]")
 TEST_CASE("Escaped element signature parsing", "[signature]")
 {
     ParseResult<Blueprint> blueprint;
-    scpl::Signature signature = SignatureParserHelper::parse(EscapedElementSignatureFixture, blueprint, 14);
+    scpl::Signature signature = SignatureParserHelper::parse(EscapedElementSignatureFixture, blueprint, ElementMemberTypeTraits);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -263,7 +272,7 @@ TEST_CASE("Escaped element signature parsing", "[signature]")
 TEST_CASE("Element value signature parsing", "[signature]")
 {
     ParseResult<Blueprint> blueprint;
-    scpl::Signature signature = SignatureParserHelper::parse("42", blueprint, 14);
+    scpl::Signature signature = SignatureParserHelper::parse("42", blueprint, ElementMemberTypeTraits);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -279,7 +288,7 @@ TEST_CASE("Element value signature parsing", "[signature]")
 TEST_CASE("Element attributes signature parsing", "[signature]")
 {
     ParseResult<Blueprint> blueprint;
-    scpl::Signature signature = SignatureParserHelper::parse("(number)", blueprint, 14);
+    scpl::Signature signature = SignatureParserHelper::parse("(number)", blueprint, ElementMemberTypeTraits);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -295,7 +304,7 @@ TEST_CASE("Element attributes signature parsing", "[signature]")
 TEST_CASE("Element attributes description signature parsing", "[signature]")
 {
     ParseResult<Blueprint> blueprint;
-    scpl::Signature signature = SignatureParserHelper::parse("(number) - something () cool", blueprint, 14);
+    scpl::Signature signature = SignatureParserHelper::parse("(number) - something () cool", blueprint, ElementMemberTypeTraits);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -311,7 +320,7 @@ TEST_CASE("Element attributes description signature parsing", "[signature]")
 TEST_CASE("Property signature parsing with element traits", "[signature]")
 {
     ParseResult<Blueprint> blueprint;
-    scpl::Signature signature = SignatureParserHelper::parse(PropertySignatureFixture, blueprint, 14);
+    scpl::Signature signature = SignatureParserHelper::parse(PropertySignatureFixture, blueprint, ElementMemberTypeTraits);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -329,7 +338,7 @@ TEST_CASE("Property signature parsing with element traits", "[signature]")
 TEST_CASE("Property signature parsing without identifier", "[signature]")
 {
     ParseResult<Blueprint> blueprint;
-    scpl::Signature signature = SignatureParserHelper::parse("(x)", blueprint, 15);
+    scpl::Signature signature = SignatureParserHelper::parse("(x)", blueprint, PropertyMemberTypeTraits);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.size() == 1);
@@ -345,7 +354,7 @@ TEST_CASE("Property signature parsing without identifier", "[signature]")
 TEST_CASE("Property signature parsing without a value", "[signature]")
 {
     ParseResult<Blueprint> blueprint;
-    scpl::Signature signature = SignatureParserHelper::parse("id: (number)", blueprint, 15);
+    scpl::Signature signature = SignatureParserHelper::parse("id: (number)", blueprint, PropertyMemberTypeTraits);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.size() == 1);
@@ -361,7 +370,7 @@ TEST_CASE("Property signature parsing without a value", "[signature]")
 TEST_CASE("Element signature parsing without value and attributes", "[signature]")
 {
     ParseResult<Blueprint> blueprint;
-    scpl::Signature signature = SignatureParserHelper::parse("- content is the king", blueprint, 14);
+    scpl::Signature signature = SignatureParserHelper::parse("- content is the king", blueprint, ElementMemberTypeTraits);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.size() == 1);
@@ -374,11 +383,11 @@ TEST_CASE("Element signature parsing without value and attributes", "[signature]
     REQUIRE(signature.remainingContent.empty());
 }
 
-TEST_CASE("Escaped array element signatue parsing", "[signature]")
+TEST_CASE("Escaped array element signature parsing", "[signature]")
 {
     ParseResult<Blueprint> blueprint;
 
-    scpl::Signature signature = SignatureParserHelper::parse( "`1 `, 00 ``2, `3` da(t)a`` 45 ", blueprint, 14);
+    scpl::Signature signature = SignatureParserHelper::parse( "`1 `, 00 ``2, `3` da(t)a`` 45 ", blueprint, ElementMemberTypeTraits);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -395,7 +404,7 @@ TEST_CASE("Escaped array element signatue parsing", "[signature]")
 TEST_CASE("Unescaped array element signature parsing", "[signature]")
 {
     ParseResult<Blueprint> blueprint;
-    scpl::Signature signature = SignatureParserHelper::parse( "1 , 2,3 (optional, array) - numbers", blueprint, 14);
+    scpl::Signature signature = SignatureParserHelper::parse( "1 , 2,3 (optional, array) - numbers", blueprint, ElementMemberTypeTraits);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -415,7 +424,7 @@ TEST_CASE("Unescaped array element signature parsing", "[signature]")
 TEST_CASE("Escaped attributes signature parsing", "[signature]")
 {
     ParseResult<Blueprint> blueprint;
-    scpl::Signature signature = SignatureParserHelper::parse( "1 (`optio)nal, array` , fixed)", blueprint, 14);
+    scpl::Signature signature = SignatureParserHelper::parse( "1 (`optio)nal, array` , fixed)", blueprint, ElementMemberTypeTraits);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -433,7 +442,7 @@ TEST_CASE("Escaped attributes signature parsing", "[signature]")
 TEST_CASE("Attributes with many brackets signature parsing", "[signature]")
 {
     ParseResult<Blueprint> blueprint;
-    scpl::Signature signature = SignatureParserHelper::parse( "1 ([op(t[io]na)l, p][], [A](http://a.com))", blueprint, 14);
+    scpl::Signature signature = SignatureParserHelper::parse( "1 ([op(t[io]na)l, p][], [A](http://a.com))", blueprint, ElementMemberTypeTraits);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
