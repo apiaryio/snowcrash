@@ -178,9 +178,9 @@ TEST_CASE("Extra non-space content after identifier enclosure", "[signature]")
     scpl::Signature signature = SignatureParserHelper::parse("`a`b : 42", blueprint, PropertyMemberTypeTraits);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
-    REQUIRE(blueprint.report.warnings.size() == 1);
+    REQUIRE(blueprint.report.warnings.size() == 0);
 
-    REQUIRE(signature.identifier == "`a`");
+    REQUIRE(signature.identifier == "`a`b");
     REQUIRE(signature.values.size() == 1);
     REQUIRE(signature.values[0] == "42");
     REQUIRE(signature.attributes.empty());
