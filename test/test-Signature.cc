@@ -52,9 +52,9 @@ TEST_CASE("Escaped property signature parsing", "[signature]")
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
 
-    REQUIRE(signature.identifier == "`*id*(data):3`");
+    REQUIRE(signature.identifier == "*id*(data):3");
     REQUIRE(signature.values.size() == 1);
-    REQUIRE(signature.values[0] == "`42`");
+    REQUIRE(signature.values[0] == "42");
     REQUIRE(signature.attributes.size() == 2);
     REQUIRE(signature.attributes[0] == "yes");
     REQUIRE(signature.attributes[1] == "no");
@@ -132,7 +132,7 @@ TEST_CASE("Identifier enclosed by backticks", "[signature]")
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
 
-    REQUIRE(signature.identifier == "```username `is` g``ood```");
+    REQUIRE(signature.identifier == "username `is` g``ood");
     REQUIRE(signature.values.empty());
     REQUIRE(signature.attributes.size() == 1);
     REQUIRE(signature.attributes[0] == "object");
@@ -164,7 +164,7 @@ TEST_CASE("Extra space content after identifier enclosure", "[signature]")
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
 
-    REQUIRE(signature.identifier == "`a`");
+    REQUIRE(signature.identifier == "a");
     REQUIRE(signature.values.size() == 1);
     REQUIRE(signature.values[0] == "42");
     REQUIRE(signature.attributes.empty());
@@ -262,7 +262,7 @@ TEST_CASE("Escaped element signature parsing", "[signature]")
 
     REQUIRE(signature.identifier.empty());
     REQUIRE(signature.values.size() == 1);
-    REQUIRE(signature.values[0] == "`*42*(data):3`");
+    REQUIRE(signature.values[0] == "*42*(data):3");
     REQUIRE(signature.attributes.size() == 1);
     REQUIRE(signature.attributes[0] == "number");
     REQUIRE(signature.content == "a good number");
@@ -394,7 +394,7 @@ TEST_CASE("Escaped array element signature parsing", "[signature]")
 
     REQUIRE(signature.identifier.empty());
     REQUIRE(signature.values.size() == 2);
-    REQUIRE(signature.values[0] == "`1 `");
+    REQUIRE(signature.values[0] == "1");
     REQUIRE(signature.values[1] == "00 ``2, `3` da(t)a`` 45");
     REQUIRE(signature.attributes.empty());
     REQUIRE(signature.content.empty());

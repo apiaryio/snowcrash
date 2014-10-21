@@ -202,7 +202,7 @@ namespace scpl {
             snowcrash::TrimString(identifier);
 
             if (!identifier.empty()) {
-                out.identifier = identifier;
+                out.identifier = snowcrash::StripBackticks(identifier);
             }
 
             // If the subject ended with the identifier, strip it from the subject
@@ -267,7 +267,7 @@ namespace scpl {
                         snowcrash::TrimString(subject);
 
                         snowcrash::TrimString(value);
-                        out.values.push_back(value);
+                        out.values.push_back(snowcrash::StripBackticks(value));
 
                         value = "";
                         i = 0;
@@ -289,7 +289,7 @@ namespace scpl {
                 snowcrash::TrimString(value);
 
                 if (!value.empty()) {
-                    out.values.push_back(value);
+                    out.values.push_back(snowcrash::StripBackticks(value));
                 }
 
                 // If the subject ended with the values, strip the last value from the subject

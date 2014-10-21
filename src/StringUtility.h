@@ -193,13 +193,15 @@ namespace snowcrash {
      *
      * \param subject String that needs to be parsed
      * \param begin Character representing the beginning of the escaped string
+     * \param stripEscapeChars If true, strip the escape characters from the result string
      *
      * \return Returns the escaped string
      *
      * \example (begin = 1, subject = "a```b```cd") ----> (return = "```b```", subject = "cd")
      */
     inline std::string RetrieveEscaped(std::string& subject,
-                                       const size_t begin = 0) {
+                                       size_t begin = 0,
+                                       const bool stripEscapeChars = false) {
 
         size_t levels = 0;
         const char escapeChar = subject[begin];
@@ -216,10 +218,42 @@ namespace snowcrash {
             return "";
         }
 
-        end = end + (2 * levels) + begin;
+        if (stripEscapeChars) {
+            begin = begin + levels;
+            end = end + begin;
+        } else {
+            end = end + (2 * levels) + begin;
+        }
 
         std::string escapedString = subject.substr(begin, end - begin);
         subject = subject.substr(end);
+
+        return escapedString;
+    }
+
+    /**
+     * \brief
+     *
+     * \param subject String that needs to be stripped of enclosing backticks
+     *
+     * \return Substring that has been stripped of enclosing backticks
+     */
+    inline std::string StripBackticks(std::string subject) {
+
+        // Check if first and last chars are backticks
+        if (subject[0] != '`' ||
+            subject[subject.length() - 1] != '`') {
+
+            return subject;
+        }
+
+        std::string escapedString = RetrieveEscaped(subject, 0, true);
+
+        if (escapedString.empty()) {
+            return subject;
+        }
+
+        TrimString(escapedString);
 
         return escapedString;
     }
