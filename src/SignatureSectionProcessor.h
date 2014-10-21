@@ -34,7 +34,9 @@ namespace scpl {
         static const char EscapeCharacter = '`';
         static const char ValuesDelimiter = ':';
         static const char ValueDelimiter = ',';
-        static const char AttributesDelimiter = '(';
+        static const char AttributesStartDelimiter = '(';
+        static const char AttributesEndDelimiter = ')';
+        static const char AttributeDelimiter = ',';
         static const char ContentDelimiter = '-';
 
         /**
@@ -44,7 +46,7 @@ namespace scpl {
          */
         static SignatureTraits signatureTraits() {
 
-            SignatureTraits signatureTraits(0);
+            SignatureTraits signatureTraits;
             return signatureTraits;
         };
 
@@ -90,32 +92,30 @@ namespace scpl {
             subject = snowcrash::GetFirstLine(node->text, signature.remainingContent);
             snowcrash::TrimString(subject);
 
-            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-
             if (traits.identifierTrait &&
                 !subject.empty()) {
 
-                parseSignatureIdentifier(sourceMap, out.report, subject, signature);
+                parseSignatureIdentifier(node, pd, out.report, subject, signature);
             }
 
             // Make sure values exist
             if (traits.valuesTrait &&
                 !subject.empty() &&
-                subject[0] != AttributesDelimiter) {
+                subject[0] != AttributesStartDelimiter) {
 
                 // When subject starts with values, add a ':' for easier processing
                 if (!traits.identifierTrait) {
                     subject = ValuesDelimiter + subject;
                 }
 
-                parseSignatureValues(sourceMap, out.report, subject, signature);
+                parseSignatureValues(node, pd, out.report, subject, signature);
             }
 
             if (traits.attributesTrait &&
                 !subject.empty() &&
                 subject[0] != ContentDelimiter) {
 
-                parseSignatureAttributes(sourceMap, out.report, subject, signature);
+                parseSignatureAttributes(node, pd, out.report, subject, signature);
             }
 
             if (traits.contentTrait &&
@@ -147,27 +147,29 @@ namespace scpl {
         /**
          * \brief Parse the identifier from the signature
          *
-         * \param sourceMap Source map of the node
+         * \param node Markdown node
+         * \param pd Section Parser data
          * \param report Parse Report
-         * \param subject Signature of the section that needs to be parsed
+         * \param subject String that needs to be parsed
+         *                (which will be stripped of the parsed characters)
          * \param out Signature data structure
          */
-        static void parseSignatureIdentifier(const mdp::CharactersRangeSet sourceMap,
+        static void parseSignatureIdentifier(const MarkdownNodeIterator& node,
+                                             snowcrash::SectionParserData& pd,
                                              snowcrash::Report& report,
                                              mdp::ByteBuffer& subject,
                                              Signature& out) {
 
             snowcrash::TrimString(subject);
 
-            size_t end;
+            // `*` and `_` are markdown characters for emphasis
+            std::string escapeCharacters = "*_`";
             bool isEnclosed = false;
 
             // If the identifier is enclosed, retrieve it
-            if (subject[0] == '*' ||
-                subject[0] == '_' ||
-                subject[0] == EscapeCharacter) {
+            if (escapeCharacters.find(subject[0]) != std::string::npos) {
 
-                mdp::ByteBuffer escapedString = snowcrash::RetrieveEscaped(subject, 0, subject[0]);
+                mdp::ByteBuffer escapedString = snowcrash::RetrieveEscaped(subject, 0);
 
                 if (!escapedString.empty()) {
                     isEnclosed = true;
@@ -178,10 +180,10 @@ namespace scpl {
             snowcrash::TrimString(subject);
 
             // Look for next part of the signature section
-            end = subject.find_first_of(ValuesDelimiter);
+            size_t end = subject.find_first_of(ValuesDelimiter);
 
             if (end == std::string::npos) {
-                end = subject.find_first_of(AttributesDelimiter);
+                end = subject.find_first_of(AttributesStartDelimiter);
 
                 if (end == std::string::npos) {
                     end = subject.find_first_of(ContentDelimiter);
@@ -197,6 +199,7 @@ namespace scpl {
                 if (isEnclosed) {
 
                     // WARN: Extraneous content after enclosed identifier
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
                     report.warnings.push_back(snowcrash::Warning("identifier not formatted correctly",
                                                                  snowcrash::FormattingWarning,
                                                                  sourceMap));
@@ -209,6 +212,7 @@ namespace scpl {
             if (out.identifier.empty()) {
 
                 // WARN: Empty identifier
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
                 report.warnings.push_back(snowcrash::Warning("empty identifier",
                                                              snowcrash::EmptyDefinitionWarning,
                                                              sourceMap));
@@ -220,8 +224,16 @@ namespace scpl {
 
         /**
          * \brief Parse the values from the signature
+         *
+         * \param node Markdown node
+         * \param pd Section Parser data
+         * \param report Parse Report
+         * \param subject String that needs to be parsed
+         *                (which will be stripped of the parsed characters)
+         * \param out Signature data structure
          */
-        static void parseSignatureValues(const mdp::CharactersRangeSet sourceMap,
+        static void parseSignatureValues(const MarkdownNodeIterator& node,
+                                         snowcrash::SectionParserData& pd,
                                          snowcrash::Report& report,
                                          mdp::ByteBuffer& subject,
                                          Signature& out) {
@@ -254,7 +266,7 @@ namespace scpl {
 
                         value = "";
                         i = 0;
-                    } else if (subject[i] == AttributesDelimiter ||
+                    } else if (subject[i] == AttributesStartDelimiter ||
                                subject[i] == ContentDelimiter) {
 
                         // If values section ends, cut it from subject
@@ -283,6 +295,7 @@ namespace scpl {
                 if (out.values.empty()) {
 
                     // WARN: Empty values
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
                     report.warnings.push_back(snowcrash::Warning("empty values",
                                                                  snowcrash::EmptyDefinitionWarning,
                                                                  sourceMap));
@@ -294,64 +307,74 @@ namespace scpl {
 
         /**
          * \brief Parse the attributes from the signature
+         *
+         * \param node Markdown node
+         * \param pd Section Parser data
+         * \param report Parse Report
+         * \param subject String that needs to be parsed
+         *                (which will be stripped of the parsed characters)
+         * \param out Signature data structure
          */
-        static void parseSignatureAttributes(const mdp::CharactersRangeSet sourceMap,
+        static void parseSignatureAttributes(const MarkdownNodeIterator& node,
+                                             snowcrash::SectionParserData& pd,
                                              snowcrash::Report& report,
                                              mdp::ByteBuffer& subject,
                                              Signature& out) {
 
-            if (subject[0] == AttributesDelimiter) {
-
-                bool attributesNotFinished = true;
-
-                // While there are attributes still left
-                do {
-                    // Retrieve attribute
-                    mdp::ByteBuffer attribute = recursiveBracketMatch(subject, 0, ')', true);
-                    size_t length = attribute.size();
-
-                    // If the last char is not a comma, attributes are finished
-                    if (attribute[length - 1] != ',') {
-                        attributesNotFinished = false;
-                    } else {
-                        attribute = attribute.substr(0, length - 1);
-
-                        // For easier processing
-                        subject = "(" + subject;
-                    }
-
-                    snowcrash::TrimString(attribute);
-
-                    if (!attribute.empty()) {
-                        out.attributes.push_back(attribute);
-                    }
-                } while (attributesNotFinished);
-
-                snowcrash::TrimString(subject);
+            if (subject[0] != AttributesStartDelimiter) {
+                return;
             }
+
+            bool attributesNotFinished = true;
+
+            // While there are attributes still left
+            while (attributesNotFinished) {
+
+                // Retrieve attribute
+                mdp::ByteBuffer attribute = matchBrackets(subject, 0, AttributesEndDelimiter, true);
+                size_t length = attribute.size();
+
+                // If the last char is not an attribute delimiter, attributes are finished
+                if (attribute[length - 1] != AttributeDelimiter) {
+                    attributesNotFinished = false;
+                } else {
+                    attribute = attribute.substr(0, length - 1);
+
+                    // For easier processing
+                    subject = AttributesStartDelimiter + subject;
+                }
+
+                snowcrash::TrimString(attribute);
+
+                if (!attribute.empty()) {
+                    out.attributes.push_back(attribute);
+                }
+            };
+
+            snowcrash::TrimString(subject);
         };
 
         /**
-         * \brief Find the matching bracket while doing the same for nested brackets and return
-         *        the string until there while also cutting the signature that needs to be parsed
+         * \brief Find the matching bracket while ignoring any nested brackets and return the string
+         *        enclosed by them, while also stripping the string that needs to be parsed
          *
-         * \param subject The signature section that needs to be parsed
+         * \param subject The string that needs to be parsed
          * \param begin Character index representing the beginning of the bracket that needs to be matched
          * \param endBracket The type of bracket that needs to be matched
-         * \param splitByComma If this is true, we need to return when we find a non-nested comma
+         * \param splitByAttribute If this is true, we need to return when we find a top-level attribute delimiter
          *
          * \return String inside the given brackets. If not splitting by comma, append the brackets too
          */
-        static mdp::ByteBuffer recursiveBracketMatch(mdp::ByteBuffer& subject,
-                                                     size_t begin,
-                                                     const char endBracket,
-                                                     const bool splitByComma = false) {
+        static mdp::ByteBuffer matchBrackets(mdp::ByteBuffer& subject,
+                                             size_t begin,
+                                             const char endBracket,
+                                             const bool splitByAttribute = false) {
 
             size_t i = begin + 1;
             mdp::ByteBuffer returnString;
 
             // Append the beginning bracket
-            if (!splitByComma) {
+            if (!splitByAttribute) {
                 returnString += subject[begin];
             }
 
@@ -366,22 +389,22 @@ namespace scpl {
                     i = 0;
                 } else if (subject[i] == '[') {
 
-                    returnString += recursiveBracketMatch(subject, i, ']');
+                    returnString += matchBrackets(subject, i, ']');
                     i = 0;
                 } else if (subject[i] == '(') {
 
-                    returnString += recursiveBracketMatch(subject, i, ')');
+                    returnString += matchBrackets(subject, i, ')');
                     i = 0;
                 } else if (subject[i] == endBracket) {
 
                     // Append the ending bracket
-                    if (!splitByComma) {
+                    if (!splitByAttribute) {
                         returnString += subject[i];
                     }
 
                     subject = subject.substr(i + 1);
                     break;
-                } else if (splitByComma && subject[i] == ',') {
+                } else if (splitByAttribute && subject[i] == AttributeDelimiter) {
 
                     // Return when encountering comma
                     returnString += subject[i];

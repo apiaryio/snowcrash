@@ -186,28 +186,31 @@ namespace snowcrash {
     };
 
     /**
-     * \brief Retrieve strings enclosed by matching backticks
+     * \brief Retrieve the string enclosed by the given matching escaping characters
      *
-     * \param subject Signature of the section that needs to be parsed
-     * \param begin Character index representing the beginning of the escaped string
-     * \param escapeChar Character used to escape the string
+     *        Please note that the subject will be stripped of the escaped string
+     *        and the characters before it
      *
-     * \return Returns the escaped string, new subject will be from the end of the escaped string
+     * \param subject String that needs to be parsed
+     * \param begin Character representing the beginning of the escaped string
      *
-     * \example (begin = 1, escapeChar = "`", subject = "a```b```cd") ----> (return = "```b```", subject = "cd")
+     * \return Returns the escaped string
+     *
+     * \example (begin = 1, subject = "a```b```cd") ----> (return = "```b```", subject = "cd")
      */
     inline std::string RetrieveEscaped(std::string& subject,
-                                       const size_t begin,
-                                       const char escapeChar = '`') {
+                                       const size_t begin) {
 
-        size_t levels = 0, end;
+        size_t levels = 0;
+        const char escapeChar = subject[begin];
 
         // Get the level of the backticks
         while (subject[levels + begin] == escapeChar) {
             levels++;
         }
 
-        end = subject.substr(levels + begin).find(subject.substr(begin, levels));
+        std::string borderChars = subject.substr(begin, levels);
+        size_t end = subject.substr(levels + begin).find(borderChars);
 
         if (end == std::string::npos) {
             return "";
