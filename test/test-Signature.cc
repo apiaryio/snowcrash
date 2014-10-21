@@ -369,17 +369,21 @@ TEST_CASE("Property signature parsing without a value", "[signature]")
 
 TEST_CASE("Element signature parsing without value and attributes", "[signature]")
 {
+    mdp::MarkdownNode source(mdp::RootMarkdownNodeType, NULL, "");
+    mdp::MarkdownNode paragraph(mdp::ParagraphMarkdownNodeType, &source, "- content is the king");
+
+    source.children().push_back(paragraph);
+
     ParseResult<Blueprint> blueprint;
-    scpl::Signature signature = SignatureParserHelper::parse("- content is the king", blueprint, ElementMemberTypeTraits);
+    scpl::Signature signature = SignatureParserHelper::parse("", blueprint, ElementMemberTypeTraits, &source);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.size() == 1);
 
     REQUIRE(signature.identifier.empty());
-    REQUIRE(signature.values.size() == 1);
-    REQUIRE(signature.values[0] == "- content is the king");
+    REQUIRE(signature.values.size() == 0);
     REQUIRE(signature.attributes.empty());
-    REQUIRE(signature.content.empty());
+    REQUIRE(signature.content == "content is the king");
     REQUIRE(signature.remainingContent.empty());
 }
 
