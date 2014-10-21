@@ -164,49 +164,50 @@ namespace scpl {
 
             // `*` and `_` are markdown characters for emphasis
             std::string escapeCharacters = "*_`";
-            bool isEnclosed = false;
 
-            // If the identifier is enclosed, retrieve it
-            if (escapeCharacters.find(subject[0]) != std::string::npos) {
+            size_t i = 0;
+            mdp::ByteBuffer identifier;
 
-                mdp::ByteBuffer escapedString = snowcrash::RetrieveEscaped(subject, 0);
+            // Traverse over the string
+            while (i < subject.length()) {
 
-                if (!escapedString.empty()) {
-                    isEnclosed = true;
-                    out.identifier = escapedString;
-                }
-            }
+                if (escapeCharacters.find(subject[i]) != std::string::npos) {
 
-            snowcrash::TrimString(subject);
+                    // If escaped string, retrieve it and strip it from the subject
+                    mdp::ByteBuffer escapedString = snowcrash::RetrieveEscaped(subject);
 
-            // Look for next part of the signature section
-            size_t end = subject.find_first_of(ValuesDelimiter);
-
-            if (end == std::string::npos) {
-                end = subject.find_first_of(AttributesStartDelimiter);
-
-                if (end == std::string::npos) {
-                    end = subject.find_first_of(ContentDelimiter);
-
-                    if (end == std::string::npos) {
-                        end = subject.length();
+                    if (!escapedString.empty()) {
+                        identifier += escapedString;
+                        i = 0;
+                    } else {
+                        identifier += subject[i];
+                        i++;
                     }
+                } else if (subject[i] == ValuesDelimiter ||
+                           subject[i] == AttributesStartDelimiter ||
+                           subject[i] == ContentDelimiter) {
+
+                    // If identifier ends, strip it from the subject
+                    subject = subject.substr(i);
+                    i = 0;
+                    break;
+                } else {
+
+                    identifier += subject[i];
+                    i++;
                 }
             }
 
-            // Retrieve the identifier if not done above
-            if (end > 1) {
-                if (isEnclosed) {
+            // Assign the identifier
+            snowcrash::TrimString(identifier);
 
-                    // WARN: Extraneous content after enclosed identifier
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                    report.warnings.push_back(snowcrash::Warning("identifier not formatted correctly",
-                                                                 snowcrash::FormattingWarning,
-                                                                 sourceMap));
-                } else {
-                    out.identifier = subject.substr(0, end);
-                    snowcrash::TrimString(out.identifier);
-                }
+            if (!identifier.empty()) {
+                out.identifier = identifier;
+            }
+
+            // If the subject ended with the identifier, strip it from the subject
+            if (i == subject.length()) {
+                subject = "";
             }
 
             if (out.identifier.empty()) {
@@ -218,7 +219,6 @@ namespace scpl {
                                                              sourceMap));
             }
 
-            subject = subject.substr(end);
             snowcrash::TrimString(subject);
         };
 
@@ -250,14 +250,19 @@ namespace scpl {
 
                     if (subject[i] == EscapeCharacter) {
 
-                        // If escaped string, retrieve it and cut it from subject
+                        // If escaped string, retrieve it and strip it from subject
                         mdp::ByteBuffer escapedString = snowcrash::RetrieveEscaped(subject, i);
 
-                        value += escapedString;
-                        i = 0;
+                        if (!escapedString.empty()) {
+                            value += escapedString;
+                            i = 0;
+                        } else {
+                            value += subject[i];
+                            i++;
+                        }
                     } else if (subject[i] == ValueDelimiter) {
 
-                        // If found value delimiter, add the value and cut it from subject
+                        // If found value delimiter, add the value and strip it from subject
                         subject = subject.substr(i + 1);
                         snowcrash::TrimString(subject);
 
@@ -269,7 +274,7 @@ namespace scpl {
                     } else if (subject[i] == AttributesStartDelimiter ||
                                subject[i] == ContentDelimiter) {
 
-                        // If values section ends, cut it from subject
+                        // If values section ends, strip it from subject
                         subject = subject.substr(i);
                         i = 0;
                         break;
@@ -287,7 +292,7 @@ namespace scpl {
                     out.values.push_back(value);
                 }
 
-                // If the subject ended with the values, cut the last value from the subject
+                // If the subject ended with the values, strip the last value from the subject
                 if (i == subject.length()) {
                     subject = "";
                 }
@@ -382,11 +387,16 @@ namespace scpl {
 
                 if (subject[i] == EscapeCharacter) {
 
-                    // If escaped string, retrieve it and cut it from subject
+                    // If escaped string, retrieve it and strip it from subject
                     mdp::ByteBuffer escapedString = snowcrash::RetrieveEscaped(subject, i);
 
-                    returnString += escapedString;
-                    i = 0;
+                    if (!escapedString.empty()) {
+                        returnString += escapedString;
+                        i = 0;
+                    } else {
+                        returnString += subject[i];
+                        i++;
+                    }
                 } else if (subject[i] == '[') {
 
                     returnString += matchBrackets(subject, i, ']');
