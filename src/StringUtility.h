@@ -199,7 +199,7 @@ namespace snowcrash {
      * \example (begin = 1, subject = "a```b```cd") ----> (return = "```b```", subject = "cd")
      */
     inline std::string RetrieveEscaped(std::string& subject,
-                                       const size_t begin) {
+                                       const size_t begin = 0) {
 
         size_t levels = 0;
         const char escapeChar = subject[begin];
