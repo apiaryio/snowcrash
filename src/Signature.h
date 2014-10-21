@@ -52,9 +52,9 @@ namespace scpl {
     struct SignatureTraits {
 
         enum Trait {
-            IdentifierTrait = (1 << 0), // Expect an Identifier in the signature
-            ValuesTrait     = (1 << 1), // Expect a (list of) Value in the signature
-            AttributesTrait = (1 << 2), // Expect Type definition in the signature
+            IdentifierTrait = (1 << 0), // Expect an identifier in the signature
+            ValuesTrait     = (1 << 1), // Expect a (list of) value in the signature
+            AttributesTrait = (1 << 2), // Expect a list of attributes in the signature
             ContentTrait    = (1 << 3)  // Expect inline description in the signature
         };
 
