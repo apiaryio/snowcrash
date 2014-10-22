@@ -25,12 +25,6 @@ namespace scpl {
     const char AttributeDelimiter = ',';
     const char ContentDelimiter = '-';
 
-    /*
-     * Forward Declarations
-     */
-    template<typename T>
-    struct SignatureSectionProcessor;
-
     /**
      * \brief Signature Section Processor Base
      *
@@ -60,13 +54,13 @@ namespace scpl {
                                                      const snowcrash::ParseResultRef<T>& out) {
 
             // Get the signature traits of the section
-            SignatureTraits signatureTraits = SignatureSectionProcessor<T>::signatureTraits();
+            SignatureTraits signatureTraits = snowcrash::SectionProcessor<T>::signatureTraits();
 
             // Parse Signature
-            Signature signature = SignatureSectionProcessor<T>::parseSignature(node, pd, signatureTraits, out);
+            Signature signature = snowcrash::SectionProcessor<T>::parseSignature(node, pd, signatureTraits, out);
 
             // Do section specific logic using the signature data
-            SignatureSectionProcessor<T>::finalizeSignature(node, pd, signature, out);
+            snowcrash::SectionProcessor<T>::finalizeSignature(node, pd, signature, out);
 
             return ++MarkdownNodeIterator(node);
         };
@@ -429,13 +423,6 @@ namespace scpl {
 
             return returnString;
         }
-    };
-
-    /**
-     * Default Signature Section Processor
-     */
-    template<typename T>
-    struct SignatureSectionProcessor : public SignatureSectionProcessorBase<T> {
     };
 }
 

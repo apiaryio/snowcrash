@@ -9,7 +9,7 @@
 #ifndef SNOWCRASH_MSONUTILITY_H
 #define SNOWCRASH_MSONUTILITY_H
 
-#include "MSON.h"
+#include "MSONSourcemap.h"
 
 namespace mson {
 

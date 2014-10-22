@@ -7,17 +7,20 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		404CD83A1A07D38300AB1416 /* MSONSourcemap.h in Headers */ = {isa = PBXBuildFile; fileRef = 404CD8381A07D38300AB1416 /* MSONSourcemap.h */; };
+		404CD83B1A07D38300AB1416 /* MSONValueMemberParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 404CD8391A07D38300AB1416 /* MSONValueMemberParser.h */; };
+		404CD83F1A07D3A800AB1416 /* test-MSONValueMemberParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = 404CD83E1A07D3A800AB1416 /* test-MSONValueMemberParser.cc */; };
 		4056BE0B19EE98C5003AC26C /* test-Signature.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4056BE0A19EE98C5003AC26C /* test-Signature.cc */; };
 		406B664F19FA6F63003CBD3A /* test-MSONUtility.cc in Sources */ = {isa = PBXBuildFile; fileRef = 406B664E19FA6F63003CBD3A /* test-MSONUtility.cc */; };
 		4070F30419E4C30A004892C8 /* BlueprintSourcemap.h in Headers */ = {isa = PBXBuildFile; fileRef = 4070F30119E4C30A004892C8 /* BlueprintSourcemap.h */; };
 		4070F30519E4C30A004892C8 /* CBlueprintSourcemap.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4070F30219E4C30A004892C8 /* CBlueprintSourcemap.cc */; };
 		4070F30619E4C30A004892C8 /* CBlueprintSourcemap.h in Headers */ = {isa = PBXBuildFile; fileRef = 4070F30319E4C30A004892C8 /* CBlueprintSourcemap.h */; };
 		4075AA1119F95398003C2649 /* MSONUtility.h in Headers */ = {isa = PBXBuildFile; fileRef = 4075AA1019F95398003C2649 /* MSONUtility.h */; };
+		40A1EE0B19EC0A0B00DB894A /* MSON.h in Headers */ = {isa = PBXBuildFile; fileRef = 40A1EE0A19EC0A0B00DB894A /* MSON.h */; };
+		40C61A2619F16C7300EC506D /* SignatureSectionProcessor.h in Headers */ = {isa = PBXBuildFile; fileRef = 40C61A2519F16C7300EC506D /* SignatureSectionProcessor.h */; };
 		40CA216119FE989F0086531D /* ModelTable.h in Headers */ = {isa = PBXBuildFile; fileRef = 40CA216019FE989F0086531D /* ModelTable.h */; };
 		40CA216319FE99150086531D /* test-ModelTable.cc in Sources */ = {isa = PBXBuildFile; fileRef = 40CA216219FE99150086531D /* test-ModelTable.cc */; };
 		40CA216519FE993E0086531D /* test-StringUtility.cc in Sources */ = {isa = PBXBuildFile; fileRef = 40CA216419FE993E0086531D /* test-StringUtility.cc */; };
-		40A1EE0B19EC0A0B00DB894A /* MSON.h in Headers */ = {isa = PBXBuildFile; fileRef = 40A1EE0A19EC0A0B00DB894A /* MSON.h */; };
-		40C61A2619F16C7300EC506D /* SignatureSectionProcessor.h in Headers */ = {isa = PBXBuildFile; fileRef = 40C61A2519F16C7300EC506D /* SignatureSectionProcessor.h */; };
 		BB05B9D81804493500243E1B /* perf-snowcrash.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB05B9D71804493500243E1B /* perf-snowcrash.cc */; };
 		BB05B9D918044C8200243E1B /* libsnowcrash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBFF4898170B34E6001E5FB2 /* libsnowcrash.a */; };
 		BB088F78192D7901003AA95C /* SectionParserData.h in Headers */ = {isa = PBXBuildFile; fileRef = BB088F77192D7901003AA95C /* SectionParserData.h */; };
@@ -137,17 +140,20 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		404CD8381A07D38300AB1416 /* MSONSourcemap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MSONSourcemap.h; path = src/MSONSourcemap.h; sourceTree = "<group>"; };
+		404CD8391A07D38300AB1416 /* MSONValueMemberParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MSONValueMemberParser.h; path = src/MSONValueMemberParser.h; sourceTree = "<group>"; };
+		404CD83E1A07D3A800AB1416 /* test-MSONValueMemberParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-MSONValueMemberParser.cc"; path = "test/test-MSONValueMemberParser.cc"; sourceTree = "<group>"; };
 		4056BE0A19EE98C5003AC26C /* test-Signature.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-Signature.cc"; path = "test/test-Signature.cc"; sourceTree = "<group>"; };
 		406B664E19FA6F63003CBD3A /* test-MSONUtility.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-MSONUtility.cc"; path = "test/test-MSONUtility.cc"; sourceTree = "<group>"; };
 		4070F30119E4C30A004892C8 /* BlueprintSourcemap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BlueprintSourcemap.h; path = src/BlueprintSourcemap.h; sourceTree = "<group>"; };
 		4070F30219E4C30A004892C8 /* CBlueprintSourcemap.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CBlueprintSourcemap.cc; path = src/CBlueprintSourcemap.cc; sourceTree = "<group>"; };
 		4070F30319E4C30A004892C8 /* CBlueprintSourcemap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CBlueprintSourcemap.h; path = src/CBlueprintSourcemap.h; sourceTree = "<group>"; };
 		4075AA1019F95398003C2649 /* MSONUtility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MSONUtility.h; path = src/MSONUtility.h; sourceTree = "<group>"; };
+		40A1EE0A19EC0A0B00DB894A /* MSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MSON.h; path = src/MSON.h; sourceTree = "<group>"; };
+		40C61A2519F16C7300EC506D /* SignatureSectionProcessor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SignatureSectionProcessor.h; path = src/SignatureSectionProcessor.h; sourceTree = "<group>"; };
 		40CA216019FE989F0086531D /* ModelTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ModelTable.h; path = src/ModelTable.h; sourceTree = "<group>"; };
 		40CA216219FE99150086531D /* test-ModelTable.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-ModelTable.cc"; path = "test/test-ModelTable.cc"; sourceTree = "<group>"; };
 		40CA216419FE993E0086531D /* test-StringUtility.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-StringUtility.cc"; path = "test/test-StringUtility.cc"; sourceTree = "<group>"; };
-		40A1EE0A19EC0A0B00DB894A /* MSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MSON.h; path = src/MSON.h; sourceTree = "<group>"; };
-		40C61A2519F16C7300EC506D /* SignatureSectionProcessor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SignatureSectionProcessor.h; path = src/SignatureSectionProcessor.h; sourceTree = "<group>"; };
 		BB03DC6417D3717B00C51E52 /* ParametersParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = ParametersParser.h; path = src/ParametersParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BB03DC6517D3718D00C51E52 /* test-ParametersParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-ParametersParser.cc"; path = "test/test-ParametersParser.cc"; sourceTree = "<group>"; };
 		BB05B9CE180448E300243E1B /* perf-libsnowcrash */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "perf-libsnowcrash"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -322,6 +328,7 @@
 				BB45781D182326EE00D0293A /* test-Indentation.cc */,
 				40CA216219FE99150086531D /* test-ModelTable.cc */,
 				406B664E19FA6F63003CBD3A /* test-MSONUtility.cc */,
+				404CD83E1A07D3A800AB1416 /* test-MSONValueMemberParser.cc */,
 				BBCC856019542DB300B99E90 /* test-ParameterParser.cc */,
 				BB03DC6517D3718D00C51E52 /* test-ParametersParser.cc */,
 				BBE5705C173922B70086CE22 /* test-PayloadParser.cc */,
@@ -363,7 +370,9 @@
 				BB92D88F178EF4160098A63C /* HTTP.h */,
 				40CA216019FE989F0086531D /* ModelTable.h */,
 				40A1EE0A19EC0A0B00DB894A /* MSON.h */,
+				404CD8381A07D38300AB1416 /* MSONSourcemap.h */,
 				4075AA1019F95398003C2649 /* MSONUtility.h */,
+				404CD8391A07D38300AB1416 /* MSONValueMemberParser.h */,
 				BBCC855C19542DA100B99E90 /* ParameterParser.h */,
 				BB03DC6417D3717B00C51E52 /* ParametersParser.h */,
 				BBE5705F173927870086CE22 /* PayloadParser.h */,
@@ -422,6 +431,7 @@
 				40CA216119FE989F0086531D /* ModelTable.h in Headers */,
 				40A1EE0B19EC0A0B00DB894A /* MSON.h in Headers */,
 				4075AA1119F95398003C2649 /* MSONUtility.h in Headers */,
+				404CD83B1A07D38300AB1416 /* MSONValueMemberParser.h in Headers */,
 				BBD5F9CE17353CE00049BBEE /* ResourceParser.h in Headers */,
 				4070F30419E4C30A004892C8 /* BlueprintSourcemap.h in Headers */,
 				BBE57061173927870086CE22 /* PayloadParser.h in Headers */,
@@ -434,6 +444,7 @@
 				BB088F78192D7901003AA95C /* SectionParserData.h in Headers */,
 				BBFC8420196C0C0F001A236A /* UriTemplateParser.h in Headers */,
 				BBE53563174132B100BCA7AD /* SerializeYAML.h in Headers */,
+				404CD83A1A07D38300AB1416 /* MSONSourcemap.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -594,6 +605,7 @@
 				BBE7FEBE1922CAF300A1649E /* test-Blueprint.cc in Sources */,
 				BBCC856719543A4D00B99E90 /* test-SectionParser.cc in Sources */,
 				BBB127881999700E0041E9AE /* test-ResourceGroupParser.cc in Sources */,
+				404CD83F1A07D3A800AB1416 /* test-MSONValueMemberParser.cc in Sources */,
 				BBCC856519542E5600B99E90 /* test-PayloadParser.cc in Sources */,
 				BBCC856419542E5100B99E90 /* test-ParametersParser.cc in Sources */,
 				BBB1278B199970350041E9AE /* test-Indentation.cc in Sources */,

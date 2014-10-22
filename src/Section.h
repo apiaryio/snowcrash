@@ -37,7 +37,8 @@ namespace snowcrash {
         ParametersSectionType,          /// < Parameters
         ParameterSectionType,           /// < One Parameter definition
         ValuesSectionType,              /// < Value enumeration
-        ValueSectionType                /// < One Value
+        ValueSectionType,               /// < One Value
+        MSONValueMemberSectionType      /// < MSON Value Member Type
     };
 
     /** \return Human readable name for given %SectionType */
