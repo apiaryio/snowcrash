@@ -189,7 +189,7 @@ TEST_CASE("Headers parses should return warning on multiple definition of same h
     REQUIRE(headers.report.error.code == Error::OK);
     REQUIRE(headers.report.warnings.size() == 1); // one warning due to multiple declaration same header
 
-    REQUIRE(headers.node.size() == 2); 
+    REQUIRE(headers.node.size() == 2);
 }
 
 TEST_CASE("Parse header section with more same headers Set-Cookie and Link - there should not be warning", "[headers][issue][#75]")
@@ -254,3 +254,67 @@ TEST_CASE("Aditional test for Header name insenstivity combined with allowed mul
     REQUIRE(headers.node[1].first == "Set-Cookie");
     REQUIRE(headers.node[1].second == "kockaprede");
 }
+
+TEST_CASE("Headers should  name against token definition", "[headers][issue][#158]")
+{
+
+    SECTION("Forget semicolon - but there at least one colon in value") {
+        const mdp::ByteBuffer source = \
+        "+ Headers\n\n"\
+        "        Last-Modified Sat, 02 Aug 2014 23:10:05 GMT\n";
+        ParseResult<Headers> headers;
+        SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
+
+        REQUIRE(headers.report.error.code == Error::OK); // no error
+        REQUIRE(headers.report.warnings.size() == 1);    // warning - header is not defined correctly
+        REQUIRE(headers.report.warnings[0].message == "Missing colon after header name");
+
+        REQUIRE(headers.node[0].first == "Last-Modified");
+        REQUIRE(headers.node[0].second == "Sat, 02 Aug 2014 23:10:05 GMT");
+    }
+
+    SECTION("No colon") {
+        const mdp::ByteBuffer source = \
+        "+ Headers\n\n"\
+        "        Set-Cookie chocolate cookie\n";
+        ParseResult<Headers> headers;
+        SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
+
+        REQUIRE(headers.report.error.code == Error::OK); // no error
+        REQUIRE(headers.report.warnings.size() == 1);    // warning - header is not defined correctly
+        REQUIRE(headers.report.warnings[0].message == "Missing colon after header name");
+
+        REQUIRE(headers.node[0].first == "Set-Cookie");
+        REQUIRE(headers.node[0].second == "chocolate cookie");
+    }
+
+    SECTION("More colons") {
+        const mdp::ByteBuffer source = \
+        "+ Headers\n\n"\
+        "        Set-Cookie :: chocolate cookie\n";
+        ParseResult<Headers> headers;
+        SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
+
+        REQUIRE(headers.report.error.code == Error::OK); // no error
+        REQUIRE(headers.report.warnings.size() == 0);    // warning - header is not defined correctly
+
+        REQUIRE(headers.node[0].first == "Set-Cookie");
+        REQUIRE(headers.node[0].second == ": chocolate cookie");
+    }
+
+    SECTION("Strange but valid token") {
+        const mdp::ByteBuffer source = \
+        "+ Headers\n\n"\
+        "        # : chocolate cookie\n";
+        ParseResult<Headers> headers;
+        SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
+
+        REQUIRE(headers.report.error.code == Error::OK); // no error
+        REQUIRE(headers.report.warnings.size() == 0);    // warning - header is not defined correctly
+
+        REQUIRE(headers.node[0].first == "#");
+        REQUIRE(headers.node[0].second == "chocolate cookie");
+    }
+
+}
+

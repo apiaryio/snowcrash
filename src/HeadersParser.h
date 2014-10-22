@@ -14,6 +14,7 @@
 #include "CodeBlockUtility.h"
 #include "StringUtility.h"
 #include "BlueprintUtility.h"
+#include "RegexMatch.h"
 
 namespace snowcrash {
 
@@ -108,6 +109,45 @@ namespace snowcrash {
             }
         }
 
+        static bool parseHeaderLine(const mdp::ByteBuffer& line, 
+            KeyValuePair& keyValuePair,
+            const ParseResultRef<Headers>& out,
+            mdp::CharactersRangeSet sourceMap) {
+
+#define HEADER_NAME_TOKEN "[[:alnum:]!#$%&'*+-.^_`|~]+"
+            std::string re = "^[[:blank:]]*(" HEADER_NAME_TOKEN ")[[:blank:]]*(:|[[:blank:]]+)(.*)$";
+#undef HEADER_NAME_TOKEN
+
+            CaptureGroups parts;
+            bool matched = RegexCapture(line, re, parts, 4);
+
+            if (!matched)
+                return false;
+
+            keyValuePair = std::make_pair(parts[1], parts[3]);
+            TrimString(keyValuePair.first);
+            TrimString(keyValuePair.second);
+
+            if (parts[2].size() < 1 || parts[2][0] != ':') {
+                out.report.warnings.push_back(Warning("Missing colon after header name",
+                    FormattingWarning,
+                    sourceMap));
+            }
+
+            if (findHeader(out.node, keyValuePair) != out.node.end() && !isAllowedMultipleDefinition(keyValuePair)) {
+                // WARN: duplicate header on this level
+                std::stringstream ss;
+
+                ss << "duplicate definition of '" << keyValuePair.first << "' header";
+
+                out.report.warnings.push_back(Warning(ss.str(),
+                    DuplicateWarning,
+                    sourceMap));
+            }
+
+            return (!keyValuePair.first.empty() && !keyValuePair.second.empty());
+        }
+
         /** Retrieve headers from content */
         static void headersFromContent(const MarkdownNodeIterator& node,
                                        const mdp::ByteBuffer& content,
@@ -125,20 +165,9 @@ namespace snowcrash {
                 }
 
                 Header header;
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
 
-                if (CodeBlockUtility::keyValueFromLine(*line, header)) {
-                    if (findHeader(out.node, header) != out.node.end() && !isAllowedMultipleDefinition(header)) {
-                        // WARN: duplicate header on this level
-                        std::stringstream ss;
-
-                        ss << "duplicate definition of '" << header.first << "' header";
-
-                        mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                        out.report.warnings.push_back(Warning(ss.str(),
-                                                              DuplicateWarning,
-                                                              sourceMap));
-                    }
-
+                if (parseHeaderLine(*line, header, out, sourceMap)) {
                     out.node.push_back(header);
 
                     if (pd.exportSourceMap()) {
