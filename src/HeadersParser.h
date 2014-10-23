@@ -24,6 +24,50 @@ namespace snowcrash {
     /** Header Iterator in its containment group */
     typedef Collection<Header>::const_iterator HeaderIterator;
 
+    /** Base class for functor to check validity of parsed header */
+    struct ValidateFunctorBase {
+        /** intended to generate warning mesage */
+        virtual std::string getMessage() const = 0;
+        /** 
+         * intended to invoke validation 
+         * \return true if validation is ok
+         *
+         * data for validation you can inject into functor via c-tor
+         */
+        virtual bool operator()() const = 0;
+    };
+
+    /** Functor implementation for check header contains colon character between name and value */
+    struct ColonChecker : public ValidateFunctorBase {
+        const CaptureGroups& captures;
+        explicit ColonChecker(const CaptureGroups& captures) : captures(captures) {}
+        virtual bool operator()() const;
+        virtual std::string getMessage() const;
+    };
+
+    /** Functor implementation to check Headers duplicity */
+    struct HeadersDuplicateChecker : public ValidateFunctorBase {
+        const Header& header;
+        const Headers& headers;
+        explicit HeadersDuplicateChecker(const Header& header, const Headers& headers) : header(header), headers(headers) {}
+
+        virtual bool operator()() const;
+        virtual std::string getMessage() const;
+    };
+
+    /** Functor receive and invoke individual Validators and conditionaly push reports  */
+    struct HeaderParserValidator {
+        const ParseResultRef<Headers>& out;
+        mdp::CharactersRangeSet sourceMap;
+
+        HeaderParserValidator(const ParseResultRef<Headers>& out, 
+            mdp::CharactersRangeSet sourceMap) 
+            : out(out), sourceMap(sourceMap) {}
+
+        bool operator()(const ValidateFunctorBase& rule);
+    };
+
+
     /**
      *  Headers Section Processor
      */
@@ -109,10 +153,21 @@ namespace snowcrash {
             }
         }
 
+        /** 
+         * Parse individual line of header
+         * \return true if valid header definition
+         *
+         * Header name is checked against token definition
+         *
+         * \param line - contains individual line with header definition
+         * \param header - is filled by name and value if definition is valid
+         * \param out - "report" member can receive warning while checking validity
+         * \param sourceMap - just contain source mapping for warning report
+         */
         static bool parseHeaderLine(const mdp::ByteBuffer& line, 
-            KeyValuePair& keyValuePair,
+            Header& header, 
             const ParseResultRef<Headers>& out,
-            mdp::CharactersRangeSet sourceMap) {
+            const mdp::CharactersRangeSet sourceMap) {
 
 #define HEADER_NAME_TOKEN "[[:alnum:]!#$%&'*+-.^_`|~]+"
             std::string re = "^[[:blank:]]*(" HEADER_NAME_TOKEN ")[[:blank:]]*(:|[[:blank:]]+)(.*)$";
@@ -124,34 +179,22 @@ namespace snowcrash {
             if (!matched)
                 return false;
 
-            keyValuePair = std::make_pair(parts[1], parts[3]);
-            TrimString(keyValuePair.first);
-            TrimString(keyValuePair.second);
+            header = std::make_pair(parts[1], parts[3]);
+            TrimString(header.first);
+            TrimString(header.second);
 
-            if (parts[2].size() < 1 || parts[2][0] != ':') {
-                out.report.warnings.push_back(Warning("Missing colon after header name",
-                    HTTPWarning,
-                    sourceMap));
-            }
+            HeaderParserValidator validate(out, sourceMap);
+        
+            validate(ColonChecker(parts));
+            validate(HeadersDuplicateChecker(header, out.node));
 
-            if (findHeader(out.node, keyValuePair) != out.node.end() && !isAllowedMultipleDefinition(keyValuePair)) {
-                // WARN: duplicate header on this level
-                std::stringstream ss;
-
-                ss << "duplicate definition of '" << keyValuePair.first << "' header";
-
-                out.report.warnings.push_back(Warning(ss.str(),
-                    HTTPWarning,
-                    sourceMap));
-            }
-
-            return (!keyValuePair.first.empty() && !keyValuePair.second.empty());
+            return (!header.first.empty() && !header.second.empty());
         }
 
         /** Retrieve headers from content */
         static void headersFromContent(const MarkdownNodeIterator& node,
                                        const mdp::ByteBuffer& content,
-                                       SectionParserData& pd,
+                                       const SectionParserData& pd,
                                        const ParseResultRef<Headers>& out) {
 
             std::vector<std::string> lines = Split(content, '\n');
@@ -251,34 +294,6 @@ namespace snowcrash {
             }
         }
 
-        /** Finds a header in its containment group by its key (first) */
-        static HeaderIterator findHeader(const Headers& headers,
-                                         const Header& header) {
-
-            return std::find_if(headers.begin(),
-                                headers.end(),
-                                std::bind2nd(MatchFirsts<Header, IEqual<Header::first_type> >(), header));
-        }
-
-        typedef std::vector<std::string> HeadersKeyCollection;
-        /** Get collection of allowed keywords - workarround due to C++98 restriction - static initialization of vector */
-        static const HeadersKeyCollection& getAllowedMultipleDefinitions() {
-            static std::string keys[] = {
-                HTTPHeaderName::SetCookie,
-                HTTPHeaderName::Link,
-            };
-
-            static const HeadersKeyCollection allowedMultipleDefinitions(keys, keys + (sizeof(keys)/sizeof(keys[0])));
-            return allowedMultipleDefinitions;
-        }
-
-        /** Check if Header name has allowed multiple definitions */
-        static bool isAllowedMultipleDefinition(const Header& header) {
-              const HeadersKeyCollection& keys = getAllowedMultipleDefinitions();
-              return std::find_if(keys.begin(),
-                                  keys.end(),
-                                  std::bind1st(MatchFirstWith<Header, std::string, IEqual<std::string> >(), header)) != keys.end();
-        }
     };
 
     /** Headers Section Parser */

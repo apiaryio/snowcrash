@@ -94,7 +94,7 @@
         'src/BlueprintUtility.h',
         'src/CodeBlockUtility.h',
         'src/HeadersParser.h',
-        'src/ModelTable.h',
+        'src/HeadersParser.cc',
         'src/ParameterParser.h',
         'src/ParametersParser.h',
         'src/Platform.h',
