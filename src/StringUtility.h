@@ -232,7 +232,9 @@ namespace snowcrash {
     }
 
     /**
-     * \brief
+     * \brief Strip the enclosing backticks and return the string in the middle.
+     *
+     *        If there are no matching enclosing bacticks, return the whole string.
      *
      * \param subject String that needs to be stripped of enclosing backticks
      *
