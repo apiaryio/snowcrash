@@ -130,7 +130,7 @@ namespace snowcrash {
 
             if (parts[2].size() < 1 || parts[2][0] != ':') {
                 out.report.warnings.push_back(Warning("Missing colon after header name",
-                    FormattingWarning,
+                    HTTPWarning,
                     sourceMap));
             }
 
@@ -141,7 +141,7 @@ namespace snowcrash {
                 ss << "duplicate definition of '" << keyValuePair.first << "' header";
 
                 out.report.warnings.push_back(Warning(ss.str(),
-                    DuplicateWarning,
+                    HTTPWarning,
                     sourceMap));
             }
 
