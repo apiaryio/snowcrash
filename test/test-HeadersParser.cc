@@ -204,7 +204,7 @@ TEST_CASE("Parse header section with more same headers Set-Cookie and Link - the
     SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
 
     REQUIRE(headers.report.error.code == Error::OK);
-    REQUIRE(headers.report.warnings.size() == 0); // no warning - multiple definition, but from allowed set
+    REQUIRE(headers.report.warnings.empty()); // no warning - multiple definition, but from allowed set
 
     REQUIRE(headers.node.size() == 2);
     REQUIRE(headers.node[0].first == "Set-Cookie");
@@ -246,7 +246,7 @@ TEST_CASE("Aditional test for Header name insenstivity combined with allowed mul
     SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
 
     REQUIRE(headers.report.error.code == Error::OK);
-    REQUIRE(headers.report.warnings.size() == 0); // no warning - multiple definition, but from allowed set
+    REQUIRE(headers.report.warnings.empty()); // no warning - multiple definition, but from allowed set
 
     REQUIRE(headers.node.size() == 2);
     REQUIRE(headers.node[0].first == "Set-cookie");
@@ -266,8 +266,9 @@ TEST_CASE("Headers should  name against token definition", "[headers][issue][#15
         SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
 
         REQUIRE(headers.report.error.code == Error::OK); // no error
+
         REQUIRE(headers.report.warnings.size() == 1);    // warning - header is not defined correctly
-        REQUIRE(headers.report.warnings[0].message == "Missing colon after header name");
+        REQUIRE(headers.report.warnings[0].message == "missing colon after header name");
 
         REQUIRE(headers.node[0].first == "Last-Modified");
         REQUIRE(headers.node[0].second == "Sat, 02 Aug 2014 23:10:05 GMT");
@@ -281,8 +282,9 @@ TEST_CASE("Headers should  name against token definition", "[headers][issue][#15
         SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
 
         REQUIRE(headers.report.error.code == Error::OK); // no error
+
         REQUIRE(headers.report.warnings.size() == 1);    // warning - header is not defined correctly
-        REQUIRE(headers.report.warnings[0].message == "Missing colon after header name");
+        REQUIRE(headers.report.warnings[0].message == "missing colon after header name");
 
         REQUIRE(headers.node[0].first == "Set-Cookie");
         REQUIRE(headers.node[0].second == "chocolate cookie");
@@ -296,7 +298,7 @@ TEST_CASE("Headers should  name against token definition", "[headers][issue][#15
         SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
 
         REQUIRE(headers.report.error.code == Error::OK); // no error
-        REQUIRE(headers.report.warnings.size() == 0);    // warning - header is not defined correctly
+        REQUIRE(headers.report.warnings.empty());    
 
         REQUIRE(headers.node[0].first == "Set-Cookie");
         REQUIRE(headers.node[0].second == ": chocolate cookie");
@@ -310,10 +312,26 @@ TEST_CASE("Headers should  name against token definition", "[headers][issue][#15
         SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
 
         REQUIRE(headers.report.error.code == Error::OK); // no error
-        REQUIRE(headers.report.warnings.size() == 0);    // warning - header is not defined correctly
+        REQUIRE(headers.report.warnings.empty());    
 
         REQUIRE(headers.node[0].first == "#");
         REQUIRE(headers.node[0].second == "chocolate cookie");
+    }
+
+    SECTION("invalid header name") {
+        const mdp::ByteBuffer source = \
+        "+ Headers\n\n"\
+        "        <Header> : chocolate cookie\n";
+        ParseResult<Headers> headers;
+        SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
+
+        REQUIRE(headers.report.error.code == Error::OK); // no error
+
+        REQUIRE(headers.report.warnings.size() == 2);    // warning - header is not defined correctly
+        REQUIRE(headers.report.warnings[0].message == "unable to parse HTTP header, expected '<header name> : <header value>', one header per line");    
+        REQUIRE(headers.report.warnings[1].message == "no headers specified");    
+
+        REQUIRE(headers.node.empty());
     }
 
 }

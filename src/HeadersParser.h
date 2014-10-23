@@ -26,8 +26,10 @@ namespace snowcrash {
 
     /** Base class for functor to check validity of parsed header */
     struct ValidateFunctorBase {
+
         /** intended to generate warning mesage */
         virtual std::string getMessage() const = 0;
+
         /** 
          * intended to invoke validation 
          * \return true if validation is ok
@@ -35,33 +37,44 @@ namespace snowcrash {
          * data for validation you can inject into functor via c-tor
          */
         virtual bool operator()() const = 0;
+
     };
 
     /** Functor implementation for check header contains colon character between name and value */
     struct ColonChecker : public ValidateFunctorBase {
+
         const CaptureGroups& captures;
+
         explicit ColonChecker(const CaptureGroups& captures) : captures(captures) {}
+
         virtual bool operator()() const;
         virtual std::string getMessage() const;
+
     };
 
     /** Functor implementation to check Headers duplicity */
     struct HeadersDuplicateChecker : public ValidateFunctorBase {
+
         const Header& header;
         const Headers& headers;
-        explicit HeadersDuplicateChecker(const Header& header, const Headers& headers) : header(header), headers(headers) {}
+
+        explicit HeadersDuplicateChecker(const Header& header, 
+                                         const Headers& headers) 
+            : header(header), headers(headers) {}
 
         virtual bool operator()() const;
         virtual std::string getMessage() const;
+
     };
 
     /** Functor receive and invoke individual Validators and conditionaly push reports  */
     struct HeaderParserValidator {
+
         const ParseResultRef<Headers>& out;
         mdp::CharactersRangeSet sourceMap;
 
         HeaderParserValidator(const ParseResultRef<Headers>& out, 
-            mdp::CharactersRangeSet sourceMap) 
+                              mdp::CharactersRangeSet sourceMap) 
             : out(out), sourceMap(sourceMap) {}
 
         bool operator()(const ValidateFunctorBase& rule);
@@ -111,6 +124,7 @@ namespace snowcrash {
 
         static bool isDescriptionNode(const MarkdownNodeIterator& node,
                                       SectionType sectionType) {
+
             return false;
         }
 
@@ -165,9 +179,9 @@ namespace snowcrash {
          * \param sourceMap - just contain source mapping for warning report
          */
         static bool parseHeaderLine(const mdp::ByteBuffer& line, 
-            Header& header, 
-            const ParseResultRef<Headers>& out,
-            const mdp::CharactersRangeSet sourceMap) {
+                                    Header& header, 
+                                    const ParseResultRef<Headers>& out,
+                                    const mdp::CharactersRangeSet sourceMap) {
 
 #define HEADER_NAME_TOKEN "[[:alnum:]!#$%&'*+-.^_`|~]+"
             std::string re = "^[[:blank:]]*(" HEADER_NAME_TOKEN ")[[:blank:]]*(:|[[:blank:]]+)(.*)$";
