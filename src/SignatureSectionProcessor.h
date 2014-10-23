@@ -34,7 +34,7 @@ namespace scpl {
         static const char EscapeCharacter = '`';
         static const char ValuesDelimiter = ':';
         static const char ValueDelimiter = ',';
-        static const char AttributesStartDelimiter = '(';
+        static const char AttributesBeginDelimiter = '(';
         static const char AttributesEndDelimiter = ')';
         static const char AttributeDelimiter = ',';
         static const char ContentDelimiter = '-';
@@ -101,7 +101,7 @@ namespace scpl {
             // Make sure values exist
             if (traits.valuesTrait &&
                 !subject.empty() &&
-                subject[0] != AttributesStartDelimiter) {
+                subject[0] != AttributesBeginDelimiter) {
 
                 // When subject starts with values, add a ':' for easier processing
                 if (!traits.identifierTrait) {
@@ -184,7 +184,7 @@ namespace scpl {
                         i++;
                     }
                 } else if (subject[i] == ValuesDelimiter ||
-                           subject[i] == AttributesStartDelimiter ||
+                           subject[i] == AttributesBeginDelimiter ||
                            subject[i] == ContentDelimiter) {
 
                     // If identifier ends, strip it from the subject
@@ -271,7 +271,7 @@ namespace scpl {
 
                         value = "";
                         i = 0;
-                    } else if (subject[i] == AttributesStartDelimiter ||
+                    } else if (subject[i] == AttributesBeginDelimiter ||
                                subject[i] == ContentDelimiter) {
 
                         // If values section ends, strip it from subject
@@ -326,7 +326,7 @@ namespace scpl {
                                              mdp::ByteBuffer& subject,
                                              Signature& out) {
 
-            if (subject[0] != AttributesStartDelimiter) {
+            if (subject[0] != AttributesBeginDelimiter) {
                 return;
             }
 
@@ -346,7 +346,7 @@ namespace scpl {
                     attribute = attribute.substr(0, length - 1);
 
                     // For easier processing
-                    subject = AttributesStartDelimiter + subject;
+                    subject = AttributesBeginDelimiter + subject;
                 }
 
                 snowcrash::TrimString(attribute);
