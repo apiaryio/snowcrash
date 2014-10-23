@@ -228,7 +228,7 @@ namespace snowcrash {
 
             return std::find_if(headers.begin(),
                                 headers.end(),
-                                std::bind2nd(MatchFirsts<Header, IEqual<typename Header::first_type> >(), header));
+                                std::bind2nd(MatchFirsts<Header, IEqual<Header::first_type> >(), header));
         }
 
         typedef std::vector<std::string> HeadersKeyCollection;
