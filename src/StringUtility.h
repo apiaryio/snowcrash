@@ -8,8 +8,8 @@
 //  Credits:
 //  http://stackoverflow.com/questions/216823/whats-the-best-way-to-trim-stdstring
 
-#ifndef SNOWCRAH_TRIMSTRING_H
-#define SNOWCRAH_TRIMSTRING_H
+#ifndef SNOWCRAH_STRINGUTILITY_H
+#define SNOWCRAH_STRINGUTILITY_H
 
 #include <algorithm>
 #include <functional>

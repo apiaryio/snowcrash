@@ -8,9 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		4056BE0B19EE98C5003AC26C /* test-Signature.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4056BE0A19EE98C5003AC26C /* test-Signature.cc */; };
+		406B664F19FA6F63003CBD3A /* test-MSONUtility.cc in Sources */ = {isa = PBXBuildFile; fileRef = 406B664E19FA6F63003CBD3A /* test-MSONUtility.cc */; };
 		4070F30419E4C30A004892C8 /* BlueprintSourcemap.h in Headers */ = {isa = PBXBuildFile; fileRef = 4070F30119E4C30A004892C8 /* BlueprintSourcemap.h */; };
 		4070F30519E4C30A004892C8 /* CBlueprintSourcemap.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4070F30219E4C30A004892C8 /* CBlueprintSourcemap.cc */; };
 		4070F30619E4C30A004892C8 /* CBlueprintSourcemap.h in Headers */ = {isa = PBXBuildFile; fileRef = 4070F30319E4C30A004892C8 /* CBlueprintSourcemap.h */; };
+		4075AA1119F95398003C2649 /* MSONUtility.h in Headers */ = {isa = PBXBuildFile; fileRef = 4075AA1019F95398003C2649 /* MSONUtility.h */; };
 		40CA216119FE989F0086531D /* ModelTable.h in Headers */ = {isa = PBXBuildFile; fileRef = 40CA216019FE989F0086531D /* ModelTable.h */; };
 		40CA216319FE99150086531D /* test-ModelTable.cc in Sources */ = {isa = PBXBuildFile; fileRef = 40CA216219FE99150086531D /* test-ModelTable.cc */; };
 		40CA216519FE993E0086531D /* test-StringUtility.cc in Sources */ = {isa = PBXBuildFile; fileRef = 40CA216419FE993E0086531D /* test-StringUtility.cc */; };
@@ -136,9 +138,11 @@
 
 /* Begin PBXFileReference section */
 		4056BE0A19EE98C5003AC26C /* test-Signature.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-Signature.cc"; path = "test/test-Signature.cc"; sourceTree = "<group>"; };
+		406B664E19FA6F63003CBD3A /* test-MSONUtility.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-MSONUtility.cc"; path = "test/test-MSONUtility.cc"; sourceTree = "<group>"; };
 		4070F30119E4C30A004892C8 /* BlueprintSourcemap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BlueprintSourcemap.h; path = src/BlueprintSourcemap.h; sourceTree = "<group>"; };
 		4070F30219E4C30A004892C8 /* CBlueprintSourcemap.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CBlueprintSourcemap.cc; path = src/CBlueprintSourcemap.cc; sourceTree = "<group>"; };
 		4070F30319E4C30A004892C8 /* CBlueprintSourcemap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CBlueprintSourcemap.h; path = src/CBlueprintSourcemap.h; sourceTree = "<group>"; };
+		4075AA1019F95398003C2649 /* MSONUtility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MSONUtility.h; path = src/MSONUtility.h; sourceTree = "<group>"; };
 		40CA216019FE989F0086531D /* ModelTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ModelTable.h; path = src/ModelTable.h; sourceTree = "<group>"; };
 		40CA216219FE99150086531D /* test-ModelTable.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-ModelTable.cc"; path = "test/test-ModelTable.cc"; sourceTree = "<group>"; };
 		40CA216419FE993E0086531D /* test-StringUtility.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-StringUtility.cc"; path = "test/test-StringUtility.cc"; sourceTree = "<group>"; };
@@ -317,6 +321,7 @@
 				BBD73565192ED45D009FE09E /* test-HeadersParser.cc */,
 				BB45781D182326EE00D0293A /* test-Indentation.cc */,
 				40CA216219FE99150086531D /* test-ModelTable.cc */,
+				406B664E19FA6F63003CBD3A /* test-MSONUtility.cc */,
 				BBCC856019542DB300B99E90 /* test-ParameterParser.cc */,
 				BB03DC6517D3718D00C51E52 /* test-ParametersParser.cc */,
 				BBE5705C173922B70086CE22 /* test-PayloadParser.cc */,
@@ -358,6 +363,7 @@
 				BB92D88F178EF4160098A63C /* HTTP.h */,
 				40CA216019FE989F0086531D /* ModelTable.h */,
 				40A1EE0A19EC0A0B00DB894A /* MSON.h */,
+				4075AA1019F95398003C2649 /* MSONUtility.h */,
 				BBCC855C19542DA100B99E90 /* ParameterParser.h */,
 				BB03DC6417D3717B00C51E52 /* ParametersParser.h */,
 				BBE5705F173927870086CE22 /* PayloadParser.h */,
@@ -415,6 +421,7 @@
 				BB8C3E631923D6FE00EF36FA /* SectionParser.h in Headers */,
 				40CA216119FE989F0086531D /* ModelTable.h in Headers */,
 				40A1EE0B19EC0A0B00DB894A /* MSON.h in Headers */,
+				4075AA1119F95398003C2649 /* MSONUtility.h in Headers */,
 				BBD5F9CE17353CE00049BBEE /* ResourceParser.h in Headers */,
 				4070F30419E4C30A004892C8 /* BlueprintSourcemap.h in Headers */,
 				BBE57061173927870086CE22 /* PayloadParser.h in Headers */,
@@ -510,7 +517,7 @@
 		BBFF4890170B34E6001E5FB2 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0500;
+				LastUpgradeCheck = 0610;
 				ORGANIZATIONNAME = "Apiary Inc.";
 			};
 			buildConfigurationList = BBFF4893170B34E6001E5FB2 /* Build configuration list for PBXProject "snowcrash" */;
@@ -575,6 +582,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BBFC8425196C1AD4001A236A /* test-ActionParser.cc in Sources */,
+				4086365A19F7DB3000B92907 /* test-MSONValueMemberParser.cc in Sources */,
 				BBCC856319542DB300B99E90 /* test-ValuesParser.cc in Sources */,
 				BBB1278C199970A80041E9AE /* test-SymbolIdentifier.cc in Sources */,
 				BBFC8426196C1AFD001A236A /* test-RegexMatch.cc in Sources */,
@@ -689,6 +697,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_PROFILING_CODE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				ONLY_ACTIVE_ARCH = YES;
 				USER_HEADER_SEARCH_PATHS = "./ext/markdown-parser/src/** ./ext/markdown-parser/ext/sundown/**";
 			};
 			name = Debug;
@@ -725,6 +734,7 @@
 		BBFF489D170B34E6001E5FB2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				EXECUTABLE_PREFIX = "";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -737,6 +747,7 @@
 		BBFF489E170B34E6001E5FB2 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				EXECUTABLE_PREFIX = "";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
