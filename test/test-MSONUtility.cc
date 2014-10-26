@@ -57,8 +57,8 @@ TEST_CASE("Parse wildcard value", "[mson_utility]")
 
     Value value = parseValue(source);
 
-    REQUIRE(value.literal == "*");
-    REQUIRE(value.variable == false);
+    REQUIRE(value.literal.empty());
+    REQUIRE(value.variable == true);
 }
 
 TEST_CASE("Parse value with non-matching '_'", "[mson_utility]")
@@ -69,4 +69,103 @@ TEST_CASE("Parse value with non-matching '_'", "[mson_utility]")
 
     REQUIRE(value.literal == "_rel");
     REQUIRE(value.variable == false);
+}
+
+TEST_CASE("Parse canonical type name",  "[mson_utility]")
+{
+    std::string source = "Person";
+
+    TypeName typeName = parseTypeName(source);
+
+    REQUIRE(typeName.name == UndefinedTypeName);
+    REQUIRE(typeName.symbol.literal == "Person");
+    REQUIRE(typeName.symbol.variable == false);
+}
+
+TEST_CASE("Parse boolean type name",  "[mson_utility]")
+{
+    std::string source = "boolean";
+
+    TypeName typeName = parseTypeName(source);
+
+    REQUIRE(typeName.name == BooleanTypeName);
+    REQUIRE(typeName.symbol.literal.empty());
+    REQUIRE(typeName.symbol.variable == false);
+}
+
+TEST_CASE("Parse string type name",  "[mson_utility]")
+{
+    std::string source = "string";
+
+    TypeName typeName = parseTypeName(source);
+
+    REQUIRE(typeName.name == StringTypeName);
+    REQUIRE(typeName.symbol.literal.empty());
+    REQUIRE(typeName.symbol.variable == false);
+}
+
+TEST_CASE("Parse number type name",  "[mson_utility]")
+{
+    std::string source = "number";
+
+    TypeName typeName = parseTypeName(source);
+
+    REQUIRE(typeName.name == NumberTypeName);
+    REQUIRE(typeName.symbol.literal.empty());
+    REQUIRE(typeName.symbol.variable == false);
+}
+
+TEST_CASE("Parse array type name",  "[mson_utility]")
+{
+    std::string source = "array";
+
+    TypeName typeName = parseTypeName(source);
+
+    REQUIRE(typeName.name == ArrayTypeName);
+    REQUIRE(typeName.symbol.literal.empty());
+    REQUIRE(typeName.symbol.variable == false);
+}
+
+TEST_CASE("Parse enum type name",  "[mson_utility]")
+{
+    std::string source = "enum";
+
+    TypeName typeName = parseTypeName(source);
+
+    REQUIRE(typeName.name == EnumTypeName);
+    REQUIRE(typeName.symbol.literal.empty());
+    REQUIRE(typeName.symbol.variable == false);
+}
+
+TEST_CASE("Parse object type name",  "[mson_utility]")
+{
+    std::string source = "object";
+
+    TypeName typeName = parseTypeName(source);
+
+    REQUIRE(typeName.name == ObjectTypeName);
+    REQUIRE(typeName.symbol.literal.empty());
+    REQUIRE(typeName.symbol.variable == false);
+}
+
+TEST_CASE("Parse variable type name", "[mson_utility]")
+{
+    std::string source = "*T*";
+
+    TypeName typeName = parseTypeName(source);
+
+    REQUIRE(typeName.name == UndefinedTypeName);
+    REQUIRE(typeName.symbol.literal == "T");
+    REQUIRE(typeName.symbol.variable == true);
+}
+
+TEST_CASE("Parse wildcard type name", "[mson_utility]")
+{
+    std::string source = "*";
+
+    TypeName typeName = parseTypeName(source);
+
+    REQUIRE(typeName.name == UndefinedTypeName);
+    REQUIRE(typeName.symbol.literal.empty());
+    REQUIRE(typeName.symbol.variable == true);
 }

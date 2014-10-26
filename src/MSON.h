@@ -32,6 +32,9 @@ namespace mson {
     /** A simple or actual value */
     struct Value {
 
+        Value()
+        : literal(""), variable(false) {}
+
         /** Literal value */
         Literal literal;
 
@@ -45,6 +48,9 @@ namespace mson {
     /** Type symbol (identifier) */
     struct Symbol {
 
+        Symbol()
+        : literal(""), variable(false) {}
+
         /** Name of the symbol */
         Literal literal;
 
@@ -54,17 +60,20 @@ namespace mson {
 
     /** Value of type name if based type */
     enum BaseTypeName {
-        UndefinedTypeName, // Not a base type name
-        BooleanTypeName,   // `boolean` type name
-        StringTypeName,    // `string` type name
-        NumberTypeName,    // `number` type name
-        ArrayTypeName,     // `array` type name
-        EnumTypeName,      // `enum` type name
-        ObjectTypeName     // `object` type name
+        UndefinedTypeName = 0, // Not a base type name
+        BooleanTypeName,       // `boolean` type name
+        StringTypeName,        // `string` type name
+        NumberTypeName,        // `number` type name
+        ArrayTypeName,         // `array` type name
+        EnumTypeName,          // `enum` type name
+        ObjectTypeName         // `object` type name
     };
 
     /** Base or named type's name */
     struct TypeName {
+
+        TypeName()
+        : name(UndefinedTypeName) {}
 
         /** EITHER Base type's value */
         BaseTypeName name;
