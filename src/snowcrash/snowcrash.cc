@@ -96,7 +96,7 @@ void GetLinesEndIndex(const std::string& source,
  */
 void PrintAnnotation(const std::string& prefix,
                      const snowcrash::SourceAnnotation& annotation,
-                     const std::string source,
+                     const std::string& source,
                      const bool isUseLineNumbers)
 {
 
