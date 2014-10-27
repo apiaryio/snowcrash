@@ -77,7 +77,7 @@ namespace snowcrash {
                     if (pd.exportSourceMap() && !out.node.description.empty()) {
                         out.sourceMap.description.sourceMap.append(node->sourceMap);
                     }
-                } else if (!parseSymbolReference(node, pd, remainingContent, out)) {
+                } else if (!parseModelReference(node, pd, remainingContent, out)) {
 
                     // NOTE: NOT THE CORRECT WAY TO DO THIS
                     // https://github.com/apiaryio/snowcrash/commit/a7c5868e62df0048a85e2f9aeeb42c3b3e0a2f07#commitcomment-7322085
@@ -102,11 +102,11 @@ namespace snowcrash {
             mdp::ByteBuffer content;
 
             if (!out.node.reference.id.empty()) {
-                //WARN: ignoring extraneous content after symbol reference
+                //WARN: ignoring extraneous content after model reference
                 std::stringstream ss;
 
-                ss << "ignoring extraneous content after symbol reference";
-                ss << ", expected symbol reference only e.g. '[" << out.node.reference.id << "][]'";
+                ss << "ignoring extraneous content after model reference";
+                ss << ", expected model reference only e.g. '[" << out.node.reference.id << "][]'";
 
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
                 out.report.warnings.push_back(Warning(ss.str(),
@@ -116,7 +116,7 @@ namespace snowcrash {
 
                 if (!out.node.body.empty() ||
                     node->type != mdp::ParagraphMarkdownNodeType ||
-                    !parseSymbolReference(node, pd, node->text, out)) {
+                    !parseModelReference(node, pd, node->text, out)) {
 
                     // NOTE: NOT THE CORRECT WAY TO DO THIS
                     // https://github.com/apiaryio/snowcrash/commit/a7c5868e62df0048a85e2f9aeeb42c3b3e0a2f07#commitcomment-7322085
@@ -467,28 +467,28 @@ namespace snowcrash {
             return true;
         }
 
-        /** Given the reference id(name), initializes reference of the payload accordingly(if possible resolve it) */
-        static bool parseSymbolReference(const MarkdownNodeIterator& node,
-                                         SectionParserData& pd,
-                                         mdp::ByteBuffer& source,
-                                         const ParseResultRef<Payload>& out) {
+        /** Given the reference id(name), initializes reference of the payload accordingly (if possible resolve it) */
+        static bool parseModelReference(const MarkdownNodeIterator& node,
+                                        SectionParserData& pd,
+                                        mdp::ByteBuffer& source,
+                                        const ParseResultRef<Payload>& out) {
 
             Identifier symbol;
 
             TrimString(source);
 
-            if (GetSymbolReference(source, symbol)) {
+            if (GetModelReference(source, symbol)) {
 
                 out.node.reference.id = symbol;
                 out.node.reference.meta.node = node;
-                out.node.reference.type = Reference::SymbolReference;
+                out.node.reference.type = Reference::ModelReference;
 
                 if (pd.exportSourceMap() && !symbol.empty()) {
                     out.sourceMap.reference.sourceMap = node->sourceMap;
                 }
 
-                // If symbol has not been defined yet in symbol table
-                if (pd.symbolTable.resourceModels.find(symbol) == pd.symbolTable.resourceModels.end()) {
+                // If model has not been defined yet in model table
+                if (pd.modelTable.resourceModels.find(symbol) == pd.modelTable.resourceModels.end()) {
 
                     out.node.reference.meta.state = Reference::StatePending;
 
@@ -514,7 +514,7 @@ namespace snowcrash {
                                           const ParseResultRef<Payload>& out) {
 
             SourceMap<ResourceModel> modelSM;
-            ResourceModel model = pd.symbolTable.resourceModels.at(out.node.reference.id);
+            ResourceModel model = pd.modelTable.resourceModels.at(out.node.reference.id);
 
 
             out.node.description = model.description;
@@ -553,7 +553,7 @@ namespace snowcrash {
 
             if (pd.exportSourceMap()) {
 
-                modelSM = pd.symbolSourceMapTable.resourceModels.at(out.node.reference.id);
+                modelSM = pd.modelSourceMapTable.resourceModels.at(out.node.reference.id);
 
                 out.sourceMap.description = modelSM.description;
                 out.sourceMap.parameters = modelSM.parameters;

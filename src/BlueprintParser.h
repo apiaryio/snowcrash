@@ -404,14 +404,14 @@ namespace snowcrash {
                     if (pd.exportSourceMap()) {
 
                         ParseResultRef<Payload> payload(out.report, *requestIt, *requestSourceMapIt);
-                        resolvePendingSymbols(pd, payload);
+                        resolvePendingModels(pd, payload);
                         SectionProcessor<Payload>::checkRequest(requestIt->reference.meta.node, pd, payload);
                     }
                     else {
 
                         SourceMap<Payload> tempSourceMap;
                         ParseResultRef<Payload> payload(out.report, *requestIt, tempSourceMap);
-                        resolvePendingSymbols(pd, payload);
+                        resolvePendingModels(pd, payload);
                         SectionProcessor<Payload>::checkRequest(requestIt->reference.meta.node, pd, payload);
                     }
                 }
@@ -444,14 +444,14 @@ namespace snowcrash {
                     if (pd.exportSourceMap()) {
 
                         ParseResultRef<Payload> payload(out.report, *responseIt, *responseSourceMapIt);
-                        resolvePendingSymbols(pd, payload);
+                        resolvePendingModels(pd, payload);
                         SectionProcessor<Payload>::checkResponse(responseIt->reference.meta.node, pd, payload);
                     }
                     else {
 
                         SourceMap<Payload> tempSourceMap;
                         ParseResultRef<Payload> payload(out.report, *responseIt, tempSourceMap);
-                        resolvePendingSymbols(pd, payload);
+                        resolvePendingModels(pd, payload);
                         SectionProcessor<Payload>::checkResponse(responseIt->reference.meta.node, pd, payload);
                     }
                 }
@@ -463,21 +463,21 @@ namespace snowcrash {
         }
 
         /**
-         *  \brief  Resolve pending references
-         *  \param  pd       Section parser state
+         *  \brief  Resolve pending model references
+         *  \param  pd       Section parser data
          *  \param  out      Processed output
          */
-        static void resolvePendingSymbols(SectionParserData& pd,
+        static void resolvePendingModels(SectionParserData& pd,
                                           const ParseResultRef<Payload>& out) {
 
-            if (pd.symbolTable.resourceModels.find(out.node.reference.id) == pd.symbolTable.resourceModels.end()) {
+            if (pd.modelTable.resourceModels.find(out.node.reference.id) == pd.modelTable.resourceModels.end()) {
 
-                // ERR: Undefined symbol
+                // ERR: Undefined model reference
                 std::stringstream ss;
-                ss << "Undefined symbol " << out.node.reference.id;
+                ss << "Undefined resource model " << out.node.reference.id;
 
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(out.node.reference.meta.node->sourceMap, pd.sourceData);
-                out.report.error = Error(ss.str(), SymbolError, sourceMap);
+                out.report.error = Error(ss.str(), ModelError, sourceMap);
 
                 out.node.reference.meta.state = Reference::StateUnresolved;
             }

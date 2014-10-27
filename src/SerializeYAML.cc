@@ -313,7 +313,7 @@ static void serialize(const Payload& payload, size_t level, bool array, std::ost
     // Name
     serialize(SerializeKey::Name, payload.name, 0, os);
 
-    // Reference
+    // Model Reference
     serialize(payload.reference, level + 1, os);
 
     // Description

@@ -1,13 +1,13 @@
 //
-//  SymbolTable.h
+//  ModelTable.h
 //  snowcrash
 //
 //  Created by Zdenek Nemec on 6/9/13.
 //  Copyright (c) 2013 Apiary Inc. All rights reserved.
 //
 
-#ifndef SNOWCRASH_SYMBOLTABLE_H
-#define SNOWCRASH_SYMBOLTABLE_H
+#ifndef SNOWCRASH_MODELTABLE_H
+#define SNOWCRASH_MODELTABLE_H
 
 #include <string>
 #include <map>
@@ -25,13 +25,10 @@
 // Symbol identifier regex
 #define SYMBOL_IDENTIFIER "([^][()]+)"
 
-namespace snowcrashconst {
+namespace snowcrash {
 
     /** Symbol reference matching regex */
-    const char* const SymbolReferenceRegex("^[[:blank:]]*\\[" SYMBOL_IDENTIFIER "]\\[][[:blank:]]*$");
-}
-
-namespace snowcrash {
+    const char* const ModelReferenceRegex("^[[:blank:]]*\\[" SYMBOL_IDENTIFIER "]\\[][[:blank:]]*$");
 
     // Resource Object Symbol
     typedef std::pair<Identifier, ResourceModel> ResourceModelSymbol;
@@ -39,34 +36,34 @@ namespace snowcrash {
     // Resource Object Symbol source map
     typedef std::pair<Identifier, SourceMap<ResourceModel> > ResourceModelSymbolSourceMap;
 
-    // Resource Object Symbol Table
-    typedef std::map<Identifier, ResourceModel> ResourceModelSymbolTable;
+    // Resource Object Model Table
+    typedef std::map<Identifier, ResourceModel> ResourceModelTable;
 
-    // Resource Object Symbol Table source map
-    typedef std::map<Identifier, SourceMap<ResourceModel> > ResourceModelSymbolSourceMapTable;
+    // Resource Object Model Table source map
+    typedef std::map<Identifier, SourceMap<ResourceModel> > ResourceModelSourceMapTable;
 
-    struct SymbolTable {
+    struct ModelTable {
 
-        // Resource Object Symbol Table
-        ResourceModelSymbolTable resourceModels;
+        // Resource Object Model Table
+        ResourceModelTable resourceModels;
     };
 
-    struct SymbolSourceMapTable {
+    struct ModelSourceMapTable {
 
-        // Resource Object Symbol Table source map
-        ResourceModelSymbolSourceMapTable resourceModels;
+        // Resource Object Model Table source map
+        ResourceModelSourceMapTable resourceModels;
     };
 
     // Checks whether given source data represents reference to a symbol returning true if so,
     // false otherwise. If source data is represent reference referred symbol name is filled in.
-    inline bool GetSymbolReference(const mdp::ByteBuffer& sourceData,
-                                   Identifier& referredSymbol) {
+    inline bool GetModelReference(const mdp::ByteBuffer& sourceData,
+                                   Identifier& referredModel) {
 
         CaptureGroups captureGroups;
 
-        if (RegexCapture(sourceData, snowcrashconst::SymbolReferenceRegex, captureGroups, 3)) {
-            referredSymbol = captureGroups[1];
-            TrimString(referredSymbol);
+        if (RegexCapture(sourceData, ModelReferenceRegex, captureGroups, 3)) {
+            referredModel = captureGroups[1];
+            TrimString(referredModel);
             return true;
         }
 
@@ -75,11 +72,12 @@ namespace snowcrash {
 
 #ifdef DEBUG
     // Prints markdown block recursively to stdout
-    inline void PrintSymbolTable(const SymbolTable& symbolTable) {
+    inline void PrintModelTable(const ModelTable& modelTable) {
 
         std::cout << "Resource Model Symbols:\n";
-        for (ResourceModelSymbolTable::const_iterator it = symbolTable.resourceModels.begin();
-             it != symbolTable.resourceModels.end();
+
+        for (ResourceModelSymbolTable::const_iterator it = ModelTable.resourceModels.begin();
+             it != ModelTable.resourceModels.end();
              ++it) {
 
             std::cout << "- " << it->first << " - body: '" << EscapeNewlines(it->second.body) << "'\n";

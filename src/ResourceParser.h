@@ -129,14 +129,14 @@ namespace snowcrash {
                     out.sourceMap.model.body.sourceMap.append(node->sourceMap);
                 }
 
-                // Update model in the symbol table as well
-                ResourceModelSymbolTable::iterator it = pd.symbolTable.resourceModels.find(out.node.model.name);
+                // Update model in the model table as well
+                ResourceModelTable::iterator it = pd.modelTable.resourceModels.find(out.node.model.name);
 
-                if (it != pd.symbolTable.resourceModels.end()) {
+                if (it != pd.modelTable.resourceModels.end()) {
                     it->second.body = out.node.model.body;
 
                     if (pd.exportSourceMap()) {
-                        pd.symbolSourceMapTable.resourceModels[out.node.model.name].body = out.sourceMap.model.body;
+                        pd.modelSourceMapTable.resourceModels[out.node.model.name].body = out.sourceMap.model.body;
                     }
                 }
 
@@ -382,29 +382,29 @@ namespace snowcrash {
 
                     mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
                     out.report.error = Error(ss.str(),
-                                             SymbolError,
+                                             ModelError,
                                              sourceMap);
                 }
             }
 
-            ResourceModelSymbolTable::iterator it = pd.symbolTable.resourceModels.find(model.node.name);
+            ResourceModelTable::iterator it = pd.modelTable.resourceModels.find(model.node.name);
 
-            if (it == pd.symbolTable.resourceModels.end()) {
+            if (it == pd.modelTable.resourceModels.end()) {
 
-                pd.symbolTable.resourceModels[model.node.name] = model.node;
+                pd.modelTable.resourceModels[model.node.name] = model.node;
 
                 if (pd.exportSourceMap()) {
-                    pd.symbolSourceMapTable.resourceModels[model.node.name] = model.sourceMap;
+                    pd.modelSourceMapTable.resourceModels[model.node.name] = model.sourceMap;
                 }
             } else {
 
-                // ERR: Symbol already defined
+                // ERR: Model already defined
                 std::stringstream ss;
                 ss << "symbol '" << model.node.name << "' already defined";
 
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
                 out.report.error = Error(ss.str(),
-                                         SymbolError,
+                                         ModelError,
                                          sourceMap);
             }
 

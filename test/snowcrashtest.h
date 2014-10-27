@@ -15,7 +15,7 @@
 
 namespace snowcrashtest {
 
-    struct Symbols {
+    struct Models {
 
         std::vector<snowcrash::ResourceModelSymbol> models;
         std::vector<snowcrash::ResourceModelSymbolSourceMap> modelsSM;
@@ -29,7 +29,7 @@ namespace snowcrashtest {
                           snowcrash::SectionType type,
                           const snowcrash::ParseResultRef<T>& out,
                           const snowcrash::BlueprintParserOptions& opts = 0,
-                          const Symbols& symbols = Symbols(),
+                          const Models& models = Models(),
                           snowcrash::ParseResult<snowcrash::Blueprint>* bp = NULL) {
 
             mdp::MarkdownParser markdownParser;
@@ -52,8 +52,8 @@ namespace snowcrashtest {
 
             pd.sectionsContext.push_back(type);
 
-            pd.symbolTable.resourceModels.insert(symbols.models.begin(), symbols.models.end());
-            pd.symbolSourceMapTable.resourceModels.insert(symbols.modelsSM.begin(), symbols.modelsSM.end());
+            pd.modelTable.resourceModels.insert(models.models.begin(), models.models.end());
+            pd.modelSourceMapTable.resourceModels.insert(models.modelsSM.begin(), models.modelsSM.end());
 
             PARSER::parse(markdownAST.children().begin(),
                           markdownAST.children(),
@@ -62,11 +62,11 @@ namespace snowcrashtest {
         }
     };
 
-    struct SymbolHelper {
+    struct ModelHelper {
 
         /** Builds a Symbols entry for testing purposes */
-        static void buildSymbol(mdp::ByteBuffer name,
-                                Symbols& symbols) {
+        static void buildModel(mdp::ByteBuffer name,
+                               Models& models) {
 
             snowcrash::ResourceModel model;
             snowcrash::SourceMap<snowcrash::ResourceModel> modelSM;
@@ -76,11 +76,11 @@ namespace snowcrashtest {
 
             model.description = "Foo";
             model.body = "Bar";
-            symbols.models.push_back(snowcrash::ResourceModelSymbol(name, model));
+            models.models.push_back(snowcrash::ResourceModelSymbol(name, model));
 
             modelSM.description.sourceMap = sourcemap;
             modelSM.body.sourceMap = sourcemap;
-            symbols.modelsSM.push_back(snowcrash::ResourceModelSymbolSourceMap(name, modelSM));
+            models.modelsSM.push_back(snowcrash::ResourceModelSymbolSourceMap(name, modelSM));
         }
     };
 }
