@@ -33,7 +33,7 @@ namespace mson {
     struct Value {
 
         Value()
-        : literal(""), variable(false) {}
+        : variable(false) {}
 
         /** Literal value */
         Literal literal;
@@ -49,7 +49,7 @@ namespace mson {
     struct Symbol {
 
         Symbol()
-        : literal(""), variable(false) {}
+        : variable(false) {}
 
         /** Name of the symbol */
         Literal literal;
@@ -89,9 +89,9 @@ namespace mson {
     enum TypeAttribute {
         RequiredTypeAttribute = (1 << 0),  // The type is required
         OptionalTypeAttribute = (1 << 1),  // The type is optional
-        DefaultTypeAttribute  = (1 << 2),  // The type is default
+        FixedTypeAttribute    = (1 << 2),  // The type is fixed
         SampleTypeAttribute   = (1 << 3),  // The type is a sample
-        FixedTypeAttribute    = (1 << 4)   // The type is fixed
+        DefaultTypeAttribute  = (1 << 4)   // The type is default
     };
 
     /** List of type attributes */
@@ -109,6 +109,9 @@ namespace mson {
 
     /** Definition of an instance of a type */
     struct TypeDefinition {
+
+        TypeDefinition()
+        : attributes(0) {}
 
         /** Type specification */
         TypeSpecification typeSpecification;
@@ -135,7 +138,7 @@ namespace mson {
 
     /** Type of a type section */
     enum TypeSectionType {
-        UndefinedTypeSectionType,        // Unknown
+        UndefinedTypeSectionType = 0,    // Unknown
         BlockDescriptionTypeSectionType, // Markdown block description
         MemberTypeSectionType,           // Contains member types
         SampleTypeSectionType,           // Sample member types
@@ -144,6 +147,9 @@ namespace mson {
 
     /** Section of a type */
     struct TypeSection {
+
+        TypeSection()
+        : type(UndefinedTypeSectionType) {}
 
         /** Content of the type section */
         struct TypeSectionContent {
@@ -238,15 +244,18 @@ namespace mson {
 
     /** Type of a member type */
     enum MemberTypeType {
-        UndefinedMemberType,  // Unknown
-        PropertyMemberType,   // Property member
-        ValueMemberType,      // Value member
-        MixinMemberType,      // Mixin
-        OneOfMemberType       // One of
+        UndefinedMemberType = 0, // Unknown
+        PropertyMemberType,      // Property member
+        ValueMemberType,         // Value member
+        MixinMemberType,         // Mixin
+        OneOfMemberType          // One of
     };
 
     /** Member type of a structure */
     struct MemberType {
+
+        MemberType()
+        : type(UndefinedMemberType) {}
 
         /** Content of the member type */
         struct MemberTypeContent {

@@ -70,12 +70,10 @@ namespace mson {
      * \brief Parse Type Name from a string
      *
      * \param subject String which represents the type name
-     *
-     * \return MSON Type Name
+     * \param out MSON Type Name
      */
-    inline TypeName parseTypeName(std::string& subject){
-
-        TypeName typeName;
+    inline void parseTypeName(std::string& subject,
+                              TypeName& typeName) {
 
         if (subject == "boolean") {
             typeName.name = BooleanTypeName;
@@ -92,22 +90,101 @@ namespace mson {
         } else {
             typeName.symbol = parseSymbol(subject);
         }
-
-        return typeName;
     }
 
     /**
-     * \brief Parse Type Attributes from a list of signature attributes
+     * \brief Check Type Attribute from a string and fill list of type attributes accordingly
      *
-     * \param attributes List of signature attributes
+     * \param attribute String that needs to be checked for attribute
+     * \param typeAttributes List of type attributes
      *
-     * \return MSON Type Attributes
+     * \return True if the given string is a type attribute
      */
-    inline TypeAttributes parseTypeAttributes() {
+    inline bool parseTypeAttribute(const std::string& attribute,
+                                   TypeAttributes& typeAttributes) {
 
-        TypeAttributes typeAttributes = 0;
+        bool isAttribute = true;
 
-        return typeAttributes;
+        if (attribute == "required") {
+            typeAttributes |= RequiredTypeAttribute;
+        } else if (attribute == "optional") {
+            typeAttributes |= OptionalTypeAttribute;
+        } else if (attribute == "fixed") {
+            typeAttributes |= FixedTypeAttribute;
+        } else if (attribute == "sample") {
+            typeAttributes |= SampleTypeAttribute;
+        } else if (attribute == "default") {
+            typeAttributes |= DefaultTypeAttribute;
+        } else {
+            isAttribute = false;
+        }
+
+        return isAttribute;
+    }
+
+    /**
+     * \brief Parse Type Specification from a signature attribute
+     *
+     * \param node Markdown node of the signature
+     * \param pd Section parser data
+     * \param attribute Attribute string representing the type specification
+     * \param out MSON Type Specification
+     */
+    inline void parseTypeSpecification(const mdp::MarkdownNodeIterator& node,
+                                       snowcrash::SectionParserData& pd,
+                                       const std::string& attribute,
+                                       TypeSpecification& out) {
+
+    }
+
+    /**
+     * \brief Parse Type Definition from a list of signature attributes
+     *
+     * \param node Markdown node of the signature
+     * \param pd Section parser data
+     * \param attributes List of signature attributes
+     * \param out Type Definition parse result
+     */
+    inline void parseTypeDefinition(const mdp::MarkdownNodeIterator& node,
+                                    snowcrash::SectionParserData& pd,
+                                    std::vector<std::string>& attributes,
+                                    snowcrash::ParseResultRef<TypeDefinition>& out) {
+
+        TypeDefinition typeDefinition;
+
+        bool foundTypeSpecification = false;
+        std::vector<std::string>::iterator it;
+
+        for (it = attributes.begin(); it != attributes.end(); it++) {
+
+            // If not a recognized type attribute
+            if (!parseTypeAttribute(*it, typeDefinition.attributes)) {
+
+                // If type specification is already found
+                if (foundTypeSpecification) {
+
+                    // WARN: Ignoring unrecognized type attribute
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                    out.report.warnings.push_back(snowcrash::Warning("ignoring unrecognized type attribute",
+                                                                     snowcrash::IgnoringWarning,
+                                                                     sourceMap));
+                } else {
+
+                    foundTypeSpecification = true;
+                    parseTypeSpecification(node, pd, *it, out.node.typeSpecification);
+                }
+            }
+        }
+    }
+
+    /**
+     * \brief Parse Value Definition from a list of signature values and attributes
+     */
+    inline ValueDefinition parseValueDefinition() {
+
+        ValueDefinition valueDefinition;
+
+        return valueDefinition;
     }
 }
 
