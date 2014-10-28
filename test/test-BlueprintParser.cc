@@ -385,7 +385,7 @@ TEST_CASE("Checking a resource with global resources for duplicates", "[blueprin
     "### List posts [GET]\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Symbols(), &blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.size() == 3); // 2x no response & duplicate resource
@@ -429,7 +429,7 @@ TEST_CASE("Parsing unexpected blocks", "[blueprint]")
 
     ParseResult<Blueprint> blueprint;
 
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Symbols(), &blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.size() == 1); // no response

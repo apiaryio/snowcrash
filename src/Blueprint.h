@@ -141,7 +141,7 @@ namespace snowcrash {
 
         /** Reference Type */
         enum ReferenceType {
-            SymbolReference     // Reference as symbol
+            ModelReference  // Resource Model as a reference
         };
 
         /** Identifier */

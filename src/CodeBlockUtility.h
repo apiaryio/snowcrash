@@ -254,7 +254,7 @@ namespace snowcrash {
 
             TrimString(source);
 
-            if(GetSymbolReference(source, symbol)) {
+            if(GetModelReference(source, symbol)) {
 
                 std::stringstream ss;
                 ss << "found a possible '" << symbol << "' model reference, ";

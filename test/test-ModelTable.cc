@@ -1,5 +1,5 @@
 //
-//  test-SymbolTable.cc
+//  test-ModelTable.cc
 //  snowcrash
 //
 //  Created by Zdenek Nemec on 6/9/13.
@@ -13,7 +13,7 @@
 using namespace snowcrash;
 using namespace snowcrashtest;
 
-TEST_CASE("Parse object resource symbol", "[symbol_table]")
+TEST_CASE("Parse object resource model", "[model_table]")
 {
     mdp::ByteBuffer source = \
     "# /resource\n"\
@@ -21,11 +21,11 @@ TEST_CASE("Parse object resource symbol", "[symbol_table]")
     "          {...}\n";
 
     // Check we will get error parsing the same symbol again with the same symbol table
-    Symbols symbols;
-    SymbolHelper::buildSymbol("Super", symbols);
+    Models models;
+    ModelHelper::buildModel("Super", models);
 
     ParseResult<Resource> resource;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ModelBodySectionType, resource, 0, symbols);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ModelBodySectionType, resource, 0, models);
 
     REQUIRE(resource.report.error.code != Error::OK);
 }

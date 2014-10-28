@@ -10,8 +10,8 @@
 #define SNOWCRASH_SECTIONPARSERDATA_H
 
 #include "BlueprintSourcemap.h"
+#include "ModelTable.h"
 #include "Section.h"
-#include "SymbolTable.h"
 
 namespace snowcrash {
 
@@ -42,11 +42,11 @@ namespace snowcrash {
         /** Parser Options */
         BlueprintParserOptions options;
 
-        /** Symbol Table */
-        SymbolTable symbolTable;
+        /** Model Table */
+        ModelTable modelTable;
 
-        /** Symbol Table Sourcemap */
-        SymbolSourceMapTable symbolSourceMapTable;
+        /** Model Table Sourcemap */
+        ModelSourceMapTable modelSourceMapTable;
 
         /** Source Data */
         const mdp::ByteBuffer& sourceData;

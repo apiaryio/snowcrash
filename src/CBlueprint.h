@@ -35,7 +35,7 @@ extern "C" {
     } sc_parameter_use;
 
     typedef enum sc_reference_type_t {
-        SC_TYPE_SYMBOL_REFERENCE
+        SC_TYPE_MODEL_REFERENCE
     } sc_reference_type_t;
 
     /** Class Blueprint wrapper */

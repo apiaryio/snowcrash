@@ -30,7 +30,7 @@ const mdp::ByteBuffer ResponseBodyFixture = \
 "+ Response 200 (text/plain)\n\n"\
 "        Hello World!\n";
 
-const mdp::ByteBuffer SymbolFixture = \
+const mdp::ByteBuffer ModelFixture = \
 "+ Request\n\n"\
 "    [Symbol][]\n";
 
@@ -311,11 +311,11 @@ TEST_CASE("Parse payload with dangling body", "[payload]")
 
 TEST_CASE("Parse inline payload with symbol reference", "[payload]")
 {
-    Symbols symbols;
-    SymbolHelper::buildSymbol("Symbol", symbols);
+    Models models;
+    ModelHelper::buildModel("Symbol", models);
 
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(SymbolFixture, RequestBodySectionType, payload, ExportSourcemapOption, symbols);
+    SectionParserHelper<Payload, PayloadParser>::parse(ModelFixture, RequestBodySectionType, payload, ExportSourcemapOption, models);
 
     REQUIRE(payload.report.error.code == Error::OK);
     REQUIRE(payload.report.warnings.size() == 0);
@@ -344,11 +344,11 @@ TEST_CASE("Parse inline payload with symbol reference with extra indentation", "
     "+ Request\n\n"\
     "        [Symbol][]\n";
 
-    Symbols symbols;
-    SymbolHelper::buildSymbol("Symbol", symbols);
+    Models models;
+    ModelHelper::buildModel("Symbol", models);
 
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestBodySectionType, payload, ExportSourcemapOption, symbols);
+    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestBodySectionType, payload, ExportSourcemapOption, models);
 
     REQUIRE(payload.report.error.code == Error::OK);
     REQUIRE(payload.report.warnings.size() == 1);
@@ -372,14 +372,14 @@ TEST_CASE("Parse inline payload with symbol reference with extra indentation", "
 
 TEST_CASE("Parse inline payload with symbol reference with foreign content", "[payload]")
 {
-    mdp::ByteBuffer source = SymbolFixture;
+    mdp::ByteBuffer source = ModelFixture;
     source += "\n    Foreign\n";
 
-    Symbols symbols;
-    SymbolHelper::buildSymbol("Symbol", symbols);
+    Models models;
+    ModelHelper::buildModel("Symbol", models);
 
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestBodySectionType, payload, ExportSourcemapOption, symbols);
+    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestBodySectionType, payload, ExportSourcemapOption, models);
 
     REQUIRE(payload.report.error.code == Error::OK);
     REQUIRE(payload.report.warnings.size() == 1); // ignoring foreign entry

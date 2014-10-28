@@ -96,7 +96,7 @@ namespace snowcrash {
         /** Source Map of Schema */
         SourceMap<Asset> schema;
 
-        /** Source Map of Symbol */
+        /** Source Map of Model Reference */
         SourceMap<Reference> reference;
     };
 

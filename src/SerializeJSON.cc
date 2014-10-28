@@ -553,7 +553,7 @@ static void serialize(const SourceMap<Payload>& payload, size_t level, std::ostr
     serialize(SerializeKey::Name, payload.name, level + 1, false, os);
     os << NewLineItemBlock;
 
-    // Symbol Reference
+    // Model Reference
     serialize(payload.reference, level + 1, os);
 
     // Description

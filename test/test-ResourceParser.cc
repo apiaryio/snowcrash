@@ -461,7 +461,7 @@ TEST_CASE("Parse nameless resource with nameless model", "[resource][model][sour
     ParseResult<Resource> resource;
     SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource, ExportSourcemapOption);
 
-    REQUIRE(resource.report.error.code == SymbolError);
+    REQUIRE(resource.report.error.code == ModelError);
     REQUIRE(resource.report.warnings.empty());
 
     REQUIRE(resource.node.model.name.empty());
@@ -589,7 +589,7 @@ TEST_CASE("Parse named resource with lazy referencing", "[resource][model][issue
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[0].second == "text/plain");
 
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].reference.id == "Resource 2");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].reference.type == Reference::SymbolReference);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].reference.type == Reference::ModelReference);
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].reference.meta.state == Reference::StateResolved);
 
     SourceMap<Resources> resourcesSourceMap = blueprint.sourceMap.resourceGroups.collection[0].resources;
@@ -656,7 +656,7 @@ TEST_CASE("Parse named resource with lazy referencing with both response and req
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].requests[0].headers[0].second == "application/json");
 
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].requests[0].reference.id == "Item");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].requests[0].reference.type == Reference::SymbolReference);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].requests[0].reference.type == Reference::ModelReference);
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].requests[0].reference.meta.state == Reference::StateResolved);
 
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
@@ -665,7 +665,7 @@ TEST_CASE("Parse named resource with lazy referencing with both response and req
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers.size() == 1);
 
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].reference.id == "Collection of Items");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].reference.type == Reference::SymbolReference);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].reference.type == Reference::ModelReference);
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].reference.meta.state == Reference::StateResolved);
 }
 
@@ -716,7 +716,7 @@ TEST_CASE("Parse named resource with nameless model but reference a non-existing
     ParseResult<Blueprint> blueprint;
     parse(source, 0, blueprint);
 
-    REQUIRE(blueprint.report.error.code == SymbolError);
+    REQUIRE(blueprint.report.error.code == ModelError);
     REQUIRE(blueprint.report.warnings.empty());
 }
 

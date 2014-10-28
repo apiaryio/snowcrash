@@ -1,5 +1,5 @@
 //
-//  test/test-StringUtils.cc
+//  test-StringUtility.cc
 //  snowcrash
 //
 //  Created by Jiri Kratochvil on 10/15/14.
