@@ -18,8 +18,11 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include "RegexMatch.h"
 
 namespace snowcrash {
+
+    const char* const MarkdownLinkRegex("^[[:blank:]]*\\[" SYMBOL_IDENTIFIER "][[:blank:]](\\[([^][()]*)]|\\(([^][()]+)))[[:blank:]]*$");
 
     // Check a character not to be an space of any kind
     inline bool isSpace(const std::string::value_type i){
@@ -258,6 +261,27 @@ namespace snowcrash {
         TrimString(escapedString);
 
         return escapedString;
+    }
+
+    /**
+     * \brief If the given string is a markdown link, return the string which is being linked
+     *
+     *        If there is no link, return the whole string
+     *
+     * \param subject String which is a markdown link
+     *
+     * \return Substring which is inside the first [] of the markdown link
+     */
+    inline std::string StripMarkdownLink(std::string subject) {
+
+        // Check if markdown link
+        if (subject[0] != '[') {
+            return subject;
+        }
+
+        std::string linkedString = RegexCaptureFirst(subject, MarkdownLinkRegex);
+
+        return linkedString;
     }
 }
 
