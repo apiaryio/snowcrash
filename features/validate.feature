@@ -42,5 +42,5 @@ Feature: Validate a blueprint
     Then the output should contain:
     """
     OK.
-    warning: (5)  unexpected header block, expected a group, resource or an action definition, e.g. '# Group <name>', '# <resource name> [<URI>]' or '# <HTTP method> <URI>' : on line 4, column 1 - line 4, column 29
+    warning: (5)  unexpected header block, expected a group, resource or an action definition, e.g. '# Group <name>', '# <resource name> [<URI>]' or '# <HTTP method> <URI>'; line 4, column 1 - line 4, column 29
     """

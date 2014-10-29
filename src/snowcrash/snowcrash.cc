@@ -46,31 +46,44 @@ struct AnnotationPosition {
  *  \param range Character index mapping as input
  *  \param out Position of the given range as output
  */
-void GetLineFromMap(std::vector<size_t>& linesEndIndex,
+void GetLineFromMap(const std::vector<size_t>& linesEndIndex,
                     const mdp::Range& range,
                     AnnotationPosition& out)
 {
 
-    std::vector<size_t>::iterator annotationPositionIt;
+    std::vector<size_t>::const_iterator annotationPositionIt;
+
+    out.fromLine = 0;
+    out.fromColumn = 0;
+    out.toLine = 0;
+    out.toColumn = 0;
 
     // Finds starting line and column position
     annotationPositionIt = std::upper_bound(linesEndIndex.begin(), linesEndIndex.end(), range.location) - 1;
-    out.fromLine = std::distance(linesEndIndex.begin(), annotationPositionIt) + 1;
-    out.fromColumn = range.location - *annotationPositionIt + 1;
+
+    if (annotationPositionIt != linesEndIndex.end()) {
+
+        out.fromLine = std::distance(linesEndIndex.begin(), annotationPositionIt) + 1;
+        out.fromColumn = range.location - *annotationPositionIt + 1;
+    }
 
     // Finds ending line and column position
     annotationPositionIt = std::lower_bound(linesEndIndex.begin(), linesEndIndex.end(), range.location + range.length) - 1;
-    out.toLine = std::distance(linesEndIndex.begin(), annotationPositionIt) + 1;
-    out.toColumn = (range.location + range.length) - *annotationPositionIt + 1;
 
-    if (*(annotationPositionIt + 1) == (range.location + range.length)) {
-        out.toColumn --;
+    if (annotationPositionIt != linesEndIndex.end()) {
+
+        out.toLine = std::distance(linesEndIndex.begin(), annotationPositionIt) + 1;
+        out.toColumn = (range.location + range.length) - *annotationPositionIt + 1;
+
+        if (*(annotationPositionIt + 1) == (range.location + range.length)) {
+            out.toColumn--;
+        }
     }
 }
 
 /**
  *  \brief Given the source returns the length of all the lines in source as a vector
- *  \param source Source sting
+ *  \param source Source data
  *  \param out Vector containing indexes of all end line character in source
  */
 void GetLinesEndIndex(const std::string& source,
@@ -79,9 +92,9 @@ void GetLinesEndIndex(const std::string& source,
 
     out.push_back(0);
 
-    for (int i = 0; i < source.length(); i++) {
+    for (size_t i = 0; i < source.length(); i++) {
 
-        if(source[i] == '\n') {
+        if (source[i] == '\n') {
             out.push_back(i + 1);
         }
     }
@@ -91,7 +104,7 @@ void GetLinesEndIndex(const std::string& source,
  *  \brief Print Markdown source annotation.
  *  \param prefix A string prefix for the annotation
  *  \param annotation An annotation to print
- *  \param source Source sting
+ *  \param source Source data
  *  \param isUseLineNumbers True if the annotations needs to be printed by line and column number
  */
 void PrintAnnotation(const std::string& prefix,
@@ -122,17 +135,17 @@ void PrintAnnotation(const std::string& prefix,
              it != annotation.location.end();
              ++it) {
 
-            std::cerr << ((it == annotation.location.begin()) ? " :" : ";");
-
             if (isUseLineNumbers) {
 
                 AnnotationPosition annotationPosition;
                 GetLineFromMap(linesEndIndex, *it, annotationPosition);
 
-                std::cerr << " on line " << annotationPosition.fromLine << ", column " << annotationPosition.fromColumn;
+                std::cerr << "; line " << annotationPosition.fromLine << ", column " << annotationPosition.fromColumn;
                 std::cerr << " - line " << annotationPosition.toLine << ", column " << annotationPosition.toColumn;
             }
             else {
+
+                std::cerr << ((it == annotation.location.begin()) ? " :" : ";");
                 std::cerr << it->location << ":" << it->length;
             }
         }
@@ -144,7 +157,7 @@ void PrintAnnotation(const std::string& prefix,
 /**
  *  \brief Print parser report to stderr.
  *  \param report A parser report to print
- *  \param source Source sting
+ *  \param source Source data
  *  \param isUseLineNumbers True if the annotations needs to be printed by line and column number
  */
 void PrintReport(const snowcrash::Report& report,
