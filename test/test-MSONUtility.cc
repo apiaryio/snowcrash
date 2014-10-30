@@ -274,3 +274,84 @@ TEST_CASE("Parse required type attribute enclosed in backticks", "[mson_utility]
     REQUIRE((typeAttributes & DefaultTypeAttribute) == 0);
     REQUIRE(isAttributeParsed == false);
 }
+
+TEST_CASE("Parse canonical type specification", "[mson_utility]")
+{
+    std::string source = "object";
+    TypeSpecification typeSpecification;
+
+    parseTypeSpecification(source, typeSpecification);
+
+    REQUIRE(typeSpecification.name.name == ObjectTypeName);
+    REQUIRE(typeSpecification.name.symbol.literal.empty());
+    REQUIRE(typeSpecification.name.symbol.variable == false);
+    REQUIRE(typeSpecification.nestedTypes.empty());
+}
+
+TEST_CASE("Parse linked type specification", "[mson_utility]")
+{
+    std::string source = "[Person](http://google.com)";
+    TypeSpecification typeSpecification;
+
+    parseTypeSpecification(source, typeSpecification);
+
+    REQUIRE(typeSpecification.name.name == UndefinedTypeName);
+    REQUIRE(typeSpecification.name.symbol.literal == "Person");
+    REQUIRE(typeSpecification.name.symbol.variable == false);
+    REQUIRE(typeSpecification.nestedTypes.empty());
+}
+
+TEST_CASE("Parse implicit linked type specification", "[mson_utility]")
+{
+    std::string source = "[Person ] []";
+    TypeSpecification typeSpecification;
+
+    parseTypeSpecification(source, typeSpecification);
+
+    REQUIRE(typeSpecification.name.name == UndefinedTypeName);
+    REQUIRE(typeSpecification.name.symbol.literal == "Person");
+    REQUIRE(typeSpecification.name.symbol.variable == false);
+    REQUIRE(typeSpecification.nestedTypes.empty());
+}
+
+TEST_CASE("Parse nested types in type specification", "[mson_utility]")
+{
+    std::string source = "array[ object , Link ]";
+    TypeSpecification typeSpecification;
+
+    parseTypeSpecification(source, typeSpecification);
+
+    REQUIRE(typeSpecification.name.name == ArrayTypeName);
+    REQUIRE(typeSpecification.name.symbol.literal.empty());
+    REQUIRE(typeSpecification.name.symbol.variable == false);
+    REQUIRE(typeSpecification.nestedTypes.size() == 2);
+
+    REQUIRE(typeSpecification.nestedTypes[0].name == ObjectTypeName);
+    REQUIRE(typeSpecification.nestedTypes[0].symbol.literal.empty());
+    REQUIRE(typeSpecification.nestedTypes[0].symbol.variable == false);
+
+    REQUIRE(typeSpecification.nestedTypes[1].name == UndefinedTypeName);
+    REQUIRE(typeSpecification.nestedTypes[1].symbol.literal == "Link");
+    REQUIRE(typeSpecification.nestedTypes[1].symbol.variable == false);
+}
+
+TEST_CASE("Parse linked nested types in type specification", "[mson_utility]")
+{
+    std::string source = "[Links[[Repo][],[Search](http://google.com)]][links]";
+    TypeSpecification typeSpecification;
+
+    parseTypeSpecification(source, typeSpecification);
+
+    REQUIRE(typeSpecification.name.name == UndefinedTypeName);
+    REQUIRE(typeSpecification.name.symbol.literal == "Links");
+    REQUIRE(typeSpecification.name.symbol.variable == false);
+    REQUIRE(typeSpecification.nestedTypes.size() == 2);
+
+    REQUIRE(typeSpecification.nestedTypes[0].name == UndefinedTypeName);
+    REQUIRE(typeSpecification.nestedTypes[0].symbol.literal == "Repo");
+    REQUIRE(typeSpecification.nestedTypes[0].symbol.variable == false);
+
+    REQUIRE(typeSpecification.nestedTypes[1].name == UndefinedTypeName);
+    REQUIRE(typeSpecification.nestedTypes[1].symbol.literal == "Search");
+    REQUIRE(typeSpecification.nestedTypes[1].symbol.variable == false);
+}

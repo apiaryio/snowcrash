@@ -105,6 +105,12 @@ namespace mson {
 
         /** Array of nested types */
         TypeNames nestedTypes;
+
+        /** Reference for the type */
+        snowcrash::Reference reference;
+
+        /** References for the nested types */
+        std::deque<snowcrash::Reference> nestedReferences;
     };
 
     /** Definition of an instance of a type */

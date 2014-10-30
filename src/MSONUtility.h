@@ -125,16 +125,109 @@ namespace mson {
     /**
      * \brief Parse Type Specification from a signature attribute
      *
-     * \param node Markdown node of the signature
-     * \param pd Section parser data
-     * \param attribute Attribute string representing the type specification
-     * \param out MSON Type Specification
+     * \param subject Attribute string representing the type specification
+     * \param typeSpecification MSON Type Specification
      */
-    inline void parseTypeSpecification(const mdp::MarkdownNodeIterator& node,
-                                       snowcrash::SectionParserData& pd,
-                                       const std::string& attribute,
-                                       TypeSpecification& out) {
+    inline void parseTypeSpecification(std::string subject,
+                                       TypeSpecification& typeSpecification) {
 
+        subject = snowcrash::StripMarkdownLink(subject);
+
+        bool lookingAtNested = false;
+        bool lookingForEndLink = false;
+        bool alreadyParsedLink = false;
+        bool trimSubject = false;
+
+        size_t i = 0;
+        std::string value = "";
+
+        while (i < subject.length()) {
+
+            if (subject[i] == '[' && !alreadyParsedLink) {
+
+                trimSubject = true;
+
+                if (!lookingAtNested) {
+
+                    snowcrash::TrimString(value);
+
+                    if (!value.empty()) {
+                        parseTypeName(value, typeSpecification.name);
+                    }
+
+                    lookingAtNested = true;
+                } else {
+                    lookingForEndLink = true;
+                }
+            } else if (subject[i] == ']' && lookingAtNested && lookingForEndLink) {
+
+                trimSubject = true;
+
+                TypeName typeName;
+                snowcrash::TrimString(value);
+
+                if (!value.empty()) {
+                    parseTypeName(value, typeName);
+                    typeSpecification.nestedTypes.push_back(typeName);
+                }
+
+                alreadyParsedLink = true;
+                lookingForEndLink = false;
+            } else if (subject[i] == ',' && lookingAtNested && !lookingForEndLink) {
+
+                trimSubject = true;
+
+                if (alreadyParsedLink) {
+                    alreadyParsedLink = false;
+                } else {
+
+                    TypeName typeName;
+                    snowcrash::TrimString(value);
+
+                    if (!value.empty()) {
+                        parseTypeName(value, typeName);
+                        typeSpecification.nestedTypes.push_back(typeName);
+                    }
+                }
+            } else {
+
+                value += subject[i];
+                i++;
+            }
+
+            // Strip the subject until the current index
+            if (trimSubject) {
+
+                subject = subject.substr(i + 1);
+                snowcrash::TrimString(subject);
+
+                trimSubject = false;
+                value = "";
+                i = 0;
+            }
+        }
+
+        snowcrash::TrimString(value);
+
+        if (value.empty() || alreadyParsedLink) {
+            return;
+        }
+
+        // Remove the ending square bracket
+        if (lookingAtNested && value[value.length() - 1] == ']') {
+            value = value.substr(0, value.length() - 1);
+        }
+
+        TypeName typeName;
+
+        snowcrash::TrimString(value);
+        parseTypeName(value, typeName);
+
+        if (lookingAtNested) {
+            typeSpecification.nestedTypes.push_back(typeName);
+        } else {
+            typeSpecification.name = typeName;
+        }
     }
 
     /**
@@ -171,7 +264,7 @@ namespace mson {
                 } else {
 
                     foundTypeSpecification = true;
-                    parseTypeSpecification(node, pd, *it, out.node.typeSpecification);
+                    parseTypeSpecification(*it, out.node.typeSpecification);
                 }
             }
         }
