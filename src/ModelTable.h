@@ -76,8 +76,8 @@ namespace snowcrash {
 
         std::cout << "Resource Model Symbols:\n";
 
-        for (ResourceModelSymbolTable::const_iterator it = ModelTable.resourceModels.begin();
-             it != ModelTable.resourceModels.end();
+        for (ResourceModelTable::const_iterator it = modelTable.resourceModels.begin();
+             it != modelTable.resourceModels.end();
              ++it) {
 
             std::cout << "- " << it->first << " - body: '" << EscapeNewlines(it->second.body) << "'\n";
