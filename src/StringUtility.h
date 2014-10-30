@@ -22,7 +22,7 @@
 
 namespace snowcrash {
 
-    const char* const MarkdownLinkRegex("^[[:blank:]]*\\[" SYMBOL_IDENTIFIER "][[:blank:]](\\[([^][()]*)]|\\(([^][()]+)))[[:blank:]]*$");
+    const char* const MarkdownLinkRegex = "^[[:blank:]]*\\[(.*)][[:blank:]]*(\\[([^][()]*)]|\\(([^][()]+)\\))[[:blank:]]*$";
 
     // Check a character not to be an space of any kind
     inline bool isSpace(const std::string::value_type i){
@@ -280,6 +280,7 @@ namespace snowcrash {
         }
 
         std::string linkedString = RegexCaptureFirst(subject, MarkdownLinkRegex);
+        TrimString(linkedString);
 
         return linkedString;
     }

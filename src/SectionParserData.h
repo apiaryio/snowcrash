@@ -42,6 +42,9 @@ namespace snowcrash {
         /** Parser Options */
         BlueprintParserOptions options;
 
+        /** Named Types */
+        std::vector<mson::NamedType> types;
+
         /** Model Table */
         ModelTable modelTable;
 

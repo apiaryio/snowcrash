@@ -67,5 +67,5 @@ TEST_CASE("Remove markdown link")
 {
     REQUIRE(StripMarkdownLink("[Google][]") == "Google");
     REQUIRE(StripMarkdownLink("[Google] [google]") == "Google");
-    REQUIRE(StripMarkdownLink("[Google](https://google.com)") == "Google");
+    REQUIRE(StripMarkdownLink("[ Google](https://google.com)") == "Google");
 }
