@@ -241,9 +241,7 @@ namespace mson {
     inline void parseTypeDefinition(const mdp::MarkdownNodeIterator& node,
                                     snowcrash::SectionParserData& pd,
                                     std::vector<std::string>& attributes,
-                                    snowcrash::ParseResultRef<TypeDefinition>& out) {
-
-        TypeDefinition typeDefinition;
+                                    const snowcrash::ParseResultRef<TypeDefinition>& out) {
 
         bool foundTypeSpecification = false;
         std::vector<std::string>::iterator it;
@@ -251,7 +249,7 @@ namespace mson {
         for (it = attributes.begin(); it != attributes.end(); it++) {
 
             // If not a recognized type attribute
-            if (!parseTypeAttribute(*it, typeDefinition.attributes)) {
+            if (!parseTypeAttribute(*it, out.node.attributes)) {
 
                 // If type specification is already found
                 if (foundTypeSpecification) {
