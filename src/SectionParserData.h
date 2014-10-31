@@ -10,6 +10,7 @@
 #define SNOWCRASH_SECTIONPARSERDATA_H
 
 #include "BlueprintSourcemap.h"
+#include "MSON.h"
 #include "ModelTable.h"
 #include "Section.h"
 
