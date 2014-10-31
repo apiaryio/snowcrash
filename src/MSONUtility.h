@@ -9,7 +9,7 @@
 #ifndef SNOWCRASH_MSONUTILITY_H
 #define SNOWCRASH_MSONUTILITY_H
 
-#include "MSONSourcemap.h"
+#include "MSON.h"
 
 namespace mson {
 
@@ -266,16 +266,6 @@ namespace mson {
                 }
             }
         }
-    }
-
-    /**
-     * \brief Parse Value Definition from a list of signature values and attributes
-     */
-    inline ValueDefinition parseValueDefinition() {
-
-        ValueDefinition valueDefinition;
-
-        return valueDefinition;
     }
 }
 
