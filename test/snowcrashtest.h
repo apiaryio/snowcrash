@@ -98,7 +98,6 @@ namespace snowcrashtest {
             mdp::MarkdownNode markdownAST;
 
             snowcrash::ParseResult<snowcrash::Blueprint> blueprint;
-            snowcrash::ParseResult<snowcrash::Blueprint>* bppointer;
 
             if (node == NULL) {
                 markdownParser.parse(source, markdownAST);
@@ -108,8 +107,7 @@ namespace snowcrashtest {
 
             REQUIRE(!markdownAST.children().empty());
 
-            bppointer = &blueprint;
-            snowcrash::SectionParserData pd(0, source, bppointer->node);
+            snowcrash::SectionParserData pd(0, source, blueprint.node);
 
             scpl::Signature signature;
             scpl::SignatureTraits signatureTraits(traits);

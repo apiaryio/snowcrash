@@ -10,6 +10,7 @@
 #include "MSONUtility.h"
 
 using namespace mson;
+using namespace snowcrashtest;
 
 TEST_CASE("Parse canonical literal value", "[mson_utility]")
 {
@@ -354,4 +355,68 @@ TEST_CASE("Parse linked nested types in type specification", "[mson_utility]")
     REQUIRE(typeSpecification.nestedTypes[1].name == UndefinedTypeName);
     REQUIRE(typeSpecification.nestedTypes[1].symbol.literal == "Search");
     REQUIRE(typeSpecification.nestedTypes[1].symbol.variable == false);
+}
+
+TEST_CASE("Parse canonical type definition", "[mson_utility]")
+{
+    std::vector<std::string> attributes;
+    snowcrash::ParseResult<TypeDefinition> typeDefinition;
+    snowcrash::Blueprint blueprint;
+
+    attributes.push_back("number");
+    attributes.push_back("required");
+
+    mdp::ByteBuffer source = "+ (number, required)";
+    mdp::MarkdownParser markdownParser;
+    mdp::MarkdownNode markdownAST;
+
+    markdownParser.parse(source, markdownAST);
+    snowcrash::SectionParserData pd(0, source, blueprint);
+
+    parseTypeDefinition(markdownAST.children().begin(), pd, attributes, typeDefinition);
+
+    REQUIRE(typeDefinition.report.error.code == snowcrash::Error::OK);
+    REQUIRE(typeDefinition.report.warnings.empty());
+
+    REQUIRE(typeDefinition.node.typeSpecification.name.name == NumberTypeName);
+    REQUIRE(typeDefinition.node.typeSpecification.name.symbol.literal.empty());
+    REQUIRE(typeDefinition.node.typeSpecification.name.symbol.variable == false);
+    REQUIRE(typeDefinition.node.typeSpecification.nestedTypes.empty());
+    REQUIRE((typeDefinition.node.attributes & RequiredTypeAttribute) == RequiredTypeAttribute);
+    REQUIRE((typeDefinition.node.attributes & OptionalTypeAttribute) == 0);
+    REQUIRE((typeDefinition.node.attributes & FixedTypeAttribute) == 0);
+    REQUIRE((typeDefinition.node.attributes & SampleTypeAttribute) == 0);
+    REQUIRE((typeDefinition.node.attributes & DefaultTypeAttribute) == 0);
+}
+
+TEST_CASE("Parse type definition with non recognized type attribute", "[mson_utility]")
+{
+    std::vector<std::string> attributes;
+    snowcrash::ParseResult<TypeDefinition> typeDefinition;
+    snowcrash::Blueprint blueprint;
+
+    attributes.push_back("[Person][]");
+    attributes.push_back("optinal");
+
+    mdp::ByteBuffer source = "+ ([Person][], optinal)";
+    mdp::MarkdownParser markdownParser;
+    mdp::MarkdownNode markdownAST;
+
+    markdownParser.parse(source, markdownAST);
+    snowcrash::SectionParserData pd(0, source, blueprint);
+
+    parseTypeDefinition(markdownAST.children().begin(), pd, attributes, typeDefinition);
+
+    REQUIRE(typeDefinition.report.error.code == snowcrash::Error::OK);
+    REQUIRE(typeDefinition.report.warnings.size() == 1);
+
+    REQUIRE(typeDefinition.node.typeSpecification.name.name == UndefinedTypeName);
+    REQUIRE(typeDefinition.node.typeSpecification.name.symbol.literal == "Person");
+    REQUIRE(typeDefinition.node.typeSpecification.name.symbol.variable == false);
+    REQUIRE(typeDefinition.node.typeSpecification.nestedTypes.empty());
+    REQUIRE((typeDefinition.node.attributes & RequiredTypeAttribute) == 0);
+    REQUIRE((typeDefinition.node.attributes & OptionalTypeAttribute) == 0);
+    REQUIRE((typeDefinition.node.attributes & FixedTypeAttribute) == 0);
+    REQUIRE((typeDefinition.node.attributes & SampleTypeAttribute) == 0);
+    REQUIRE((typeDefinition.node.attributes & DefaultTypeAttribute) == 0);
 }
