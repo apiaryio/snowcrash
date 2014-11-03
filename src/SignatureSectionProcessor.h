@@ -17,6 +17,14 @@ namespace scpl {
     using mdp::MarkdownNodes;
     using mdp::MarkdownNodeIterator;
 
+    const char EscapeCharacter = '`';
+    const char ValuesDelimiter = ':';
+    const char ValueDelimiter = ',';
+    const char AttributesBeginDelimiter = '(';
+    const char AttributesEndDelimiter = ')';
+    const char AttributeDelimiter = ',';
+    const char ContentDelimiter = '-';
+
     /*
      * Forward Declarations
      */
@@ -30,14 +38,6 @@ namespace scpl {
      */
     template<typename T>
     struct SignatureSectionProcessorBase : public snowcrash::SectionProcessorBase<T> {
-
-        static const char EscapeCharacter = '`';
-        static const char ValuesDelimiter = ':';
-        static const char ValueDelimiter = ',';
-        static const char AttributesBeginDelimiter = '(';
-        static const char AttributesEndDelimiter = ')';
-        static const char AttributeDelimiter = ',';
-        static const char ContentDelimiter = '-';
 
         /**
          * \brief Signature traits of the section

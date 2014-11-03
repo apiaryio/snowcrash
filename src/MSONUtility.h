@@ -27,8 +27,10 @@ namespace mson {
         std::string buffer = subject;
         size_t len = buffer.length();
 
-        if ((buffer[0] == '*' && buffer[len - 1] == '*') ||
-            (buffer[0] == '_' && buffer[len - 1] == '_')) {
+        std::string emphasisChars = mdp::MarkdownEmphasisChars;
+
+        if (emphasisChars.find(buffer[0]) != std::string::npos &&
+            buffer[0] == buffer[len - 1]) {
 
             std::string escapedString = snowcrash::RetrieveEscaped(buffer, 0, true);
 
@@ -146,9 +148,10 @@ namespace mson {
 
         std::string subject = snowcrash::StripMarkdownLink(attribute);
 
-        bool lookingAtNested = false;
-        bool lookingForEndLink = false;
-        bool alreadyParsedLink = false;
+        bool lookingAtNested = false;    // If true, we are looking at nested types
+        bool lookingForEndLink = false;  // If true, we detected a link text and are looking for the end of it
+        bool alreadyParsedLink = false;  // If true, we already parsed the link text in the link
+
         bool trimSubject = false;
 
         size_t i = 0;
@@ -156,7 +159,8 @@ namespace mson {
 
         while (i < subject.length()) {
 
-            if (subject[i] == '[' && !alreadyParsedLink) {
+            if (subject[i] == mdp::MarkdownBeginReference &&
+                !alreadyParsedLink) {
 
                 trimSubject = true;
 
@@ -174,7 +178,9 @@ namespace mson {
                     lookingForEndLink = true;
                 }
             }
-            else if (subject[i] == ']' && lookingAtNested && lookingForEndLink) {
+            else if (subject[i] == mdp::MarkdownEndReference &&
+                     lookingAtNested &&
+                     lookingForEndLink) {
 
                 trimSubject = true;
 
@@ -190,7 +196,9 @@ namespace mson {
                 alreadyParsedLink = true;
                 lookingForEndLink = false;
             }
-            else if (subject[i] == ',' && lookingAtNested && !lookingForEndLink) {
+            else if (subject[i] == scpl::AttributeDelimiter &&
+                     lookingAtNested &&
+                     !lookingForEndLink) {
 
                 trimSubject = true;
 
@@ -235,7 +243,7 @@ namespace mson {
 
         // Remove the ending square bracket
         if (lookingAtNested &&
-            buffer[buffer.length() - 1] == ']') {
+            buffer[buffer.length() - 1] == mdp::MarkdownEndReference) {
 
             buffer = buffer.substr(0, buffer.length() - 1);
         }
