@@ -14,28 +14,30 @@
 namespace mson {
 
     /**
-     * \brief Parse Value from a string
+     * \brief Parse a string into MSON Value structure
      *
      * \param subject String which represents the value
      *
      * \return MSON Value
      */
-    inline Value parseValue(std::string& subject) {
+    inline Value parseValue(const std::string& subject) {
 
         Value value;
-        size_t len = subject.length();
 
-        if ((subject[0] == '*' && subject[len - 1] == '*') ||
-            (subject[0] == '_' && subject[len - 1] == '_')) {
+        std::string buffer = subject;
+        size_t len = buffer.length();
 
-            std::string escapedString = snowcrash::RetrieveEscaped(subject, 0, true);
+        if ((buffer[0] == '*' && buffer[len - 1] == '*') ||
+            (buffer[0] == '_' && buffer[len - 1] == '_')) {
+
+            std::string escapedString = snowcrash::RetrieveEscaped(buffer, 0, true);
 
             value.literal = escapedString;
             value.variable = true;
         }
 
         if (value.literal.empty()) {
-            value.literal = subject;
+            value.literal = buffer;
         }
 
         // When the value is a wildcard
@@ -55,7 +57,7 @@ namespace mson {
      *
      * \return MSON Symbol
      */
-    inline Symbol parseSymbol(std::string& subject) {
+    inline Symbol parseSymbol(const std::string& subject) {
 
         Symbol symbol;
         Value value = parseValue(subject);
@@ -72,22 +74,28 @@ namespace mson {
      * \param subject String which represents the type name
      * \param out MSON Type Name
      */
-    inline void parseTypeName(std::string& subject,
+    inline void parseTypeName(const std::string& subject,
                               TypeName& typeName) {
 
         if (subject == "boolean") {
             typeName.name = BooleanTypeName;
-        } else if (subject == "string") {
+        }
+        else if (subject == "string") {
             typeName.name = StringTypeName;
-        } else if (subject == "number") {
+        }
+        else if (subject == "number") {
             typeName.name = NumberTypeName;
-        } else if (subject == "array") {
+        }
+        else if (subject == "array") {
             typeName.name = ArrayTypeName;
-        } else if (subject == "enum") {
+        }
+        else if (subject == "enum") {
             typeName.name = EnumTypeName;
-        } else if (subject == "object") {
+        }
+        else if (subject == "object") {
             typeName.name = ObjectTypeName;
-        } else {
+        }
+        else {
             typeName.symbol = parseSymbol(subject);
         }
     }
@@ -107,15 +115,20 @@ namespace mson {
 
         if (attribute == "required") {
             typeAttributes |= RequiredTypeAttribute;
-        } else if (attribute == "optional") {
+        }
+        else if (attribute == "optional") {
             typeAttributes |= OptionalTypeAttribute;
-        } else if (attribute == "fixed") {
+        }
+        else if (attribute == "fixed") {
             typeAttributes |= FixedTypeAttribute;
-        } else if (attribute == "sample") {
+        }
+        else if (attribute == "sample") {
             typeAttributes |= SampleTypeAttribute;
-        } else if (attribute == "default") {
+        }
+        else if (attribute == "default") {
             typeAttributes |= DefaultTypeAttribute;
-        } else {
+        }
+        else {
             isAttribute = false;
         }
 
@@ -128,10 +141,10 @@ namespace mson {
      * \param subject Attribute string representing the type specification
      * \param typeSpecification MSON Type Specification
      */
-    inline void parseTypeSpecification(std::string subject,
+    inline void parseTypeSpecification(const std::string& attribute,
                                        TypeSpecification& typeSpecification) {
 
-        subject = snowcrash::StripMarkdownLink(subject);
+        std::string subject = snowcrash::StripMarkdownLink(attribute);
 
         bool lookingAtNested = false;
         bool lookingForEndLink = false;
@@ -139,7 +152,7 @@ namespace mson {
         bool trimSubject = false;
 
         size_t i = 0;
-        std::string value = "";
+        std::string buffer;
 
         while (i < subject.length()) {
 
@@ -149,49 +162,56 @@ namespace mson {
 
                 if (!lookingAtNested) {
 
-                    snowcrash::TrimString(value);
+                    snowcrash::TrimString(buffer);
 
-                    if (!value.empty()) {
-                        parseTypeName(value, typeSpecification.name);
+                    if (!buffer.empty()) {
+                        parseTypeName(buffer, typeSpecification.name);
                     }
 
                     lookingAtNested = true;
-                } else {
+                }
+                else {
                     lookingForEndLink = true;
                 }
-            } else if (subject[i] == ']' && lookingAtNested && lookingForEndLink) {
+            }
+            else if (subject[i] == ']' && lookingAtNested && lookingForEndLink) {
 
                 trimSubject = true;
 
                 TypeName typeName;
-                snowcrash::TrimString(value);
+                snowcrash::TrimString(buffer);
 
-                if (!value.empty()) {
-                    parseTypeName(value, typeName);
+                if (!buffer.empty()) {
+
+                    parseTypeName(buffer, typeName);
                     typeSpecification.nestedTypes.push_back(typeName);
                 }
 
                 alreadyParsedLink = true;
                 lookingForEndLink = false;
-            } else if (subject[i] == ',' && lookingAtNested && !lookingForEndLink) {
+            }
+            else if (subject[i] == ',' && lookingAtNested && !lookingForEndLink) {
 
                 trimSubject = true;
 
                 if (alreadyParsedLink) {
                     alreadyParsedLink = false;
-                } else {
+                }
+                else {
 
                     TypeName typeName;
-                    snowcrash::TrimString(value);
+                    snowcrash::TrimString(buffer);
 
-                    if (!value.empty()) {
-                        parseTypeName(value, typeName);
+                    if (!buffer.empty()) {
+
+                        parseTypeName(buffer, typeName);
                         typeSpecification.nestedTypes.push_back(typeName);
                     }
                 }
-            } else {
+            }
+            else {
 
-                value += subject[i];
+                buffer += subject[i];
                 i++;
             }
 
@@ -202,30 +222,33 @@ namespace mson {
                 snowcrash::TrimString(subject);
 
                 trimSubject = false;
-                value = "";
+                buffer.clear();
                 i = 0;
             }
         }
 
-        snowcrash::TrimString(value);
+        snowcrash::TrimString(buffer);
 
-        if (value.empty() || alreadyParsedLink) {
+        if (buffer.empty() || alreadyParsedLink) {
             return;
         }
 
         // Remove the ending square bracket
-        if (lookingAtNested && value[value.length() - 1] == ']') {
-            value = value.substr(0, value.length() - 1);
+        if (lookingAtNested &&
+            buffer[buffer.length() - 1] == ']') {
+
+            buffer = buffer.substr(0, buffer.length() - 1);
         }
 
         TypeName typeName;
 
-        snowcrash::TrimString(value);
-        parseTypeName(value, typeName);
+        snowcrash::TrimString(buffer);
+        parseTypeName(buffer, typeName);
 
         if (lookingAtNested) {
             typeSpecification.nestedTypes.push_back(typeName);
-        } else {
+        }
+        else {
             typeSpecification.name = typeName;
         }
     }
@@ -240,13 +263,14 @@ namespace mson {
      */
     inline void parseTypeDefinition(const mdp::MarkdownNodeIterator& node,
                                     snowcrash::SectionParserData& pd,
-                                    std::vector<std::string>& attributes,
+                                    const std::vector<std::string>& attributes,
                                     const snowcrash::ParseResultRef<TypeDefinition>& out) {
 
         bool foundTypeSpecification = false;
-        std::vector<std::string>::iterator it;
 
-        for (it = attributes.begin(); it != attributes.end(); it++) {
+        for (std::vector<std::string>::const_iterator it = attributes.begin();
+             it != attributes.end();
+             it++) {
 
             // If not a recognized type attribute
             if (!parseTypeAttribute(*it, out.node.attributes)) {
@@ -259,7 +283,8 @@ namespace mson {
                     out.report.warnings.push_back(snowcrash::Warning("ignoring unrecognized type attribute",
                                                                      snowcrash::IgnoringWarning,
                                                                      sourceMap));
-                } else {
+                }
+                else {
 
                     foundTypeSpecification = true;
                     parseTypeSpecification(*it, out.node.typeSpecification);
