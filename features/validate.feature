@@ -35,3 +35,12 @@ Feature: Validate a blueprint
     OK.
     warning: (5)  unexpected header block, expected a group, resource or an action definition, e.g. '# Group <name>', '# <resource name> [<URI>]' or '# <HTTP method> <URI>' :24:29
     """
+
+  Scenario: Validate an invalid blueprint file and show report by line number
+
+    When I run `snowcrash --validate invalid_blueprint.apib --use-line-num`
+    Then the output should contain:
+    """
+    OK.
+    warning: (5)  unexpected header block, expected a group, resource or an action definition, e.g. '# Group <name>', '# <resource name> [<URI>]' or '# <HTTP method> <URI>'; line 4, column 1 - line 4, column 29
+    """
