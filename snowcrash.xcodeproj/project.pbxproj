@@ -582,7 +582,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BBFC8425196C1AD4001A236A /* test-ActionParser.cc in Sources */,
-				4086365A19F7DB3000B92907 /* test-MSONValueMemberParser.cc in Sources */,
+				406B664F19FA6F63003CBD3A /* test-MSONUtility.cc in Sources */,
 				BBCC856319542DB300B99E90 /* test-ValuesParser.cc in Sources */,
 				BBB1278C199970A80041E9AE /* test-SymbolIdentifier.cc in Sources */,
 				BBFC8426196C1AFD001A236A /* test-RegexMatch.cc in Sources */,

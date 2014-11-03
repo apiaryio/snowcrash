@@ -243,7 +243,7 @@ namespace snowcrash {
      *
      * \return Substring that has been stripped of enclosing backticks
      */
-    inline std::string StripBackticks(std::string subject) {
+    inline std::string StripBackticks(std::string& subject) {
 
         // Check if first and last chars are backticks
         if (subject[0] != '`' ||
@@ -272,7 +272,7 @@ namespace snowcrash {
      *
      * \return Substring which is inside the first [] of the markdown link
      */
-    inline std::string StripMarkdownLink(std::string subject) {
+    inline std::string StripMarkdownLink(const std::string& subject) {
 
         // Check if markdown link
         if (subject[0] != '[') {

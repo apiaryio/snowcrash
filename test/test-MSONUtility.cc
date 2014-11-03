@@ -72,7 +72,7 @@ TEST_CASE("Parse value with non-matching '_'", "[mson_utility]")
     REQUIRE(value.variable == false);
 }
 
-TEST_CASE("Parse canonical type name",  "[mson_utility]")
+TEST_CASE("Parse canonical type name", "[mson_utility]")
 {
     std::string source = "Person";
     TypeName typeName;
@@ -84,7 +84,7 @@ TEST_CASE("Parse canonical type name",  "[mson_utility]")
     REQUIRE(typeName.symbol.variable == false);
 }
 
-TEST_CASE("Parse boolean type name",  "[mson_utility]")
+TEST_CASE("Parse boolean type name", "[mson_utility]")
 {
     std::string source = "boolean";
     TypeName typeName;
@@ -96,7 +96,7 @@ TEST_CASE("Parse boolean type name",  "[mson_utility]")
     REQUIRE(typeName.symbol.variable == false);
 }
 
-TEST_CASE("Parse string type name",  "[mson_utility]")
+TEST_CASE("Parse string type name", "[mson_utility]")
 {
     std::string source = "string";
     TypeName typeName;
@@ -108,7 +108,7 @@ TEST_CASE("Parse string type name",  "[mson_utility]")
     REQUIRE(typeName.symbol.variable == false);
 }
 
-TEST_CASE("Parse number type name",  "[mson_utility]")
+TEST_CASE("Parse number type name", "[mson_utility]")
 {
     std::string source = "number";
     TypeName typeName;
@@ -120,7 +120,7 @@ TEST_CASE("Parse number type name",  "[mson_utility]")
     REQUIRE(typeName.symbol.variable == false);
 }
 
-TEST_CASE("Parse array type name",  "[mson_utility]")
+TEST_CASE("Parse array type name", "[mson_utility]")
 {
     std::string source = "array";
     TypeName typeName;
@@ -132,7 +132,7 @@ TEST_CASE("Parse array type name",  "[mson_utility]")
     REQUIRE(typeName.symbol.variable == false);
 }
 
-TEST_CASE("Parse enum type name",  "[mson_utility]")
+TEST_CASE("Parse enum type name", "[mson_utility]")
 {
     std::string source = "enum";
     TypeName typeName;
@@ -144,7 +144,7 @@ TEST_CASE("Parse enum type name",  "[mson_utility]")
     REQUIRE(typeName.symbol.variable == false);
 }
 
-TEST_CASE("Parse object type name",  "[mson_utility]")
+TEST_CASE("Parse object type name", "[mson_utility]")
 {
     std::string source = "object";
     TypeName typeName;
@@ -338,7 +338,7 @@ TEST_CASE("Parse nested types in type specification", "[mson_utility]")
 
 TEST_CASE("Parse linked nested types in type specification", "[mson_utility]")
 {
-    std::string source = "[Links[[Repo][],[Search](http://google.com)]][links]";
+    std::string source = "Links[[Repo][],[Search](http://google.com)]";
     TypeSpecification typeSpecification;
 
     parseTypeSpecification(source, typeSpecification);
