@@ -14,8 +14,16 @@
 #include "markdown.h"
 
 namespace mdp {
-    
-    /** 
+
+    const char* const MarkdownEmphasisChars = "*_";
+    const char* const MarkdownListItemChars = "+-*";
+
+    const char MarkdownBeginReference = '[';
+    const char MarkdownEndReference = ']';
+
+    const char* const MarkdownLinkRegex = "^[[:blank:]]*\\[(.*)][[:blank:]]*(\\[([^][()]*)]|\\(([^][()]+)\\))[[:blank:]]*$";
+
+    /**
      *  GitHub-flavored Markdown Parser
      */
     class MarkdownParser {
