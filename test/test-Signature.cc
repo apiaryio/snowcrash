@@ -391,7 +391,7 @@ TEST_CASE("Escaped array element signature parsing", "[signature]")
 {
     ParseResult<Blueprint> blueprint;
 
-    scpl::Signature signature = SignatureParserHelper::parse( "`1 `, 00 ``2, `3` da(t)a`` 45 ", blueprint, ElementMemberTypeTraits);
+    scpl::Signature signature = SignatureParserHelper::parse("`1 `, 00 ``2, `3` da(t)a`` 45 ", blueprint, ElementMemberTypeTraits);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -408,7 +408,7 @@ TEST_CASE("Escaped array element signature parsing", "[signature]")
 TEST_CASE("Unescaped array element signature parsing", "[signature]")
 {
     ParseResult<Blueprint> blueprint;
-    scpl::Signature signature = SignatureParserHelper::parse( "1 , 2,3 (optional, array) - numbers", blueprint, ElementMemberTypeTraits);
+    scpl::Signature signature = SignatureParserHelper::parse("1 , 2,3 (optional, array) - numbers", blueprint, ElementMemberTypeTraits);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -428,7 +428,7 @@ TEST_CASE("Unescaped array element signature parsing", "[signature]")
 TEST_CASE("Escaped attributes signature parsing", "[signature]")
 {
     ParseResult<Blueprint> blueprint;
-    scpl::Signature signature = SignatureParserHelper::parse( "1 (`optio)nal, array` , fixed)", blueprint, ElementMemberTypeTraits);
+    scpl::Signature signature = SignatureParserHelper::parse("1 (`optio)nal, array` , fixed)", blueprint, ElementMemberTypeTraits);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -446,7 +446,7 @@ TEST_CASE("Escaped attributes signature parsing", "[signature]")
 TEST_CASE("Attributes with many brackets signature parsing", "[signature]")
 {
     ParseResult<Blueprint> blueprint;
-    scpl::Signature signature = SignatureParserHelper::parse( "1 ([op(t[io]na)l, p][], [A](http://a.com))", blueprint, ElementMemberTypeTraits);
+    scpl::Signature signature = SignatureParserHelper::parse("1 ([op(t[io]na)l, p][], [A](http://a.com))", blueprint, ElementMemberTypeTraits);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -457,6 +457,24 @@ TEST_CASE("Attributes with many brackets signature parsing", "[signature]")
     REQUIRE(signature.attributes.size() == 2);
     REQUIRE(signature.attributes[0] == "[op(t[io]na)l, p][]");
     REQUIRE(signature.attributes[1] == "[A](http://a.com)");
+    REQUIRE(signature.content.empty());
+    REQUIRE(signature.remainingContent.empty());
+}
+
+TEST_CASE("Identifier and values only", "[signature]")
+{
+    ParseResult<Blueprint> blueprint;
+    scpl::SignatureTraits::Traits traits = scpl::SignatureTraits::IdentifierTrait | scpl::SignatureTraits::ValuesTrait;
+    scpl::Signature signature = SignatureParserHelper::parse("Sample: 10 (1), 20", blueprint, traits);
+
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.empty());
+
+    REQUIRE(signature.identifier == "Sample");
+    REQUIRE(signature.values.size() == 2);
+    REQUIRE(signature.values[0] == "10 (1)");
+    REQUIRE(signature.values[1] == "20");
+    REQUIRE(signature.attributes.empty());
     REQUIRE(signature.content.empty());
     REQUIRE(signature.remainingContent.empty());
 }

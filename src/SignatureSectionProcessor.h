@@ -89,7 +89,7 @@ namespace scpl {
             if (traits.identifierTrait &&
                 !subject.empty()) {
 
-                parseSignatureIdentifier(node, pd, out.report, subject, signature);
+                parseSignatureIdentifier(node, pd, traits, out.report, subject, signature);
             }
 
             // Make sure values exist
@@ -102,7 +102,7 @@ namespace scpl {
                     subject = ValuesDelimiter + subject;
                 }
 
-                parseSignatureValues(node, pd, out.report, subject, signature);
+                parseSignatureValues(node, pd, traits, out.report, subject, signature);
             }
 
             if (traits.attributesTrait &&
@@ -143,6 +143,7 @@ namespace scpl {
          *
          * \param node Markdown node
          * \param pd Section Parser data
+         * \param traits Signature traits of the section signature
          * \param report Parse Report
          * \param subject String that needs to be parsed
          *                (which will be stripped of the parsed characters)
@@ -150,6 +151,7 @@ namespace scpl {
          */
         static void parseSignatureIdentifier(const MarkdownNodeIterator& node,
                                              snowcrash::SectionParserData& pd,
+                                             const SignatureTraits& traits,
                                              snowcrash::Report& report,
                                              mdp::ByteBuffer& subject,
                                              Signature& out) {
@@ -177,9 +179,9 @@ namespace scpl {
                         identifier += subject[i];
                         i++;
                     }
-                } else if (subject[i] == ValuesDelimiter ||
-                           subject[i] == AttributesBeginDelimiter ||
-                           subject[i] == ContentDelimiter) {
+                } else if ((traits.valuesTrait && subject[i] == ValuesDelimiter) ||
+                           (traits.attributesTrait && subject[i] == AttributesBeginDelimiter) ||
+                           (traits.contentTrait && subject[i] == ContentDelimiter)) {
 
                     // If identifier ends, strip it from the subject
                     subject = subject.substr(i);
@@ -221,6 +223,7 @@ namespace scpl {
          *
          * \param node Markdown node
          * \param pd Section Parser data
+         * \param traits Signature traits of the section signature
          * \param report Parse Report
          * \param subject String that needs to be parsed
          *                (which will be stripped of the parsed characters)
@@ -228,6 +231,7 @@ namespace scpl {
          */
         static void parseSignatureValues(const MarkdownNodeIterator& node,
                                          snowcrash::SectionParserData& pd,
+                                         const SignatureTraits& traits,
                                          snowcrash::Report& report,
                                          mdp::ByteBuffer& subject,
                                          Signature& out) {
@@ -265,8 +269,8 @@ namespace scpl {
 
                         value = "";
                         i = 0;
-                    } else if (subject[i] == AttributesBeginDelimiter ||
-                               subject[i] == ContentDelimiter) {
+                    } else if ((traits.attributesTrait && subject[i] == AttributesBeginDelimiter) ||
+                               (traits.contentTrait && subject[i] == ContentDelimiter)) {
 
                         // If values section ends, strip it from subject
                         subject = subject.substr(i);
