@@ -51,9 +51,8 @@ namespace snowcrash {
 
             if (!signature.remainingContent.empty()) {
 
-                mson::TypeSection typeSection;
+                mson::TypeSection typeSection(mson::BlockDescriptionTypeSectionType);
 
-                typeSection.type = mson::BlockDescriptionTypeSectionType;
                 typeSection.content.description = signature.remainingContent;
 
                 out.node.sections.push_back(typeSection);
@@ -65,7 +64,38 @@ namespace snowcrash {
                                                        SectionParserData& pd,
                                                        const ParseResultRef<mson::ValueMember>& out) {
 
+            if (out.node.sections.empty() ||
+                (out.node.sections.size() == 1 &&
+                 out.node.sections[0].type == mson::BlockDescriptionTypeSectionType)) {
+
+                if (out.node.sections.empty()) {
+
+                    mson::TypeSection typeSection(mson::BlockDescriptionTypeSectionType);
+                    out.node.sections.push_back(typeSection);
+                }
+
+                if (!out.node.sections[0].content.description.empty()) {
+                    TwoNewLines(out.node.sections[0].content.description);
+                }
+
+                mdp::ByteBuffer content = mdp::MapBytesRangeSet(node->sourceMap, pd.sourceData);
+
+                out.node.sections[0].content.description += content;
+
+                return ++MarkdownNodeIterator(node);
+            }
+
             return node;
+        }
+
+        static bool isDescriptionNode(const MarkdownNodeIterator& node,
+                                      SectionType sectionType) {
+
+            if (node->type != mdp::ListItemMarkdownNodeType) {
+                return true;
+            }
+
+            return SectionProcessorBase<mson::ValueMember>::isDescriptionNode(node, sectionType);
         }
     };
 

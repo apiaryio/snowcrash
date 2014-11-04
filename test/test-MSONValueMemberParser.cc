@@ -49,3 +49,48 @@ TEST_CASE("Parse mson value member with description not on new line", "[mson_val
     REQUIRE(valueMember.node.sections[0].content.description == "Which is also very nice\n");
     REQUIRE(valueMember.node.sections[0].content.members().empty());
 }
+
+TEST_CASE("Parse mson value member with block description", "[mson_value_member]")
+{
+    mdp::ByteBuffer source = \
+    "- red (string, required) - A color\n\n"\
+    "  Which is also very nice\n\n"\
+    "  - and awesome\n\n"\
+    "and really really nice\n\n";
+
+    ParseResult<mson::ValueMember> valueMember;
+    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(source, MSONValueMemberSectionType, valueMember);
+
+    REQUIRE(valueMember.report.error.code == Error::OK);
+    REQUIRE(valueMember.report.warnings.empty());
+
+    REQUIRE(valueMember.node.description == "A color");
+    REQUIRE(valueMember.node.valueDefinition.values.size() == 1);
+    REQUIRE(valueMember.node.sections.size() == 1);
+    REQUIRE(valueMember.node.sections[0].type == mson::BlockDescriptionTypeSectionType);
+    REQUIRE(valueMember.node.sections[0].content.description == "Which is also very nice\n\n- and awesome\n");
+    REQUIRE(valueMember.node.sections[0].content.members().empty());
+}
+
+TEST_CASE("Parse mson value member with block description, default and sample", "[mson_value_member]")
+{
+    mdp::ByteBuffer source = \
+    "- red (string, required) - A color\n\n"\
+    "  Which is also very nice\n\n"\
+    "  - and awesome\n\n"\
+    "  - Default: yellow\n"\
+    "  - Sample: green\n";
+
+    ParseResult<mson::ValueMember> valueMember;
+    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(source, MSONValueMemberSectionType, valueMember);
+
+    REQUIRE(valueMember.report.error.code == Error::OK);
+    REQUIRE(valueMember.report.warnings.empty());
+
+    REQUIRE(valueMember.node.description == "A color");
+    REQUIRE(valueMember.node.valueDefinition.values.size() == 1);
+    REQUIRE(valueMember.node.sections.size() == 1);
+    REQUIRE(valueMember.node.sections[0].type == mson::BlockDescriptionTypeSectionType);
+    REQUIRE(valueMember.node.sections[0].content.description == "Which is also very nice\n\n- and awesome\n");
+    REQUIRE(valueMember.node.sections[0].content.members().empty());
+}
