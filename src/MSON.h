@@ -13,6 +13,7 @@
 #include <string>
 #include "Platform.h"
 #include "MarkdownParser.h"
+#include "BlueprintSourcemap.h"
 
 /**
  * MSON Abstract Syntax Tree
@@ -32,6 +33,7 @@ namespace mson {
     /** A simple or actual value */
     struct Value {
 
+        /** Constructor */
         Value()
         : variable(false) {}
 
@@ -48,6 +50,7 @@ namespace mson {
     /** Type symbol (identifier) */
     struct Symbol {
 
+        /** Constructor */
         Symbol()
         : variable(false) {}
 
@@ -72,8 +75,9 @@ namespace mson {
     /** Base or named type's name */
     struct TypeName {
 
-        TypeName()
-        : name(UndefinedTypeName) {}
+        /** Constructor */
+        TypeName(const BaseTypeName& name_ = UndefinedTypeName)
+        : name(name_) {}
 
         /** EITHER Base type's value */
         BaseTypeName name;
@@ -116,6 +120,7 @@ namespace mson {
     /** Definition of an instance of a type */
     struct TypeDefinition {
 
+        /** Constructor */
         TypeDefinition()
         : attributes(0) {}
 
@@ -151,28 +156,38 @@ namespace mson {
         DefaultTypeSectionType           // Default member types
     };
 
+    /** Content of the type section */
+    struct TypeSectionContent {
+
+        /** EITHER Block description */
+        Markdown description;
+
+        /** OR Array of member types */
+        MemberTypes& members();
+        const MemberTypes& members() const;
+
+        /** Constructor */
+        TypeSectionContent(const Markdown& description_ = "");
+
+        /** Copy constructor */
+        TypeSectionContent(const TypeSectionContent& rhs);
+
+        /** Assignment operator */
+        TypeSectionContent& operator=(const TypeSectionContent& rhs);
+
+        /** Desctructor */
+        ~TypeSectionContent();
+
+    private:
+        std::auto_ptr<MemberTypes> m_members;
+    };
+
     /** Section of a type */
     struct TypeSection {
 
-        TypeSection()
-        : type(UndefinedTypeSectionType) {}
-
-        /** Content of the type section */
-        struct TypeSectionContent {
-
-            /** EITHER Block description */
-            Markdown description;
-
-            /** OR Array of member types */
-            MemberTypes& members();
-            const MemberTypes& members() const;
-
-            /** Checks if member types are present */
-            bool hasMembers() const;
-
-        private:
-            std::auto_ptr<MemberTypes> m_members;
-        };
+        /** Constructor */
+        TypeSection(const TypeSectionType& type_ = UndefinedTypeSectionType)
+        : type(type_) {}
 
         /** Denotes the type of the section */
         TypeSectionType type;
@@ -241,8 +256,17 @@ namespace mson {
         MemberTypes& members();
         const MemberTypes& members() const;
 
-        /** Checks if member types are present */
-        bool hasMembers() const;
+        /** Constructor */
+        OneOf();
+
+        /** Copy constructor */
+        OneOf(const OneOf& rhs);
+
+        /** Assignment operator */
+        OneOf& operator=(const OneOf& rhs);
+
+        /** Desctructor */
+        ~OneOf();
 
     private:
         std::auto_ptr<MemberTypes> m_members;
@@ -259,9 +283,6 @@ namespace mson {
 
     /** Member type of a structure */
     struct MemberType {
-
-        MemberType()
-        : type(UndefinedMemberType) {}
 
         /** Content of the member type */
         struct MemberTypeContent {
@@ -284,6 +305,18 @@ namespace mson {
 
         /** Content of the member type */
         MemberTypeContent content;
+
+        /** Constructor */
+        MemberType(const MemberTypeType& type_ = UndefinedMemberType);
+
+        /** Copy constructor */
+        MemberType(const MemberType& rhs);
+
+        /** Assignment operator */
+        MemberType& operator=(const MemberType& rhs);
+
+        /** Desctructor */
+        ~MemberType();
     };
 }
 

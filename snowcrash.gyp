@@ -68,6 +68,7 @@
         'src/CSourceAnnotation.h',
         'src/HTTP.cc',
         'src/HTTP.h',
+        'src/MSON.cc',
         'src/Section.cc',
         'src/Section.h',
         'src/Serialize.cc',

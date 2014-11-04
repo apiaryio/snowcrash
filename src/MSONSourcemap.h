@@ -9,7 +9,6 @@
 #ifndef SNOWCRASH_MSONSOURCEMAP_H
 #define SNOWCRASH_MSONSOURCEMAP_H
 
-#include "BlueprintSourcemap.h"
 #include "MSON.h"
 
 /**
