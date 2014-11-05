@@ -11,6 +11,7 @@
 
 #include "SectionParser.h"
 #include "MSONUtility.h"
+#include "MSONTypeSectionParser.h"
 
 using namespace scpl;
 
@@ -46,7 +47,6 @@ namespace snowcrash {
             }
 
             ParseResultRef<mson::TypeDefinition> typeDefinition(out.report, out.node.valueDefinition.typedefinition, out.sourceMap.valueDefinition.typeDefinition);
-
             mson::parseTypeDefinition(node, pd, signature.attributes, typeDefinition);
 
             if (!signature.remainingContent.empty()) {
@@ -54,7 +54,6 @@ namespace snowcrash {
                 mson::TypeSection typeSection(mson::BlockDescriptionTypeSectionType);
 
                 typeSection.content.description = signature.remainingContent;
-
                 out.node.sections.push_back(typeSection);
             }
         }
@@ -79,13 +78,30 @@ namespace snowcrash {
                 }
 
                 mdp::ByteBuffer content = mdp::MapBytesRangeSet(node->sourceMap, pd.sourceData);
-
                 out.node.sections[0].content.description += content;
 
                 return ++MarkdownNodeIterator(node);
             }
 
             return node;
+        }
+
+        static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
+                                                         const MarkdownNodes& siblings,
+                                                         SectionParserData& pd,
+                                                         const ParseResultRef<mson::ValueMember>& out) {
+
+            if (pd.sectionContext() != MSONTypeSectionSectionType) {
+                return node;
+            }
+
+            IntermediateParseResult<mson::TypeSection> typeSection(out.report);
+
+            MSONTypeSectionListParser::parse(node, siblings, pd, typeSection);
+
+            out.node.sections.push_back(typeSection.node);
+
+            return ++MarkdownNodeIterator(node);
         }
 
         static bool isDescriptionNode(const MarkdownNodeIterator& node,
@@ -96,6 +112,25 @@ namespace snowcrash {
             }
 
             return SectionProcessorBase<mson::ValueMember>::isDescriptionNode(node, sectionType);
+        }
+
+        static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
+
+            SectionType nestedType = UndefinedSectionType;
+
+            // Check if 'type section' section
+            nestedType = SectionProcessor<mson::TypeSection>::sectionType(node);
+
+            return nestedType;
+        }
+
+        static SectionTypes nestedSectionTypes() {
+            SectionTypes nested;
+
+            // Type Section
+            nested.push_back(MSONTypeSectionSectionType);
+
+            return nested;
         }
     };
 

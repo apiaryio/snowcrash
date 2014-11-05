@@ -15,7 +15,7 @@ using namespace snowcrashtest;
 TEST_CASE("Type Section header block classifier", "[type_section]")
 {
     mdp::ByteBuffer source = \
-    "## Description";
+    "## Items";
 
     mdp::MarkdownParser markdownParser;
     mdp::MarkdownNode markdownAST;
@@ -28,18 +28,6 @@ TEST_CASE("Type Section header block classifier", "[type_section]")
     sectionType = SectionProcessor<mson::TypeSection>::sectionType(markdownAST.children().begin());
     REQUIRE(sectionType == MSONTypeSectionSectionType);
 
-    markdownAST.children().front().text = "Default";
-    sectionType = SectionProcessor<mson::TypeSection>::sectionType(markdownAST.children().begin());
-    REQUIRE(sectionType == MSONTypeSectionSectionType);
-
-    markdownAST.children().front().text = "Sample";
-    sectionType = SectionProcessor<mson::TypeSection>::sectionType(markdownAST.children().begin());
-    REQUIRE(sectionType == MSONTypeSectionSectionType);
-
-    markdownAST.children().front().text = "Items";
-    sectionType = SectionProcessor<mson::TypeSection>::sectionType(markdownAST.children().begin());
-    REQUIRE(sectionType == MSONTypeSectionSectionType);
-
     markdownAST.children().front().text = "Members";
     sectionType = SectionProcessor<mson::TypeSection>::sectionType(markdownAST.children().begin());
     REQUIRE(sectionType == MSONTypeSectionSectionType);
@@ -47,12 +35,20 @@ TEST_CASE("Type Section header block classifier", "[type_section]")
     markdownAST.children().front().text = "Properties";
     sectionType = SectionProcessor<mson::TypeSection>::sectionType(markdownAST.children().begin());
     REQUIRE(sectionType == MSONTypeSectionSectionType);
+
+    markdownAST.children().front().text = "Default";
+    sectionType = SectionProcessor<mson::TypeSection>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == MSONTypeSectionSectionType);
+
+    markdownAST.children().front().text = "Sample";
+    sectionType = SectionProcessor<mson::TypeSection>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == MSONTypeSectionSectionType);
 }
 
 TEST_CASE("Type Section list block classifier", "[type_section]")
 {
     mdp::ByteBuffer source = \
-    "- Description";
+    "- Items";
 
     mdp::MarkdownParser markdownParser;
     mdp::MarkdownNode markdownAST;
@@ -66,6 +62,14 @@ TEST_CASE("Type Section list block classifier", "[type_section]")
     sectionType = SectionProcessor<mson::TypeSection>::sectionType(markdownAST.children().begin());
     REQUIRE(sectionType == MSONTypeSectionSectionType);
 
+    markdownAST.children().front().children().front().text = "Members";
+    sectionType = SectionProcessor<mson::TypeSection>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == MSONTypeSectionSectionType);
+
+    markdownAST.children().front().children().front().text = "Properties";
+    sectionType = SectionProcessor<mson::TypeSection>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == MSONTypeSectionSectionType);
+
     markdownAST.children().front().text = "Default";
     sectionType = SectionProcessor<mson::TypeSection>::sectionType(markdownAST.children().begin());
     REQUIRE(sectionType == MSONTypeSectionSectionType);
@@ -75,18 +79,6 @@ TEST_CASE("Type Section list block classifier", "[type_section]")
     REQUIRE(sectionType == MSONTypeSectionSectionType);
 
     markdownAST.children().front().children().front().text = "Sample: red, green";
-    sectionType = SectionProcessor<mson::TypeSection>::sectionType(markdownAST.children().begin());
-    REQUIRE(sectionType == MSONTypeSectionSectionType);
-
-    markdownAST.children().front().children().front().text = "Items";
-    sectionType = SectionProcessor<mson::TypeSection>::sectionType(markdownAST.children().begin());
-    REQUIRE(sectionType == MSONTypeSectionSectionType);
-
-    markdownAST.children().front().children().front().text = "Members";
-    sectionType = SectionProcessor<mson::TypeSection>::sectionType(markdownAST.children().begin());
-    REQUIRE(sectionType == MSONTypeSectionSectionType);
-
-    markdownAST.children().front().children().front().text = "Properties";
     sectionType = SectionProcessor<mson::TypeSection>::sectionType(markdownAST.children().begin());
     REQUIRE(sectionType == MSONTypeSectionSectionType);
 }

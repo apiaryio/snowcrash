@@ -16,9 +16,6 @@ using namespace scpl;
 
 namespace snowcrash {
 
-    /** Block description Type Section matching regex */
-    const char* const BlockDescriptionTypeSectionRegex = "^[[:blank:]]*[Dd]escription[[:blank:]]*$";
-
     /** Default Type Section matching regex */
     const char* const DefaultTypeSectionRegex = "^[[:blank:]]*[Dd]efault[[:blank:]]*(:.*)?$";
 
@@ -47,6 +44,42 @@ namespace snowcrash {
                                       const Signature& signature,
                                       const ParseResultRef<mson::TypeSection>& out) {
 
+            bool assignValues = false;
+
+            if (IEqual<std::string>()(signature.identifier, "Default")) {
+
+                out.node.type = mson::DefaultTypeSectionType;
+                assignValues = true;
+            }
+            else if (IEqual<std::string>()(signature.identifier, "Sample")) {
+
+                out.node.type = mson::SampleTypeSectionType;
+                assignValues = true;
+            }
+            else if (IEqual<std::string>()(signature.identifier, "Items") ||
+                     IEqual<std::string>()(signature.identifier, "Members") ||
+                     IEqual<std::string>()(signature.identifier, "Properties")) {
+
+                out.node.type = mson::MemberTypeSectionType;
+            }
+
+            if (assignValues && !signature.values.empty()) {
+
+                // TODO:
+            }
+        }
+
+        static MarkdownNodeIterator processDescription(const MarkdownNodeIterator& node,
+                                                       const MarkdownNodes& siblings,
+                                                       SectionParserData& pd,
+                                                       const ParseResultRef<mson::TypeSection>& out) {
+
+            return node;
+        }
+
+        static bool isDescriptionNode(const MarkdownNodeIterator& node,
+                                      SectionType sectionType) {
+            return false;
         }
 
         static SectionType sectionType(const MarkdownNodeIterator& node) {
@@ -66,8 +99,7 @@ namespace snowcrash {
 
             TrimString(subject);
 
-            if (RegexMatch(subject, BlockDescriptionTypeSectionRegex) ||
-                RegexMatch(subject, DefaultTypeSectionRegex) ||
+            if (RegexMatch(subject, DefaultTypeSectionRegex) ||
                 RegexMatch(subject, SampleTypeSectionRegex) ||
                 RegexMatch(subject, MemberTypeSectionRegex)) {
 
@@ -79,10 +111,10 @@ namespace snowcrash {
     };
 
     /** MSON Type Section (Header) Section Parser */
-    typedef SectionParser<mson::ValueMember, HeaderSectionAdapter> MSONTypeSectionHeaderParser;
+    typedef SectionParser<mson::TypeSection, HeaderSectionAdapter> MSONTypeSectionHeaderParser;
 
     /** MSON Type Section (List) Section Parser */
-    typedef SectionParser<mson::ValueMember, ListSectionAdapter> MSONTypeSectionListParser;
+    typedef SectionParser<mson::TypeSection, ListSectionAdapter> MSONTypeSectionListParser;
 }
 
 #endif
