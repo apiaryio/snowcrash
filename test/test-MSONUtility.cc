@@ -92,8 +92,7 @@ TEST_CASE("Parse boolean type name", "[mson_utility]")
     parseTypeName(source, typeName);
 
     REQUIRE(typeName.name == BooleanTypeName);
-    REQUIRE(typeName.symbol.literal.empty());
-    REQUIRE(typeName.symbol.variable == false);
+    MSONHelper::empty(typeName.symbol);
 }
 
 TEST_CASE("Parse string type name", "[mson_utility]")
@@ -104,8 +103,7 @@ TEST_CASE("Parse string type name", "[mson_utility]")
     parseTypeName(source, typeName);
 
     REQUIRE(typeName.name == StringTypeName);
-    REQUIRE(typeName.symbol.literal.empty());
-    REQUIRE(typeName.symbol.variable == false);
+    MSONHelper::empty(typeName.symbol);
 }
 
 TEST_CASE("Parse number type name", "[mson_utility]")
@@ -116,8 +114,7 @@ TEST_CASE("Parse number type name", "[mson_utility]")
     parseTypeName(source, typeName);
 
     REQUIRE(typeName.name == NumberTypeName);
-    REQUIRE(typeName.symbol.literal.empty());
-    REQUIRE(typeName.symbol.variable == false);
+    MSONHelper::empty(typeName.symbol);
 }
 
 TEST_CASE("Parse array type name", "[mson_utility]")
@@ -128,8 +125,7 @@ TEST_CASE("Parse array type name", "[mson_utility]")
     parseTypeName(source, typeName);
 
     REQUIRE(typeName.name == ArrayTypeName);
-    REQUIRE(typeName.symbol.literal.empty());
-    REQUIRE(typeName.symbol.variable == false);
+    MSONHelper::empty(typeName.symbol);
 }
 
 TEST_CASE("Parse enum type name", "[mson_utility]")
@@ -140,8 +136,7 @@ TEST_CASE("Parse enum type name", "[mson_utility]")
     parseTypeName(source, typeName);
 
     REQUIRE(typeName.name == EnumTypeName);
-    REQUIRE(typeName.symbol.literal.empty());
-    REQUIRE(typeName.symbol.variable == false);
+    MSONHelper::empty(typeName.symbol);
 }
 
 TEST_CASE("Parse object type name", "[mson_utility]")
@@ -152,8 +147,7 @@ TEST_CASE("Parse object type name", "[mson_utility]")
     parseTypeName(source, typeName);
 
     REQUIRE(typeName.name == ObjectTypeName);
-    REQUIRE(typeName.symbol.literal.empty());
-    REQUIRE(typeName.symbol.variable == false);
+    MSONHelper::empty(typeName.symbol);
 }
 
 TEST_CASE("Parse variable type name", "[mson_utility]")
@@ -284,8 +278,7 @@ TEST_CASE("Parse canonical type specification", "[mson_utility]")
     parseTypeSpecification(source, typeSpecification);
 
     REQUIRE(typeSpecification.name.name == ObjectTypeName);
-    REQUIRE(typeSpecification.name.symbol.literal.empty());
-    REQUIRE(typeSpecification.name.symbol.variable == false);
+    MSONHelper::empty(typeSpecification.name.symbol);
     REQUIRE(typeSpecification.nestedTypes.empty());
 }
 
@@ -323,13 +316,11 @@ TEST_CASE("Parse nested types in type specification", "[mson_utility]")
     parseTypeSpecification(source, typeSpecification);
 
     REQUIRE(typeSpecification.name.name == ArrayTypeName);
-    REQUIRE(typeSpecification.name.symbol.literal.empty());
-    REQUIRE(typeSpecification.name.symbol.variable == false);
+    MSONHelper::empty(typeSpecification.name.symbol);
     REQUIRE(typeSpecification.nestedTypes.size() == 2);
 
     REQUIRE(typeSpecification.nestedTypes[0].name == ObjectTypeName);
-    REQUIRE(typeSpecification.nestedTypes[0].symbol.literal.empty());
-    REQUIRE(typeSpecification.nestedTypes[0].symbol.variable == false);
+    MSONHelper::empty(typeSpecification.nestedTypes[0].symbol);
 
     REQUIRE(typeSpecification.nestedTypes[1].name == UndefinedTypeName);
     REQUIRE(typeSpecification.nestedTypes[1].symbol.literal == "Link");
@@ -379,8 +370,7 @@ TEST_CASE("Parse canonical type definition", "[mson_utility]")
     REQUIRE(typeDefinition.report.warnings.empty());
 
     REQUIRE(typeDefinition.node.typeSpecification.name.name == NumberTypeName);
-    REQUIRE(typeDefinition.node.typeSpecification.name.symbol.literal.empty());
-    REQUIRE(typeDefinition.node.typeSpecification.name.symbol.variable == false);
+    MSONHelper::empty(typeDefinition.node.typeSpecification.name.symbol);
     REQUIRE(typeDefinition.node.typeSpecification.nestedTypes.empty());
     REQUIRE((typeDefinition.node.attributes & RequiredTypeAttribute) == RequiredTypeAttribute);
     REQUIRE((typeDefinition.node.attributes & OptionalTypeAttribute) == 0);

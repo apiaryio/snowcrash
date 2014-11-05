@@ -50,6 +50,22 @@ TypeSectionContent::~TypeSectionContent()
 {
 }
 
+MemberTypes& OneOf::members()
+{
+    if (!m_members.get())
+        throw "no members set";
+
+    return *m_members;
+}
+
+const MemberTypes& OneOf::members() const
+{
+    if (!m_members.get())
+        throw "no members set";
+
+    return *m_members;
+}
+
 OneOf::OneOf()
 {
     m_members.reset(::new MemberTypes);

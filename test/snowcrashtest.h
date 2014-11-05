@@ -118,6 +118,92 @@ namespace snowcrashtest {
             return signature;
         }
     };
+
+    /**
+     * \brief Helper to test if part of MSON AST is empty
+     */
+    struct MSONHelper {
+
+        /** Value */
+        static void empty(const mson::Value& value) {
+
+            REQUIRE(value.literal.empty());
+            REQUIRE(value.variable == false);
+        }
+
+        /** Symbol */
+        static void empty(const mson::Symbol& symbol) {
+
+            REQUIRE(symbol.literal.empty());
+            REQUIRE(symbol.variable == false);
+        }
+
+        /** Type Name */
+        static void empty(const mson::TypeName& typeName) {
+
+            REQUIRE(typeName.name == mson::UndefinedTypeName);
+            MSONHelper::empty(typeName.symbol);
+        }
+
+        /** Type Specification */
+        static void empty(const mson::TypeSpecification& typeSpecification) {
+
+            REQUIRE(typeSpecification.nestedTypes.empty());
+            MSONHelper::empty(typeSpecification.name);
+        }
+
+        /** Type Definition */
+        static void empty(const mson::TypeDefinition& typeDefinition) {
+
+            REQUIRE(typeDefinition.attributes == 0);
+            MSONHelper::empty(typeDefinition.typeSpecification);
+        }
+
+        /** Value Definition */
+        static void empty(const mson::ValueDefinition& valueDefinition) {
+
+            REQUIRE(valueDefinition.values.empty());
+            MSONHelper::empty(valueDefinition.typedefinition);
+        }
+
+        /** Type Section */
+        static void empty(const mson::TypeSection& typeSection) {
+
+            REQUIRE(typeSection.type == mson::UndefinedTypeSectionType);
+            REQUIRE(typeSection.content.description.empty());
+            REQUIRE(typeSection.content.members().empty());
+        }
+
+        /** Value Member */
+        static void empty(const mson::ValueMember& valueMember) {
+
+            REQUIRE(valueMember.description.empty());
+            REQUIRE(valueMember.sections.empty());
+            MSONHelper::empty(valueMember.valueDefinition);
+        }
+
+        /** Property Member */
+        static void empty(const mson::PropertyMember& propertyMember) {
+
+            REQUIRE(propertyMember.name.literal.empty());
+            MSONHelper::empty(propertyMember.name.variable);
+            REQUIRE(propertyMember.description.empty());
+            REQUIRE(propertyMember.sections.empty());
+            MSONHelper::empty(propertyMember.valueDefinition);
+        }
+
+        /** Mixin */
+        static void empty(const mson::Mixin& mixin) {
+
+            MSONHelper::empty(mixin.typeDefinition);
+        }
+
+        /** One Of */
+        static void empty(const mson::OneOf& oneOf) {
+
+            REQUIRE(oneOf.members().empty());
+        }
+    };
 }
 
 #endif

@@ -27,6 +27,8 @@ TEST_CASE("Parse canonical mson value member", "[mson_value_member]")
     REQUIRE(valueMember.node.valueDefinition.values.size() == 1);
     REQUIRE(valueMember.node.valueDefinition.values[0].literal == "red");
     REQUIRE(valueMember.node.valueDefinition.typedefinition.typeSpecification.name.name == mson::StringTypeName);
+    MSONHelper::empty(valueMember.node.valueDefinition.typedefinition.typeSpecification.name.symbol);
+    REQUIRE(valueMember.node.valueDefinition.typedefinition.typeSpecification.nestedTypes.empty());
     REQUIRE(valueMember.node.valueDefinition.typedefinition.attributes == mson::RequiredTypeAttribute);
 }
 
