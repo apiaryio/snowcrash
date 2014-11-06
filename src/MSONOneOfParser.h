@@ -16,6 +16,9 @@ using namespace scpl;
 
 namespace snowcrash {
 
+    /** MSON One Of matching regex */
+    const char* const MSONOneOfRegex = "^[[:blank:]]*[Oo]ne [Oo]f[[:blank:]]*$";
+
     /**
      * MSON One Of Section Processor
      */
@@ -45,6 +48,19 @@ namespace snowcrash {
         }
 
         static SectionType sectionType(const MarkdownNodeIterator& node) {
+
+            if (node->type == mdp::ListItemMarkdownNodeType
+                && !node->children().empty()) {
+
+                mdp::ByteBuffer remaining, subject = node->children().front().text;
+
+                subject = GetFirstLine(subject, remaining);
+                TrimString(subject);
+
+                if (RegexMatch(subject, MSONOneOfRegex)) {
+                    return MSONOneOfSectionType;
+                }
+            }
 
             return UndefinedSectionType;
         }

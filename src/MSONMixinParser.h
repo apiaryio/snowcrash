@@ -16,6 +16,9 @@ using namespace scpl;
 
 namespace snowcrash {
 
+    /** MSON Mixin matching regex */
+    const char* const MSONMixinRegex = "^[[:blank:]]*[Ii]nclude[[:blank:]]+";
+
     /**
      * MSON Mixin Section Processor
      */
@@ -38,6 +41,18 @@ namespace snowcrash {
         }
 
         static SectionType sectionType(const MarkdownNodeIterator& node) {
+
+            if (node->type == mdp::ListItemMarkdownNodeType
+                && !node->children().empty()) {
+
+                mdp::ByteBuffer subject = node->children().front().text;
+
+                TrimString(subject);
+
+                if (RegexMatch(subject, MSONMixinRegex)) {
+                    return MSONMixinSectionType;
+                }
+            }
 
             return UndefinedSectionType;
         }

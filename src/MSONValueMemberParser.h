@@ -123,15 +123,6 @@ namespace snowcrash {
 
             return nestedType;
         }
-
-        static SectionTypes nestedSectionTypes() {
-            SectionTypes nested;
-
-            // Type Section
-            nested.push_back(MSONTypeSectionSectionType);
-
-            return nested;
-        }
     };
 
     /** MSON Value Member Section Parser */

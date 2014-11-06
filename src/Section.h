@@ -38,6 +38,10 @@ namespace snowcrash {
         ParameterSectionType,           /// < One Parameter definition
         ValuesSectionType,              /// < Value enumeration
         ValueSectionType,               /// < One Value
+        MSONMixinSectionType,           /// < MSON Mixin
+        MSONNamedTypeSectionType,       /// < MSON Named Type
+        MSONOneOfSectionType,           /// < MSON One Of
+        MSONPropertyMemberSectionType,  /// < MSON Property Member Type
         MSONTypeSectionSectionType,     /// < MSON Type Section
         MSONValueMemberSectionType      /// < MSON Value Member Type
     };

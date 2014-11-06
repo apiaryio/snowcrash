@@ -12,7 +12,7 @@
 using namespace snowcrash;
 using namespace snowcrashtest;
 
-TEST_CASE("Type Section header block classifier", "[type_section]")
+TEST_CASE("Type Section header block classifier", "[mson][type_section]")
 {
     mdp::ByteBuffer source = \
     "## Items";
@@ -45,7 +45,7 @@ TEST_CASE("Type Section header block classifier", "[type_section]")
     REQUIRE(sectionType == MSONTypeSectionSectionType);
 }
 
-TEST_CASE("Type Section list block classifier", "[type_section]")
+TEST_CASE("Type Section list block classifier", "[mson][type_section]")
 {
     mdp::ByteBuffer source = \
     "- Items";
@@ -81,30 +81,4 @@ TEST_CASE("Type Section list block classifier", "[type_section]")
     markdownAST.children().front().children().front().text = "Sample: red, green";
     sectionType = SectionProcessor<mson::TypeSection>::sectionType(markdownAST.children().begin());
     REQUIRE(sectionType == MSONTypeSectionSectionType);
-}
-
-TEST_CASE("Parse default type section", "[type_section]")
-{
-    mdp::ByteBuffer source = \
-    "- Default: yellow";
-
-    ParseResult<mson::TypeSection> typeSection;
-    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONTypeSectionSectionType, typeSection);
-
-    REQUIRE(typeSection.report.error.code == Error::OK);
-    REQUIRE(typeSection.report.warnings.empty());
-
-    REQUIRE(typeSection.node.type == mson::DefaultTypeSectionType);
-    REQUIRE(typeSection.node.content.description.empty());
-    REQUIRE(typeSection.node.content.members().size() == 1);
-    MSONHelper::empty(typeSection.node.content.members()[0].content.property);
-    MSONHelper::empty(typeSection.node.content.members()[0].content.mixin);
-    MSONHelper::empty(typeSection.node.content.members()[0].content.oneOf);
-    REQUIRE(typeSection.node.content.members()[0].type == mson::ValueMemberType);
-    REQUIRE(typeSection.node.content.members()[0].content.value.valueDefinition.values.size() == 1);
-    REQUIRE(typeSection.node.content.members()[0].content.value.valueDefinition.values[0].literal == "yellow");
-    REQUIRE(typeSection.node.content.members()[0].content.value.valueDefinition.values[0].variable == false);
-    MSONHelper::empty(typeSection.node.content.members()[0].content.value.valueDefinition.typedefinition);
-    REQUIRE(typeSection.node.content.members()[0].content.value.description.empty());
-    REQUIRE(typeSection.node.content.members()[0].content.value.sections.empty());
 }

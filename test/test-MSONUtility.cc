@@ -12,7 +12,7 @@
 using namespace mson;
 using namespace snowcrashtest;
 
-TEST_CASE("Parse canonical literal value", "[mson_utility]")
+TEST_CASE("Parse canonical literal value", "[mson][utility]")
 {
     std::string source = "red";
 
@@ -22,7 +22,7 @@ TEST_CASE("Parse canonical literal value", "[mson_utility]")
     REQUIRE(value.variable == false);
 }
 
-TEST_CASE("Parse canonical variable value", "[mson_utility]")
+TEST_CASE("Parse canonical variable value", "[mson][utility]")
 {
     std::string source = "*rel*";
 
@@ -32,7 +32,7 @@ TEST_CASE("Parse canonical variable value", "[mson_utility]")
     REQUIRE(value.variable == true);
 }
 
-TEST_CASE("Parse canonical variable value with '_'", "[mson_utility]")
+TEST_CASE("Parse canonical variable value with '_'", "[mson][utility]")
 {
     std::string source = "_rel_";
 
@@ -42,7 +42,7 @@ TEST_CASE("Parse canonical variable value with '_'", "[mson_utility]")
     REQUIRE(value.variable == true);
 }
 
-TEST_CASE("Parse variable value with more than 1 level '*'", "[mson_utility]")
+TEST_CASE("Parse variable value with more than 1 level '*'", "[mson][utility]")
 {
     std::string source = "**r*e*l**";
 
@@ -52,7 +52,7 @@ TEST_CASE("Parse variable value with more than 1 level '*'", "[mson_utility]")
     REQUIRE(value.variable == true);
 }
 
-TEST_CASE("Parse wildcard value", "[mson_utility]")
+TEST_CASE("Parse wildcard value", "[mson][utility]")
 {
     std::string source = "*";
 
@@ -62,7 +62,7 @@ TEST_CASE("Parse wildcard value", "[mson_utility]")
     REQUIRE(value.variable == true);
 }
 
-TEST_CASE("Parse value with non-matching '_'", "[mson_utility]")
+TEST_CASE("Parse value with non-matching '_'", "[mson][utility]")
 {
     std::string source = "_rel";
 
@@ -72,7 +72,7 @@ TEST_CASE("Parse value with non-matching '_'", "[mson_utility]")
     REQUIRE(value.variable == false);
 }
 
-TEST_CASE("Parse canonical type name", "[mson_utility]")
+TEST_CASE("Parse canonical type name", "[mson][utility]")
 {
     std::string source = "Person";
     TypeName typeName;
@@ -84,7 +84,7 @@ TEST_CASE("Parse canonical type name", "[mson_utility]")
     REQUIRE(typeName.symbol.variable == false);
 }
 
-TEST_CASE("Parse boolean type name", "[mson_utility]")
+TEST_CASE("Parse boolean type name", "[mson][utility]")
 {
     std::string source = "boolean";
     TypeName typeName;
@@ -95,7 +95,7 @@ TEST_CASE("Parse boolean type name", "[mson_utility]")
     MSONHelper::empty(typeName.symbol);
 }
 
-TEST_CASE("Parse string type name", "[mson_utility]")
+TEST_CASE("Parse string type name", "[mson][utility]")
 {
     std::string source = "string";
     TypeName typeName;
@@ -106,7 +106,7 @@ TEST_CASE("Parse string type name", "[mson_utility]")
     MSONHelper::empty(typeName.symbol);
 }
 
-TEST_CASE("Parse number type name", "[mson_utility]")
+TEST_CASE("Parse number type name", "[mson][utility]")
 {
     std::string source = "number";
     TypeName typeName;
@@ -117,7 +117,7 @@ TEST_CASE("Parse number type name", "[mson_utility]")
     MSONHelper::empty(typeName.symbol);
 }
 
-TEST_CASE("Parse array type name", "[mson_utility]")
+TEST_CASE("Parse array type name", "[mson][utility]")
 {
     std::string source = "array";
     TypeName typeName;
@@ -128,7 +128,7 @@ TEST_CASE("Parse array type name", "[mson_utility]")
     MSONHelper::empty(typeName.symbol);
 }
 
-TEST_CASE("Parse enum type name", "[mson_utility]")
+TEST_CASE("Parse enum type name", "[mson][utility]")
 {
     std::string source = "enum";
     TypeName typeName;
@@ -139,7 +139,7 @@ TEST_CASE("Parse enum type name", "[mson_utility]")
     MSONHelper::empty(typeName.symbol);
 }
 
-TEST_CASE("Parse object type name", "[mson_utility]")
+TEST_CASE("Parse object type name", "[mson][utility]")
 {
     std::string source = "object";
     TypeName typeName;
@@ -150,7 +150,7 @@ TEST_CASE("Parse object type name", "[mson_utility]")
     MSONHelper::empty(typeName.symbol);
 }
 
-TEST_CASE("Parse variable type name", "[mson_utility]")
+TEST_CASE("Parse variable type name", "[mson][utility]")
 {
     std::string source = "*T*";
     TypeName typeName;
@@ -162,7 +162,7 @@ TEST_CASE("Parse variable type name", "[mson_utility]")
     REQUIRE(typeName.symbol.variable == true);
 }
 
-TEST_CASE("Parse wildcard type name", "[mson_utility]")
+TEST_CASE("Parse wildcard type name", "[mson][utility]")
 {
     std::string source = "*";
     TypeName typeName;
@@ -174,7 +174,7 @@ TEST_CASE("Parse wildcard type name", "[mson_utility]")
     REQUIRE(typeName.symbol.variable == true);
 }
 
-TEST_CASE("Parse required type attribute", "[mson_utility]")
+TEST_CASE("Parse required type attribute", "[mson][utility]")
 {
     std::string source = "required";
     TypeAttributes typeAttributes = 0;
@@ -190,7 +190,7 @@ TEST_CASE("Parse required type attribute", "[mson_utility]")
     REQUIRE(isAttributeParsed);
 }
 
-TEST_CASE("Parse optional type attribute", "[mson_utility]")
+TEST_CASE("Parse optional type attribute", "[mson][utility]")
 {
     std::string source = "optional";
     TypeAttributes typeAttributes = 0;
@@ -206,7 +206,7 @@ TEST_CASE("Parse optional type attribute", "[mson_utility]")
     REQUIRE(isAttributeParsed);
 }
 
-TEST_CASE("Parse fixed type attribute", "[mson_utility]")
+TEST_CASE("Parse fixed type attribute", "[mson][utility]")
 {
     std::string source = "fixed";
     TypeAttributes typeAttributes = 0;
@@ -222,7 +222,7 @@ TEST_CASE("Parse fixed type attribute", "[mson_utility]")
     REQUIRE(isAttributeParsed);
 }
 
-TEST_CASE("Parse sample type attribute", "[mson_utility]")
+TEST_CASE("Parse sample type attribute", "[mson][utility]")
 {
     std::string source = "sample";
     TypeAttributes typeAttributes = 0;
@@ -238,7 +238,7 @@ TEST_CASE("Parse sample type attribute", "[mson_utility]")
     REQUIRE(isAttributeParsed);
 }
 
-TEST_CASE("Parse default type attribute", "[mson_utility]")
+TEST_CASE("Parse default type attribute", "[mson][utility]")
 {
     std::string source = "default";
     TypeAttributes typeAttributes = 0;
@@ -254,7 +254,7 @@ TEST_CASE("Parse default type attribute", "[mson_utility]")
     REQUIRE(isAttributeParsed);
 }
 
-TEST_CASE("Parse required type attribute enclosed in backticks", "[mson_utility]")
+TEST_CASE("Parse required type attribute enclosed in backticks", "[mson][utility]")
 {
     std::string source = "`required`";
     TypeAttributes typeAttributes = 0;
@@ -270,7 +270,7 @@ TEST_CASE("Parse required type attribute enclosed in backticks", "[mson_utility]
     REQUIRE(isAttributeParsed == false);
 }
 
-TEST_CASE("Parse canonical type specification", "[mson_utility]")
+TEST_CASE("Parse canonical type specification", "[mson][utility]")
 {
     std::string source = "object";
     TypeSpecification typeSpecification;
@@ -282,7 +282,7 @@ TEST_CASE("Parse canonical type specification", "[mson_utility]")
     REQUIRE(typeSpecification.nestedTypes.empty());
 }
 
-TEST_CASE("Parse linked type specification", "[mson_utility]")
+TEST_CASE("Parse linked type specification", "[mson][utility]")
 {
     std::string source = "[Person](http://google.com)";
     TypeSpecification typeSpecification;
@@ -295,7 +295,7 @@ TEST_CASE("Parse linked type specification", "[mson_utility]")
     REQUIRE(typeSpecification.nestedTypes.empty());
 }
 
-TEST_CASE("Parse implicit linked type specification", "[mson_utility]")
+TEST_CASE("Parse implicit linked type specification", "[mson][utility]")
 {
     std::string source = "[Person ] []";
     TypeSpecification typeSpecification;
@@ -308,7 +308,7 @@ TEST_CASE("Parse implicit linked type specification", "[mson_utility]")
     REQUIRE(typeSpecification.nestedTypes.empty());
 }
 
-TEST_CASE("Parse nested types in type specification", "[mson_utility]")
+TEST_CASE("Parse nested types in type specification", "[mson][utility]")
 {
     std::string source = "array[ object , Link ]";
     TypeSpecification typeSpecification;
@@ -327,7 +327,7 @@ TEST_CASE("Parse nested types in type specification", "[mson_utility]")
     REQUIRE(typeSpecification.nestedTypes[1].symbol.variable == false);
 }
 
-TEST_CASE("Parse linked nested types in type specification", "[mson_utility]")
+TEST_CASE("Parse linked nested types in type specification", "[mson][utility]")
 {
     std::string source = "Links[[Repo][],[Search](http://google.com)]";
     TypeSpecification typeSpecification;
@@ -348,7 +348,7 @@ TEST_CASE("Parse linked nested types in type specification", "[mson_utility]")
     REQUIRE(typeSpecification.nestedTypes[1].symbol.variable == false);
 }
 
-TEST_CASE("Parse canonical type definition", "[mson_utility]")
+TEST_CASE("Parse canonical type definition", "[mson][utility]")
 {
     std::vector<std::string> attributes;
     snowcrash::ParseResult<TypeDefinition> typeDefinition;
@@ -379,7 +379,7 @@ TEST_CASE("Parse canonical type definition", "[mson_utility]")
     REQUIRE((typeDefinition.node.attributes & DefaultTypeAttribute) == 0);
 }
 
-TEST_CASE("Parse type definition with non recognized type attribute", "[mson_utility]")
+TEST_CASE("Parse type definition with non recognized type attribute", "[mson][utility]")
 {
     std::vector<std::string> attributes;
     snowcrash::ParseResult<TypeDefinition> typeDefinition;

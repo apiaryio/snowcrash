@@ -16,14 +16,14 @@ using namespace scpl;
 
 namespace snowcrash {
 
-    /** Default Type Section matching regex */
-    const char* const DefaultTypeSectionRegex = "^[[:blank:]]*[Dd]efault[[:blank:]]*(:.*)?$";
+    /** MSON Default Type Section matching regex */
+    const char* const MSONDefaultTypeSectionRegex = "^[[:blank:]]*[Dd]efault[[:blank:]]*(:.*)?$";
 
-    /** Sample Type Section matching regex */
-    const char* const SampleTypeSectionRegex = "^[[:blank:]]*[Ss]ample[[:blank:]]*(:.*)?$";
+    /** MSON Sample Type Section matching regex */
+    const char* const MSONSampleTypeSectionRegex = "^[[:blank:]]*[Ss]ample[[:blank:]]*(:.*)?$";
 
-    /** Member group Type Section matching regex */
-    const char* const MemberTypeSectionRegex = "^[[:blank:]]*([Ii]tems|[Mm]embers|[Pp]roperties)[[:blank:]]*$";
+    /** MSON Member group Type Section matching regex */
+    const char* const MSONMemberTypeSectionRegex = "^[[:blank:]]*([Ii]tems|[Mm]embers|[Pp]roperties)[[:blank:]]*$";
 
     /**
      * MSON Type Section Section Processor
@@ -84,7 +84,7 @@ namespace snowcrash {
 
         static SectionType sectionType(const MarkdownNodeIterator& node) {
 
-            mdp::ByteBuffer subject;
+            mdp::ByteBuffer subject, remaining;
 
             if (node->type == mdp::HeaderMarkdownNodeType &&
                 !node->text.empty()) {
@@ -97,11 +97,12 @@ namespace snowcrash {
                 subject = node->children().front().text;
             }
 
+            subject = GetFirstLine(subject, remaining);
             TrimString(subject);
 
-            if (RegexMatch(subject, DefaultTypeSectionRegex) ||
-                RegexMatch(subject, SampleTypeSectionRegex) ||
-                RegexMatch(subject, MemberTypeSectionRegex)) {
+            if (RegexMatch(subject, MSONDefaultTypeSectionRegex) ||
+                RegexMatch(subject, MSONSampleTypeSectionRegex) ||
+                RegexMatch(subject, MSONMemberTypeSectionRegex)) {
 
                 return MSONTypeSectionSectionType;
             }
