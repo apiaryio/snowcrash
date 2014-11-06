@@ -318,6 +318,19 @@ namespace mson {
         /** Desctructor */
         ~MemberType();
     };
+
+    /** Kind of Base Type */
+    enum BaseTypeKind {
+        UndefinedBaseTypeKind = 0, // Primitive Types
+        PropertyBaseTypeKind,      // Object Structure Type
+        ValueBaseTypeKind          // Array & Enum Structure Type
+    };
+
+    /** Named Types base type table */
+    typedef std::map<Literal, BaseTypeKind> NamedTypeBaseTable;
+
+    /** Named Types inheritance table */
+    typedef std::map<Literal, Literal> NamedTypeInheritanceTable;
 }
 
 #endif

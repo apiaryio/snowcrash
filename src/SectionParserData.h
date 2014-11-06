@@ -45,6 +45,12 @@ namespace snowcrash {
         /** Named Types */
         std::vector<mson::NamedType> msonTypesTable;
 
+        /** Named Type Base Table */
+        mson::NamedTypeBaseTable namedTypeBaseTable;
+
+        /** Named Type Inheritance Table */
+        mson::NamedTypeInheritanceTable namedTypeInheritanceTable;
+
         /** Model Table */
         ModelTable modelTable;
 
