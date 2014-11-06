@@ -410,3 +410,43 @@ TEST_CASE("Parse type definition with non recognized type attribute", "[mson_uti
     REQUIRE((typeDefinition.node.attributes & SampleTypeAttribute) == 0);
     REQUIRE((typeDefinition.node.attributes & DefaultTypeAttribute) == 0);
 }
+
+TEST_CASE("Build member type from one of")
+{
+    OneOf oneOf;
+    MemberType memberType;
+
+    buildMemberType(oneOf, memberType);
+
+    REQUIRE(memberType.type == OneOfMemberType);
+}
+
+TEST_CASE("Build member type from mixin")
+{
+    Mixin mixin;
+    MemberType memberType;
+
+    buildMemberType(mixin, memberType);
+
+    REQUIRE(memberType.type == MixinMemberType);
+}
+
+TEST_CASE("Build member type from value member")
+{
+    ValueMember valueMember;
+    MemberType memberType;
+
+    buildMemberType(valueMember, memberType);
+
+    REQUIRE(memberType.type == ValueMemberType);
+}
+
+TEST_CASE("Build member type from property memeber")
+{
+    PropertyMember propertyMember;
+    MemberType memberType;
+
+    buildMemberType(propertyMember, memberType);
+
+    REQUIRE(memberType.type == PropertyMemberType);
+}

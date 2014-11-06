@@ -300,6 +300,58 @@ namespace mson {
             }
         }
     }
+
+    /**
+     * \brief Build Member Type from property member
+     *
+     * \param propertyMember Property member which was given
+     * \param memberType Member type which was built
+     */
+    inline void buildMemberType(const PropertyMember& propertyMember,
+                                MemberType& memberType) {
+
+        memberType.type = PropertyMemberType;
+        memberType.content.property = propertyMember;
+    }
+
+    /**
+     * \brief Build Member Type from value member
+     *
+     * \param valueMember Value member which was given
+     * \param memberType Member type which was built
+     */
+    inline void buildMemberType(const ValueMember& valueMember,
+                                MemberType& memberType) {
+
+        memberType.type = ValueMemberType;
+        memberType.content.value = valueMember;
+    }
+
+    /**
+     * \brief Build Member Type from mixin type
+     *
+     * \param mixin Mixin which was given
+     * \param memberType Member type which was built
+     */
+    inline void buildMemberType(const Mixin& mixin,
+                                MemberType& memberType) {
+
+        memberType.type = MixinMemberType;
+        memberType.content.mixin = mixin;
+    }
+
+    /**
+     * \brief Build Member Type from one of type
+     *
+     * \param oneOf One of which was given
+     * \param memberType Member type which was built
+     */
+    inline void buildMemberType(const OneOf& oneOf,
+                                MemberType& memberType) {
+
+        memberType.type = OneOfMemberType;
+        memberType.content.oneOf = oneOf;
+    }
 }
 
 #endif
