@@ -11,6 +11,8 @@
 
 #include <deque>
 #include <string>
+#include <map>
+
 #include "Platform.h"
 #include "MarkdownParser.h"
 #include "BlueprintSourcemap.h"

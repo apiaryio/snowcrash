@@ -488,7 +488,7 @@ namespace snowcrash {
                 }
 
                 // If model has not been defined yet in model table
-                if (pd.modelTable.resourceModels.find(symbol) == pd.modelTable.resourceModels.end()) {
+                if (pd.modelTable.find(symbol) == pd.modelTable.end()) {
 
                     out.node.reference.meta.state = Reference::StatePending;
 
@@ -514,7 +514,7 @@ namespace snowcrash {
                                           const ParseResultRef<Payload>& out) {
 
             SourceMap<ResourceModel> modelSM;
-            ResourceModel model = pd.modelTable.resourceModels.at(out.node.reference.id);
+            ResourceModel model = pd.modelTable.at(out.node.reference.id);
 
 
             out.node.description = model.description;
@@ -553,7 +553,7 @@ namespace snowcrash {
 
             if (pd.exportSourceMap()) {
 
-                modelSM = pd.modelSourceMapTable.resourceModels.at(out.node.reference.id);
+                modelSM = pd.modelSourceMapTable.at(out.node.reference.id);
 
                 out.sourceMap.description = modelSM.description;
                 out.sourceMap.parameters = modelSM.parameters;

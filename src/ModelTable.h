@@ -30,29 +30,11 @@ namespace snowcrash {
     /** Symbol reference matching regex */
     const char* const ModelReferenceRegex("^[[:blank:]]*\\[" SYMBOL_IDENTIFIER "]\\[][[:blank:]]*$");
 
-    // Resource Object Symbol
-    typedef std::pair<Identifier, ResourceModel> ResourceModelSymbol;
-
-    // Resource Object Symbol source map
-    typedef std::pair<Identifier, SourceMap<ResourceModel> > ResourceModelSymbolSourceMap;
-
     // Resource Object Model Table
-    typedef std::map<Identifier, ResourceModel> ResourceModelTable;
+    typedef std::map<Identifier, ResourceModel> ModelTable;
 
     // Resource Object Model Table source map
-    typedef std::map<Identifier, SourceMap<ResourceModel> > ResourceModelSourceMapTable;
-
-    struct ModelTable {
-
-        // Resource Object Model Table
-        ResourceModelTable resourceModels;
-    };
-
-    struct ModelSourceMapTable {
-
-        // Resource Object Model Table source map
-        ResourceModelSourceMapTable resourceModels;
-    };
+    typedef std::map<Identifier, SourceMap<ResourceModel> > ModelSourceMapTable;
 
     // Checks whether given source data represents reference to a symbol returning true if so,
     // false otherwise. If source data is represent reference referred symbol name is filled in.
@@ -76,8 +58,8 @@ namespace snowcrash {
 
         std::cout << "Resource Model Symbols:\n";
 
-        for (ResourceModelTable::const_iterator it = modelTable.resourceModels.begin();
-             it != modelTable.resourceModels.end();
+        for (ModelTable::const_iterator it = modelTable.begin();
+             it != modelTable.end();
              ++it) {
 
             std::cout << "- " << it->first << " - body: '" << EscapeNewlines(it->second.body) << "'\n";

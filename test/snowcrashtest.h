@@ -17,9 +17,8 @@ namespace snowcrashtest {
 
     struct Models {
 
-        std::vector<snowcrash::ResourceModelSymbol> models;
-        std::vector<snowcrash::ResourceModelSymbolSourceMap> modelsSM;
-
+        snowcrash::ModelTable models;
+        snowcrash::ModelSourceMapTable modelsSM;
     };
 
     template <typename T, typename PARSER>
@@ -52,8 +51,8 @@ namespace snowcrashtest {
 
             pd.sectionsContext.push_back(type);
 
-            pd.modelTable.resourceModels.insert(models.models.begin(), models.models.end());
-            pd.modelSourceMapTable.resourceModels.insert(models.modelsSM.begin(), models.modelsSM.end());
+            pd.modelTable.insert(models.models.begin(), models.models.end());
+            pd.modelSourceMapTable.insert(models.modelsSM.begin(), models.modelsSM.end());
 
             PARSER::parse(markdownAST.children().begin(),
                           markdownAST.children(),
@@ -76,11 +75,11 @@ namespace snowcrashtest {
 
             model.description = "Foo";
             model.body = "Bar";
-            models.models.push_back(snowcrash::ResourceModelSymbol(name, model));
+            models.models[name] = model;
 
             modelSM.description.sourceMap = sourcemap;
             modelSM.body.sourceMap = sourcemap;
-            models.modelsSM.push_back(snowcrash::ResourceModelSymbolSourceMap(name, modelSM));
+            models.modelsSM[name] = modelSM;
         }
     };
 

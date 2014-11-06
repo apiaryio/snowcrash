@@ -130,13 +130,13 @@ namespace snowcrash {
                 }
 
                 // Update model in the model table as well
-                ResourceModelTable::iterator it = pd.modelTable.resourceModels.find(out.node.model.name);
+                ModelTable::iterator it = pd.modelTable.find(out.node.model.name);
 
-                if (it != pd.modelTable.resourceModels.end()) {
+                if (it != pd.modelTable.end()) {
                     it->second.body = out.node.model.body;
 
                     if (pd.exportSourceMap()) {
-                        pd.modelSourceMapTable.resourceModels[out.node.model.name].body = out.sourceMap.model.body;
+                        pd.modelSourceMapTable[out.node.model.name].body = out.sourceMap.model.body;
                     }
                 }
 
@@ -387,14 +387,14 @@ namespace snowcrash {
                 }
             }
 
-            ResourceModelTable::iterator it = pd.modelTable.resourceModels.find(model.node.name);
+            ModelTable::iterator it = pd.modelTable.find(model.node.name);
 
-            if (it == pd.modelTable.resourceModels.end()) {
+            if (it == pd.modelTable.end()) {
 
-                pd.modelTable.resourceModels[model.node.name] = model.node;
+                pd.modelTable[model.node.name] = model.node;
 
                 if (pd.exportSourceMap()) {
-                    pd.modelSourceMapTable.resourceModels[model.node.name] = model.sourceMap;
+                    pd.modelSourceMapTable[model.node.name] = model.sourceMap;
                 }
             } else {
 

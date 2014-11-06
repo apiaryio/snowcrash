@@ -470,7 +470,7 @@ namespace snowcrash {
         static void resolvePendingModels(SectionParserData& pd,
                                           const ParseResultRef<Payload>& out) {
 
-            if (pd.modelTable.resourceModels.find(out.node.reference.id) == pd.modelTable.resourceModels.end()) {
+            if (pd.modelTable.find(out.node.reference.id) == pd.modelTable.end()) {
 
                 // ERR: Undefined model reference
                 std::stringstream ss;
