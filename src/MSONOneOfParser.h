@@ -39,6 +39,8 @@ namespace snowcrash {
 
         }
 
+        NO_DESCRIPTION(mson::OneOf)
+
         static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
                                                          const MarkdownNodes& siblings,
                                                          SectionParserData& pd,

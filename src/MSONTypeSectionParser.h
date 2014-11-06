@@ -69,18 +69,7 @@ namespace snowcrash {
             }
         }
 
-        static MarkdownNodeIterator processDescription(const MarkdownNodeIterator& node,
-                                                       const MarkdownNodes& siblings,
-                                                       SectionParserData& pd,
-                                                       const ParseResultRef<mson::TypeSection>& out) {
-
-            return node;
-        }
-
-        static bool isDescriptionNode(const MarkdownNodeIterator& node,
-                                      SectionType sectionType) {
-            return false;
-        }
+        NO_DESCRIPTION(mson::TypeSection)
 
         static SectionType sectionType(const MarkdownNodeIterator& node) {
 

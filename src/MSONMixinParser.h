@@ -40,6 +40,8 @@ namespace snowcrash {
 
         }
 
+        NO_DESCRIPTION(mson::Mixin)
+
         static SectionType sectionType(const MarkdownNodeIterator& node) {
 
             if (node->type == mdp::ListItemMarkdownNodeType

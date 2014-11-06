@@ -13,6 +13,19 @@
 #include "SourceAnnotation.h"
 #include "Signature.h"
 
+#define NO_DESCRIPTION(T)\
+static MarkdownNodeIterator processDescription(const MarkdownNodeIterator& node,\
+                                               const MarkdownNodes& siblings,\
+                                               SectionParserData& pd,\
+                                               const ParseResultRef<T>& out) {\
+    return node;\
+}\
+\
+static bool isDescriptionNode(const MarkdownNodeIterator& node,\
+                              SectionType sectionType) {\
+    return false;\
+}\
+
 namespace snowcrash {
 
     using mdp::MarkdownNode;
