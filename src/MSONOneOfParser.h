@@ -69,6 +69,29 @@ namespace snowcrash {
 
         static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
 
+            SectionType nestedType = UndefinedSectionType;
+
+            // Check if mson mixin section
+            nestedType = SectionProcessor<mson::Mixin>::sectionType(node);
+
+            if (nestedType != MSONMixinSectionType) {
+                return nestedType;
+            }
+
+            // Check if mson one of section
+            nestedType = SectionProcessor<mson::OneOf>::sectionType(node);
+
+            if (nestedType != MSONOneOfSectionType) {
+                return nestedType;
+            }
+
+            // Check if mson member type section section
+            nestedType = SectionProcessor<mson::TypeSection>::sectionType(node);
+
+            if (nestedType != MSONMemberTypeGroupSectionType) {
+                return nestedType;
+            }
+
             return UndefinedSectionType;
         }
     };

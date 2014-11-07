@@ -58,11 +58,6 @@ namespace snowcrash {
 
             return UndefinedSectionType;
         }
-
-        static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
-
-            return UndefinedSectionType;
-        }
     };
 
     /** MSON Mixin Section Parser */

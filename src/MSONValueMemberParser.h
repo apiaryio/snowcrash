@@ -91,7 +91,9 @@ namespace snowcrash {
                                                          SectionParserData& pd,
                                                          const ParseResultRef<mson::ValueMember>& out) {
 
-            if (pd.sectionContext() != MSONTypeSectionSectionType) {
+            if ((pd.sectionContext() != MSONTypeSectionSectionType) &&
+                (pd.sectionContext() != MSONMemberTypeGroupSectionType)) {
+
                 return node;
             }
 
@@ -118,7 +120,7 @@ namespace snowcrash {
 
             SectionType nestedType = UndefinedSectionType;
 
-            // Check if 'type section' section
+            // Check if mson type section section
             nestedType = SectionProcessor<mson::TypeSection>::sectionType(node);
 
             return nestedType;

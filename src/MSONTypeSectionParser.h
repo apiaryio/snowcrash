@@ -71,6 +71,14 @@ namespace snowcrash {
 
         NO_DESCRIPTION(mson::TypeSection)
 
+        static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
+                                                         const MarkdownNodes& siblings,
+                                                         SectionParserData& pd,
+                                                         const ParseResultRef<mson::TypeSection>& out) {
+
+            return node;
+        }
+
         static SectionType sectionType(const MarkdownNodeIterator& node) {
 
             mdp::ByteBuffer subject, remaining;
@@ -90,10 +98,34 @@ namespace snowcrash {
             TrimString(subject);
 
             if (RegexMatch(subject, MSONDefaultTypeSectionRegex) ||
-                RegexMatch(subject, MSONSampleTypeSectionRegex) ||
-                RegexMatch(subject, MSONMemberTypeSectionRegex)) {
+                RegexMatch(subject, MSONSampleTypeSectionRegex)) {
 
                 return MSONTypeSectionSectionType;
+            }
+
+            if (RegexMatch(subject, MSONMemberTypeSectionRegex)) {
+                return MSONMemberTypeGroupSectionType;
+            }
+
+            return UndefinedSectionType;
+        }
+
+        static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
+
+            SectionType nestedType = UndefinedSectionType;
+
+            // Check if mson mixin section
+            nestedType = SectionProcessor<mson::Mixin>::sectionType(node);
+
+            if (nestedType != MSONMixinSectionType) {
+                return nestedType;
+            }
+
+            // Check if mson one of section
+            nestedType = SectionProcessor<mson::OneOf>::sectionType(node);
+
+            if (nestedType != MSONOneOfSectionType) {
+                return nestedType;
             }
 
             return UndefinedSectionType;

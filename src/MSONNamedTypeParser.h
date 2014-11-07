@@ -11,6 +11,7 @@
 
 #include "SectionParser.h"
 #include "MSONUtility.h"
+#include "MSONTypeSectionParser.h"
 
 using namespace scpl;
 
@@ -42,7 +43,19 @@ namespace snowcrash {
                                                          SectionParserData& pd,
                                                          const ParseResultRef<mson::NamedType>& out) {
 
-            return node;
+            if ((pd.sectionContext() != MSONTypeSectionSectionType) &&
+                (pd.sectionContext() != MSONMemberTypeGroupSectionType)) {
+
+                return node;
+            }
+
+            IntermediateParseResult<mson::TypeSection> typeSection(out.report);
+
+            MSONTypeSectionHeaderParser::parse(node, siblings, pd, typeSection);
+
+            out.node.sections.push_back(typeSection.node);
+
+            return ++MarkdownNodeIterator(node);
         }
 
         static SectionType sectionType(const MarkdownNodeIterator& node) {
@@ -52,7 +65,12 @@ namespace snowcrash {
 
         static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
 
-            return UndefinedSectionType;
+            SectionType nestedType = UndefinedSectionType;
+
+            // Check if mson type section section
+            nestedType = SectionProcessor<mson::TypeSection>::sectionType(node);
+
+            return nestedType;
         }
     };
     

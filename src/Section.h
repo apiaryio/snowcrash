@@ -40,6 +40,7 @@ namespace snowcrash {
         ValueSectionType,               /// < One Value
         MSONMixinSectionType,           /// < MSON Mixin
         MSONNamedTypeSectionType,       /// < MSON Named Type
+        MSONMemberTypeGroupSectionType, /// < MSON Member Type Group Type Section
         MSONOneOfSectionType,           /// < MSON One Of
         MSONPropertyMemberSectionType,  /// < MSON Property Member Type
         MSONTypeSectionSectionType,     /// < MSON Type Section
