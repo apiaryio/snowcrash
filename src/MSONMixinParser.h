@@ -17,7 +17,7 @@ using namespace scpl;
 namespace snowcrash {
 
     /** MSON Mixin matching regex */
-    const char* const MSONMixinRegex = "^[[:blank:]]*[Ii]nclude[[:blank:]]+";
+    const char* const MSONMixinRegex = "^[[:blank:]]*([Ii]nclude[[:blank:]]+)";
 
     /**
      * MSON Mixin Section Processor
@@ -38,6 +38,33 @@ namespace snowcrash {
                                       const Signature& signature,
                                       const ParseResultRef<mson::Mixin>& out) {
 
+            CaptureGroups captureGroups;
+            ParseResultRef<mson::TypeDefinition> typeDefinition(out.report,
+                                                                out.node.typeDefinition,
+                                                                out.sourceMap.typeDefinition);
+
+            if (signature.identifier == "Include") {
+                mson::parseTypeDefinition(node, pd, signature.attributes, typeDefinition);
+            }
+            else if (RegexCapture(signature.identifier, MSONMixinRegex, captureGroups, 2) &&
+                     !captureGroups[1].empty()) {
+
+                // Get the type name
+                std::string typeName = signature.identifier.substr(captureGroups[1].length());
+
+                out.node.typeDefinition.typeSpecification.name.symbol = mson::parseSymbol(typeName);
+            }
+
+            if ((out.node.typeDefinition.typeSpecification.name.name == mson::StringTypeName) ||
+                (out.node.typeDefinition.typeSpecification.name.name == mson::NumberTypeName) ||
+                (out.node.typeDefinition.typeSpecification.name.name == mson::BooleanTypeName)) {
+
+                // WARN: invalid mixin base type
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                out.report.warnings.push_back(Warning("mixin type cannot use a non-structure base type",
+                                                      FormattingWarning,
+                                                      sourceMap));
+            }
         }
 
         NO_DESCRIPTION(mson::Mixin)

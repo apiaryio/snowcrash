@@ -92,6 +92,11 @@ namespace snowcrash {
                 return nestedType;
             }
 
+            // Return property member type section if list item
+            if (node->type == mdp::ListItemMarkdownNodeType) {
+                return MSONPropertyMemberSectionType;
+            }
+
             return UndefinedSectionType;
         }
     };

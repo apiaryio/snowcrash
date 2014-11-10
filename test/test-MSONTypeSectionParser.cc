@@ -26,15 +26,15 @@ TEST_CASE("Type Section header block classifier", "[mson][type_section]")
     REQUIRE(markdownAST.children().front().type == mdp::HeaderMarkdownNodeType);
 
     sectionType = SectionProcessor<mson::TypeSection>::sectionType(markdownAST.children().begin());
-    REQUIRE(sectionType == MSONTypeSectionSectionType);
+    REQUIRE(sectionType == MSONMemberTypeGroupSectionType);
 
     markdownAST.children().front().text = "Members";
     sectionType = SectionProcessor<mson::TypeSection>::sectionType(markdownAST.children().begin());
-    REQUIRE(sectionType == MSONTypeSectionSectionType);
+    REQUIRE(sectionType == MSONMemberTypeGroupSectionType);
 
     markdownAST.children().front().text = "Properties";
     sectionType = SectionProcessor<mson::TypeSection>::sectionType(markdownAST.children().begin());
-    REQUIRE(sectionType == MSONTypeSectionSectionType);
+    REQUIRE(sectionType == MSONMemberTypeGroupSectionType);
 
     markdownAST.children().front().text = "Default";
     sectionType = SectionProcessor<mson::TypeSection>::sectionType(markdownAST.children().begin());
@@ -60,17 +60,17 @@ TEST_CASE("Type Section list block classifier", "[mson][type_section]")
     REQUIRE(!markdownAST.children().front().children().empty());
 
     sectionType = SectionProcessor<mson::TypeSection>::sectionType(markdownAST.children().begin());
-    REQUIRE(sectionType == MSONTypeSectionSectionType);
+    REQUIRE(sectionType == MSONMemberTypeGroupSectionType);
 
     markdownAST.children().front().children().front().text = "Members";
     sectionType = SectionProcessor<mson::TypeSection>::sectionType(markdownAST.children().begin());
-    REQUIRE(sectionType == MSONTypeSectionSectionType);
+    REQUIRE(sectionType == MSONMemberTypeGroupSectionType);
 
     markdownAST.children().front().children().front().text = "Properties";
     sectionType = SectionProcessor<mson::TypeSection>::sectionType(markdownAST.children().begin());
-    REQUIRE(sectionType == MSONTypeSectionSectionType);
+    REQUIRE(sectionType == MSONMemberTypeGroupSectionType);
 
-    markdownAST.children().front().text = "Default";
+    markdownAST.children().front().children().front().text = "Default";
     sectionType = SectionProcessor<mson::TypeSection>::sectionType(markdownAST.children().begin());
     REQUIRE(sectionType == MSONTypeSectionSectionType);
 

@@ -44,6 +44,14 @@ namespace snowcrash {
         /** Source Map of Value Definition */
         SourceMap<mson::ValueDefinition> valueDefinition;
     };
+
+    /** Source Map structure for Mixin */
+    template<>
+    struct SourceMap<mson::Mixin> : public SourceMapBase {
+
+        /** Source Map for Type Definition */
+        SourceMap<mson::TypeDefinition> typeDefinition;
+    };
 }
 
 #endif
