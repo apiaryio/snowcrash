@@ -322,14 +322,14 @@ namespace mson {
     };
 
     /** Kind of Base Type */
-    enum BaseTypeKind {
-        UndefinedBaseTypeKind = 0, // Primitive Types
-        PropertyBaseTypeKind,      // Object Structure Type
-        ValueBaseTypeKind          // Array & Enum Structure Type
+    enum BaseType {
+        UndefinedBaseType = 0, // Primitive Types
+        PropertyBaseType,      // Object Structure Type
+        ValueBaseType          // Array & Enum Structure Type
     };
 
     /** Named Types base type table */
-    typedef std::map<Literal, BaseTypeKind> NamedTypeBaseTable;
+    typedef std::map<Literal, BaseType> NamedTypeBaseTable;
 
     /** Named Types inheritance table */
     typedef std::map<Literal, Literal> NamedTypeInheritanceTable;
