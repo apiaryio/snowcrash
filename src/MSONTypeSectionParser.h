@@ -11,6 +11,7 @@
 
 #include "SectionParser.h"
 #include "MSONUtility.h"
+#include "MSONMixinParser.h"
 
 using namespace scpl;
 
@@ -71,13 +72,10 @@ namespace snowcrash {
 
         NO_DESCRIPTION(mson::TypeSection)
 
-        static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
-                                                         const MarkdownNodes& siblings,
-                                                         SectionParserData& pd,
-                                                         const ParseResultRef<mson::TypeSection>& out) {
-
-            return node;
-        }
+        static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator&,
+                                                         const MarkdownNodes&,
+                                                         SectionParserData&,
+                                                         const ParseResultRef<mson::TypeSection>&);
 
         static SectionType sectionType(const MarkdownNodeIterator& node) {
 
@@ -110,26 +108,7 @@ namespace snowcrash {
             return UndefinedSectionType;
         }
 
-        static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
-
-            SectionType nestedType = UndefinedSectionType;
-
-            // Check if mson mixin section
-            nestedType = SectionProcessor<mson::Mixin>::sectionType(node);
-
-            if (nestedType != MSONMixinSectionType) {
-                return nestedType;
-            }
-
-            // Check if mson one of section
-            nestedType = SectionProcessor<mson::OneOf>::sectionType(node);
-
-            if (nestedType != MSONOneOfSectionType) {
-                return nestedType;
-            }
-
-            return UndefinedSectionType;
-        }
+        static SectionType nestedSectionType(const MarkdownNodeIterator&);
     };
 
     /** MSON Type Section (Header) Section Parser */

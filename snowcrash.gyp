@@ -69,6 +69,8 @@
         'src/HTTP.cc',
         'src/HTTP.h',
         'src/MSON.cc',
+        'src/MSONOneOfParser.cc',
+        'src/MSONTypeSectionParser.cc',
         'src/Section.cc',
         'src/Section.h',
         'src/Serialize.cc',
