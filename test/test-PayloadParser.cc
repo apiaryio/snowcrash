@@ -312,7 +312,7 @@ TEST_CASE("Parse payload with dangling body", "[payload]")
 TEST_CASE("Parse inline payload with symbol reference", "[payload]")
 {
     Models models;
-    ModelHelper::buildModel("Symbol", models);
+    BuildHelper::model("Symbol", models);
 
     ParseResult<Payload> payload;
     SectionParserHelper<Payload, PayloadParser>::parse(ModelFixture, RequestBodySectionType, payload, ExportSourcemapOption, models);
@@ -345,7 +345,7 @@ TEST_CASE("Parse inline payload with symbol reference with extra indentation", "
     "        [Symbol][]\n";
 
     Models models;
-    ModelHelper::buildModel("Symbol", models);
+    BuildHelper::model("Symbol", models);
 
     ParseResult<Payload> payload;
     SectionParserHelper<Payload, PayloadParser>::parse(source, RequestBodySectionType, payload, ExportSourcemapOption, models);
@@ -376,7 +376,7 @@ TEST_CASE("Parse inline payload with symbol reference with foreign content", "[p
     source += "\n    Foreign\n";
 
     Models models;
-    ModelHelper::buildModel("Symbol", models);
+    BuildHelper::model("Symbol", models);
 
     ParseResult<Payload> payload;
     SectionParserHelper<Payload, PayloadParser>::parse(source, RequestBodySectionType, payload, ExportSourcemapOption, models);

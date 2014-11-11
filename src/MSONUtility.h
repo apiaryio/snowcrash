@@ -14,6 +14,35 @@
 namespace mson {
 
     /**
+     * \brief Parse a MSON BaseTypeName into MSON BaseType
+     *
+     * \param type MSON BaseTypeName
+     *
+     * \return MSON BaseType
+     */
+    inline BaseType parseBaseType(const BaseTypeName& type) {
+
+        if ((type == StringTypeName) ||
+            (type == NumberTypeName) ||
+            (type == BooleanTypeName)) {
+
+            return PrimitiveBaseType;
+        }
+
+        if (type == ObjectTypeName) {
+            return PropertyBaseType;
+        }
+
+        if ((type == ArrayTypeName) ||
+            (type == EnumTypeName)) {
+
+            return ValueBaseType;
+        }
+
+        return UndefinedBaseType;
+    }
+
+    /**
      * \brief Parse a string into MSON Value structure
      *
      * \param subject String which represents the value
@@ -298,6 +327,22 @@ namespace mson {
                     parseTypeSpecification(*it, out.node.typeSpecification);
                 }
             }
+        }
+
+        out.node.baseType = parseBaseType(out.node.typeSpecification.name.name);
+
+        if (out.node.baseType == UndefinedBaseType) {
+            out.node.baseType = pd.namedTypeBaseTable[out.node.typeSpecification.name.symbol.literal];
+        }
+
+        if ((out.node.baseType != ValueBaseType) &&
+            !out.node.typeSpecification.nestedTypes.empty()) {
+
+            // WARN: Nested types for non (array or enum) structure base type
+            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+            out.report.warnings.push_back(snowcrash::Warning("nested types should not be present for array or enum structure type",
+                                                             snowcrash::LogicalErrorWarning,
+                                                             sourceMap));
         }
     }
 

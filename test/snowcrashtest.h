@@ -21,6 +21,11 @@ namespace snowcrashtest {
         snowcrash::ModelSourceMapTable modelsSM;
     };
 
+    struct NamedTypes {
+
+        mson::NamedTypeBaseTable bases;
+    };
+
     template <typename T, typename PARSER>
     struct SectionParserHelper {
 
@@ -29,7 +34,8 @@ namespace snowcrashtest {
                           const snowcrash::ParseResultRef<T>& out,
                           const snowcrash::BlueprintParserOptions& opts = 0,
                           const Models& models = Models(),
-                          snowcrash::ParseResult<snowcrash::Blueprint>* bp = NULL) {
+                          snowcrash::ParseResult<snowcrash::Blueprint>* bp = NULL,
+                          const NamedTypes& namedTypes = NamedTypes()) {
 
             mdp::MarkdownParser markdownParser;
             mdp::MarkdownNode markdownAST;
@@ -54,18 +60,30 @@ namespace snowcrashtest {
             pd.modelTable.insert(models.models.begin(), models.models.end());
             pd.modelSourceMapTable.insert(models.modelsSM.begin(), models.modelsSM.end());
 
+            pd.namedTypeBaseTable.insert(namedTypes.bases.begin(), namedTypes.bases.end());
+
             PARSER::parse(markdownAST.children().begin(),
                           markdownAST.children(),
                           pd,
                           out);
         }
+
+        static void parseMSON(const mdp::ByteBuffer& source,
+                              snowcrash::SectionType type,
+                              const snowcrash::ParseResultRef<T>& out,
+                              const snowcrash::BlueprintParserOptions& opts = 0,
+                              const NamedTypes& namedTypes = NamedTypes()) {
+
+            parse(source, type, out, opts, Models(), NULL, namedTypes);
+        }
+
     };
 
-    struct ModelHelper {
+    struct BuildHelper {
 
         /** Builds a Symbols entry for testing purposes */
-        static void buildModel(mdp::ByteBuffer name,
-                               Models& models) {
+        static void model(const mdp::ByteBuffer& name,
+                          Models& models) {
 
             snowcrash::ResourceModel model;
             snowcrash::SourceMap<snowcrash::ResourceModel> modelSM;
@@ -80,6 +98,14 @@ namespace snowcrashtest {
             modelSM.description.sourceMap = sourcemap;
             modelSM.body.sourceMap = sourcemap;
             models.modelsSM[name] = modelSM;
+        }
+
+        /** Builds an named type entry for testing purposes */
+        static void namedType(const mson::Literal& literal,
+                              const mson::BaseType& baseType,
+                              NamedTypes& namedTypes) {
+
+            namedTypes.bases[literal] = baseType;
         }
     };
 

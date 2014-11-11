@@ -37,8 +37,11 @@ TEST_CASE("Parse canonical mson mixin", "[mson][mixin]")
 {
     mdp::ByteBuffer source = "- Include Person";
 
+    NamedTypes namedTypes;
+    BuildHelper::namedType("Person", mson::PropertyBaseType, namedTypes);
+
     ParseResult<mson::Mixin> mixin;
-    SectionParserHelper<mson::Mixin, MSONMixinParser>::parse(source, MSONMixinSectionType, mixin);
+    SectionParserHelper<mson::Mixin, MSONMixinParser>::parseMSON(source, MSONMixinSectionType, mixin, 0, namedTypes);
 
     REQUIRE(mixin.report.error.code == Error::OK);
     REQUIRE(mixin.report.warnings.empty());
@@ -54,8 +57,11 @@ TEST_CASE("Parse mson mixin with canonical type definition", "[mson][mixin]")
 {
     mdp::ByteBuffer source = "- Include (Person, sample)";
 
+    NamedTypes namedTypes;
+    BuildHelper::namedType("Person", mson::PropertyBaseType, namedTypes);
+
     ParseResult<mson::Mixin> mixin;
-    SectionParserHelper<mson::Mixin, MSONMixinParser>::parse(source, MSONMixinSectionType, mixin);
+    SectionParserHelper<mson::Mixin, MSONMixinParser>::parseMSON(source, MSONMixinSectionType, mixin, 0, namedTypes);
 
     REQUIRE(mixin.report.error.code == Error::OK);
     REQUIRE(mixin.report.warnings.empty());
@@ -76,6 +82,7 @@ TEST_CASE("Parse mson mixin with base type definition", "[mson][mixin]")
 
     REQUIRE(mixin.report.error.code == Error::OK);
     REQUIRE(mixin.report.warnings.size() == 1);
+    REQUIRE(mixin.report.warnings[0].code == FormattingWarning);
 
     REQUIRE(mixin.node.typeDefinition.attributes == 0);
     REQUIRE(mixin.node.typeDefinition.typeSpecification.name.name == mson::StringTypeName);
@@ -87,8 +94,11 @@ TEST_CASE("Parse mson mixin with nested type definition", "[mson][mixin]")
 {
     mdp::ByteBuffer source = "- Include (Person[number, string], required)";
 
+    NamedTypes namedTypes;
+    BuildHelper::namedType("Person", mson::ValueBaseType, namedTypes);
+
     ParseResult<mson::Mixin> mixin;
-    SectionParserHelper<mson::Mixin, MSONMixinParser>::parse(source, MSONMixinSectionType, mixin);
+    SectionParserHelper<mson::Mixin, MSONMixinParser>::parseMSON(source, MSONMixinSectionType, mixin, 0, namedTypes);
 
     REQUIRE(mixin.report.error.code == Error::OK);
     REQUIRE(mixin.report.warnings.empty());

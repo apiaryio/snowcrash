@@ -372,11 +372,7 @@ TEST_CASE("Parse canonical type definition", "[mson][utility]")
     REQUIRE(typeDefinition.node.typeSpecification.name.name == NumberTypeName);
     MSONHelper::empty(typeDefinition.node.typeSpecification.name.symbol);
     REQUIRE(typeDefinition.node.typeSpecification.nestedTypes.empty());
-    REQUIRE((typeDefinition.node.attributes & RequiredTypeAttribute) == RequiredTypeAttribute);
-    REQUIRE((typeDefinition.node.attributes & OptionalTypeAttribute) == 0);
-    REQUIRE((typeDefinition.node.attributes & FixedTypeAttribute) == 0);
-    REQUIRE((typeDefinition.node.attributes & SampleTypeAttribute) == 0);
-    REQUIRE((typeDefinition.node.attributes & DefaultTypeAttribute) == 0);
+    REQUIRE(typeDefinition.node.attributes == RequiredTypeAttribute);
 }
 
 TEST_CASE("Parse type definition with non recognized type attribute", "[mson][utility]")
@@ -404,11 +400,37 @@ TEST_CASE("Parse type definition with non recognized type attribute", "[mson][ut
     REQUIRE(typeDefinition.node.typeSpecification.name.symbol.literal == "Person");
     REQUIRE(typeDefinition.node.typeSpecification.name.symbol.variable == false);
     REQUIRE(typeDefinition.node.typeSpecification.nestedTypes.empty());
-    REQUIRE((typeDefinition.node.attributes & RequiredTypeAttribute) == 0);
-    REQUIRE((typeDefinition.node.attributes & OptionalTypeAttribute) == 0);
-    REQUIRE((typeDefinition.node.attributes & FixedTypeAttribute) == 0);
-    REQUIRE((typeDefinition.node.attributes & SampleTypeAttribute) == 0);
-    REQUIRE((typeDefinition.node.attributes & DefaultTypeAttribute) == 0);
+    REQUIRE(typeDefinition.node.attributes == 0);
+}
+
+TEST_CASE("Parse type definition when non-structure type has nested types")
+{
+    std::vector<std::string> attributes;
+    snowcrash::ParseResult<TypeDefinition> typeDefinition;
+    snowcrash::Blueprint blueprint;
+
+    attributes.push_back("Person[number, string]");
+
+    mdp::ByteBuffer source = "+ (Person[number, string])";
+    mdp::MarkdownParser markdownParser;
+    mdp::MarkdownNode markdownAST;
+
+    markdownParser.parse(source, markdownAST);
+    snowcrash::SectionParserData pd(0, source, blueprint);
+
+    pd.namedTypeBaseTable["Person"] = mson::PropertyBaseType;
+
+    parseTypeDefinition(markdownAST.children().begin(), pd, attributes, typeDefinition);
+
+    REQUIRE(typeDefinition.report.error.code == snowcrash::Error::OK);
+    REQUIRE(typeDefinition.report.warnings.size() == 1);
+    REQUIRE(typeDefinition.report.warnings[0].code == snowcrash::LogicalErrorWarning);
+
+    REQUIRE(typeDefinition.node.typeSpecification.name.name == UndefinedTypeName);
+    REQUIRE(typeDefinition.node.typeSpecification.name.symbol.literal == "Person");
+    REQUIRE(typeDefinition.node.typeSpecification.name.symbol.variable == false);
+    REQUIRE(typeDefinition.node.typeSpecification.nestedTypes.size() == 2);
+    REQUIRE(typeDefinition.node.attributes == 0);
 }
 
 TEST_CASE("Build member type from one of")
@@ -449,4 +471,28 @@ TEST_CASE("Build member type from property memeber")
     buildMemberType(propertyMember, memberType);
 
     REQUIRE(memberType.type == PropertyMemberType);
+}
+
+TEST_CASE("Parsing base type from base type name")
+{
+    BaseTypeName baseTypeName = UndefinedTypeName;
+    REQUIRE(parseBaseType(baseTypeName) == UndefinedBaseType);
+
+    baseTypeName = StringTypeName;
+    REQUIRE(parseBaseType(baseTypeName) == PrimitiveBaseType);
+
+    baseTypeName = BooleanTypeName;
+    REQUIRE(parseBaseType(baseTypeName) == PrimitiveBaseType);
+
+    baseTypeName = NumberTypeName;
+    REQUIRE(parseBaseType(baseTypeName) == PrimitiveBaseType);
+
+    baseTypeName = ObjectTypeName;
+    REQUIRE(parseBaseType(baseTypeName) == PropertyBaseType);
+
+    baseTypeName = ArrayTypeName;
+    REQUIRE(parseBaseType(baseTypeName) == ValueBaseType);
+
+    baseTypeName = EnumTypeName;
+    REQUIRE(parseBaseType(baseTypeName) == ValueBaseType);
 }

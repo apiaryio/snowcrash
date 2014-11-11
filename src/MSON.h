@@ -32,6 +32,20 @@ namespace mson {
     /** Literal */
     typedef std::string Literal;
 
+    /** Kind of Base Type */
+    enum BaseType {
+        UndefinedBaseType = 0, // Undefined
+        PrimitiveBaseType,     // Primitive Types
+        PropertyBaseType,      // Object Structure Type
+        ValueBaseType          // Array & Enum Structure Type
+    };
+
+    /** Named Types base type table */
+    typedef std::map<Literal, BaseType> NamedTypeBaseTable;
+
+    /** Named Types inheritance table */
+    typedef std::map<Literal, Literal> NamedTypeInheritanceTable;
+
     /** A simple or actual value */
     struct Value {
 
@@ -124,7 +138,10 @@ namespace mson {
 
         /** Constructor */
         TypeDefinition()
-        : attributes(0) {}
+        : baseType(UndefinedBaseType), attributes(0) {}
+
+        /** Base Type (for the type definition) */
+        BaseType baseType;
 
         /** Type specification */
         TypeSpecification typeSpecification;
@@ -320,19 +337,6 @@ namespace mson {
         /** Desctructor */
         ~MemberType();
     };
-
-    /** Kind of Base Type */
-    enum BaseType {
-        UndefinedBaseType = 0, // Primitive Types
-        PropertyBaseType,      // Object Structure Type
-        ValueBaseType          // Array & Enum Structure Type
-    };
-
-    /** Named Types base type table */
-    typedef std::map<Literal, BaseType> NamedTypeBaseTable;
-
-    /** Named Types inheritance table */
-    typedef std::map<Literal, Literal> NamedTypeInheritanceTable;
 }
 
 #endif

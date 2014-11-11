@@ -37,7 +37,10 @@ namespace snowcrash {
         SectionParserData(BlueprintParserOptions opts,
                           const mdp::ByteBuffer& src,
                           const Blueprint& bp)
-        : options(opts), sourceData(src), blueprint(bp) {}
+        : options(opts), sourceData(src), blueprint(bp)
+        {
+            namedTypeBaseTable[""] = mson::UndefinedBaseType;
+        }
 
         /** Parser Options */
         BlueprintParserOptions options;
