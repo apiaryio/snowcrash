@@ -33,19 +33,26 @@ namespace snowcrash {
             return signatureTraits;
         }
 
-        static void finalizeSignature(const MarkdownNodeIterator& node,
-                                      SectionParserData& pd,
-                                      const Signature& signature,
-                                      const ParseResultRef<mson::OneOf>& out) {
-
-        }
-
         NO_DESCRIPTION(mson::OneOf)
 
         static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator&,
                                                          const MarkdownNodes&,
                                                          SectionParserData&,
                                                          const ParseResultRef<mson::OneOf>&);
+
+        static void finalize(const MarkdownNodeIterator& node,
+                             SectionParserData& pd,
+                             const ParseResultRef<mson::OneOf>& out) {
+
+            if (out.node.members().empty()) {
+
+                // WARN: one of type do not have nested members
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                out.report.warnings.push_back(Warning("one of type must have nested members",
+                                                      EmptyDefinitionWarning,
+                                                      sourceMap));
+            }
+        }
 
         static SectionType sectionType(const MarkdownNodeIterator& node) {
 

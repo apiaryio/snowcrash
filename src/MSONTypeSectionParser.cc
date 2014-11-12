@@ -59,14 +59,14 @@ namespace snowcrash {
         // Check if mson mixin section
         nestedType = SectionProcessor<mson::Mixin>::sectionType(node);
 
-        if (nestedType != MSONMixinSectionType) {
+        if (nestedType != UndefinedSectionType) {
             return nestedType;
         }
 
         // Check if mson one of section
         nestedType = SectionProcessor<mson::OneOf>::sectionType(node);
 
-        if (nestedType != MSONOneOfSectionType) {
+        if (nestedType != UndefinedSectionType) {
             return nestedType;
         }
 

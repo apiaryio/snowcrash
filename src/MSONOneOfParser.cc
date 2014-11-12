@@ -13,10 +13,10 @@
 namespace snowcrash {
 
     /** Implementation of processNestedSection */
-    static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
-                                                     const MarkdownNodes& siblings,
-                                                     SectionParserData& pd,
-                                                     const ParseResultRef<mson::OneOf>& out) {
+    MarkdownNodeIterator SectionProcessor<mson::OneOf>::processNestedSection(const MarkdownNodeIterator& node,
+                                                                             const MarkdownNodes& siblings,
+                                                                             SectionParserData& pd,
+                                                                             const ParseResultRef<mson::OneOf>& out) {
 
         MarkdownNodeIterator cur = node;
         mson::MemberType memberType;
@@ -77,21 +77,21 @@ namespace snowcrash {
         // Check if mson mixin section
         nestedType = SectionProcessor<mson::Mixin>::sectionType(node);
 
-        if (nestedType != MSONMixinSectionType) {
+        if (nestedType != UndefinedSectionType) {
             return nestedType;
         }
 
         // Check if mson one of section
         nestedType = SectionProcessor<mson::OneOf>::sectionType(node);
 
-        if (nestedType != MSONOneOfSectionType) {
+        if (nestedType != UndefinedSectionType) {
             return nestedType;
         }
 
         // Check if mson member type section section
         nestedType = SectionProcessor<mson::TypeSection>::sectionType(node);
 
-        if (nestedType != MSONMemberTypeGroupSectionType) {
+        if (nestedType != UndefinedSectionType) {
             return nestedType;
         }
 

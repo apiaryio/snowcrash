@@ -45,6 +45,14 @@ namespace snowcrash {
         SourceMap<mson::ValueDefinition> valueDefinition;
     };
 
+    /** Source Map structure for Property Member */
+    template<>
+    struct SourceMap<mson::PropertyMember> : public SourceMap<mson::ValueMember> {
+
+        /** Source Map for Property Name */
+        SourceMap<mson::PropertyName> name;
+    };
+
     /** Source Map structure for Mixin */
     template<>
     struct SourceMap<mson::Mixin> : public SourceMapBase {
