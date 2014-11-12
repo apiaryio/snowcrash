@@ -80,6 +80,8 @@ namespace scpl {
                                         const SignatureTraits& traits,
                                         const snowcrash::ParseResultRef<T>& out) {
 
+            // TODO: What about a single value (used as string) containing `,`
+
             Signature signature;
             mdp::ByteBuffer subject;
 

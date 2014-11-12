@@ -40,6 +40,8 @@ namespace snowcrash {
 
             out.node.description = signature.content;
 
+            mson::parsePropertyName(signature.identifier, out.node.name);
+
             for (std::vector<mdp::ByteBuffer>::const_iterator it = signature.values.begin();
                  it != signature.values.end();
                  it++) {
