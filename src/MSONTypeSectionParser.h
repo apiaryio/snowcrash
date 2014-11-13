@@ -23,8 +23,11 @@ namespace snowcrash {
     /** MSON Sample Type Section matching regex */
     const char* const MSONSampleTypeSectionRegex = "^[[:blank:]]*[Ss]ample[[:blank:]]*(:.*)?$";
 
-    /** MSON Member group Type Section matching regex */
-    const char* const MSONMemberTypeSectionRegex = "^[[:blank:]]*([Ii]tems|[Mm]embers|[Pp]roperties)[[:blank:]]*$";
+    /** MSON Value Members Type Section matching regex */
+    const char* const MSONValueMembersTypeSectionRegex = "^[[:blank:]]*([Ii]tems|[Mm]embers)[[:blank:]]*$";
+
+    /** MSON Property Members Type Section matching regex */
+    const char* const MSONPropertyMembersTypeSectionRegex = "^[[:blank:]]*([Pp]roperties)[[:blank:]]*$";
 
     /**
      * MSON Type Section Section Processor
@@ -64,9 +67,10 @@ namespace snowcrash {
                 out.node.type = mson::MemberTypeSectionType;
             }
 
-            if (assignValues && !signature.values.empty()) {
+            if (assignValues &&
+                (!signature.values.empty() || !signature.value.empty())) {
 
-                // TODO:
+                // TODO: Build values for sample/default type sections
             }
         }
 
@@ -101,8 +105,12 @@ namespace snowcrash {
                 return MSONTypeSectionSectionType;
             }
 
-            if (RegexMatch(subject, MSONMemberTypeSectionRegex)) {
-                return MSONMemberTypeGroupSectionType;
+            if (RegexMatch(subject, MSONValueMembersTypeSectionRegex)) {
+                return MSONValueMemberSectionType;
+            }
+
+            if (RegexMatch(subject, MSONPropertyMembersTypeSectionRegex)) {
+                return MSONPropertyMembersSectionType;
             }
 
             return UndefinedSectionType;

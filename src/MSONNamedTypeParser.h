@@ -44,7 +44,8 @@ namespace snowcrash {
                                                          const ParseResultRef<mson::NamedType>& out) {
 
             if ((pd.sectionContext() != MSONTypeSectionSectionType) &&
-                (pd.sectionContext() != MSONMemberTypeGroupSectionType)) {
+                (pd.sectionContext() != MSONPropertyMembersSectionType) &&
+                (pd.sectionContext() != MSONValueMembersSectionType)) {
 
                 return node;
             }

@@ -85,25 +85,10 @@ namespace snowcrash {
             return node;
         }
 
-        static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
-                                                         const MarkdownNodes& siblings,
-                                                         SectionParserData& pd,
-                                                         const ParseResultRef<mson::ValueMember>& out) {
-
-            if ((pd.sectionContext() != MSONTypeSectionSectionType) &&
-                (pd.sectionContext() != MSONMemberTypeGroupSectionType)) {
-
-                return node;
-            }
-
-            IntermediateParseResult<mson::TypeSection> typeSection(out.report);
-
-            MSONTypeSectionListParser::parse(node, siblings, pd, typeSection);
-
-            out.node.sections.push_back(typeSection.node);
-
-            return ++MarkdownNodeIterator(node);
-        }
+        static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator&,
+                                                         const MarkdownNodes&,
+                                                         SectionParserData&,
+                                                         const ParseResultRef<mson::ValueMember>&);
 
         static bool isDescriptionNode(const MarkdownNodeIterator& node,
                                       SectionType sectionType) {
@@ -115,15 +100,7 @@ namespace snowcrash {
             return SectionProcessorBase<mson::ValueMember>::isDescriptionNode(node, sectionType);
         }
 
-        static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
-
-            SectionType nestedType = UndefinedSectionType;
-
-            // Check if mson type section section
-            nestedType = SectionProcessor<mson::TypeSection>::sectionType(node);
-
-            return nestedType;
-        }
+        static SectionType nestedSectionType(const MarkdownNodeIterator&);
     };
 
     /** MSON Value Member Section Parser */

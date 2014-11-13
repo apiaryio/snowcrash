@@ -81,6 +81,7 @@ namespace snowcrash {
                 return UndefinedSectionType;
 
             size_t size = sectionsContext.size();
+
             if (size == 1)
                 return sectionsContext.back();
             else

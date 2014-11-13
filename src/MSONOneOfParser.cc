@@ -40,7 +40,7 @@ namespace snowcrash {
                 break;
             }
 
-            case MSONMemberTypeGroupSectionType:
+            case MSONPropertyMembersSectionType:
             {
                 IntermediateParseResult<mson::TypeSection> typeSection(out.report);
                 cur = MSONTypeSectionListParser::parse(node, siblings, pd, typeSection);

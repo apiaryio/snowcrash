@@ -8,6 +8,8 @@
 
 #include "MSONTypeSectionParser.h"
 #include "MSONOneOfParser.h"
+#include "MSONPropertyMemberParser.h"
+#include "MSONValueMemberParser.h"
 
 namespace snowcrash {
 
@@ -18,34 +20,68 @@ namespace snowcrash {
                                                                                    const ParseResultRef<mson::TypeSection>& out) {
 
         MarkdownNodeIterator cur = node;
+        SectionType parentSectionType = pd.parentSectionContext();
 
-        switch (pd.sectionContext()) {
-            case MSONMixinSectionType:
-            {
-                IntermediateParseResult<mson::Mixin> mixin(out.report);
-                cur = MSONMixinParser::parse(node, siblings, pd, mixin);
+        if (parentSectionType == MSONPropertyMembersSectionType ||
+            parentSectionType == MSONValueMembersSectionType) {
 
-                mson::MemberType memberType;
-                mson::buildMemberType(mixin.node, memberType);
+            mson::MemberType memberType;
 
-                out.node.content.members().push_back(memberType);
-                break;
+            switch (pd.sectionContext()) {
+                case MSONMixinSectionType:
+                {
+                    // TODO: See if mixin is allowed for an array/enum
+                    IntermediateParseResult<mson::Mixin> mixin(out.report);
+                    cur = MSONMixinParser::parse(node, siblings, pd, mixin);
+
+                    mson::buildMemberType(mixin.node, memberType);
+                    break;
+                }
+
+                case MSONOneOfSectionType:
+                {
+                    if (parentSectionType != MSONPropertyMembersSectionType) {
+                        break;
+                    }
+
+                    IntermediateParseResult<mson::OneOf> oneOf(out.report);
+                    cur = MSONOneOfParser::parse(node, siblings, pd, oneOf);
+
+                    mson::buildMemberType(oneOf.node, memberType);
+                    break;
+                }
+
+                case UndefinedSectionType:
+                {
+                    if (parentSectionType == MSONPropertyMembersSectionType) {
+
+                        IntermediateParseResult<mson::PropertyMember> propertyMember(out.report);
+                        cur = MSONPropertyMemberParser::parse(node, siblings, pd, propertyMember);
+
+                        mson::buildMemberType(propertyMember.node, memberType);
+                    }
+                    else {
+
+                        IntermediateParseResult<mson::ValueMember> valueMember(out.report);
+                        cur = MSONValueMemberParser::parse(node, siblings, pd, valueMember);
+
+                        mson::buildMemberType(valueMember.node, memberType);
+                    }
+
+                    break;
+                }
+
+                default:
+                    break;
             }
 
-            case MSONOneOfSectionType:
-            {
-                IntermediateParseResult<mson::OneOf> oneOf(out.report);
-                cur = MSONOneOfParser::parse(node, siblings, pd, oneOf);
-
-                mson::MemberType memberType;
-                mson::buildMemberType(oneOf.node, memberType);
-
+            if (memberType.type != mson::UndefinedMemberType) {
                 out.node.content.members().push_back(memberType);
-                break;
             }
+        }
+        else if (parentSectionType == MSONTypeSectionSectionType) {
 
-            default:
-                break;
+            // TODO: Build sample/default type sections
         }
 
         return cur;
