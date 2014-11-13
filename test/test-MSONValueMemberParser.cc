@@ -26,10 +26,10 @@ TEST_CASE("Parse canonical mson value member", "[mson][value_member]")
     REQUIRE(valueMember.node.description == "A color");
     REQUIRE(valueMember.node.valueDefinition.values.size() == 1);
     REQUIRE(valueMember.node.valueDefinition.values[0].literal == "red");
-    REQUIRE(valueMember.node.valueDefinition.typedefinition.typeSpecification.name.name == mson::StringTypeName);
-    MSONHelper::empty(valueMember.node.valueDefinition.typedefinition.typeSpecification.name.symbol);
-    REQUIRE(valueMember.node.valueDefinition.typedefinition.typeSpecification.nestedTypes.empty());
-    REQUIRE(valueMember.node.valueDefinition.typedefinition.attributes == mson::RequiredTypeAttribute);
+    REQUIRE(valueMember.node.valueDefinition.typeDefinition.typeSpecification.name.name == mson::StringTypeName);
+    MSONHelper::empty(valueMember.node.valueDefinition.typeDefinition.typeSpecification.name.symbol);
+    REQUIRE(valueMember.node.valueDefinition.typeDefinition.typeSpecification.nestedTypes.empty());
+    REQUIRE(valueMember.node.valueDefinition.typeDefinition.attributes == mson::RequiredTypeAttribute);
 }
 
 TEST_CASE("Parse mson value member with description not on new line", "[mson][value_member]")

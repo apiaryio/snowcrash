@@ -157,7 +157,7 @@ namespace mson {
         Values values;
 
         /** Type of the values */
-        TypeDefinition typedefinition;
+        TypeDefinition typeDefinition;
     };
 
     /** Forward Declaration for member type */

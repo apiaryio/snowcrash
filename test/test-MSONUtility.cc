@@ -364,7 +364,7 @@ TEST_CASE("Parse canonical type definition", "[mson][utility]")
     markdownParser.parse(source, markdownAST);
     snowcrash::SectionParserData pd(0, source, blueprint);
 
-    parseTypeDefinition(markdownAST.children().begin(), pd, attributes, typeDefinition);
+    parseTypeDefinition(markdownAST.children().begin(), pd, attributes, typeDefinition.report, typeDefinition.node);
 
     REQUIRE(typeDefinition.report.error.code == snowcrash::Error::OK);
     REQUIRE(typeDefinition.report.warnings.empty());
@@ -391,7 +391,7 @@ TEST_CASE("Parse type definition with non recognized type attribute", "[mson][ut
     markdownParser.parse(source, markdownAST);
     snowcrash::SectionParserData pd(0, source, blueprint);
 
-    parseTypeDefinition(markdownAST.children().begin(), pd, attributes, typeDefinition);
+    parseTypeDefinition(markdownAST.children().begin(), pd, attributes, typeDefinition.report, typeDefinition.node);
 
     REQUIRE(typeDefinition.report.error.code == snowcrash::Error::OK);
     REQUIRE(typeDefinition.report.warnings.size() == 1);
@@ -403,7 +403,7 @@ TEST_CASE("Parse type definition with non recognized type attribute", "[mson][ut
     REQUIRE(typeDefinition.node.attributes == 0);
 }
 
-TEST_CASE("Parse type definition when non-structure type has nested types")
+TEST_CASE("Parse type definition when non-structure type has nested types", "[mson][utility]")
 {
     std::vector<std::string> attributes;
     snowcrash::ParseResult<TypeDefinition> typeDefinition;
@@ -420,7 +420,7 @@ TEST_CASE("Parse type definition when non-structure type has nested types")
 
     pd.namedTypeBaseTable["Person"] = mson::PropertyBaseType;
 
-    parseTypeDefinition(markdownAST.children().begin(), pd, attributes, typeDefinition);
+    parseTypeDefinition(markdownAST.children().begin(), pd, attributes, typeDefinition.report, typeDefinition.node);
 
     REQUIRE(typeDefinition.report.error.code == snowcrash::Error::OK);
     REQUIRE(typeDefinition.report.warnings.size() == 1);
@@ -433,7 +433,7 @@ TEST_CASE("Parse type definition when non-structure type has nested types")
     REQUIRE(typeDefinition.node.attributes == 0);
 }
 
-TEST_CASE("Build member type from one of")
+TEST_CASE("Build member type from one of", "[mson][utility]")
 {
     OneOf oneOf;
     MemberType memberType;
@@ -443,7 +443,7 @@ TEST_CASE("Build member type from one of")
     REQUIRE(memberType.type == OneOfMemberType);
 }
 
-TEST_CASE("Build member type from mixin")
+TEST_CASE("Build member type from mixin", "[mson][utility]")
 {
     Mixin mixin;
     MemberType memberType;
@@ -453,7 +453,7 @@ TEST_CASE("Build member type from mixin")
     REQUIRE(memberType.type == MixinMemberType);
 }
 
-TEST_CASE("Build member type from value member")
+TEST_CASE("Build member type from value member", "[mson][utility]")
 {
     ValueMember valueMember;
     MemberType memberType;
@@ -463,7 +463,7 @@ TEST_CASE("Build member type from value member")
     REQUIRE(memberType.type == ValueMemberType);
 }
 
-TEST_CASE("Build member type from property memeber")
+TEST_CASE("Build member type from property memeber", "[mson][utility]")
 {
     PropertyMember propertyMember;
     MemberType memberType;
@@ -473,7 +473,7 @@ TEST_CASE("Build member type from property memeber")
     REQUIRE(memberType.type == PropertyMemberType);
 }
 
-TEST_CASE("Parsing base type from base type name")
+TEST_CASE("Parsing base type from base type name", "[mson][utility]")
 {
     BaseTypeName baseTypeName = UndefinedTypeName;
     REQUIRE(parseBaseType(baseTypeName) == UndefinedBaseType);
@@ -495,4 +495,82 @@ TEST_CASE("Parsing base type from base type name")
 
     baseTypeName = EnumTypeName;
     REQUIRE(parseBaseType(baseTypeName) == ValueBaseType);
+}
+
+TEST_CASE("Parse canonical property name", "[mson][utility]")
+{
+    std::string id = "customer";
+    snowcrash::ParseResult<PropertyName> propertyName;
+    snowcrash::Blueprint blueprint;
+
+    mdp::ByteBuffer source = "+ " + id;
+    mdp::MarkdownParser markdownParser;
+    mdp::MarkdownNode markdownAST;
+
+    markdownParser.parse(source, markdownAST);
+    snowcrash::SectionParserData pd(0, source, blueprint);
+
+    parsePropertyName(markdownAST.children().begin(), pd, id, propertyName.report, propertyName.node);
+
+    REQUIRE(propertyName.report.error.code == snowcrash::Error::OK);
+    REQUIRE(propertyName.report.warnings.empty());
+
+    REQUIRE(propertyName.node.literal == "customer");
+    MSONHelper::empty(propertyName.node.variable);
+}
+
+TEST_CASE("Parse variable property name", "[mson][utility]")
+{
+    std::string id = "*rel (Custom String)*";
+    snowcrash::ParseResult<PropertyName> propertyName;
+    snowcrash::Blueprint blueprint;
+
+    mdp::ByteBuffer source = "+ " + id;
+    mdp::MarkdownParser markdownParser;
+    mdp::MarkdownNode markdownAST;
+
+    markdownParser.parse(source, markdownAST);
+    snowcrash::SectionParserData pd(0, source, blueprint);
+
+    parsePropertyName(markdownAST.children().begin(), pd, id, propertyName.report, propertyName.node);
+
+    REQUIRE(propertyName.report.error.code == snowcrash::Error::OK);
+    REQUIRE(propertyName.report.warnings.empty());
+
+    REQUIRE(propertyName.node.literal.empty());
+    REQUIRE(propertyName.node.variable.values.size() == 1);
+    REQUIRE(propertyName.node.variable.values[0].literal == "rel");
+    REQUIRE(propertyName.node.variable.values[0].variable == false);
+    REQUIRE(propertyName.node.variable.typeDefinition.attributes == 0);
+    REQUIRE(propertyName.node.variable.typeDefinition.typeSpecification.name.name == UndefinedTypeName);
+    REQUIRE(propertyName.node.variable.typeDefinition.typeSpecification.name.symbol.literal == "Custom String");
+    REQUIRE(propertyName.node.variable.typeDefinition.typeSpecification.name.symbol.variable == false);
+}
+
+TEST_CASE("Parse multi-value variable property name", "[mson][utility]")
+{
+    std::string id = "*1, 2 (Custom)*";
+    snowcrash::ParseResult<PropertyName> propertyName;
+    snowcrash::Blueprint blueprint;
+
+    mdp::ByteBuffer source = "+ " + id;
+    mdp::MarkdownParser markdownParser;
+    mdp::MarkdownNode markdownAST;
+
+    markdownParser.parse(source, markdownAST);
+    snowcrash::SectionParserData pd(0, source, blueprint);
+
+    parsePropertyName(markdownAST.children().begin(), pd, id, propertyName.report, propertyName.node);
+
+    REQUIRE(propertyName.report.error.code == snowcrash::Error::OK);
+    REQUIRE(propertyName.report.warnings.empty());
+
+    REQUIRE(propertyName.node.literal.empty());
+    REQUIRE(propertyName.node.variable.values.size() == 1);
+    REQUIRE(propertyName.node.variable.values[0].literal == "1, 2");
+    REQUIRE(propertyName.node.variable.values[0].variable == false);
+    REQUIRE(propertyName.node.variable.typeDefinition.attributes == 0);
+    REQUIRE(propertyName.node.variable.typeDefinition.typeSpecification.name.name == UndefinedTypeName);
+    REQUIRE(propertyName.node.variable.typeDefinition.typeSpecification.name.symbol.literal == "Custom");
+    REQUIRE(propertyName.node.variable.typeDefinition.typeSpecification.name.symbol.variable == false);
 }

@@ -138,7 +138,7 @@ namespace snowcrashtest {
             scpl::SignatureTraits signatureTraits(traits);
 
             signature = scpl::SignatureSectionProcessorBase<snowcrash::Blueprint>
-                            ::parseSignature(markdownAST.children().begin(), pd, signatureTraits, out);
+                            ::parseSignature(markdownAST.children().begin(), pd, signatureTraits, out.report);
 
             return signature;
         }
@@ -188,7 +188,7 @@ namespace snowcrashtest {
         static void empty(const mson::ValueDefinition& valueDefinition) {
 
             REQUIRE(valueDefinition.values.empty());
-            MSONHelper::empty(valueDefinition.typedefinition);
+            MSONHelper::empty(valueDefinition.typeDefinition);
         }
 
         /** Type Section */

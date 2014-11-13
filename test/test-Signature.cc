@@ -35,6 +35,7 @@ TEST_CASE("Property signature parsing", "[signature]")
     REQUIRE(blueprint.report.warnings.empty());
 
     REQUIRE(signature.identifier == "id");
+    REQUIRE(signature.value == "42");
     REQUIRE(signature.values.size() == 1);
     REQUIRE(signature.values[0] == "42");
     REQUIRE(signature.attributes.size() == 2);
@@ -53,6 +54,7 @@ TEST_CASE("Escaped property signature parsing", "[signature]")
     REQUIRE(blueprint.report.warnings.empty());
 
     REQUIRE(signature.identifier == "*id*(data):3");
+    REQUIRE(signature.value == "42");
     REQUIRE(signature.values.size() == 1);
     REQUIRE(signature.values[0] == "42");
     REQUIRE(signature.attributes.size() == 2);
@@ -71,6 +73,7 @@ TEST_CASE("Multiline signature parsing", "[signature]")
     REQUIRE(blueprint.report.warnings.empty());
 
     REQUIRE(signature.identifier == "id");
+    REQUIRE(signature.value.empty());
     REQUIRE(signature.values.empty());
     REQUIRE(signature.attributes.empty());
     REQUIRE(signature.content.empty());
@@ -86,6 +89,7 @@ TEST_CASE("Identifier only signature parsing", "[signature]")
     REQUIRE(blueprint.report.warnings.empty());
 
     REQUIRE(signature.identifier == "id");
+    REQUIRE(signature.value.empty());
     REQUIRE(signature.values.empty());
     REQUIRE(signature.attributes.empty());
     REQUIRE(signature.content.empty());
@@ -101,6 +105,7 @@ TEST_CASE("Identifier enclosed by asterisk", "[signature]")
     REQUIRE(blueprint.report.warnings.empty());
 
     REQUIRE(signature.identifier == "*rel (Custom String)*");
+    REQUIRE(signature.value.empty());
     REQUIRE(signature.values.empty());
     REQUIRE(signature.attributes.size() == 1);
     REQUIRE(signature.attributes[0] == "object");
@@ -117,6 +122,7 @@ TEST_CASE("Identifier enclosed by underscore", "[signature]")
     REQUIRE(blueprint.report.warnings.empty());
 
     REQUIRE(signature.identifier == "_rel (*Custom* String)_");
+    REQUIRE(signature.value.empty());
     REQUIRE(signature.values.empty());
     REQUIRE(signature.attributes.size() == 1);
     REQUIRE(signature.attributes[0] == "object");
@@ -133,6 +139,7 @@ TEST_CASE("Identifier enclosed by backticks", "[signature]")
     REQUIRE(blueprint.report.warnings.empty());
 
     REQUIRE(signature.identifier == "username `is` g``ood");
+    REQUIRE(signature.value.empty());
     REQUIRE(signature.values.empty());
     REQUIRE(signature.attributes.size() == 1);
     REQUIRE(signature.attributes[0] == "object");
@@ -149,6 +156,7 @@ TEST_CASE("Identifier enclosing not completed", "[signature]")
     REQUIRE(blueprint.report.warnings.empty());
 
     REQUIRE(signature.identifier == "_rel");
+    REQUIRE(signature.value.empty());
     REQUIRE(signature.values.empty());
     REQUIRE(signature.attributes.size() == 1);
     REQUIRE(signature.attributes[0] == "object");
@@ -165,6 +173,7 @@ TEST_CASE("Extra space content after identifier enclosure", "[signature]")
     REQUIRE(blueprint.report.warnings.empty());
 
     REQUIRE(signature.identifier == "a");
+    REQUIRE(signature.value == "42");
     REQUIRE(signature.values.size() == 1);
     REQUIRE(signature.values[0] == "42");
     REQUIRE(signature.attributes.empty());
@@ -181,6 +190,7 @@ TEST_CASE("Extra non-space content after identifier enclosure", "[signature]")
     REQUIRE(blueprint.report.warnings.size() == 0);
 
     REQUIRE(signature.identifier == "`a`b");
+    REQUIRE(signature.value == "42");
     REQUIRE(signature.values.size() == 1);
     REQUIRE(signature.values[0] == "42");
     REQUIRE(signature.attributes.empty());
@@ -197,6 +207,7 @@ TEST_CASE("Identifier description signature parsing", "[signature]")
     REQUIRE(blueprint.report.warnings.empty());
 
     REQUIRE(signature.identifier == "id");
+    REQUIRE(signature.value.empty());
     REQUIRE(signature.values.empty());
     REQUIRE(signature.attributes.empty());
     REQUIRE(signature.content == "a good - info");
@@ -212,6 +223,7 @@ TEST_CASE("Identifier value signature parsing", "[signature]")
     REQUIRE(blueprint.report.warnings.empty());
 
     REQUIRE(signature.identifier == "id");
+    REQUIRE(signature.value == "a good data");
     REQUIRE(signature.values.size() == 1);
     REQUIRE(signature.values[0] == "a good data");
     REQUIRE(signature.attributes.empty());
@@ -228,6 +240,7 @@ TEST_CASE("Identifier attributes signature parsing", "[signature]")
     REQUIRE(blueprint.report.warnings.empty());
 
     REQUIRE(signature.identifier == "id");
+    REQUIRE(signature.value.empty());
     REQUIRE(signature.values.empty());
     REQUIRE(signature.attributes.size() == 1);
     REQUIRE(signature.attributes[0] == "number");
@@ -244,6 +257,7 @@ TEST_CASE("Element signature parsing", "[signature]")
     REQUIRE(blueprint.report.warnings.empty());
 
     REQUIRE(signature.identifier.empty());
+    REQUIRE(signature.value == "42");
     REQUIRE(signature.values.size() == 1);
     REQUIRE(signature.values[0] == "42");
     REQUIRE(signature.attributes.size() == 1);
@@ -261,6 +275,7 @@ TEST_CASE("Escaped element signature parsing", "[signature]")
     REQUIRE(blueprint.report.warnings.empty());
 
     REQUIRE(signature.identifier.empty());
+    REQUIRE(signature.value == "*42*(data):3");
     REQUIRE(signature.values.size() == 1);
     REQUIRE(signature.values[0] == "*42*(data):3");
     REQUIRE(signature.attributes.size() == 1);
@@ -278,6 +293,7 @@ TEST_CASE("Element value signature parsing", "[signature]")
     REQUIRE(blueprint.report.warnings.empty());
 
     REQUIRE(signature.identifier.empty());
+    REQUIRE(signature.value == "42");
     REQUIRE(signature.values.size() == 1);
     REQUIRE(signature.values[0] == "42");
     REQUIRE(signature.attributes.empty());
@@ -294,6 +310,7 @@ TEST_CASE("Element attributes signature parsing", "[signature]")
     REQUIRE(blueprint.report.warnings.empty());
 
     REQUIRE(signature.identifier.empty());
+    REQUIRE(signature.value.empty());
     REQUIRE(signature.values.empty());
     REQUIRE(signature.attributes.size() == 1);
     REQUIRE(signature.attributes[0] == "number");
@@ -310,6 +327,7 @@ TEST_CASE("Element attributes description signature parsing", "[signature]")
     REQUIRE(blueprint.report.warnings.empty());
 
     REQUIRE(signature.identifier.empty());
+    REQUIRE(signature.value.empty());
     REQUIRE(signature.values.empty());
     REQUIRE(signature.attributes.size() == 1);
     REQUIRE(signature.attributes[0] == "number");
@@ -326,6 +344,7 @@ TEST_CASE("Property signature parsing with element traits", "[signature]")
     REQUIRE(blueprint.report.warnings.empty());
 
     REQUIRE(signature.identifier.empty());
+    REQUIRE(signature.value == "id: 42");
     REQUIRE(signature.values.size() == 1);
     REQUIRE(signature.values[0] == "id: 42");
     REQUIRE(signature.attributes.size() == 2);
@@ -344,6 +363,7 @@ TEST_CASE("Property signature parsing without identifier", "[signature]")
     REQUIRE(blueprint.report.warnings.size() == 1);
 
     REQUIRE(signature.identifier.empty());
+    REQUIRE(signature.value.empty());
     REQUIRE(signature.values.empty());
     REQUIRE(signature.attributes.size() == 1);
     REQUIRE(signature.attributes[0] == "x");
@@ -360,6 +380,7 @@ TEST_CASE("Property signature parsing without a value", "[signature]")
     REQUIRE(blueprint.report.warnings.size() == 1);
 
     REQUIRE(signature.identifier == "id");
+    REQUIRE(signature.value.empty());
     REQUIRE(signature.values.empty());
     REQUIRE(signature.attributes.size() == 1);
     REQUIRE(signature.attributes[0] == "number");
@@ -381,6 +402,7 @@ TEST_CASE("Element signature parsing without value and attributes", "[signature]
     REQUIRE(blueprint.report.warnings.size() == 1);
 
     REQUIRE(signature.identifier.empty());
+    REQUIRE(signature.value.empty());
     REQUIRE(signature.values.size() == 0);
     REQUIRE(signature.attributes.empty());
     REQUIRE(signature.content == "content is the king");
@@ -397,6 +419,7 @@ TEST_CASE("Escaped array element signature parsing", "[signature]")
     REQUIRE(blueprint.report.warnings.empty());
 
     REQUIRE(signature.identifier.empty());
+    REQUIRE(signature.value == "`1 `, 00 ``2, `3` da(t)a`` 45");
     REQUIRE(signature.values.size() == 2);
     REQUIRE(signature.values[0] == "1");
     REQUIRE(signature.values[1] == "00 ``2, `3` da(t)a`` 45");
@@ -414,6 +437,7 @@ TEST_CASE("Unescaped array element signature parsing", "[signature]")
     REQUIRE(blueprint.report.warnings.empty());
 
     REQUIRE(signature.identifier.empty());
+    REQUIRE(signature.value == "1 , 2,3");
     REQUIRE(signature.values.size() == 3);
     REQUIRE(signature.values[0] == "1");
     REQUIRE(signature.values[1] == "2");
@@ -434,6 +458,7 @@ TEST_CASE("Escaped attributes signature parsing", "[signature]")
     REQUIRE(blueprint.report.warnings.empty());
 
     REQUIRE(signature.identifier.empty());
+    REQUIRE(signature.value == "1");
     REQUIRE(signature.values.size() == 1);
     REQUIRE(signature.values[0] == "1");
     REQUIRE(signature.attributes.size() == 2);
@@ -452,6 +477,7 @@ TEST_CASE("Attributes with many brackets signature parsing", "[signature]")
     REQUIRE(blueprint.report.warnings.empty());
 
     REQUIRE(signature.identifier.empty());
+    REQUIRE(signature.value == "1");
     REQUIRE(signature.values.size() == 1);
     REQUIRE(signature.values[0] == "1");
     REQUIRE(signature.attributes.size() == 2);
@@ -471,6 +497,7 @@ TEST_CASE("Identifier and values only", "[signature]")
     REQUIRE(blueprint.report.warnings.empty());
 
     REQUIRE(signature.identifier == "Sample");
+    REQUIRE(signature.value == "10 (1), 20");
     REQUIRE(signature.values.size() == 2);
     REQUIRE(signature.values[0] == "10 (1)");
     REQUIRE(signature.values[1] == "20");

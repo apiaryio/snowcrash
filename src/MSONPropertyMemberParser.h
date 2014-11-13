@@ -40,7 +40,7 @@ namespace snowcrash {
 
             out.node.description = signature.content;
 
-            mson::parsePropertyName(signature.identifier, out.node.name);
+            mson::parsePropertyName(node, pd, signature.identifier, out.report, out.node.name);
 
             for (std::vector<mdp::ByteBuffer>::const_iterator it = signature.values.begin();
                  it != signature.values.end();
@@ -49,8 +49,7 @@ namespace snowcrash {
                 out.node.valueDefinition.values.push_back(mson::parseValue(*it));
             }
 
-            ParseResultRef<mson::TypeDefinition> typeDefinition(out.report, out.node.valueDefinition.typedefinition, out.sourceMap.valueDefinition.typeDefinition);
-            mson::parseTypeDefinition(node, pd, signature.attributes, typeDefinition);
+            mson::parseTypeDefinition(node, pd, signature.attributes, out.report, out.node.valueDefinition.typeDefinition);
 
             if (!signature.remainingContent.empty()) {
 

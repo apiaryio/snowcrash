@@ -95,7 +95,6 @@ TEST_CASE("Parse mson one of with one of", "[mson][one_of]")
     "        - given_name\n"\
     "        - suffixed_name";
 
-
     ParseResult<mson::OneOf> oneOf;
     SectionParserHelper<mson::OneOf, MSONOneOfParser>::parseMSON(source, MSONOneOfSectionType, oneOf);
 
@@ -107,11 +106,7 @@ TEST_CASE("Parse mson one of with one of", "[mson][one_of]")
     REQUIRE(oneOf.node.members().at(0).content.property.name.literal == "last_name");
     REQUIRE(oneOf.node.members().at(0).content.property.sections.empty());
     REQUIRE(oneOf.node.members().at(0).content.property.description.empty());
-    MSONHelper::empty(oneOf.node.members().at(0).content.property.name.variable);
     MSONHelper::empty(oneOf.node.members().at(0).content.property.valueDefinition);
-    MSONHelper::empty(oneOf.node.members().at(0).content.oneOf);
-    MSONHelper::empty(oneOf.node.members().at(0).content.mixin);
-    MSONHelper::empty(oneOf.node.members().at(0).content.value);
 
     REQUIRE(oneOf.node.members().at(1).type == mson::OneOfMemberType);
     REQUIRE(oneOf.node.members().at(1).content.oneOf.members().size() == 2);
@@ -124,4 +119,24 @@ TEST_CASE("Parse mson one of with one of", "[mson][one_of]")
     MSONHelper::empty(oneOf.node.members().at(1).content.property);
     MSONHelper::empty(oneOf.node.members().at(1).content.mixin);
     MSONHelper::empty(oneOf.node.members().at(1).content.value);
+}
+
+TEST_CASE("Parse mson one of with member group")
+{
+    mdp::ByteBuffer source = \
+    "- One Of\n"\
+    "    - full_name\n"\
+    "    - Properties\n"\
+    "        - first_name\n"\
+    "        - last_name";
+
+    ParseResult<mson::OneOf> oneOf;
+    SectionParserHelper<mson::OneOf, MSONOneOfParser>::parseMSON(source, MSONOneOfSectionType, oneOf);
+
+    REQUIRE(oneOf.node.members().size() == 2);
+    REQUIRE(oneOf.node.members().at(0).type == mson::PropertyMemberType);
+    REQUIRE(oneOf.node.members().at(0).content.property.name.literal == "full_name");
+    REQUIRE(oneOf.node.members().at(0).content.property.sections.empty());
+    REQUIRE(oneOf.node.members().at(0).content.property.description.empty());
+    MSONHelper::empty(oneOf.node.members().at(0).content.property.valueDefinition);
 }

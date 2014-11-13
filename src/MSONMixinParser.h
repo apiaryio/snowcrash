@@ -39,10 +39,6 @@ namespace snowcrash {
                                       const ParseResultRef<mson::Mixin>& out) {
 
             CaptureGroups captureGroups;
-            ParseResultRef<mson::TypeDefinition> typeDefinition(out.report,
-                                                                out.node.typeDefinition,
-                                                                out.sourceMap.typeDefinition);
-
             std::vector<mdp::ByteBuffer> attributes = signature.attributes;
 
             if (RegexCapture(signature.identifier, MSONMixinRegex, captureGroups, 2) &&
@@ -53,7 +49,7 @@ namespace snowcrash {
                 attributes.insert(attributes.begin(), typeName);
             }
 
-            mson::parseTypeDefinition(node, pd, attributes, typeDefinition);
+            mson::parseTypeDefinition(node, pd, attributes, out.report, out.node.typeDefinition);
 
             if ((out.node.typeDefinition.baseType == mson::PrimitiveBaseType) ||
                 (out.node.typeDefinition.baseType == mson::UndefinedBaseType)) {

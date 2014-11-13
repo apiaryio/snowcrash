@@ -11,6 +11,8 @@
 
 #include "MSONSourcemap.h"
 
+using namespace scpl;
+
 namespace mson {
 
     /**
@@ -240,7 +242,7 @@ namespace mson {
                 alreadyParsedLink = true;
                 lookingForEndLink = false;
             }
-            else if (subject[i] == scpl::AttributeDelimiter &&
+            else if (subject[i] == AttributeDelimiter &&
                      lookingAtNested &&
                      !lookingForEndLink) {
 
@@ -311,12 +313,14 @@ namespace mson {
      * \param node Markdown node of the signature
      * \param pd Section parser data
      * \param attributes List of signature attributes
-     * \param out Type Definition parse result
+     * \param report Parse result report
+     * \param typeDefinition MSON Type Definition
      */
     inline void parseTypeDefinition(const mdp::MarkdownNodeIterator& node,
                                     snowcrash::SectionParserData& pd,
                                     const std::vector<std::string>& attributes,
-                                    const snowcrash::ParseResultRef<TypeDefinition>& out) {
+                                    snowcrash::Report& report,
+                                    mson::TypeDefinition& typeDefinition) {
 
         bool foundTypeSpecification = false;
 
@@ -325,49 +329,55 @@ namespace mson {
              it++) {
 
             // If not a recognized type attribute
-            if (!parseTypeAttribute(*it, out.node.attributes)) {
+            if (!parseTypeAttribute(*it, typeDefinition.attributes)) {
 
                 // If type specification is already found
                 if (foundTypeSpecification) {
 
                     // WARN: Ignoring unrecognized type attribute
                     mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                    out.report.warnings.push_back(snowcrash::Warning("ignoring unrecognized type attribute",
-                                                                     snowcrash::IgnoringWarning,
-                                                                     sourceMap));
+                    report.warnings.push_back(snowcrash::Warning("ignoring unrecognized type attribute",
+                                                                 snowcrash::IgnoringWarning,
+                                                                 sourceMap));
                 }
                 else {
 
                     foundTypeSpecification = true;
-                    parseTypeSpecification(*it, out.node.typeSpecification);
+                    parseTypeSpecification(*it, typeDefinition.typeSpecification);
                 }
             }
         }
 
-        out.node.baseType = parseBaseType(out.node.typeSpecification.name.name);
+        typeDefinition.baseType = parseBaseType(typeDefinition.typeSpecification.name.name);
 
-        if (out.node.baseType == UndefinedBaseType) {
-            out.node.baseType = pd.namedTypeBaseTable[out.node.typeSpecification.name.symbol.literal];
+        if (typeDefinition.baseType == UndefinedBaseType) {
+            typeDefinition.baseType = pd.namedTypeBaseTable[typeDefinition.typeSpecification.name.symbol.literal];
         }
 
-        if ((out.node.baseType != ValueBaseType) &&
-            !out.node.typeSpecification.nestedTypes.empty()) {
+        if ((typeDefinition.baseType != ValueBaseType) &&
+            !typeDefinition.typeSpecification.nestedTypes.empty()) {
 
             // WARN: Nested types for non (array or enum) structure base type
             mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-            out.report.warnings.push_back(snowcrash::Warning("nested types should not be present for array or enum structure type",
-                                                             snowcrash::LogicalErrorWarning,
-                                                             sourceMap));
+            report.warnings.push_back(snowcrash::Warning("nested types should not be present for array or enum structure type",
+                                                         snowcrash::LogicalErrorWarning,
+                                                         sourceMap));
         }
     }
 
     /**
      * \brief Parse Property Name from a string given by signature identifier
      *
+     * \param node Markdown node of the signature
+     * \param pd Section parser data
      * \param subject String representing the property name
+     * \param report Parse result report
      * \param propertyName MSON Property Name
      */
-    inline void parsePropertyName(const std::string& subject,
+    inline void parsePropertyName(const mdp::MarkdownNodeIterator& node,
+                                  snowcrash::SectionParserData& pd,
+                                  const std::string& subject,
+                                  snowcrash::Report& report,
                                   PropertyName& propertyName) {
 
         std::string buffer = subject;
@@ -376,8 +386,16 @@ namespace mson {
 
             std::string escapedString = snowcrash::RetrieveEscaped(buffer, 0, true);
 
-            // TODO:
-            // propertyName.variable;
+            SignatureTraits traits(SignatureTraits::ValuesTrait |
+                                   SignatureTraits::AttributesTrait);
+
+            Signature signature = SignatureSectionProcessorBase<PropertyName>::parseSignature(node, pd, traits, report, escapedString);
+
+            if (!signature.value.empty()) {
+                propertyName.variable.values.push_back(parseValue(signature.value));
+            }
+
+            parseTypeDefinition(node, pd, signature.attributes, report, propertyName.variable.typeDefinition);
         }
         else {
             propertyName.literal = subject;
