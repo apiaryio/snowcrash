@@ -17,7 +17,7 @@ namespace snowcrash {
      *  API Blueprint Sections Types.
      */
     enum SectionType {
-        UndefinedSectionType,           /// < Undefined section
+        UndefinedSectionType = 0,       /// < Undefined section
         BlueprintSectionType,           /// < Blueprint overview
         ResourceGroupSectionType,       /// < Resource group
         ResourceSectionType,            /// < Resource
@@ -45,7 +45,8 @@ namespace snowcrash {
         MSONTypeSectionSectionType,     /// < MSON Type Section
         MSONPropertyMembersSectionType, /// < MSON Property Members Type Section
         MSONValueMembersSectionType,    /// < MSON Value Members Type Section
-        MSONValueMemberSectionType      /// < MSON Value Member Type
+        MSONValueMemberSectionType,     /// < MSON Value Member Type
+        MSONSectionType                 /// < MSON Property Member or Value Member
     };
 
     /** \return Human readable name for given %SectionType */

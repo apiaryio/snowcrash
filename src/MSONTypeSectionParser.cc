@@ -30,7 +30,6 @@ namespace snowcrash {
             switch (pd.sectionContext()) {
                 case MSONMixinSectionType:
                 {
-                    // TODO: See if mixin is allowed for an array/enum
                     IntermediateParseResult<mson::Mixin> mixin(out.report);
                     cur = MSONMixinParser::parse(node, siblings, pd, mixin);
 
@@ -51,7 +50,7 @@ namespace snowcrash {
                     break;
                 }
 
-                case UndefinedSectionType:
+                case MSONSectionType:
                 {
                     if (parentSectionType == MSONPropertyMembersSectionType) {
 
@@ -106,6 +105,6 @@ namespace snowcrash {
             return nestedType;
         }
 
-        return UndefinedSectionType;
+        return MSONSectionType;
     }
 }

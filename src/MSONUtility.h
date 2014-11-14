@@ -457,10 +457,10 @@ namespace mson {
     /**
      * \brief Build Member Type from members type
      *
-     * \param members Members collection
+     * \param members List of Member types for members collection
      * \param memberType Member type which was built
      */
-    inline void buildMemberType(const Members& members,
+    inline void buildMemberType(const MemberTypes& members,
                                 MemberType& memberType) {
 
         memberType.type = MembersMemberType;

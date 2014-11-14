@@ -45,8 +45,7 @@ namespace snowcrash {
                 IntermediateParseResult<mson::TypeSection> typeSection(out.report);
                 cur = MSONTypeSectionListParser::parse(node, siblings, pd, typeSection);
 
-                // TODO:
-                // mson::buildMemberType(typeSection, memberType);
+                mson::buildMemberType(typeSection.node.content.members(), memberType);
                 break;
             }
 

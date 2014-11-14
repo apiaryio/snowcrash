@@ -68,6 +68,13 @@ const MemberTypes& Members::members() const
     return *m_members;
 }
 
+Members& Members::operator=(const MemberTypes& rhs)
+{
+    m_members.reset(::new MemberTypes(rhs));
+
+    return *this;
+}
+
 Members::Members()
 {
     m_members.reset(::new MemberTypes);

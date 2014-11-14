@@ -278,6 +278,9 @@ namespace mson {
         MemberTypes& members();
         const MemberTypes& members() const;
 
+        /** Set members from member types */
+        Members& operator=(const MemberTypes& rhs);
+
         /** Constructor */
         Members();
 

@@ -59,6 +59,7 @@ TEST_CASE("Parse canonical mson one of", "[mson][one_of]")
     MSONHelper::empty(oneOf.node.members().at(0).content.oneOf);
     MSONHelper::empty(oneOf.node.members().at(0).content.mixin);
     MSONHelper::empty(oneOf.node.members().at(0).content.value);
+    MSONHelper::empty(oneOf.node.members().at(0).content.members);
 
     REQUIRE(oneOf.node.members().at(1).type == mson::PropertyMemberType);
     REQUIRE(oneOf.node.members().at(1).content.property.name.literal == "province");
@@ -70,6 +71,7 @@ TEST_CASE("Parse canonical mson one of", "[mson][one_of]")
     MSONHelper::empty(oneOf.node.members().at(1).content.oneOf);
     MSONHelper::empty(oneOf.node.members().at(1).content.mixin);
     MSONHelper::empty(oneOf.node.members().at(1).content.value);
+    MSONHelper::empty(oneOf.node.members().at(0).content.members);
 }
 
 TEST_CASE("Parse mson one of without any nested members", "[mson][one_of]")
@@ -119,6 +121,7 @@ TEST_CASE("Parse mson one of with one of", "[mson][one_of]")
     MSONHelper::empty(oneOf.node.members().at(1).content.property);
     MSONHelper::empty(oneOf.node.members().at(1).content.mixin);
     MSONHelper::empty(oneOf.node.members().at(1).content.value);
+    MSONHelper::empty(oneOf.node.members().at(0).content.members);
 }
 
 TEST_CASE("Parse mson one of with member group")
@@ -139,4 +142,14 @@ TEST_CASE("Parse mson one of with member group")
     REQUIRE(oneOf.node.members().at(0).content.property.sections.empty());
     REQUIRE(oneOf.node.members().at(0).content.property.description.empty());
     MSONHelper::empty(oneOf.node.members().at(0).content.property.valueDefinition);
+    REQUIRE(oneOf.node.members().at(1).type == mson::MembersMemberType);
+    MSONHelper::empty(oneOf.node.members().at(1).content.property);
+    MSONHelper::empty(oneOf.node.members().at(1).content.mixin);
+    MSONHelper::empty(oneOf.node.members().at(1).content.value);
+    MSONHelper::empty(oneOf.node.members().at(0).content.oneOf);
+    REQUIRE(oneOf.node.members().at(1).content.members.members().size() == 2);
+    REQUIRE(oneOf.node.members().at(1).content.members.members().at(0).type == mson::PropertyMemberType);
+    REQUIRE(oneOf.node.members().at(1).content.members.members().at(0).content.property.name.literal == "first_name");
+    REQUIRE(oneOf.node.members().at(1).content.members.members().at(1).type == mson::PropertyMemberType);
+    REQUIRE(oneOf.node.members().at(1).content.members.members().at(1).content.property.name.literal == "last_name");
 }

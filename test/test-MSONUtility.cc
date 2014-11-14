@@ -475,12 +475,20 @@ TEST_CASE("Build member type from property memeber", "[mson][utility]")
 
 TEST_CASE("Build memebr type from members collection", "[mson][utility]")
 {
-    Members members;
+    MemberTypes members;
     MemberType memberType;
 
-    buildMemberType(members, memberType);
+    TypeSection typeSection;
+    PropertyMember propertyMember;
+    MemberType propertyMemberType;
+
+    buildMemberType(propertyMember, propertyMemberType);
+    typeSection.content.members().push_back(propertyMemberType);
+
+    buildMemberType(typeSection.content.members(), memberType);
 
     REQUIRE(memberType.type == MembersMemberType);
+    REQUIRE(memberType.content.members.members().size() == 1);
 }
 
 TEST_CASE("Parsing base type from base type name", "[mson][utility]")
