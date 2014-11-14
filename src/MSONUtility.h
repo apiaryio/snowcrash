@@ -453,6 +453,19 @@ namespace mson {
         memberType.type = OneOfMemberType;
         memberType.content.oneOf = oneOf;
     }
+
+    /**
+     * \brief Build Member Type from members type
+     *
+     * \param members Members collection
+     * \param memberType Member type which was built
+     */
+    inline void buildMemberType(const Members& members,
+                                MemberType& memberType) {
+
+        memberType.type = MembersMemberType;
+        memberType.content.members = members;
+    }
 }
 
 #endif

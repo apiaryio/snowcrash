@@ -196,6 +196,7 @@ namespace snowcrashtest {
 
             REQUIRE(typeSection.type == mson::UndefinedTypeSectionType);
             REQUIRE(typeSection.content.description.empty());
+            REQUIRE(typeSection.content.value.empty());
             REQUIRE(typeSection.content.members().empty());
         }
 
@@ -227,6 +228,12 @@ namespace snowcrashtest {
         static void empty(const mson::OneOf& oneOf) {
 
             REQUIRE(oneOf.members().empty());
+        }
+
+        /** Members */
+        static void empty(const mson::Members& members) {
+
+            REQUIRE(members.members().empty());
         }
     };
 }

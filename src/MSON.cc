@@ -26,8 +26,8 @@ const MemberTypes& TypeSectionContent::members() const
     return *m_members;
 }
 
-TypeSectionContent::TypeSectionContent(const Markdown& description_)
-: description(description_)
+TypeSectionContent::TypeSectionContent(const Markdown& description_, const Literal& value_)
+: description(description_), value(value_)
 {
     m_members.reset(::new MemberTypes);
 }
@@ -35,12 +35,14 @@ TypeSectionContent::TypeSectionContent(const Markdown& description_)
 TypeSectionContent::TypeSectionContent(const TypeSectionContent& rhs)
 {
     this->description = rhs.description;
+    this->value = rhs.value;
     m_members.reset(::new MemberTypes(*rhs.m_members.get()));
 }
 
 TypeSectionContent& TypeSectionContent::operator=(const TypeSectionContent& rhs)
 {
     this->description = rhs.description;
+    this->value = rhs.value;
     m_members.reset(::new MemberTypes(*rhs.m_members.get()));
 
     return *this;
@@ -50,7 +52,7 @@ TypeSectionContent::~TypeSectionContent()
 {
 }
 
-MemberTypes& OneOf::members()
+MemberTypes& Members::members()
 {
     if (!m_members.get())
         throw "no members set";
@@ -58,12 +60,33 @@ MemberTypes& OneOf::members()
     return *m_members;
 }
 
-const MemberTypes& OneOf::members() const
+const MemberTypes& Members::members() const
 {
     if (!m_members.get())
         throw "no members set";
 
     return *m_members;
+}
+
+Members::Members()
+{
+    m_members.reset(::new MemberTypes);
+}
+
+Members::Members(const Members& rhs)
+{
+    m_members.reset(::new MemberTypes(*rhs.m_members.get()));
+}
+
+Members& Members::operator=(const Members& rhs)
+{
+    m_members.reset(::new MemberTypes(*rhs.m_members.get()));
+
+    return *this;
+}
+
+Members::~Members()
+{
 }
 
 OneOf::OneOf()

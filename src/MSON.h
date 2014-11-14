@@ -181,12 +181,15 @@ namespace mson {
         /** EITHER Block description */
         Markdown description;
 
+        /** OR Literal value */
+        Literal value;
+
         /** OR Array of member types */
         MemberTypes& members();
         const MemberTypes& members() const;
 
         /** Constructor */
-        TypeSectionContent(const Markdown& description_ = "");
+        TypeSectionContent(const Markdown& description_ = "", const Literal& value_ = "");
 
         /** Copy constructor */
         TypeSectionContent(const TypeSectionContent& rhs);
@@ -268,12 +271,31 @@ namespace mson {
         TypeDefinition typeDefinition;
     };
 
-    /** One Of type */
-    struct OneOf {
+    /** Members type */
+    struct Members {
 
         /** List of mutually exclusive member types */
         MemberTypes& members();
         const MemberTypes& members() const;
+
+        /** Constructor */
+        Members();
+
+        /** Copy constructor */
+        Members(const Members& rhs);
+
+        /** Assignment operator */
+        Members& operator=(const Members& rhs);
+
+        /** Desctructor */
+        ~Members();
+
+    protected:
+        std::auto_ptr<MemberTypes> m_members;
+    };
+
+    /** One Of type */
+    struct OneOf : public Members {
 
         /** Constructor */
         OneOf();
@@ -286,9 +308,6 @@ namespace mson {
 
         /** Desctructor */
         ~OneOf();
-
-    private:
-        std::auto_ptr<MemberTypes> m_members;
     };
 
     /** Type of a member type */
@@ -297,7 +316,8 @@ namespace mson {
         PropertyMemberType,      // Property member
         ValueMemberType,         // Value member
         MixinMemberType,         // Mixin
-        OneOfMemberType          // One of
+        OneOfMemberType,         // One of
+        MembersMemberType        // Members collection
     };
 
     /** Member type of a structure */
@@ -317,6 +337,9 @@ namespace mson {
 
             /** OR One of member */
             OneOf oneOf;
+
+            /** OR Members collection */
+            Members members;
         };
 
         /** Type of the member type */

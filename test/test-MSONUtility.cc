@@ -473,6 +473,16 @@ TEST_CASE("Build member type from property memeber", "[mson][utility]")
     REQUIRE(memberType.type == PropertyMemberType);
 }
 
+TEST_CASE("Build memebr type from members collection", "[mson][utility]")
+{
+    Members members;
+    MemberType memberType;
+
+    buildMemberType(members, memberType);
+
+    REQUIRE(memberType.type == MembersMemberType);
+}
+
 TEST_CASE("Parsing base type from base type name", "[mson][utility]")
 {
     BaseTypeName baseTypeName = UndefinedTypeName;

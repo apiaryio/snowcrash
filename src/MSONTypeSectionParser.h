@@ -106,7 +106,7 @@ namespace snowcrash {
             }
 
             if (RegexMatch(subject, MSONValueMembersTypeSectionRegex)) {
-                return MSONValueMemberSectionType;
+                return MSONValueMembersSectionType;
             }
 
             if (RegexMatch(subject, MSONPropertyMembersTypeSectionRegex)) {
