@@ -89,6 +89,7 @@ TEST_CASE("Parse canonical mson sample list type section", "[mson][type_section]
     "- Sample: 75";
 
     ParseResult<mson::TypeSection> typeSection;
+    typeSection.node.baseType = mson::PrimitiveBaseType;
     SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONTypeSectionSectionType, typeSection);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
@@ -106,6 +107,7 @@ TEST_CASE("Parse array mson sample list type section", "[mson][type_section]")
     "- Sample: 75, 100";
 
     ParseResult<mson::TypeSection> typeSection;
+    typeSection.node.baseType = mson::ValueBaseType;
     SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONTypeSectionSectionType, typeSection);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
@@ -123,12 +125,13 @@ TEST_CASE("Parse array mson sample list type section", "[mson][type_section]")
     REQUIRE(typeSection.node.content.members().at(1).content.value.valueDefinition.values[0].literal == "100");
 }
 
-TEST_CASE("Parse string with comma mson sample list type section", "[mson][type_section]")
+TEST_CASE("Parse mson sample list type section for a string but having values", "[mson][type_section]")
 {
     mdp::ByteBuffer source = \
     "- Sample: 75, 100";
 
     ParseResult<mson::TypeSection> typeSection;
+    typeSection.node.baseType = mson::PrimitiveBaseType;
     SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONTypeSectionSectionType, typeSection);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
@@ -136,6 +139,24 @@ TEST_CASE("Parse string with comma mson sample list type section", "[mson][type_
 
     REQUIRE(typeSection.node.type == mson::SampleTypeSectionType);
     REQUIRE(typeSection.node.content.value == "75, 100");
+    REQUIRE(typeSection.node.content.description.empty());
+    REQUIRE(typeSection.node.content.members().empty());
+}
+
+TEST_CASE("Parse mson sample list type section for an object with a value", "[mson][type_section]")
+{
+    mdp::ByteBuffer source = \
+    "- Sample: 75, 100";
+
+    ParseResult<mson::TypeSection> typeSection;
+    typeSection.node.baseType = mson::PropertyBaseType;
+    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONTypeSectionSectionType, typeSection);
+
+    REQUIRE(typeSection.report.error.code == Error::OK);
+    REQUIRE(typeSection.report.warnings.size() == 1);
+
+    REQUIRE(typeSection.node.type == mson::SampleTypeSectionType);
+    REQUIRE(typeSection.node.content.value.empty());
     REQUIRE(typeSection.node.content.description.empty());
     REQUIRE(typeSection.node.content.members().empty());
 }
@@ -148,6 +169,7 @@ TEST_CASE("Parse mson sample list type section with values as list items", "[mso
     "  - green\n";
 
     ParseResult<mson::TypeSection> typeSection;
+    typeSection.node.baseType = mson::ValueBaseType;
     SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONTypeSectionSectionType, typeSection);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
@@ -174,6 +196,7 @@ TEST_CASE("Parse multi-line mson sample list type section without newline", "[ms
     " yellow";
 
     ParseResult<mson::TypeSection> typeSection;
+    typeSection.node.baseType = mson::PrimitiveBaseType;
     SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONTypeSectionSectionType, typeSection);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
@@ -194,6 +217,7 @@ TEST_CASE("Parse multi-line mson sample list type section with newline", "[mson]
     "yellow";
 
     ParseResult<mson::TypeSection> typeSection;
+    typeSection.node.baseType = mson::PrimitiveBaseType;
     SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONTypeSectionSectionType, typeSection);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
@@ -213,6 +237,7 @@ TEST_CASE("Parse markdown multi-line mson sample list type section", "[mson][typ
     "  - green";
 
     ParseResult<mson::TypeSection> typeSection;
+    typeSection.node.baseType = mson::PrimitiveBaseType;
     SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONTypeSectionSectionType, typeSection);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
@@ -232,7 +257,8 @@ TEST_CASE("Parse mson sample header type section with values as list items", "[m
     "  - green\n";
 
     ParseResult<mson::TypeSection> typeSection;
-    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONTypeSectionSectionType, typeSection);
+    typeSection.node.baseType = mson::ValueBaseType;
+    SectionParserHelper<mson::TypeSection, MSONTypeSectionHeaderParser>::parse(source, MSONTypeSectionSectionType, typeSection);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());
@@ -258,7 +284,8 @@ TEST_CASE("Parse multi-line mson sample header type section", "[mson][type_secti
     "yellow";
 
     ParseResult<mson::TypeSection> typeSection;
-    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONTypeSectionSectionType, typeSection);
+    typeSection.node.baseType = mson::PrimitiveBaseType;
+    SectionParserHelper<mson::TypeSection, MSONTypeSectionHeaderParser>::parse(source, MSONTypeSectionSectionType, typeSection);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());
@@ -278,7 +305,8 @@ TEST_CASE("Parse multi-line mson sample header type section with multiple nested
     " yellow";
 
     ParseResult<mson::TypeSection> typeSection;
-    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONTypeSectionSectionType, typeSection);
+    typeSection.node.baseType = mson::PrimitiveBaseType;
+    SectionParserHelper<mson::TypeSection, MSONTypeSectionHeaderParser>::parse(source, MSONTypeSectionSectionType, typeSection);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());
@@ -297,7 +325,8 @@ TEST_CASE("Parse markdown multi-line mson sample header type section", "[mson][t
     "  - green";
 
     ParseResult<mson::TypeSection> typeSection;
-    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONTypeSectionSectionType, typeSection);
+    typeSection.node.baseType = mson::PrimitiveBaseType;
+    SectionParserHelper<mson::TypeSection, MSONTypeSectionHeaderParser>::parse(source, MSONTypeSectionSectionType, typeSection);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());

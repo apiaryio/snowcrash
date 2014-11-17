@@ -466,6 +466,21 @@ namespace mson {
         memberType.type = MembersMemberType;
         memberType.content.members = members;
     }
+
+    /**
+     * \brief Build Member Type from a value
+     *
+     * \param value Value of the value member
+     * \param memberType Member type which was built
+     */
+    inline void buildMemberType(const Value& value,
+                                MemberType& memberType) {
+
+        ValueMember valueMember;
+
+        valueMember.valueDefinition.values.push_back(value);
+        buildMemberType(valueMember, memberType);
+    }
 }
 
 #endif

@@ -209,7 +209,10 @@ namespace mson {
 
         /** Constructor */
         TypeSection(const TypeSectionType& type_ = UndefinedTypeSectionType)
-        : type(type_) {}
+        : baseType(UndefinedBaseType), type(type_) {}
+
+        /** Base Type (for the parent of the type section) */
+        BaseType baseType;
 
         /** Denotes the type of the section */
         TypeSectionType type;

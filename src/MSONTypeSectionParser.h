@@ -70,7 +70,27 @@ namespace snowcrash {
             if (assignValues &&
                 (!signature.values.empty() || !signature.value.empty())) {
 
-                // TODO: Build values for sample/default type sections
+                if (out.node.baseType == mson::PrimitiveBaseType) {
+                    out.node.content.value = signature.value;
+                }
+                else if (out.node.baseType == mson::ValueBaseType) {
+
+                    for (size_t i = 0; i < signature.values.size(); i++) {
+
+                        mson::MemberType memberType;
+
+                        mson::buildMemberType(mson::parseValue(signature.values[i]), memberType);
+                        out.node.content.members().push_back(memberType);
+                    }
+                }
+                else {
+
+                    // WARN: sample/default is for an object but it has values in signature
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                    out.report.warnings.push_back(Warning("a type section for an object cannot have value(s) in the signature of the type section",
+                                                          LogicalErrorWarning,
+                                                          sourceMap));
+                }
             }
         }
 
