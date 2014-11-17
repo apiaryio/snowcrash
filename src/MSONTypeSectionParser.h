@@ -92,6 +92,13 @@ namespace snowcrash {
                                                           sourceMap));
                 }
             }
+
+            if (assignValues &&
+                !signature.remainingContent.empty() &&
+                out.node.baseType == mson::PrimitiveBaseType) {
+
+                out.node.content.value += signature.remainingContent;
+            }
         }
 
         NO_DESCRIPTION(mson::TypeSection)
@@ -122,7 +129,7 @@ namespace snowcrash {
             if (RegexMatch(subject, MSONDefaultTypeSectionRegex) ||
                 RegexMatch(subject, MSONSampleTypeSectionRegex)) {
 
-                return MSONTypeSectionSectionType;
+                return MSONSampleDefaultSectionType;
             }
 
             if (RegexMatch(subject, MSONValueMembersTypeSectionRegex)) {

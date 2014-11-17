@@ -42,7 +42,7 @@ namespace snowcrash {
         MSONNamedTypeSectionType,       /// < MSON Named Type
         MSONOneOfSectionType,           /// < MSON One Of
         MSONPropertyMemberSectionType,  /// < MSON Property Member Type
-        MSONTypeSectionSectionType,     /// < MSON Type Section
+        MSONSampleDefaultSectionType,   /// < MSON Sample/Default Type Section
         MSONPropertyMembersSectionType, /// < MSON Property Members Type Section
         MSONValueMembersSectionType,    /// < MSON Value Members Type Section
         MSONValueMemberSectionType,     /// < MSON Value Member Type

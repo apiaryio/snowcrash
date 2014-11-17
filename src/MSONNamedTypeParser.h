@@ -43,7 +43,7 @@ namespace snowcrash {
                                                          SectionParserData& pd,
                                                          const ParseResultRef<mson::NamedType>& out) {
 
-            if ((pd.sectionContext() != MSONTypeSectionSectionType) &&
+            if ((pd.sectionContext() != MSONSampleDefaultSectionType) &&
                 (pd.sectionContext() != MSONPropertyMembersSectionType) &&
                 (pd.sectionContext() != MSONValueMembersSectionType)) {
 

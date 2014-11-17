@@ -22,10 +22,10 @@ namespace snowcrash {
         MarkdownNodeIterator cur = node;
         SectionType parentSectionType = pd.parentSectionContext();
 
+        mson::MemberType memberType;
+
         if (parentSectionType == MSONPropertyMembersSectionType ||
             parentSectionType == MSONValueMembersSectionType) {
-
-            mson::MemberType memberType;
 
             switch (pd.sectionContext()) {
                 case MSONMixinSectionType:
@@ -73,14 +73,57 @@ namespace snowcrash {
                 default:
                     break;
             }
+        }
+        else if (parentSectionType == MSONSampleDefaultSectionType) {
 
-            if (memberType.type != mson::UndefinedMemberType) {
-                out.node.content.members().push_back(memberType);
+            switch (pd.sectionContext()) {
+                case MSONMixinSectionType:
+                case MSONOneOfSectionType:
+                {
+                    // WARN: mixin and oneOf not supported in sample/default
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                    out.report.warnings.push_back(Warning("a sample or default type section cannot have 'mixin' or 'one of' types",
+                                                          LogicalErrorWarning,
+                                                          sourceMap));
+                    break;
+                }
+
+                case MSONSectionType:
+                {
+                    if (out.node.baseType == mson::PrimitiveBaseType) {
+
+                        if (!out.node.content.value.empty()) {
+                            TwoNewLines(out.node.content.value);
+                        }
+
+                        out.node.content.value += mdp::MapBytesRangeSet(node->sourceMap, pd.sourceData);
+                        cur = ++MarkdownNodeIterator(node);
+                    }
+                    else if (out.node.baseType == mson::ValueBaseType) {
+
+                        IntermediateParseResult<mson::ValueMember> valueMember(out.report);
+                        cur = MSONValueMemberParser::parse(node, siblings, pd, valueMember);
+
+                        mson::buildMemberType(valueMember.node, memberType);
+                    }
+                    else if (out.node.baseType == mson::PropertyBaseType) {
+
+                        IntermediateParseResult<mson::PropertyMember> propertyMember(out.report);
+                        cur = MSONPropertyMemberParser::parse(node, siblings, pd, propertyMember);
+
+                        mson::buildMemberType(propertyMember.node, memberType);
+                    }
+
+                    break;
+                }
+
+                default:
+                    break;
             }
         }
-        else if (parentSectionType == MSONTypeSectionSectionType) {
 
-            // TODO: Build sample/default type sections
+        if (memberType.type != mson::UndefinedMemberType) {
+            out.node.content.members().push_back(memberType);
         }
 
         return cur;
