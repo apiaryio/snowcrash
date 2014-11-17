@@ -97,9 +97,9 @@ TEST_CASE("Parse mson value member with block description, default and sample", 
     REQUIRE(valueMember.node.sections[0].type == mson::BlockDescriptionTypeSectionType);
     REQUIRE(valueMember.node.sections[0].content.description == "Which is also very nice\n\n- and awesome\n");
     REQUIRE(valueMember.node.sections[1].type == mson::DefaultTypeSectionType);
-    REQUIRE(valueMember.node.sections[1].content.members().size() == 1);
+    REQUIRE(valueMember.node.sections[1].content.value == "yellow");
     REQUIRE(valueMember.node.sections[2].type == mson::SampleTypeSectionType);
-    REQUIRE(valueMember.node.sections[2].content.members().size() == 1);
+    REQUIRE(valueMember.node.sections[2].content.value == "green\n");
 }
 
 TEST_CASE("Parse mson value member array with sample", "[mson][value_member]")
@@ -121,7 +121,7 @@ TEST_CASE("Parse mson value member array with sample", "[mson][value_member]")
 
     REQUIRE(valueMember.node.description == "List of colors");
     REQUIRE(valueMember.node.valueDefinition.values.empty());
-    REQUIRE(valueMember.node.sections.size() == 3);
+    REQUIRE(valueMember.node.sections.size() == 2);
     REQUIRE(valueMember.node.sections[0].type == mson::BlockDescriptionTypeSectionType);
     REQUIRE(valueMember.node.sections[0].content.description == "Lots and lots of them\n");
     REQUIRE(valueMember.node.sections[1].type == mson::SampleTypeSectionType);
@@ -162,6 +162,7 @@ TEST_CASE("Parse mson value member array with items", "[mson][value_member]")
     REQUIRE(valueMember.node.valueDefinition.typeDefinition.typeSpecification.name.name == mson::ArrayTypeName);
     REQUIRE(valueMember.node.sections.size() == 1);
 
+    REQUIRE(valueMember.node.sections[0].content.description.empty());
     REQUIRE(valueMember.node.sections[0].type == mson::MemberTypeSectionType);
     REQUIRE(valueMember.node.sections[0].content.members().size() == 2);
     REQUIRE(valueMember.node.sections[0].content.members().at(0).type == mson::ValueMemberType);

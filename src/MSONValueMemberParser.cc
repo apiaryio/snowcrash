@@ -6,8 +6,9 @@
 //  Copyright (c) 2014 Apiary Inc. All rights reserved.
 //
 
-#include "MSONValueMemberParser.h"
+#include "MSONPropertyMemberParser.h"
 #include "MSONTypeSectionParser.h"
+#include "MSONValueMemberParser.h"
 
 namespace snowcrash {
 
@@ -17,18 +18,74 @@ namespace snowcrash {
                                                                                    SectionParserData& pd,
                                                                                    const ParseResultRef<mson::ValueMember>& out) {
 
-        if ((pd.sectionContext() != MSONSampleDefaultSectionType) &&
-            (pd.sectionContext() != MSONPropertyMembersSectionType) &&
-            (pd.sectionContext() != MSONValueMembersSectionType)) {
+        if (pd.sectionContext() == MSONSectionType) {
 
-            return node;
+            if (node->type == mdp::ListItemMarkdownNodeType &&
+                (out.node.sections.empty() ||
+                 (out.node.sections.size() == 1 &&
+                  out.node.sections[0].type == mson::MemberTypeSectionType))) {
+
+                // Build a section to indicate nested members
+                if (out.node.sections.empty()) {
+
+                    mson::TypeSection typeSection(mson::MemberTypeSectionType);
+                    out.node.sections.push_back(typeSection);
+                }
+
+                MarkdownNodeIterator cur = node;
+                mson::MemberType memberType;
+
+                switch (out.node.valueDefinition.typeDefinition.baseType) {
+                    case mson::PrimitiveBaseType:
+                    {
+                        //WARN: Primitive type members should not have nested members
+                        mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                        out.report.warnings.push_back(Warning("primitive base type members should not have nested members",
+                                                              LogicalErrorWarning,
+                                                              sourceMap));
+                        break;
+                    }
+
+                    case mson::PropertyBaseType:
+                    {
+                        IntermediateParseResult<mson::PropertyMember> propertyMember(out.report);
+                        cur = MSONPropertyMemberParser::parse(node, siblings, pd, propertyMember);
+
+                        mson::buildMemberType(propertyMember.node, memberType);
+                        break;
+                    }
+
+                    case mson::ValueBaseType:
+                    {
+                        IntermediateParseResult<mson::ValueMember> valueMember(out.report);
+                        cur = MSONValueMemberParser::parse(node, siblings, pd, valueMember);
+
+                        mson::buildMemberType(valueMember.node, memberType);
+                        break;
+                    }
+
+                    default:
+                        break;
+                }
+
+                if (memberType.type != mson::UndefinedMemberType) {
+                    out.node.sections[0].content.members().push_back(memberType);
+                }
+
+                return cur;
+            }
+
+            SectionProcessor<mson::ValueMember>::processDescription(node, siblings, pd, out);
         }
+        else {
 
-        IntermediateParseResult<mson::TypeSection> typeSection(out.report);
+            IntermediateParseResult<mson::TypeSection> typeSection(out.report);
+            typeSection.node.baseType = out.node.valueDefinition.typeDefinition.baseType;
 
-        MSONTypeSectionListParser::parse(node, siblings, pd, typeSection);
+            MSONTypeSectionListParser::parse(node, siblings, pd, typeSection);
 
-        out.node.sections.push_back(typeSection.node);
+            out.node.sections.push_back(typeSection.node);
+        }
 
         return ++MarkdownNodeIterator(node);
     }
@@ -40,7 +97,11 @@ namespace snowcrash {
 
         // Check if mson type section section
         nestedType = SectionProcessor<mson::TypeSection>::sectionType(node);
-        
-        return nestedType;
+
+        if (nestedType != UndefinedSectionType) {
+            return nestedType;
+        }
+
+        return MSONSectionType;
     }
 }
