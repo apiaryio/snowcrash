@@ -78,6 +78,19 @@ namespace snowcrash {
 
     };
 
+    /** Functor implementation to check Headers duplicity */
+    struct HeaderValuePresentedChecker : public ValidateFunctorBase {
+
+        const Header& header;
+
+        explicit HeaderValuePresentedChecker(const Header& header) 
+            : header(header) {}
+
+        virtual bool operator()() const;
+        virtual std::string getMessage() const;
+
+    };
+
     /** Functor receive and invoke individual Validators and conditionaly push reports  */
     struct HeaderParserValidator {
 
@@ -194,16 +207,15 @@ namespace snowcrash {
                                     const ParseResultRef<Headers>& out,
                                     const mdp::CharactersRangeSet sourceMap) {
 
-            std::string re = "^[[:blank:]]*([^:[:blank:]]+)[[:blank:]]*(:|[[:blank:]]+)(.*)$";
+            std::string re = " *([^:[:blank:]]+)(( *:? *)(.*)?)$";
 
             CaptureGroups parts;
-            bool matched = RegexCapture(line, re, parts, 4);
+            bool matched = RegexCapture(line, re, parts, 5);
 
             if (!matched)
                 return false;
 
-            header = std::make_pair(parts[1], parts[3]);
-            TrimString(header.first);
+            header = std::make_pair(parts[1], parts[4]);
             TrimString(header.second);
 
             HeaderParserValidator validate(out, sourceMap);
@@ -211,8 +223,9 @@ namespace snowcrash {
             validate(HeaderNameTokenChecker(header.first));
             validate(ColonPresentedChecker(parts));
             validate(HeadersDuplicateChecker(header, out.node));
+            validate(HeaderValuePresentedChecker(header));
 
-            return (!header.first.empty() && !header.second.empty());
+            return !header.first.empty();
         }
 
         /** Retrieve headers from content */

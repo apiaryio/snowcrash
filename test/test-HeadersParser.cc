@@ -95,13 +95,16 @@ TEST_CASE("parse malformed headers fixture", "[headers]")
     REQUIRE(headers.report.error.code == Error::OK);
     REQUIRE(headers.report.warnings.size() == 1); // malformed header
 
-    REQUIRE(headers.node.size() == 2);
+    REQUIRE(headers.node.size() == 3);
     REQUIRE(headers.node[0].first == "Content-Type");
     REQUIRE(headers.node[0].second == "application/json");
     REQUIRE(headers.node[1].first == "X-My-Header");
     REQUIRE(headers.node[1].second == "Hello World!");
+    REQUIRE(headers.node[2].first == "X-Custom-Header");
+    REQUIRE(headers.node[2].second == "");
 
-    REQUIRE(headers.sourceMap.collection.size() == 2);
+    REQUIRE(headers.sourceMap.collection.size() == 3);
+
     REQUIRE(headers.sourceMap.collection[0].sourceMap.size() == 3);
     REQUIRE(headers.sourceMap.collection[0].sourceMap[0].location == 15);
     REQUIRE(headers.sourceMap.collection[0].sourceMap[0].length == 35);
@@ -109,6 +112,7 @@ TEST_CASE("parse malformed headers fixture", "[headers]")
     REQUIRE(headers.sourceMap.collection[0].sourceMap[1].length == 30);
     REQUIRE(headers.sourceMap.collection[0].sourceMap[2].location == 88);
     REQUIRE(headers.sourceMap.collection[0].sourceMap[2].length == 21);
+
     REQUIRE(headers.sourceMap.collection[1].sourceMap.size() == 3);
     REQUIRE(headers.sourceMap.collection[1].sourceMap[0].location == 15);
     REQUIRE(headers.sourceMap.collection[1].sourceMap[0].length == 35);
@@ -116,6 +120,14 @@ TEST_CASE("parse malformed headers fixture", "[headers]")
     REQUIRE(headers.sourceMap.collection[1].sourceMap[1].length == 30);
     REQUIRE(headers.sourceMap.collection[1].sourceMap[2].location == 88);
     REQUIRE(headers.sourceMap.collection[1].sourceMap[2].length == 21);
+
+    REQUIRE(headers.sourceMap.collection[2].sourceMap.size() == 3);
+    REQUIRE(headers.sourceMap.collection[2].sourceMap[0].location == 15);
+    REQUIRE(headers.sourceMap.collection[2].sourceMap[0].length == 35);
+    REQUIRE(headers.sourceMap.collection[2].sourceMap[1].location == 54);
+    REQUIRE(headers.sourceMap.collection[2].sourceMap[1].length == 30);
+    REQUIRE(headers.sourceMap.collection[2].sourceMap[2].location == 88);
+    REQUIRE(headers.sourceMap.collection[2].sourceMap[2].length == 21);
 }
 
 TEST_CASE("Parse header section composed of multiple blocks", "[headers]")
@@ -347,7 +359,7 @@ TEST_CASE("Allow parse nonvalid headers, provide apropriate warning", "[headers]
     SECTION("Header has no value - just name") {
         const mdp::ByteBuffer source = \
         "+ Headers\n\n"\
-        "        Header\n";
+        "        Header:\n";
 
         ParseResult<Headers> headers;
         SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
@@ -356,6 +368,25 @@ TEST_CASE("Allow parse nonvalid headers, provide apropriate warning", "[headers]
 
         REQUIRE(headers.report.warnings.size() == 1);    // warning - header name is not defined correctly
         REQUIRE(headers.report.warnings[0].message == "HTTP header has no value");    
+
+        REQUIRE(headers.node.size() == 1);
+        REQUIRE(headers.node[0].first == "Header");
+        REQUIRE(headers.node[0].second == "");
+    }
+
+    SECTION("Header has no value and there is no colon presented ") {
+        const mdp::ByteBuffer source = \
+        "+ Headers\n\n"\
+        "        Header\n";
+
+        ParseResult<Headers> headers;
+        SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
+
+        REQUIRE(headers.report.error.code == Error::OK); // no error
+
+        REQUIRE(headers.report.warnings.size() == 2);
+        REQUIRE(headers.report.warnings[0].message == "missing colon after header name");    
+        REQUIRE(headers.report.warnings[1].message == "HTTP header has no value");    
 
         REQUIRE(headers.node.size() == 1);
         REQUIRE(headers.node[0].first == "Header");

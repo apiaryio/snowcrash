@@ -64,7 +64,7 @@ std::string HeaderNameTokenChecker::getMessage() const {
 
 bool ColonPresentedChecker::operator()() const {
 
-    return captures[2].size() >= 1 && captures[2][0] == ':';
+    return captures[3].size() >= 1 && (captures[3].find(':') != std::string::npos);
 }
 
 std::string ColonPresentedChecker::getMessage() const {
@@ -84,6 +84,16 @@ std::string HeadersDuplicateChecker::getMessage() const {
     ss << "duplicate definition of '" << header.first << "' header";
 
     return ss.str();
+}
+
+bool HeaderValuePresentedChecker::operator()() const {
+
+    return !header.second.empty();
+}
+
+std::string HeaderValuePresentedChecker::getMessage() const {
+
+    return "HTTP header has no value";
 }
 
 bool HeaderParserValidator::operator()(const ValidateFunctorBase& rule) {
