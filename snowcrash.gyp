@@ -107,7 +107,8 @@
         'src/SourceAnnotation.h',
         'src/StringUtility.h',
         'src/ValuesParser.h',
-        'src/Version.h'
+        'src/Version.h',
+        'src/ResolutionService.h'
       ],
       'conditions': [
         [ 'OS=="win"',
@@ -150,6 +151,7 @@
         'test/test-UriTemplateParser.cc',
         'test/test-ValuesParser.cc',
         'test/test-Warnings.cc',
+        'test/test-Resolutions.cc',
         'test/test-csnowcrash.cc',
         'test/test-snowcrash.cc'
       ],

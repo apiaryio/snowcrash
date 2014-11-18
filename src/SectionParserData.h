@@ -23,7 +23,8 @@ namespace snowcrash {
     enum BlueprintParserOption {
         RenderDescriptionsOption = (1 << 0),    /// < Render Markdown in description.
         RequireBlueprintNameOption = (1 << 1),  /// < Treat missing blueprint name as error
-        ExportSourcemapOption = (1 << 2)        /// < Export source maps AST
+        ExportSourcemapOption = (1 << 2),        /// < Export source maps AST
+        ResolveWarningsAndErrorsOption = (1 << 3) /// < Provide resolutions for warnings and errors
     };
 
     typedef unsigned int BlueprintParserOptions;
