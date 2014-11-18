@@ -69,21 +69,21 @@ namespace snowcrash {
                 (out.node.sections.size() == 1 &&
                  out.node.sections[0].type == mson::BlockDescriptionTypeSectionType)) {
 
-                    if (out.node.sections.empty()) {
+                if (out.node.sections.empty()) {
 
-                        mson::TypeSection typeSection(mson::BlockDescriptionTypeSectionType);
-                        out.node.sections.push_back(typeSection);
-                    }
-
-                    if (!out.node.sections[0].content.description.empty()) {
-                        TwoNewLines(out.node.sections[0].content.description);
-                    }
-
-                    mdp::ByteBuffer content = mdp::MapBytesRangeSet(node->sourceMap, pd.sourceData);
-                    out.node.sections[0].content.description += content;
-                    
-                    return ++MarkdownNodeIterator(node);
+                    mson::TypeSection typeSection(mson::BlockDescriptionTypeSectionType);
+                    out.node.sections.push_back(typeSection);
                 }
+
+                if (!out.node.sections[0].content.description.empty()) {
+                    TwoNewLines(out.node.sections[0].content.description);
+                }
+
+                mdp::ByteBuffer content = mdp::MapBytesRangeSet(node->sourceMap, pd.sourceData);
+                out.node.sections[0].content.description += content;
+                    
+                return ++MarkdownNodeIterator(node);
+            }
             
             return node;
         }

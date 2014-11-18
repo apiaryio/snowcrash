@@ -93,15 +93,6 @@ namespace snowcrash {
     /** Implementation of nestedSectionType */
     SectionType SectionProcessor<mson::PropertyMember>::nestedSectionType(const MarkdownNodeIterator& node) {
 
-        SectionType nestedType = UndefinedSectionType;
-
-        // Check if mson type section section
-        nestedType = SectionProcessor<mson::TypeSection>::sectionType(node);
-
-        if (nestedType != UndefinedSectionType) {
-            return nestedType;
-        }
-
-        return MSONSectionType;
+        return SectionProcessor<mson::ValueMember>::nestedSectionType(node);
     }
 }
