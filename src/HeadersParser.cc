@@ -36,12 +36,38 @@ static bool isAllowedMultipleDefinition(const Header& header) {
         std::bind1st(MatchFirstWith<Header, std::string, IEqual<std::string> >(), header)) != keys.end();
 }
 
-bool ColonChecker::operator()() const {
+static bool isNotValidTokenChar(const std::string::value_type& c) {
+    static const std::string validChars("-#$%&'*+.^_`|~");
+
+    return !(std::isalnum(c) || (validChars.find(c) != std::string::npos));
+}
+
+static std::string::const_iterator findNonValidCharInHeaderName(const std::string& token) {
+
+    return std::find_if(token.begin(), token.end(), isNotValidTokenChar);
+}
+
+bool HeaderNameTokenChecker::operator()() const {
+
+  return findNonValidCharInHeaderName(headerName) == headerName.end();
+}
+
+std::string HeaderNameTokenChecker::getMessage() const {
+
+    std::stringstream ss;
+    ss << "HTTP header field name contain illegal character '" 
+        << *findNonValidCharInHeaderName(headerName)
+        << "'";
+
+    return ss.str();
+}
+
+bool ColonPresentedChecker::operator()() const {
 
     return captures[2].size() >= 1 && captures[2][0] == ':';
 }
 
-std::string ColonChecker::getMessage() const {
+std::string ColonPresentedChecker::getMessage() const {
 
     return "missing colon after header name";
 }

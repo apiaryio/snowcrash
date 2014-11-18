@@ -40,12 +40,23 @@ namespace snowcrash {
 
     };
 
+    /** Functor implementation for check header name is valid token according to specification \see http://tools.ietf.org/html/rfc7230#section-3.2.6 */
+    struct HeaderNameTokenChecker : public ValidateFunctorBase {
+
+        const std::string& headerName;
+
+        explicit HeaderNameTokenChecker(const std::string& headerName) : headerName(headerName) {}
+
+        virtual bool operator()() const;
+        virtual std::string getMessage() const;
+    };
+
     /** Functor implementation for check header contains colon character between name and value */
-    struct ColonChecker : public ValidateFunctorBase {
+    struct ColonPresentedChecker : public ValidateFunctorBase {
 
         const CaptureGroups& captures;
 
-        explicit ColonChecker(const CaptureGroups& captures) : captures(captures) {}
+        explicit ColonPresentedChecker(const CaptureGroups& captures) : captures(captures) {}
 
         virtual bool operator()() const;
         virtual std::string getMessage() const;
@@ -183,9 +194,7 @@ namespace snowcrash {
                                     const ParseResultRef<Headers>& out,
                                     const mdp::CharactersRangeSet sourceMap) {
 
-#define HEADER_NAME_TOKEN "[[:alnum:]!#$%&'*+-.^_`|~]+"
-            std::string re = "^[[:blank:]]*(" HEADER_NAME_TOKEN ")[[:blank:]]*(:|[[:blank:]]+)(.*)$";
-#undef HEADER_NAME_TOKEN
+            std::string re = "^[[:blank:]]*([^:[:blank:]]+)[[:blank:]]*(:|[[:blank:]]+)(.*)$";
 
             CaptureGroups parts;
             bool matched = RegexCapture(line, re, parts, 4);
@@ -199,7 +208,8 @@ namespace snowcrash {
 
             HeaderParserValidator validate(out, sourceMap);
         
-            validate(ColonChecker(parts));
+            validate(HeaderNameTokenChecker(header.first));
+            validate(ColonPresentedChecker(parts));
             validate(HeadersDuplicateChecker(header, out.node));
 
             return (!header.first.empty() && !header.second.empty());

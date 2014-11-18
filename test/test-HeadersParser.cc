@@ -327,11 +327,12 @@ TEST_CASE("Headers should  name against token definition", "[headers][issue][#15
 
         REQUIRE(headers.report.error.code == Error::OK); // no error
 
-        REQUIRE(headers.report.warnings.size() == 2);    // warning - header is not defined correctly
-        REQUIRE(headers.report.warnings[0].message == "unable to parse HTTP header, expected '<header name> : <header value>', one header per line");    
-        REQUIRE(headers.report.warnings[1].message == "no headers specified");    
+        REQUIRE(headers.report.warnings.size() == 1);    // warning - header name is not defined correctly
+        REQUIRE(headers.report.warnings[0].message == "HTTP header field name contain illegal character '<'");    
 
-        REQUIRE(headers.node.empty());
+        REQUIRE(headers.node.size() == 1);
+        REQUIRE(headers.node[0].first == "<Header>");
+        REQUIRE(headers.node[0].second == "chocolate cookie");
     }
 
 }
