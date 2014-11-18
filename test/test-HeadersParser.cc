@@ -255,13 +255,32 @@ TEST_CASE("Aditional test for Header name insenstivity combined with allowed mul
     REQUIRE(headers.node[1].second == "kockaprede");
 }
 
-TEST_CASE("Headers should  name against token definition", "[headers][issue][#158]")
+TEST_CASE("Missing or wrong placed colon in header definition", "[headers][issue][#158]")
 {
 
-    SECTION("Forget semicolon - but there at least one colon in value") {
+
+    SECTION("No colon") {
+        const mdp::ByteBuffer source = \
+        "+ Headers\n\n"\
+        "        Set-Cookie chocolate cookie\n";
+
+        ParseResult<Headers> headers;
+        SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
+
+        REQUIRE(headers.report.error.code == Error::OK); // no error
+
+        REQUIRE(headers.report.warnings.size() == 1);    // warning - header is not defined correctly
+        REQUIRE(headers.report.warnings[0].message == "missing colon after header name");
+
+        REQUIRE(headers.node[0].first == "Set-Cookie");
+        REQUIRE(headers.node[0].second == "chocolate cookie");
+    }
+
+    SECTION("Missing colon - but there is another in value") {
         const mdp::ByteBuffer source = \
         "+ Headers\n\n"\
         "        Last-Modified Sat, 02 Aug 2014 23:10:05 GMT\n";
+
         ParseResult<Headers> headers;
         SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
 
@@ -274,26 +293,11 @@ TEST_CASE("Headers should  name against token definition", "[headers][issue][#15
         REQUIRE(headers.node[0].second == "Sat, 02 Aug 2014 23:10:05 GMT");
     }
 
-    SECTION("No colon") {
-        const mdp::ByteBuffer source = \
-        "+ Headers\n\n"\
-        "        Set-Cookie chocolate cookie\n";
-        ParseResult<Headers> headers;
-        SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
-
-        REQUIRE(headers.report.error.code == Error::OK); // no error
-
-        REQUIRE(headers.report.warnings.size() == 1);    // warning - header is not defined correctly
-        REQUIRE(headers.report.warnings[0].message == "missing colon after header name");
-
-        REQUIRE(headers.node[0].first == "Set-Cookie");
-        REQUIRE(headers.node[0].second == "chocolate cookie");
-    }
-
     SECTION("More colons") {
         const mdp::ByteBuffer source = \
         "+ Headers\n\n"\
         "        Set-Cookie :: chocolate cookie\n";
+
         ParseResult<Headers> headers;
         SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
 
@@ -303,11 +307,15 @@ TEST_CASE("Headers should  name against token definition", "[headers][issue][#15
         REQUIRE(headers.node[0].first == "Set-Cookie");
         REQUIRE(headers.node[0].second == ": chocolate cookie");
     }
+}
+
+TEST_CASE("Allow parse nonvalid headers, provide apropriate warning", "[headers][issue][#158]") {
 
     SECTION("Strange but valid token") {
         const mdp::ByteBuffer source = \
         "+ Headers\n\n"\
         "        # : chocolate cookie\n";
+
         ParseResult<Headers> headers;
         SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
 
@@ -318,10 +326,11 @@ TEST_CASE("Headers should  name against token definition", "[headers][issue][#15
         REQUIRE(headers.node[0].second == "chocolate cookie");
     }
 
-    SECTION("invalid header name") {
+    SECTION("Invalid characters in header name") {
         const mdp::ByteBuffer source = \
         "+ Headers\n\n"\
         "        <Header> : chocolate cookie\n";
+
         ParseResult<Headers> headers;
         SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
 
@@ -333,6 +342,24 @@ TEST_CASE("Headers should  name against token definition", "[headers][issue][#15
         REQUIRE(headers.node.size() == 1);
         REQUIRE(headers.node[0].first == "<Header>");
         REQUIRE(headers.node[0].second == "chocolate cookie");
+    }
+
+    SECTION("Header has no value - just name") {
+        const mdp::ByteBuffer source = \
+        "+ Headers\n\n"\
+        "        Header\n";
+
+        ParseResult<Headers> headers;
+        SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
+
+        REQUIRE(headers.report.error.code == Error::OK); // no error
+
+        REQUIRE(headers.report.warnings.size() == 1);    // warning - header name is not defined correctly
+        REQUIRE(headers.report.warnings[0].message == "HTTP header has no value");    
+
+        REQUIRE(headers.node.size() == 1);
+        REQUIRE(headers.node[0].first == "Header");
+        REQUIRE(headers.node[0].second == "");
     }
 
 }
