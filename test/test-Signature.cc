@@ -505,3 +505,22 @@ TEST_CASE("Identifier and values only", "[signature]")
     REQUIRE(signature.content.empty());
     REQUIRE(signature.remainingContent.empty());
 }
+
+TEST_CASE("Identifier with an underscore", "[signature]")
+{
+    ParseResult<Blueprint> blueprint;
+    scpl::Signature signature = SignatureParserHelper::parse("site_admin: false (boolean, default)", blueprint, PropertyMemberTypeTraits);
+
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.empty());
+
+    REQUIRE(signature.identifier == "site_admin");
+    REQUIRE(signature.value == "false");
+    REQUIRE(signature.values.size() == 1);
+    REQUIRE(signature.values[0] == "false");
+    REQUIRE(signature.attributes.size() == 2);
+    REQUIRE(signature.attributes[0] == "boolean");
+    REQUIRE(signature.attributes[1] == "default");
+    REQUIRE(signature.content.empty());
+    REQUIRE(signature.remainingContent.empty());
+}

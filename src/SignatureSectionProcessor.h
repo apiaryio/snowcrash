@@ -191,7 +191,7 @@ namespace scpl {
                 if (escapeCharacters.find(subject[i]) != std::string::npos) {
 
                     // If escaped string, retrieve it and strip it from the subject
-                    mdp::ByteBuffer escapedString = snowcrash::RetrieveEscaped(subject);
+                    mdp::ByteBuffer escapedString = snowcrash::RetrieveEscaped(subject, i);
 
                     if (!escapedString.empty()) {
                         identifier += escapedString;
