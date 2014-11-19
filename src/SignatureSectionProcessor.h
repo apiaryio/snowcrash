@@ -99,7 +99,7 @@ namespace scpl {
 
                     // WARN: Empty identifier
                     mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                    report.warnings.push_back(snowcrash::Warning("empty identifier",
+                    report.warnings.push_back(snowcrash::Warning("no identifier specified",
                                                                  snowcrash::EmptyDefinitionWarning,
                                                                  sourceMap));
                 }
@@ -123,7 +123,7 @@ namespace scpl {
 
                         // WARN: Empty values
                         mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                        report.warnings.push_back(snowcrash::Warning("empty values",
+                        report.warnings.push_back(snowcrash::Warning("no values specified",
                                                                      snowcrash::EmptyDefinitionWarning,
                                                                      sourceMap));
                     }
@@ -244,6 +244,7 @@ namespace scpl {
                                          mdp::ByteBuffer& subject,
                                          Signature& out) {
 
+            // Remove leading delimiter
             subject = subject.substr(1);
             snowcrash::TrimString(subject);
 
@@ -306,7 +307,7 @@ namespace scpl {
 
             snowcrash::TrimString(subject);
 
-            // Fill signature.value by finding the string which was stripped
+            // Fill signature value with the string which was stripped from subject
             out.value = out.value.substr(0, out.value.length() - subject.length());
 
             snowcrash::TrimString(out.value);

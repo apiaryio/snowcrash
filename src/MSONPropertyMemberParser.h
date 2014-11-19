@@ -81,10 +81,10 @@ namespace snowcrash {
 
                 mdp::ByteBuffer content = mdp::MapBytesRangeSet(node->sourceMap, pd.sourceData);
                 out.node.sections[0].content.description += content;
-                    
+
                 return ++MarkdownNodeIterator(node);
             }
-            
+
             return node;
         }
 
@@ -105,7 +105,7 @@ namespace snowcrash {
 
         static SectionType nestedSectionType(const MarkdownNodeIterator&);
     };
-    
+
     /** MSON Property Member Section Parser */
     typedef SectionParser<mson::PropertyMember, ListSectionAdapter> MSONPropertyMemberParser;
 }

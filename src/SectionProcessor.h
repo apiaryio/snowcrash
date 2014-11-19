@@ -13,7 +13,8 @@
 #include "SourceAnnotation.h"
 #include "Signature.h"
 
-#define NO_DESCRIPTION(T)\
+// Use the following macro whenever a section doesn't have description
+#define NO_SECTION_DESCRIPTION(T)\
 static MarkdownNodeIterator processDescription(const MarkdownNodeIterator& node,\
                                                const MarkdownNodes& siblings,\
                                                SectionParserData& pd,\

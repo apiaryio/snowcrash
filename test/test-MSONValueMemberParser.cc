@@ -142,6 +142,9 @@ TEST_CASE("Parse mson value member with multiple values", "[mson][value_member]"
     REQUIRE(valueMember.node.description.empty());
     REQUIRE(valueMember.node.sections.empty());
     REQUIRE(valueMember.node.valueDefinition.values.size() == 3);
+    REQUIRE(valueMember.node.valueDefinition.values[0].literal == "1");
+    REQUIRE(valueMember.node.valueDefinition.values[1].literal == "yellow");
+    REQUIRE(valueMember.node.valueDefinition.values[2].literal == "true");
 }
 
 TEST_CASE("Parse mson value member array with items", "[mson][value_member]")

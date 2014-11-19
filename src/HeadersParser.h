@@ -43,7 +43,7 @@ namespace snowcrash {
             return ++MarkdownNodeIterator(node);
         }
 
-        NO_DESCRIPTION(Headers)
+        NO_SECTION_DESCRIPTION(Headers)
 
         static MarkdownNodeIterator processContent(const MarkdownNodeIterator& node,
                                                    const MarkdownNodes& siblings,

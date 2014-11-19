@@ -58,7 +58,7 @@ namespace snowcrash {
             return ++MarkdownNodeIterator(node);
         }
 
-        NO_DESCRIPTION(Parameters)
+        NO_SECTION_DESCRIPTION(Parameters)
 
         static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
                                                          const MarkdownNodes& siblings,

@@ -9,13 +9,16 @@
 #ifndef SNOWCRASH_MSON_H
 #define SNOWCRASH_MSON_H
 
-#include <deque>
+#include <vector>
 #include <string>
 #include <map>
+#include <stdexcept>
 
 #include "Platform.h"
 #include "MarkdownParser.h"
 #include "BlueprintSourcemap.h"
+
+#define MEMBERS_NOT_SET_ERR std::logic_error("no members set")
 
 /**
  * MSON Abstract Syntax Tree
@@ -61,7 +64,7 @@ namespace mson {
     };
 
     /** Collection of values */
-    typedef std::deque<Value> Values;
+    typedef std::vector<Value> Values;
 
     /** Type symbol (identifier) */
     struct Symbol {
@@ -103,7 +106,7 @@ namespace mson {
     };
 
     /** Collection of type names */
-    typedef std::deque<TypeName> TypeNames;
+    typedef std::vector<TypeName> TypeNames;
 
     /** Attribute of a type */
     enum TypeAttribute {
@@ -130,7 +133,7 @@ namespace mson {
         snowcrash::Reference reference;
 
         /** References for the nested types */
-        std::deque<snowcrash::Reference> nestedReferences;
+        std::vector<snowcrash::Reference> nestedReferences;
     };
 
     /** Definition of an instance of a type */
@@ -164,7 +167,7 @@ namespace mson {
     struct MemberType;
 
     /** Collection of member types */
-    typedef std::deque<MemberType> MemberTypes;
+    typedef std::vector<MemberType> MemberTypes;
 
     /** Type of a type section */
     enum TypeSectionType {
@@ -189,7 +192,7 @@ namespace mson {
         const MemberTypes& members() const;
 
         /** Constructor */
-        TypeSectionContent(const Markdown& description_ = "", const Literal& value_ = "");
+        TypeSectionContent(const Markdown& description_ = Markdown(), const Literal& value_ = Literal());
 
         /** Copy constructor */
         TypeSectionContent(const TypeSectionContent& rhs);
@@ -222,7 +225,7 @@ namespace mson {
     };
 
     /** Collection of type sections */
-    typedef std::deque<TypeSection> TypeSections;
+    typedef std::vector<TypeSection> TypeSections;
 
     /** User-define named type */
     struct NamedType {
@@ -281,7 +284,7 @@ namespace mson {
         MemberTypes& members();
         const MemberTypes& members() const;
 
-        /** Set members from member types */
+        /** Builds the member structures from the list of member types */
         Members& operator=(const MemberTypes& rhs);
 
         /** Constructor */

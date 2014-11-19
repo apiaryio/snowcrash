@@ -67,7 +67,7 @@ namespace snowcrash {
             return node;
         }
 
-        NO_DESCRIPTION(Values)
+        NO_SECTION_DESCRIPTION(Values)
 
         static SectionType sectionType(const MarkdownNodeIterator& node) {
 

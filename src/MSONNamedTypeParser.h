@@ -107,15 +107,15 @@ namespace snowcrash {
                 SectionProcessor<mson::NamedType>::processDescription(node, siblings, pd, out);
             }
             else {
-                
+
                 IntermediateParseResult<mson::TypeSection> typeSection(out.report);
                 typeSection.node.baseType = out.node.base.baseType;
-                
+
                 MSONTypeSectionListParser::parse(node, siblings, pd, typeSection);
-                
+
                 out.node.sections.push_back(typeSection.node);
             }
-            
+
             return ++MarkdownNodeIterator(node);
         }
 
@@ -144,7 +144,7 @@ namespace snowcrash {
 
                 return ++MarkdownNodeIterator(node);
             }
-            
+
             return node;
         }
 
@@ -164,7 +164,7 @@ namespace snowcrash {
             return SectionProcessor<mson::ValueMember>::nestedSectionType(node);
         }
     };
-    
+
     /** MSON Named Type Section Parser */
     typedef SectionParser<mson::NamedType, HeaderSectionAdapter> MSONNamedTypeParser;
 }

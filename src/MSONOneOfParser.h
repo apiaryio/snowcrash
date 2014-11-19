@@ -33,7 +33,7 @@ namespace snowcrash {
             return signatureTraits;
         }
 
-        NO_DESCRIPTION(mson::OneOf)
+        NO_SECTION_DESCRIPTION(mson::OneOf)
 
         static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator&,
                                                          const MarkdownNodes&,

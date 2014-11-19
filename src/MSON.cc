@@ -13,7 +13,7 @@ using namespace mson;
 MemberTypes& TypeSectionContent::members()
 {
     if (!m_members.get())
-        throw "no members set";
+        throw MEMBERS_NOT_SET_ERR;
 
     return *m_members;
 }
@@ -21,7 +21,7 @@ MemberTypes& TypeSectionContent::members()
 const MemberTypes& TypeSectionContent::members() const
 {
     if (!m_members.get())
-        throw "no members set";
+        throw MEMBERS_NOT_SET_ERR;
 
     return *m_members;
 }
@@ -55,7 +55,7 @@ TypeSectionContent::~TypeSectionContent()
 MemberTypes& Members::members()
 {
     if (!m_members.get())
-        throw "no members set";
+        throw MEMBERS_NOT_SET_ERR;
 
     return *m_members;
 }
@@ -63,7 +63,7 @@ MemberTypes& Members::members()
 const MemberTypes& Members::members() const
 {
     if (!m_members.get())
-        throw "no members set";
+        throw MEMBERS_NOT_SET_ERR;
 
     return *m_members;
 }

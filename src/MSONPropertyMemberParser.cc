@@ -78,15 +78,15 @@ namespace snowcrash {
             SectionProcessor<mson::PropertyMember>::processDescription(node, siblings, pd, out);
         }
         else {
-            
+
             IntermediateParseResult<mson::TypeSection> typeSection(out.report);
             typeSection.node.baseType = out.node.valueDefinition.typeDefinition.baseType;
-            
+
             MSONTypeSectionListParser::parse(node, siblings, pd, typeSection);
-            
+
             out.node.sections.push_back(typeSection.node);
         }
-        
+
         return ++MarkdownNodeIterator(node);
     }
 

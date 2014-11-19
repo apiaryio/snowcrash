@@ -56,13 +56,13 @@ namespace snowcrash {
 
                 // WARN: invalid mixin base type
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                out.report.warnings.push_back(Warning("mixin type cannot use a non-structure base type",
+                out.report.warnings.push_back(Warning("mixin type may not include a type of a primitive sub-type",
                                                       FormattingWarning,
                                                       sourceMap));
             }
         }
 
-        NO_DESCRIPTION(mson::Mixin)
+        NO_SECTION_DESCRIPTION(mson::Mixin)
 
         static SectionType sectionType(const MarkdownNodeIterator& node) {
 

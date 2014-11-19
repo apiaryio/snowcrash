@@ -174,7 +174,7 @@ namespace snowcrash {
         static void finalize(const MarkdownNodeIterator& node,
                              SectionParserData& pd,
                              const ParseResultRef<Blueprint>& out) {
-     
+
             checkLazyReferencing(pd, out);
 
             if (!out.node.name.empty())

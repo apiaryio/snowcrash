@@ -101,7 +101,7 @@ namespace snowcrash {
             }
         }
 
-        NO_DESCRIPTION(mson::TypeSection)
+        NO_SECTION_DESCRIPTION(mson::TypeSection)
 
         static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator&,
                                                          const MarkdownNodes&,
