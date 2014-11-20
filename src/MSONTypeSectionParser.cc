@@ -33,20 +33,26 @@ namespace snowcrash {
                     IntermediateParseResult<mson::Mixin> mixin(out.report);
                     cur = MSONMixinParser::parse(node, siblings, pd, mixin);
 
-                    mson::buildMemberType(mixin.node, memberType);
+                    memberType.build(mixin.node);
                     break;
                 }
 
                 case MSONOneOfSectionType:
                 {
                     if (parentSectionType != MSONPropertyMembersSectionType) {
+
+                        // WARN: One of can not be a nested member for a non object structure type
+                        mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                        out.report.warnings.push_back(Warning("one-of can not be a nested member for a type not sub typed from object",
+                                                              LogicalErrorWarning,
+                                                              sourceMap));
                         break;
                     }
 
                     IntermediateParseResult<mson::OneOf> oneOf(out.report);
                     cur = MSONOneOfParser::parse(node, siblings, pd, oneOf);
 
-                    mson::buildMemberType(oneOf.node, memberType);
+                    memberType.build(oneOf.node);
                     break;
                 }
 
@@ -57,14 +63,14 @@ namespace snowcrash {
                         IntermediateParseResult<mson::PropertyMember> propertyMember(out.report);
                         cur = MSONPropertyMemberParser::parse(node, siblings, pd, propertyMember);
 
-                        mson::buildMemberType(propertyMember.node, memberType);
+                        memberType.build(propertyMember.node);
                     }
                     else {
 
                         IntermediateParseResult<mson::ValueMember> valueMember(out.report);
                         cur = MSONValueMemberParser::parse(node, siblings, pd, valueMember);
 
-                        mson::buildMemberType(valueMember.node, memberType);
+                        memberType.build(valueMember.node);
                     }
 
                     break;
@@ -81,8 +87,12 @@ namespace snowcrash {
                 case MSONOneOfSectionType:
                 {
                     // WARN: mixin and oneOf not supported in sample/default
+                    std::stringstream ss;
+
+                    ss << "sample and default type sections cannot have `" << SectionName(pd.sectionContext()) << "` type";
+
                     mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                    out.report.warnings.push_back(Warning("a sample or default type section cannot have 'mixin' or 'one of' types",
+                    out.report.warnings.push_back(Warning(ss.str(),
                                                           LogicalErrorWarning,
                                                           sourceMap));
                     break;
@@ -104,14 +114,14 @@ namespace snowcrash {
                         IntermediateParseResult<mson::ValueMember> valueMember(out.report);
                         cur = MSONValueMemberParser::parse(node, siblings, pd, valueMember);
 
-                        mson::buildMemberType(valueMember.node, memberType);
+                        memberType.build(valueMember.node);
                     }
                     else if (out.node.baseType == mson::PropertyBaseType) {
 
                         IntermediateParseResult<mson::PropertyMember> propertyMember(out.report);
                         cur = MSONPropertyMemberParser::parse(node, siblings, pd, propertyMember);
 
-                        mson::buildMemberType(propertyMember.node, memberType);
+                        memberType.build(propertyMember.node);
                     }
 
                     break;

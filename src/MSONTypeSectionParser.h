@@ -78,8 +78,8 @@ namespace snowcrash {
                     for (size_t i = 0; i < signature.values.size(); i++) {
 
                         mson::MemberType memberType;
+                        memberType.build(mson::parseValue(signature.values[i]));
 
-                        mson::buildMemberType(mson::parseValue(signature.values[i]), memberType);
                         out.node.content.members().push_back(memberType);
                     }
                 }
@@ -87,7 +87,7 @@ namespace snowcrash {
 
                     // WARN: sample/default is for an object but it has values in signature
                     mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                    out.report.warnings.push_back(Warning("a type section for an object cannot have value(s) in the signature of the type section",
+                    out.report.warnings.push_back(Warning("a sample and/or default type section for a type which is sub-typed from an object cannot have value(s) beside the keyword",
                                                           LogicalErrorWarning,
                                                           sourceMap));
                 }

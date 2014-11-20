@@ -366,6 +366,14 @@ namespace mson {
         /** Assignment operator */
         MemberType& operator=(const MemberType& rhs);
 
+        /** Functions which allow the building of member type */
+        void build(const PropertyMember& propertyMember);
+        void build(const ValueMember& valueMember);
+        void build(const Mixin& mixin);
+        void build(const OneOf& oneOf);
+        void build(const MemberTypes& memberTypes);
+        void build(const Value& value);
+
         /** Desctructor */
         ~MemberType();
     };

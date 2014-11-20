@@ -128,6 +128,9 @@ TEST_CASE("Parse mson one of with member group")
     ParseResult<mson::OneOf> oneOf;
     SectionParserHelper<mson::OneOf, MSONOneOfParser>::parseMSON(source, MSONOneOfSectionType, oneOf);
 
+    REQUIRE(oneOf.report.error.code == Error::OK);
+    REQUIRE(oneOf.report.warnings.empty());
+
     REQUIRE(oneOf.node.members().size() == 2);
     REQUIRE(oneOf.node.members().at(0).type == mson::PropertyMemberType);
     REQUIRE(oneOf.node.members().at(0).content.property.name.literal == "full_name");

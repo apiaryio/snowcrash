@@ -514,7 +514,7 @@ namespace snowcrash {
                                           const ParseResultRef<Payload>& out) {
 
             SourceMap<ResourceModel> modelSM;
-            ResourceModel model = pd.modelTable.at(out.node.reference.id);
+            ResourceModel model = pd.modelTable.find(out.node.reference.id)->second;
 
 
             out.node.description = model.description;

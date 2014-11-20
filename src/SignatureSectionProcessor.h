@@ -72,7 +72,7 @@ namespace scpl {
          * \param pd Section Parser data
          * \param traits Signature traits of the section signature
          * \param report Parse result report of the section
-         * \param subject The string that needs to be parsed
+         * \param subjectOrig The string that needs to be parsed
          *
          * \return Signature data
          */
@@ -80,9 +80,10 @@ namespace scpl {
                                         snowcrash::SectionParserData& pd,
                                         const SignatureTraits& traits,
                                         snowcrash::Report& report,
-                                        mdp::ByteBuffer subject = "") {
+                                        const mdp::ByteBuffer& subjectOrig = "") {
 
             Signature signature;
+            mdp::ByteBuffer subject = subjectOrig;
 
             if (subject.empty()) {
 

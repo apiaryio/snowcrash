@@ -80,7 +80,7 @@ namespace snowcrash {
                                  IntermediateParseResult<mson::PropertyMember> propertyMember(out.report);
                                  cur = MSONPropertyMemberParser::parse(node, siblings, pd, propertyMember);
 
-                                 mson::buildMemberType(propertyMember.node, memberType);
+                                 memberType.build(propertyMember.node);
                                  break;
                              }
 
@@ -89,7 +89,7 @@ namespace snowcrash {
                                  IntermediateParseResult<mson::ValueMember> valueMember(out.report);
                                  cur = MSONValueMemberParser::parse(node, siblings, pd, valueMember);
 
-                                 mson::buildMemberType(valueMember.node, memberType);
+                                 memberType.build(valueMember.node);
                                  break;
                              }
 

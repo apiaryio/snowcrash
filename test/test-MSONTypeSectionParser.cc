@@ -154,6 +154,7 @@ TEST_CASE("Parse mson sample list type section for an object with a value", "[ms
 
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.size() == 1);
+    REQUIRE(typeSection.report.warnings[0].code == LogicalErrorWarning);
 
     REQUIRE(typeSection.node.type == mson::SampleTypeSectionType);
     REQUIRE(typeSection.node.content.value.empty());
@@ -227,6 +228,29 @@ TEST_CASE("Parse multi-line mson sample list type section with newline", "[mson]
     REQUIRE(typeSection.node.content.value == " red\n   green\nyellow");
     REQUIRE(typeSection.node.content.description.empty());
     REQUIRE(typeSection.node.content.members().empty());
+}
+
+TEST_CASE("Parse mson sample list type section with values as para for values base type", "[mson][type_section]")
+{
+    mdp::ByteBuffer source = \
+    "- Sample\n\n"\
+    "    a\n"\
+    "    b";
+
+    ParseResult<mson::TypeSection> typeSection;
+    typeSection.node.baseType = mson::ValueBaseType;
+    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection);
+
+    REQUIRE(typeSection.report.error.code == Error::OK);
+    REQUIRE(typeSection.report.warnings.empty());
+
+    REQUIRE(typeSection.node.type == mson::SampleTypeSectionType);
+    REQUIRE(typeSection.node.content.value.empty());
+    REQUIRE(typeSection.node.content.description.empty());
+    REQUIRE(typeSection.node.content.members().size() == 1);
+    REQUIRE(typeSection.node.content.members().at(0).type == mson::ValueMemberType);
+    REQUIRE(typeSection.node.content.members().at(0).content.value.valueDefinition.values.size() == 1);
+    REQUIRE(typeSection.node.content.members().at(0).content.value.valueDefinition.values[0].literal == "a\nb");
 }
 
 TEST_CASE("Parse markdown multi-line mson sample list type section", "[mson][type_section]")
@@ -335,4 +359,37 @@ TEST_CASE("Parse markdown multi-line mson sample header type section", "[mson][t
     REQUIRE(typeSection.node.content.value == "- red\n\n- green");
     REQUIRE(typeSection.node.content.description.empty());
     REQUIRE(typeSection.node.content.members().empty());
+}
+
+TEST_CASE("Parse mson items list type section for values base type containing one of", "[mson][type_section]")
+{
+    mdp::ByteBuffer source = \
+    "- Items\n"\
+    "    - One Of\n"\
+    "        - first_name\n"\
+    "        - last_name";
+
+    ParseResult<mson::TypeSection> typeSection;
+    typeSection.node.baseType = mson::ValueBaseType;
+    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection);
+
+    REQUIRE(typeSection.report.error.code == Error::OK);
+    REQUIRE(typeSection.report.warnings.size() == 1);
+    REQUIRE(typeSection.report.warnings[0].code == LogicalErrorWarning);
+}
+
+TEST_CASE("Parse mson properties list type section for values base type", "[mson][type_section]")
+{
+    mdp::ByteBuffer source = \
+    "- Properties\n"\
+    "    - first_name\n"\
+    "    - last_name";
+
+    ParseResult<mson::TypeSection> typeSection;
+    typeSection.node.baseType = mson::ValueBaseType;
+    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection);
+
+    REQUIRE(typeSection.report.error.code == Error::OK);
+    REQUIRE(typeSection.report.warnings.size() == 1);
+    REQUIRE(typeSection.report.warnings[0].code == LogicalErrorWarning);
 }

@@ -351,7 +351,7 @@ namespace mson {
         typeDefinition.baseType = parseBaseType(typeDefinition.typeSpecification.name.name);
 
         if (typeDefinition.baseType == UndefinedBaseType) {
-            typeDefinition.baseType = pd.namedTypeBaseTable[typeDefinition.typeSpecification.name.symbol.literal];
+            typeDefinition.baseType = pd.namedTypeBaseTable.find(typeDefinition.typeSpecification.name.symbol.literal)->second;
         }
 
         if ((typeDefinition.baseType != ValueBaseType) &&
@@ -359,7 +359,7 @@ namespace mson {
 
             // WARN: Nested types for non (array or enum) structure base type
             mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-            report.warnings.push_back(snowcrash::Warning("nested types should not be present for array or enum structure type",
+            report.warnings.push_back(snowcrash::Warning("nested types should be present only for types which are sub typed from either array or enum structure type",
                                                          snowcrash::LogicalErrorWarning,
                                                          sourceMap));
         }
@@ -400,86 +400,6 @@ namespace mson {
         else {
             propertyName.literal = subject;
         }
-    }
-
-    /**
-     * \brief Build Member Type from property member
-     *
-     * \param propertyMember Property member which was given
-     * \param memberType Member type which was built
-     */
-    inline void buildMemberType(const PropertyMember& propertyMember,
-                                MemberType& memberType) {
-
-        memberType.type = PropertyMemberType;
-        memberType.content.property = propertyMember;
-    }
-
-    /**
-     * \brief Build Member Type from value member
-     *
-     * \param valueMember Value member which was given
-     * \param memberType Member type which was built
-     */
-    inline void buildMemberType(const ValueMember& valueMember,
-                                MemberType& memberType) {
-
-        memberType.type = ValueMemberType;
-        memberType.content.value = valueMember;
-    }
-
-    /**
-     * \brief Build Member Type from mixin type
-     *
-     * \param mixin Mixin which was given
-     * \param memberType Member type which was built
-     */
-    inline void buildMemberType(const Mixin& mixin,
-                                MemberType& memberType) {
-
-        memberType.type = MixinMemberType;
-        memberType.content.mixin = mixin;
-    }
-
-    /**
-     * \brief Build Member Type from one of type
-     *
-     * \param oneOf One of which was given
-     * \param memberType Member type which was built
-     */
-    inline void buildMemberType(const OneOf& oneOf,
-                                MemberType& memberType) {
-
-        memberType.type = OneOfMemberType;
-        memberType.content.oneOf = oneOf;
-    }
-
-    /**
-     * \brief Build Member Type from members type
-     *
-     * \param members List of Member types for members collection
-     * \param memberType Member type which was built
-     */
-    inline void buildMemberType(const MemberTypes& members,
-                                MemberType& memberType) {
-
-        memberType.type = MembersMemberType;
-        memberType.content.members = members;
-    }
-
-    /**
-     * \brief Build Member Type from a value
-     *
-     * \param value Value of the value member
-     * \param memberType Member type which was built
-     */
-    inline void buildMemberType(const Value& value,
-                                MemberType& memberType) {
-
-        ValueMember valueMember;
-
-        valueMember.valueDefinition.values.push_back(value);
-        buildMemberType(valueMember, memberType);
     }
 }
 

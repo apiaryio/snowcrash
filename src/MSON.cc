@@ -139,3 +139,71 @@ MemberType& MemberType::operator=(const MemberType& rhs)
 MemberType::~MemberType()
 {
 }
+
+/**
+ * \brief Build Member Type from property member
+ *
+ * \param propertyMember Property member which was given
+ */
+void MemberType::build(const PropertyMember& propertyMember)
+{
+    this->type = PropertyMemberType;
+    this->content.property = propertyMember;
+}
+
+/**
+ * \brief Build Member Type from value member
+ *
+ * \param valueMember Value member which was given
+ */
+void MemberType::build(const ValueMember& valueMember)
+{
+    this->type = ValueMemberType;
+    this->content.value = valueMember;
+}
+
+/**
+ * \brief Build Member Type from mixin type
+ *
+ * \param mixin Mixin which was given
+ */
+void MemberType::build(const Mixin& mixin)
+{
+    this->type = MixinMemberType;
+    this->content.mixin = mixin;
+}
+
+/**
+ * \brief Build Member Type from one of type
+ *
+ * \param oneOf One of which was given
+ */
+void MemberType::build(const OneOf& oneOf)
+{
+    this->type = OneOfMemberType;
+    this->content.oneOf = oneOf;
+}
+
+/**
+ * \brief Build Member Type from members type
+ *
+ * \param members List of Member types for members collection
+ */
+void MemberType::build(const MemberTypes& members)
+{
+    this->type = MembersMemberType;
+    this->content.members = members;
+}
+
+/**
+ * \brief Build Member Type from a value
+ *
+ * \param value Value of the value member
+ */
+void MemberType::build(const Value& value)
+{
+    ValueMember valueMember;
+
+    valueMember.valueDefinition.values.push_back(value);
+    this->build(valueMember);
+}

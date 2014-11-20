@@ -27,7 +27,7 @@ namespace snowcrash {
                 IntermediateParseResult<mson::Mixin> mixin(out.report);
                 cur = MSONMixinParser::parse(node, siblings, pd, mixin);
 
-                mson::buildMemberType(mixin.node, memberType);
+                memberType.build(mixin.node);
                 break;
             }
 
@@ -36,7 +36,7 @@ namespace snowcrash {
                 IntermediateParseResult<mson::OneOf> oneOf(out.report);
                 cur = MSONOneOfParser::parse(node, siblings, pd, oneOf);
 
-                mson::buildMemberType(oneOf.node, memberType);
+                memberType.build(oneOf.node);
                 break;
             }
 
@@ -45,7 +45,7 @@ namespace snowcrash {
                 IntermediateParseResult<mson::TypeSection> typeSection(out.report);
                 cur = MSONTypeSectionListParser::parse(node, siblings, pd, typeSection);
 
-                mson::buildMemberType(typeSection.node.content.members(), memberType);
+                memberType.build(typeSection.node.content.members());
                 break;
             }
 
@@ -54,7 +54,7 @@ namespace snowcrash {
                 IntermediateParseResult<mson::PropertyMember> propertyMember(out.report);
                 cur = MSONPropertyMemberParser::parse(node, siblings, pd, propertyMember);
 
-                mson::buildMemberType(propertyMember.node, memberType);
+                memberType.build(propertyMember.node);
                 break;
             }
 

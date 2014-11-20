@@ -17,13 +17,13 @@ namespace snowcrashtest {
 
     struct Models {
 
-        snowcrash::ModelTable models;
-        snowcrash::ModelSourceMapTable modelsSM;
+        snowcrash::ModelTable modelTable;
+        snowcrash::ModelSourceMapTable modelSourceMapTable;
     };
 
     struct NamedTypes {
 
-        mson::NamedTypeBaseTable bases;
+        mson::NamedTypeBaseTable baseTable;
     };
 
     template <typename T, typename PARSER>
@@ -57,10 +57,10 @@ namespace snowcrashtest {
 
             pd.sectionsContext.push_back(type);
 
-            pd.modelTable.insert(models.models.begin(), models.models.end());
-            pd.modelSourceMapTable.insert(models.modelsSM.begin(), models.modelsSM.end());
+            pd.modelTable.insert(models.modelTable.begin(), models.modelTable.end());
+            pd.modelSourceMapTable.insert(models.modelSourceMapTable.begin(), models.modelSourceMapTable.end());
 
-            pd.namedTypeBaseTable.insert(namedTypes.bases.begin(), namedTypes.bases.end());
+            pd.namedTypeBaseTable.insert(namedTypes.baseTable.begin(), namedTypes.baseTable.end());
 
             PARSER::parse(markdownAST.children().begin(),
                           markdownAST.children(),
@@ -79,10 +79,10 @@ namespace snowcrashtest {
 
     };
 
-    struct BuildHelper {
+    struct ModelHelper {
 
         /** Builds a Symbols entry for testing purposes */
-        static void model(const mdp::ByteBuffer& name,
+        static void build(const mdp::ByteBuffer& name,
                           Models& models) {
 
             snowcrash::ResourceModel model;
@@ -93,19 +93,22 @@ namespace snowcrashtest {
 
             model.description = "Foo";
             model.body = "Bar";
-            models.models[name] = model;
+            models.modelTable[name] = model;
 
             modelSM.description.sourceMap = sourcemap;
             modelSM.body.sourceMap = sourcemap;
-            models.modelsSM[name] = modelSM;
+            models.modelSourceMapTable[name] = modelSM;
         }
+    };
+
+    struct NamedTypeHelper {
 
         /** Builds an named type entry for testing purposes */
-        static void namedType(const mson::Literal& literal,
-                              const mson::BaseType& baseType,
-                              NamedTypes& namedTypes) {
+        static void build(const mson::Literal& literal,
+                          const mson::BaseType& baseType,
+                          NamedTypes& namedTypes) {
 
-            namedTypes.bases[literal] = baseType;
+            namedTypes.baseTable[literal] = baseType;
         }
     };
 

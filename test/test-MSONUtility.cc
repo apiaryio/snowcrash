@@ -438,7 +438,7 @@ TEST_CASE("Build member type from one of", "[mson][utility]")
     OneOf oneOf;
     MemberType memberType;
 
-    buildMemberType(oneOf, memberType);
+    memberType.build(oneOf);
 
     REQUIRE(memberType.type == OneOfMemberType);
 }
@@ -448,7 +448,7 @@ TEST_CASE("Build member type from mixin", "[mson][utility]")
     Mixin mixin;
     MemberType memberType;
 
-    buildMemberType(mixin, memberType);
+    memberType.build(mixin);
 
     REQUIRE(memberType.type == MixinMemberType);
 }
@@ -458,7 +458,7 @@ TEST_CASE("Build member type from value member", "[mson][utility]")
     ValueMember valueMember;
     MemberType memberType;
 
-    buildMemberType(valueMember, memberType);
+    memberType.build(valueMember);
 
     REQUIRE(memberType.type == ValueMemberType);
 }
@@ -468,7 +468,7 @@ TEST_CASE("Build member type from property memeber", "[mson][utility]")
     PropertyMember propertyMember;
     MemberType memberType;
 
-    buildMemberType(propertyMember, memberType);
+    memberType.build(propertyMember);
 
     REQUIRE(memberType.type == PropertyMemberType);
 }
@@ -482,10 +482,10 @@ TEST_CASE("Build memebr type from members collection", "[mson][utility]")
     PropertyMember propertyMember;
     MemberType propertyMemberType;
 
-    buildMemberType(propertyMember, propertyMemberType);
+    memberType.build(propertyMember);
     typeSection.content.members().push_back(propertyMemberType);
 
-    buildMemberType(typeSection.content.members(), memberType);
+    memberType.build(typeSection.content.members());
 
     REQUIRE(memberType.type == MembersMemberType);
     REQUIRE(memberType.content.members.members().size() == 1);
