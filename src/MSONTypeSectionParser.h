@@ -43,10 +43,10 @@ namespace snowcrash {
             return signatureTraits;
         }
 
-        static void finalizeSignature(const MarkdownNodeIterator& node,
-                                      SectionParserData& pd,
-                                      const Signature& signature,
-                                      const ParseResultRef<mson::TypeSection>& out) {
+        static MarkdownNodeIterator finalizeSignature(const MarkdownNodeIterator& node,
+                                                      SectionParserData& pd,
+                                                      const Signature& signature,
+                                                      const ParseResultRef<mson::TypeSection>& out) {
 
             bool assignValues = false;
 
@@ -61,8 +61,43 @@ namespace snowcrash {
                 assignValues = true;
             }
             else if (IEqual<std::string>()(signature.identifier, "Items") ||
-                     IEqual<std::string>()(signature.identifier, "Members") ||
-                     IEqual<std::string>()(signature.identifier, "Properties")) {
+                     IEqual<std::string>()(signature.identifier, "Members")) {
+
+                if (out.node.baseType != mson::ValueBaseType) {
+
+                    //WARN: Items/Members should only be allowed for value types
+                    std::stringstream ss;
+
+                    ss << "type section `" << signature.identifier;
+                    ss << "` not allowed for a type sub-typed from a primitive or object type";
+
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                    out.report.warnings.push_back(Warning(ss.str(),
+                                                          LogicalErrorWarning,
+                                                          sourceMap));
+
+                    return node;
+                }
+
+                out.node.type = mson::MemberTypeSectionType;
+            }
+            else if (IEqual<std::string>()(signature.identifier, "Properties")) {
+
+                if (out.node.baseType != mson::PropertyBaseType) {
+
+                    //WARN: Properties should only be allowed for object types
+                    std::stringstream ss;
+
+                    ss << "type section `" << signature.identifier;
+                    ss << "` is only allowed for a type sub-typed from an object type";
+
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                    out.report.warnings.push_back(Warning(ss.str(),
+                                                          LogicalErrorWarning,
+                                                          sourceMap));
+
+                    return node;
+                }
 
                 out.node.type = mson::MemberTypeSectionType;
             }
@@ -99,6 +134,8 @@ namespace snowcrash {
 
                 out.node.content.value += signature.remainingContent;
             }
+
+            return ++MarkdownNodeIterator(node);
         }
 
         NO_SECTION_DESCRIPTION(mson::TypeSection)

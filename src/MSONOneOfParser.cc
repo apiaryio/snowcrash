@@ -43,6 +43,8 @@ namespace snowcrash {
             case MSONPropertyMembersSectionType:
             {
                 IntermediateParseResult<mson::TypeSection> typeSection(out.report);
+                typeSection.node.baseType = mson::PropertyBaseType;
+
                 cur = MSONTypeSectionListParser::parse(node, siblings, pd, typeSection);
 
                 memberType.build(typeSection.node.content.members());

@@ -84,7 +84,9 @@ namespace snowcrash {
 
             MSONTypeSectionListParser::parse(node, siblings, pd, typeSection);
 
-            out.node.sections.push_back(typeSection.node);
+            if (typeSection.node.type != mson::UndefinedTypeSectionType) {
+                out.node.sections.push_back(typeSection.node);
+            }
         }
 
         return ++MarkdownNodeIterator(node);

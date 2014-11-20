@@ -32,10 +32,10 @@ namespace snowcrash {
             return signatureTraits;
         }
 
-        static void finalizeSignature(const MarkdownNodeIterator& node,
-                                      SectionParserData& pd,
-                                      const Signature& signature,
-                                      const ParseResultRef<mson::ValueMember>& out) {
+        static MarkdownNodeIterator finalizeSignature(const MarkdownNodeIterator& node,
+                                                      SectionParserData& pd,
+                                                      const Signature& signature,
+                                                      const ParseResultRef<mson::ValueMember>& out) {
 
             out.node.description = signature.content;
 
@@ -55,6 +55,8 @@ namespace snowcrash {
                 typeSection.content.description = signature.remainingContent;
                 out.node.sections.push_back(typeSection);
             }
+
+            return ++MarkdownNodeIterator(node);
         }
 
         static MarkdownNodeIterator processDescription(const MarkdownNodeIterator& node,

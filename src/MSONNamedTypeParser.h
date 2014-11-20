@@ -33,13 +33,15 @@ namespace snowcrash {
             return signatureTraits;
         }
 
-        static void finalizeSignature(const MarkdownNodeIterator& node,
-                                      SectionParserData& pd,
-                                      const Signature& signature,
-                                      const ParseResultRef<mson::NamedType>& out) {
+        static MarkdownNodeIterator finalizeSignature(const MarkdownNodeIterator& node,
+                                                      SectionParserData& pd,
+                                                      const Signature& signature,
+                                                      const ParseResultRef<mson::NamedType>& out) {
 
             mson::parseTypeName(signature.identifier, out.node.name);
             mson::parseTypeDefinition(node, pd, signature.attributes, out.report, out.node.base);
+
+            return ++MarkdownNodeIterator(node);
         }
 
         static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
@@ -113,7 +115,9 @@ namespace snowcrash {
 
                 MSONTypeSectionListParser::parse(node, siblings, pd, typeSection);
 
-                out.node.sections.push_back(typeSection.node);
+                if (typeSection.node.type != mson::UndefinedTypeSectionType) {
+                    out.node.sections.push_back(typeSection.node);
+                }
             }
 
             return ++MarkdownNodeIterator(node);

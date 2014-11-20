@@ -109,14 +109,16 @@ namespace snowcrash {
                         out.node.content.value += mdp::MapBytesRangeSet(node->sourceMap, pd.sourceData);
                         cur = ++MarkdownNodeIterator(node);
                     }
-                    else if (out.node.baseType == mson::ValueBaseType) {
+                    else if (out.node.baseType == mson::ValueBaseType &&
+                             node->type == mdp::ListItemMarkdownNodeType) {
 
                         IntermediateParseResult<mson::ValueMember> valueMember(out.report);
                         cur = MSONValueMemberParser::parse(node, siblings, pd, valueMember);
 
                         memberType.build(valueMember.node);
                     }
-                    else if (out.node.baseType == mson::PropertyBaseType) {
+                    else if (out.node.baseType == mson::PropertyBaseType &&
+                             node->type == mdp::ListItemMarkdownNodeType) {
 
                         IntermediateParseResult<mson::PropertyMember> propertyMember(out.report);
                         cur = MSONPropertyMemberParser::parse(node, siblings, pd, propertyMember);

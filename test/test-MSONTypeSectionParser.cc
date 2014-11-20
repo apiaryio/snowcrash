@@ -247,10 +247,7 @@ TEST_CASE("Parse mson sample list type section with values as para for values ba
     REQUIRE(typeSection.node.type == mson::SampleTypeSectionType);
     REQUIRE(typeSection.node.content.value.empty());
     REQUIRE(typeSection.node.content.description.empty());
-    REQUIRE(typeSection.node.content.members().size() == 1);
-    REQUIRE(typeSection.node.content.members().at(0).type == mson::ValueMemberType);
-    REQUIRE(typeSection.node.content.members().at(0).content.value.valueDefinition.values.size() == 1);
-    REQUIRE(typeSection.node.content.members().at(0).content.value.valueDefinition.values[0].literal == "a\nb");
+    REQUIRE(typeSection.node.content.members().empty());
 }
 
 TEST_CASE("Parse markdown multi-line mson sample list type section", "[mson][type_section]")
@@ -376,6 +373,8 @@ TEST_CASE("Parse mson items list type section for values base type containing on
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.size() == 1);
     REQUIRE(typeSection.report.warnings[0].code == LogicalErrorWarning);
+
+    REQUIRE(typeSection.node.content.members().empty());
 }
 
 TEST_CASE("Parse mson properties list type section for values base type", "[mson][type_section]")
@@ -392,4 +391,6 @@ TEST_CASE("Parse mson properties list type section for values base type", "[mson
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.size() == 1);
     REQUIRE(typeSection.report.warnings[0].code == LogicalErrorWarning);
+
+    MSONHelper::empty(typeSection.node);
 }

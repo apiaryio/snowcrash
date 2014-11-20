@@ -60,9 +60,7 @@ namespace scpl {
             Signature signature = snowcrash::SectionProcessor<T>::parseSignature(node, pd, signatureTraits, out.report);
 
             // Do section specific logic using the signature data
-            snowcrash::SectionProcessor<T>::finalizeSignature(node, pd, signature, out);
-
-            return ++MarkdownNodeIterator(node);
+            return snowcrash::SectionProcessor<T>::finalizeSignature(node, pd, signature, out);
         };
 
         /**
@@ -158,11 +156,16 @@ namespace scpl {
          * \param pd Section Parser data
          * \param signature Signature data
          * \param out Parse result of the section
+         *
+         * \return Result of process operation
          */
-        static void finalizeSignature(const MarkdownNodeIterator& node,
-                                      snowcrash::SectionParserData& pd,
-                                      const Signature& signature,
-                                      const snowcrash::ParseResultRef<T>& out) {};
+        static MarkdownNodeIterator finalizeSignature(const MarkdownNodeIterator& node,
+                                                      snowcrash::SectionParserData& pd,
+                                                      const Signature& signature,
+                                                      const snowcrash::ParseResultRef<T>& out) {
+
+            return ++MarkdownNodeIterator(node);
+        };
 
         /**
          * \brief Parse the identifier from the signature

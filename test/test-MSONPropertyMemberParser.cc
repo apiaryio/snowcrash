@@ -145,3 +145,39 @@ TEST_CASE("Parse mson property member object with nested members", "[mson][prope
     REQUIRE(propertyMember.node.sections[0].content.members().at(1).content.property.valueDefinition.values.size() == 1);
     REQUIRE(propertyMember.node.sections[0].content.members().at(1).content.property.valueDefinition.values[0].literal == "Sunkara");
 }
+
+TEST_CASE("Parse mson array property member with nested properties type section", "[mson][property_member]")
+{
+    mdp::ByteBuffer source = \
+    "- user (array)\n\n"\
+    "    List of users\n"\
+    "    - Properties\n"\
+    "        - first_name\n"\
+    "        - last_name";
+
+    ParseResult<mson::PropertyMember> propertyMember;
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember);
+
+    REQUIRE(propertyMember.report.error.code == Error::OK);
+    REQUIRE(propertyMember.report.warnings.size() == 1);
+    REQUIRE(propertyMember.report.warnings[0].code == LogicalErrorWarning);
+
+    REQUIRE(propertyMember.node.sections.size() == 1);
+    REQUIRE(propertyMember.node.sections[0].type == mson::BlockDescriptionTypeSectionType);
+}
+
+//TEST_CASE("Parse mson property member when it has a type section in nested members", "[mson][property_member]")
+//{
+//    mdp::ByteBuffer source = \
+//    "- user (object)\n"\
+//    "    - username (string)\n"\
+//    "    - Properties\n"\
+//    "        - last_name";
+//
+//    ParseResult<mson::PropertyMember> propertyMember;
+//    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember);
+//
+//    REQUIRE(propertyMember.report.error.code == Error::OK);
+//    REQUIRE(propertyMember.report.warnings.empty());
+//    REQUIRE(propertyMember.report.warnings[0].code == LogicalErrorWarning);
+//}

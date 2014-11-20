@@ -33,10 +33,10 @@ namespace snowcrash {
             return signatureTraits;
         }
 
-        static void finalizeSignature(const MarkdownNodeIterator& node,
-                                      SectionParserData& pd,
-                                      const Signature& signature,
-                                      const ParseResultRef<mson::Mixin>& out) {
+        static MarkdownNodeIterator finalizeSignature(const MarkdownNodeIterator& node,
+                                                      SectionParserData& pd,
+                                                      const Signature& signature,
+                                                      const ParseResultRef<mson::Mixin>& out) {
 
             CaptureGroups captureGroups;
             std::vector<mdp::ByteBuffer> attributes = signature.attributes;
@@ -60,6 +60,8 @@ namespace snowcrash {
                                                       FormattingWarning,
                                                       sourceMap));
             }
+
+            return ++MarkdownNodeIterator(node);
         }
 
         NO_SECTION_DESCRIPTION(mson::Mixin)
