@@ -14,6 +14,7 @@
 #include "CodeBlockUtility.h"
 #include "StringUtility.h"
 #include "BlueprintUtility.h"
+#include "RegexMatch.h"
 
 namespace snowcrash {
 
@@ -22,6 +23,87 @@ namespace snowcrash {
 
     /** Header Iterator in its containment group */
     typedef Collection<Header>::const_iterator HeaderIterator;
+
+    /** Base class for functor to check validity of parsed header */
+    struct ValidateFunctorBase {
+
+        /** intended to generate warning mesage */
+        virtual std::string getMessage() const = 0;
+
+        /** 
+         * intended to invoke validation 
+         * \return true if validation is ok
+         *
+         * data for validation you can inject into functor via c-tor
+         */
+        virtual bool operator()() const = 0;
+
+    };
+
+    /** Functor implementation for check header name is valid token according to specification \see http://tools.ietf.org/html/rfc7230#section-3.2.6 */
+    struct HeaderNameTokenChecker : public ValidateFunctorBase {
+
+        const std::string& headerName;
+
+        explicit HeaderNameTokenChecker(const std::string& headerName) : headerName(headerName) {}
+
+        virtual bool operator()() const;
+        virtual std::string getMessage() const;
+    };
+
+    /** Functor implementation for check header contains colon character between name and value */
+    struct ColonPresentedChecker : public ValidateFunctorBase {
+
+        const CaptureGroups& captures;
+
+        explicit ColonPresentedChecker(const CaptureGroups& captures) : captures(captures) {}
+
+        virtual bool operator()() const;
+        virtual std::string getMessage() const;
+
+    };
+
+    /** Functor implementation to check Headers duplicity */
+    struct HeadersDuplicateChecker : public ValidateFunctorBase {
+
+        const Header& header;
+        const Headers& headers;
+
+        explicit HeadersDuplicateChecker(const Header& header, 
+                                         const Headers& headers) 
+            : header(header), headers(headers) {}
+
+        virtual bool operator()() const;
+        virtual std::string getMessage() const;
+
+    };
+
+    /** Functor implementation to check Headers duplicity */
+    struct HeaderValuePresentedChecker : public ValidateFunctorBase {
+
+        const Header& header;
+
+        explicit HeaderValuePresentedChecker(const Header& header) 
+            : header(header) {}
+
+        virtual bool operator()() const;
+        virtual std::string getMessage() const;
+
+    };
+
+    /** Functor receive and invoke individual Validators and conditionaly push reports  */
+    struct HeaderParserValidator {
+
+        const ParseResultRef<Headers>& out;
+        mdp::CharactersRangeSet sourceMap;
+
+        HeaderParserValidator(const ParseResultRef<Headers>& out, 
+                              mdp::CharactersRangeSet sourceMap) 
+            : out(out), sourceMap(sourceMap) {}
+
+        bool operator()(const ValidateFunctorBase& rule);
+    };
+
 
     /**
      *  Headers Section Processor
@@ -66,6 +148,7 @@ namespace snowcrash {
 
         static bool isDescriptionNode(const MarkdownNodeIterator& node,
                                       SectionType sectionType) {
+
             return false;
         }
 
@@ -108,10 +191,47 @@ namespace snowcrash {
             }
         }
 
+        /** 
+         * Parse individual line of header
+         * \return true if valid header definition
+         *
+         * Header name is checked against token definition
+         *
+         * \param line - contains individual line with header definition
+         * \param header - is filled by name and value if definition is valid
+         * \param out - "report" member can receive warning while checking validity
+         * \param sourceMap - just contain source mapping for warning report
+         */
+        static bool parseHeaderLine(const mdp::ByteBuffer& line, 
+                                    Header& header, 
+                                    const ParseResultRef<Headers>& out,
+                                    const mdp::CharactersRangeSet sourceMap) {
+
+            std::string re = " *([^:[:blank:]]+)(( *:? *)(.*)?)$";
+
+            CaptureGroups parts;
+            bool matched = RegexCapture(line, re, parts, 5);
+
+            if (!matched)
+                return false;
+
+            header = std::make_pair(parts[1], parts[4]);
+            TrimString(header.second);
+
+            HeaderParserValidator validate(out, sourceMap);
+        
+            validate(HeaderNameTokenChecker(header.first));
+            validate(ColonPresentedChecker(parts));
+            validate(HeadersDuplicateChecker(header, out.node));
+            validate(HeaderValuePresentedChecker(header));
+
+            return !header.first.empty();
+        }
+
         /** Retrieve headers from content */
         static void headersFromContent(const MarkdownNodeIterator& node,
                                        const mdp::ByteBuffer& content,
-                                       SectionParserData& pd,
+                                       const SectionParserData& pd,
                                        const ParseResultRef<Headers>& out) {
 
             std::vector<std::string> lines = Split(content, '\n');
@@ -125,20 +245,9 @@ namespace snowcrash {
                 }
 
                 Header header;
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
 
-                if (CodeBlockUtility::keyValueFromLine(*line, header)) {
-                    if (findHeader(out.node, header) != out.node.end() && !isAllowedMultipleDefinition(header)) {
-                        // WARN: duplicate header on this level
-                        std::stringstream ss;
-
-                        ss << "duplicate definition of '" << header.first << "' header";
-
-                        mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                        out.report.warnings.push_back(Warning(ss.str(),
-                                                              DuplicateWarning,
-                                                              sourceMap));
-                    }
-
+                if (parseHeaderLine(*line, header, out, sourceMap)) {
                     out.node.push_back(header);
 
                     if (pd.exportSourceMap()) {
@@ -222,34 +331,6 @@ namespace snowcrash {
             }
         }
 
-        /** Finds a header in its containment group by its key (first) */
-        static HeaderIterator findHeader(const Headers& headers,
-                                         const Header& header) {
-
-            return std::find_if(headers.begin(),
-                                headers.end(),
-                                std::bind2nd(MatchFirsts<Header, IEqual<Header::first_type> >(), header));
-        }
-
-        typedef std::vector<std::string> HeadersKeyCollection;
-        /** Get collection of allowed keywords - workarround due to C++98 restriction - static initialization of vector */
-        static const HeadersKeyCollection& getAllowedMultipleDefinitions() {
-            static std::string keys[] = {
-                HTTPHeaderName::SetCookie,
-                HTTPHeaderName::Link,
-            };
-
-            static const HeadersKeyCollection allowedMultipleDefinitions(keys, keys + (sizeof(keys)/sizeof(keys[0])));
-            return allowedMultipleDefinitions;
-        }
-
-        /** Check if Header name has allowed multiple definitions */
-        static bool isAllowedMultipleDefinition(const Header& header) {
-              const HeadersKeyCollection& keys = getAllowedMultipleDefinitions();
-              return std::find_if(keys.begin(),
-                                  keys.end(),
-                                  std::bind1st(MatchFirstWith<Header, std::string, IEqual<std::string> >(), header)) != keys.end();
-        }
     };
 
     /** Headers Section Parser */
