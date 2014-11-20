@@ -180,4 +180,9 @@ TEST_CASE("Parse mson array property member with nested properties type section"
 //    REQUIRE(propertyMember.report.error.code == Error::OK);
 //    REQUIRE(propertyMember.report.warnings.empty());
 //    REQUIRE(propertyMember.report.warnings[0].code == LogicalErrorWarning);
+//
+//    REQUIRE(propertyMember.node.sections.size() == 1);
+//    REQUIRE(propertyMember.node.sections[0].type == mson::MemberTypeSectionType);
+//    REQUIRE(propertyMember.node.sections[0].content.members().size() == 1);
+//    REQUIRE(propertyMember.node.sections[0].content.members().at(0).content.property.name.literal == "username");
 //}

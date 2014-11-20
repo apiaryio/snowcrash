@@ -34,6 +34,14 @@ namespace snowcrash {
         SourceMap<mson::TypeDefinition> typeDefinition;
     };
 
+    /** Source Map structure for Named Type */
+    template<>
+    struct SourceMap<mson::NamedType> {
+
+        /** Source Map of Type Sections */
+        SourceMap<mson::TypeSections> sections;
+    };
+
     /** Source Map structure for Value Member */
     template<>
     struct SourceMap<mson::ValueMember> : public SourceMapBase {
@@ -43,6 +51,9 @@ namespace snowcrash {
 
         /** Source Map of Value Definition */
         SourceMap<mson::ValueDefinition> valueDefinition;
+
+        /** Source Map of Type Sections */
+        SourceMap<mson::TypeSections> sections;
     };
 
     /** Source Map structure for Property Member */

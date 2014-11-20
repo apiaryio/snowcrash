@@ -6,10 +6,9 @@
 //  Copyright (c) 2014 Apiary Inc. All rights reserved.
 //
 
-#include "MSONTypeSectionParser.h"
 #include "MSONOneOfParser.h"
+#include "MSONTypeSectionParser.h"
 #include "MSONPropertyMemberParser.h"
-#include "MSONValueMemberParser.h"
 
 namespace snowcrash {
 

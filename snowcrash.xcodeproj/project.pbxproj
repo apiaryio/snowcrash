@@ -19,7 +19,6 @@
 		4079DBA71A138C310075B534 /* MSONOneOfParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4079DBA61A138C310075B534 /* MSONOneOfParser.cc */; };
 		4079DBA91A138C580075B534 /* MSONTypeSectionParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4079DBA81A138C580075B534 /* MSONTypeSectionParser.cc */; };
 		408F38DA1A153AB200104774 /* MSONValueMemberParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = 408F38D91A153AB200104774 /* MSONValueMemberParser.cc */; };
-		408F38DC1A153AC400104774 /* MSONPropertyMemberParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = 408F38DB1A153AC400104774 /* MSONPropertyMemberParser.cc */; };
 		40A1EE0B19EC0A0B00DB894A /* MSON.h in Headers */ = {isa = PBXBuildFile; fileRef = 40A1EE0A19EC0A0B00DB894A /* MSON.h */; };
 		40BCDEAA1A0A9489008C6C84 /* MSONPropertyMemberParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 40BCDEA91A0A9489008C6C84 /* MSONPropertyMemberParser.h */; };
 		40BCDEAC1A0A96F8008C6C84 /* MSONMixinParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 40BCDEAB1A0A96F8008C6C84 /* MSONMixinParser.h */; };
@@ -167,7 +166,6 @@
 		4079DBA61A138C310075B534 /* MSONOneOfParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MSONOneOfParser.cc; path = src/MSONOneOfParser.cc; sourceTree = "<group>"; };
 		4079DBA81A138C580075B534 /* MSONTypeSectionParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MSONTypeSectionParser.cc; path = src/MSONTypeSectionParser.cc; sourceTree = "<group>"; };
 		408F38D91A153AB200104774 /* MSONValueMemberParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MSONValueMemberParser.cc; path = src/MSONValueMemberParser.cc; sourceTree = "<group>"; };
-		408F38DB1A153AC400104774 /* MSONPropertyMemberParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MSONPropertyMemberParser.cc; path = src/MSONPropertyMemberParser.cc; sourceTree = "<group>"; };
 		40A1EE0A19EC0A0B00DB894A /* MSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MSON.h; path = src/MSON.h; sourceTree = "<group>"; };
 		40BCDEA91A0A9489008C6C84 /* MSONPropertyMemberParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MSONPropertyMemberParser.h; path = src/MSONPropertyMemberParser.h; sourceTree = "<group>"; };
 		40BCDEAB1A0A96F8008C6C84 /* MSONMixinParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MSONMixinParser.h; path = src/MSONMixinParser.h; sourceTree = "<group>"; };
@@ -410,7 +408,6 @@
 				40BCDEB11A0A9790008C6C84 /* MSONNamedTypeParser.h */,
 				4079DBA61A138C310075B534 /* MSONOneOfParser.cc */,
 				40BCDEAD1A0A9724008C6C84 /* MSONOneOfParser.h */,
-				408F38DB1A153AC400104774 /* MSONPropertyMemberParser.cc */,
 				40BCDEA91A0A9489008C6C84 /* MSONPropertyMemberParser.h */,
 				404CD8381A07D38300AB1416 /* MSONSourcemap.h */,
 				4079DBA81A138C580075B534 /* MSONTypeSectionParser.cc */,
@@ -632,7 +629,6 @@
 				BBCC856919545FCE00B99E90 /* Signature.cc in Sources */,
 				BBE53565174132B100BCA7AD /* SerializeJSON.cc in Sources */,
 				BBFC8418196C0C0F001A236A /* CBlueprint.cc in Sources */,
-				408F38DC1A153AC400104774 /* MSONPropertyMemberParser.cc in Sources */,
 				BBFC841C196C0C0F001A236A /* CSourceAnnotation.cc in Sources */,
 				40DE0C0C1A08F3CF00D2F0A8 /* MSON.cc in Sources */,
 				BBFC841F196C0C0F001A236A /* UriTemplateParser.cc in Sources */,

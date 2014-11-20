@@ -9,10 +9,6 @@
 #ifndef SNOWCRASH_MSONNAMEDTYPEPARSER_H
 #define SNOWCRASH_MSONNAMEDTYPEPARSER_H
 
-#include "SectionParser.h"
-#include "MSONUtility.h"
-#include "MSONPropertyMemberParser.h"
-#include "MSONTypeSectionParser.h"
 #include "MSONValueMemberParser.h"
 
 using namespace scpl;
@@ -44,113 +40,24 @@ namespace snowcrash {
             return ++MarkdownNodeIterator(node);
         }
 
-        static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
-                                                         const MarkdownNodes& siblings,
-                                                         SectionParserData& pd,
-                                                         const ParseResultRef<mson::NamedType>& out) {
-
-            if (pd.sectionContext() == MSONSectionType) {
-
-                if (node->type == mdp::ListItemMarkdownNodeType &&
-                    (out.node.sections.empty() ||
-                     (out.node.sections.size() == 1 &&
-                      out.node.sections[0].type == mson::MemberTypeSectionType))) {
-
-                         // Build a section to indicate nested members
-                         if (out.node.sections.empty()) {
-
-                             mson::TypeSection typeSection(mson::MemberTypeSectionType);
-                             out.node.sections.push_back(typeSection);
-                         }
-
-                         MarkdownNodeIterator cur = node;
-                         mson::MemberType memberType;
-
-                         switch (out.node.base.baseType) {
-                             case mson::PrimitiveBaseType:
-                             {
-                                 //WARN: Primitive type members should not have nested members
-                                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                                 out.report.warnings.push_back(Warning("primitive base type members should not have nested members",
-                                                                       LogicalErrorWarning,
-                                                                       sourceMap));
-                                 break;
-                             }
-
-                             case mson::PropertyBaseType:
-                             {
-                                 IntermediateParseResult<mson::PropertyMember> propertyMember(out.report);
-                                 cur = MSONPropertyMemberParser::parse(node, siblings, pd, propertyMember);
-
-                                 memberType.build(propertyMember.node);
-                                 break;
-                             }
-
-                             case mson::ValueBaseType:
-                             {
-                                 IntermediateParseResult<mson::ValueMember> valueMember(out.report);
-                                 cur = MSONValueMemberParser::parse(node, siblings, pd, valueMember);
-
-                                 memberType.build(valueMember.node);
-                                 break;
-                             }
-
-                             default:
-                                 break;
-                         }
-
-                         if (memberType.type != mson::UndefinedMemberType) {
-                             out.node.sections[0].content.members().push_back(memberType);
-                         }
-
-                         return cur;
-                     }
-
-                SectionProcessor<mson::NamedType>::processDescription(node, siblings, pd, out);
-            }
-            else {
-
-                IntermediateParseResult<mson::TypeSection> typeSection(out.report);
-                typeSection.node.baseType = out.node.base.baseType;
-
-                MSONTypeSectionListParser::parse(node, siblings, pd, typeSection);
-
-                if (typeSection.node.type != mson::UndefinedTypeSectionType) {
-                    out.node.sections.push_back(typeSection.node);
-                }
-            }
-
-            return ++MarkdownNodeIterator(node);
-        }
-
-
         static MarkdownNodeIterator processDescription(const MarkdownNodeIterator& node,
                                                        const MarkdownNodes& siblings,
                                                        SectionParserData& pd,
                                                        const ParseResultRef<mson::NamedType>& out) {
 
-            if (out.node.sections.empty() ||
-                (out.node.sections.size() == 1 &&
-                 out.node.sections[0].type == mson::BlockDescriptionTypeSectionType)) {
-
-                if (out.node.sections.empty()) {
-
-                    mson::TypeSection typeSection(mson::BlockDescriptionTypeSectionType);
-                    out.node.sections.push_back(typeSection);
-                }
-
-                if (!out.node.sections[0].content.description.empty()) {
-                    TwoNewLines(out.node.sections[0].content.description);
-                }
-
-                mdp::ByteBuffer content = mdp::MapBytesRangeSet(node->sourceMap, pd.sourceData);
-                out.node.sections[0].content.description += content;
-
-                return ++MarkdownNodeIterator(node);
-            }
-
-            return node;
+            return SectionProcessor<mson::ValueMember>::blockDescription(node, pd, out.node.sections, out.sourceMap.sections);
         }
+
+        static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
+                                                         const MarkdownNodes& siblings,
+                                                         SectionParserData& pd,
+                                                         const ParseResultRef<mson::NamedType>& out) {
+
+            return SectionProcessor<mson::ValueMember>::processNestedMembers(node, siblings, pd, out.report,
+                                                                             out.node.sections, out.sourceMap.sections,
+                                                                             out.node.base.baseType);
+        }
+
 
         static bool isDescriptionNode(const MarkdownNodeIterator& node,
                                       SectionType sectionType) {

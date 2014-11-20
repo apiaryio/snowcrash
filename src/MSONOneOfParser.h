@@ -9,8 +9,6 @@
 #ifndef SNOWCRASH_MSONONEOFPARSER_H
 #define SNOWCRASH_MSONONEOFPARSER_H
 
-#include "SectionParser.h"
-#include "MSONUtility.h"
 #include "MSONMixinParser.h"
 
 using namespace scpl;
