@@ -162,6 +162,21 @@ namespace snowcrash {
                                                          mson::TypeSections&,
                                                          SourceMap<mson::TypeSections>&,
                                                          mson::BaseType&);
+
+        /**
+         * \brief Check the given list of type sections for a member group
+         */
+        static bool checkForMemberGroup(const mson::TypeSections& sections) {
+
+            for (size_t i = 0; i < sections.size(); i++) {
+
+                if (sections[i].type == mson::MemberTypeSectionType) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     };
 
     /** MSON Value Member Section Parser */

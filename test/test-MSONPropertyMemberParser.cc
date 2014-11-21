@@ -166,23 +166,70 @@ TEST_CASE("Parse mson array property member with nested properties type section"
     REQUIRE(propertyMember.node.sections[0].type == mson::BlockDescriptionTypeSectionType);
 }
 
-//TEST_CASE("Parse mson property member when it has a type section in nested members", "[mson][property_member]")
-//{
-//    mdp::ByteBuffer source = \
-//    "- user (object)\n"\
-//    "    - username (string)\n"\
-//    "    - Properties\n"\
-//    "        - last_name";
-//
-//    ParseResult<mson::PropertyMember> propertyMember;
-//    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember);
-//
-//    REQUIRE(propertyMember.report.error.code == Error::OK);
-//    REQUIRE(propertyMember.report.warnings.empty());
-//    REQUIRE(propertyMember.report.warnings[0].code == LogicalErrorWarning);
-//
-//    REQUIRE(propertyMember.node.sections.size() == 1);
-//    REQUIRE(propertyMember.node.sections[0].type == mson::MemberTypeSectionType);
-//    REQUIRE(propertyMember.node.sections[0].content.members().size() == 1);
-//    REQUIRE(propertyMember.node.sections[0].content.members().at(0).content.property.name.literal == "username");
-//}
+TEST_CASE("Parse mson property member when it has a member group in nested members", "[mson][property_member]")
+{
+    mdp::ByteBuffer source = \
+    "- user (object)\n"\
+    "    - username (string)\n"\
+    "    - Properties\n"\
+    "        - last_name";
+
+    ParseResult<mson::PropertyMember> propertyMember;
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember);
+
+    REQUIRE(propertyMember.report.error.code == Error::OK);
+    REQUIRE(propertyMember.report.warnings.size() == 1);
+    REQUIRE(propertyMember.report.warnings[0].code == IgnoringWarning);
+
+    REQUIRE(propertyMember.node.sections.size() == 1);
+    REQUIRE(propertyMember.node.sections[0].type == mson::MemberTypeSectionType);
+    REQUIRE(propertyMember.node.sections[0].content.members().size() == 1);
+    REQUIRE(propertyMember.node.sections[0].content.members().at(0).content.property.name.literal == "username");
+}
+
+TEST_CASE("Parse mson property member when it has multiple member groups", "[mson][property_member]")
+{
+    mdp::ByteBuffer source = \
+    "- user (object)\n\n"\
+    "    This is good\n"\
+    "    - really\n\n"\
+    "    I am serious\n"\
+    "    - Properties\n"\
+    "        - last_name\n"\
+    "    -  Properties\n"\
+    "        - first_name";
+
+    ParseResult<mson::PropertyMember> propertyMember;
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember);
+
+    REQUIRE(propertyMember.report.error.code == Error::OK);
+    REQUIRE(propertyMember.report.warnings.size() == 1);
+    REQUIRE(propertyMember.report.warnings[0].code == IgnoringWarning);
+
+    REQUIRE(propertyMember.node.sections.size() == 2);
+    REQUIRE(propertyMember.node.sections[0].type == mson::BlockDescriptionTypeSectionType);
+    REQUIRE(propertyMember.node.sections[0].content.description == "This is good\n\n- really\n\nI am serious\n");
+    REQUIRE(propertyMember.node.sections[1].type == mson::MemberTypeSectionType);
+    REQUIRE(propertyMember.node.sections[1].content.members().size() == 1);
+    REQUIRE(propertyMember.node.sections[1].content.members().at(0).content.property.name.literal == "last_name");
+}
+
+TEST_CASE("Parse mson property member when it has the wrong member group", "[mson][property_member]")
+{
+    mdp::ByteBuffer source = \
+    "- user (array)\n\n"\
+    "    This is good\n"\
+    "    - Properties\n"\
+    "        - last_name";
+
+    ParseResult<mson::PropertyMember> propertyMember;
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember);
+
+    REQUIRE(propertyMember.report.error.code == Error::OK);
+    REQUIRE(propertyMember.report.warnings.size() == 1);
+    REQUIRE(propertyMember.report.warnings[0].code == LogicalErrorWarning);
+
+    REQUIRE(propertyMember.node.sections.size() == 1);
+    REQUIRE(propertyMember.node.sections[0].type == mson::BlockDescriptionTypeSectionType);
+    REQUIRE(propertyMember.node.sections[0].content.description == "This is good\n");
+}

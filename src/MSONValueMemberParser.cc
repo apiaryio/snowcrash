@@ -36,77 +36,87 @@ namespace snowcrash {
                                                                                    SourceMap<mson::TypeSections>& sourceMap,
                                                                                    mson::BaseType& baseType) {
 
+        MarkdownNodeIterator cur = node;
+
         if (pd.sectionContext() == MSONSectionType) {
 
-            if (node->type == mdp::ListItemMarkdownNodeType &&
-                (sections.empty() ||
-                 (sections.size() == 1 &&
-                  sections[0].type == mson::MemberTypeSectionType))) {
-
-                // Build a section to indicate nested members
-                if (sections.empty()) {
-
-                    mson::TypeSection typeSection(mson::MemberTypeSectionType);
-                    sections.push_back(typeSection);
-                }
-
-                MarkdownNodeIterator cur = node;
-                mson::MemberType memberType;
-
-                switch (baseType) {
-                    case mson::PrimitiveBaseType:
-                    {
-                        //WARN: Primitive type members should not have nested members
-                        mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                        report.warnings.push_back(Warning("primitive base type members should not have nested members",
-                                                          LogicalErrorWarning,
-                                                          sourceMap));
-                        break;
-                    }
-
-                    case mson::PropertyBaseType:
-                    {
-                        IntermediateParseResult<mson::PropertyMember> propertyMember(report);
-                        cur = MSONPropertyMemberParser::parse(node, siblings, pd, propertyMember);
-
-                        memberType.build(propertyMember.node);
-                        break;
-                    }
-
-                    case mson::ValueBaseType:
-                    {
-                        IntermediateParseResult<mson::ValueMember> valueMember(report);
-                        cur = MSONValueMemberParser::parse(node, siblings, pd, valueMember);
-
-                        memberType.build(valueMember.node);
-                        break;
-                    }
-
-                    default:
-                        break;
-                }
-
-                if (memberType.type != mson::UndefinedMemberType) {
-                    sections[0].content.members().push_back(memberType);
-                }
-
-                return cur;
+            // If the nodes follow after some block description without member
+            // seperator, then they are treated as description
+            if (!sections.empty() && sections.back().type == mson::BlockDescriptionTypeSectionType) {
+                return SectionProcessor<mson::ValueMember>::blockDescription(node, pd, sections, sourceMap);
             }
 
-            SectionProcessor<mson::ValueMember>::blockDescription(node, pd, sections, sourceMap);
+            // Build a section to indicate nested members
+            if (sections.empty()) {
+
+                mson::TypeSection typeSection(mson::MemberTypeSectionType);
+                sections.push_back(typeSection);
+            }
+
+            mson::MemberType memberType;
+
+            switch (baseType) {
+                case mson::PrimitiveBaseType:
+                {
+                    //WARN: Primitive type members should not have nested members
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                    report.warnings.push_back(Warning("primitive base type members should not have nested members",
+                                                      LogicalErrorWarning,
+                                                      sourceMap));
+                    break;
+                }
+
+                case mson::PropertyBaseType:
+                {
+                    IntermediateParseResult<mson::PropertyMember> propertyMember(report);
+                    cur = MSONPropertyMemberParser::parse(node, siblings, pd, propertyMember);
+
+                    memberType.build(propertyMember.node);
+                    break;
+                }
+
+                case mson::ValueBaseType:
+                {
+                    IntermediateParseResult<mson::ValueMember> valueMember(report);
+                    cur = MSONValueMemberParser::parse(node, siblings, pd, valueMember);
+
+                    memberType.build(valueMember.node);
+                    break;
+                }
+
+                default:
+                    break;
+            }
+
+            if (memberType.type != mson::UndefinedMemberType) {
+                sections[0].content.members().push_back(memberType);
+            }
+        }
+        // If the type section is a member group, check for an existing member group
+        else if (((pd.sectionContext() == MSONPropertyMembersSectionType) ||
+                  (pd.sectionContext() == MSONValueMembersSectionType)) &&
+                  !sections.empty() && checkForMemberGroup(sections)) {
+
+            //WARN: Member group type section already exists
+            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+            report.warnings.push_back(Warning("a nested member group has already been defined for this type",
+                                              IgnoringWarning,
+                                              sourceMap));
         }
         else {
-            
+
             IntermediateParseResult<mson::TypeSection> typeSection(report);
             typeSection.node.baseType = baseType;
-            
+
             MSONTypeSectionListParser::parse(node, siblings, pd, typeSection);
-            
+
             if (typeSection.node.type != mson::UndefinedTypeSectionType) {
                 sections.push_back(typeSection.node);
             }
+
+            cur = ++MarkdownNodeIterator(node);
         }
-        
-        return ++MarkdownNodeIterator(node);
+
+        return cur;
     }
 }
