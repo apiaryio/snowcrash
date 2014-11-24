@@ -60,7 +60,7 @@ namespace snowcrash {
                 {
                     //WARN: Primitive type members should not have nested members
                     mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                    report.warnings.push_back(Warning("primitive base type members should not have nested members",
+                    report.warnings.push_back(Warning("sub-types of primitive types should not have nested members",
                                                       LogicalErrorWarning,
                                                       sourceMap));
                     break;
