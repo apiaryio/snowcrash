@@ -162,6 +162,44 @@ namespace snowcrash {
                                                          mson::TypeSections&,
                                                          SourceMap<mson::TypeSections>&,
                                                          mson::BaseType&);
+
+        /**
+         * \brief Resolve base types if possible, based on nested node given
+         *
+         * \param node Node to process
+         * \param sectionType Section Type
+         * \param baseType Base Type of the MSON member that needs to be resolved
+         */
+        static void resolveImplicitBaseType(const MarkdownNodeIterator& node,
+                                            const SectionType& sectionType,
+                                            mson::BaseType& baseType) {
+
+            if (baseType != mson::UndefinedBaseType) {
+                return;
+            }
+
+            switch (sectionType) {
+                case MSONSectionType:
+                {
+                    if (node->type == mdp::ListItemMarkdownNodeType) {
+                        baseType = mson::ImplicitPropertyBaseType;
+                    }
+                    else {
+                        baseType = mson::ImplicitPrimitiveBaseType;
+                    }
+
+                    break;
+                }
+
+                case MSONPropertyMembersSectionType:
+                {
+                    baseType = mson::ImplicitPropertyBaseType;
+                }
+
+                default:
+                    break;
+            }
+        }
     };
 
     /** MSON Value Member Section Parser */

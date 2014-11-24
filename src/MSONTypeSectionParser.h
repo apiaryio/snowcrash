@@ -82,7 +82,8 @@ namespace snowcrash {
             }
             else if (IEqual<std::string>()(signature.identifier, "Properties")) {
 
-                if (out.node.baseType != mson::PropertyBaseType) {
+                if (out.node.baseType != mson::PropertyBaseType &&
+                    out.node.baseType != mson::ImplicitPropertyBaseType) {
 
                     //WARN: Properties should only be allowed for object types
                     std::stringstream ss;
@@ -104,7 +105,9 @@ namespace snowcrash {
             if (assignValues &&
                 (!signature.values.empty() || !signature.value.empty())) {
 
-                if (out.node.baseType == mson::PrimitiveBaseType) {
+                if (out.node.baseType == mson::PrimitiveBaseType ||
+                    out.node.baseType == mson::ImplicitPrimitiveBaseType) {
+
                     out.node.content.value = signature.value;
                 }
                 else if (out.node.baseType == mson::ValueBaseType) {
@@ -127,9 +130,9 @@ namespace snowcrash {
                 }
             }
 
-            if (assignValues &&
-                !signature.remainingContent.empty() &&
-                out.node.baseType == mson::PrimitiveBaseType) {
+            if (assignValues && !signature.remainingContent.empty() &&
+                (out.node.baseType == mson::PrimitiveBaseType ||
+                 out.node.baseType == mson::ImplicitPrimitiveBaseType)) {
 
                 out.node.content.value += signature.remainingContent;
             }

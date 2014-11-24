@@ -99,7 +99,25 @@ namespace snowcrash {
 
                 case MSONSectionType:
                 {
-                    if (out.node.baseType == mson::PrimitiveBaseType) {
+                    if (out.node.baseType == mson::ValueBaseType &&
+                        node->type == mdp::ListItemMarkdownNodeType) {
+
+                        IntermediateParseResult<mson::ValueMember> valueMember(out.report);
+                        cur = MSONValueMemberParser::parse(node, siblings, pd, valueMember);
+
+                        memberType.build(valueMember.node);
+                    }
+                    else if ((out.node.baseType == mson::PropertyBaseType ||
+                              out.node.baseType == mson::ImplicitPropertyBaseType) &&
+                             node->type == mdp::ListItemMarkdownNodeType) {
+
+                        IntermediateParseResult<mson::PropertyMember> propertyMember(out.report);
+                        cur = MSONPropertyMemberParser::parse(node, siblings, pd, propertyMember);
+
+                        memberType.build(propertyMember.node);
+                    }
+                    if (out.node.baseType == mson::PrimitiveBaseType ||
+                        out.node.baseType == mson::ImplicitPrimitiveBaseType) {
 
                         if (!out.node.content.value.empty()) {
                             TwoNewLines(out.node.content.value);
@@ -107,22 +125,6 @@ namespace snowcrash {
 
                         out.node.content.value += mdp::MapBytesRangeSet(node->sourceMap, pd.sourceData);
                         cur = ++MarkdownNodeIterator(node);
-                    }
-                    else if (out.node.baseType == mson::ValueBaseType &&
-                             node->type == mdp::ListItemMarkdownNodeType) {
-
-                        IntermediateParseResult<mson::ValueMember> valueMember(out.report);
-                        cur = MSONValueMemberParser::parse(node, siblings, pd, valueMember);
-
-                        memberType.build(valueMember.node);
-                    }
-                    else if (out.node.baseType == mson::PropertyBaseType &&
-                             node->type == mdp::ListItemMarkdownNodeType) {
-
-                        IntermediateParseResult<mson::PropertyMember> propertyMember(out.report);
-                        cur = MSONPropertyMemberParser::parse(node, siblings, pd, propertyMember);
-
-                        memberType.build(propertyMember.node);
                     }
 
                     break;

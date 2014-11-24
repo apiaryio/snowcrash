@@ -37,10 +37,12 @@ namespace mson {
 
     /** Kind of Base Type */
     enum BaseType {
-        UndefinedBaseType = 0, // Undefined
-        PrimitiveBaseType,     // Primitive Types
-        PropertyBaseType,      // Object Structure Type
-        ValueBaseType          // Array & Enum Structure Type
+        UndefinedBaseType = 0,     // Undefined
+        PrimitiveBaseType,         // Primitive Types
+        ImplicitPrimitiveBaseType, // Primitive Types (implicit)
+        PropertyBaseType,          // Object Structure Type
+        ImplicitPropertyBaseType,  // Object Structure Type (implicit)
+        ValueBaseType              // Array & Enum Structure Type
     };
 
     /** Named Types base type table */
@@ -128,12 +130,6 @@ namespace mson {
 
         /** Array of nested types */
         TypeNames nestedTypes;
-
-        /** Reference for the type */
-        snowcrash::Reference reference;
-
-        /** References for the nested types */
-        std::vector<snowcrash::Reference> nestedReferences;
     };
 
     /** Definition of an instance of a type */
