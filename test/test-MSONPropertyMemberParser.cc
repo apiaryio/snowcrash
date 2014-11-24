@@ -178,13 +178,15 @@ TEST_CASE("Parse mson property member when it has a member group in nested membe
     SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember);
 
     REQUIRE(propertyMember.report.error.code == Error::OK);
-    REQUIRE(propertyMember.report.warnings.size() == 1);
-    REQUIRE(propertyMember.report.warnings[0].code == IgnoringWarning);
+    REQUIRE(propertyMember.report.warnings.empty());
 
-    REQUIRE(propertyMember.node.sections.size() == 1);
+    REQUIRE(propertyMember.node.sections.size() == 2);
     REQUIRE(propertyMember.node.sections[0].type == mson::MemberTypeSectionType);
     REQUIRE(propertyMember.node.sections[0].content.members().size() == 1);
     REQUIRE(propertyMember.node.sections[0].content.members().at(0).content.property.name.literal == "username");
+    REQUIRE(propertyMember.node.sections[1].type == mson::MemberTypeSectionType);
+    REQUIRE(propertyMember.node.sections[1].content.members().size() == 1);
+    REQUIRE(propertyMember.node.sections[1].content.members().at(0).content.property.name.literal == "last_name");
 }
 
 TEST_CASE("Parse mson property member when it has multiple member groups", "[mson][property_member]")
@@ -203,15 +205,17 @@ TEST_CASE("Parse mson property member when it has multiple member groups", "[mso
     SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember);
 
     REQUIRE(propertyMember.report.error.code == Error::OK);
-    REQUIRE(propertyMember.report.warnings.size() == 1);
-    REQUIRE(propertyMember.report.warnings[0].code == IgnoringWarning);
+    REQUIRE(propertyMember.report.warnings.empty());
 
-    REQUIRE(propertyMember.node.sections.size() == 2);
+    REQUIRE(propertyMember.node.sections.size() == 3);
     REQUIRE(propertyMember.node.sections[0].type == mson::BlockDescriptionTypeSectionType);
     REQUIRE(propertyMember.node.sections[0].content.description == "This is good\n\n- really\n\nI am serious\n");
     REQUIRE(propertyMember.node.sections[1].type == mson::MemberTypeSectionType);
     REQUIRE(propertyMember.node.sections[1].content.members().size() == 1);
     REQUIRE(propertyMember.node.sections[1].content.members().at(0).content.property.name.literal == "last_name");
+    REQUIRE(propertyMember.node.sections[2].type == mson::MemberTypeSectionType);
+    REQUIRE(propertyMember.node.sections[2].content.members().size() == 1);
+    REQUIRE(propertyMember.node.sections[2].content.members().at(0).content.property.name.literal == "first_name");
 }
 
 TEST_CASE("Parse mson property member when it has the wrong member group", "[mson][property_member]")

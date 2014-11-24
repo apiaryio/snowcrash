@@ -92,17 +92,6 @@ namespace snowcrash {
                 sections[0].content.members().push_back(memberType);
             }
         }
-        // If the type section is a member group, check for an existing member group
-        else if (((pd.sectionContext() == MSONPropertyMembersSectionType) ||
-                  (pd.sectionContext() == MSONValueMembersSectionType)) &&
-                  !sections.empty() && checkForMemberGroup(sections)) {
-
-            //WARN: Member group type section already exists
-            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-            report.warnings.push_back(Warning("a nested member group has already been defined for this type",
-                                              IgnoringWarning,
-                                              sourceMap));
-        }
         else {
 
             IntermediateParseResult<mson::TypeSection> typeSection(report);
