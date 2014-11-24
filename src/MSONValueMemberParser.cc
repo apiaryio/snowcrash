@@ -46,18 +46,20 @@ namespace snowcrash {
                 return SectionProcessor<mson::ValueMember>::blockDescription(node, pd, sections, sourceMap);
             }
 
+            // Try to resolve base type if not given
+            resolveImplicitBaseType(node, pd.sectionContext(), baseType);
+
             // Build a section to indicate nested members
             if (sections.empty() ||
                 (!sections.empty() && sections.back().type != mson::MemberTypeSectionType)) {
 
                 mson::TypeSection typeSection(mson::MemberTypeSectionType);
+                typeSection.baseType = baseType;
+
                 sections.push_back(typeSection);
             }
 
             mson::MemberType memberType;
-
-            // Try to resolve base type if not given
-            resolveImplicitBaseType(node, pd.sectionContext(), baseType);
 
             if (baseType == mson::ValueBaseType &&
                 node->type == mdp::ListItemMarkdownNodeType) {
@@ -79,11 +81,21 @@ namespace snowcrash {
             else if (baseType == mson::PrimitiveBaseType ||
                      baseType == mson::ImplicitPrimitiveBaseType) {
 
-                //WARN: Primitive type members should not have nested members
+                // WARN: Primitive type members should not have nested members
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
                 report.warnings.push_back(Warning("sub-types of primitive types should not have nested members",
                                                   LogicalErrorWarning,
                                                   sourceMap));
+            }
+            else {
+
+                // WARN: Ignoring unrecognized block in mson nested members
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                report.warnings.push_back(Warning("ignorning unrecognized block",
+                                                  IgnoringWarning,
+                                                  sourceMap));
+
+                cur = ++MarkdownNodeIterator(node);
             }
 
             if (memberType.type != mson::UndefinedMemberType) {

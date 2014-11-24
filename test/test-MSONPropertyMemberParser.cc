@@ -284,14 +284,9 @@ TEST_CASE("Parse mson property member when it is an object and has no sub-type s
     ParseResult<mson::PropertyMember> propertyMember;
     SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember);
 
-
-    for (size_t i = 0; i < propertyMember.report.warnings.size(); i++) {
-        std::cout << propertyMember.report.warnings[i].message << std::endl;
-    }
-
-//    REQUIRE(propertyMember.report.error.code == Error::OK);
-//    REQUIRE(propertyMember.report.warnings.size() == 1);
-//    REQUIRE(propertyMember.report.warnings[0].code == IgnoringWarning);
+    REQUIRE(propertyMember.report.error.code == Error::OK);
+    REQUIRE(propertyMember.report.warnings.size() == 1);
+    REQUIRE(propertyMember.report.warnings[0].code == IgnoringWarning);
 
     REQUIRE(propertyMember.node.name.literal == "user");
     REQUIRE(propertyMember.node.valueDefinition.typeDefinition.baseType == mson::ImplicitPropertyBaseType);
