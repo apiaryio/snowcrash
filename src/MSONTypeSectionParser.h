@@ -120,7 +120,8 @@ namespace snowcrash {
                         out.node.content.members().push_back(memberType);
                     }
                 }
-                else {
+                else if (out.node.baseType == mson::PropertyBaseType ||
+                         out.node.baseType == mson::ImplicitPropertyBaseType) {
 
                     // WARN: sample/default is for an object but it has values in signature
                     mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);

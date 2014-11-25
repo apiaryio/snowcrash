@@ -273,7 +273,7 @@ TEST_CASE("Parse mson property member when it is an object and has no sub-type s
     REQUIRE(propertyMember.node.sections[1].content.members().at(0).content.property.sections.empty());
 }
 
-TEST_CASE("Parse mson property member when it is an object and has no sub-type specified", "[mson][property_member][now]")
+TEST_CASE("Parse mson property member when it is an object and has no sub-type specified", "[mson][property_member]")
 {
     mdp::ByteBuffer source = \
     "- user\n\n"\
@@ -308,4 +308,26 @@ TEST_CASE("Parse mson property member when it is an object and has no sub-type s
     REQUIRE(propertyMember.node.sections[0].content.members().at(1).content.property.valueDefinition.values.size() == 1);
     REQUIRE(propertyMember.node.sections[0].content.members().at(1).content.property.valueDefinition.values[0].literal == "pavan");
     REQUIRE(propertyMember.node.sections[0].content.members().at(1).content.property.sections.empty());
+}
+
+TEST_CASE("Parse mson property member when it is a string and has no sub-type specified", "[mson][property_member]")
+{
+    mdp::ByteBuffer source = \
+    "- username\n"\
+    "    - Sample: Pavan, Sunkara";
+
+    ParseResult<mson::PropertyMember> propertyMember;
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember);
+
+    REQUIRE(propertyMember.report.error.code == Error::OK);
+    REQUIRE(propertyMember.report.warnings.empty());
+
+    REQUIRE(propertyMember.node.name.literal == "username");
+    REQUIRE(propertyMember.node.valueDefinition.typeDefinition.baseType == mson::ImplicitPrimitiveBaseType);
+    REQUIRE(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.name.name == mson::UndefinedTypeName);
+    MSONHelper::empty(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.name.symbol);
+
+    REQUIRE(propertyMember.node.sections.size() == 1);
+    REQUIRE(propertyMember.node.sections[0].type == mson::SampleTypeSectionType);
+    REQUIRE(propertyMember.node.sections[0].content.value == "Pavan, Sunkara");
 }

@@ -194,6 +194,7 @@ namespace snowcrash {
                 case MSONPropertyMembersSectionType:
                 {
                     baseType = mson::ImplicitPropertyBaseType;
+                    break;
                 }
 
                 default:
