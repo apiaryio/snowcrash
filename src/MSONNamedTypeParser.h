@@ -55,7 +55,7 @@ namespace snowcrash {
 
             return SectionProcessor<mson::ValueMember>::processNestedMembers(node, siblings, pd, out.report,
                                                                              out.node.sections, out.sourceMap.sections,
-                                                                             out.node.base.baseType);
+                                                                             out.node.base.baseType, true);
         }
 
 

@@ -34,7 +34,8 @@ namespace snowcrash {
                                                                                    Report& report,
                                                                                    mson::TypeSections& sections,
                                                                                    SourceMap<mson::TypeSections>& sourceMap,
-                                                                                   mson::BaseType& baseType) {
+                                                                                   mson::BaseType& baseType,
+                                                                                   bool headerAdapter) {
 
         MarkdownNodeIterator cur = node;
 
@@ -110,7 +111,12 @@ namespace snowcrash {
             IntermediateParseResult<mson::TypeSection> typeSection(report);
             typeSection.node.baseType = baseType;
 
-            MSONTypeSectionListParser::parse(node, siblings, pd, typeSection);
+            if (headerAdapter) {
+                MSONTypeSectionHeaderParser::parse(node, siblings, pd, typeSection);
+            }
+            else {
+                MSONTypeSectionListParser::parse(node, siblings, pd, typeSection);
+            }
 
             if (typeSection.node.type != mson::UndefinedTypeSectionType) {
                 sections.push_back(typeSection.node);

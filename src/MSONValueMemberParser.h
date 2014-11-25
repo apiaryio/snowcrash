@@ -60,6 +60,10 @@ namespace snowcrash {
         static bool isDescriptionNode(const MarkdownNodeIterator& node,
                                       SectionType sectionType) {
 
+            if (SectionProcessor<mson::ValueMember>::nestedSectionType(node) != MSONSectionType) {
+                return false;
+            }
+
             if (node->type != mdp::ListItemMarkdownNodeType) {
                 return true;
             }
@@ -154,6 +158,7 @@ namespace snowcrash {
          * \param sections MSON Type Section collection
          * \param sourceMap MSON Type Section collection source map
          * \param baseType Base Type of the MSON member to be sent for nested type sections
+         * \param headerAdapter If true, use Header adapter for MSON Type Section parsing
          */
         static MarkdownNodeIterator processNestedMembers(const MarkdownNodeIterator&,
                                                          const MarkdownNodes&,
@@ -161,7 +166,8 @@ namespace snowcrash {
                                                          Report&,
                                                          mson::TypeSections&,
                                                          SourceMap<mson::TypeSections>&,
-                                                         mson::BaseType&);
+                                                         mson::BaseType&,
+                                                         bool headerAdapter = false);
 
         /**
          * \brief Resolve base types if possible, based on nested node given

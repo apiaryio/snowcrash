@@ -107,3 +107,26 @@ TEST_CASE("Parse canonical mson named type", "[mson][named_type]")
     REQUIRE(submember.content.property.valueDefinition.values.size() == 1);
     REQUIRE(submember.content.property.valueDefinition.values[0].literal == "Medium");
 }
+
+TEST_CASE("Parse named type with a type section", "[mson][named_type]")
+{
+    mdp::ByteBuffer source = \
+    "# User (string)\n"\
+    "## Sample: pksunkara";
+
+    ParseResult<mson::NamedType> namedType;
+    SectionParserHelper<mson::NamedType, MSONNamedTypeParser>::parse(source, MSONNamedTypeSectionType, namedType);
+
+    REQUIRE(namedType.report.error.code == Error::OK);
+    REQUIRE(namedType.report.warnings.empty());
+
+    REQUIRE(namedType.node.name.symbol.literal == "User");
+    REQUIRE(namedType.node.name.name == mson::UndefinedTypeName);
+    REQUIRE(namedType.node.base.attributes == 0);
+    REQUIRE(namedType.node.base.typeSpecification.name.name == mson::StringTypeName);
+    MSONHelper::empty(namedType.node.base.typeSpecification.name.symbol);
+    REQUIRE(namedType.node.base.baseType == mson::PrimitiveBaseType);
+    REQUIRE(namedType.node.sections.size() == 1);
+    REQUIRE(namedType.node.sections[0].type == mson::SampleTypeSectionType);
+    REQUIRE(namedType.node.sections[0].content.value == "pksunkara");
+}
