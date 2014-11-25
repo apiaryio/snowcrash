@@ -141,6 +141,10 @@ namespace snowcrash {
 
         struct ReferenceMetadata {
 
+            /** Constructor */
+            ReferenceMetadata(State state_ = StateUnresolved)
+            : state(state_) {}
+
             /** Markdown AST reference source node (for source map) */
             mdp::MarkdownNodeIterator node;
 
@@ -185,6 +189,9 @@ namespace snowcrash {
 
         /** Payload-specific Headers */
         Headers headers;
+
+        /** Payload-specific Attributes */
+        Attributes attributes;
 
         /** Body */
         Asset body;

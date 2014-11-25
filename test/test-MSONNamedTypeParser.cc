@@ -131,7 +131,7 @@ TEST_CASE("Parse named type with a type section", "[mson][named_type]")
     REQUIRE(namedType.node.sections[0].content.value == "pksunkara");
 }
 
-TEST_CASE("Parse named type without type specification", "[mson][named_type][now]")
+TEST_CASE("Parse named type without type specification", "[mson][named_type]")
 {
     mdp::ByteBuffer source = \
     "# User\n"\

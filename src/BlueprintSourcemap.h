@@ -82,11 +82,14 @@ namespace snowcrash {
         /** Source Map of Payload Description */
         SourceMap<Description> description;
 
-        /** Payload-specific Parameters */
+        /** Source Map of Payload-specific Parameters */
         SourceMap<Parameters> parameters;
 
-        /** Payload-specific Headers */
+        /** Source Map of Payload-specific Headers */
         SourceMap<Headers> headers;
+
+        /** Source Map of Payload-specific Attributes */
+        SourceMap<Attributes> attributes;
 
         /** Source Map of Body */
         SourceMap<Asset> body;
