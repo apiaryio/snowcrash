@@ -9,8 +9,8 @@
 #ifndef SNOWCRASH_ATTRIBUTESPARSER_H
 #define SNOWCRASH_ATTRIBUTESPARSER_H
 
-#include "SectionParser.h"
 #include "RegexMatch.h"
+#include "MSONValueMemberParser.h"
 
 using namespace scpl;
 
@@ -33,7 +33,55 @@ namespace snowcrash {
             return signatureTraits;
         }
 
-        NO_SECTION_DESCRIPTION(Attributes)
+        static MarkdownNodeIterator finalizeSignature(const MarkdownNodeIterator& node,
+                                                      SectionParserData& pd,
+                                                      const Signature& signature,
+                                                      const ParseResultRef<Attributes>& out) {
+
+            if (!IEqual<std::string>()(signature.identifier, "Attribute") &&
+                !IEqual<std::string>()(signature.identifier, "Attributes")) {
+
+                return node;
+            }
+
+            mson::parseTypeDefinition(node, pd, signature.attributes, out.report, out.node.source.base);
+
+            // Default to `object` type specification
+            if (out.node.source.base.baseType == mson::UndefinedBaseType) {
+                out.node.source.base.baseType = mson::ImplicitPropertyBaseType;
+            }
+
+            SectionProcessor<mson::ValueMember>::parseRemainingContent(node, pd, signature.remainingContent,
+                                                                       out.node.source.sections, out.sourceMap.sections);
+
+            return ++MarkdownNodeIterator(node);
+        }
+
+        static MarkdownNodeIterator processDescription(const MarkdownNodeIterator& node,
+                                                       const MarkdownNodes& siblings,
+                                                       SectionParserData& pd,
+                                                       const ParseResultRef<Attributes>& out) {
+
+            return SectionProcessor<mson::ValueMember>::blockDescription(node, pd, out.node.source.sections, out.sourceMap.sections);
+        }
+
+        static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
+                                                         const MarkdownNodes& siblings,
+                                                         SectionParserData& pd,
+                                                         const ParseResultRef<Attributes>& out) {
+
+            ParseResultRef<mson::TypeSections> typeSections(out.report, out.node.source.sections, out.sourceMap.sections);
+
+            return SectionProcessor<mson::ValueMember>
+                    ::processNestedMembers<MSONTypeSectionListParser>(node, siblings, pd, typeSections,
+                                                                      out.node.source.base.baseType);
+        }
+
+        static bool isDescriptionNode(const MarkdownNodeIterator& node,
+                                      SectionType sectionType) {
+
+            return SectionProcessor<mson::ValueMember>::isDescriptionNode(node, sectionType);
+        }
 
         static SectionType sectionType(const MarkdownNodeIterator& node) {
 
@@ -51,6 +99,11 @@ namespace snowcrash {
             }
 
             return UndefinedSectionType;
+        }
+
+        static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
+
+            return SectionProcessor<mson::ValueMember>::nestedSectionType(node);
         }
     };
 

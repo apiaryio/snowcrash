@@ -158,10 +158,10 @@ namespace snowcrash {
     struct DataStructure {
 
         /** As described in source */
-        mson::NamedType type;
+        mson::NamedType source;
 
         /** As resolved by subsequent tooling */
-        mson::NamedType resolvedType;
+        mson::NamedType resolved;
     };
 
     /**
