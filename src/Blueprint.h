@@ -14,6 +14,7 @@
 #include <utility>
 #include "Platform.h"
 #include "MarkdownNode.h"
+#include "MSONSourcemap.h"
 
 /**
  *  API Blueprint Abstract Syntax Tree
@@ -52,18 +53,6 @@ namespace snowcrash {
 
     /** A generic key - value pair */
     typedef std::pair<std::string, std::string> KeyValuePair;
-
-    /**
-     * Default Container for collections.
-     *
-     *  FIXME: Use C++11 template aliases when migrating to C++11.
-     */
-    template<typename T>
-    struct Collection {
-        typedef std::vector<T> type;
-        typedef typename std::vector<T>::iterator iterator;
-        typedef typename std::vector<T>::const_iterator const_iterator;
-    };
 
     /** An asset data */
     typedef std::string Asset;
@@ -162,6 +151,23 @@ namespace snowcrash {
         /** Metadata for the reference */
         ReferenceMetadata meta;
     };
+
+    /**
+     * Data Structure
+     */
+    struct DataStructure {
+
+        /** As described in source */
+        mson::NamedType type;
+
+        /** As resolved by subsequent tooling */
+        mson::NamedType resolvedType;
+    };
+
+    /**
+     *  Attributes
+     */
+    typedef DataStructure Attributes;
 
     /**
      *  Payload

@@ -10,6 +10,7 @@
 #define SNOWCRASH_MSONSOURCEMAP_H
 
 #include "MSON.h"
+#include "MarkdownParser.h"
 
 /**
  * MSON Sourcemap Abstract Syntax Tree
@@ -18,7 +19,20 @@
  * Data types in this document define the MSON Sourcemap AST
  */
 
+#define SOURCE_MAP_COLLECTION(T, TC) template<>\
+struct SourceMap<TC> {\
+    Collection<SourceMap<T> >::type collection;\
+};\
+
 namespace snowcrash {
+
+    struct SourceMapBase {
+        mdp::BytesRangeSet sourceMap;
+    };
+
+    template<typename T>
+    struct SourceMap : public SourceMapBase {
+    };
 
     /** Source Map of Collection of Values */
     SOURCE_MAP_COLLECTION(mson::Value, mson::Values)

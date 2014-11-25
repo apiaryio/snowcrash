@@ -16,7 +16,6 @@
 
 #include "Platform.h"
 #include "MarkdownParser.h"
-#include "BlueprintSourcemap.h"
 
 #define MEMBERS_NOT_SET_ERR std::logic_error("no members set")
 
@@ -26,6 +25,21 @@
  *
  * Data types in this document define the MSON AST
  */
+
+namespace snowcrash {
+
+    /**
+     * Default Container for collections.
+     *
+     *  FIXME: Use C++11 template aliases when migrating to C++11.
+     */
+    template<typename T>
+    struct Collection {
+        typedef std::vector<T> type;
+        typedef typename std::vector<T>::iterator iterator;
+        typedef typename std::vector<T>::const_iterator const_iterator;
+    };
+}
 
 namespace mson {
 

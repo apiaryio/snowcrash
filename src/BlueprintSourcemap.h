@@ -10,7 +10,6 @@
 #define SNOWCRASH_BLUEPRINT_SOURCEMAP_H
 
 #include "Blueprint.h"
-#include "MarkdownParser.h"
 
 /**
  *  API Blueprint Sourcemap Abstract Syntax Tree
@@ -19,20 +18,7 @@
  *  Data types in this documents define the API Blueprint Sourcemap AST.
  */
 
-#define SOURCE_MAP_COLLECTION(T, TC) template<>\
-struct SourceMap<TC> {\
-    Collection<SourceMap<T> >::type collection;\
-};\
-
 namespace snowcrash {
-
-    struct SourceMapBase {
-        mdp::BytesRangeSet sourceMap;
-    };
-
-    template<typename T>
-    struct SourceMap : public SourceMapBase {
-    };
 
     /** Source Map of Metadata Collection */
     SOURCE_MAP_COLLECTION(Metadata, MetadataCollection)
@@ -43,7 +29,9 @@ namespace snowcrash {
     /** Source Map of Collection of Parameter values */
     SOURCE_MAP_COLLECTION(Value, Values)
 
-    /** Source Map Structure for Parameter */
+    /**
+     * Source Map Structure for Parameter
+     */
     template<>
     struct SourceMap<Parameter> : public SourceMapBase {
 
@@ -71,6 +59,16 @@ namespace snowcrash {
 
     /** Source Map of Collection of Parameters */
     SOURCE_MAP_COLLECTION(Parameter, Parameters)
+
+    /**
+     * Source Map Structure for DataStructure
+     */
+    template<>
+    struct SourceMap<DataStructure> : public SourceMap<mson::NamedType> {
+    };
+
+    /** Source Map of Attributes */
+    // 'Attributes' type is same as 'DataStructure'
 
     /**
      * Source Map Structure for Payload

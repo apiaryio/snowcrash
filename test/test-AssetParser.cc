@@ -22,7 +22,7 @@ const mdp::ByteBuffer SchemaAssetFixture = \
 "\n"\
 "        Dolor Sit Amet\n";
 
-TEST_CASE("recognize explicit body signature", "[asset]")
+TEST_CASE("Recognize explicit body signature", "[asset]")
 {
     mdp::MarkdownParser markdownParser;
     mdp::MarkdownNode markdownAST;
@@ -33,7 +33,7 @@ TEST_CASE("recognize explicit body signature", "[asset]")
     REQUIRE(sectionType == BodySectionType);
 }
 
-TEST_CASE("recognize body with content on signature", "[asset]")
+TEST_CASE("Recognize body with content on signature", "[asset]")
 {
     mdp::ByteBuffer source = \
     "+ Body\n"\
@@ -48,7 +48,7 @@ TEST_CASE("recognize body with content on signature", "[asset]")
     REQUIRE(sectionType == BodySectionType);
 }
 
-TEST_CASE("recognize schema signature", "[asset]")
+TEST_CASE("Recognize schema signature", "[asset]")
 {
     mdp::MarkdownParser markdownParser;
     mdp::MarkdownNode markdownAST;
@@ -59,7 +59,7 @@ TEST_CASE("recognize schema signature", "[asset]")
     REQUIRE(sectionType == SchemaSectionType);
 }
 
-TEST_CASE("parse body asset", "[asset]")
+TEST_CASE("Parse body asset", "[asset]")
 {
     ParseResult<Asset> asset;
     SectionParserHelper<Asset, AssetParser>::parse(BodyAssetFixture, BodySectionType, asset, ExportSourcemapOption);
@@ -73,7 +73,7 @@ TEST_CASE("parse body asset", "[asset]")
     REQUIRE(asset.sourceMap.sourceMap[0].length == 16);
 }
 
-TEST_CASE("parse schema asset", "[asset]")
+TEST_CASE("Parse schema asset", "[asset]")
 {
     ParseResult<Asset> asset;
     SectionParserHelper<Asset, AssetParser>::parse(SchemaAssetFixture, SchemaSectionType, asset, ExportSourcemapOption);

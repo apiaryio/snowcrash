@@ -92,6 +92,7 @@
         'src/SectionParserData.h',
         'src/ActionParser.h',
         'src/AssetParser.h',
+        'src/AttributesParser.h',
         'src/Blueprint.h',
         'src/BlueprintParser.h',
         'src/BlueprintSourcemap.h',
@@ -146,6 +147,7 @@
       'sources': [
         'test/test-ActionParser.cc',
         'test/test-AssetParser.cc',
+        'test/test-AttributesParser.cc',
         'test/test-Blueprint.cc',
         'test/test-BlueprintParser.cc',
         'test/test-HeadersParser.cc',

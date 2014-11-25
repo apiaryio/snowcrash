@@ -10,7 +10,6 @@
 #define SNOWCRASH_SECTIONPARSER_H
 
 #include <stdexcept>
-#include "SectionProcessor.h"
 #include "SignatureSectionProcessor.h"
 
 #define ADAPTER_MISMATCH_ERR std::logic_error("mismatched adapter and node type")

@@ -10,7 +10,7 @@
 #define SNOWCRASH_SECTIONPARSERDATA_H
 
 #include "ModelTable.h"
-#include "MSONSourcemap.h"
+#include "BlueprintSourcemap.h"
 #include "Section.h"
 
 namespace snowcrash {

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		401E5E661A24B545009570D0 /* AttributesParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 401E5E651A24B545009570D0 /* AttributesParser.h */; };
+		401E5E681A24B56B009570D0 /* test-AttributesParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = 401E5E671A24B56B009570D0 /* test-AttributesParser.cc */; };
 		404CD83A1A07D38300AB1416 /* MSONSourcemap.h in Headers */ = {isa = PBXBuildFile; fileRef = 404CD8381A07D38300AB1416 /* MSONSourcemap.h */; };
 		404CD83B1A07D38300AB1416 /* MSONValueMemberParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 404CD8391A07D38300AB1416 /* MSONValueMemberParser.h */; };
 		404CD83F1A07D3A800AB1416 /* test-MSONValueMemberParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = 404CD83E1A07D3A800AB1416 /* test-MSONValueMemberParser.cc */; };
@@ -154,6 +156,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		401E5E651A24B545009570D0 /* AttributesParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AttributesParser.h; path = src/AttributesParser.h; sourceTree = "<group>"; };
+		401E5E671A24B56B009570D0 /* test-AttributesParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-AttributesParser.cc"; path = "test/test-AttributesParser.cc"; sourceTree = "<group>"; };
 		404CD8381A07D38300AB1416 /* MSONSourcemap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MSONSourcemap.h; path = src/MSONSourcemap.h; sourceTree = "<group>"; };
 		404CD8391A07D38300AB1416 /* MSONValueMemberParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MSONValueMemberParser.h; path = src/MSONValueMemberParser.h; sourceTree = "<group>"; };
 		404CD83E1A07D3A800AB1416 /* test-MSONValueMemberParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-MSONValueMemberParser.cc"; path = "test/test-MSONValueMemberParser.cc"; sourceTree = "<group>"; };
@@ -349,6 +353,7 @@
 				BB088F76192D289C003AA95C /* snowcrashtest.h */,
 				BB50F0BC17D1DC9B0002C363 /* test-ActionParser.cc */,
 				BB3DD974174654FD004C4077 /* test-AssetParser.cc */,
+				401E5E671A24B56B009570D0 /* test-AttributesParser.cc */,
 				BBFF48D7170C57F1001E5FB2 /* test-Blueprint.cc */,
 				BBA01FF817292F9C0050B603 /* test-BlueprintParser.cc */,
 				BBFC8421196C0C27001A236A /* test-csnowcrash.cc */,
@@ -385,6 +390,7 @@
 			children = (
 				BB50F0BB17D1DB4D0002C363 /* ActionParser.h */,
 				BB3DD973174654B8004C4077 /* AssetParser.h */,
+				401E5E651A24B545009570D0 /* AttributesParser.h */,
 				BBFF48D4170C4F30001E5FB2 /* Blueprint.h */,
 				BBA91DC0171D402600649B05 /* BlueprintParser.h */,
 				4070F30119E4C30A004892C8 /* BlueprintSourcemap.h */,
@@ -468,6 +474,7 @@
 				BBB0F42A1731CE0D00C92465 /* RegexMatch.h in Headers */,
 				BBD5F9C917353C310049BBEE /* ResourceGroupParser.h in Headers */,
 				BBFC8419196C0C0F001A236A /* CBlueprint.h in Headers */,
+				401E5E661A24B545009570D0 /* AttributesParser.h in Headers */,
 				40BCDEAC1A0A96F8008C6C84 /* MSONMixinParser.h in Headers */,
 				BBC2D85F18301FEC00FBCEA7 /* CodeBlockUtility.h in Headers */,
 				BB8C3E631923D6FE00EF36FA /* SectionParser.h in Headers */,
@@ -654,6 +661,7 @@
 				40CA216519FE993E0086531D /* test-StringUtility.cc in Sources */,
 				BBFC8427196C1B1F001A236A /* test-ResourceParser.cc in Sources */,
 				BBE7FEBE1922CAF300A1649E /* test-Blueprint.cc in Sources */,
+				401E5E681A24B56B009570D0 /* test-AttributesParser.cc in Sources */,
 				BBCC856719543A4D00B99E90 /* test-SectionParser.cc in Sources */,
 				40BCDEBD1A0A9892008C6C84 /* test-MSONNamedTypeParser.cc in Sources */,
 				BBB127881999700E0041E9AE /* test-ResourceGroupParser.cc in Sources */,
