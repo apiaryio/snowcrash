@@ -73,6 +73,13 @@ namespace snowcrash {
 
         static SectionType nestedSectionType(const MarkdownNodeIterator&);
 
+        static void finalize(const MarkdownNodeIterator& node,
+                             SectionParserData& pd,
+                             const ParseResultRef<mson::ValueMember>& out) {
+
+            SectionProcessor<mson::ValueMember>::finalizeImplicitBaseType(out.node.valueDefinition.typeDefinition.baseType);
+        }
+
         /**
          * \brief Use signature data to fill up the AST
          *
@@ -170,6 +177,18 @@ namespace snowcrash {
                                                          bool headerAdapter = false);
 
         /**
+         * \brief If base type is still undefined, make it implicit string
+         *
+         * \param MSON member base type
+         */
+        static void finalizeImplicitBaseType(mson::BaseType& baseType) {
+
+            if (baseType == mson::UndefinedBaseType) {
+                baseType = mson::ImplicitPrimitiveBaseType;
+            }
+        }
+
+        /**
          * \brief Resolve base types if possible, based on nested node given
          *
          * \param node Node to process
@@ -190,9 +209,6 @@ namespace snowcrash {
                     if (node->type == mdp::ListItemMarkdownNodeType) {
                         baseType = mson::ImplicitPropertyBaseType;
                     }
-                    else {
-                        baseType = mson::ImplicitPrimitiveBaseType;
-                    }
 
                     break;
                 }
@@ -200,6 +216,12 @@ namespace snowcrash {
                 case MSONPropertyMembersSectionType:
                 {
                     baseType = mson::ImplicitPropertyBaseType;
+                    break;
+                }
+
+                case MSONSampleDefaultSectionType:
+                {
+                    baseType = mson::ImplicitPrimitiveBaseType;
                     break;
                 }
 

@@ -37,6 +37,11 @@ namespace snowcrash {
             mson::parseTypeName(signature.identifier, out.node.name);
             mson::parseTypeDefinition(node, pd, signature.attributes, out.report, out.node.base);
 
+            // Named types should have type specification when sub-typed from primitive types
+            if (out.node.base.baseType == mson::UndefinedBaseType) {
+                out.node.base.baseType = mson::ImplicitPropertyBaseType;
+            }
+
             return ++MarkdownNodeIterator(node);
         }
 

@@ -130,3 +130,25 @@ TEST_CASE("Parse named type with a type section", "[mson][named_type]")
     REQUIRE(namedType.node.sections[0].type == mson::SampleTypeSectionType);
     REQUIRE(namedType.node.sections[0].content.value == "pksunkara");
 }
+
+TEST_CASE("Parse named type without type specification", "[mson][named_type][now]")
+{
+    mdp::ByteBuffer source = \
+    "# User\n"\
+    "## Sample: pksunkara";
+
+    ParseResult<mson::NamedType> namedType;
+    SectionParserHelper<mson::NamedType, MSONNamedTypeParser>::parse(source, MSONNamedTypeSectionType, namedType);
+
+    REQUIRE(namedType.report.error.code == Error::OK);
+    REQUIRE(namedType.report.warnings.size() == 1);
+    REQUIRE(namedType.report.warnings[0].code == LogicalErrorWarning);
+
+    REQUIRE(namedType.node.name.symbol.literal == "User");
+    REQUIRE(namedType.node.base.attributes == 0);
+    MSONHelper::empty(namedType.node.base.typeSpecification.name);
+    REQUIRE(namedType.node.base.baseType == mson::ImplicitPropertyBaseType);
+    REQUIRE(namedType.node.sections.size() == 1);
+    REQUIRE(namedType.node.sections[0].type == mson::SampleTypeSectionType);
+    REQUIRE(namedType.node.sections[0].baseType == mson::ImplicitPropertyBaseType);
+}

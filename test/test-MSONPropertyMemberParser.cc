@@ -181,16 +181,14 @@ TEST_CASE("Parse mson property member when it has a member group in nested membe
     REQUIRE(propertyMember.report.error.code == Error::OK);
     REQUIRE(propertyMember.report.warnings.empty());
 
-    REQUIRE(propertyMember.node.sections.size() == 3);
+    REQUIRE(propertyMember.node.sections.size() == 2);
     REQUIRE(propertyMember.node.sections[0].type == mson::MemberTypeSectionType);
     REQUIRE(propertyMember.node.sections[0].content.members().size() == 1);
     REQUIRE(propertyMember.node.sections[0].content.members().at(0).content.property.name.literal == "username");
     REQUIRE(propertyMember.node.sections[1].type == mson::MemberTypeSectionType);
-    REQUIRE(propertyMember.node.sections[1].content.members().size() == 1);
+    REQUIRE(propertyMember.node.sections[1].content.members().size() == 2);
     REQUIRE(propertyMember.node.sections[1].content.members().at(0).content.property.name.literal == "last_name");
-    REQUIRE(propertyMember.node.sections[2].type == mson::MemberTypeSectionType);
-    REQUIRE(propertyMember.node.sections[2].content.members().size() == 1);
-    REQUIRE(propertyMember.node.sections[2].content.members().at(0).content.property.name.literal == "first_name");
+    REQUIRE(propertyMember.node.sections[1].content.members().at(1).content.property.name.literal == "first_name");
 }
 
 TEST_CASE("Parse mson property member when it has multiple member groups", "[mson][property_member]")
@@ -295,6 +293,7 @@ TEST_CASE("Parse mson property member when it is an object and has no sub-type s
 
     REQUIRE(propertyMember.node.sections.size() == 1);
     REQUIRE(propertyMember.node.sections[0].type == mson::MemberTypeSectionType);
+    REQUIRE(propertyMember.node.sections[0].baseType == mson::ImplicitPropertyBaseType);
     REQUIRE(propertyMember.node.sections[0].content.members().size() == 2);
 
     REQUIRE(propertyMember.node.sections[0].content.members().at(0).type == mson::PropertyMemberType);
@@ -313,7 +312,8 @@ TEST_CASE("Parse mson property member when it is an object and has no sub-type s
 TEST_CASE("Parse mson property member when it is a string and has no sub-type specified", "[mson][property_member]")
 {
     mdp::ByteBuffer source = \
-    "- username\n"\
+    "- username\n\n"\
+    "    Some block description\n\n"\
     "    - Sample: Pavan, Sunkara";
 
     ParseResult<mson::PropertyMember> propertyMember;
@@ -327,7 +327,32 @@ TEST_CASE("Parse mson property member when it is a string and has no sub-type sp
     REQUIRE(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.name.name == mson::UndefinedTypeName);
     MSONHelper::empty(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.name.symbol);
 
+    REQUIRE(propertyMember.node.sections.size() == 2);
+    REQUIRE(propertyMember.node.sections[0].type == mson::BlockDescriptionTypeSectionType);
+    REQUIRE(propertyMember.node.sections[0].content.description == "Some block description\n");
+    REQUIRE(propertyMember.node.sections[1].type == mson::SampleTypeSectionType);
+    REQUIRE(propertyMember.node.sections[1].baseType == mson::ImplicitPrimitiveBaseType);
+    REQUIRE(propertyMember.node.sections[1].content.value == "Pavan, Sunkara");
+}
+
+TEST_CASE("Parse mson property member when no sub-type specified and no nested sections", "[mson][property_member]")
+{
+    mdp::ByteBuffer source = \
+    "- username\n\n"\
+    "    Some block description";
+
+    ParseResult<mson::PropertyMember> propertyMember;
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember);
+
+    REQUIRE(propertyMember.report.error.code == Error::OK);
+    REQUIRE(propertyMember.report.warnings.empty());
+
+    REQUIRE(propertyMember.node.name.literal == "username");
+    REQUIRE(propertyMember.node.valueDefinition.typeDefinition.baseType == mson::ImplicitPrimitiveBaseType);
+    REQUIRE(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.name.name == mson::UndefinedTypeName);
+    MSONHelper::empty(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.name.symbol);
+
     REQUIRE(propertyMember.node.sections.size() == 1);
-    REQUIRE(propertyMember.node.sections[0].type == mson::SampleTypeSectionType);
-    REQUIRE(propertyMember.node.sections[0].content.value == "Pavan, Sunkara");
+    REQUIRE(propertyMember.node.sections[0].type == mson::BlockDescriptionTypeSectionType);
+    REQUIRE(propertyMember.node.sections[0].content.description == "Some block description");
 }

@@ -69,6 +69,13 @@ namespace snowcrash {
 
             return SectionProcessor<mson::ValueMember>::nestedSectionType(node);
         }
+
+        static void finalize(const MarkdownNodeIterator& node,
+                             SectionParserData& pd,
+                             const ParseResultRef<mson::PropertyMember>& out) {
+
+            SectionProcessor<mson::ValueMember>::finalizeImplicitBaseType(out.node.valueDefinition.typeDefinition.baseType);
+        }
     };
 
     /** MSON Property Member Section Parser */

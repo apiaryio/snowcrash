@@ -100,7 +100,7 @@ namespace snowcrash {
             }
 
             if (memberType.type != mson::UndefinedMemberType) {
-                sections[0].content.members().push_back(memberType);
+                sections.back().content.members().push_back(memberType);
             }
         }
         else {
