@@ -945,3 +945,62 @@ TEST_CASE("Body list item in description", "[resource][regression][#190]")
     REQUIRE(resource.sourceMap.actions.collection[0].description.sourceMap[0].location == 10);
     REQUIRE(resource.sourceMap.actions.collection[0].description.sourceMap[0].length == 34);
 }
+
+TEST_CASE("Parse resource attributes", "[resource]")
+{
+    mdp::ByteBuffer source = \
+    "# Coupons [/coupons]\n\n"\
+    "+ Attributes (array[Coupon])\n\n"\
+    "## List [GET]\n\n"\
+    "+ Response 200 (application/json)\n\n"\
+    "  + Attributes (Coupons)";
+
+    ParseResult<Resource> resource;
+    NamedTypes namedTypes;
+
+    NamedTypeHelper::build("Coupon", mson::PropertyBaseType, namedTypes);
+    NamedTypeHelper::build("Coupons", mson::ValueBaseType, namedTypes);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource, ExportSourcemapOption, Models(), NULL, namedTypes);
+
+    REQUIRE(resource.report.error.code == Error::OK);
+    REQUIRE(resource.report.warnings.empty());
+
+    REQUIRE(resource.node.name == "Coupons");
+    REQUIRE(resource.node.attributes.source.name.symbol.literal == "Coupons");
+    REQUIRE(resource.node.attributes.source.base.typeSpecification.name.name == mson::ArrayTypeName);
+    REQUIRE(resource.node.attributes.source.base.typeSpecification.nestedTypes.size() == 1);
+    REQUIRE(resource.node.attributes.source.base.typeSpecification.nestedTypes[0].symbol.literal == "Coupon");
+
+    REQUIRE(resource.node.actions.size() == 1);
+    REQUIRE(resource.node.actions[0].examples.size() == 1);
+    REQUIRE(resource.node.actions[0].examples[0].responses.size() == 1);
+}
+
+TEST_CASE("Parse unnamed resource attributes", "[resource]")
+{
+    mdp::ByteBuffer source = \
+    "# /coupons\n\n"\
+    "+ Attributes (array[Coupon])\n\n"\
+    "## List [GET]\n\n"\
+    "+ Response 200 (application/json)\n\n"\
+    "  + Attributes (Coupons)";
+
+    ParseResult<Resource> resource;
+    NamedTypes namedTypes;
+
+    NamedTypeHelper::build("Coupon", mson::PropertyBaseType, namedTypes);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource, ExportSourcemapOption, Models(), NULL, namedTypes);
+
+    REQUIRE(resource.report.error.code == Error::OK);
+    REQUIRE(resource.report.warnings.size() == 1); // Unknown type 'Coupons'
+
+    REQUIRE(resource.node.name.empty());
+    REQUIRE(resource.node.attributes.source.name.empty());
+    REQUIRE(resource.node.attributes.source.base.typeSpecification.name.name == mson::ArrayTypeName);
+    REQUIRE(resource.node.attributes.source.base.typeSpecification.nestedTypes.size() == 1);
+    REQUIRE(resource.node.attributes.source.base.typeSpecification.nestedTypes[0].symbol.literal == "Coupon");
+
+    REQUIRE(resource.node.actions.size() == 1);
+    REQUIRE(resource.node.actions[0].examples.size() == 1);
+    REQUIRE(resource.node.actions[0].examples[0].responses.size() == 1);
+}

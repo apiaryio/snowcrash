@@ -189,6 +189,9 @@ namespace snowcrash {
         /** Model representing this Resource */
         SourceMap<ResourceModel> model;
 
+        /** Source Map of Resource-specific Attributes */
+        SourceMap<Attributes> attributes;
+
         /** Parameters */
         SourceMap<Parameters> parameters;
 

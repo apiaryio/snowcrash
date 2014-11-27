@@ -302,6 +302,9 @@ namespace snowcrash {
         /** Model representing this Resource */
         ResourceModel model;
 
+        /** Resource-specific Attributes */
+        Attributes attributes;
+
         /** Parameters */
         Parameters parameters;
 

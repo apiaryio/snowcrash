@@ -105,6 +105,18 @@ namespace snowcrash {
                     return SectionProcessor<Action>::handleDeprecatedHeaders(node, siblings, pd, headers);
                 }
 
+                case AttributesSectionType:
+                {
+                    ParseResultRef<Attributes> attributes(out.report, out.node.attributes, out.sourceMap.attributes);
+                    MarkdownNodeIterator cur = AttributesParser::parse(node, siblings, pd, attributes);
+
+                    if (!out.node.name.empty()) {
+                        attributes.node.source.name.symbol.literal = out.node.name;
+                    }
+
+                    return cur;
+                }
+
                 default:
                     break;
             }
@@ -189,7 +201,7 @@ namespace snowcrash {
             // Check if headers section
             nestedType = SectionProcessor<Headers>::sectionType(node);
 
-            if (nestedType == HeadersSectionType) {
+            if (nestedType != UndefinedSectionType) {
                 return nestedType;
             }
 
@@ -199,6 +211,13 @@ namespace snowcrash {
             if (nestedType == ModelSectionType ||
                 nestedType == ModelBodySectionType) {
 
+                return nestedType;
+            }
+
+            // Check if attributes section
+            nestedType = SectionProcessor<Attributes>::sectionType(node);
+
+            if (nestedType != UndefinedSectionType) {
                 return nestedType;
             }
 
@@ -252,14 +271,14 @@ namespace snowcrash {
             // Consolidate deprecated headers into subsequent payloads
             if (!out.node.headers.empty()) {
 
-                Collection<Action>::iterator actIt = out.node.actions.begin();
-                Collection<SourceMap<Action> >::iterator actSMIt = out.sourceMap.actions.collection.begin();
+                Collection<Action>::iterator actionIt = out.node.actions.begin();
+                Collection<SourceMap<Action> >::iterator actionSMIt = out.sourceMap.actions.collection.begin();
 
                 for (;
-                     actIt != out.node.actions.end();
-                     ++actIt, ++actSMIt) {
+                     actionIt != out.node.actions.end();
+                     ++actionIt, ++actionSMIt) {
 
-                    SectionProcessor<Headers>::injectDeprecatedHeaders(pd, out.node.headers, out.sourceMap.headers, actIt->examples, actSMIt->examples);
+                    SectionProcessor<Headers>::injectDeprecatedHeaders(pd, out.node.headers, out.sourceMap.headers, actionIt->examples, actionSMIt->examples);
                 }
 
                 out.node.headers.clear();
