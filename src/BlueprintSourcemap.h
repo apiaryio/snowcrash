@@ -147,6 +147,9 @@ namespace snowcrash {
         /** Action-specific Parameters */
         SourceMap<Parameters> parameters;
 
+        /** Action-specific Attributes */
+        SourceMap<Attributes> attributes;
+
         /**
          *  \brief Action-specific HTTP headers
          *

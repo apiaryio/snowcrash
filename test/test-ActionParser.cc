@@ -489,3 +489,33 @@ TEST_CASE("Warn when request is not followed by a response", "[action]")
     REQUIRE(action.sourceMap.examples.collection[1].requests.collection.size() == 1);
     REQUIRE(action.sourceMap.examples.collection[1].responses.collection.size() == 0);
 }
+
+TEST_CASE("Parse action attributes", "[action]")
+{
+    mdp::ByteBuffer source = \
+    "# GET /1\n\n"\
+    "+ attributes (Coupon)\n"\
+    "+ request A\n\n"\
+    "+ response 204\n\n"
+    "+ request B\n\n"\
+    "  + attributes (string)\n\n"\
+    "+ response 204";
+
+    ParseResult<Action> action;
+    NamedTypes namedTypes;
+
+    NamedTypeHelper::build("Coupon", mson::PropertyBaseType, namedTypes);
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action, ExportSourcemapOption, Models(), NULL, namedTypes);
+
+    REQUIRE(action.report.error.code == Error::OK);
+    REQUIRE(action.report.warnings.empty());
+
+    REQUIRE(action.node.attributes.source.base.typeSpecification.name.symbol.literal == "Coupon");
+    REQUIRE(action.node.examples.size() == 2);
+    REQUIRE(action.node.examples[0].requests.size() == 1);
+    REQUIRE(action.node.examples[0].requests[0].attributes.source.empty());
+    REQUIRE(action.node.examples[0].responses.size() == 1);
+    REQUIRE(action.node.examples[1].requests.size() == 1);
+    REQUIRE(action.node.examples[1].requests[0].attributes.source.base.typeSpecification.name.name == mson::StringTypeName);
+    REQUIRE(action.node.examples[1].responses.size() == 1);
+}

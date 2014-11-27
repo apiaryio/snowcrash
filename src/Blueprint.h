@@ -261,6 +261,9 @@ namespace snowcrash {
         /** Action-specific Parameters */
         Parameters parameters;
 
+        /** Action-specific Attributes */
+        Attributes attributes;
+
         /**
          *  \brief Action-specific HTTP headers
          *
