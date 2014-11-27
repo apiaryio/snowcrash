@@ -54,8 +54,9 @@ namespace snowcrash {
                                                          SectionParserData& pd,
                                                          const ParseResultRef<mson::PropertyMember>& out) {
 
-            return SectionProcessor<mson::ValueMember>::processNestedMembers(node, siblings, pd, out.report,
-                                                                             out.node.sections, out.sourceMap.sections,
+            ParseResultRef<mson::TypeSections> typeSections(out.report, out.node.sections, out.sourceMap.sections);
+
+            return SectionProcessor<mson::ValueMember>::processNestedMembers(node, siblings, pd, typeSections,
                                                                              out.node.valueDefinition.typeDefinition.baseType);
         }
 

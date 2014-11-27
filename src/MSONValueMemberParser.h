@@ -52,8 +52,9 @@ namespace snowcrash {
                                                          SectionParserData& pd,
                                                          const ParseResultRef<mson::ValueMember>& out) {
 
-            return SectionProcessor<mson::ValueMember>::processNestedMembers(node, siblings, pd, out.report,
-                                                                             out.node.sections, out.sourceMap.sections,
+            ParseResultRef<mson::TypeSections> typeSections(out.report, out.node.sections, out.sourceMap.sections);
+
+            return SectionProcessor<mson::ValueMember>::processNestedMembers(node, siblings, pd, typeSections,
                                                                              out.node.valueDefinition.typeDefinition.baseType);
         }
 
@@ -161,20 +162,16 @@ namespace snowcrash {
          * \param node Node to process
          * \param siblings Siblings of the node being processed
          * \param pd Section Parser Data
-         * \param report Section Parser result report
-         * \param sections MSON Type Section collection
-         * \param sourceMap MSON Type Section collection source map
+         * \param sections MSON Type Section collection Parse Result
          * \param baseType Base Type of the MSON member to be sent for nested type sections
-         * \param headerAdapter If true, use Header adapter for MSON Type Section parsing
+         * \param usingHeaderParser If true, use MSONTypSectionHeaderParser
          */
-        static MarkdownNodeIterator processNestedMembers(const MarkdownNodeIterator&,
-                                                         const MarkdownNodes&,
-                                                         SectionParserData&,
-                                                         Report&,
-                                                         mson::TypeSections&,
-                                                         SourceMap<mson::TypeSections>&,
-                                                         mson::BaseType&,
-                                                         bool headerAdapter = false);
+        static MarkdownNodeIterator processNestedMembers(const MarkdownNodeIterator& node,
+                                                         const MarkdownNodes& siblings,
+                                                         SectionParserData& pd,
+                                                         const ParseResultRef<mson::TypeSections>& sections,
+                                                         mson::BaseType& baseType,
+                                                         bool usingHeaderParser = false);
 
         /**
          * \brief If base type is still undefined, make it implicit string
