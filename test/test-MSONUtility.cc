@@ -391,6 +391,8 @@ TEST_CASE("Parse type definition with non recognized type attribute", "[mson][ut
     markdownParser.parse(source, markdownAST);
     snowcrash::SectionParserData pd(0, source, blueprint);
 
+    pd.namedTypeBaseTable["Person"] = mson::PropertyBaseType;
+
     parseTypeDefinition(markdownAST.children().begin(), pd, attributes, typeDefinition.report, typeDefinition.node);
 
     REQUIRE(typeDefinition.report.error.code == snowcrash::Error::OK);
@@ -553,7 +555,8 @@ TEST_CASE("Parse variable property name", "[mson][utility]")
     parsePropertyName(markdownAST.children().begin(), pd, id, propertyName.report, propertyName.node);
 
     REQUIRE(propertyName.report.error.code == snowcrash::Error::OK);
-    REQUIRE(propertyName.report.warnings.empty());
+    REQUIRE(propertyName.report.warnings.size() == 1); // Unknown named type
+    REQUIRE(propertyName.report.warnings[0].code == snowcrash::LogicalErrorWarning);
 
     REQUIRE(propertyName.node.literal.empty());
     REQUIRE(propertyName.node.variable.values.size() == 1);
@@ -577,6 +580,8 @@ TEST_CASE("Parse multi-value variable property name", "[mson][utility]")
 
     markdownParser.parse(source, markdownAST);
     snowcrash::SectionParserData pd(0, source, blueprint);
+
+    pd.namedTypeBaseTable["Custom"] = mson::ValueBaseType;
 
     parsePropertyName(markdownAST.children().begin(), pd, id, propertyName.report, propertyName.node);
 

@@ -349,9 +349,25 @@ namespace mson {
         }
 
         typeDefinition.baseType = parseBaseType(typeDefinition.typeSpecification.name.name);
+        NamedTypeBaseTable::iterator it = pd.namedTypeBaseTable.find(typeDefinition.typeSpecification.name.symbol.literal);
 
-        if (typeDefinition.baseType == UndefinedBaseType) {
-            typeDefinition.baseType = pd.namedTypeBaseTable.find(typeDefinition.typeSpecification.name.symbol.literal)->second;
+        if (typeDefinition.baseType == UndefinedBaseType &&
+            it != pd.namedTypeBaseTable.end()) {
+
+            typeDefinition.baseType = it->second;
+        }
+
+        if (typeDefinition.baseType == UndefinedBaseType &&
+            !typeDefinition.typeSpecification.name.symbol.literal.empty()) {
+
+            // WARN: Unable to find the named type in the named type base type table
+            std::stringstream ss;
+            ss << "unable to find the symbol `" << typeDefinition.typeSpecification.name.symbol.literal << "` in the list of named types";
+
+            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+            report.warnings.push_back(snowcrash::Warning(ss.str(),
+                                                         snowcrash::LogicalErrorWarning,
+                                                         sourceMap));
         }
 
         if ((typeDefinition.baseType != ValueBaseType) &&
