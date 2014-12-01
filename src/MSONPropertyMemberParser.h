@@ -56,8 +56,9 @@ namespace snowcrash {
 
             ParseResultRef<mson::TypeSections> typeSections(out.report, out.node.sections, out.sourceMap.sections);
 
-            return SectionProcessor<mson::ValueMember>::processNestedMembers(node, siblings, pd, typeSections,
-                                                                             out.node.valueDefinition.typeDefinition.baseType);
+            return SectionProcessor<mson::ValueMember>
+                    ::processNestedMembers<MSONTypeSectionListParser>(node, siblings, pd, typeSections,
+                                                                      out.node.valueDefinition.typeDefinition.baseType);
         }
 
         static bool isDescriptionNode(const MarkdownNodeIterator& node,

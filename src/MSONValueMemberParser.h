@@ -11,6 +11,7 @@
 
 #include "SectionParser.h"
 #include "MSONUtility.h"
+#include "MSONTypeSectionParser.h"
 
 using namespace scpl;
 
@@ -54,8 +55,9 @@ namespace snowcrash {
 
             ParseResultRef<mson::TypeSections> typeSections(out.report, out.node.sections, out.sourceMap.sections);
 
-            return SectionProcessor<mson::ValueMember>::processNestedMembers(node, siblings, pd, typeSections,
-                                                                             out.node.valueDefinition.typeDefinition.baseType);
+            return SectionProcessor<mson::ValueMember>
+                    ::processNestedMembers<MSONTypeSectionListParser>(node, siblings, pd, typeSections,
+                                                                      out.node.valueDefinition.typeDefinition.baseType);
         }
 
         static bool isDescriptionNode(const MarkdownNodeIterator& node,
@@ -164,14 +166,53 @@ namespace snowcrash {
          * \param pd Section Parser Data
          * \param sections MSON Type Section collection Parse Result
          * \param baseType Base Type of the MSON member to be sent for nested type sections
-         * \param usingHeaderParser If true, use MSONTypSectionHeaderParser
          */
+        template<typename PARSER>
         static MarkdownNodeIterator processNestedMembers(const MarkdownNodeIterator& node,
                                                          const MarkdownNodes& siblings,
                                                          SectionParserData& pd,
                                                          const ParseResultRef<mson::TypeSections>& sections,
-                                                         mson::BaseType& baseType,
-                                                         bool usingHeaderParser = false);
+                                                         mson::BaseType& baseType) {
+
+            MarkdownNodeIterator cur = node;
+
+            if (pd.sectionContext() == MSONSectionType) {
+                cur = processMSONSection(node, siblings, pd, sections, baseType);
+            }
+            else {
+
+                // Try to resolve base type if not given before parsing further
+                resolveImplicitBaseType(node, pd.sectionContext(), baseType);
+
+                IntermediateParseResult<mson::TypeSection> typeSection(sections.report);
+                typeSection.node.baseType = baseType;
+
+                PARSER::parse(node, siblings, pd, typeSection);
+
+                if (typeSection.node.type != mson::UndefinedTypeSectionType) {
+                    sections.node.push_back(typeSection.node);
+                }
+
+                cur = ++MarkdownNodeIterator(node);
+            }
+
+            return cur;
+        }
+
+        /**
+         * \brief Given a MSONSectionType nested section, process it
+         *
+         * \param node Node to process
+         * \param siblings Siblings of the node being processed
+         * \param pd Section Parser Data
+         * \param sections MSON Type Section collection Parse Result
+         * \param baseType Base Type of the MSON member to be sent for nested type sections
+         */
+        static MarkdownNodeIterator processMSONSection(const MarkdownNodeIterator& node,
+                                                       const MarkdownNodes& siblings,
+                                                       SectionParserData& pd,
+                                                       const ParseResultRef<mson::TypeSections>& sections,
+                                                       mson::BaseType& baseType);
 
         /**
          * \brief If base type is still undefined, make it implicit string

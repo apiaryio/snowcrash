@@ -7,7 +7,6 @@
 //
 
 #include "MSONOneOfParser.h"
-#include "MSONTypeSectionParser.h"
 #include "MSONPropertyMemberParser.h"
 
 namespace snowcrash {
