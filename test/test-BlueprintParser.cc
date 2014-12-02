@@ -428,7 +428,6 @@ TEST_CASE("Parsing unexpected blocks", "[blueprint]")
     "# GET /\n";
 
     ParseResult<Blueprint> blueprint;
-
     SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
@@ -459,4 +458,53 @@ TEST_CASE("Parsing unexpected blocks", "[blueprint]")
     REQUIRE(blueprint.sourceMap.metadata.collection[0].sourceMap[0].location == 0);
     REQUIRE(blueprint.sourceMap.metadata.collection[0].sourceMap[0].length == 12);
     REQUIRE(blueprint.sourceMap.resourceGroups.collection.size() == 1);
+}
+
+TEST_CASE("Parsing blueprint with mson data structures", "[blueprint]")
+{
+    mdp::ByteBuffer source = \
+    "# Group Plans\n"\
+    "## Plans [/plans]\n"\
+    "+ Attributes (array[Plan])\n\n"\
+    "### List all plans [GET]\n"\
+    "+ Response 200 (application/json)\n"\
+    "    + Attributes (Plans)\n\n"\
+    "### Create a plan [POST]\n"\
+    "+ Request (application/json)\n"\
+    "    + Attributes (Plan Base)\n"\
+    "+ Response 201 (application/json)\n"\
+    "    + Attributes (Plan)\n\n"\
+    "## Plan [/plan/{id}]\n"\
+    "+ Parameters\n\n"\
+    "    + id (required, string)\n\n"\
+    "+ Attributes (Plan Base)\n\n"\
+    "    + type: Plan (default)\n"\
+    "    + created ([Timestamp][])\n\n"\
+    "### Retrieve a plan [GET]\n"\
+    "+ Response 200 (application/json)\n"\
+    "    + Attributes (Plan)\n\n"\
+    "### Update a plan [PATCH]\n"\
+    "+ Request (application/json)\n"\
+    "    + Attributes (Plan Base)\n"\
+    "+ Response 200 (application/json)\n"\
+    "    + Attributes (Plan)\n\n"\
+    "### Delete a plan [DELETE]\n"\
+    "+ Response 204\n\n"\
+    "# Data Structures\n"\
+    "## Plan Base\n"\
+    "- name\n"\
+    "- amount (number)\n"\
+    "- trial (optional)\n\n"\
+    "## Timestamp (number)\n";
+
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
+
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.empty());
+
+    REQUIRE(blueprint.node.resourceGroups.size() == 1);
+    REQUIRE(blueprint.node.dataStructures.types.size() == 2);
+    REQUIRE(blueprint.node.dataStructures.types[0].source.name.symbol.literal == "Plan Base");
+    REQUIRE(blueprint.node.dataStructures.types[1].source.name.symbol.literal == "Timestamp");
 }

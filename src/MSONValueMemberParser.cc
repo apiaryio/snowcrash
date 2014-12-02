@@ -49,6 +49,11 @@ namespace snowcrash {
 
         MarkdownNodeIterator cur = node;
 
+        // If we encounter a header node, stop parsing
+        if (node->type == mdp::HeaderMarkdownNodeType) {
+            return cur;
+        }
+
         // If the nodes follow after some block description without member
         // seperator, then they are treated as description
         if (!sections.node.empty() && sections.node.back().type == mson::TypeSection::BlockDescriptionType) {

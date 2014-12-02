@@ -11,6 +11,7 @@
 
 #include "ResourceParser.h"
 #include "ResourceGroupParser.h"
+#include "DataStructuresParser.h"
 #include "SectionParser.h"
 #include "RegexMatch.h"
 #include "CodeBlockUtility.h"
@@ -130,6 +131,11 @@ namespace snowcrash {
 
                 return cur;
             }
+            else if (pd.sectionContext() == DataStructuresSectionType) {
+
+                ParseResultRef<DataStructures> dataStructures(out.report, out.node.dataStructures, out.sourceMap.dataStructures);
+                return DataStructuresParser::parse(node, siblings, pd, dataStructures);
+            }
 
             return node;
         }
@@ -157,6 +163,13 @@ namespace snowcrash {
                 return nestedType;
             }
 
+            // Check if DataStructures section
+            nestedType = SectionProcessor<DataStructures>::sectionType(node);
+
+            if (nestedType != UndefinedSectionType) {
+                return nestedType;
+            }
+
             return UndefinedSectionType;
         }
 
@@ -165,6 +178,7 @@ namespace snowcrash {
 
             // Resource Group & descendants
             nested.push_back(ResourceGroupSectionType);
+            nested.push_back(DataStructuresSectionType);
             SectionTypes types = SectionProcessor<ResourceGroup>::nestedSectionTypes();
             nested.insert(nested.end(), types.begin(), types.end());
 
@@ -203,7 +217,6 @@ namespace snowcrash {
             // Since Blueprint is currently top-level node any unprocessed node should be reported
             return true;
         }
-
 
         static void parseMetadata(const MarkdownNodeIterator& node,
                                   SectionParserData& pd,

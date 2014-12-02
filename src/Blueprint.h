@@ -168,6 +168,18 @@ namespace snowcrash {
         mson::NamedType resolved;
     };
 
+    /** Collection of Data Structures */
+    typedef Collection<DataStructure>::type DataStructureCollection;
+
+    /**
+     * Data Structures
+     */
+    struct DataStructures {
+
+        /** List of data structures */
+        DataStructureCollection types;
+    };
+
     /**
      *  Attributes
      */
@@ -366,6 +378,9 @@ namespace snowcrash {
 
         /** The set of API Resource Groups */
         ResourceGroups resourceGroups;
+
+        /** List of Data Structures */
+        DataStructures dataStructures;
     };
 }
 
