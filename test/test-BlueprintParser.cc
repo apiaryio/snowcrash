@@ -460,7 +460,7 @@ TEST_CASE("Parsing unexpected blocks", "[blueprint]")
     REQUIRE(blueprint.sourceMap.resourceGroups.collection.size() == 1);
 }
 
-TEST_CASE("Parsing blueprint with mson data structures", "[blueprint]")
+TEST_CASE("Parsing blueprint with mson data structures", "[blueprint][now]")
 {
     mdp::ByteBuffer source = \
     "# Group Plans\n"\
@@ -492,6 +492,8 @@ TEST_CASE("Parsing blueprint with mson data structures", "[blueprint]")
     "+ Response 204\n\n"\
     "# Data Structures\n"\
     "## Plan Base\n"\
+    "Base object for write operations\n\n"\
+    "### Properties\n"\
     "- name\n"\
     "- amount (number)\n"\
     "- trial (optional)\n\n"\

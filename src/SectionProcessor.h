@@ -168,6 +168,13 @@ namespace snowcrash {
             return ++MarkdownNodeIterator(node);
         }
 
+        /** Pre-process for nested sections (called after description) */
+        static void preprocessNestedSections(const MarkdownNodeIterator& node,
+                                             const MarkdownNodes& siblings,
+                                             SectionParserData& pd,
+                                             const ParseResultRef<T>& out) {
+        }
+
         /**
          *  \brief Process nested sections Markdown node(s)
          *  \param node     Node to process

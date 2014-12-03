@@ -34,6 +34,9 @@ SectionType snowcrash::SectionKeywordSignature(const mdp::MarkdownNodeIterator& 
     if ((type = SectionProcessor<Asset>::sectionType(node)) != UndefinedSectionType)
         return type;
 
+    if ((type = SectionProcessor<Attributes>::sectionType(node)) != UndefinedSectionType)
+        return type;
+
     if ((type = SectionProcessor<Payload>::sectionType(node)) != UndefinedSectionType)
         return type;
 

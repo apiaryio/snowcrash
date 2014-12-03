@@ -69,7 +69,7 @@ namespace snowcrash {
 
                 SectionType nestedType = nestedSectionType(cur);
 
-                // Resources Groups only, parse as exclusive nested sections
+                // Nested Sections only, parse as exclusive nested sections
                 if (nestedType != UndefinedSectionType) {
                     layout = ExclusiveNestedSectionLayout;
                     return cur;
@@ -138,6 +138,61 @@ namespace snowcrash {
             }
 
             return node;
+        }
+
+        static void preprocessNestedSections(const MarkdownNodeIterator& node,
+                                             const MarkdownNodes& siblings,
+                                             SectionParserData& pd,
+                                             const ParseResultRef<Blueprint>& out) {
+
+            MarkdownNodeIterator cur = node, contextCur;
+            SectionType sectionType, contextSectionType = UndefinedSectionType;
+
+            while (cur != siblings.end()) {
+
+                sectionType = SectionKeywordSignature(cur);
+
+                // Complete Action is recognized as resource section
+                if (sectionType == ResourceSectionType) {
+
+                    ActionType actionType = SectionProcessor<Action>::actionType(cur);
+
+                    if (actionType == CompleteActionType) {
+                        sectionType = ActionSectionType;
+                    }
+                }
+
+                std::cout << sectionType << std::endl;
+                std::cout << contextSectionType << std::endl;
+
+                if (cur->type == mdp::HeaderMarkdownNodeType) {
+
+                    if (contextSectionType == DataStructuresSectionType) {
+
+                    }
+                    else if (sectionType == ResourceSectionType ||
+                             sectionType == DataStructuresSectionType) {
+
+                        contextSectionType = sectionType;
+                        contextCur = cur;
+                    }
+                }
+                else if (cur->type == mdp::ListItemMarkdownNodeType &&
+                         contextSectionType == ResourceSectionType &&
+                         sectionType == AttributesSectionType) {
+
+
+                }
+
+                if (cur->type == mdp::HeaderMarkdownNodeType) {
+                    std::cout << cur->text << std::endl;
+                }
+                else if (cur->type == mdp::ListItemMarkdownNodeType) {
+                    std::cout << cur->children().front().text << std::endl;
+                }
+
+                cur++;
+            }
         }
 
         static SectionType sectionType(const MarkdownNodeIterator& node) {

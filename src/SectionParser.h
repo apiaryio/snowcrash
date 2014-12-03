@@ -107,6 +107,8 @@ namespace snowcrash {
 
             SectionType lastSectionType = UndefinedSectionType;
 
+            SectionProcessor<T>::preprocessNestedSections(node, collection, pd, out);
+
             // Nested sections
             while(cur != collection.end()) {
 
