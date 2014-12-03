@@ -2,7 +2,7 @@ language: cpp
 compiler:
   - gcc
   - clang
-script: 
+script:
   - ./configure --include-integration-tests
   - make test
 before_install:
@@ -13,10 +13,14 @@ before_install:
 notifications:
   email:
     recipients:
-      - z@apiary.io  
+      - z@apiary.io
     on_success: change
     on_failure: always
   hipchat:
-    - secure: "HqBUrmf4P2bgvwb4b9PL1tBae2wcZaXadOgwRwAFhdhDZFHaKXIXlJRUW8tN\ntdO83OZgatxJrpWWQj8VYTfDuhlE3b3NxVWeXc3PkfrHmuvejQf4veh7kwR0\njLVE6jb+ZbFIwRE2W0VFLFKYQHI6PLem4W0OKXW5Shqzy8Ewlow="
+    rooms:
+      secure: "HqBUrmf4P2bgvwb4b9PL1tBae2wcZaXadOgwRwAFhdhDZFHaKXIXlJRUW8tN\ntdO83OZgatxJrpWWQj8VYTfDuhlE3b3NxVWeXc3PkfrHmuvejQf4veh7kwR0\njLVE6jb+ZbFIwRE2W0VFLFKYQHI6PLem4W0OKXW5Shqzy8Ewlow="
+    template:
+      - '%{repository}#%{build_number} (%{branch} - %{commit} : %{author}): %{message} (<a href="%{build_url}">Details</a>/<a href="%{compare_url}">Change view</a>)'
+    format: html
 env:
-  - RVM=2.0.0    
+  - RVM=2.0.0
