@@ -38,7 +38,7 @@ TEST_CASE("Parse canonical mson named type", "[mson][named_type]")
     REQUIRE(namedType.node.name.name == mson::UndefinedTypeName);
     REQUIRE(namedType.node.base.attributes == 0);
     REQUIRE(namedType.node.base.typeSpecification.name.name == mson::ObjectTypeName);
-    MSONHelper::empty(namedType.node.base.typeSpecification.name.symbol);
+    REQUIRE(namedType.node.base.typeSpecification.name.symbol.empty());
     REQUIRE(namedType.node.base.baseType == mson::PropertyBaseType);
     REQUIRE(namedType.node.sections.size() == 1);
     REQUIRE(namedType.node.sections[0].type == mson::MemberTypeSectionType);
@@ -124,7 +124,7 @@ TEST_CASE("Parse named type with a type section", "[mson][named_type]")
     REQUIRE(namedType.node.name.name == mson::UndefinedTypeName);
     REQUIRE(namedType.node.base.attributes == 0);
     REQUIRE(namedType.node.base.typeSpecification.name.name == mson::StringTypeName);
-    MSONHelper::empty(namedType.node.base.typeSpecification.name.symbol);
+    REQUIRE(namedType.node.base.typeSpecification.name.symbol.empty());
     REQUIRE(namedType.node.base.baseType == mson::PrimitiveBaseType);
     REQUIRE(namedType.node.sections.size() == 1);
     REQUIRE(namedType.node.sections[0].type == mson::SampleTypeSectionType);
@@ -146,7 +146,7 @@ TEST_CASE("Parse named type without type specification", "[mson][named_type][now
 
     REQUIRE(namedType.node.name.symbol.literal == "User");
     REQUIRE(namedType.node.base.attributes == 0);
-    MSONHelper::empty(namedType.node.base.typeSpecification.name);
+    REQUIRE(namedType.node.base.typeSpecification.name.empty());
     REQUIRE(namedType.node.base.baseType == mson::ImplicitPropertyBaseType);
     REQUIRE(namedType.node.sections.size() == 1);
     REQUIRE(namedType.node.sections[0].type == mson::SampleTypeSectionType);

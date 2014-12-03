@@ -391,8 +391,7 @@ TEST_CASE("Parse mson properties list type section for values base type", "[mson
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.size() == 1);
     REQUIRE(typeSection.report.warnings[0].code == LogicalErrorWarning);
-
-    MSONHelper::empty(typeSection.node);
+    REQUIRE(typeSection.node.empty());
 }
 
 TEST_CASE("Parse mson sample type section for a simple object", "[mson][type_section]")

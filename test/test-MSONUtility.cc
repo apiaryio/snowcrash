@@ -92,7 +92,7 @@ TEST_CASE("Parse boolean type name", "[mson][utility]")
     parseTypeName(source, typeName);
 
     REQUIRE(typeName.name == BooleanTypeName);
-    MSONHelper::empty(typeName.symbol);
+    REQUIRE(typeName.symbol.empty());
 }
 
 TEST_CASE("Parse string type name", "[mson][utility]")
@@ -103,7 +103,7 @@ TEST_CASE("Parse string type name", "[mson][utility]")
     parseTypeName(source, typeName);
 
     REQUIRE(typeName.name == StringTypeName);
-    MSONHelper::empty(typeName.symbol);
+    REQUIRE(typeName.symbol.empty());
 }
 
 TEST_CASE("Parse number type name", "[mson][utility]")
@@ -114,7 +114,7 @@ TEST_CASE("Parse number type name", "[mson][utility]")
     parseTypeName(source, typeName);
 
     REQUIRE(typeName.name == NumberTypeName);
-    MSONHelper::empty(typeName.symbol);
+    REQUIRE(typeName.symbol.empty());
 }
 
 TEST_CASE("Parse array type name", "[mson][utility]")
@@ -125,7 +125,7 @@ TEST_CASE("Parse array type name", "[mson][utility]")
     parseTypeName(source, typeName);
 
     REQUIRE(typeName.name == ArrayTypeName);
-    MSONHelper::empty(typeName.symbol);
+    REQUIRE(typeName.symbol.empty());
 }
 
 TEST_CASE("Parse enum type name", "[mson][utility]")
@@ -136,7 +136,7 @@ TEST_CASE("Parse enum type name", "[mson][utility]")
     parseTypeName(source, typeName);
 
     REQUIRE(typeName.name == EnumTypeName);
-    MSONHelper::empty(typeName.symbol);
+    REQUIRE(typeName.symbol.empty());
 }
 
 TEST_CASE("Parse object type name", "[mson][utility]")
@@ -147,7 +147,7 @@ TEST_CASE("Parse object type name", "[mson][utility]")
     parseTypeName(source, typeName);
 
     REQUIRE(typeName.name == ObjectTypeName);
-    MSONHelper::empty(typeName.symbol);
+    REQUIRE(typeName.symbol.empty());
 }
 
 TEST_CASE("Parse variable type name", "[mson][utility]")
@@ -278,7 +278,7 @@ TEST_CASE("Parse canonical type specification", "[mson][utility]")
     parseTypeSpecification(source, typeSpecification);
 
     REQUIRE(typeSpecification.name.name == ObjectTypeName);
-    MSONHelper::empty(typeSpecification.name.symbol);
+    REQUIRE(typeSpecification.name.symbol.empty());
     REQUIRE(typeSpecification.nestedTypes.empty());
 }
 
@@ -316,11 +316,11 @@ TEST_CASE("Parse nested types in type specification", "[mson][utility]")
     parseTypeSpecification(source, typeSpecification);
 
     REQUIRE(typeSpecification.name.name == ArrayTypeName);
-    MSONHelper::empty(typeSpecification.name.symbol);
+    REQUIRE(typeSpecification.name.symbol.empty());
     REQUIRE(typeSpecification.nestedTypes.size() == 2);
 
     REQUIRE(typeSpecification.nestedTypes[0].name == ObjectTypeName);
-    MSONHelper::empty(typeSpecification.nestedTypes[0].symbol);
+    REQUIRE(typeSpecification.nestedTypes[0].symbol.empty());
 
     REQUIRE(typeSpecification.nestedTypes[1].name == UndefinedTypeName);
     REQUIRE(typeSpecification.nestedTypes[1].symbol.literal == "Link");
@@ -370,7 +370,7 @@ TEST_CASE("Parse canonical type definition", "[mson][utility]")
     REQUIRE(typeDefinition.report.warnings.empty());
 
     REQUIRE(typeDefinition.node.typeSpecification.name.name == NumberTypeName);
-    MSONHelper::empty(typeDefinition.node.typeSpecification.name.symbol);
+    REQUIRE(typeDefinition.node.typeSpecification.name.symbol.empty());
     REQUIRE(typeDefinition.node.typeSpecification.nestedTypes.empty());
     REQUIRE(typeDefinition.node.attributes == RequiredTypeAttribute);
 }
@@ -536,7 +536,7 @@ TEST_CASE("Parse canonical property name", "[mson][utility]")
     REQUIRE(propertyName.report.warnings.empty());
 
     REQUIRE(propertyName.node.literal == "customer");
-    MSONHelper::empty(propertyName.node.variable);
+    REQUIRE(propertyName.node.variable.empty());
 }
 
 TEST_CASE("Parse variable property name", "[mson][utility]")

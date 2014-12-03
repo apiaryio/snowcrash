@@ -86,7 +86,7 @@ TEST_CASE("Parse mson mixin with base type definition", "[mson][mixin]")
 
     REQUIRE(mixin.node.typeDefinition.attributes == 0);
     REQUIRE(mixin.node.typeDefinition.typeSpecification.name.name == mson::StringTypeName);
-    MSONHelper::empty(mixin.node.typeDefinition.typeSpecification.name.symbol);
+    REQUIRE(mixin.node.typeDefinition.typeSpecification.name.symbol.empty());
     REQUIRE(mixin.node.typeDefinition.typeSpecification.nestedTypes.empty());
 }
 
@@ -109,7 +109,7 @@ TEST_CASE("Parse mson mixin with nested type definition", "[mson][mixin]")
     REQUIRE(mixin.node.typeDefinition.typeSpecification.name.symbol.variable == false);
     REQUIRE(mixin.node.typeDefinition.typeSpecification.nestedTypes.size() == 2);
     REQUIRE(mixin.node.typeDefinition.typeSpecification.nestedTypes[0].name == mson::NumberTypeName);
-    MSONHelper::empty(mixin.node.typeDefinition.typeSpecification.nestedTypes[0].symbol);
+    REQUIRE(mixin.node.typeDefinition.typeSpecification.nestedTypes[0].symbol.empty());
     REQUIRE(mixin.node.typeDefinition.typeSpecification.nestedTypes[1].name == mson::StringTypeName);
-    MSONHelper::empty(mixin.node.typeDefinition.typeSpecification.nestedTypes[1].symbol);
+    REQUIRE(mixin.node.typeDefinition.typeSpecification.nestedTypes[1].symbol.empty());
 }

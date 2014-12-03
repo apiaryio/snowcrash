@@ -55,11 +55,11 @@ TEST_CASE("Parse canonical mson one of", "[mson][one_of]")
     REQUIRE(oneOf.node.members().at(0).content.property.valueDefinition.values.at(0).literal == "Andhra Pradesh");
     REQUIRE(oneOf.node.members().at(0).content.property.sections.empty());
     REQUIRE(oneOf.node.members().at(0).content.property.description.empty());
-    MSONHelper::empty(oneOf.node.members().at(0).content.property.name.variable);
-    MSONHelper::empty(oneOf.node.members().at(0).content.oneOf);
-    MSONHelper::empty(oneOf.node.members().at(0).content.mixin);
-    MSONHelper::empty(oneOf.node.members().at(0).content.value);
-    MSONHelper::empty(oneOf.node.members().at(0).content.members);
+    REQUIRE(oneOf.node.members().at(0).content.property.name.variable.empty());
+    REQUIRE(oneOf.node.members().at(0).content.oneOf.empty());
+    REQUIRE(oneOf.node.members().at(0).content.mixin.empty());
+    REQUIRE(oneOf.node.members().at(0).content.value.empty());
+    REQUIRE(oneOf.node.members().at(0).content.members.empty());
 
     REQUIRE(oneOf.node.members().at(1).type == mson::PropertyMemberType);
     REQUIRE(oneOf.node.members().at(1).content.property.name.literal == "province");
@@ -67,7 +67,7 @@ TEST_CASE("Parse canonical mson one of", "[mson][one_of]")
     REQUIRE(oneOf.node.members().at(1).content.property.valueDefinition.values.at(0).literal == "Madras");
     REQUIRE(oneOf.node.members().at(1).content.property.sections.empty());
     REQUIRE(oneOf.node.members().at(1).content.property.description.empty());
-    MSONHelper::empty(oneOf.node.members().at(1).content.property.name.variable);
+    REQUIRE(oneOf.node.members().at(1).content.property.name.variable.empty());
 }
 
 TEST_CASE("Parse mson one of without any nested members", "[mson][one_of]")
@@ -104,16 +104,16 @@ TEST_CASE("Parse mson one of with one of", "[mson][one_of]")
     REQUIRE(oneOf.node.members().at(0).content.property.name.literal == "last_name");
     REQUIRE(oneOf.node.members().at(0).content.property.sections.empty());
     REQUIRE(oneOf.node.members().at(0).content.property.description.empty());
-    MSONHelper::empty(oneOf.node.members().at(0).content.property.valueDefinition);
+    REQUIRE(oneOf.node.members().at(0).content.property.valueDefinition.empty());
 
     REQUIRE(oneOf.node.members().at(1).type == mson::OneOfMemberType);
     REQUIRE(oneOf.node.members().at(1).content.oneOf.members().size() == 2);
     REQUIRE(oneOf.node.members().at(1).content.oneOf.members().at(0).type == mson::PropertyMemberType);
     REQUIRE(oneOf.node.members().at(1).content.oneOf.members().at(0).content.property.name.literal == "given_name");
-    MSONHelper::empty(oneOf.node.members().at(1).content.oneOf.members().at(0).content.property.valueDefinition);
+    REQUIRE(oneOf.node.members().at(1).content.oneOf.members().at(0).content.property.valueDefinition.empty());
     REQUIRE(oneOf.node.members().at(1).content.oneOf.members().at(1).type == mson::PropertyMemberType);
     REQUIRE(oneOf.node.members().at(1).content.oneOf.members().at(1).content.property.name.literal == "suffixed_name");
-    MSONHelper::empty(oneOf.node.members().at(1).content.oneOf.members().at(1).content.property.valueDefinition);
+    REQUIRE(oneOf.node.members().at(1).content.oneOf.members().at(1).content.property.valueDefinition.empty());
 }
 
 TEST_CASE("Parse mson one of with member group")
@@ -136,12 +136,12 @@ TEST_CASE("Parse mson one of with member group")
     REQUIRE(oneOf.node.members().at(0).content.property.name.literal == "full_name");
     REQUIRE(oneOf.node.members().at(0).content.property.sections.empty());
     REQUIRE(oneOf.node.members().at(0).content.property.description.empty());
-    MSONHelper::empty(oneOf.node.members().at(0).content.property.valueDefinition);
+    REQUIRE(oneOf.node.members().at(0).content.property.valueDefinition.empty());
     REQUIRE(oneOf.node.members().at(1).type == mson::MembersMemberType);
-    MSONHelper::empty(oneOf.node.members().at(1).content.property);
-    MSONHelper::empty(oneOf.node.members().at(1).content.mixin);
-    MSONHelper::empty(oneOf.node.members().at(1).content.value);
-    MSONHelper::empty(oneOf.node.members().at(1).content.oneOf);
+    REQUIRE(oneOf.node.members().at(1).content.property.empty());
+    REQUIRE(oneOf.node.members().at(1).content.mixin.empty());
+    REQUIRE(oneOf.node.members().at(1).content.value.empty());
+    REQUIRE(oneOf.node.members().at(1).content.oneOf.empty());
     REQUIRE(oneOf.node.members().at(1).content.members.members().size() == 2);
     REQUIRE(oneOf.node.members().at(1).content.members.members().at(0).type == mson::PropertyMemberType);
     REQUIRE(oneOf.node.members().at(1).content.members.members().at(0).content.property.name.literal == "first_name");

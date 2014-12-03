@@ -10,6 +10,36 @@
 
 using namespace mson;
 
+bool Value::empty() const
+{
+    return (this->literal.empty() && this->variable == false);
+}
+
+bool Symbol::empty() const
+{
+    return (this->literal.empty() && this->variable == false);
+}
+
+bool TypeName::empty() const
+{
+    return (this->name == UndefinedTypeName && this->symbol.empty());
+}
+
+bool TypeSpecification::empty() const
+{
+    return (this->nestedTypes.empty() && this->name.empty());
+}
+
+bool TypeDefinition::empty() const
+{
+    return (this->attributes == 0 && this->typeSpecification.empty());
+}
+
+bool ValueDefinition::empty() const
+{
+    return (this->values.empty() && this->typeDefinition.empty());
+}
+
 MemberTypes& TypeSectionContent::members()
 {
     if (!m_members.get())
@@ -50,6 +80,42 @@ TypeSectionContent& TypeSectionContent::operator=(const TypeSectionContent& rhs)
 
 TypeSectionContent::~TypeSectionContent()
 {
+}
+
+bool TypeSection::empty() const
+{
+    return (this->type == UndefinedTypeSectionType &&
+            this->content.value.empty() &&
+            this->content.description.empty() &&
+            this->content.members().empty());
+}
+
+bool NamedType::empty() const
+{
+    return (this->base.empty() && this->name.empty() &&
+            this->sections.empty());
+}
+
+bool ValueMember::empty() const
+{
+    return (this->valueDefinition.empty() && this->sections.empty() &&
+            this->description.empty());
+}
+
+bool PropertyName::empty() const
+{
+    return (this->literal.empty() && this->variable.empty());
+}
+
+bool PropertyMember::empty() const
+{
+    return (this->name.empty() && this->description.empty() &&
+            this->sections.empty() && this->valueDefinition.empty());
+}
+
+bool Mixin::empty() const
+{
+    return (this->typeDefinition.empty());
 }
 
 MemberTypes& Members::members()
@@ -94,6 +160,11 @@ Members& Members::operator=(const Members& rhs)
 
 Members::~Members()
 {
+}
+
+bool Members::empty() const
+{
+    return (this->members().empty());
 }
 
 OneOf::OneOf()

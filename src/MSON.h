@@ -35,7 +35,12 @@ namespace mson {
     /** Literal */
     typedef std::string Literal;
 
-    /** Kind of Base Type */
+    /**
+     * Kind of Base Type
+     *
+     * This is an internal thing to keep track of what kind of type,
+     * that particular named type or member is sub-typed from
+     */
     enum BaseType {
         UndefinedBaseType = 0,     // Undefined
         PrimitiveBaseType,         // Primitive Types
@@ -63,6 +68,9 @@ namespace mson {
 
         /** Flag to denote variable value */
         bool variable;
+
+        /** Check if empty */
+        bool empty() const;
     };
 
     /** Collection of values */
@@ -80,6 +88,9 @@ namespace mson {
 
         /** Flag to denote variable type name */
         bool variable;
+
+        /** Check if empty */
+        bool empty() const;
     };
 
     /** Value of type name if based type */
@@ -105,6 +116,9 @@ namespace mson {
 
         /** OR Named type's identifier */
         Symbol symbol;
+
+        /** Check if empty */
+        bool empty() const;
     };
 
     /** Collection of type names */
@@ -130,6 +144,9 @@ namespace mson {
 
         /** Array of nested types */
         TypeNames nestedTypes;
+
+        /** Check if empty */
+        bool empty() const;
     };
 
     /** Definition of an instance of a type */
@@ -139,7 +156,12 @@ namespace mson {
         TypeDefinition()
         : baseType(UndefinedBaseType), attributes(0) {}
 
-        /** Base Type (for the type definition) */
+        /**
+         * Base Type (for the type definition)
+         *
+         * Representing the base type from which this member or
+         * named type is sub-typed from. Not present in the AST
+         */
         BaseType baseType;
 
         /** Type specification */
@@ -147,6 +169,9 @@ namespace mson {
 
         /** List of type attributes (byte-wise OR) */
         TypeAttributes attributes;
+
+        /** Check if empty */
+        bool empty() const;
     };
 
     /** Value definition of a type instance */
@@ -157,6 +182,9 @@ namespace mson {
 
         /** Type of the values */
         TypeDefinition typeDefinition;
+
+        /** Check if empty */
+        bool empty() const;
     };
 
     /** Forward Declaration for member type */
@@ -218,6 +246,9 @@ namespace mson {
 
         /** Content of the type section */
         TypeSectionContent content;
+
+        /** Check if empty */
+        bool empty() const;
     };
 
     /** Collection of type sections */
@@ -234,6 +265,9 @@ namespace mson {
 
         /** List of named type's sections */
         TypeSections sections;
+
+        /** Check if empty */
+        bool empty() const;
     };
 
     /** Individual member of an array or enum structure */
@@ -247,6 +281,9 @@ namespace mson {
 
         /** List of member type's sections */
         TypeSections sections;
+
+        /** Check if empty */
+        bool empty() const;
     };
 
     /** Name of a property member */
@@ -257,6 +294,9 @@ namespace mson {
 
         /** OR Variable name of the property */
         ValueDefinition variable;
+
+        /** Check if empty */
+        bool empty() const;
     };
 
     /** Individual member of an object structure */
@@ -264,6 +304,9 @@ namespace mson {
 
         /** Name of the property */
         PropertyName name;
+
+        /** Check if empty */
+        bool empty() const;
     };
 
     /** Mixin type */
@@ -271,6 +314,9 @@ namespace mson {
 
         /** Type definition of the type to be included */
         TypeDefinition typeDefinition;
+
+        /** Check if empty */
+        bool empty() const;
     };
 
     /** Members type */
@@ -294,6 +340,9 @@ namespace mson {
 
         /** Desctructor */
         ~Members();
+
+        /** Check if empty */
+        bool empty() const;
 
     protected:
         std::auto_ptr<MemberTypes> m_members;
