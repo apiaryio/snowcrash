@@ -470,8 +470,8 @@ TEST_CASE("Parsing blueprint with mson data structures", "[blueprint][now]")
     "+ Response 200 (application/json)\n"\
     "    + Attributes (Plans)\n\n"\
     "### Create a plan [POST]\n"\
+    "+ Attributes (Plan Base)\n"\
     "+ Request (application/json)\n"\
-    "    + Attributes (Plan Base)\n"\
     "+ Response 201 (application/json)\n"\
     "    + Attributes (Plan)\n\n"\
     "## Plan [/plan/{id}]\n"\
@@ -497,15 +497,53 @@ TEST_CASE("Parsing blueprint with mson data structures", "[blueprint][now]")
     "- name\n"\
     "- amount (number)\n"\
     "- trial (optional)\n\n"\
-    "## Timestamp (number)\n";
+    "## Timestamp (number)\n\n"\
+    "## Coupon [/coupon/{id}]\n"\
+    "+ Parameters\n\n"\
+    "    + id (required, string)\n\n"\
+    "### Delete a coupon [DELETE]\n"\
+    "+ Response 204\n\n";
+
+    mdp::MarkdownParser markdownParser;
+    mdp::MarkdownNode markdownAST;
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
+    mson::NamedTypeBaseTable::iterator baseIt;
+    mson::NamedTypeInheritanceTable::iterator inheritanceIt;
+
+    markdownParser.parse(source, markdownAST);
+    REQUIRE(!markdownAST.children().empty());
+
+    snowcrash::SectionParserData pd(ExportSourcemapOption, source, blueprint.node);
+    pd.sectionsContext.push_back(BlueprintSectionType);
+
+    BlueprintParser::parse(markdownAST.children().begin(), markdownAST.children(), pd, blueprint);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
 
-    REQUIRE(blueprint.node.resourceGroups.size() == 1);
+    baseIt = pd.namedTypeBaseTable.find("Plan Base");
+    REQUIRE(baseIt != pd.namedTypeBaseTable.end());
+    REQUIRE(baseIt->second == mson::ImplicitPropertyBaseType);
+
+    baseIt = pd.namedTypeBaseTable.find("Plan");
+    REQUIRE(baseIt != pd.namedTypeBaseTable.end());
+    REQUIRE(baseIt->second == mson::ImplicitPropertyBaseType);
+
+    baseIt = pd.namedTypeBaseTable.find("Plans");
+    REQUIRE(baseIt != pd.namedTypeBaseTable.end());
+    REQUIRE(baseIt->second == mson::ValueBaseType);
+
+    baseIt = pd.namedTypeBaseTable.find("Timestamp");
+    REQUIRE(baseIt != pd.namedTypeBaseTable.end());
+    REQUIRE(baseIt->second == mson::PrimitiveBaseType);
+
+    inheritanceIt = pd.namedTypeInheritanceTable.find("Plan");
+    REQUIRE(inheritanceIt != pd.namedTypeInheritanceTable.end());
+    REQUIRE(inheritanceIt->second == "Plan Base");
+
+    REQUIRE(blueprint.node.resourceGroups.size() == 2);
+    REQUIRE(blueprint.node.resourceGroups[1].resources.size() == 1);
     REQUIRE(blueprint.node.dataStructures.types.size() == 2);
     REQUIRE(blueprint.node.dataStructures.types[0].source.name.symbol.literal == "Plan Base");
     REQUIRE(blueprint.node.dataStructures.types[1].source.name.symbol.literal == "Timestamp");

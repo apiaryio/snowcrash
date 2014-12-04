@@ -63,11 +63,8 @@ namespace snowcrash {
 
                     return cur;
                 }
-            } else if (RegexCapture(node->text, NamedResourceHeaderRegex, captureGroups, 4)) {
-
-                out.node.name = captureGroups[1];
-                TrimString(out.node.name);
-                out.node.uriTemplate = captureGroups[2];
+            } else {
+                matchNamedResourceHeader(node, out.node);
             }
 
             if (pd.exportSourceMap()) {
@@ -286,6 +283,25 @@ namespace snowcrash {
                 if (pd.exportSourceMap()) {
                     out.sourceMap.headers.collection.clear();
                 }
+            }
+        }
+
+        /**
+         * \brief Given a named resource header, retrieve the name and uriTemplate
+         *
+         * \param node Markdown node to process
+         * \param resource Resource data structure
+         */
+        static void matchNamedResourceHeader(const MarkdownNodeIterator& node,
+                                             Resource& resource) {
+
+            CaptureGroups captureGroups;
+
+            if (RegexCapture(node->text, NamedResourceHeaderRegex, captureGroups, 4)) {
+
+                resource.name = captureGroups[1];
+                TrimString(resource.name);
+                resource.uriTemplate = captureGroups[2];
             }
         }
 

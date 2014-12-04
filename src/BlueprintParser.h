@@ -148,6 +148,7 @@ namespace snowcrash {
             MarkdownNodeIterator cur = node, contextCur;
             SectionType sectionType, contextSectionType = UndefinedSectionType;
 
+            // Iterate over nested sections
             while (cur != siblings.end()) {
 
                 sectionType = SectionKeywordSignature(cur);
@@ -162,37 +163,51 @@ namespace snowcrash {
                     }
                 }
 
-                std::cout << sectionType << std::endl;
-                std::cout << contextSectionType << std::endl;
-
                 if (cur->type == mdp::HeaderMarkdownNodeType) {
 
-                    if (contextSectionType == DataStructuresSectionType) {
-
-                    }
-                    else if (sectionType == ResourceSectionType ||
-                             sectionType == DataStructuresSectionType) {
+                    if (sectionType == ResourceSectionType ||
+                        sectionType == DataStructuresSectionType) {
 
                         contextSectionType = sectionType;
                         contextCur = cur;
+                    }
+                    else if (contextSectionType != DataStructuresSectionType) {
+
+                        contextSectionType = UndefinedSectionType;
+                    }
+
+                    if (contextSectionType == DataStructuresSectionType) {
+
+                        if (sectionType != MSONSampleDefaultSectionType &&
+                            sectionType != MSONPropertyMembersSectionType &&
+                            sectionType != MSONValueMembersSectionType &&
+                            sectionType != UndefinedSectionType &&
+                            sectionType != DataStructuresSectionType) {
+
+                            contextSectionType = UndefinedSectionType;
+                        }
+                        else if (sectionType == UndefinedSectionType) {
+                            fillNamedTypeTables(cur, pd, cur->text, out.report);
+                        }
                     }
                 }
                 else if (cur->type == mdp::ListItemMarkdownNodeType &&
                          contextSectionType == ResourceSectionType &&
                          sectionType == AttributesSectionType) {
 
+                    Resource resource;
+                    SectionProcessor<Resource>::matchNamedResourceHeader(contextCur, resource);
 
-                }
-
-                if (cur->type == mdp::HeaderMarkdownNodeType) {
-                    std::cout << cur->text << std::endl;
-                }
-                else if (cur->type == mdp::ListItemMarkdownNodeType) {
-                    std::cout << cur->children().front().text << std::endl;
+                    if (!resource.name.empty()) {
+                        fillNamedTypeTables(cur, pd, cur->children().front().text, out.report, resource.name);
+                    }
                 }
 
                 cur++;
             }
+
+            // Resolve all named type base table entries
+            resolveNamedTypeTables(pd);
         }
 
         static SectionType sectionType(const MarkdownNodeIterator& node) {
@@ -271,6 +286,76 @@ namespace snowcrash {
 
             // Since Blueprint is currently top-level node any unprocessed node should be reported
             return true;
+        }
+
+        /**
+         * \brief Fill named type table entries from the signature information
+         *
+         * \param node Markdown node to process
+         * \param pd Section parser data
+         * \param subject Signature of the named type
+         * \param report Parse report
+         * \param name Name of the named type (only given in case of named resource)
+         */
+        static void fillNamedTypeTables(const MarkdownNodeIterator& node,
+                                        SectionParserData& pd,
+                                        const std::string& subject,
+                                        Report& report,
+                                        const std::string& name = "") {
+
+            std::string buffer = subject, identifier;
+            mson::TypeDefinition typeDefinition;
+
+            SignatureTraits traits(SignatureTraits::IdentifierTrait |
+                                   SignatureTraits::AttributesTrait);
+
+            Signature signature = SignatureSectionProcessorBase<Blueprint>::parseSignature(node, pd, traits, report, buffer);
+            mson::parseTypeDefinition(node, pd, signature.attributes, report, typeDefinition, true);
+
+            // Name of the named types cannot be variable
+            if (!name.empty() && mson::checkVariable(signature.identifier)) {
+                return;
+            }
+
+            if (!name.empty()) {
+                identifier = name;
+            } else {
+                identifier = signature.identifier;
+            }
+
+            if (typeDefinition.typeSpecification.name.name != mson::UndefinedTypeName) {
+                pd.namedTypeBaseTable[identifier] = mson::parseBaseType(typeDefinition.typeSpecification.name.name);
+            }
+            else if (!typeDefinition.typeSpecification.name.symbol.literal.empty() &&
+                     !typeDefinition.typeSpecification.name.symbol.variable) {
+
+                pd.namedTypeInheritanceTable[identifier] = typeDefinition.typeSpecification.name.symbol.literal;
+            }
+            else if (typeDefinition.typeSpecification.name.empty()) {
+                pd.namedTypeBaseTable[identifier] = mson::ImplicitPropertyBaseType;
+            }
+        }
+
+        /**
+         * \brief Resolve named type base table entries from the named type inheritance table
+         *
+         * \param pd Section parser data
+         */
+        static void resolveNamedTypeTables(SectionParserData& pd) {
+
+            mson::NamedTypeInheritanceTable::iterator it;
+            mson::NamedTypeBaseTable::iterator baseIt;
+
+            for (it = pd.namedTypeInheritanceTable.begin();
+                 it != pd.namedTypeInheritanceTable.end();
+                 it++) {
+
+                baseIt = pd.namedTypeBaseTable.find(it->second);
+
+                if (baseIt != pd.namedTypeBaseTable.end()) {
+                    pd.namedTypeBaseTable[it->first] = baseIt->second;
+                }
+            }
         }
 
         static void parseMetadata(const MarkdownNodeIterator& node,

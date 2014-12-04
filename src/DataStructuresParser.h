@@ -48,12 +48,6 @@ namespace snowcrash {
             return cur;
         }
 
-        static bool isUnexpectedNode(const MarkdownNodeIterator& node,
-                                     SectionType sectionType) {
-
-            return true;
-        }
-
         static SectionType sectionType(const MarkdownNodeIterator& node) {
 
             if (node->type == mdp::HeaderMarkdownNodeType &&

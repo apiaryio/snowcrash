@@ -63,7 +63,9 @@ namespace snowcrash {
         static bool isDescriptionNode(const MarkdownNodeIterator& node,
                                       SectionType sectionType) {
 
-            if (SectionProcessor<mson::ValueMember>::nestedSectionType(node) != MSONSectionType) {
+            if (SectionProcessor<mson::ValueMember>::nestedSectionType(node) != MSONSectionType ||
+                node->type == mdp::HeaderMarkdownNodeType) {
+
                 return false;
             }
 

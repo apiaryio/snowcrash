@@ -73,7 +73,11 @@ namespace snowcrash {
 
         static SectionType sectionType(const MarkdownNodeIterator& node) {
 
-            if (node->type == mdp::HeaderMarkdownNodeType) {
+            SectionType sectionType = SectionKeywordSignature(node);
+
+            if (node->type == mdp::HeaderMarkdownNodeType &&
+                sectionType == UndefinedSectionType) {
+
                 return MSONNamedTypeSectionType;
             }
 
