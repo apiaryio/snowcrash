@@ -208,13 +208,11 @@ namespace snowcrash {
                 IntermediateParseResult<mson::TypeSection> typeSection(sections.report);
                 typeSection.node.baseType = baseType;
 
-                PARSER::parse(node, siblings, pd, typeSection);
+                cur = PARSER::parse(node, siblings, pd, typeSection);
 
                 if (typeSection.node.type != mson::TypeSection::UndefinedType) {
                     sections.node.push_back(typeSection.node);
                 }
-
-                cur = ++MarkdownNodeIterator(node);
             }
 
             return cur;

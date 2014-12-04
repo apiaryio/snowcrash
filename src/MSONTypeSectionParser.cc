@@ -22,6 +22,10 @@ namespace snowcrash {
 
         mson::MemberType memberType;
 
+        if (node->type == mdp::HeaderMarkdownNodeType) {
+            return cur;
+        }
+
         if (parentSectionType == MSONPropertyMembersSectionType ||
             parentSectionType == MSONValueMembersSectionType) {
 

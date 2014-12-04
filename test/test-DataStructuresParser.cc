@@ -56,3 +56,38 @@ TEST_CASE("Parse canonical data structures", "[data_structures]")
     REQUIRE(dataStructures.node.types[1].source.base.typeSpecification.name.name == mson::ArrayTypeName);
     REQUIRE(dataStructures.node.types[1].source.base.typeSpecification.nestedTypes.size() == 1);
 }
+
+TEST_CASE("Parse multiple data structures with type sections", "[data_structures]")
+{
+    mdp::ByteBuffer source = \
+    "# Data Structures\n\n"\
+    "## User\n\n"\
+    "Some description\n\n"\
+    "### Properties\n\n"\
+    "- first_name\n"\
+    "- last_name\n\n"\
+    "## Email (array[string])";
+
+    ParseResult<DataStructures> dataStructures;
+    SectionParserHelper<DataStructures, DataStructuresParser>::parse(source, DataStructuresSectionType, dataStructures);
+
+    REQUIRE(dataStructures.report.error.code == Error::OK);
+    REQUIRE(dataStructures.report.warnings.empty());
+
+    REQUIRE(dataStructures.node.types.size() == 2);
+    REQUIRE(dataStructures.node.types[0].resolved.empty());
+    REQUIRE(dataStructures.node.types[0].source.name.symbol.literal == "User");
+    REQUIRE(dataStructures.node.types[0].source.base.baseType == mson::ImplicitPropertyBaseType);
+    REQUIRE(dataStructures.node.types[0].source.base.attributes == 0);
+    REQUIRE(dataStructures.node.types[0].source.base.typeSpecification.name.empty());
+    REQUIRE(dataStructures.node.types[0].source.base.typeSpecification.nestedTypes.empty());
+    REQUIRE(dataStructures.node.types[0].source.sections.size() == 2);
+    REQUIRE(dataStructures.node.types[0].source.sections[0].type == mson::BlockDescriptionTypeSectionType);
+    REQUIRE(dataStructures.node.types[0].source.sections[0].content.description == "Some description\n\n");
+    REQUIRE(dataStructures.node.types[0].source.sections[1].type == mson::MemberTypeSectionType);
+    REQUIRE(dataStructures.node.types[0].source.sections[1].content.members().size() == 2);
+    REQUIRE(dataStructures.node.types[1].resolved.empty());
+    REQUIRE(dataStructures.node.types[1].source.name.symbol.literal == "Email");
+    REQUIRE(dataStructures.node.types[1].source.base.typeSpecification.name.name == mson::ArrayTypeName);
+    REQUIRE(dataStructures.node.types[1].source.base.typeSpecification.nestedTypes.size() == 1);
+}
