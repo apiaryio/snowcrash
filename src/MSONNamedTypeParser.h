@@ -39,7 +39,7 @@ namespace snowcrash {
 
             // Named types should have type specification when sub-typed from primitive types
             if (out.node.base.baseType == mson::UndefinedBaseType) {
-                out.node.base.baseType = mson::ImplicitPropertyBaseType;
+                out.node.base.baseType = mson::ImplicitObjectBaseType;
             }
 
             return ++MarkdownNodeIterator(node);

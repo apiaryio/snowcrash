@@ -149,7 +149,7 @@ TEST_CASE("Parse mson sample list type section for an object with a value", "[ms
     "- Sample: 75, 100";
 
     ParseResult<mson::TypeSection> typeSection;
-    typeSection.node.baseType = mson::PropertyBaseType;
+    typeSection.node.baseType = mson::ObjectBaseType;
     SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
@@ -404,7 +404,7 @@ TEST_CASE("Parse mson sample type section for a simple object", "[mson][type_sec
 
     mson::MemberType member;
     ParseResult<mson::TypeSection> typeSection;
-    typeSection.node.baseType = mson::PropertyBaseType;
+    typeSection.node.baseType = mson::ObjectBaseType;
     SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
@@ -446,7 +446,7 @@ TEST_CASE("Parse mson sample type section for a complex object", "[mson][type_se
 
     mson::MemberType member, submember;
     ParseResult<mson::TypeSection> typeSection;
-    typeSection.node.baseType = mson::PropertyBaseType;
+    typeSection.node.baseType = mson::ObjectBaseType;
     SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
@@ -486,7 +486,7 @@ TEST_CASE("Parse mson sample type section for a complex object", "[mson][type_se
     submember = member.content.property.sections[0].content.members().at(2);
     REQUIRE(submember.type == mson::ValueMemberType);
     REQUIRE(submember.content.value.valueDefinition.values.empty());
-    REQUIRE(submember.content.value.valueDefinition.typeDefinition.baseType == mson::PropertyBaseType);
+    REQUIRE(submember.content.value.valueDefinition.typeDefinition.baseType == mson::ObjectBaseType);
     REQUIRE(submember.content.value.sections.size() == 1);
     REQUIRE(submember.content.value.sections[0].type == mson::MemberTypeSectionType);
     REQUIRE(submember.content.value.sections[0].content.members().size() == 1);

@@ -106,8 +106,8 @@ namespace snowcrash {
 
                         memberType.build(valueMember.node);
                     }
-                    else if ((out.node.baseType == mson::PropertyBaseType ||
-                              out.node.baseType == mson::ImplicitPropertyBaseType) &&
+                    else if ((out.node.baseType == mson::ObjectBaseType ||
+                              out.node.baseType == mson::ImplicitObjectBaseType) &&
                              node->type == mdp::ListItemMarkdownNodeType) {
 
                         IntermediateParseResult<mson::PropertyMember> propertyMember(out.report);

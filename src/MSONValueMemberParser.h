@@ -245,7 +245,7 @@ namespace snowcrash {
                 case MSONSectionType:
                 {
                     if (node->type == mdp::ListItemMarkdownNodeType) {
-                        baseType = mson::ImplicitPropertyBaseType;
+                        baseType = mson::ImplicitObjectBaseType;
                     }
 
                     break;
@@ -253,7 +253,7 @@ namespace snowcrash {
 
                 case MSONPropertyMembersSectionType:
                 {
-                    baseType = mson::ImplicitPropertyBaseType;
+                    baseType = mson::ImplicitObjectBaseType;
                     break;
                 }
 

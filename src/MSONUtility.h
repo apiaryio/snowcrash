@@ -52,7 +52,7 @@ namespace mson {
         }
 
         if (type == ObjectTypeName) {
-            return PropertyBaseType;
+            return ObjectBaseType;
         }
 
         if ((type == ArrayTypeName) ||

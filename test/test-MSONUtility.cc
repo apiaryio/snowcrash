@@ -391,7 +391,7 @@ TEST_CASE("Parse type definition with non recognized type attribute", "[mson][ut
     markdownParser.parse(source, markdownAST);
     snowcrash::SectionParserData pd(0, source, blueprint);
 
-    pd.namedTypeBaseTable["Person"] = mson::PropertyBaseType;
+    pd.namedTypeBaseTable["Person"] = mson::ObjectBaseType;
 
     parseTypeDefinition(markdownAST.children().begin(), pd, attributes, typeDefinition.report, typeDefinition.node);
 
@@ -420,7 +420,7 @@ TEST_CASE("Parse type definition when non-structure type has nested types", "[ms
     markdownParser.parse(source, markdownAST);
     snowcrash::SectionParserData pd(0, source, blueprint);
 
-    pd.namedTypeBaseTable["Person"] = mson::PropertyBaseType;
+    pd.namedTypeBaseTable["Person"] = mson::ObjectBaseType;
 
     parseTypeDefinition(markdownAST.children().begin(), pd, attributes, typeDefinition.report, typeDefinition.node);
 
@@ -508,7 +508,7 @@ TEST_CASE("Parsing base type from base type name", "[mson][utility]")
     REQUIRE(parseBaseType(baseTypeName) == PrimitiveBaseType);
 
     baseTypeName = ObjectTypeName;
-    REQUIRE(parseBaseType(baseTypeName) == PropertyBaseType);
+    REQUIRE(parseBaseType(baseTypeName) == ObjectBaseType);
 
     baseTypeName = ArrayTypeName;
     REQUIRE(parseBaseType(baseTypeName) == ValueBaseType);

@@ -45,8 +45,8 @@ namespace mson {
         UndefinedBaseType = 0,     // Undefined
         PrimitiveBaseType,         // Primitive Types
         ImplicitPrimitiveBaseType, // Primitive Types (implicit)
-        PropertyBaseType,          // Object Structure Type
-        ImplicitPropertyBaseType,  // Object Structure Type (implicit)
+        ObjectBaseType,            // Object Structure Type
+        ImplicitObjectBaseType,    // Object Structure Type (implicit)
         ValueBaseType              // Array & Enum Structure Type
     };
 

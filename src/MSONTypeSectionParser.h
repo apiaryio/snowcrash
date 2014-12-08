@@ -82,8 +82,8 @@ namespace snowcrash {
             }
             else if (IEqual<std::string>()(signature.identifier, "Properties")) {
 
-                if (out.node.baseType != mson::PropertyBaseType &&
-                    out.node.baseType != mson::ImplicitPropertyBaseType) {
+                if (out.node.baseType != mson::ObjectBaseType &&
+                    out.node.baseType != mson::ImplicitObjectBaseType) {
 
                     //WARN: Properties should only be allowed for object types
                     std::stringstream ss;
@@ -120,8 +120,8 @@ namespace snowcrash {
                         out.node.content.members().push_back(memberType);
                     }
                 }
-                else if (out.node.baseType == mson::PropertyBaseType ||
-                         out.node.baseType == mson::ImplicitPropertyBaseType) {
+                else if (out.node.baseType == mson::ObjectBaseType ||
+                         out.node.baseType == mson::ImplicitObjectBaseType) {
 
                     // WARN: sample/default is for an object but it has values in signature
                     mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);

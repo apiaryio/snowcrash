@@ -38,7 +38,7 @@ TEST_CASE("Parse canonical mson mixin", "[mson][mixin]")
     mdp::ByteBuffer source = "- Include Person";
 
     NamedTypes namedTypes;
-    NamedTypeHelper::build("Person", mson::PropertyBaseType, namedTypes);
+    NamedTypeHelper::build("Person", mson::ObjectBaseType, namedTypes);
 
     ParseResult<mson::Mixin> mixin;
     SectionParserHelper<mson::Mixin, MSONMixinParser>::parseMSON(source, MSONMixinSectionType, mixin, 0, namedTypes);
@@ -58,7 +58,7 @@ TEST_CASE("Parse mson mixin with canonical type definition", "[mson][mixin]")
     mdp::ByteBuffer source = "- Include (Person, sample)";
 
     NamedTypes namedTypes;
-    NamedTypeHelper::build("Person", mson::PropertyBaseType, namedTypes);
+    NamedTypeHelper::build("Person", mson::ObjectBaseType, namedTypes);
 
     ParseResult<mson::Mixin> mixin;
     SectionParserHelper<mson::Mixin, MSONMixinParser>::parseMSON(source, MSONMixinSectionType, mixin, 0, namedTypes);

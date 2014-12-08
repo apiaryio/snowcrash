@@ -255,7 +255,7 @@ TEST_CASE("Parse mson property member when it is an object and has no sub-type s
     REQUIRE(propertyMember.report.warnings.empty());
 
     REQUIRE(propertyMember.node.name.literal == "user");
-    REQUIRE(propertyMember.node.valueDefinition.typeDefinition.baseType == mson::ImplicitPropertyBaseType);
+    REQUIRE(propertyMember.node.valueDefinition.typeDefinition.baseType == mson::ImplicitObjectBaseType);
     REQUIRE(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.name.name == mson::UndefinedTypeName);
     REQUIRE(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.name.symbol.empty());
 
@@ -287,13 +287,13 @@ TEST_CASE("Parse mson property member when it is an object and has no sub-type s
     REQUIRE(propertyMember.report.warnings[0].code == IgnoringWarning);
 
     REQUIRE(propertyMember.node.name.literal == "user");
-    REQUIRE(propertyMember.node.valueDefinition.typeDefinition.baseType == mson::ImplicitPropertyBaseType);
+    REQUIRE(propertyMember.node.valueDefinition.typeDefinition.baseType == mson::ImplicitObjectBaseType);
     REQUIRE(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.name.name == mson::UndefinedTypeName);
     REQUIRE(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.name.symbol.empty());
 
     REQUIRE(propertyMember.node.sections.size() == 1);
     REQUIRE(propertyMember.node.sections[0].type == mson::MemberTypeSectionType);
-    REQUIRE(propertyMember.node.sections[0].baseType == mson::ImplicitPropertyBaseType);
+    REQUIRE(propertyMember.node.sections[0].baseType == mson::ImplicitObjectBaseType);
     REQUIRE(propertyMember.node.sections[0].content.members().size() == 2);
 
     REQUIRE(propertyMember.node.sections[0].content.members().at(0).type == mson::PropertyMemberType);

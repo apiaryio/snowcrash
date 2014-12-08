@@ -39,7 +39,7 @@ TEST_CASE("Parse canonical mson named type", "[mson][named_type]")
     REQUIRE(namedType.node.base.attributes == 0);
     REQUIRE(namedType.node.base.typeSpecification.name.name == mson::ObjectTypeName);
     REQUIRE(namedType.node.base.typeSpecification.name.symbol.empty());
-    REQUIRE(namedType.node.base.baseType == mson::PropertyBaseType);
+    REQUIRE(namedType.node.base.baseType == mson::ObjectBaseType);
     REQUIRE(namedType.node.sections.size() == 1);
     REQUIRE(namedType.node.sections[0].type == mson::MemberTypeSectionType);
     REQUIRE(namedType.node.sections[0].content.members().size() == 5);
@@ -85,7 +85,7 @@ TEST_CASE("Parse canonical mson named type", "[mson][named_type]")
     REQUIRE(member.type == mson::PropertyMemberType);
     REQUIRE(member.content.property.name.literal == "plan");
     REQUIRE(member.content.property.valueDefinition.values.empty());
-    REQUIRE(member.content.property.valueDefinition.typeDefinition.baseType == mson::PropertyBaseType);
+    REQUIRE(member.content.property.valueDefinition.typeDefinition.baseType == mson::ObjectBaseType);
     REQUIRE(member.content.property.valueDefinition.typeDefinition.typeSpecification.name.name == mson::ObjectTypeName);
     REQUIRE(member.content.property.sections.size() == 2);
     REQUIRE(member.content.property.sections[0].type == mson::BlockDescriptionTypeSectionType);
@@ -147,8 +147,8 @@ TEST_CASE("Parse named type without type specification", "[mson][named_type][now
     REQUIRE(namedType.node.name.symbol.literal == "User");
     REQUIRE(namedType.node.base.attributes == 0);
     REQUIRE(namedType.node.base.typeSpecification.name.empty());
-    REQUIRE(namedType.node.base.baseType == mson::ImplicitPropertyBaseType);
+    REQUIRE(namedType.node.base.baseType == mson::ImplicitObjectBaseType);
     REQUIRE(namedType.node.sections.size() == 1);
     REQUIRE(namedType.node.sections[0].type == mson::SampleTypeSectionType);
-    REQUIRE(namedType.node.sections[0].baseType == mson::ImplicitPropertyBaseType);
+    REQUIRE(namedType.node.sections[0].baseType == mson::ImplicitObjectBaseType);
 }
