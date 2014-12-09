@@ -37,7 +37,7 @@ namespace snowcrash {
 
         // If the nodes follow after some block description without member
         // seperator, then they are treated as description
-        if (!sections.node.empty() && sections.node.back().type == mson::BlockDescriptionTypeSectionType) {
+        if (!sections.node.empty() && sections.node.back().type == mson::TypeSection::BlockDescriptionType) {
             return SectionProcessor<mson::ValueMember>::blockDescription(node, pd, sections.node, sections.sourceMap);
         }
 
@@ -46,9 +46,9 @@ namespace snowcrash {
 
         // Build a section to indicate nested members
         if (sections.node.empty() ||
-            (!sections.node.empty() && sections.node.back().type != mson::MemberTypeSectionType)) {
+            (!sections.node.empty() && sections.node.back().type != mson::TypeSection::MemberType)) {
 
-            mson::TypeSection typeSection(mson::MemberTypeSectionType);
+            mson::TypeSection typeSection(mson::TypeSection::MemberType);
             typeSection.baseType = baseType;
 
             sections.node.push_back(typeSection);
@@ -93,7 +93,7 @@ namespace snowcrash {
             cur = ++MarkdownNodeIterator(node);
         }
 
-        if (memberType.type != mson::UndefinedMemberType) {
+        if (memberType.type != mson::MemberType::UndefinedType) {
             sections.node.back().content.members().push_back(memberType);
         }
 

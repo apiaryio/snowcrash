@@ -113,7 +113,7 @@ namespace snowcrash {
 
             if (!signature.remainingContent.empty()) {
 
-                mson::TypeSection typeSection(mson::BlockDescriptionTypeSectionType);
+                mson::TypeSection typeSection(mson::TypeSection::BlockDescriptionType);
 
                 typeSection.content.description = signature.remainingContent;
                 valueMember.sections.push_back(typeSection);
@@ -137,11 +137,11 @@ namespace snowcrash {
 
             if (sections.empty() ||
                 (sections.size() == 1 &&
-                 sections[0].type == mson::BlockDescriptionTypeSectionType)) {
+                 sections[0].type == mson::TypeSection::BlockDescriptionType)) {
 
                 if (sections.empty()) {
 
-                    mson::TypeSection typeSection(mson::BlockDescriptionTypeSectionType);
+                    mson::TypeSection typeSection(mson::TypeSection::BlockDescriptionType);
                     sections.push_back(typeSection);
                 }
 
@@ -189,7 +189,7 @@ namespace snowcrash {
 
                 PARSER::parse(node, siblings, pd, typeSection);
 
-                if (typeSection.node.type != mson::UndefinedTypeSectionType) {
+                if (typeSection.node.type != mson::TypeSection::UndefinedType) {
                     sections.node.push_back(typeSection.node);
                 }
 

@@ -40,7 +40,7 @@ bool ValueDefinition::empty() const
     return (this->values.empty() && this->typeDefinition.empty());
 }
 
-MemberTypes& TypeSectionContent::members()
+MemberTypes& TypeSection::Content::members()
 {
     if (!m_members.get())
         throw MEMBERS_NOT_SET_ERR;
@@ -48,7 +48,7 @@ MemberTypes& TypeSectionContent::members()
     return *m_members;
 }
 
-const MemberTypes& TypeSectionContent::members() const
+const MemberTypes& TypeSection::Content::members() const
 {
     if (!m_members.get())
         throw MEMBERS_NOT_SET_ERR;
@@ -56,20 +56,20 @@ const MemberTypes& TypeSectionContent::members() const
     return *m_members;
 }
 
-TypeSectionContent::TypeSectionContent(const Markdown& description_, const Literal& value_)
+TypeSection::Content::Content(const Markdown& description_, const Literal& value_)
 : description(description_), value(value_)
 {
     m_members.reset(::new MemberTypes);
 }
 
-TypeSectionContent::TypeSectionContent(const TypeSectionContent& rhs)
+TypeSection::Content::Content(const TypeSection::Content& rhs)
 {
     this->description = rhs.description;
     this->value = rhs.value;
     m_members.reset(::new MemberTypes(*rhs.m_members.get()));
 }
 
-TypeSectionContent& TypeSectionContent::operator=(const TypeSectionContent& rhs)
+TypeSection::Content& TypeSection::Content::operator=(const TypeSection::Content& rhs)
 {
     this->description = rhs.description;
     this->value = rhs.value;
@@ -78,13 +78,13 @@ TypeSectionContent& TypeSectionContent::operator=(const TypeSectionContent& rhs)
     return *this;
 }
 
-TypeSectionContent::~TypeSectionContent()
+TypeSection::Content::~Content()
 {
 }
 
 bool TypeSection::empty() const
 {
-    return (this->type == UndefinedTypeSectionType &&
+    return (this->type == TypeSection::UndefinedType &&
             this->content.value.empty() &&
             this->content.description.empty() &&
             this->content.members().empty());
@@ -188,7 +188,7 @@ OneOf::~OneOf()
 {
 }
 
-MemberType::MemberType(const MemberTypeType& type_)
+MemberType::MemberType(const MemberType::Type& type_)
 : type(type_)
 {
 }
@@ -218,7 +218,7 @@ MemberType::~MemberType()
  */
 void MemberType::build(const PropertyMember& propertyMember)
 {
-    this->type = PropertyMemberType;
+    this->type = MemberType::PropertyType;
     this->content.property = propertyMember;
 }
 
@@ -229,7 +229,7 @@ void MemberType::build(const PropertyMember& propertyMember)
  */
 void MemberType::build(const ValueMember& valueMember)
 {
-    this->type = ValueMemberType;
+    this->type = MemberType::ValueType;
     this->content.value = valueMember;
 }
 
@@ -240,7 +240,7 @@ void MemberType::build(const ValueMember& valueMember)
  */
 void MemberType::build(const Mixin& mixin)
 {
-    this->type = MixinMemberType;
+    this->type = MemberType::MixinType;
     this->content.mixin = mixin;
 }
 
@@ -251,7 +251,7 @@ void MemberType::build(const Mixin& mixin)
  */
 void MemberType::build(const OneOf& oneOf)
 {
-    this->type = OneOfMemberType;
+    this->type = MemberType::OneOfType;
     this->content.oneOf = oneOf;
 }
 
@@ -262,7 +262,7 @@ void MemberType::build(const OneOf& oneOf)
  */
 void MemberType::build(const MemberTypes& members)
 {
-    this->type = MembersMemberType;
+    this->type = MemberType::MembersType;
     this->content.members = members;
 }
 

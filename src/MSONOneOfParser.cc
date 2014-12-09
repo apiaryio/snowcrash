@@ -64,7 +64,7 @@ namespace snowcrash {
                 break;
         }
 
-        if (memberType.type != mson::UndefinedMemberType) {
+        if (memberType.type != mson::MemberType::UndefinedType) {
             out.node.members().push_back(memberType);
         }
 

@@ -193,59 +193,59 @@ namespace mson {
     /** Collection of member types */
     typedef std::vector<MemberType> MemberTypes;
 
-    /** Type of a type section */
-    enum TypeSectionType {
-        UndefinedTypeSectionType = 0,    // Unknown
-        BlockDescriptionTypeSectionType, // Markdown block description
-        MemberTypeSectionType,           // Contains member types
-        SampleTypeSectionType,           // Sample member types
-        DefaultTypeSectionType           // Default member types
-    };
-
-    /** Content of the type section */
-    struct TypeSectionContent {
-
-        /** EITHER Block description */
-        Markdown description;
-
-        /** OR Literal value */
-        Literal value;
-
-        /** OR Array of member types */
-        MemberTypes& members();
-        const MemberTypes& members() const;
-
-        /** Constructor */
-        TypeSectionContent(const Markdown& description_ = Markdown(), const Literal& value_ = Literal());
-
-        /** Copy constructor */
-        TypeSectionContent(const TypeSectionContent& rhs);
-
-        /** Assignment operator */
-        TypeSectionContent& operator=(const TypeSectionContent& rhs);
-
-        /** Desctructor */
-        ~TypeSectionContent();
-
-    private:
-        std::auto_ptr<MemberTypes> m_members;
-    };
-
     /** Section of a type */
     struct TypeSection {
 
+        /** Type of a type section */
+        enum Type {
+            UndefinedType = 0,    // Unknown
+            BlockDescriptionType, // Markdown block description
+            MemberType,           // Contains member types
+            SampleType,           // Sample member types
+            DefaultType           // Default member types
+        };
+
+        /** Content of the type section */
+        struct Content {
+
+            /** EITHER Block description */
+            Markdown description;
+
+            /** OR Literal value */
+            Literal value;
+
+            /** OR Array of member types */
+            MemberTypes& members();
+            const MemberTypes& members() const;
+
+            /** Constructor */
+            Content(const Markdown& description_ = Markdown(), const Literal& value_ = Literal());
+
+            /** Copy constructor */
+            Content(const TypeSection::Content& rhs);
+
+            /** Assignment operator */
+            TypeSection::Content& operator=(const TypeSection::Content& rhs);
+
+            /** Desctructor */
+            ~Content();
+
+        private:
+            std::auto_ptr<MemberTypes> m_members;
+        };
+
         /** Constructor */
-        TypeSection(const TypeSectionType& type_ = UndefinedTypeSectionType)
+        TypeSection(const TypeSection::Type& type_ = TypeSection::UndefinedType)
         : baseType(UndefinedBaseType), type(type_) {}
 
         /** Base Type (for the parent of the type section) */
         BaseType baseType;
 
         /** Denotes the type of the section */
-        TypeSectionType type;
+        TypeSection::Type type;
 
         /** Content of the type section */
-        TypeSectionContent content;
+        TypeSection::Content content;
 
         /** Check if empty */
         bool empty() const;
@@ -364,21 +364,21 @@ namespace mson {
         ~OneOf();
     };
 
-    /** Type of a member type */
-    enum MemberTypeType {
-        UndefinedMemberType = 0, // Unknown
-        PropertyMemberType,      // Property member
-        ValueMemberType,         // Value member
-        MixinMemberType,         // Mixin
-        OneOfMemberType,         // One of
-        MembersMemberType        // Members collection
-    };
-
     /** Member type of a structure */
     struct MemberType {
 
+        /** Type of a member type */
+        enum Type {
+            UndefinedType = 0, // Unknown
+            PropertyType,      // Property member
+            ValueType,         // Value member
+            MixinType,         // Mixin
+            OneOfType,         // One of
+            MembersType        // Members collection
+        };
+
         /** Content of the member type */
-        struct MemberTypeContent {
+        struct Content {
 
             /** EITHER Property member */
             PropertyMember property;
@@ -397,13 +397,13 @@ namespace mson {
         };
 
         /** Type of the member type */
-        MemberTypeType type;
+        MemberType::Type type;
 
         /** Content of the member type */
-        MemberTypeContent content;
+        MemberType::Content content;
 
         /** Constructor */
-        MemberType(const MemberTypeType& type_ = UndefinedMemberType);
+        MemberType(const MemberType::Type& type_ = MemberType::UndefinedType);
 
         /** Copy constructor */
         MemberType(const MemberType& rhs);

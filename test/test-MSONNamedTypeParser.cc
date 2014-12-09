@@ -41,11 +41,11 @@ TEST_CASE("Parse canonical mson named type", "[mson][named_type]")
     REQUIRE(namedType.node.base.typeSpecification.name.symbol.empty());
     REQUIRE(namedType.node.base.baseType == mson::ObjectBaseType);
     REQUIRE(namedType.node.sections.size() == 1);
-    REQUIRE(namedType.node.sections[0].type == mson::MemberTypeSectionType);
+    REQUIRE(namedType.node.sections[0].type == mson::TypeSection::MemberType);
     REQUIRE(namedType.node.sections[0].content.members().size() == 5);
 
     member = namedType.node.sections[0].content.members().at(0);
-    REQUIRE(member.type == mson::PropertyMemberType);
+    REQUIRE(member.type == mson::MemberType::PropertyType);
     REQUIRE(member.content.property.name.literal == "login");
     REQUIRE(member.content.property.valueDefinition.values.size() == 1);
     REQUIRE(member.content.property.valueDefinition.values[0].literal == "pksunkara");
@@ -54,7 +54,7 @@ TEST_CASE("Parse canonical mson named type", "[mson][named_type]")
     REQUIRE(member.content.property.sections.empty());
 
     member = namedType.node.sections[0].content.members().at(1);
-    REQUIRE(member.type == mson::PropertyMemberType);
+    REQUIRE(member.type == mson::MemberType::PropertyType);
     REQUIRE(member.content.property.name.literal == "name");
     REQUIRE(member.content.property.valueDefinition.values.size() == 1);
     REQUIRE(member.content.property.valueDefinition.values[0].literal == "Pavan Kumar Sunkara");
@@ -63,7 +63,7 @@ TEST_CASE("Parse canonical mson named type", "[mson][named_type]")
     REQUIRE(member.content.property.sections.empty());
 
     member = namedType.node.sections[0].content.members().at(2);
-    REQUIRE(member.type == mson::PropertyMemberType);
+    REQUIRE(member.type == mson::MemberType::PropertyType);
     REQUIRE(member.content.property.name.literal == "admin");
     REQUIRE(member.content.property.valueDefinition.values.size() == 1);
     REQUIRE(member.content.property.valueDefinition.values[0].literal == "false");
@@ -72,7 +72,7 @@ TEST_CASE("Parse canonical mson named type", "[mson][named_type]")
     REQUIRE(member.content.property.sections.empty());
 
     member = namedType.node.sections[0].content.members().at(3);
-    REQUIRE(member.type == mson::PropertyMemberType);
+    REQUIRE(member.type == mson::MemberType::PropertyType);
     REQUIRE(member.content.property.name.literal == "orgs");
     REQUIRE(member.content.property.valueDefinition.values.size() == 2);
     REQUIRE(member.content.property.valueDefinition.values[0].literal == "confy");
@@ -82,26 +82,26 @@ TEST_CASE("Parse canonical mson named type", "[mson][named_type]")
     REQUIRE(member.content.property.sections.empty());
 
     member = namedType.node.sections[0].content.members().at(4);
-    REQUIRE(member.type == mson::PropertyMemberType);
+    REQUIRE(member.type == mson::MemberType::PropertyType);
     REQUIRE(member.content.property.name.literal == "plan");
     REQUIRE(member.content.property.valueDefinition.values.empty());
     REQUIRE(member.content.property.valueDefinition.typeDefinition.baseType == mson::ObjectBaseType);
     REQUIRE(member.content.property.valueDefinition.typeDefinition.typeSpecification.name.name == mson::ObjectTypeName);
     REQUIRE(member.content.property.sections.size() == 2);
-    REQUIRE(member.content.property.sections[0].type == mson::BlockDescriptionTypeSectionType);
+    REQUIRE(member.content.property.sections[0].type == mson::TypeSection::BlockDescriptionType);
     REQUIRE(member.content.property.sections[0].content.description == "The subscription plan of the user\n");
-    REQUIRE(member.content.property.sections[1].type == mson::MemberTypeSectionType);
+    REQUIRE(member.content.property.sections[1].type == mson::TypeSection::MemberType);
     REQUIRE(member.content.property.sections[1].content.members().size() == 2);
 
     submember = member.content.property.sections[1].content.members().at(0);
-    REQUIRE(submember.type == mson::PropertyMemberType);
+    REQUIRE(submember.type == mson::MemberType::PropertyType);
     REQUIRE(submember.content.property.name.literal == "stripe");
     REQUIRE(submember.content.property.valueDefinition.typeDefinition.typeSpecification.name.name == mson::NumberTypeName);
     REQUIRE(submember.content.property.valueDefinition.values.size() == 1);
     REQUIRE(submember.content.property.valueDefinition.values[0].literal == "1284");
 
     submember = member.content.property.sections[1].content.members().at(1);
-    REQUIRE(submember.type == mson::PropertyMemberType);
+    REQUIRE(submember.type == mson::MemberType::PropertyType);
     REQUIRE(submember.content.property.name.literal == "name");
     REQUIRE(submember.content.property.valueDefinition.typeDefinition.typeSpecification.name.name == mson::StringTypeName);
     REQUIRE(submember.content.property.valueDefinition.values.size() == 1);
@@ -127,7 +127,7 @@ TEST_CASE("Parse named type with a type section", "[mson][named_type]")
     REQUIRE(namedType.node.base.typeSpecification.name.symbol.empty());
     REQUIRE(namedType.node.base.baseType == mson::PrimitiveBaseType);
     REQUIRE(namedType.node.sections.size() == 1);
-    REQUIRE(namedType.node.sections[0].type == mson::SampleTypeSectionType);
+    REQUIRE(namedType.node.sections[0].type == mson::TypeSection::SampleType);
     REQUIRE(namedType.node.sections[0].content.value == "pksunkara");
 }
 
@@ -149,6 +149,6 @@ TEST_CASE("Parse named type without type specification", "[mson][named_type][now
     REQUIRE(namedType.node.base.typeSpecification.name.empty());
     REQUIRE(namedType.node.base.baseType == mson::ImplicitObjectBaseType);
     REQUIRE(namedType.node.sections.size() == 1);
-    REQUIRE(namedType.node.sections[0].type == mson::SampleTypeSectionType);
+    REQUIRE(namedType.node.sections[0].type == mson::TypeSection::SampleType);
     REQUIRE(namedType.node.sections[0].baseType == mson::ImplicitObjectBaseType);
 }

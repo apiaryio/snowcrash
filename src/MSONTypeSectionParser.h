@@ -51,12 +51,12 @@ namespace snowcrash {
 
             if (IEqual<std::string>()(signature.identifier, "Default")) {
 
-                out.node.type = mson::DefaultTypeSectionType;
+                out.node.type = mson::TypeSection::DefaultType;
                 assignValues = true;
             }
             else if (IEqual<std::string>()(signature.identifier, "Sample")) {
 
-                out.node.type = mson::SampleTypeSectionType;
+                out.node.type = mson::TypeSection::SampleType;
                 assignValues = true;
             }
             else if (IEqual<std::string>()(signature.identifier, "Items") ||
@@ -78,7 +78,7 @@ namespace snowcrash {
                     return node;
                 }
 
-                out.node.type = mson::MemberTypeSectionType;
+                out.node.type = mson::TypeSection::MemberType;
             }
             else if (IEqual<std::string>()(signature.identifier, "Properties")) {
 
@@ -99,7 +99,7 @@ namespace snowcrash {
                     return node;
                 }
 
-                out.node.type = mson::MemberTypeSectionType;
+                out.node.type = mson::TypeSection::MemberType;
             }
 
             if (assignValues &&
