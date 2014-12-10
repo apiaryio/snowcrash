@@ -176,7 +176,10 @@ namespace snowcrash {
 
             MarkdownNodeIterator cur = node;
 
-            if (pd.sectionContext() == MSONSectionType) {
+            if (pd.sectionContext() == MSONSectionType ||
+                pd.sectionContext() == MSONMixinSectionType ||
+                pd.sectionContext() == MSONOneOfSectionType) {
+
                 cur = processMSONSection(node, siblings, pd, sections, baseType);
             }
             else {
@@ -243,6 +246,8 @@ namespace snowcrash {
 
             switch (sectionType) {
                 case MSONSectionType:
+                case MSONOneOfSectionType:
+                case MSONMixinSectionType:
                 {
                     if (node->type == mdp::ListItemMarkdownNodeType) {
                         baseType = mson::ImplicitObjectBaseType;

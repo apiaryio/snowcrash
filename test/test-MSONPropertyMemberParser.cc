@@ -356,3 +356,60 @@ TEST_CASE("Parse mson property member when no sub-type specified and no nested s
     REQUIRE(propertyMember.node.sections[0].type == mson::TypeSection::BlockDescriptionType);
     REQUIRE(propertyMember.node.sections[0].content.description == "Some block description");
 }
+
+TEST_CASE("Parse mson property member when containing a mixin", "[mson][property_member]")
+{
+    mdp::ByteBuffer source = \
+    "- formal_person (object)\n"\
+    "  - prefix: Mr\n"\
+    "  - Include Person";
+
+    NamedTypes namedTypes;
+    NamedTypeHelper::build("Person", mson::ObjectBaseType, namedTypes);
+
+    ParseResult<mson::PropertyMember> propertyMember;
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption, Models(), NULL, namedTypes);
+
+    REQUIRE(propertyMember.report.error.code == Error::OK);
+    REQUIRE(propertyMember.report.warnings.empty());
+
+    REQUIRE(propertyMember.node.name.literal == "formal_person");
+    REQUIRE(propertyMember.node.sections.size() == 1);
+    REQUIRE(propertyMember.node.sections[0].type == mson::TypeSection::MemberType);
+    REQUIRE(propertyMember.node.sections[0].content.members().size() == 2);
+
+    REQUIRE(propertyMember.node.sections[0].content.members().at(0).type == mson::MemberType::PropertyType);
+    REQUIRE(propertyMember.node.sections[0].content.members().at(1).type == mson::MemberType::MixinType);
+    REQUIRE(propertyMember.node.sections[0].content.members().at(1).content.mixin.typeDefinition.typeSpecification.name.symbol.literal == "Person");
+}
+
+TEST_CASE("Parse mson property member when containing an oneOf", "[mson][property_member]")
+{
+    mdp::ByteBuffer source = \
+    "- formal_person (object)\n"\
+    "    - first_name\n"\
+    "    - One Of\n"\
+    "        - last_name\n"\
+    "        - given_name: Smith";
+
+    ParseResult<mson::PropertyMember> propertyMember;
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember);
+
+    REQUIRE(propertyMember.report.error.code == Error::OK);
+    REQUIRE(propertyMember.report.warnings.empty());
+
+    REQUIRE(propertyMember.node.name.literal == "formal_person");
+    REQUIRE(propertyMember.node.sections.size() == 1);
+    REQUIRE(propertyMember.node.sections[0].type == mson::TypeSection::MemberType);
+    REQUIRE(propertyMember.node.sections[0].content.members().size() == 2);
+
+    REQUIRE(propertyMember.node.sections[0].content.members().at(0).type == mson::MemberType::PropertyType);
+    REQUIRE(propertyMember.node.sections[0].content.members().at(1).type == mson::MemberType::OneOfType);
+
+    mson::OneOf oneOf = propertyMember.node.sections[0].content.members().at(1).content.oneOf;
+    REQUIRE(oneOf.members().size() == 2);
+    REQUIRE(oneOf.members().at(0).type == mson::MemberType::PropertyType);
+    REQUIRE(oneOf.members().at(0).content.property.name.literal == "last_name");
+    REQUIRE(oneOf.members().at(1).type == mson::MemberType::PropertyType);
+    REQUIRE(oneOf.members().at(1).content.property.name.literal == "given_name");
+}

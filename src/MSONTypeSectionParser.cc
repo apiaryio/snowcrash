@@ -44,7 +44,8 @@ namespace snowcrash {
                         out.report.warnings.push_back(Warning("one-of can not be a nested member for a type not sub typed from object",
                                                               LogicalErrorWarning,
                                                               sourceMap));
-                        break;
+
+                        return cur;
                     }
 
                     IntermediateParseResult<mson::OneOf> oneOf(out.report);

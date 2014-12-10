@@ -23,6 +23,20 @@ namespace snowcrash {
             return nestedType;
         }
 
+        // Check if mson mixin section
+        nestedType = SectionProcessor<mson::Mixin>::sectionType(node);
+
+        if (nestedType != UndefinedSectionType) {
+            return nestedType;
+        }
+
+        // Check if mson one of section
+        nestedType = SectionProcessor<mson::OneOf>::sectionType(node);
+
+        if (nestedType != UndefinedSectionType) {
+            return nestedType;
+        }
+
         return MSONSectionType;
     }
 
@@ -56,41 +70,70 @@ namespace snowcrash {
 
         mson::MemberType memberType;
 
-        if (baseType == mson::ValueBaseType &&
-            node->type == mdp::ListItemMarkdownNodeType) {
+        if (pd.sectionContext() == MSONMixinSectionType) {
 
-            IntermediateParseResult<mson::ValueMember> valueMember(sections.report);
-            cur = MSONValueMemberParser::parse(node, siblings, pd, valueMember);
+            IntermediateParseResult<mson::Mixin> mixin(sections.report);
+            cur = MSONMixinParser::parse(node, siblings, pd, mixin);
 
-            memberType.build(valueMember.node);
+            memberType.build(mixin.node);
         }
-        else if ((baseType == mson::ObjectBaseType ||
-                  baseType == mson::ImplicitObjectBaseType) &&
-                 node->type == mdp::ListItemMarkdownNodeType) {
+        else if (pd.sectionContext() == MSONOneOfSectionType) {
 
-            IntermediateParseResult<mson::PropertyMember> propertyMember(sections.report);
-            cur = MSONPropertyMemberParser::parse(node, siblings, pd, propertyMember);
+            if (baseType != mson::ObjectBaseType &&
+                baseType != mson::ImplicitObjectBaseType) {
 
-            memberType.build(propertyMember.node);
-        }
-        else if (baseType == mson::PrimitiveBaseType ||
-                 baseType == mson::ImplicitPrimitiveBaseType) {
+                // WARN: One of can not be a nested member for a non object structure type
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                sections.report.warnings.push_back(Warning("one-of can not be a nested member for a type not sub typed from object",
+                                                           LogicalErrorWarning,
+                                                           sourceMap));
 
-            // WARN: Primitive type members should not have nested members
-            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-            sections.report.warnings.push_back(Warning("sub-types of primitive types should not have nested members",
-                                                       LogicalErrorWarning,
-                                                       sourceMap));
+                return cur;
+            }
+
+            IntermediateParseResult<mson::OneOf> oneOf(sections.report);
+            cur = MSONOneOfParser::parse(node, siblings, pd, oneOf);
+
+            memberType.build(oneOf.node);
         }
         else {
 
-            // WARN: Ignoring unrecognized block in mson nested members
-            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-            sections.report.warnings.push_back(Warning("ignorning unrecognized block",
-                                                       IgnoringWarning,
-                                                       sourceMap));
+            if (baseType == mson::ValueBaseType &&
+                node->type == mdp::ListItemMarkdownNodeType) {
 
-            cur = ++MarkdownNodeIterator(node);
+                IntermediateParseResult<mson::ValueMember> valueMember(sections.report);
+                cur = MSONValueMemberParser::parse(node, siblings, pd, valueMember);
+
+                memberType.build(valueMember.node);
+            }
+            else if ((baseType == mson::ObjectBaseType ||
+                      baseType == mson::ImplicitObjectBaseType) &&
+                     node->type == mdp::ListItemMarkdownNodeType) {
+
+                IntermediateParseResult<mson::PropertyMember> propertyMember(sections.report);
+                cur = MSONPropertyMemberParser::parse(node, siblings, pd, propertyMember);
+
+                memberType.build(propertyMember.node);
+            }
+            else if (baseType == mson::PrimitiveBaseType ||
+                     baseType == mson::ImplicitPrimitiveBaseType) {
+
+                // WARN: Primitive type members should not have nested members
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                sections.report.warnings.push_back(Warning("sub-types of primitive types should not have nested members",
+                                                           LogicalErrorWarning,
+                                                           sourceMap));
+            }
+            else {
+
+                // WARN: Ignoring unrecognized block in mson nested members
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                sections.report.warnings.push_back(Warning("ignorning unrecognized block",
+                                                           IgnoringWarning,
+                                                           sourceMap));
+                
+                cur = ++MarkdownNodeIterator(node);
+            }
         }
 
         if (memberType.type != mson::MemberType::UndefinedType) {
