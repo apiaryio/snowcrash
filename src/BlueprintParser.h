@@ -332,7 +332,7 @@ namespace snowcrash {
                 pd.namedTypeInheritanceTable[identifier] = typeDefinition.typeSpecification.name.symbol.literal;
             }
             else if (typeDefinition.typeSpecification.name.empty()) {
-                pd.namedTypeBaseTable[identifier] = mson::ImplicitPropertyBaseType;
+                pd.namedTypeBaseTable[identifier] = mson::ImplicitObjectBaseType;
             }
         }
 

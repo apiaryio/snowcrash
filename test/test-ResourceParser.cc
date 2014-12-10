@@ -958,7 +958,7 @@ TEST_CASE("Parse resource attributes", "[resource]")
     ParseResult<Resource> resource;
     NamedTypes namedTypes;
 
-    NamedTypeHelper::build("Coupon", mson::PropertyBaseType, namedTypes);
+    NamedTypeHelper::build("Coupon", mson::ObjectBaseType, namedTypes);
     NamedTypeHelper::build("Coupons", mson::ValueBaseType, namedTypes);
     SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource, ExportSourcemapOption, Models(), NULL, namedTypes);
 
@@ -988,7 +988,7 @@ TEST_CASE("Parse unnamed resource attributes", "[resource]")
     ParseResult<Resource> resource;
     NamedTypes namedTypes;
 
-    NamedTypeHelper::build("Coupon", mson::PropertyBaseType, namedTypes);
+    NamedTypeHelper::build("Coupon", mson::ObjectBaseType, namedTypes);
     SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource, ExportSourcemapOption, Models(), NULL, namedTypes);
 
     REQUIRE(resource.report.error.code == Error::OK);

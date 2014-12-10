@@ -682,7 +682,7 @@ TEST_CASE("Parse a payload with attributes", "[payload]")
     REQUIRE(payload.node.attributes.source.base.attributes == 0);
     REQUIRE(payload.node.attributes.source.base.typeSpecification.name.name == mson::ObjectTypeName);
     REQUIRE(payload.node.attributes.source.sections.size() == 1);
-    REQUIRE(payload.node.attributes.source.sections[0].type == mson::MemberTypeSectionType);
+    REQUIRE(payload.node.attributes.source.sections[0].type == mson::TypeSection::MemberType);
     REQUIRE(payload.node.attributes.source.sections[0].content.members().size() == 4);
 }
 

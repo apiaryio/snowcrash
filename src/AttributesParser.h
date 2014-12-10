@@ -48,7 +48,7 @@ namespace snowcrash {
 
             // Default to `object` type specification
             if (out.node.source.base.baseType == mson::UndefinedBaseType) {
-                out.node.source.base.baseType = mson::ImplicitPropertyBaseType;
+                out.node.source.base.baseType = mson::ImplicitObjectBaseType;
             }
 
             SectionProcessor<mson::ValueMember>::parseRemainingContent(node, pd, signature.remainingContent,

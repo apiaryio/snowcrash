@@ -524,11 +524,11 @@ TEST_CASE("Parsing blueprint with mson data structures", "[blueprint][now]")
 
     baseIt = pd.namedTypeBaseTable.find("Plan Base");
     REQUIRE(baseIt != pd.namedTypeBaseTable.end());
-    REQUIRE(baseIt->second == mson::ImplicitPropertyBaseType);
+    REQUIRE(baseIt->second == mson::ImplicitObjectBaseType);
 
     baseIt = pd.namedTypeBaseTable.find("Plan");
     REQUIRE(baseIt != pd.namedTypeBaseTable.end());
-    REQUIRE(baseIt->second == mson::ImplicitPropertyBaseType);
+    REQUIRE(baseIt->second == mson::ImplicitObjectBaseType);
 
     baseIt = pd.namedTypeBaseTable.find("Plans");
     REQUIRE(baseIt != pd.namedTypeBaseTable.end());
