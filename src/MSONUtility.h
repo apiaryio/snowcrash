@@ -9,9 +9,60 @@
 #ifndef SNOWCRASH_MSONUTILITY_H
 #define SNOWCRASH_MSONUTILITY_H
 
-#include "MSON.h"
+#include "MSONSourcemap.h"
+
+using namespace scpl;
 
 namespace mson {
+
+    /**
+     * \brief Check if the given string is variable
+     *
+     * \param String to check
+     *
+     * \return True if variable string
+     */
+    inline bool checkVariable(const std::string& subject) {
+
+        std::string emphasisChars = mdp::MarkdownEmphasisChars;
+
+        if (emphasisChars.find(subject[0]) != std::string::npos &&
+            subject[0] == subject[subject.length() - 1]) {
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * \brief Parse a MSON BaseTypeName into MSON BaseType
+     *
+     * \param type MSON BaseTypeName
+     *
+     * \return MSON BaseType
+     */
+    inline BaseType parseBaseType(const BaseTypeName& type) {
+
+        if ((type == StringTypeName) ||
+            (type == NumberTypeName) ||
+            (type == BooleanTypeName)) {
+
+            return PrimitiveBaseType;
+        }
+
+        if (type == ObjectTypeName) {
+            return ObjectBaseType;
+        }
+
+        if ((type == ArrayTypeName) ||
+            (type == EnumTypeName)) {
+
+            return ValueBaseType;
+        }
+
+        return UndefinedBaseType;
+    }
 
     /**
      * \brief Parse a string into MSON Value structure
@@ -23,14 +74,9 @@ namespace mson {
     inline Value parseValue(const std::string& subject) {
 
         Value value;
-
         std::string buffer = subject;
-        size_t len = buffer.length();
 
-        std::string emphasisChars = mdp::MarkdownEmphasisChars;
-
-        if (emphasisChars.find(buffer[0]) != std::string::npos &&
-            buffer[0] == buffer[len - 1]) {
+        if (checkVariable(subject)) {
 
             std::string escapedString = snowcrash::RetrieveEscaped(buffer, 0, true);
 
@@ -74,7 +120,7 @@ namespace mson {
      * \brief Parse Type Name from a string
      *
      * \param subject String which represents the type name
-     * \param out MSON Type Name
+     * \param typeName MSON Type Name
      */
     inline void parseTypeName(const std::string& subject,
                               TypeName& typeName) {
@@ -196,7 +242,7 @@ namespace mson {
                 alreadyParsedLink = true;
                 lookingForEndLink = false;
             }
-            else if (subject[i] == scpl::AttributeDelimiter &&
+            else if (subject[i] == AttributeDelimiter &&
                      lookingAtNested &&
                      !lookingForEndLink) {
 
@@ -267,12 +313,14 @@ namespace mson {
      * \param node Markdown node of the signature
      * \param pd Section parser data
      * \param attributes List of signature attributes
-     * \param out Type Definition parse result
+     * \param report Parse result report
+     * \param typeDefinition MSON Type Definition
      */
     inline void parseTypeDefinition(const mdp::MarkdownNodeIterator& node,
                                     snowcrash::SectionParserData& pd,
                                     const std::vector<std::string>& attributes,
-                                    const snowcrash::ParseResultRef<TypeDefinition>& out) {
+                                    snowcrash::Report& report,
+                                    mson::TypeDefinition& typeDefinition) {
 
         bool foundTypeSpecification = false;
 
@@ -281,23 +329,92 @@ namespace mson {
              it++) {
 
             // If not a recognized type attribute
-            if (!parseTypeAttribute(*it, out.node.attributes)) {
+            if (!parseTypeAttribute(*it, typeDefinition.attributes)) {
 
                 // If type specification is already found
                 if (foundTypeSpecification) {
 
                     // WARN: Ignoring unrecognized type attribute
                     mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                    out.report.warnings.push_back(snowcrash::Warning("ignoring unrecognized type attribute",
-                                                                     snowcrash::IgnoringWarning,
-                                                                     sourceMap));
+                    report.warnings.push_back(snowcrash::Warning("ignoring unrecognized type attribute",
+                                                                 snowcrash::IgnoringWarning,
+                                                                 sourceMap));
                 }
                 else {
 
                     foundTypeSpecification = true;
-                    parseTypeSpecification(*it, out.node.typeSpecification);
+                    parseTypeSpecification(*it, typeDefinition.typeSpecification);
                 }
             }
+        }
+
+        typeDefinition.baseType = parseBaseType(typeDefinition.typeSpecification.name.name);
+        NamedTypeBaseTable::iterator it = pd.namedTypeBaseTable.find(typeDefinition.typeSpecification.name.symbol.literal);
+
+        if (typeDefinition.baseType == UndefinedBaseType &&
+            it != pd.namedTypeBaseTable.end()) {
+
+            typeDefinition.baseType = it->second;
+        }
+
+        if (typeDefinition.baseType == UndefinedBaseType &&
+            !typeDefinition.typeSpecification.name.symbol.literal.empty()) {
+
+            // WARN: Unable to find the named type in the named type base type table
+            std::stringstream ss;
+            ss << "unable to find the symbol `" << typeDefinition.typeSpecification.name.symbol.literal << "` in the list of named types";
+
+            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+            report.warnings.push_back(snowcrash::Warning(ss.str(),
+                                                         snowcrash::LogicalErrorWarning,
+                                                         sourceMap));
+        }
+
+        if ((typeDefinition.baseType != ValueBaseType) &&
+            !typeDefinition.typeSpecification.nestedTypes.empty()) {
+
+            // WARN: Nested types for non (array or enum) structure base type
+            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+            report.warnings.push_back(snowcrash::Warning("nested types should be present only for types which are sub typed from either array or enum structure type",
+                                                         snowcrash::LogicalErrorWarning,
+                                                         sourceMap));
+        }
+    }
+
+    /**
+     * \brief Parse Property Name from a string given by signature identifier
+     *
+     * \param node Markdown node of the signature
+     * \param pd Section parser data
+     * \param subject String representing the property name
+     * \param report Parse result report
+     * \param propertyName MSON Property Name
+     */
+    inline void parsePropertyName(const mdp::MarkdownNodeIterator& node,
+                                  snowcrash::SectionParserData& pd,
+                                  const std::string& subject,
+                                  snowcrash::Report& report,
+                                  PropertyName& propertyName) {
+
+        std::string buffer = subject;
+
+        if (checkVariable(subject)) {
+
+            std::string escapedString = snowcrash::RetrieveEscaped(buffer, 0, true);
+
+            SignatureTraits traits(SignatureTraits::ValuesTrait |
+                                   SignatureTraits::AttributesTrait);
+
+            Signature signature = SignatureSectionProcessorBase<PropertyName>::parseSignature(node, pd, traits, report, escapedString);
+
+            if (!signature.value.empty()) {
+                propertyName.variable.values.push_back(parseValue(signature.value));
+            }
+
+            parseTypeDefinition(node, pd, signature.attributes, report, propertyName.variable.typeDefinition);
+        }
+        else {
+            propertyName.literal = subject;
         }
     }
 }

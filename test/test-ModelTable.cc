@@ -22,7 +22,7 @@ TEST_CASE("Parse object resource model", "[model_table]")
 
     // Check we will get error parsing the same symbol again with the same symbol table
     Models models;
-    ModelHelper::buildModel("Super", models);
+    ModelHelper::build("Super", models);
 
     ParseResult<Resource> resource;
     SectionParserHelper<Resource, ResourceParser>::parse(source, ModelBodySectionType, resource, 0, models);

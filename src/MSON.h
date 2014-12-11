@@ -9,10 +9,16 @@
 #ifndef SNOWCRASH_MSON_H
 #define SNOWCRASH_MSON_H
 
-#include <deque>
+#include <vector>
 #include <string>
+#include <map>
+#include <stdexcept>
+
 #include "Platform.h"
 #include "MarkdownParser.h"
+#include "BlueprintSourcemap.h"
+
+#define MEMBERS_NOT_SET_ERR std::logic_error("no members set")
 
 /**
  * MSON Abstract Syntax Tree
@@ -29,9 +35,31 @@ namespace mson {
     /** Literal */
     typedef std::string Literal;
 
+    /**
+     * Kind of Base Type
+     *
+     * This is an internal thing to keep track of what kind of type,
+     * that particular named type or member is sub-typed from
+     */
+    enum BaseType {
+        UndefinedBaseType = 0,     // Undefined
+        PrimitiveBaseType,         // Primitive Types
+        ImplicitPrimitiveBaseType, // Primitive Types (implicit)
+        ObjectBaseType,            // Object Structure Type
+        ImplicitObjectBaseType,    // Object Structure Type (implicit)
+        ValueBaseType              // Array & Enum Structure Type
+    };
+
+    /** Named Types base type table */
+    typedef std::map<Literal, BaseType> NamedTypeBaseTable;
+
+    /** Named Types inheritance table */
+    typedef std::map<Literal, Literal> NamedTypeInheritanceTable;
+
     /** A simple or actual value */
     struct Value {
 
+        /** Constructor */
         Value()
         : variable(false) {}
 
@@ -40,14 +68,18 @@ namespace mson {
 
         /** Flag to denote variable value */
         bool variable;
+
+        /** Check if empty */
+        bool empty() const;
     };
 
     /** Collection of values */
-    typedef std::deque<Value> Values;
+    typedef std::vector<Value> Values;
 
     /** Type symbol (identifier) */
     struct Symbol {
 
+        /** Constructor */
         Symbol()
         : variable(false) {}
 
@@ -56,6 +88,9 @@ namespace mson {
 
         /** Flag to denote variable type name */
         bool variable;
+
+        /** Check if empty */
+        bool empty() const;
     };
 
     /** Value of type name if based type */
@@ -72,18 +107,22 @@ namespace mson {
     /** Base or named type's name */
     struct TypeName {
 
-        TypeName()
-        : name(UndefinedTypeName) {}
+        /** Constructor */
+        TypeName(const BaseTypeName& name_ = UndefinedTypeName)
+        : name(name_) {}
 
         /** EITHER Base type's value */
         BaseTypeName name;
 
         /** OR Named type's identifier */
         Symbol symbol;
+
+        /** Check if empty */
+        bool empty() const;
     };
 
     /** Collection of type names */
-    typedef std::deque<TypeName> TypeNames;
+    typedef std::vector<TypeName> TypeNames;
 
     /** Attribute of a type */
     enum TypeAttribute {
@@ -106,24 +145,33 @@ namespace mson {
         /** Array of nested types */
         TypeNames nestedTypes;
 
-        /** Reference for the type */
-        snowcrash::Reference reference;
-
-        /** References for the nested types */
-        std::deque<snowcrash::Reference> nestedReferences;
+        /** Check if empty */
+        bool empty() const;
     };
 
     /** Definition of an instance of a type */
     struct TypeDefinition {
 
+        /** Constructor */
         TypeDefinition()
-        : attributes(0) {}
+        : baseType(UndefinedBaseType), attributes(0) {}
+
+        /**
+         * Base Type (for the type definition)
+         *
+         * Representing the base type from which this member or
+         * named type is sub-typed from. Not present in the AST
+         */
+        BaseType baseType;
 
         /** Type specification */
         TypeSpecification typeSpecification;
 
         /** List of type attributes (byte-wise OR) */
         TypeAttributes attributes;
+
+        /** Check if empty */
+        bool empty() const;
     };
 
     /** Value definition of a type instance */
@@ -133,56 +181,78 @@ namespace mson {
         Values values;
 
         /** Type of the values */
-        TypeDefinition typedefinition;
+        TypeDefinition typeDefinition;
+
+        /** Check if empty */
+        bool empty() const;
     };
 
     /** Forward Declaration for member type */
     struct MemberType;
 
     /** Collection of member types */
-    typedef std::deque<MemberType> MemberTypes;
-
-    /** Type of a type section */
-    enum TypeSectionType {
-        UndefinedTypeSectionType = 0,    // Unknown
-        BlockDescriptionTypeSectionType, // Markdown block description
-        MemberTypeSectionType,           // Contains member types
-        SampleTypeSectionType,           // Sample member types
-        DefaultTypeSectionType           // Default member types
-    };
+    typedef std::vector<MemberType> MemberTypes;
 
     /** Section of a type */
     struct TypeSection {
 
-        TypeSection()
-        : type(UndefinedTypeSectionType) {}
+        /** Type of a type section */
+        enum Type {
+            UndefinedType = 0,    // Unknown
+            BlockDescriptionType, // Markdown block description
+            MemberType,           // Contains member types
+            SampleType,           // Sample member types
+            DefaultType           // Default member types
+        };
 
         /** Content of the type section */
-        struct TypeSectionContent {
+        struct Content {
 
             /** EITHER Block description */
             Markdown description;
+
+            /** OR Literal value */
+            Literal value;
 
             /** OR Array of member types */
             MemberTypes& members();
             const MemberTypes& members() const;
 
-            /** Checks if member types are present */
-            bool hasMembers() const;
+            /** Constructor */
+            Content(const Markdown& description_ = Markdown(), const Literal& value_ = Literal());
+
+            /** Copy constructor */
+            Content(const TypeSection::Content& rhs);
+
+            /** Assignment operator */
+            TypeSection::Content& operator=(const TypeSection::Content& rhs);
+
+            /** Desctructor */
+            ~Content();
 
         private:
             std::auto_ptr<MemberTypes> m_members;
         };
 
+        /** Constructor */
+        TypeSection(const TypeSection::Type& type_ = TypeSection::UndefinedType)
+        : baseType(UndefinedBaseType), type(type_) {}
+
+        /** Base Type (for the parent of the type section) */
+        BaseType baseType;
+
         /** Denotes the type of the section */
-        TypeSectionType type;
+        TypeSection::Type type;
 
         /** Content of the type section */
-        TypeSectionContent content;
+        TypeSection::Content content;
+
+        /** Check if empty */
+        bool empty() const;
     };
 
     /** Collection of type sections */
-    typedef std::deque<TypeSection> TypeSections;
+    typedef std::vector<TypeSection> TypeSections;
 
     /** User-define named type */
     struct NamedType {
@@ -195,6 +265,9 @@ namespace mson {
 
         /** List of named type's sections */
         TypeSections sections;
+
+        /** Check if empty */
+        bool empty() const;
     };
 
     /** Individual member of an array or enum structure */
@@ -208,6 +281,9 @@ namespace mson {
 
         /** List of member type's sections */
         TypeSections sections;
+
+        /** Check if empty */
+        bool empty() const;
     };
 
     /** Name of a property member */
@@ -218,6 +294,9 @@ namespace mson {
 
         /** OR Variable name of the property */
         ValueDefinition variable;
+
+        /** Check if empty */
+        bool empty() const;
     };
 
     /** Individual member of an object structure */
@@ -225,6 +304,9 @@ namespace mson {
 
         /** Name of the property */
         PropertyName name;
+
+        /** Check if empty */
+        bool empty() const;
     };
 
     /** Mixin type */
@@ -232,39 +314,58 @@ namespace mson {
 
         /** Type definition of the type to be included */
         TypeDefinition typeDefinition;
+
+        /** Check if empty */
+        bool empty() const;
     };
 
-    /** One Of type */
-    struct OneOf {
+    /** Collection of Member types */
+    struct Members {
 
         /** List of mutually exclusive member types */
         MemberTypes& members();
         const MemberTypes& members() const;
 
-        /** Checks if member types are present */
-        bool hasMembers() const;
+        /** Builds the member structures from the list of member types */
+        Members& operator=(const MemberTypes& rhs);
 
-    private:
+        /** Constructor */
+        Members();
+
+        /** Copy constructor */
+        Members(const Members& rhs);
+
+        /** Assignment operator */
+        Members& operator=(const Members& rhs);
+
+        /** Desctructor */
+        ~Members();
+
+        /** Check if empty */
+        bool empty() const;
+
+    protected:
         std::auto_ptr<MemberTypes> m_members;
     };
 
-    /** Type of a member type */
-    enum MemberTypeType {
-        UndefinedMemberType = 0, // Unknown
-        PropertyMemberType,      // Property member
-        ValueMemberType,         // Value member
-        MixinMemberType,         // Mixin
-        OneOfMemberType          // One of
-    };
+    /** One Of type */
+    typedef Members OneOf;
 
-    /** Member type of a structure */
+    /** Member of a structure */
     struct MemberType {
 
-        MemberType()
-        : type(UndefinedMemberType) {}
+        /** Type of a member type */
+        enum Type {
+            UndefinedType = 0, // Unknown
+            PropertyType,      // Property member
+            ValueType,         // Value member
+            MixinType,         // Mixin
+            OneOfType,         // One of
+            MembersType        // Members collection
+        };
 
         /** Content of the member type */
-        struct MemberTypeContent {
+        struct Content {
 
             /** EITHER Property member */
             PropertyMember property;
@@ -277,13 +378,36 @@ namespace mson {
 
             /** OR One of member */
             OneOf oneOf;
+
+            /** OR Members collection */
+            Members members;
         };
 
         /** Type of the member type */
-        MemberTypeType type;
+        MemberType::Type type;
 
         /** Content of the member type */
-        MemberTypeContent content;
+        MemberType::Content content;
+
+        /** Constructor */
+        MemberType(const MemberType::Type& type_ = MemberType::UndefinedType);
+
+        /** Copy constructor */
+        MemberType(const MemberType& rhs);
+
+        /** Assignment operator */
+        MemberType& operator=(const MemberType& rhs);
+
+        /** Functions which allow the building of member type */
+        void build(const PropertyMember& propertyMember);
+        void build(const ValueMember& valueMember);
+        void build(const Mixin& mixin);
+        void build(const OneOf& oneOf);
+        void build(const MemberTypes& memberTypes);
+        void build(const Value& value);
+
+        /** Desctructor */
+        ~MemberType();
     };
 }
 

@@ -17,9 +17,13 @@ namespace snowcrashtest {
 
     struct Models {
 
-        std::vector<snowcrash::ResourceModelSymbol> models;
-        std::vector<snowcrash::ResourceModelSymbolSourceMap> modelsSM;
+        snowcrash::ModelTable modelTable;
+        snowcrash::ModelSourceMapTable modelSourceMapTable;
+    };
 
+    struct NamedTypes {
+
+        mson::NamedTypeBaseTable baseTable;
     };
 
     template <typename T, typename PARSER>
@@ -30,7 +34,8 @@ namespace snowcrashtest {
                           const snowcrash::ParseResultRef<T>& out,
                           const snowcrash::BlueprintParserOptions& opts = 0,
                           const Models& models = Models(),
-                          snowcrash::ParseResult<snowcrash::Blueprint>* bp = NULL) {
+                          snowcrash::ParseResult<snowcrash::Blueprint>* bp = NULL,
+                          const NamedTypes& namedTypes = NamedTypes()) {
 
             mdp::MarkdownParser markdownParser;
             mdp::MarkdownNode markdownAST;
@@ -52,21 +57,33 @@ namespace snowcrashtest {
 
             pd.sectionsContext.push_back(type);
 
-            pd.modelTable.resourceModels.insert(models.models.begin(), models.models.end());
-            pd.modelSourceMapTable.resourceModels.insert(models.modelsSM.begin(), models.modelsSM.end());
+            pd.modelTable.insert(models.modelTable.begin(), models.modelTable.end());
+            pd.modelSourceMapTable.insert(models.modelSourceMapTable.begin(), models.modelSourceMapTable.end());
+
+            pd.namedTypeBaseTable.insert(namedTypes.baseTable.begin(), namedTypes.baseTable.end());
 
             PARSER::parse(markdownAST.children().begin(),
                           markdownAST.children(),
                           pd,
                           out);
         }
+
+        static void parseMSON(const mdp::ByteBuffer& source,
+                              snowcrash::SectionType type,
+                              const snowcrash::ParseResultRef<T>& out,
+                              const snowcrash::BlueprintParserOptions& opts = 0,
+                              const NamedTypes& namedTypes = NamedTypes()) {
+
+            parse(source, type, out, opts, Models(), NULL, namedTypes);
+        }
+
     };
 
     struct ModelHelper {
 
         /** Builds a Symbols entry for testing purposes */
-        static void buildModel(mdp::ByteBuffer name,
-                               Models& models) {
+        static void build(const mdp::ByteBuffer& name,
+                          Models& models) {
 
             snowcrash::ResourceModel model;
             snowcrash::SourceMap<snowcrash::ResourceModel> modelSM;
@@ -76,11 +93,22 @@ namespace snowcrashtest {
 
             model.description = "Foo";
             model.body = "Bar";
-            models.models.push_back(snowcrash::ResourceModelSymbol(name, model));
+            models.modelTable[name] = model;
 
             modelSM.description.sourceMap = sourcemap;
             modelSM.body.sourceMap = sourcemap;
-            models.modelsSM.push_back(snowcrash::ResourceModelSymbolSourceMap(name, modelSM));
+            models.modelSourceMapTable[name] = modelSM;
+        }
+    };
+
+    struct NamedTypeHelper {
+
+        /** Builds an named type entry for testing purposes */
+        static void build(const mson::Literal& literal,
+                          const mson::BaseType& baseType,
+                          NamedTypes& namedTypes) {
+
+            namedTypes.baseTable[literal] = baseType;
         }
     };
 
@@ -113,7 +141,7 @@ namespace snowcrashtest {
             scpl::SignatureTraits signatureTraits(traits);
 
             signature = scpl::SignatureSectionProcessorBase<snowcrash::Blueprint>
-                            ::parseSignature(markdownAST.children().begin(), pd, signatureTraits, out);
+                            ::parseSignature(markdownAST.children().begin(), pd, signatureTraits, out.report);
 
             return signature;
         }

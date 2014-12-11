@@ -36,6 +36,12 @@ std::string snowcrash::SectionName(const SectionType& section) {
         case HeadersSectionType:
             return "headers";
 
+        case MSONMixinSectionType:
+            return "mixin";
+
+        case MSONOneOfSectionType:
+            return "one-of";
+
         default:
             return "section";
     }

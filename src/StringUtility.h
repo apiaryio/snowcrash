@@ -152,9 +152,9 @@ namespace snowcrash {
     };
 
     /**
-     *  \brief  compare containers equality 
+     *  \brief  compare containers equality
      *
-     *  \requirements 
+     *  \requirements
      *    - both containers must support methods ::length(), ::begin(), ::end()
      *    - both containers must be iterable
      *    - both containers must contain comparable types

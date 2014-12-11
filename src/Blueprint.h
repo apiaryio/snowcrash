@@ -162,7 +162,7 @@ namespace snowcrash {
         /** Metadata for the reference */
         ReferenceMetadata meta;
     };
-    
+
     /**
      *  Payload
      */

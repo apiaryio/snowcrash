@@ -13,6 +13,20 @@
 #include "SourceAnnotation.h"
 #include "Signature.h"
 
+// Use the following macro whenever a section doesn't have description
+#define NO_SECTION_DESCRIPTION(T)\
+static MarkdownNodeIterator processDescription(const MarkdownNodeIterator& node,\
+                                               const MarkdownNodes& siblings,\
+                                               SectionParserData& pd,\
+                                               const ParseResultRef<T>& out) {\
+    return node;\
+}\
+\
+static bool isDescriptionNode(const MarkdownNodeIterator& node,\
+                              SectionType sectionType) {\
+    return false;\
+}\
+
 namespace snowcrash {
 
     using mdp::MarkdownNode;

@@ -69,3 +69,20 @@ TEST_CASE("Remove markdown link")
     REQUIRE(StripMarkdownLink("[Google] [google]") == "Google");
     REQUIRE(StripMarkdownLink("[ Google](https://google.com)") == "Google");
 }
+
+TEST_CASE("Retrieve escaped string")
+{
+    std::string subject;
+
+    subject = "a```b```cd";
+    REQUIRE(RetrieveEscaped(subject, 1) == "```b```");
+    REQUIRE(subject == "cd");
+
+    subject = "*rel (custom)*";
+    REQUIRE(RetrieveEscaped(subject) == "*rel (custom)*");
+    REQUIRE(subject == "");
+
+    subject = "site_admin";
+    REQUIRE(RetrieveEscaped(subject, 4) == "");
+    REQUIRE(subject == "site_admin");
+}

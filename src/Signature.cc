@@ -15,6 +15,7 @@
 #include "ParametersParser.h"
 #include "ResourceParser.h"
 #include "ResourceGroupParser.h"
+#include "MSONTypeSectionParser.h"
 
 using namespace snowcrash;
 
@@ -22,6 +23,9 @@ SectionType snowcrash::SectionKeywordSignature(const mdp::MarkdownNodeIterator& 
 {
     // Note: Every-keyword defined section should be listed here...
     SectionType type = UndefinedSectionType;
+
+    if ((type = SectionProcessor<mson::TypeSection>::sectionType(node)) != UndefinedSectionType)
+        return type;
 
     if ((type = SectionProcessor<Headers>::sectionType(node)) != UndefinedSectionType)
         return type;

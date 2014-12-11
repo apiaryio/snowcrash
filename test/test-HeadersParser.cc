@@ -189,7 +189,7 @@ TEST_CASE("Headers parses should return warning on multiple definition of same h
     REQUIRE(headers.report.error.code == Error::OK);
     REQUIRE(headers.report.warnings.size() == 1); // one warning due to multiple declaration same header
 
-    REQUIRE(headers.node.size() == 2); 
+    REQUIRE(headers.node.size() == 2);
 }
 
 TEST_CASE("Parse header section with more same headers Set-Cookie and Link - there should not be warning", "[headers][issue][#75]")

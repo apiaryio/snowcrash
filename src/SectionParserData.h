@@ -9,9 +9,8 @@
 #ifndef SNOWCRASH_SECTIONPARSERDATA_H
 #define SNOWCRASH_SECTIONPARSERDATA_H
 
-#include "BlueprintSourcemap.h"
-#include "MSON.h"
 #include "ModelTable.h"
+#include "MSONSourcemap.h"
 #include "Section.h"
 
 namespace snowcrash {
@@ -38,13 +37,22 @@ namespace snowcrash {
         SectionParserData(BlueprintParserOptions opts,
                           const mdp::ByteBuffer& src,
                           const Blueprint& bp)
-        : options(opts), sourceData(src), blueprint(bp) {}
+        : options(opts), sourceData(src), blueprint(bp)
+        {
+            namedTypeBaseTable[""] = mson::UndefinedBaseType;
+        }
 
         /** Parser Options */
         BlueprintParserOptions options;
 
         /** Named Types */
         std::vector<mson::NamedType> msonTypesTable;
+
+        /** Table of named types and resolved base types */
+        mson::NamedTypeBaseTable namedTypeBaseTable;
+
+        /** Table mapping named type to sub types */
+        mson::NamedTypeInheritanceTable namedTypeInheritanceTable;
 
         /** Model Table */
         ModelTable modelTable;
@@ -73,6 +81,7 @@ namespace snowcrash {
                 return UndefinedSectionType;
 
             size_t size = sectionsContext.size();
+
             if (size == 1)
                 return sectionsContext.back();
             else

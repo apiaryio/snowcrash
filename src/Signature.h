@@ -37,6 +37,8 @@ namespace scpl {
     struct Signature {
 
         mdp::ByteBuffer identifier;              // Signature Identifier
+        mdp::ByteBuffer value;                   // Signature Value (unparsed values)
+
         std::vector<mdp::ByteBuffer> values;     // Signature Values
         std::vector<mdp::ByteBuffer> attributes; // Signature Attributes
 

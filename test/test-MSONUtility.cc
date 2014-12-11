@@ -12,7 +12,7 @@
 using namespace mson;
 using namespace snowcrashtest;
 
-TEST_CASE("Parse canonical literal value", "[mson_utility]")
+TEST_CASE("Parse canonical literal value", "[mson][utility]")
 {
     std::string source = "red";
 
@@ -22,7 +22,7 @@ TEST_CASE("Parse canonical literal value", "[mson_utility]")
     REQUIRE(value.variable == false);
 }
 
-TEST_CASE("Parse canonical variable value", "[mson_utility]")
+TEST_CASE("Parse canonical variable value", "[mson][utility]")
 {
     std::string source = "*rel*";
 
@@ -32,7 +32,7 @@ TEST_CASE("Parse canonical variable value", "[mson_utility]")
     REQUIRE(value.variable == true);
 }
 
-TEST_CASE("Parse canonical variable value with '_'", "[mson_utility]")
+TEST_CASE("Parse canonical variable value with '_'", "[mson][utility]")
 {
     std::string source = "_rel_";
 
@@ -42,7 +42,7 @@ TEST_CASE("Parse canonical variable value with '_'", "[mson_utility]")
     REQUIRE(value.variable == true);
 }
 
-TEST_CASE("Parse variable value with more than 1 level '*'", "[mson_utility]")
+TEST_CASE("Parse variable value with more than 1 level '*'", "[mson][utility]")
 {
     std::string source = "**r*e*l**";
 
@@ -52,7 +52,7 @@ TEST_CASE("Parse variable value with more than 1 level '*'", "[mson_utility]")
     REQUIRE(value.variable == true);
 }
 
-TEST_CASE("Parse wildcard value", "[mson_utility]")
+TEST_CASE("Parse wildcard value", "[mson][utility]")
 {
     std::string source = "*";
 
@@ -62,7 +62,7 @@ TEST_CASE("Parse wildcard value", "[mson_utility]")
     REQUIRE(value.variable == true);
 }
 
-TEST_CASE("Parse value with non-matching '_'", "[mson_utility]")
+TEST_CASE("Parse value with non-matching '_'", "[mson][utility]")
 {
     std::string source = "_rel";
 
@@ -72,7 +72,7 @@ TEST_CASE("Parse value with non-matching '_'", "[mson_utility]")
     REQUIRE(value.variable == false);
 }
 
-TEST_CASE("Parse canonical type name", "[mson_utility]")
+TEST_CASE("Parse canonical type name", "[mson][utility]")
 {
     std::string source = "Person";
     TypeName typeName;
@@ -84,7 +84,7 @@ TEST_CASE("Parse canonical type name", "[mson_utility]")
     REQUIRE(typeName.symbol.variable == false);
 }
 
-TEST_CASE("Parse boolean type name", "[mson_utility]")
+TEST_CASE("Parse boolean type name", "[mson][utility]")
 {
     std::string source = "boolean";
     TypeName typeName;
@@ -92,11 +92,10 @@ TEST_CASE("Parse boolean type name", "[mson_utility]")
     parseTypeName(source, typeName);
 
     REQUIRE(typeName.name == BooleanTypeName);
-    REQUIRE(typeName.symbol.literal.empty());
-    REQUIRE(typeName.symbol.variable == false);
+    REQUIRE(typeName.symbol.empty());
 }
 
-TEST_CASE("Parse string type name", "[mson_utility]")
+TEST_CASE("Parse string type name", "[mson][utility]")
 {
     std::string source = "string";
     TypeName typeName;
@@ -104,11 +103,10 @@ TEST_CASE("Parse string type name", "[mson_utility]")
     parseTypeName(source, typeName);
 
     REQUIRE(typeName.name == StringTypeName);
-    REQUIRE(typeName.symbol.literal.empty());
-    REQUIRE(typeName.symbol.variable == false);
+    REQUIRE(typeName.symbol.empty());
 }
 
-TEST_CASE("Parse number type name", "[mson_utility]")
+TEST_CASE("Parse number type name", "[mson][utility]")
 {
     std::string source = "number";
     TypeName typeName;
@@ -116,11 +114,10 @@ TEST_CASE("Parse number type name", "[mson_utility]")
     parseTypeName(source, typeName);
 
     REQUIRE(typeName.name == NumberTypeName);
-    REQUIRE(typeName.symbol.literal.empty());
-    REQUIRE(typeName.symbol.variable == false);
+    REQUIRE(typeName.symbol.empty());
 }
 
-TEST_CASE("Parse array type name", "[mson_utility]")
+TEST_CASE("Parse array type name", "[mson][utility]")
 {
     std::string source = "array";
     TypeName typeName;
@@ -128,11 +125,10 @@ TEST_CASE("Parse array type name", "[mson_utility]")
     parseTypeName(source, typeName);
 
     REQUIRE(typeName.name == ArrayTypeName);
-    REQUIRE(typeName.symbol.literal.empty());
-    REQUIRE(typeName.symbol.variable == false);
+    REQUIRE(typeName.symbol.empty());
 }
 
-TEST_CASE("Parse enum type name", "[mson_utility]")
+TEST_CASE("Parse enum type name", "[mson][utility]")
 {
     std::string source = "enum";
     TypeName typeName;
@@ -140,11 +136,10 @@ TEST_CASE("Parse enum type name", "[mson_utility]")
     parseTypeName(source, typeName);
 
     REQUIRE(typeName.name == EnumTypeName);
-    REQUIRE(typeName.symbol.literal.empty());
-    REQUIRE(typeName.symbol.variable == false);
+    REQUIRE(typeName.symbol.empty());
 }
 
-TEST_CASE("Parse object type name", "[mson_utility]")
+TEST_CASE("Parse object type name", "[mson][utility]")
 {
     std::string source = "object";
     TypeName typeName;
@@ -152,11 +147,10 @@ TEST_CASE("Parse object type name", "[mson_utility]")
     parseTypeName(source, typeName);
 
     REQUIRE(typeName.name == ObjectTypeName);
-    REQUIRE(typeName.symbol.literal.empty());
-    REQUIRE(typeName.symbol.variable == false);
+    REQUIRE(typeName.symbol.empty());
 }
 
-TEST_CASE("Parse variable type name", "[mson_utility]")
+TEST_CASE("Parse variable type name", "[mson][utility]")
 {
     std::string source = "*T*";
     TypeName typeName;
@@ -168,7 +162,7 @@ TEST_CASE("Parse variable type name", "[mson_utility]")
     REQUIRE(typeName.symbol.variable == true);
 }
 
-TEST_CASE("Parse wildcard type name", "[mson_utility]")
+TEST_CASE("Parse wildcard type name", "[mson][utility]")
 {
     std::string source = "*";
     TypeName typeName;
@@ -180,7 +174,7 @@ TEST_CASE("Parse wildcard type name", "[mson_utility]")
     REQUIRE(typeName.symbol.variable == true);
 }
 
-TEST_CASE("Parse required type attribute", "[mson_utility]")
+TEST_CASE("Parse required type attribute", "[mson][utility]")
 {
     std::string source = "required";
     TypeAttributes typeAttributes = 0;
@@ -196,7 +190,7 @@ TEST_CASE("Parse required type attribute", "[mson_utility]")
     REQUIRE(isAttributeParsed);
 }
 
-TEST_CASE("Parse optional type attribute", "[mson_utility]")
+TEST_CASE("Parse optional type attribute", "[mson][utility]")
 {
     std::string source = "optional";
     TypeAttributes typeAttributes = 0;
@@ -212,7 +206,7 @@ TEST_CASE("Parse optional type attribute", "[mson_utility]")
     REQUIRE(isAttributeParsed);
 }
 
-TEST_CASE("Parse fixed type attribute", "[mson_utility]")
+TEST_CASE("Parse fixed type attribute", "[mson][utility]")
 {
     std::string source = "fixed";
     TypeAttributes typeAttributes = 0;
@@ -228,7 +222,7 @@ TEST_CASE("Parse fixed type attribute", "[mson_utility]")
     REQUIRE(isAttributeParsed);
 }
 
-TEST_CASE("Parse sample type attribute", "[mson_utility]")
+TEST_CASE("Parse sample type attribute", "[mson][utility]")
 {
     std::string source = "sample";
     TypeAttributes typeAttributes = 0;
@@ -244,7 +238,7 @@ TEST_CASE("Parse sample type attribute", "[mson_utility]")
     REQUIRE(isAttributeParsed);
 }
 
-TEST_CASE("Parse default type attribute", "[mson_utility]")
+TEST_CASE("Parse default type attribute", "[mson][utility]")
 {
     std::string source = "default";
     TypeAttributes typeAttributes = 0;
@@ -260,7 +254,7 @@ TEST_CASE("Parse default type attribute", "[mson_utility]")
     REQUIRE(isAttributeParsed);
 }
 
-TEST_CASE("Parse required type attribute enclosed in backticks", "[mson_utility]")
+TEST_CASE("Parse required type attribute enclosed in backticks", "[mson][utility]")
 {
     std::string source = "`required`";
     TypeAttributes typeAttributes = 0;
@@ -276,7 +270,7 @@ TEST_CASE("Parse required type attribute enclosed in backticks", "[mson_utility]
     REQUIRE(isAttributeParsed == false);
 }
 
-TEST_CASE("Parse canonical type specification", "[mson_utility]")
+TEST_CASE("Parse canonical type specification", "[mson][utility]")
 {
     std::string source = "object";
     TypeSpecification typeSpecification;
@@ -284,12 +278,11 @@ TEST_CASE("Parse canonical type specification", "[mson_utility]")
     parseTypeSpecification(source, typeSpecification);
 
     REQUIRE(typeSpecification.name.name == ObjectTypeName);
-    REQUIRE(typeSpecification.name.symbol.literal.empty());
-    REQUIRE(typeSpecification.name.symbol.variable == false);
+    REQUIRE(typeSpecification.name.symbol.empty());
     REQUIRE(typeSpecification.nestedTypes.empty());
 }
 
-TEST_CASE("Parse linked type specification", "[mson_utility]")
+TEST_CASE("Parse linked type specification", "[mson][utility]")
 {
     std::string source = "[Person](http://google.com)";
     TypeSpecification typeSpecification;
@@ -302,7 +295,7 @@ TEST_CASE("Parse linked type specification", "[mson_utility]")
     REQUIRE(typeSpecification.nestedTypes.empty());
 }
 
-TEST_CASE("Parse implicit linked type specification", "[mson_utility]")
+TEST_CASE("Parse implicit linked type specification", "[mson][utility]")
 {
     std::string source = "[Person ] []";
     TypeSpecification typeSpecification;
@@ -315,7 +308,7 @@ TEST_CASE("Parse implicit linked type specification", "[mson_utility]")
     REQUIRE(typeSpecification.nestedTypes.empty());
 }
 
-TEST_CASE("Parse nested types in type specification", "[mson_utility]")
+TEST_CASE("Parse nested types in type specification", "[mson][utility]")
 {
     std::string source = "array[ object , Link ]";
     TypeSpecification typeSpecification;
@@ -323,20 +316,18 @@ TEST_CASE("Parse nested types in type specification", "[mson_utility]")
     parseTypeSpecification(source, typeSpecification);
 
     REQUIRE(typeSpecification.name.name == ArrayTypeName);
-    REQUIRE(typeSpecification.name.symbol.literal.empty());
-    REQUIRE(typeSpecification.name.symbol.variable == false);
+    REQUIRE(typeSpecification.name.symbol.empty());
     REQUIRE(typeSpecification.nestedTypes.size() == 2);
 
     REQUIRE(typeSpecification.nestedTypes[0].name == ObjectTypeName);
-    REQUIRE(typeSpecification.nestedTypes[0].symbol.literal.empty());
-    REQUIRE(typeSpecification.nestedTypes[0].symbol.variable == false);
+    REQUIRE(typeSpecification.nestedTypes[0].symbol.empty());
 
     REQUIRE(typeSpecification.nestedTypes[1].name == UndefinedTypeName);
     REQUIRE(typeSpecification.nestedTypes[1].symbol.literal == "Link");
     REQUIRE(typeSpecification.nestedTypes[1].symbol.variable == false);
 }
 
-TEST_CASE("Parse linked nested types in type specification", "[mson_utility]")
+TEST_CASE("Parse linked nested types in type specification", "[mson][utility]")
 {
     std::string source = "Links[[Repo][],[Search](http://google.com)]";
     TypeSpecification typeSpecification;
@@ -357,7 +348,7 @@ TEST_CASE("Parse linked nested types in type specification", "[mson_utility]")
     REQUIRE(typeSpecification.nestedTypes[1].symbol.variable == false);
 }
 
-TEST_CASE("Parse canonical type definition", "[mson_utility]")
+TEST_CASE("Parse canonical type definition", "[mson][utility]")
 {
     std::vector<std::string> attributes;
     snowcrash::ParseResult<TypeDefinition> typeDefinition;
@@ -373,23 +364,18 @@ TEST_CASE("Parse canonical type definition", "[mson_utility]")
     markdownParser.parse(source, markdownAST);
     snowcrash::SectionParserData pd(0, source, blueprint);
 
-    parseTypeDefinition(markdownAST.children().begin(), pd, attributes, typeDefinition);
+    parseTypeDefinition(markdownAST.children().begin(), pd, attributes, typeDefinition.report, typeDefinition.node);
 
     REQUIRE(typeDefinition.report.error.code == snowcrash::Error::OK);
     REQUIRE(typeDefinition.report.warnings.empty());
 
     REQUIRE(typeDefinition.node.typeSpecification.name.name == NumberTypeName);
-    REQUIRE(typeDefinition.node.typeSpecification.name.symbol.literal.empty());
-    REQUIRE(typeDefinition.node.typeSpecification.name.symbol.variable == false);
+    REQUIRE(typeDefinition.node.typeSpecification.name.symbol.empty());
     REQUIRE(typeDefinition.node.typeSpecification.nestedTypes.empty());
-    REQUIRE((typeDefinition.node.attributes & RequiredTypeAttribute) == RequiredTypeAttribute);
-    REQUIRE((typeDefinition.node.attributes & OptionalTypeAttribute) == 0);
-    REQUIRE((typeDefinition.node.attributes & FixedTypeAttribute) == 0);
-    REQUIRE((typeDefinition.node.attributes & SampleTypeAttribute) == 0);
-    REQUIRE((typeDefinition.node.attributes & DefaultTypeAttribute) == 0);
+    REQUIRE(typeDefinition.node.attributes == RequiredTypeAttribute);
 }
 
-TEST_CASE("Parse type definition with non recognized type attribute", "[mson_utility]")
+TEST_CASE("Parse type definition with non recognized type attribute", "[mson][utility]")
 {
     std::vector<std::string> attributes;
     snowcrash::ParseResult<TypeDefinition> typeDefinition;
@@ -405,7 +391,9 @@ TEST_CASE("Parse type definition with non recognized type attribute", "[mson_uti
     markdownParser.parse(source, markdownAST);
     snowcrash::SectionParserData pd(0, source, blueprint);
 
-    parseTypeDefinition(markdownAST.children().begin(), pd, attributes, typeDefinition);
+    pd.namedTypeBaseTable["Person"] = mson::ObjectBaseType;
+
+    parseTypeDefinition(markdownAST.children().begin(), pd, attributes, typeDefinition.report, typeDefinition.node);
 
     REQUIRE(typeDefinition.report.error.code == snowcrash::Error::OK);
     REQUIRE(typeDefinition.report.warnings.size() == 1);
@@ -414,9 +402,198 @@ TEST_CASE("Parse type definition with non recognized type attribute", "[mson_uti
     REQUIRE(typeDefinition.node.typeSpecification.name.symbol.literal == "Person");
     REQUIRE(typeDefinition.node.typeSpecification.name.symbol.variable == false);
     REQUIRE(typeDefinition.node.typeSpecification.nestedTypes.empty());
-    REQUIRE((typeDefinition.node.attributes & RequiredTypeAttribute) == 0);
-    REQUIRE((typeDefinition.node.attributes & OptionalTypeAttribute) == 0);
-    REQUIRE((typeDefinition.node.attributes & FixedTypeAttribute) == 0);
-    REQUIRE((typeDefinition.node.attributes & SampleTypeAttribute) == 0);
-    REQUIRE((typeDefinition.node.attributes & DefaultTypeAttribute) == 0);
+    REQUIRE(typeDefinition.node.attributes == 0);
+}
+
+TEST_CASE("Parse type definition when non-structure type has nested types", "[mson][utility]")
+{
+    std::vector<std::string> attributes;
+    snowcrash::ParseResult<TypeDefinition> typeDefinition;
+    snowcrash::Blueprint blueprint;
+
+    attributes.push_back("Person[number, string]");
+
+    mdp::ByteBuffer source = "+ (Person[number, string])";
+    mdp::MarkdownParser markdownParser;
+    mdp::MarkdownNode markdownAST;
+
+    markdownParser.parse(source, markdownAST);
+    snowcrash::SectionParserData pd(0, source, blueprint);
+
+    pd.namedTypeBaseTable["Person"] = mson::ObjectBaseType;
+
+    parseTypeDefinition(markdownAST.children().begin(), pd, attributes, typeDefinition.report, typeDefinition.node);
+
+    REQUIRE(typeDefinition.report.error.code == snowcrash::Error::OK);
+    REQUIRE(typeDefinition.report.warnings.size() == 1);
+    REQUIRE(typeDefinition.report.warnings[0].code == snowcrash::LogicalErrorWarning);
+
+    REQUIRE(typeDefinition.node.typeSpecification.name.name == UndefinedTypeName);
+    REQUIRE(typeDefinition.node.typeSpecification.name.symbol.literal == "Person");
+    REQUIRE(typeDefinition.node.typeSpecification.name.symbol.variable == false);
+    REQUIRE(typeDefinition.node.typeSpecification.nestedTypes.size() == 2);
+    REQUIRE(typeDefinition.node.attributes == 0);
+}
+
+TEST_CASE("Build member type from one of", "[mson][utility]")
+{
+    OneOf oneOf;
+    MemberType memberType;
+
+    memberType.build(oneOf);
+
+    REQUIRE(memberType.type == MemberType::OneOfType);
+}
+
+TEST_CASE("Build member type from mixin", "[mson][utility]")
+{
+    Mixin mixin;
+    MemberType memberType;
+
+    memberType.build(mixin);
+
+    REQUIRE(memberType.type == MemberType::MixinType);
+}
+
+TEST_CASE("Build member type from value member", "[mson][utility]")
+{
+    ValueMember valueMember;
+    MemberType memberType;
+
+    memberType.build(valueMember);
+
+    REQUIRE(memberType.type == MemberType::ValueType);
+}
+
+TEST_CASE("Build member type from property memeber", "[mson][utility]")
+{
+    PropertyMember propertyMember;
+    MemberType memberType;
+
+    memberType.build(propertyMember);
+
+    REQUIRE(memberType.type == MemberType::PropertyType);
+}
+
+TEST_CASE("Build memebr type from members collection", "[mson][utility]")
+{
+    MemberTypes members;
+    MemberType memberType;
+
+    TypeSection typeSection;
+    PropertyMember propertyMember;
+    MemberType propertyMemberType;
+
+    memberType.build(propertyMember);
+    typeSection.content.members().push_back(propertyMemberType);
+
+    memberType.build(typeSection.content.members());
+
+    REQUIRE(memberType.type == MemberType::MembersType);
+    REQUIRE(memberType.content.members.members().size() == 1);
+}
+
+TEST_CASE("Parsing base type from base type name", "[mson][utility]")
+{
+    BaseTypeName baseTypeName = UndefinedTypeName;
+    REQUIRE(parseBaseType(baseTypeName) == UndefinedBaseType);
+
+    baseTypeName = StringTypeName;
+    REQUIRE(parseBaseType(baseTypeName) == PrimitiveBaseType);
+
+    baseTypeName = BooleanTypeName;
+    REQUIRE(parseBaseType(baseTypeName) == PrimitiveBaseType);
+
+    baseTypeName = NumberTypeName;
+    REQUIRE(parseBaseType(baseTypeName) == PrimitiveBaseType);
+
+    baseTypeName = ObjectTypeName;
+    REQUIRE(parseBaseType(baseTypeName) == ObjectBaseType);
+
+    baseTypeName = ArrayTypeName;
+    REQUIRE(parseBaseType(baseTypeName) == ValueBaseType);
+
+    baseTypeName = EnumTypeName;
+    REQUIRE(parseBaseType(baseTypeName) == ValueBaseType);
+}
+
+TEST_CASE("Parse canonical property name", "[mson][utility]")
+{
+    std::string id = "customer";
+    snowcrash::ParseResult<PropertyName> propertyName;
+    snowcrash::Blueprint blueprint;
+
+    mdp::ByteBuffer source = "+ " + id;
+    mdp::MarkdownParser markdownParser;
+    mdp::MarkdownNode markdownAST;
+
+    markdownParser.parse(source, markdownAST);
+    snowcrash::SectionParserData pd(0, source, blueprint);
+
+    parsePropertyName(markdownAST.children().begin(), pd, id, propertyName.report, propertyName.node);
+
+    REQUIRE(propertyName.report.error.code == snowcrash::Error::OK);
+    REQUIRE(propertyName.report.warnings.empty());
+
+    REQUIRE(propertyName.node.literal == "customer");
+    REQUIRE(propertyName.node.variable.empty());
+}
+
+TEST_CASE("Parse variable property name", "[mson][utility]")
+{
+    std::string id = "*rel (Custom String)*";
+    snowcrash::ParseResult<PropertyName> propertyName;
+    snowcrash::Blueprint blueprint;
+
+    mdp::ByteBuffer source = "+ " + id;
+    mdp::MarkdownParser markdownParser;
+    mdp::MarkdownNode markdownAST;
+
+    markdownParser.parse(source, markdownAST);
+    snowcrash::SectionParserData pd(0, source, blueprint);
+
+    parsePropertyName(markdownAST.children().begin(), pd, id, propertyName.report, propertyName.node);
+
+    REQUIRE(propertyName.report.error.code == snowcrash::Error::OK);
+    REQUIRE(propertyName.report.warnings.size() == 1); // Unknown named type
+    REQUIRE(propertyName.report.warnings[0].code == snowcrash::LogicalErrorWarning);
+
+    REQUIRE(propertyName.node.literal.empty());
+    REQUIRE(propertyName.node.variable.values.size() == 1);
+    REQUIRE(propertyName.node.variable.values[0].literal == "rel");
+    REQUIRE(propertyName.node.variable.values[0].variable == false);
+    REQUIRE(propertyName.node.variable.typeDefinition.attributes == 0);
+    REQUIRE(propertyName.node.variable.typeDefinition.typeSpecification.name.name == UndefinedTypeName);
+    REQUIRE(propertyName.node.variable.typeDefinition.typeSpecification.name.symbol.literal == "Custom String");
+    REQUIRE(propertyName.node.variable.typeDefinition.typeSpecification.name.symbol.variable == false);
+}
+
+TEST_CASE("Parse multi-value variable property name", "[mson][utility]")
+{
+    std::string id = "*1, 2 (Custom)*";
+    snowcrash::ParseResult<PropertyName> propertyName;
+    snowcrash::Blueprint blueprint;
+
+    mdp::ByteBuffer source = "+ " + id;
+    mdp::MarkdownParser markdownParser;
+    mdp::MarkdownNode markdownAST;
+
+    markdownParser.parse(source, markdownAST);
+    snowcrash::SectionParserData pd(0, source, blueprint);
+
+    pd.namedTypeBaseTable["Custom"] = mson::ValueBaseType;
+
+    parsePropertyName(markdownAST.children().begin(), pd, id, propertyName.report, propertyName.node);
+
+    REQUIRE(propertyName.report.error.code == snowcrash::Error::OK);
+    REQUIRE(propertyName.report.warnings.empty());
+
+    REQUIRE(propertyName.node.literal.empty());
+    REQUIRE(propertyName.node.variable.values.size() == 1);
+    REQUIRE(propertyName.node.variable.values[0].literal == "1, 2");
+    REQUIRE(propertyName.node.variable.values[0].variable == false);
+    REQUIRE(propertyName.node.variable.typeDefinition.attributes == 0);
+    REQUIRE(propertyName.node.variable.typeDefinition.typeSpecification.name.name == UndefinedTypeName);
+    REQUIRE(propertyName.node.variable.typeDefinition.typeSpecification.name.symbol.literal == "Custom");
+    REQUIRE(propertyName.node.variable.typeDefinition.typeSpecification.name.symbol.variable == false);
 }

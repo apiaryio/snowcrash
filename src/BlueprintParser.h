@@ -174,7 +174,7 @@ namespace snowcrash {
         static void finalize(const MarkdownNodeIterator& node,
                              SectionParserData& pd,
                              const ParseResultRef<Blueprint>& out) {
-     
+
             checkLazyReferencing(pd, out);
 
             if (!out.node.name.empty())
@@ -470,7 +470,7 @@ namespace snowcrash {
         static void resolvePendingModels(SectionParserData& pd,
                                           const ParseResultRef<Payload>& out) {
 
-            if (pd.modelTable.resourceModels.find(out.node.reference.id) == pd.modelTable.resourceModels.end()) {
+            if (pd.modelTable.find(out.node.reference.id) == pd.modelTable.end()) {
 
                 // ERR: Undefined model reference
                 std::stringstream ss;

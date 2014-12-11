@@ -450,6 +450,7 @@ namespace snowcrash {
             }
 
             CaptureGroups captureGroups;
+
             if (RegexCapture(subject, ActionHeaderRegex, captureGroups, 3)) {
 
                 if (captureGroups[2].empty()) {
