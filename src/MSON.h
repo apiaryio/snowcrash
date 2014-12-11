@@ -319,7 +319,7 @@ namespace mson {
         bool empty() const;
     };
 
-    /** Members type */
+    /** Collection of Member types */
     struct Members {
 
         /** List of mutually exclusive member types */
@@ -349,22 +349,9 @@ namespace mson {
     };
 
     /** One Of type */
-    struct OneOf : public Members {
+    typedef Members OneOf;
 
-        /** Constructor */
-        OneOf();
-
-        /** Copy constructor */
-        OneOf(const OneOf& rhs);
-
-        /** Assignment operator */
-        OneOf& operator=(const OneOf& rhs);
-
-        /** Desctructor */
-        ~OneOf();
-    };
-
-    /** Member type of a structure */
+    /** Member of a structure */
     struct MemberType {
 
         /** Type of a member type */

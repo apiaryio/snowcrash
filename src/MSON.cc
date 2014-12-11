@@ -167,27 +167,6 @@ bool Members::empty() const
     return (this->members().empty());
 }
 
-OneOf::OneOf()
-{
-    m_members.reset(::new MemberTypes);
-}
-
-OneOf::OneOf(const OneOf& rhs)
-{
-    m_members.reset(::new MemberTypes(*rhs.m_members.get()));
-}
-
-OneOf& OneOf::operator=(const OneOf& rhs)
-{
-    m_members.reset(::new MemberTypes(*rhs.m_members.get()));
-
-    return *this;
-}
-
-OneOf::~OneOf()
-{
-}
-
 MemberType::MemberType(const MemberType::Type& type_)
 : type(type_)
 {

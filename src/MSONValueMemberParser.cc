@@ -84,7 +84,7 @@ namespace snowcrash {
 
                 // WARN: One of can not be a nested member for a non object structure type
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                sections.report.warnings.push_back(Warning("one-of can not be a nested member for a type not sub typed from object",
+                sections.report.warnings.push_back(Warning("one of may be a nested member of a object sub-types only",
                                                            LogicalErrorWarning,
                                                            sourceMap));
 
