@@ -122,7 +122,7 @@ namespace scpl {
 
                         // WARN: Empty values
                         mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                        report.warnings.push_back(snowcrash::Warning("no values specified",
+                        report.warnings.push_back(snowcrash::Warning("no value(s) specified",
                                                                      snowcrash::EmptyDefinitionWarning,
                                                                      sourceMap));
                     }
