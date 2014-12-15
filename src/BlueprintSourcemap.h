@@ -70,17 +70,7 @@ namespace snowcrash {
     /** Source Map of Attributes */
     // 'Attributes' type is same as 'DataStructure'
 
-    SOURCE_MAP_COLLECTION(DataStructure, DataStructureCollection)
-
-    /**
-     * Source Map Structure for Data Structures
-     */
-    template<>
-    struct SourceMap<DataStructures> : public SourceMapBase {
-
-        /** Source Map of list of data structures */
-        SourceMap<DataStructureCollection> types;
-    };
+    SOURCE_MAP_COLLECTION(DataStructure, DataStructures)
 
     /**
      * Source Map Structure for Payload
@@ -272,5 +262,7 @@ namespace snowcrash {
         SourceMap<DataStructures> dataStructures;
     };
 }
+
+#undef SOURCE_MAP_COLLECTION
 
 #endif

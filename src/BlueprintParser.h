@@ -146,7 +146,8 @@ namespace snowcrash {
                                              const ParseResultRef<Blueprint>& out) {
 
             MarkdownNodeIterator cur = node, contextCur;
-            SectionType sectionType, contextSectionType = UndefinedSectionType;
+            SectionType sectionType = UndefinedSectionType;
+            SectionType contextSectionType = UndefinedSectionType;
 
             // Iterate over nested sections
             while (cur != siblings.end()) {
@@ -165,6 +166,8 @@ namespace snowcrash {
 
                 if (cur->type == mdp::HeaderMarkdownNodeType) {
 
+                    // If the current node is a Resource or DataStructures section, assign it as context
+                    // Otherwise, make sure the current context is not DataStructures section and remove the context
                     if (sectionType == ResourceSectionType ||
                         sectionType == DataStructuresSectionType) {
 
@@ -176,6 +179,7 @@ namespace snowcrash {
                         contextSectionType = UndefinedSectionType;
                     }
 
+                    // If context is DataStructures section, NamedTypes should be filled
                     if (contextSectionType == DataStructuresSectionType) {
 
                         if (sectionType != MSONSampleDefaultSectionType &&
@@ -299,18 +303,20 @@ namespace snowcrash {
          */
         static void fillNamedTypeTables(const MarkdownNodeIterator& node,
                                         SectionParserData& pd,
-                                        const std::string& subject,
+                                        const mdp::ByteBuffer& subject,
                                         Report& report,
-                                        const std::string& name = "") {
+                                        const mdp::ByteBuffer& name = "") {
 
-            std::string buffer = subject, identifier;
+            mdp::ByteBuffer buffer = subject;
+            mson::Literal identifier;
             mson::TypeDefinition typeDefinition;
+            Report tmpReport;
 
             SignatureTraits traits(SignatureTraits::IdentifierTrait |
                                    SignatureTraits::AttributesTrait);
 
-            Signature signature = SignatureSectionProcessorBase<Blueprint>::parseSignature(node, pd, traits, report, buffer);
-            mson::parseTypeDefinition(node, pd, signature.attributes, report, typeDefinition, true);
+            Signature signature = SignatureSectionProcessorBase<Blueprint>::parseSignature(node, pd, traits, tmpReport, buffer);
+            mson::parseTypeDefinition(node, pd, signature.attributes, tmpReport, typeDefinition);
 
             // Name of the named types cannot be variable
             if (!name.empty() && mson::checkVariable(signature.identifier)) {
@@ -319,7 +325,8 @@ namespace snowcrash {
 
             if (!name.empty()) {
                 identifier = name;
-            } else {
+            }
+            else {
                 identifier = signature.identifier;
             }
 
@@ -332,6 +339,8 @@ namespace snowcrash {
                 pd.namedTypeInheritanceTable[identifier] = typeDefinition.typeSpecification.name.symbol.literal;
             }
             else if (typeDefinition.typeSpecification.name.empty()) {
+
+                // If there is no specification, an object is assumed
                 pd.namedTypeBaseTable[identifier] = mson::ImplicitObjectBaseType;
             }
         }

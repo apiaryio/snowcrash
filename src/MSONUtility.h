@@ -315,14 +315,12 @@ namespace mson {
      * \param attributes List of signature attributes
      * \param report Parse result report
      * \param typeDefinition MSON Type Definition
-     * \param supressWarnings If true, don't check ancestor types
      */
     inline void parseTypeDefinition(const mdp::MarkdownNodeIterator& node,
                                     snowcrash::SectionParserData& pd,
                                     const std::vector<std::string>& attributes,
                                     snowcrash::Report& report,
-                                    mson::TypeDefinition& typeDefinition,
-                                    int supressWarnings = false) {
+                                    mson::TypeDefinition& typeDefinition) {
 
         bool foundTypeSpecification = false;
 
@@ -357,10 +355,6 @@ namespace mson {
             it != pd.namedTypeBaseTable.end()) {
 
             typeDefinition.baseType = it->second;
-        }
-
-        if (supressWarnings) {
-            return;
         }
 
         if (typeDefinition.baseType == UndefinedBaseType &&

@@ -168,7 +168,10 @@ namespace snowcrash {
             return ++MarkdownNodeIterator(node);
         }
 
-        /** Pre-process for nested sections (called after description) */
+        /**
+         * Pre-process for nested sections, basically a look-ahead before processing nested sections
+         * Only used by BlueprintParser for now
+         */
         static void preprocessNestedSections(const MarkdownNodeIterator& node,
                                              const MarkdownNodes& siblings,
                                              SectionParserData& pd,

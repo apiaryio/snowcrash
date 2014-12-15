@@ -42,7 +42,7 @@ namespace snowcrash {
 
                 dataStructure.source = namedType.node;
 
-                out.node.types.push_back(dataStructure);
+                out.node.push_back(dataStructure);
             }
 
             return cur;

@@ -169,16 +169,7 @@ namespace snowcrash {
     };
 
     /** Collection of Data Structures */
-    typedef Collection<DataStructure>::type DataStructureCollection;
-
-    /**
-     * Data Structures
-     */
-    struct DataStructures {
-
-        /** List of data structures */
-        DataStructureCollection types;
-    };
+    typedef Collection<DataStructure>::type DataStructures;
 
     /**
      *  Attributes

@@ -19,6 +19,21 @@
  * Data types in this document define the MSON Sourcemap AST
  */
 
+namespace snowcrash {
+
+    /**
+     * Default Container for collections.
+     *
+     *  FIXME: Use C++11 template aliases when migrating to C++11.
+     */
+    template<typename T>
+    struct Collection {
+        typedef std::vector<T> type;
+        typedef typename std::vector<T>::iterator iterator;
+        typedef typename std::vector<T>::const_iterator const_iterator;
+    };
+}
+
 #define SOURCE_MAP_COLLECTION(T, TC) template<>\
 struct SourceMap<TC> {\
     Collection<SourceMap<T> >::type collection;\

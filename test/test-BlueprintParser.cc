@@ -460,49 +460,76 @@ TEST_CASE("Parsing unexpected blocks", "[blueprint]")
     REQUIRE(blueprint.sourceMap.resourceGroups.collection.size() == 1);
 }
 
-TEST_CASE("Parsing blueprint with mson data structures", "[blueprint][now]")
+TEST_CASE("Parsing blueprint with mson data structures", "[blueprint]")
 {
     mdp::ByteBuffer source = \
     "# Group Plans\n"\
+    "\n"\
     "## Plans [/plans]\n"\
-    "+ Attributes (array[Plan])\n\n"\
+    "\n"\
+    "+ Attributes (array[Plan])\n"\
+    "\n"\
     "### List all plans [GET]\n"\
+    "\n"\
     "+ Response 200 (application/json)\n"\
-    "    + Attributes (Plans)\n\n"\
+    "    + Attributes (Plans)\n"\
+    "\n"\
     "### Create a plan [POST]\n"\
+    "\n"\
     "+ Attributes (Plan Base)\n"\
+    "\n"\
     "+ Request (application/json)\n"\
+    "\n"\
     "+ Response 201 (application/json)\n"\
-    "    + Attributes (Plan)\n\n"\
+    "    + Attributes (Plan)\n"\
+    "\n"\
     "## Plan [/plan/{id}]\n"\
+    "\n"\
     "+ Parameters\n\n"\
-    "    + id (required, string)\n\n"\
-    "+ Attributes (Plan Base)\n\n"\
+    "    + id (required, string)\n"\
+    "\n"\
+    "+ Attributes (Plan Base)\n"\
     "    + type: Plan (default)\n"\
-    "    + created ([Timestamp][])\n\n"\
+    "    + created ([Timestamp][])\n"\
+    "\n"\
     "### Retrieve a plan [GET]\n"\
+    "\n"\
     "+ Response 200 (application/json)\n"\
-    "    + Attributes (Plan)\n\n"\
+    "    + Attributes (Plan)\n"\
+    "\n"\
     "### Update a plan [PATCH]\n"\
+    "\n"\
     "+ Request (application/json)\n"\
     "    + Attributes (Plan Base)\n"\
+    "\n"\
     "+ Response 200 (application/json)\n"\
     "    + Attributes (Plan)\n\n"\
+    "\n"\
     "### Delete a plan [DELETE]\n"\
-    "+ Response 204\n\n"\
+    "\n"\
+    "+ Response 204\n"\
+    "\n"\
     "# Data Structures\n"\
+    "\n"\
     "## Plan Base\n"\
-    "Base object for write operations\n\n"\
+    "Base object for write operations\n"\
+    "\n"\
     "### Properties\n"\
     "- name\n"\
     "- amount (number)\n"\
     "- trial (optional)\n\n"\
-    "## Timestamp (number)\n\n"\
+    "\n"\
+    "## Timestamp (number)\n"\
+    "\n"\
     "## Coupon [/coupon/{id}]\n"\
+    "\n"\
     "+ Parameters\n\n"\
     "    + id (required, string)\n\n"\
+    "\n"\
     "### Delete a coupon [DELETE]\n"\
-    "+ Response 204\n\n";
+    "\n"\
+    "+ Response 204\n"\
+    "\n";
 
     mdp::MarkdownParser markdownParser;
     mdp::MarkdownNode markdownAST;
@@ -544,7 +571,7 @@ TEST_CASE("Parsing blueprint with mson data structures", "[blueprint][now]")
 
     REQUIRE(blueprint.node.resourceGroups.size() == 2);
     REQUIRE(blueprint.node.resourceGroups[1].resources.size() == 1);
-    REQUIRE(blueprint.node.dataStructures.types.size() == 2);
-    REQUIRE(blueprint.node.dataStructures.types[0].source.name.symbol.literal == "Plan Base");
-    REQUIRE(blueprint.node.dataStructures.types[1].source.name.symbol.literal == "Timestamp");
+    REQUIRE(blueprint.node.dataStructures.size() == 2);
+    REQUIRE(blueprint.node.dataStructures[0].source.name.symbol.literal == "Plan Base");
+    REQUIRE(blueprint.node.dataStructures[1].source.name.symbol.literal == "Timestamp");
 }
