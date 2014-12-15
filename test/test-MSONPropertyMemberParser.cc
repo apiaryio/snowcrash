@@ -413,3 +413,43 @@ TEST_CASE("Parse mson property member when containing an oneOf", "[mson][propert
     REQUIRE(oneOf.members().at(1).type == mson::MemberType::PropertyType);
     REQUIRE(oneOf.members().at(1).content.property.name.literal == "given_name");
 }
+
+TEST_CASE("Parse mson property member containing a list of values and no type specification", "[mson][property_member]")
+{
+    mdp::ByteBuffer source = \
+    "- list: 1, 2, 3";
+
+    ParseResult<mson::PropertyMember> propertyMember;
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember);
+
+    REQUIRE(propertyMember.report.error.code == Error::OK);
+    REQUIRE(propertyMember.report.warnings.empty());
+
+    REQUIRE(propertyMember.node.name.literal == "list");
+    REQUIRE(propertyMember.node.valueDefinition.values.size() == 3);
+    REQUIRE(propertyMember.node.valueDefinition.values[0].literal == "1");
+    REQUIRE(propertyMember.node.valueDefinition.values[1].literal == "2");
+    REQUIRE(propertyMember.node.valueDefinition.values[2].literal == "3");
+//  REQUIRE(propertyMember.node.valueDefinition.typeDefinition.baseType == mson::ImplicitValueBaseType);
+    REQUIRE(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.empty());
+    REQUIRE(propertyMember.node.sections.empty());
+}
+
+TEST_CASE("Parse mson property containing list of value with string type specification", "[mson][property_member]")
+{
+    mdp::ByteBuffer source = \
+    "- list: 1, 2, 3 (string)";
+
+    ParseResult<mson::PropertyMember> propertyMember;
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember);
+
+    REQUIRE(propertyMember.report.error.code == Error::OK);
+    REQUIRE(propertyMember.report.warnings.empty());
+
+    REQUIRE(propertyMember.node.name.literal == "list");
+//  REQUIRE(propertyMember.node.valueDefinition.values.size() == 1);
+//  REQUIRE(propertyMember.node.valueDefinition.values[0].literal == "1, 2, 3");
+    REQUIRE(propertyMember.node.valueDefinition.typeDefinition.baseType == mson::PrimitiveBaseType);
+    REQUIRE(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.name.name == mson::StringTypeName);
+    REQUIRE(propertyMember.node.sections.empty());
+}
