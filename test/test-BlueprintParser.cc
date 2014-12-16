@@ -575,3 +575,27 @@ TEST_CASE("Parsing blueprint with mson data structures", "[blueprint]")
     REQUIRE(blueprint.node.dataStructures[0].source.name.symbol.literal == "Plan Base");
     REQUIRE(blueprint.node.dataStructures[1].source.name.symbol.literal == "Timestamp");
 }
+
+TEST_CASE("Parse blueprint with two named types having the same name", "[blueprint]")
+{
+    mdp::ByteBuffer source = \
+    "# Data Structures\n"\
+    "## Coupon\n"\
+    "- real_name - Coupon's real name\n"\
+    "\n"\
+    "# Coupon [/coupon]\n"\
+    "+ Attributes\n"\
+    "    - name - Coupon name";
+
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
+
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.size() == 1);
+    REQUIRE(blueprint.report.warnings[0].code == DuplicateWarning);
+
+    REQUIRE(blueprint.node.resourceGroups.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].attributes.source.empty());
+    REQUIRE(blueprint.node.dataStructures.size() == 1);
+}

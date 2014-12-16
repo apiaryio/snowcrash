@@ -140,6 +140,10 @@ namespace snowcrash {
             return node;
         }
 
+        /**
+         * Look ahead through all the nested sections and gather list of all
+         * named types along with their base types and the types they are sub-typed from
+         */
         static void preprocessNestedSections(const MarkdownNodeIterator& node,
                                              const MarkdownNodes& siblings,
                                              SectionParserData& pd,
@@ -293,7 +297,8 @@ namespace snowcrash {
         }
 
         /**
-         * \brief Fill named type table entries from the signature information
+         * \brief Fill named type table entries from the signature information.
+         *        Both base table and inheritance table.
          *
          * \param node Markdown node to process
          * \param pd Section parser data
@@ -330,6 +335,14 @@ namespace snowcrash {
                 identifier = signature.identifier;
             }
 
+            // If named type already exists, do nothing
+            mson::NamedTypeBaseTable::iterator it = pd.namedTypeBaseTable.find(identifier);
+
+            if (it != pd.namedTypeBaseTable.end()) {
+                return;
+            }
+
+            // Otherwise, add the respective entries to the tables
             if (typeDefinition.typeSpecification.name.name != mson::UndefinedTypeName) {
                 pd.namedTypeBaseTable[identifier] = mson::parseBaseType(typeDefinition.typeSpecification.name.name);
             }

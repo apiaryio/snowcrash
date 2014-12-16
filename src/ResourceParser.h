@@ -11,6 +11,7 @@
 
 #include "SectionParser.h"
 #include "ActionParser.h"
+#include "DataStructuresParser.h"
 #include "HeadersParser.h"
 #include "ParametersParser.h"
 #include "UriTemplateParser.h"
@@ -108,6 +109,24 @@ namespace snowcrash {
                     MarkdownNodeIterator cur = AttributesParser::parse(node, siblings, pd, attributes);
 
                     if (!out.node.name.empty()) {
+
+                        if (SectionProcessor<DataStructures>::isNamedTypeDuplicate(pd.blueprint, out.node.name)) {
+
+                            // WARN: duplicate named type
+                            std::stringstream ss;
+                            ss << "named type with name '" << out.node.name << "' already exists";
+
+                            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                            out.report.warnings.push_back(Warning(ss.str(),
+                                                                  DuplicateWarning,
+                                                                  sourceMap));
+
+                            // Remove the attributes data from the AST since we are ignoring this
+                            out.node.attributes.source = mson::NamedType();
+
+                            return cur;
+                        }
+
                         attributes.node.source.name.symbol.literal = out.node.name;
                     }
 

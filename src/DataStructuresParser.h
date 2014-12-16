@@ -40,9 +40,22 @@ namespace snowcrash {
 
                 cur = MSONNamedTypeParser::parse(node, siblings, pd, namedType);
 
-                dataStructure.source = namedType.node;
+                if (isNamedTypeDuplicate(pd.blueprint, namedType.node.name.symbol.literal)) {
 
-                out.node.push_back(dataStructure);
+                    // WARN: duplicate named type
+                    std::stringstream ss;
+                    ss << "named type with name '" << namedType.node.name.symbol.literal << "' already exists";
+
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                    out.report.warnings.push_back(Warning(ss.str(),
+                                                          DuplicateWarning,
+                                                          sourceMap));
+                }
+                else {
+
+                    dataStructure.source = namedType.node;
+                    out.node.push_back(dataStructure);
+                }
             }
 
             return cur;
@@ -69,6 +82,41 @@ namespace snowcrash {
         static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
 
             return SectionProcessor<mson::NamedType>::sectionType(node);
+        }
+
+        /**
+         * \brief Check if a named type already exists with the given name
+         *
+         * \param blueprint The blueprint which is formed until now
+         * \param name The named type name to be checked
+         */
+        static bool isNamedTypeDuplicate(const Blueprint& blueprint,
+                                         mdp::ByteBuffer& name) {
+
+            for (Collection<ResourceGroup>::const_iterator resourceGroupIt = blueprint.resourceGroups.begin();
+                 resourceGroupIt != blueprint.resourceGroups.end();
+                 ++resourceGroupIt) {
+
+                for (Collection<Resource>::const_iterator resourceIt = resourceGroupIt->resources.begin();
+                     resourceIt != resourceGroupIt->resources.end();
+                     ++resourceIt) {
+
+                    if (resourceIt->attributes.source.name.symbol.literal == name) {
+                        return true;
+                    }
+                }
+            }
+
+            for (DataStructures::const_iterator it = blueprint.dataStructures.begin();
+                 it != blueprint.dataStructures.end();
+                 ++it) {
+
+                if (it->source.name.symbol.literal == name) {
+                    return true;
+                }
+            }
+
+            return false;
         }
     };
 
