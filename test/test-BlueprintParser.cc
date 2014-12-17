@@ -428,7 +428,6 @@ TEST_CASE("Parsing unexpected blocks", "[blueprint]")
     "# GET /\n";
 
     ParseResult<Blueprint> blueprint;
-
     SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
@@ -459,4 +458,144 @@ TEST_CASE("Parsing unexpected blocks", "[blueprint]")
     REQUIRE(blueprint.sourceMap.metadata.collection[0].sourceMap[0].location == 0);
     REQUIRE(blueprint.sourceMap.metadata.collection[0].sourceMap[0].length == 12);
     REQUIRE(blueprint.sourceMap.resourceGroups.collection.size() == 1);
+}
+
+TEST_CASE("Parsing blueprint with mson data structures", "[blueprint]")
+{
+    mdp::ByteBuffer source = \
+    "# Group Plans\n"\
+    "\n"\
+    "## Plans [/plans]\n"\
+    "\n"\
+    "+ Attributes (array[Plan])\n"\
+    "\n"\
+    "### List all plans [GET]\n"\
+    "\n"\
+    "+ Response 200 (application/json)\n"\
+    "    + Attributes (Plans)\n"\
+    "\n"\
+    "### Create a plan [POST]\n"\
+    "\n"\
+    "+ Attributes (Plan Base)\n"\
+    "\n"\
+    "+ Request (application/json)\n"\
+    "\n"\
+    "+ Response 201 (application/json)\n"\
+    "    + Attributes (Plan)\n"\
+    "\n"\
+    "## Plan [/plan/{id}]\n"\
+    "\n"\
+    "+ Parameters\n\n"\
+    "    + id (required, string)\n"\
+    "\n"\
+    "+ Attributes (Plan Base)\n"\
+    "    + type: Plan (default)\n"\
+    "    + created ([Timestamp][])\n"\
+    "\n"\
+    "### Retrieve a plan [GET]\n"\
+    "\n"\
+    "+ Response 200 (application/json)\n"\
+    "    + Attributes (Plan)\n"\
+    "\n"\
+    "### Update a plan [PATCH]\n"\
+    "\n"\
+    "+ Request (application/json)\n"\
+    "    + Attributes (Plan Base)\n"\
+    "\n"\
+    "+ Response 200 (application/json)\n"\
+    "    + Attributes (Plan)\n\n"\
+    "\n"\
+    "### Delete a plan [DELETE]\n"\
+    "\n"\
+    "+ Response 204\n"\
+    "\n"\
+    "# Data Structures\n"\
+    "\n"\
+    "## Plan Base\n"\
+    "Base object for write operations\n"\
+    "\n"\
+    "### Properties\n"\
+    "- name\n"\
+    "- amount (number)\n"\
+    "- trial (optional)\n\n"\
+    "\n"\
+    "## Timestamp (number)\n"\
+    "\n"\
+    "## Coupon [/coupon/{id}]\n"\
+    "\n"\
+    "+ Parameters\n\n"\
+    "    + id (required, string)\n\n"\
+    "\n"\
+    "### Delete a coupon [DELETE]\n"\
+    "\n"\
+    "+ Response 204\n"\
+    "\n";
+
+    mdp::MarkdownParser markdownParser;
+    mdp::MarkdownNode markdownAST;
+
+    ParseResult<Blueprint> blueprint;
+    mson::NamedTypeBaseTable::iterator baseIt;
+    mson::NamedTypeInheritanceTable::iterator inheritanceIt;
+
+    markdownParser.parse(source, markdownAST);
+    REQUIRE(!markdownAST.children().empty());
+
+    snowcrash::SectionParserData pd(ExportSourcemapOption, source, blueprint.node);
+    pd.sectionsContext.push_back(BlueprintSectionType);
+
+    BlueprintParser::parse(markdownAST.children().begin(), markdownAST.children(), pd, blueprint);
+
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.empty());
+
+    baseIt = pd.namedTypeBaseTable.find("Plan Base");
+    REQUIRE(baseIt != pd.namedTypeBaseTable.end());
+    REQUIRE(baseIt->second == mson::ImplicitObjectBaseType);
+
+    baseIt = pd.namedTypeBaseTable.find("Plan");
+    REQUIRE(baseIt != pd.namedTypeBaseTable.end());
+    REQUIRE(baseIt->second == mson::ImplicitObjectBaseType);
+
+    baseIt = pd.namedTypeBaseTable.find("Plans");
+    REQUIRE(baseIt != pd.namedTypeBaseTable.end());
+    REQUIRE(baseIt->second == mson::ValueBaseType);
+
+    baseIt = pd.namedTypeBaseTable.find("Timestamp");
+    REQUIRE(baseIt != pd.namedTypeBaseTable.end());
+    REQUIRE(baseIt->second == mson::PrimitiveBaseType);
+
+    inheritanceIt = pd.namedTypeInheritanceTable.find("Plan");
+    REQUIRE(inheritanceIt != pd.namedTypeInheritanceTable.end());
+    REQUIRE(inheritanceIt->second == "Plan Base");
+
+    REQUIRE(blueprint.node.resourceGroups.size() == 2);
+    REQUIRE(blueprint.node.resourceGroups[1].resources.size() == 1);
+    REQUIRE(blueprint.node.dataStructures.size() == 2);
+    REQUIRE(blueprint.node.dataStructures[0].source.name.symbol.literal == "Plan Base");
+    REQUIRE(blueprint.node.dataStructures[1].source.name.symbol.literal == "Timestamp");
+}
+
+TEST_CASE("Parse blueprint with two named types having the same name", "[blueprint]")
+{
+    mdp::ByteBuffer source = \
+    "# Data Structures\n"\
+    "## Coupon\n"\
+    "- real_name - Coupon's real name\n"\
+    "\n"\
+    "# Coupon [/coupon]\n"\
+    "+ Attributes\n"\
+    "    - name - Coupon name";
+
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
+
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.size() == 1);
+    REQUIRE(blueprint.report.warnings[0].code == DuplicateWarning);
+
+    REQUIRE(blueprint.node.resourceGroups.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].attributes.source.empty());
+    REQUIRE(blueprint.node.dataStructures.size() == 1);
 }

@@ -16,6 +16,7 @@
 #include "ResourceParser.h"
 #include "ResourceGroupParser.h"
 #include "MSONTypeSectionParser.h"
+#include "DataStructuresParser.h"
 
 using namespace snowcrash;
 
@@ -31,6 +32,9 @@ SectionType snowcrash::SectionKeywordSignature(const mdp::MarkdownNodeIterator& 
         return type;
 
     if ((type = SectionProcessor<Asset>::sectionType(node)) != UndefinedSectionType)
+        return type;
+
+    if ((type = SectionProcessor<Attributes>::sectionType(node)) != UndefinedSectionType)
         return type;
 
     if ((type = SectionProcessor<Payload>::sectionType(node)) != UndefinedSectionType)
@@ -55,6 +59,9 @@ SectionType snowcrash::SectionKeywordSignature(const mdp::MarkdownNodeIterator& 
         return type;
 
     if ((type = SectionProcessor<ResourceGroup>::sectionType(node)) != UndefinedSectionType)
+        return type;
+
+    if ((type = SectionProcessor<DataStructures>::sectionType(node)) != UndefinedSectionType)
         return type;
 
     return type;

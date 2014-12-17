@@ -10,6 +10,7 @@
 #define SNOWCRASH_MSONSOURCEMAP_H
 
 #include "MSON.h"
+#include "MarkdownParser.h"
 
 /**
  * MSON Sourcemap Abstract Syntax Tree
@@ -19,6 +20,34 @@
  */
 
 namespace snowcrash {
+
+    /**
+     * Default Container for collections.
+     *
+     *  FIXME: Use C++11 template aliases when migrating to C++11.
+     */
+    template<typename T>
+    struct Collection {
+        typedef std::vector<T> type;
+        typedef typename std::vector<T>::iterator iterator;
+        typedef typename std::vector<T>::const_iterator const_iterator;
+    };
+}
+
+#define SOURCE_MAP_COLLECTION(T, TC) template<>\
+struct SourceMap<TC> {\
+    Collection<SourceMap<T> >::type collection;\
+};\
+
+namespace snowcrash {
+
+    struct SourceMapBase {
+        mdp::BytesRangeSet sourceMap;
+    };
+
+    template<typename T>
+    struct SourceMap : public SourceMapBase {
+    };
 
     /** Source Map of Collection of Values */
     SOURCE_MAP_COLLECTION(mson::Value, mson::Values)

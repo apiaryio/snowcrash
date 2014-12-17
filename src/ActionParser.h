@@ -155,6 +155,12 @@ namespace snowcrash {
                     return SectionProcessor<Action>::handleDeprecatedHeaders(node, siblings, pd, headers);
                 }
 
+                case AttributesSectionType:
+                {
+                    ParseResultRef<Attributes> attributes(out.report, out.node.attributes, out.sourceMap.attributes);
+                    return AttributesParser::parse(node, siblings, pd, attributes);
+                }
+
                 default:
                     break;
             }
@@ -263,7 +269,14 @@ namespace snowcrash {
             // Check if headers section
             nestedType = SectionProcessor<Headers>::sectionType(node);
 
-            if (nestedType == HeadersSectionType) {
+            if (nestedType != UndefinedSectionType) {
+                return nestedType;
+            }
+
+            // Check if attributes section
+            nestedType = SectionProcessor<Attributes>::sectionType(node);
+
+            if (nestedType != UndefinedSectionType) {
                 return nestedType;
             }
 

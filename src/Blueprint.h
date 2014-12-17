@@ -14,6 +14,7 @@
 #include <utility>
 #include "Platform.h"
 #include "MarkdownNode.h"
+#include "MSONSourcemap.h"
 
 /**
  *  API Blueprint Abstract Syntax Tree
@@ -52,18 +53,6 @@ namespace snowcrash {
 
     /** A generic key - value pair */
     typedef std::pair<std::string, std::string> KeyValuePair;
-
-    /**
-     * Default Container for collections.
-     *
-     *  FIXME: Use C++11 template aliases when migrating to C++11.
-     */
-    template<typename T>
-    struct Collection {
-        typedef std::vector<T> type;
-        typedef typename std::vector<T>::iterator iterator;
-        typedef typename std::vector<T>::const_iterator const_iterator;
-    };
 
     /** An asset data */
     typedef std::string Asset;
@@ -152,6 +141,10 @@ namespace snowcrash {
 
         struct ReferenceMetadata {
 
+            /** Constructor */
+            ReferenceMetadata(State state_ = StateUnresolved)
+            : state(state_) {}
+
             /** Markdown AST reference source node (for source map) */
             mdp::MarkdownNodeIterator node;
 
@@ -162,6 +155,26 @@ namespace snowcrash {
         /** Metadata for the reference */
         ReferenceMetadata meta;
     };
+
+    /**
+     * Data Structure
+     */
+    struct DataStructure {
+
+        /** As described in source */
+        mson::NamedType source;
+
+        /** As resolved by subsequent tooling */
+        mson::NamedType resolved;
+    };
+
+    /** Collection of Data Structures */
+    typedef Collection<DataStructure>::type DataStructures;
+
+    /**
+     *  Attributes
+     */
+    typedef DataStructure Attributes;
 
     /**
      *  Payload
@@ -179,6 +192,9 @@ namespace snowcrash {
 
         /** Payload-specific Headers */
         Headers headers;
+
+        /** Payload-specific Attributes */
+        Attributes attributes;
 
         /** Body */
         Asset body;
@@ -248,6 +264,9 @@ namespace snowcrash {
         /** Action-specific Parameters */
         Parameters parameters;
 
+        /** Action-specific Attributes */
+        Attributes attributes;
+
         /**
          *  \brief Action-specific HTTP headers
          *
@@ -285,6 +304,9 @@ namespace snowcrash {
 
         /** Model representing this Resource */
         ResourceModel model;
+
+        /** Resource-specific Attributes */
+        Attributes attributes;
 
         /** Parameters */
         Parameters parameters;
@@ -347,6 +369,9 @@ namespace snowcrash {
 
         /** The set of API Resource Groups */
         ResourceGroups resourceGroups;
+
+        /** List of Data Structures */
+        DataStructures dataStructures;
     };
 }
 

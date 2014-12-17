@@ -49,6 +49,12 @@ namespace snowcrash {
 
         MarkdownNodeIterator cur = node;
 
+        // If we encounter a header node, stop parsing. Headers which are not
+        // type section signatures are ineligible to be nested sections of a MSON section
+        if (node->type == mdp::HeaderMarkdownNodeType) {
+            return cur;
+        }
+
         // If the nodes follow after some block description without member
         // seperator, then they are treated as description
         if (!sections.node.empty() && sections.node.back().type == mson::TypeSection::BlockDescriptionType) {

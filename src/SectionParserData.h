@@ -10,7 +10,7 @@
 #define SNOWCRASH_SECTIONPARSERDATA_H
 
 #include "ModelTable.h"
-#include "MSONSourcemap.h"
+#include "BlueprintSourcemap.h"
 #include "Section.h"
 
 namespace snowcrash {
@@ -37,10 +37,7 @@ namespace snowcrash {
         SectionParserData(BlueprintParserOptions opts,
                           const mdp::ByteBuffer& src,
                           const Blueprint& bp)
-        : options(opts), sourceData(src), blueprint(bp)
-        {
-            namedTypeBaseTable[""] = mson::UndefinedBaseType;
-        }
+        : options(opts), sourceData(src), blueprint(bp) {}
 
         /** Parser Options */
         BlueprintParserOptions options;

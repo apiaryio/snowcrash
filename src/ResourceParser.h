@@ -11,6 +11,7 @@
 
 #include "SectionParser.h"
 #include "ActionParser.h"
+#include "DataStructuresParser.h"
 #include "HeadersParser.h"
 #include "ParametersParser.h"
 #include "UriTemplateParser.h"
@@ -63,11 +64,8 @@ namespace snowcrash {
 
                     return cur;
                 }
-            } else if (RegexCapture(node->text, NamedResourceHeaderRegex, captureGroups, 4)) {
-
-                out.node.name = captureGroups[1];
-                TrimString(out.node.name);
-                out.node.uriTemplate = captureGroups[2];
+            } else {
+                matchNamedResourceHeader(node, out.node);
             }
 
             if (pd.exportSourceMap()) {
@@ -103,6 +101,36 @@ namespace snowcrash {
                 {
                     ParseResultRef<Headers> headers(out.report, out.node.headers, out.sourceMap.headers);
                     return SectionProcessor<Action>::handleDeprecatedHeaders(node, siblings, pd, headers);
+                }
+
+                case AttributesSectionType:
+                {
+                    ParseResultRef<Attributes> attributes(out.report, out.node.attributes, out.sourceMap.attributes);
+                    MarkdownNodeIterator cur = AttributesParser::parse(node, siblings, pd, attributes);
+
+                    if (!out.node.name.empty()) {
+
+                        if (SectionProcessor<DataStructures>::isNamedTypeDuplicate(pd.blueprint, out.node.name)) {
+
+                            // WARN: duplicate named type
+                            std::stringstream ss;
+                            ss << "named type with name '" << out.node.name << "' already exists";
+
+                            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                            out.report.warnings.push_back(Warning(ss.str(),
+                                                                  DuplicateWarning,
+                                                                  sourceMap));
+
+                            // Remove the attributes data from the AST since we are ignoring this
+                            out.node.attributes.source = mson::NamedType();
+
+                            return cur;
+                        }
+
+                        attributes.node.source.name.symbol.literal = out.node.name;
+                    }
+
+                    return cur;
                 }
 
                 default:
@@ -189,7 +217,7 @@ namespace snowcrash {
             // Check if headers section
             nestedType = SectionProcessor<Headers>::sectionType(node);
 
-            if (nestedType == HeadersSectionType) {
+            if (nestedType != UndefinedSectionType) {
                 return nestedType;
             }
 
@@ -199,6 +227,13 @@ namespace snowcrash {
             if (nestedType == ModelSectionType ||
                 nestedType == ModelBodySectionType) {
 
+                return nestedType;
+            }
+
+            // Check if attributes section
+            nestedType = SectionProcessor<Attributes>::sectionType(node);
+
+            if (nestedType != UndefinedSectionType) {
                 return nestedType;
             }
 
@@ -252,14 +287,14 @@ namespace snowcrash {
             // Consolidate deprecated headers into subsequent payloads
             if (!out.node.headers.empty()) {
 
-                Collection<Action>::iterator actIt = out.node.actions.begin();
-                Collection<SourceMap<Action> >::iterator actSMIt = out.sourceMap.actions.collection.begin();
+                Collection<Action>::iterator actionIt = out.node.actions.begin();
+                Collection<SourceMap<Action> >::iterator actionSMIt = out.sourceMap.actions.collection.begin();
 
                 for (;
-                     actIt != out.node.actions.end();
-                     ++actIt, ++actSMIt) {
+                     actionIt != out.node.actions.end();
+                     ++actionIt, ++actionSMIt) {
 
-                    SectionProcessor<Headers>::injectDeprecatedHeaders(pd, out.node.headers, out.sourceMap.headers, actIt->examples, actSMIt->examples);
+                    SectionProcessor<Headers>::injectDeprecatedHeaders(pd, out.node.headers, out.sourceMap.headers, actionIt->examples, actionSMIt->examples);
                 }
 
                 out.node.headers.clear();
@@ -267,6 +302,25 @@ namespace snowcrash {
                 if (pd.exportSourceMap()) {
                     out.sourceMap.headers.collection.clear();
                 }
+            }
+        }
+
+        /**
+         * \brief Given a named resource header, retrieve the name and uriTemplate
+         *
+         * \param node Markdown node to process
+         * \param resource Resource data structure
+         */
+        static void matchNamedResourceHeader(const MarkdownNodeIterator& node,
+                                             Resource& resource) {
+
+            CaptureGroups captureGroups;
+
+            if (RegexCapture(node->text, NamedResourceHeaderRegex, captureGroups, 4)) {
+
+                resource.name = captureGroups[1];
+                TrimString(resource.name);
+                resource.uriTemplate = captureGroups[2];
             }
         }
 

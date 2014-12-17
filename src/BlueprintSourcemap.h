@@ -10,7 +10,6 @@
 #define SNOWCRASH_BLUEPRINT_SOURCEMAP_H
 
 #include "Blueprint.h"
-#include "MarkdownParser.h"
 
 /**
  *  API Blueprint Sourcemap Abstract Syntax Tree
@@ -19,20 +18,7 @@
  *  Data types in this documents define the API Blueprint Sourcemap AST.
  */
 
-#define SOURCE_MAP_COLLECTION(T, TC) template<>\
-struct SourceMap<TC> {\
-    Collection<SourceMap<T> >::type collection;\
-};\
-
 namespace snowcrash {
-
-    struct SourceMapBase {
-        mdp::BytesRangeSet sourceMap;
-    };
-
-    template<typename T>
-    struct SourceMap : public SourceMapBase {
-    };
 
     /** Source Map of Metadata Collection */
     SOURCE_MAP_COLLECTION(Metadata, MetadataCollection)
@@ -43,7 +29,9 @@ namespace snowcrash {
     /** Source Map of Collection of Parameter values */
     SOURCE_MAP_COLLECTION(Value, Values)
 
-    /** Source Map Structure for Parameter */
+    /**
+     * Source Map Structure for Parameter
+     */
     template<>
     struct SourceMap<Parameter> : public SourceMapBase {
 
@@ -73,6 +61,18 @@ namespace snowcrash {
     SOURCE_MAP_COLLECTION(Parameter, Parameters)
 
     /**
+     * Source Map Structure for DataStructure
+     */
+    template<>
+    struct SourceMap<DataStructure> : public SourceMap<mson::NamedType> {
+    };
+
+    /** Source Map of Attributes */
+    // 'Attributes' type is same as 'DataStructure'
+
+    SOURCE_MAP_COLLECTION(DataStructure, DataStructures)
+
+    /**
      * Source Map Structure for Payload
      */
     template<>
@@ -84,11 +84,14 @@ namespace snowcrash {
         /** Source Map of Payload Description */
         SourceMap<Description> description;
 
-        /** Payload-specific Parameters */
+        /** Source Map of Payload-specific Parameters */
         SourceMap<Parameters> parameters;
 
-        /** Payload-specific Headers */
+        /** Source Map of Payload-specific Headers */
         SourceMap<Headers> headers;
+
+        /** Source Map of Payload-specific Attributes */
+        SourceMap<Attributes> attributes;
 
         /** Source Map of Body */
         SourceMap<Asset> body;
@@ -146,6 +149,9 @@ namespace snowcrash {
         /** Action-specific Parameters */
         SourceMap<Parameters> parameters;
 
+        /** Action-specific Attributes */
+        SourceMap<Attributes> attributes;
+
         /**
          *  \brief Action-specific HTTP headers
          *
@@ -184,6 +190,9 @@ namespace snowcrash {
 
         /** Model representing this Resource */
         SourceMap<ResourceModel> model;
+
+        /** Source Map of Resource-specific Attributes */
+        SourceMap<Attributes> attributes;
 
         /** Parameters */
         SourceMap<Parameters> parameters;
@@ -248,7 +257,12 @@ namespace snowcrash {
 
         /** The set of API Resource Groups */
         SourceMap<ResourceGroups> resourceGroups;
+
+        /** List of Data Structures */
+        SourceMap<DataStructures> dataStructures;
     };
 }
+
+#undef SOURCE_MAP_COLLECTION
 
 #endif

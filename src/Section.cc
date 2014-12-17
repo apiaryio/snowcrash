@@ -40,7 +40,7 @@ std::string snowcrash::SectionName(const SectionType& section) {
             return "mixin";
 
         case MSONOneOfSectionType:
-            return "one-of";
+            return "one of";
 
         default:
             return "section";

@@ -63,7 +63,9 @@ namespace snowcrash {
         static bool isDescriptionNode(const MarkdownNodeIterator& node,
                                       SectionType sectionType) {
 
-            if (SectionProcessor<mson::ValueMember>::nestedSectionType(node) != MSONSectionType) {
+            if (SectionProcessor<mson::ValueMember>::nestedSectionType(node) != MSONSectionType ||
+                node->type == mdp::HeaderMarkdownNodeType) {
+
                 return false;
             }
 
@@ -110,16 +112,34 @@ namespace snowcrash {
             }
 
             mson::parseTypeDefinition(node, pd, signature.attributes, report, valueMember.valueDefinition.typeDefinition);
-
-            if (!signature.remainingContent.empty()) {
-
-                mson::TypeSection typeSection(mson::TypeSection::BlockDescriptionType);
-
-                typeSection.content.description = signature.remainingContent;
-                valueMember.sections.push_back(typeSection);
-            }
+            parseRemainingContent(node, pd, signature.remainingContent, valueMember.sections, sourceMap.sections);
 
             return ++MarkdownNodeIterator(node);
+        }
+
+        /**
+         * \brief Parse the signature's remaining content
+         *
+         * \param node Node to process
+         * \param pd Section Parser Data
+         * \param remainingContent Signature's remaining content
+         * \param sections MSON Type Section collection
+         * \param sourceMap MSON Type Section collection source map
+         */
+        static void parseRemainingContent(const MarkdownNodeIterator& node,
+                                          SectionParserData& pd,
+                                          const mdp::ByteBuffer& remainingContent,
+                                          mson::TypeSections& sections,
+                                          SourceMap<mson::TypeSections>& sourceMap) {
+
+            if (remainingContent.empty()) {
+                return;
+            }
+
+            mson::TypeSection typeSection(mson::TypeSection::BlockDescriptionType);
+
+            typeSection.content.description = remainingContent;
+            sections.push_back(typeSection);
         }
 
         /**
@@ -190,13 +210,11 @@ namespace snowcrash {
                 IntermediateParseResult<mson::TypeSection> typeSection(sections.report);
                 typeSection.node.baseType = baseType;
 
-                PARSER::parse(node, siblings, pd, typeSection);
+                cur = PARSER::parse(node, siblings, pd, typeSection);
 
                 if (typeSection.node.type != mson::TypeSection::UndefinedType) {
                     sections.node.push_back(typeSection.node);
                 }
-
-                cur = ++MarkdownNodeIterator(node);
             }
 
             return cur;

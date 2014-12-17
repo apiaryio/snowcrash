@@ -16,7 +16,6 @@
 
 #include "Platform.h"
 #include "MarkdownParser.h"
-#include "BlueprintSourcemap.h"
 
 #define MEMBERS_NOT_SET_ERR std::logic_error("no members set")
 
