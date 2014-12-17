@@ -126,22 +126,22 @@ namespace mson {
                               TypeName& typeName) {
 
         if (subject == "boolean") {
-            typeName.name = BooleanTypeName;
+            typeName.base = BooleanTypeName;
         }
         else if (subject == "string") {
-            typeName.name = StringTypeName;
+            typeName.base = StringTypeName;
         }
         else if (subject == "number") {
-            typeName.name = NumberTypeName;
+            typeName.base = NumberTypeName;
         }
         else if (subject == "array") {
-            typeName.name = ArrayTypeName;
+            typeName.base = ArrayTypeName;
         }
         else if (subject == "enum") {
-            typeName.name = EnumTypeName;
+            typeName.base = EnumTypeName;
         }
         else if (subject == "object") {
-            typeName.name = ObjectTypeName;
+            typeName.base = ObjectTypeName;
         }
         else {
             typeName.symbol = parseSymbol(subject);
@@ -348,7 +348,7 @@ namespace mson {
             }
         }
 
-        typeDefinition.baseType = parseBaseType(typeDefinition.typeSpecification.name.name);
+        typeDefinition.baseType = parseBaseType(typeDefinition.typeSpecification.name.base);
         NamedTypeBaseTable::iterator it = pd.namedTypeBaseTable.find(typeDefinition.typeSpecification.name.symbol.literal);
 
         if (typeDefinition.baseType == UndefinedBaseType &&

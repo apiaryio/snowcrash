@@ -35,11 +35,11 @@ namespace snowcrash {
                                                       const ParseResultRef<mson::NamedType>& out) {
 
             mson::parseTypeName(signature.identifier, out.node.name);
-            mson::parseTypeDefinition(node, pd, signature.attributes, out.report, out.node.base);
+            mson::parseTypeDefinition(node, pd, signature.attributes, out.report, out.node.typeDefinition);
 
             // Named types should have type specification when sub-typed from primitive types
-            if (out.node.base.baseType == mson::UndefinedBaseType) {
-                out.node.base.baseType = mson::ImplicitObjectBaseType;
+            if (out.node.typeDefinition.baseType == mson::UndefinedBaseType) {
+                out.node.typeDefinition.baseType = mson::ImplicitObjectBaseType;
             }
 
             return ++MarkdownNodeIterator(node);
@@ -62,7 +62,7 @@ namespace snowcrash {
 
             return SectionProcessor<mson::ValueMember>
                     ::processNestedMembers<MSONTypeSectionHeaderParser>(node, siblings, pd, typeSections,
-                                                                        out.node.base.baseType);
+                                                                        out.node.typeDefinition.baseType);
         }
 
         static bool isDescriptionNode(const MarkdownNodeIterator& node,

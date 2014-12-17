@@ -28,7 +28,7 @@ TEST_CASE("Parse canonical mson property member", "[mson][property_member]")
     REQUIRE(propertyMember.node.description == "A color");
     REQUIRE(propertyMember.node.valueDefinition.values.size() == 1);
     REQUIRE(propertyMember.node.valueDefinition.values[0].literal == "red");
-    REQUIRE(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.name.name == mson::StringTypeName);
+    REQUIRE(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.name.base == mson::StringTypeName);
     REQUIRE(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.name.symbol.empty());
     REQUIRE(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.nestedTypes.empty());
     REQUIRE(propertyMember.node.valueDefinition.typeDefinition.attributes == mson::RequiredTypeAttribute);
@@ -127,7 +127,7 @@ TEST_CASE("Parse mson property member object with nested members", "[mson][prope
     REQUIRE(propertyMember.node.name.variable.empty());
     REQUIRE(propertyMember.node.description.empty());
     REQUIRE(propertyMember.node.valueDefinition.values.empty());
-    REQUIRE(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.name.name == mson::ObjectTypeName);
+    REQUIRE(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.name.base == mson::ObjectTypeName);
     REQUIRE(propertyMember.node.sections.size() == 1);
 
     REQUIRE(propertyMember.node.sections[0].content.description.empty());
@@ -256,7 +256,7 @@ TEST_CASE("Parse mson property member when it is an object and has no sub-type s
 
     REQUIRE(propertyMember.node.name.literal == "user");
     REQUIRE(propertyMember.node.valueDefinition.typeDefinition.baseType == mson::ImplicitObjectBaseType);
-    REQUIRE(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.name.name == mson::UndefinedTypeName);
+    REQUIRE(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.name.base == mson::UndefinedTypeName);
     REQUIRE(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.name.symbol.empty());
 
     REQUIRE(propertyMember.node.sections.size() == 2);
@@ -288,7 +288,7 @@ TEST_CASE("Parse mson property member when it is an object and has no sub-type s
 
     REQUIRE(propertyMember.node.name.literal == "user");
     REQUIRE(propertyMember.node.valueDefinition.typeDefinition.baseType == mson::ImplicitObjectBaseType);
-    REQUIRE(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.name.name == mson::UndefinedTypeName);
+    REQUIRE(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.name.base == mson::UndefinedTypeName);
     REQUIRE(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.name.symbol.empty());
 
     REQUIRE(propertyMember.node.sections.size() == 1);
@@ -324,7 +324,7 @@ TEST_CASE("Parse mson property member when it is a string and has no sub-type sp
 
     REQUIRE(propertyMember.node.name.literal == "username");
     REQUIRE(propertyMember.node.valueDefinition.typeDefinition.baseType == mson::ImplicitPrimitiveBaseType);
-    REQUIRE(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.name.name == mson::UndefinedTypeName);
+    REQUIRE(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.name.base == mson::UndefinedTypeName);
     REQUIRE(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.name.symbol.empty());
 
     REQUIRE(propertyMember.node.sections.size() == 2);
@@ -349,7 +349,7 @@ TEST_CASE("Parse mson property member when no sub-type specified and no nested s
 
     REQUIRE(propertyMember.node.name.literal == "username");
     REQUIRE(propertyMember.node.valueDefinition.typeDefinition.baseType == mson::ImplicitPrimitiveBaseType);
-    REQUIRE(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.name.name == mson::UndefinedTypeName);
+    REQUIRE(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.name.base == mson::UndefinedTypeName);
     REQUIRE(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.name.symbol.empty());
 
     REQUIRE(propertyMember.node.sections.size() == 1);
@@ -380,7 +380,7 @@ TEST_CASE("Parse mson property member when containing a mixin", "[mson][property
 
     REQUIRE(propertyMember.node.sections[0].content.members().at(0).type == mson::MemberType::PropertyType);
     REQUIRE(propertyMember.node.sections[0].content.members().at(1).type == mson::MemberType::MixinType);
-    REQUIRE(propertyMember.node.sections[0].content.members().at(1).content.mixin.typeDefinition.typeSpecification.name.symbol.literal == "Person");
+    REQUIRE(propertyMember.node.sections[0].content.members().at(1).content.mixin.typeSpecification.name.symbol.literal == "Person");
 }
 
 TEST_CASE("Parse mson property member when containing an oneOf", "[mson][property_member]")
@@ -450,6 +450,6 @@ TEST_CASE("Parse mson property containing list of value with string type specifi
 //  REQUIRE(propertyMember.node.valueDefinition.values.size() == 1);
 //  REQUIRE(propertyMember.node.valueDefinition.values[0].literal == "1, 2, 3");
     REQUIRE(propertyMember.node.valueDefinition.typeDefinition.baseType == mson::PrimitiveBaseType);
-    REQUIRE(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.name.name == mson::StringTypeName);
+    REQUIRE(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.name.base == mson::StringTypeName);
     REQUIRE(propertyMember.node.sections.empty());
 }

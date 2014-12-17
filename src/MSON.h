@@ -107,11 +107,11 @@ namespace mson {
     struct TypeName {
 
         /** Constructor */
-        TypeName(const BaseTypeName& name_ = UndefinedTypeName)
-        : name(name_) {}
+        TypeName(const BaseTypeName& base_ = UndefinedTypeName)
+        : base(base_) {}
 
         /** EITHER Base type's value */
-        BaseTypeName name;
+        BaseTypeName base;
 
         /** OR Named type's identifier */
         Symbol symbol;
@@ -260,7 +260,7 @@ namespace mson {
         TypeName name;
 
         /** The ancestor type definition */
-        TypeDefinition base;
+        TypeDefinition typeDefinition;
 
         /** List of named type's sections */
         TypeSections sections;
@@ -309,14 +309,7 @@ namespace mson {
     };
 
     /** Mixin type */
-    struct Mixin {
-
-        /** Type definition of the type to be included */
-        TypeDefinition typeDefinition;
-
-        /** Check if empty */
-        bool empty() const;
-    };
+    typedef TypeDefinition Mixin;
 
     /** Collection of Member types */
     struct Members {

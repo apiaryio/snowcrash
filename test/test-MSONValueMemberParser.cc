@@ -26,7 +26,7 @@ TEST_CASE("Parse canonical mson value member", "[mson][value_member]")
     REQUIRE(valueMember.node.description == "A color");
     REQUIRE(valueMember.node.valueDefinition.values.size() == 1);
     REQUIRE(valueMember.node.valueDefinition.values[0].literal == "red");
-    REQUIRE(valueMember.node.valueDefinition.typeDefinition.typeSpecification.name.name == mson::StringTypeName);
+    REQUIRE(valueMember.node.valueDefinition.typeDefinition.typeSpecification.name.base == mson::StringTypeName);
     REQUIRE(valueMember.node.valueDefinition.typeDefinition.typeSpecification.name.symbol.empty());
     REQUIRE(valueMember.node.valueDefinition.typeDefinition.typeSpecification.nestedTypes.empty());
     REQUIRE(valueMember.node.valueDefinition.typeDefinition.attributes == mson::RequiredTypeAttribute);
@@ -162,7 +162,7 @@ TEST_CASE("Parse mson value member array with items", "[mson][value_member]")
 
     REQUIRE(valueMember.node.description.empty());
     REQUIRE(valueMember.node.valueDefinition.values.empty());
-    REQUIRE(valueMember.node.valueDefinition.typeDefinition.typeSpecification.name.name == mson::ArrayTypeName);
+    REQUIRE(valueMember.node.valueDefinition.typeDefinition.typeSpecification.name.base == mson::ArrayTypeName);
     REQUIRE(valueMember.node.sections.size() == 1);
 
     REQUIRE(valueMember.node.sections[0].content.description.empty());

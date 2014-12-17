@@ -38,11 +38,11 @@ TEST_CASE("Parse canonical attributes", "[attributes]")
     REQUIRE(attributes.node.resolved.empty());
     REQUIRE(attributes.node.source.name.empty());
     REQUIRE(attributes.node.source.sections.empty());
-    REQUIRE(attributes.node.source.base.attributes == 0);
-    REQUIRE(attributes.node.source.base.typeSpecification.name.name == mson::ArrayTypeName);
-    REQUIRE(attributes.node.source.base.typeSpecification.nestedTypes.size() == 1);
-    REQUIRE(attributes.node.source.base.typeSpecification.nestedTypes[0].symbol.literal == "Coupon");
-    REQUIRE(attributes.node.source.base.baseType == mson::ValueBaseType);
+    REQUIRE(attributes.node.source.typeDefinition.attributes == 0);
+    REQUIRE(attributes.node.source.typeDefinition.typeSpecification.name.base == mson::ArrayTypeName);
+    REQUIRE(attributes.node.source.typeDefinition.typeSpecification.nestedTypes.size() == 1);
+    REQUIRE(attributes.node.source.typeDefinition.typeSpecification.nestedTypes[0].symbol.literal == "Coupon");
+    REQUIRE(attributes.node.source.typeDefinition.baseType == mson::ValueBaseType);
 }
 
 TEST_CASE("Parse attributes with nested members", "[attributes]")
@@ -61,9 +61,9 @@ TEST_CASE("Parse attributes with nested members", "[attributes]")
 
     REQUIRE(attributes.node.resolved.empty());
     REQUIRE(attributes.node.source.name.empty());
-    REQUIRE(attributes.node.source.base.attributes == 0);
-    REQUIRE(attributes.node.source.base.typeSpecification.empty());
-    REQUIRE(attributes.node.source.base.baseType == mson::ImplicitObjectBaseType);
+    REQUIRE(attributes.node.source.typeDefinition.attributes == 0);
+    REQUIRE(attributes.node.source.typeDefinition.typeSpecification.empty());
+    REQUIRE(attributes.node.source.typeDefinition.baseType == mson::ImplicitObjectBaseType);
     REQUIRE(attributes.node.source.sections.size() == 1);
     REQUIRE(attributes.node.source.sections[0].type == mson::TypeSection::MemberType);
     REQUIRE(attributes.node.source.sections[0].content.members().size() == 2);
@@ -73,7 +73,7 @@ TEST_CASE("Parse attributes with nested members", "[attributes]")
     REQUIRE(member.content.property.name.literal == "message");
     REQUIRE(member.content.property.description == "The blog post article");
     REQUIRE(member.content.property.valueDefinition.values.empty());
-    REQUIRE(member.content.property.valueDefinition.typeDefinition.typeSpecification.name.name == mson::StringTypeName);
+    REQUIRE(member.content.property.valueDefinition.typeDefinition.typeSpecification.name.base == mson::StringTypeName);
 
     member = attributes.node.source.sections[0].content.members().at(1);
     REQUIRE(member.type == mson::MemberType::PropertyType);
@@ -81,7 +81,7 @@ TEST_CASE("Parse attributes with nested members", "[attributes]")
     REQUIRE(member.content.property.description == "Author of the blog post");
     REQUIRE(member.content.property.valueDefinition.values.size() == 1);
     REQUIRE(member.content.property.valueDefinition.values[0].literal == "john@appleseed.com");
-    REQUIRE(member.content.property.valueDefinition.typeDefinition.typeSpecification.name.name == mson::StringTypeName);
+    REQUIRE(member.content.property.valueDefinition.typeDefinition.typeSpecification.name.base == mson::StringTypeName);
 }
 
 TEST_CASE("Parse attributes with block description", "[attributes]")
@@ -101,9 +101,9 @@ TEST_CASE("Parse attributes with block description", "[attributes]")
 
     REQUIRE(attributes.node.resolved.empty());
     REQUIRE(attributes.node.source.name.empty());
-    REQUIRE(attributes.node.source.base.attributes == 0);
-    REQUIRE(attributes.node.source.base.typeSpecification.empty());
-    REQUIRE(attributes.node.source.base.baseType == mson::ImplicitObjectBaseType);
+    REQUIRE(attributes.node.source.typeDefinition.attributes == 0);
+    REQUIRE(attributes.node.source.typeDefinition.typeSpecification.empty());
+    REQUIRE(attributes.node.source.typeDefinition.baseType == mson::ImplicitObjectBaseType);
     REQUIRE(attributes.node.source.sections.size() == 2);
     REQUIRE(attributes.node.source.sections[0].type == mson::TypeSection::BlockDescriptionType);
     REQUIRE(attributes.node.source.sections[0].content.description == "Awesome description\n\n+ With list\n");

@@ -49,10 +49,10 @@ namespace snowcrash {
                 attributes.insert(attributes.begin(), typeName);
             }
 
-            mson::parseTypeDefinition(node, pd, attributes, out.report, out.node.typeDefinition);
+            mson::parseTypeDefinition(node, pd, attributes, out.report, out.node);
 
-            if ((out.node.typeDefinition.baseType == mson::PrimitiveBaseType) ||
-                (out.node.typeDefinition.baseType == mson::UndefinedBaseType)) {
+            if ((out.node.baseType == mson::PrimitiveBaseType) ||
+                (out.node.baseType == mson::UndefinedBaseType)) {
 
                 // WARN: invalid mixin base type
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);

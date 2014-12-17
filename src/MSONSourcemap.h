@@ -93,13 +93,8 @@ namespace snowcrash {
         SourceMap<mson::PropertyName> name;
     };
 
-    /** Source Map structure for Mixin */
-    template<>
-    struct SourceMap<mson::Mixin> : public SourceMapBase {
-
-        /** Source Map for Type Definition */
-        SourceMap<mson::TypeDefinition> typeDefinition;
-    };
+    /** Source Map of Mixin */
+    // 'Mixin' type is same as 'TypeDefinition'
 }
 
 #endif

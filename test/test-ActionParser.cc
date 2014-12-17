@@ -511,12 +511,12 @@ TEST_CASE("Warn when request is not followed by a response", "[action]")
 //    REQUIRE(action.report.error.code == Error::OK);
 //    REQUIRE(action.report.warnings.empty());
 //
-//    REQUIRE(action.node.attributes.source.base.typeSpecification.name.symbol.literal == "Coupon");
+//    REQUIRE(action.node.attributes.source.typeDefinition.typeSpecification.name.symbol.literal == "Coupon");
 //    REQUIRE(action.node.examples.size() == 2);
 //    REQUIRE(action.node.examples[0].requests.size() == 1);
 //    REQUIRE(action.node.examples[0].requests[0].attributes.source.empty());
 //    REQUIRE(action.node.examples[0].responses.size() == 1);
 //    REQUIRE(action.node.examples[1].requests.size() == 1);
-//    REQUIRE(action.node.examples[1].requests[0].attributes.source.base.typeSpecification.name.name == mson::StringTypeName);
+//    REQUIRE(action.node.examples[1].requests[0].attributes.source.typeDefinition.typeSpecification.name.base == mson::StringTypeName);
 //    REQUIRE(action.node.examples[1].responses.size() == 1);
 //}

@@ -22,7 +22,7 @@ bool Symbol::empty() const
 
 bool TypeName::empty() const
 {
-    return (this->name == UndefinedTypeName && this->symbol.empty());
+    return (this->base == UndefinedTypeName && this->symbol.empty());
 }
 
 bool TypeSpecification::empty() const
@@ -92,7 +92,8 @@ bool TypeSection::empty() const
 
 bool NamedType::empty() const
 {
-    return (this->base.empty() && this->name.empty() &&
+    return (this->typeDefinition.empty() &&
+            this->name.empty() &&
             this->sections.empty());
 }
 
@@ -111,11 +112,6 @@ bool PropertyMember::empty() const
 {
     return (this->name.empty() && this->description.empty() &&
             this->sections.empty() && this->valueDefinition.empty());
-}
-
-bool Mixin::empty() const
-{
-    return (this->typeDefinition.empty());
 }
 
 MemberTypes& Members::members()

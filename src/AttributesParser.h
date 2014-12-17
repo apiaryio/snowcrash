@@ -44,11 +44,11 @@ namespace snowcrash {
                 return node;
             }
 
-            mson::parseTypeDefinition(node, pd, signature.attributes, out.report, out.node.source.base);
+            mson::parseTypeDefinition(node, pd, signature.attributes, out.report, out.node.source.typeDefinition);
 
             // Default to `object` type specification
-            if (out.node.source.base.baseType == mson::UndefinedBaseType) {
-                out.node.source.base.baseType = mson::ImplicitObjectBaseType;
+            if (out.node.source.typeDefinition.baseType == mson::UndefinedBaseType) {
+                out.node.source.typeDefinition.baseType = mson::ImplicitObjectBaseType;
             }
 
             SectionProcessor<mson::ValueMember>::parseRemainingContent(node, pd, signature.remainingContent,
@@ -74,7 +74,7 @@ namespace snowcrash {
 
             return SectionProcessor<mson::ValueMember>
                     ::processNestedMembers<MSONTypeSectionListParser>(node, siblings, pd, typeSections,
-                                                                      out.node.source.base.baseType);
+                                                                      out.node.source.typeDefinition.baseType);
         }
 
         static bool isDescriptionNode(const MarkdownNodeIterator& node,
