@@ -104,15 +104,27 @@ namespace snowcrash {
 
             valueMember.description = signature.content;
 
+            mson::parseTypeDefinition(node, pd, signature.attributes, report, valueMember.valueDefinition.typeDefinition);
+            parseRemainingContent(node, pd, signature.remainingContent, valueMember.sections, sourceMap.sections);
+
+            if (signature.values.size() > 1) {
+
+                if (valueMember.valueDefinition.typeDefinition.baseType == mson::PrimitiveBaseType) {
+
+                    valueMember.valueDefinition.values.push_back(mson::parseValue(signature.value));
+                    return ++MarkdownNodeIterator(node);
+                }
+                else if (valueMember.valueDefinition.typeDefinition.baseType == mson::UndefinedBaseType) {
+                    valueMember.valueDefinition.typeDefinition.baseType = mson::ImplicitValueBaseType;
+                }
+            }
+
             for (std::vector<mdp::ByteBuffer>::const_iterator it = signature.values.begin();
                  it != signature.values.end();
                  it++) {
 
                 valueMember.valueDefinition.values.push_back(mson::parseValue(*it));
             }
-
-            mson::parseTypeDefinition(node, pd, signature.attributes, report, valueMember.valueDefinition.typeDefinition);
-            parseRemainingContent(node, pd, signature.remainingContent, valueMember.sections, sourceMap.sections);
 
             return ++MarkdownNodeIterator(node);
         }

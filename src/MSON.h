@@ -46,7 +46,8 @@ namespace mson {
         ImplicitPrimitiveBaseType, // Primitive Types (implicit)
         ObjectBaseType,            // Object Structure Type
         ImplicitObjectBaseType,    // Object Structure Type (implicit)
-        ValueBaseType              // Array & Enum Structure Type
+        ValueBaseType,             // Array & Enum Structure Type
+        ImplicitValueBaseType      // Array & Enum Structure Type (implicit)
     };
 
     /** Named Types base type table */

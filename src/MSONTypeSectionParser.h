@@ -62,7 +62,8 @@ namespace snowcrash {
             else if (IEqual<std::string>()(signature.identifier, "Items") ||
                      IEqual<std::string>()(signature.identifier, "Members")) {
 
-                if (out.node.baseType != mson::ValueBaseType) {
+                if (out.node.baseType != mson::ValueBaseType &&
+                    out.node.baseType != mson::ImplicitValueBaseType) {
 
                     //WARN: Items/Members should only be allowed for value types
                     std::stringstream ss;
@@ -110,7 +111,8 @@ namespace snowcrash {
 
                     out.node.content.value = signature.value;
                 }
-                else if (out.node.baseType == mson::ValueBaseType) {
+                else if (out.node.baseType == mson::ValueBaseType ||
+                         out.node.baseType == mson::ImplicitValueBaseType) {
 
                     for (size_t i = 0; i < signature.values.size(); i++) {
 

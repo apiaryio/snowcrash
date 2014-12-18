@@ -370,7 +370,8 @@ namespace mson {
                                                          sourceMap));
         }
 
-        if ((typeDefinition.baseType != ValueBaseType) &&
+        if (typeDefinition.baseType != ValueBaseType &&
+            typeDefinition.baseType != ImplicitValueBaseType &&
             !typeDefinition.typeSpecification.nestedTypes.empty()) {
 
             // WARN: Nested types for non (array or enum) structure base type

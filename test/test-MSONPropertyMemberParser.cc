@@ -430,7 +430,7 @@ TEST_CASE("Parse mson property member containing a list of values and no type sp
     REQUIRE(propertyMember.node.valueDefinition.values[0].literal == "1");
     REQUIRE(propertyMember.node.valueDefinition.values[1].literal == "2");
     REQUIRE(propertyMember.node.valueDefinition.values[2].literal == "3");
-//  REQUIRE(propertyMember.node.valueDefinition.typeDefinition.baseType == mson::ImplicitValueBaseType);
+    REQUIRE(propertyMember.node.valueDefinition.typeDefinition.baseType == mson::ImplicitValueBaseType);
     REQUIRE(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.empty());
     REQUIRE(propertyMember.node.sections.empty());
 }
@@ -447,8 +447,8 @@ TEST_CASE("Parse mson property containing list of value with string type specifi
     REQUIRE(propertyMember.report.warnings.empty());
 
     REQUIRE(propertyMember.node.name.literal == "list");
-//  REQUIRE(propertyMember.node.valueDefinition.values.size() == 1);
-//  REQUIRE(propertyMember.node.valueDefinition.values[0].literal == "1, 2, 3");
+    REQUIRE(propertyMember.node.valueDefinition.values.size() == 1);
+    REQUIRE(propertyMember.node.valueDefinition.values[0].literal == "1, 2, 3");
     REQUIRE(propertyMember.node.valueDefinition.typeDefinition.baseType == mson::PrimitiveBaseType);
     REQUIRE(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.name.base == mson::StringTypeName);
     REQUIRE(propertyMember.node.sections.empty());

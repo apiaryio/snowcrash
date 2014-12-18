@@ -104,7 +104,8 @@ namespace snowcrash {
         }
         else {
 
-            if (baseType == mson::ValueBaseType &&
+            if ((baseType == mson::ValueBaseType ||
+                 baseType == mson::ImplicitValueBaseType) &&
                 node->type == mdp::ListItemMarkdownNodeType) {
 
                 IntermediateParseResult<mson::ValueMember> valueMember(sections.report);
