@@ -438,59 +438,57 @@ TEST_CASE("Parse type definition when non-structure type has nested types", "[ms
 TEST_CASE("Build member type from one of", "[mson][utility]")
 {
     OneOf oneOf;
-    MemberType memberType;
+    Element element;
 
-    memberType.build(oneOf);
+    element.build(oneOf);
 
-    REQUIRE(memberType.type == MemberType::OneOfType);
+    REQUIRE(element.klass == Element::OneOfClass);
 }
 
 TEST_CASE("Build member type from mixin", "[mson][utility]")
 {
     Mixin mixin;
-    MemberType memberType;
+    Element element;
 
-    memberType.build(mixin);
+    element.build(mixin);
 
-    REQUIRE(memberType.type == MemberType::MixinType);
+    REQUIRE(element.klass == Element::MixinClass);
 }
 
 TEST_CASE("Build member type from value member", "[mson][utility]")
 {
     ValueMember valueMember;
-    MemberType memberType;
+    Element element;
 
-    memberType.build(valueMember);
+    element.build(valueMember);
 
-    REQUIRE(memberType.type == MemberType::ValueType);
+    REQUIRE(element.klass == Element::ValueClass);
 }
 
 TEST_CASE("Build member type from property memeber", "[mson][utility]")
 {
     PropertyMember propertyMember;
-    MemberType memberType;
+    Element element;
 
-    memberType.build(propertyMember);
+    element.build(propertyMember);
 
-    REQUIRE(memberType.type == MemberType::PropertyType);
+    REQUIRE(element.klass == Element::PropertyClass);
 }
 
 TEST_CASE("Build memebr type from members collection", "[mson][utility]")
 {
-    MemberTypes members;
-    MemberType memberType;
-
+    Element element;
     TypeSection typeSection;
     PropertyMember propertyMember;
-    MemberType propertyMemberType;
+    Element propertyMemberElement;
 
-    memberType.build(propertyMember);
-    typeSection.content.members().push_back(propertyMemberType);
+    element.build(propertyMember);
+    typeSection.content.elements().push_back(propertyMemberElement);
 
-    memberType.build(typeSection.content.members());
+    element.buildFromElements(typeSection.content.elements());
 
-    REQUIRE(memberType.type == MemberType::MembersType);
-    REQUIRE(memberType.content.members.members().size() == 1);
+    REQUIRE(element.klass == Element::GroupClass);
+    REQUIRE(element.content.elements().size() == 1);
 }
 
 TEST_CASE("Parsing base type from base type name", "[mson][utility]")

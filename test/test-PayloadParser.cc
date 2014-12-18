@@ -682,8 +682,8 @@ TEST_CASE("Parse a payload with attributes", "[payload]")
     REQUIRE(payload.node.attributes.source.typeDefinition.attributes == 0);
     REQUIRE(payload.node.attributes.source.typeDefinition.typeSpecification.name.base == mson::ObjectTypeName);
     REQUIRE(payload.node.attributes.source.sections.size() == 1);
-    REQUIRE(payload.node.attributes.source.sections[0].type == mson::TypeSection::MemberType);
-    REQUIRE(payload.node.attributes.source.sections[0].content.members().size() == 4);
+    REQUIRE(payload.node.attributes.source.sections[0].klass == mson::TypeSection::MemberTypeClass);
+    REQUIRE(payload.node.attributes.source.sections[0].content.elements().size() == 4);
 }
 
 TEST_CASE("Parse a request with attributes and no body", "[payload]")

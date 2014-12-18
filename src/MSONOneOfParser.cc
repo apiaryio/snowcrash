@@ -19,7 +19,7 @@ namespace snowcrash {
                                                                              const ParseResultRef<mson::OneOf>& out) {
 
         MarkdownNodeIterator cur = node;
-        mson::MemberType memberType;
+        mson::Element element;
 
         switch (pd.sectionContext()) {
             case MSONMixinSectionType:
@@ -27,7 +27,7 @@ namespace snowcrash {
                 IntermediateParseResult<mson::Mixin> mixin(out.report);
                 cur = MSONMixinParser::parse(node, siblings, pd, mixin);
 
-                memberType.build(mixin.node);
+                element.build(mixin.node);
                 break;
             }
 
@@ -36,7 +36,7 @@ namespace snowcrash {
                 IntermediateParseResult<mson::OneOf> oneOf(out.report);
                 cur = MSONOneOfParser::parse(node, siblings, pd, oneOf);
 
-                memberType.build(oneOf.node);
+                element.build(oneOf.node);
                 break;
             }
 
@@ -47,7 +47,7 @@ namespace snowcrash {
 
                 cur = MSONTypeSectionListParser::parse(node, siblings, pd, typeSection);
 
-                memberType.build(typeSection.node.content.members());
+                element.buildFromElements(typeSection.node.content.elements());
                 break;
             }
 
@@ -56,7 +56,7 @@ namespace snowcrash {
                 IntermediateParseResult<mson::PropertyMember> propertyMember(out.report);
                 cur = MSONPropertyMemberParser::parse(node, siblings, pd, propertyMember);
 
-                memberType.build(propertyMember.node);
+                element.build(propertyMember.node);
                 break;
             }
 
@@ -64,8 +64,8 @@ namespace snowcrash {
                 break;
         }
 
-        if (memberType.type != mson::MemberType::UndefinedType) {
-            out.node.members().push_back(memberType);
+        if (element.klass != mson::Element::UndefinedClass) {
+            out.node.push_back(element);
         }
 
         return cur;

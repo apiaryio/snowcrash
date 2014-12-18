@@ -57,7 +57,7 @@ namespace snowcrash {
 
         // If the nodes follow after some block description without member
         // seperator, then they are treated as description
-        if (!sections.node.empty() && sections.node.back().type == mson::TypeSection::BlockDescriptionType) {
+        if (!sections.node.empty() && sections.node.back().klass == mson::TypeSection::BlockDescriptionClass) {
             return SectionProcessor<mson::ValueMember>::blockDescription(node, pd, sections.node, sections.sourceMap);
         }
 
@@ -66,22 +66,22 @@ namespace snowcrash {
 
         // Build a section to indicate nested members
         if (sections.node.empty() ||
-            (!sections.node.empty() && sections.node.back().type != mson::TypeSection::MemberType)) {
+            (!sections.node.empty() && sections.node.back().klass != mson::TypeSection::MemberTypeClass)) {
 
-            mson::TypeSection typeSection(mson::TypeSection::MemberType);
+            mson::TypeSection typeSection(mson::TypeSection::MemberTypeClass);
             typeSection.baseType = baseType;
 
             sections.node.push_back(typeSection);
         }
 
-        mson::MemberType memberType;
+        mson::Element element;
 
         if (pd.sectionContext() == MSONMixinSectionType) {
 
             IntermediateParseResult<mson::Mixin> mixin(sections.report);
             cur = MSONMixinParser::parse(node, siblings, pd, mixin);
 
-            memberType.build(mixin.node);
+            element.build(mixin.node);
         }
         else if (pd.sectionContext() == MSONOneOfSectionType) {
 
@@ -100,7 +100,7 @@ namespace snowcrash {
             IntermediateParseResult<mson::OneOf> oneOf(sections.report);
             cur = MSONOneOfParser::parse(node, siblings, pd, oneOf);
 
-            memberType.build(oneOf.node);
+            element.build(oneOf.node);
         }
         else {
 
@@ -111,7 +111,7 @@ namespace snowcrash {
                 IntermediateParseResult<mson::ValueMember> valueMember(sections.report);
                 cur = MSONValueMemberParser::parse(node, siblings, pd, valueMember);
 
-                memberType.build(valueMember.node);
+                element.build(valueMember.node);
             }
             else if ((baseType == mson::ObjectBaseType ||
                       baseType == mson::ImplicitObjectBaseType) &&
@@ -120,7 +120,7 @@ namespace snowcrash {
                 IntermediateParseResult<mson::PropertyMember> propertyMember(sections.report);
                 cur = MSONPropertyMemberParser::parse(node, siblings, pd, propertyMember);
 
-                memberType.build(propertyMember.node);
+                element.build(propertyMember.node);
             }
             else if (baseType == mson::PrimitiveBaseType ||
                      baseType == mson::ImplicitPrimitiveBaseType) {
@@ -143,8 +143,8 @@ namespace snowcrash {
             }
         }
 
-        if (memberType.type != mson::MemberType::UndefinedType) {
-            sections.node.back().content.members().push_back(memberType);
+        if (element.klass != mson::Element::UndefinedClass) {
+            sections.node.back().content.elements().push_back(element);
         }
 
         return cur;
