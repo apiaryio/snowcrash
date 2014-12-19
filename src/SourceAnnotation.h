@@ -16,24 +16,24 @@
 namespace snowcrash {
 
     /**
-    *  \brief  A resolution annotation.
-    *
-    *  A resolution to a source annotation describing how to fix an issue described by the source annotation.
-    *  Includes a location within the source data, the resolved source data and an optional message.
-    */
+     *  \brief  A resolution annotation.
+     *
+     *  A resolution to a source annotation describing how to fix an issue described by the source annotation.
+     *  Includes a location within the source data, the resolved source data and an optional message.
+     */
     struct ResolutionAnnotation {
 
         /**
-        *  \brief  %ResolutionAnnotation default constructor.
-        *
-        *  Creates an empty resolution annotation.
-        */
+         *  \brief  %ResolutionAnnotation default constructor.
+         *
+         *  Creates an empty resolution annotation.
+         */
         ResolutionAnnotation() {}
 
         /**
-        *  \brief  %ResolutionAnnotation copy constructor.
-        *  \param  rhs  An annotation to be copied.
-        */
+         *  \brief  %ResolutionAnnotation copy constructor.
+         *  \param  rhs  An annotation to be copied.
+         */
         ResolutionAnnotation(const ResolutionAnnotation& rhs) {
 
             this->message = rhs.message;
@@ -42,11 +42,11 @@ namespace snowcrash {
         }
 
         /**
-        *  \brief  %ResolutionAnnotation constructor.
-        *  \param  message     An annotation message.
-        *  \param  resolvedSource   The resolved source data.
-        *  \param  location    A location of the annotation.
-        */
+         *  \brief  %ResolutionAnnotation constructor.
+         *  \param  message     An annotation message.
+         *  \param  resolvedSource   The resolved source data.
+         *  \param  location    A location of the annotation.
+         */
         ResolutionAnnotation(const std::string& message,
             const mdp::ByteBuffer&  resolvedSource = mdp::ByteBuffer(),
             const mdp::BytesRange& location = mdp::BytesRange()) {
@@ -64,9 +64,9 @@ namespace snowcrash {
         ~ResolutionAnnotation() {}
 
         /**
-        *  \brief  %ResolutionAnnotation assignment operator
-        *  \param  rhs  A resolution annotation to be assigned to this annotation.
-        */
+         *  \brief  %ResolutionAnnotation assignment operator
+         *  \param  rhs  A resolution annotation to be assigned to this annotation.
+         */
         ResolutionAnnotation& operator=(const ResolutionAnnotation& rhs) {
             this->message = rhs.message;
             this->location = rhs.location;
@@ -85,34 +85,34 @@ namespace snowcrash {
     };
 
     /**
-    *  A set of resolution source annotations.
-    */
+     *  A set of resolution source annotations.
+     */
     typedef std::vector<ResolutionAnnotation> Resolutions;
 
     /**
-    *  \brief  A source data annotation.
-    *
-    *  Annotation bound to a source data block. Includes an
-    *  annotation code and an optional message.
-    */
+     *  \brief  A source data annotation.
+     *
+     *  Annotation bound to a source data block. Includes an
+     *  annotation code and an optional message.
+     */
     struct SourceAnnotation {
 
         /**
-        *  \brief Default annotation code representing success.
-        */
+         *  \brief Default annotation code representing success.
+         */
         static const int OK;
 
         /**
-        *  \brief  %SourceAnnotation default constructor.
-        *
-        *  Creates an empty annotation with the default annotation code.
-        */
+         *  \brief  %SourceAnnotation default constructor.
+         *
+         *  Creates an empty annotation with the default annotation code.
+         */
         SourceAnnotation() : code(OK), subCode(OK) {}
 
         /**
-        *  \brief  %SourceAnnotation copy constructor.
-        *  \param  rhs  An annotation to be copied.
-        */
+         *  \brief  %SourceAnnotation copy constructor.
+         *  \param  rhs  An annotation to be copied.
+         */
         SourceAnnotation(const SourceAnnotation& rhs) : resolutions(rhs.resolutions) {
             this->message = rhs.message;
             this->code = rhs.code;
@@ -121,14 +121,15 @@ namespace snowcrash {
         }
 
         /**
-        *  \brief  %SourceAnnotation constructor.
-        *  \param  message     An annotation message.
-        *  \param  code        Annotation code.
-        *  \param  location    A location of the annotation.
-        */
+         *  \brief  %SourceAnnotation constructor.
+         *  \param  message     An annotation message.
+         *  \param  code        Annotation code.
+         *  \param  subCode     Annotation subCode.
+         *  \param  location    A location of the annotation.
+         */
         SourceAnnotation(const std::string& message,
-            int code = OK,
-            const mdp::CharactersRangeSet& location = mdp::CharactersRangeSet()) {
+            int code,
+            const mdp::CharactersRangeSet& location) {
 
             this->message = message;
             this->code = code;
@@ -138,14 +139,13 @@ namespace snowcrash {
                 this->location.assign(location.begin(), location.end());
         }
 
-
         /**
-        *  \brief  %SourceAnnotation constructor.
-        *  \param  message     An annotation message.
-        *  \param  code        Annotation code.
-        *  \param  subCode        Annotation subCode.
-        *  \param  location    A location of the annotation.
-        */
+         *  \brief  %SourceAnnotation constructor.
+         *  \param  message     An annotation message.
+         *  \param  code        Annotation code.
+         *  \param  subCode        Annotation subCode.
+         *  \param  location    A location of the annotation.
+         */
         SourceAnnotation(const std::string& message,
             int code = OK,
             int subCode = OK,
@@ -163,9 +163,9 @@ namespace snowcrash {
         ~SourceAnnotation() {}
 
         /**
-        *  \brief  %SourceAnnotation assignment operator
-        *  \param  rhs  An annotation to be assigned to this annotation.
-        */
+         *  \brief  %SourceAnnotation assignment operator
+         *  \param  rhs  An annotation to be assigned to this annotation.
+         */
         SourceAnnotation& operator=(const SourceAnnotation& rhs) {
             this->message = rhs.message;
             this->code = rhs.code;
@@ -191,13 +191,13 @@ namespace snowcrash {
     };
 
     /**
-    *  Error source annotation.
-    */
+     *  Error source annotation.
+     */
     typedef SourceAnnotation Error;
 
     /**
-    *  Error codes
-    */
+     *  Error codes
+     */
     enum ErrorCode {
         NoError = 0,
         ApplicationError = 1,
@@ -206,13 +206,13 @@ namespace snowcrash {
     };
 
     /**
-    *  Warning source annotation.
-    */
+     *  Warning source annotation.
+     */
     typedef SourceAnnotation Warning;
 
     /**
-    *  Warning codes
-    */
+     *  Warning codes
+     */
     enum WarningCode {
         NoWarning = 0,
         APINameWarning = 1,
@@ -231,39 +231,39 @@ namespace snowcrash {
     };
 
     /**
-    * UriTemplate warning subCodes
-    */
+     * UriTemplate warning subCodes
+     */
     enum UriTemplateWarningSubCode {
-        OK = 0,
-        SquareBracketWarning = 1,
-        NestedCurlyBracketsWarning = 2,
-        MismatchedCurlyBracketsWarning = 3,
-        ContainsSpacesWarning = 4,
-        ContainsHyphensWarning = 5,
-        ContainsAssignmentWarning = 6,
-        InvalidCharactersWarning = 7,
-        UnsupportedExpressionWarning = 8
+        NoUriTemplateWarningSubCode = 0,
+        SquareBracketWarningUriTemplateWarningSubCode = 1,
+        NestedCurlyBracketsWarningUriTemplateWarningSubCode = 2,
+        MismatchedCurlyBracketsWarningUriTemplateWarningSubCode = 3,
+        ContainsSpacesWarningUriTemplateWarningSubCode = 4,
+        ContainsHyphensWarningUriTemplateWarningSubCode = 5,
+        ContainsAssignmentWarningUriTemplateWarningSubCode = 6,
+        InvalidCharactersWarningUriTemplateWarningSubCode = 7,
+        UnsupportedExpressionWarningUriTemplateWarningSubCode = 8
     };
 
     /**
-    *  A set of warning source annotations.
-    */
+     *  A set of warning source annotations.
+     */
     typedef std::vector<Warning> Warnings;
 
     /**
-    *  \brief A parsing report Report.
-    *
-    *  Result of a source data parsing operation.
-    *  Composed of ONE error source annotation
-    *  and a set of warning source annotations.
-    */
+     *  \brief A parsing report Report.
+     *
+     *  Result of a source data parsing operation.
+     *  Composed of ONE error source annotation
+     *  and a set of warning source annotations.
+     */
     struct Report {
 
         /**
-        *  \brief Append a report to this one, replacing the error source annotation.
-        *
-        *  NOTE: A binding does not need to wrap this action.
-        */
+         *  \brief Append a report to this one, replacing the error source annotation.
+         *
+         *  NOTE: A binding does not need to wrap this action.
+         */
         Report& operator+=(const Report& rhs) {
             error = rhs.error;
             warnings.insert(warnings.end(), rhs.warnings.begin(), rhs.warnings.end());
