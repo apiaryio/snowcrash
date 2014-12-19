@@ -8,7 +8,7 @@
 
 #include "snowcrash.h"
 #include "BlueprintParser.h"
-#include "ResolutionService.h"
+#include "UriTemplateResolvers.h"
 
 const int snowcrash::SourceAnnotation::OK = 0;
 
@@ -75,15 +75,14 @@ int snowcrash::parse(const mdp::ByteBuffer& source,
 
         //Create Resolutions
         if (options && snowcrash::ResolveWarningsAndErrorsOption) {
-            snowcrash::ResolutionService service;
-            service.resolveBlueprintReportWarningsAndErrors(source, out.report);
+            ResolutionService::getInstance().generateResolutions(source, out.report);
         }
     }
     catch (const std::exception& e) {
 
         std::stringstream ss;
         ss << "parser exception: '" << e.what() << "'";
-        out.report.error = Error(ss.str(), 1, 0);
+        out.report.error = Error(ss.str(), ApplicationError);
     }
     catch (...) {
 
@@ -91,4 +90,5 @@ int snowcrash::parse(const mdp::ByteBuffer& source,
     }
 
     return out.report.error.code;
+
 }

@@ -84,6 +84,7 @@
         'src/csnowcrash.h',
         'src/UriTemplateParser.cc',
         'src/UriTemplateParser.h',
+        'src/UriTemplateResolvers.h',
         'src/PayloadParser.h',
         'src/SectionParserData.h',
         'src/ActionParser.h',
@@ -100,6 +101,8 @@
         'src/ParametersParser.h',
         'src/Platform.h',
         'src/RegexMatch.h',
+        'src/ResolutionService.h',
+        'src/ResolutionService.cc',
         'src/ResourceGroupParser.h',
         'src/ResourceParser.h',
         'src/SectionParser.h',
@@ -107,8 +110,7 @@
         'src/SourceAnnotation.h',
         'src/StringUtility.h',
         'src/ValuesParser.h',
-        'src/Version.h',
-        'src/ResolutionService.h'
+        'src/Version.h'
       ],
       'conditions': [
         [ 'OS=="win"',
@@ -143,6 +145,7 @@
         'test/test-ParametersParser.cc',
         'test/test-PayloadParser.cc',
         'test/test-RegexMatch.cc',
+        'test/test-Resolutions.cc',
         'test/test-ResourceParser.cc',
         'test/test-ResourceGroupParser.cc',
         'test/test-SectionParser.cc',
@@ -151,7 +154,6 @@
         'test/test-UriTemplateParser.cc',
         'test/test-ValuesParser.cc',
         'test/test-Warnings.cc',
-        'test/test-Resolutions.cc',
         'test/test-csnowcrash.cc',
         'test/test-snowcrash.cc'
       ],

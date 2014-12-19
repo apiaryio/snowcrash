@@ -25,6 +25,7 @@ static const std::string SourcemapArgument = "sourcemap";
 static const std::string ValidateArgument = "validate";
 static const std::string VersionArgument = "version";
 static const std::string UseLineNumbersArgument = "use-line-num";
+static const std::string ResolveWarningsAndErrorsArgument = "resolutions";
 
 /** enum Snow Crash AST output format. */
 enum SerializationFormat {
@@ -106,21 +107,23 @@ void GetLinesEndIndex(const std::string& source,
  *  \param annotation An annotation to print
  *  \param source Source data
  *  \param isUseLineNumbers True if the annotations needs to be printed by line and column number
+ *  \param generateResolutions True if the annotations resolutions need to be printed
  */
 void PrintAnnotation(const std::string& prefix,
                      const snowcrash::SourceAnnotation& annotation,
                      const std::string& source,
-                     const bool isUseLineNumbers)
+                     const bool isUseLineNumbers,
+                     const bool generateResolutions)
 {
-
-    std::cerr << prefix;
+    std::stringstream ss;
+    ss << prefix;
 
     if (annotation.code != SourceAnnotation::OK) {
-        std::cerr << " (" << annotation.code << ") ";
+        ss << " (" << annotation.code << ") ";
     }
 
     if (!annotation.message.empty()) {
-        std::cerr << " " << annotation.message;
+        ss << " " << annotation.message;
     }
 
     std::vector<size_t> linesEndIndex;
@@ -129,29 +132,56 @@ void PrintAnnotation(const std::string& prefix,
         GetLinesEndIndex(source, linesEndIndex);
     }
 
-    if (!annotation.location.empty()) {
 
-        for (mdp::CharactersRangeSet::const_iterator it = annotation.location.begin();
-             it != annotation.location.end();
-             ++it) {
+    if (generateResolutions) {
+        if (!annotation.resolutions.empty()) {
+            for (snowcrash::Resolutions::const_iterator it = annotation.resolutions.begin();
+                it != annotation.resolutions.end();
+                ++it) {
+                
+                std::cerr << ss.str() << ", " << it->message;
+                
+                if (isUseLineNumbers) {
+                    AnnotationPosition annotationPosition;
+                    GetLineFromMap(linesEndIndex, it->location, annotationPosition);
 
-            if (isUseLineNumbers) {
+                    std::cerr << "; line " << annotationPosition.fromLine << ", column " << annotationPosition.fromColumn;
+                    std::cerr << " - line " << annotationPosition.toLine << ", column " << annotationPosition.toColumn;
+                }
+                else {
 
-                AnnotationPosition annotationPosition;
-                GetLineFromMap(linesEndIndex, *it, annotationPosition);
-
-                std::cerr << "; line " << annotationPosition.fromLine << ", column " << annotationPosition.fromColumn;
-                std::cerr << " - line " << annotationPosition.toLine << ", column " << annotationPosition.toColumn;
-            }
-            else {
-
-                std::cerr << ((it == annotation.location.begin()) ? " :" : ";");
-                std::cerr << it->location << ":" << it->length;
+                    std::cerr << ":" << it->location.location << ":" << it->location.length;
+                }
+                std::cerr << std::endl;
             }
         }
     }
+    else {
+        if (!annotation.location.empty()) {
 
-    std::cerr << std::endl;
+            for (mdp::CharactersRangeSet::const_iterator it = annotation.location.begin();
+                it != annotation.location.end();
+                ++it) {
+
+                if (isUseLineNumbers) {
+
+                    AnnotationPosition annotationPosition;
+                    GetLineFromMap(linesEndIndex, *it, annotationPosition);
+
+                    ss << "; line " << annotationPosition.fromLine << ", column " << annotationPosition.fromColumn;
+                    ss << " - line " << annotationPosition.toLine << ", column " << annotationPosition.toColumn;
+                }
+                else {
+
+                    ss << ((it == annotation.location.begin()) ? " :" : ";");
+                    ss << it->location << ":" << it->length;
+                }
+            }
+        }
+        std::cerr << ss.str() << std::endl;
+    }
+    
+    
 }
 
 /**
@@ -159,10 +189,12 @@ void PrintAnnotation(const std::string& prefix,
  *  \param report A parser report to print
  *  \param source Source data
  *  \param isUseLineNumbers True if the annotations needs to be printed by line and column number
+ *  \generateResolutions True if the annotations resolutions need to be printed
  */
 void PrintReport(const snowcrash::Report& report,
                  const std::string& source,
-                 const bool isUseLineNumbers)
+                 const bool isUseLineNumbers,
+                 const bool generateResolutions)
 {
 
     std::cerr << std::endl;
@@ -171,11 +203,11 @@ void PrintReport(const snowcrash::Report& report,
         std::cerr << "OK.\n";
     }
     else {
-        PrintAnnotation("error:", report.error, source, isUseLineNumbers);
+        PrintAnnotation("error:", report.error, source, isUseLineNumbers, generateResolutions);
     }
 
     for (snowcrash::Warnings::const_iterator it = report.warnings.begin(); it != report.warnings.end(); ++it) {
-        PrintAnnotation("warning:", *it, source, isUseLineNumbers);
+        PrintAnnotation("warning:", *it, source, isUseLineNumbers, generateResolutions);
     }
 }
 
@@ -184,6 +216,7 @@ int main(int argc, const char *argv[])
 
     cmdline::parser argumentParser;
     bool isUseLineNumbers = false;
+    bool generateResolutions = false;
 
     argumentParser.set_program_name("snowcrash");
     std::stringstream ss;
@@ -202,7 +235,7 @@ int main(int argc, const char *argv[])
     argumentParser.add(VersionArgument, 'v', "print Snow Crash version");
     argumentParser.add(ValidateArgument, 'l', "validate input only, do not print AST");
     argumentParser.add(UseLineNumbersArgument, 'u', "use line and row number instead of character index when printing annotation");
-
+    argumentParser.add(ResolveWarningsAndErrorsArgument, 'r', "generate resolutions to warnings and errors");
     argumentParser.parse_check(argc, argv);
 
     // Check arguments
@@ -255,6 +288,10 @@ int main(int argc, const char *argv[])
 
     if (argumentParser.exist(SourcemapArgument)) {
         options |= snowcrash::ExportSourcemapOption;
+    }
+
+    if (argumentParser.exist(ResolveWarningsAndErrorsArgument)) {
+        options |= snowcrash::ResolveWarningsAndErrorsOption;
     }
 
     // Parse
@@ -318,8 +355,13 @@ int main(int argc, const char *argv[])
         }
     }
 
+    // check if annotation map should include resolutions
+    if (argumentParser.exist(ResolveWarningsAndErrorsArgument)) {
+        generateResolutions = true;
+    }
+
     // report
-    PrintReport(blueprint.report, inputStream.str(), isUseLineNumbers);
+    PrintReport(blueprint.report, inputStream.str(), isUseLineNumbers, generateResolutions);
 
     return blueprint.report.error.code;
 }
