@@ -235,7 +235,7 @@ TEST_CASE("Parse uri template for invalid variable name, contains spaces", "[inv
     parser.parse(uri, sourceBlock, result);
 
     REQUIRE(result.report.warnings.size() == 1);
-    REQUIRE(result.report.warnings[0].message == "URI template '?varone, vartwo' contains spaces.");
+    REQUIRE(result.report.warnings[0].message == "URI template '?varone, vartwo' contains spaces");
 
 }
 
