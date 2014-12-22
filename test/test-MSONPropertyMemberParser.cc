@@ -406,7 +406,7 @@ TEST_CASE("Parse mson property member when containing an oneOf", "[mson][propert
     REQUIRE(propertyMember.node.sections[0].content.elements().at(0).klass == mson::Element::PropertyClass);
     REQUIRE(propertyMember.node.sections[0].content.elements().at(1).klass == mson::Element::OneOfClass);
 
-    mson::OneOf oneOf = propertyMember.node.sections[0].content.elements().at(1).content.elements();
+    mson::OneOf oneOf = propertyMember.node.sections[0].content.elements().at(1).content.oneOf();
     REQUIRE(oneOf.size() == 2);
     REQUIRE(oneOf.at(0).klass == mson::Element::PropertyClass);
     REQUIRE(oneOf.at(0).content.property.name.literal == "last_name");

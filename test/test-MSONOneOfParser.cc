@@ -58,6 +58,7 @@ TEST_CASE("Parse canonical mson one of", "[mson][one_of]")
     REQUIRE(oneOf.node.at(0).content.property.name.variable.empty());
     REQUIRE(oneOf.node.at(0).content.mixin.empty());
     REQUIRE(oneOf.node.at(0).content.value.empty());
+    REQUIRE(oneOf.node.at(0).content.oneOf().empty());
     REQUIRE(oneOf.node.at(0).content.elements().empty());
 
     REQUIRE(oneOf.node.at(1).klass == mson::Element::PropertyClass);
@@ -106,13 +107,13 @@ TEST_CASE("Parse mson one of with one of", "[mson][one_of]")
     REQUIRE(oneOf.node.at(0).content.property.valueDefinition.empty());
 
     REQUIRE(oneOf.node.at(1).klass == mson::Element::OneOfClass);
-    REQUIRE(oneOf.node.at(1).content.elements().size() == 2);
-    REQUIRE(oneOf.node.at(1).content.elements().at(0).klass == mson::Element::PropertyClass);
-    REQUIRE(oneOf.node.at(1).content.elements().at(0).content.property.name.literal == "given_name");
-    REQUIRE(oneOf.node.at(1).content.elements().at(0).content.property.valueDefinition.empty());
-    REQUIRE(oneOf.node.at(1).content.elements().at(1).klass == mson::Element::PropertyClass);
-    REQUIRE(oneOf.node.at(1).content.elements().at(1).content.property.name.literal == "suffixed_name");
-    REQUIRE(oneOf.node.at(1).content.elements().at(1).content.property.valueDefinition.empty());
+    REQUIRE(oneOf.node.at(1).content.oneOf().size() == 2);
+    REQUIRE(oneOf.node.at(1).content.oneOf().at(0).klass == mson::Element::PropertyClass);
+    REQUIRE(oneOf.node.at(1).content.oneOf().at(0).content.property.name.literal == "given_name");
+    REQUIRE(oneOf.node.at(1).content.oneOf().at(0).content.property.valueDefinition.empty());
+    REQUIRE(oneOf.node.at(1).content.oneOf().at(1).klass == mson::Element::PropertyClass);
+    REQUIRE(oneOf.node.at(1).content.oneOf().at(1).content.property.name.literal == "suffixed_name");
+    REQUIRE(oneOf.node.at(1).content.oneOf().at(1).content.property.valueDefinition.empty());
 }
 
 TEST_CASE("Parse mson one of with member group")

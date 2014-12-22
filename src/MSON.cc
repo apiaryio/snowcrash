@@ -114,6 +114,22 @@ bool PropertyMember::empty() const
             this->sections.empty() && this->valueDefinition.empty());
 }
 
+OneOf& Element::Content::oneOf()
+{
+    if (!m_elements.get())
+        throw ELEMENTS_NOT_SET_ERR;
+
+    return *m_elements;
+}
+
+const OneOf& Element::Content::oneOf() const
+{
+    if (!m_elements.get())
+        throw ELEMENTS_NOT_SET_ERR;
+
+    return *m_elements;
+}
+
 Elements& Element::Content::elements()
 {
     if (!m_elements.get())

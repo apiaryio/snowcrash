@@ -341,6 +341,9 @@ namespace mson {
             Mixin mixin;
 
             /** OR One of member */
+            OneOf& oneOf();
+            const OneOf& oneOf() const;
+
             /** OR Collection of elements */
             Elements& elements();
             const Elements& elements() const;
