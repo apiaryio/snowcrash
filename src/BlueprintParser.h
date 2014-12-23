@@ -343,8 +343,8 @@ namespace snowcrash {
             }
 
             // Otherwise, add the respective entries to the tables
-            if (typeDefinition.typeSpecification.name.name != mson::UndefinedTypeName) {
-                pd.namedTypeBaseTable[identifier] = mson::parseBaseType(typeDefinition.typeSpecification.name.name);
+            if (typeDefinition.typeSpecification.name.base != mson::UndefinedTypeName) {
+                pd.namedTypeBaseTable[identifier] = mson::parseBaseType(typeDefinition.typeSpecification.name.base);
             }
             else if (!typeDefinition.typeSpecification.name.symbol.literal.empty() &&
                      !typeDefinition.typeSpecification.name.symbol.variable) {

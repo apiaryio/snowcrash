@@ -95,10 +95,10 @@ TEST_CASE("Parse canonical mson sample list type section", "[mson][type_section]
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());
 
-    REQUIRE(typeSection.node.type == mson::TypeSection::SampleType);
+    REQUIRE(typeSection.node.klass == mson::TypeSection::SampleClass);
     REQUIRE(typeSection.node.content.value == "75");
     REQUIRE(typeSection.node.content.description.empty());
-    REQUIRE(typeSection.node.content.members().empty());
+    REQUIRE(typeSection.node.content.elements().empty());
 }
 
 TEST_CASE("Parse array mson sample list type section", "[mson][type_section]")
@@ -113,16 +113,16 @@ TEST_CASE("Parse array mson sample list type section", "[mson][type_section]")
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());
 
-    REQUIRE(typeSection.node.type == mson::TypeSection::SampleType);
+    REQUIRE(typeSection.node.klass == mson::TypeSection::SampleClass);
     REQUIRE(typeSection.node.content.value.empty());
     REQUIRE(typeSection.node.content.description.empty());
-    REQUIRE(typeSection.node.content.members().size() == 2);
-    REQUIRE(typeSection.node.content.members().at(0).type == mson::MemberType::ValueType);
-    REQUIRE(typeSection.node.content.members().at(0).content.value.valueDefinition.values.size() == 1);
-    REQUIRE(typeSection.node.content.members().at(0).content.value.valueDefinition.values[0].literal == "75");
-    REQUIRE(typeSection.node.content.members().at(1).type == mson::MemberType::ValueType);
-    REQUIRE(typeSection.node.content.members().at(1).content.value.valueDefinition.values.size() == 1);
-    REQUIRE(typeSection.node.content.members().at(1).content.value.valueDefinition.values[0].literal == "100");
+    REQUIRE(typeSection.node.content.elements().size() == 2);
+    REQUIRE(typeSection.node.content.elements().at(0).klass == mson::Element::ValueClass);
+    REQUIRE(typeSection.node.content.elements().at(0).content.value.valueDefinition.values.size() == 1);
+    REQUIRE(typeSection.node.content.elements().at(0).content.value.valueDefinition.values[0].literal == "75");
+    REQUIRE(typeSection.node.content.elements().at(1).klass == mson::Element::ValueClass);
+    REQUIRE(typeSection.node.content.elements().at(1).content.value.valueDefinition.values.size() == 1);
+    REQUIRE(typeSection.node.content.elements().at(1).content.value.valueDefinition.values[0].literal == "100");
 }
 
 TEST_CASE("Parse mson sample list type section for a string but having values", "[mson][type_section]")
@@ -137,10 +137,10 @@ TEST_CASE("Parse mson sample list type section for a string but having values", 
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());
 
-    REQUIRE(typeSection.node.type == mson::TypeSection::SampleType);
+    REQUIRE(typeSection.node.klass == mson::TypeSection::SampleClass);
     REQUIRE(typeSection.node.content.value == "75, 100");
     REQUIRE(typeSection.node.content.description.empty());
-    REQUIRE(typeSection.node.content.members().empty());
+    REQUIRE(typeSection.node.content.elements().empty());
 }
 
 TEST_CASE("Parse mson sample list type section for an object with a value", "[mson][type_section]")
@@ -156,10 +156,10 @@ TEST_CASE("Parse mson sample list type section for an object with a value", "[ms
     REQUIRE(typeSection.report.warnings.size() == 1);
     REQUIRE(typeSection.report.warnings[0].code == LogicalErrorWarning);
 
-    REQUIRE(typeSection.node.type == mson::TypeSection::SampleType);
+    REQUIRE(typeSection.node.klass == mson::TypeSection::SampleClass);
     REQUIRE(typeSection.node.content.value.empty());
     REQUIRE(typeSection.node.content.description.empty());
-    REQUIRE(typeSection.node.content.members().empty());
+    REQUIRE(typeSection.node.content.elements().empty());
 }
 
 TEST_CASE("Parse mson sample list type section with values as list items", "[mson][type_section]")
@@ -176,16 +176,16 @@ TEST_CASE("Parse mson sample list type section with values as list items", "[mso
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());
 
-    REQUIRE(typeSection.node.type == mson::TypeSection::SampleType);
+    REQUIRE(typeSection.node.klass == mson::TypeSection::SampleClass);
     REQUIRE(typeSection.node.content.value.empty());
     REQUIRE(typeSection.node.content.description.empty());
-    REQUIRE(typeSection.node.content.members().size() == 2);
-    REQUIRE(typeSection.node.content.members().at(0).type == mson::MemberType::ValueType);
-    REQUIRE(typeSection.node.content.members().at(0).content.value.valueDefinition.values.size() == 1);
-    REQUIRE(typeSection.node.content.members().at(0).content.value.valueDefinition.values[0].literal == "red");
-    REQUIRE(typeSection.node.content.members().at(1).type == mson::MemberType::ValueType);
-    REQUIRE(typeSection.node.content.members().at(1).content.value.valueDefinition.values.size() == 1);
-    REQUIRE(typeSection.node.content.members().at(1).content.value.valueDefinition.values[0].literal == "green");
+    REQUIRE(typeSection.node.content.elements().size() == 2);
+    REQUIRE(typeSection.node.content.elements().at(0).klass == mson::Element::ValueClass);
+    REQUIRE(typeSection.node.content.elements().at(0).content.value.valueDefinition.values.size() == 1);
+    REQUIRE(typeSection.node.content.elements().at(0).content.value.valueDefinition.values[0].literal == "red");
+    REQUIRE(typeSection.node.content.elements().at(1).klass == mson::Element::ValueClass);
+    REQUIRE(typeSection.node.content.elements().at(1).content.value.valueDefinition.values.size() == 1);
+    REQUIRE(typeSection.node.content.elements().at(1).content.value.valueDefinition.values[0].literal == "green");
 }
 
 TEST_CASE("Parse multi-line mson sample list type section without newline", "[mson][type_section]")
@@ -203,10 +203,10 @@ TEST_CASE("Parse multi-line mson sample list type section without newline", "[ms
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());
 
-    REQUIRE(typeSection.node.type == mson::TypeSection::SampleType);
+    REQUIRE(typeSection.node.klass == mson::TypeSection::SampleClass);
     REQUIRE(typeSection.node.content.value == " red\n   green\n\nyellow");
     REQUIRE(typeSection.node.content.description.empty());
-    REQUIRE(typeSection.node.content.members().empty());
+    REQUIRE(typeSection.node.content.elements().empty());
 }
 
 TEST_CASE("Parse multi-line mson sample list type section with newline", "[mson][type_section]")
@@ -224,10 +224,10 @@ TEST_CASE("Parse multi-line mson sample list type section with newline", "[mson]
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());
 
-    REQUIRE(typeSection.node.type == mson::TypeSection::SampleType);
+    REQUIRE(typeSection.node.klass == mson::TypeSection::SampleClass);
     REQUIRE(typeSection.node.content.value == " red\n   green\nyellow");
     REQUIRE(typeSection.node.content.description.empty());
-    REQUIRE(typeSection.node.content.members().empty());
+    REQUIRE(typeSection.node.content.elements().empty());
 }
 
 TEST_CASE("Parse mson sample list type section with values as para for values base type", "[mson][type_section]")
@@ -244,10 +244,10 @@ TEST_CASE("Parse mson sample list type section with values as para for values ba
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());
 
-    REQUIRE(typeSection.node.type == mson::TypeSection::SampleType);
+    REQUIRE(typeSection.node.klass == mson::TypeSection::SampleClass);
     REQUIRE(typeSection.node.content.value.empty());
     REQUIRE(typeSection.node.content.description.empty());
-    REQUIRE(typeSection.node.content.members().empty());
+    REQUIRE(typeSection.node.content.elements().empty());
 }
 
 TEST_CASE("Parse markdown multi-line mson sample list type section", "[mson][type_section]")
@@ -264,10 +264,10 @@ TEST_CASE("Parse markdown multi-line mson sample list type section", "[mson][typ
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());
 
-    REQUIRE(typeSection.node.type == mson::TypeSection::SampleType);
+    REQUIRE(typeSection.node.klass == mson::TypeSection::SampleClass);
     REQUIRE(typeSection.node.content.value == "- red\n\n- green");
     REQUIRE(typeSection.node.content.description.empty());
-    REQUIRE(typeSection.node.content.members().empty());
+    REQUIRE(typeSection.node.content.elements().empty());
 }
 
 TEST_CASE("Parse mson sample header type section with values as list items", "[mson][type_section]")
@@ -284,16 +284,16 @@ TEST_CASE("Parse mson sample header type section with values as list items", "[m
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());
 
-    REQUIRE(typeSection.node.type == mson::TypeSection::SampleType);
+    REQUIRE(typeSection.node.klass == mson::TypeSection::SampleClass);
     REQUIRE(typeSection.node.content.value.empty());
     REQUIRE(typeSection.node.content.description.empty());
-    REQUIRE(typeSection.node.content.members().size() == 2);
-    REQUIRE(typeSection.node.content.members().at(0).type == mson::MemberType::ValueType);
-    REQUIRE(typeSection.node.content.members().at(0).content.value.valueDefinition.values.size() == 1);
-    REQUIRE(typeSection.node.content.members().at(0).content.value.valueDefinition.values[0].literal == "red");
-    REQUIRE(typeSection.node.content.members().at(1).type == mson::MemberType::ValueType);
-    REQUIRE(typeSection.node.content.members().at(1).content.value.valueDefinition.values.size() == 1);
-    REQUIRE(typeSection.node.content.members().at(1).content.value.valueDefinition.values[0].literal == "green");
+    REQUIRE(typeSection.node.content.elements().size() == 2);
+    REQUIRE(typeSection.node.content.elements().at(0).klass == mson::Element::ValueClass);
+    REQUIRE(typeSection.node.content.elements().at(0).content.value.valueDefinition.values.size() == 1);
+    REQUIRE(typeSection.node.content.elements().at(0).content.value.valueDefinition.values[0].literal == "red");
+    REQUIRE(typeSection.node.content.elements().at(1).klass == mson::Element::ValueClass);
+    REQUIRE(typeSection.node.content.elements().at(1).content.value.valueDefinition.values.size() == 1);
+    REQUIRE(typeSection.node.content.elements().at(1).content.value.valueDefinition.values[0].literal == "green");
 }
 
 TEST_CASE("Parse multi-line mson sample header type section", "[mson][type_section]")
@@ -311,10 +311,10 @@ TEST_CASE("Parse multi-line mson sample header type section", "[mson][type_secti
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());
 
-    REQUIRE(typeSection.node.type == mson::TypeSection::SampleType);
+    REQUIRE(typeSection.node.klass == mson::TypeSection::SampleClass);
     REQUIRE(typeSection.node.content.value == "   red\n     green\nyellow");
     REQUIRE(typeSection.node.content.description.empty());
-    REQUIRE(typeSection.node.content.members().empty());
+    REQUIRE(typeSection.node.content.elements().empty());
 }
 
 TEST_CASE("Parse multi-line mson sample header type section with multiple nested nodes", "[mson][type_section]")
@@ -332,10 +332,10 @@ TEST_CASE("Parse multi-line mson sample header type section with multiple nested
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());
 
-    REQUIRE(typeSection.node.type == mson::TypeSection::SampleType);
+    REQUIRE(typeSection.node.klass == mson::TypeSection::SampleClass);
     REQUIRE(typeSection.node.content.value == "   red\n     green\n\n yellow");
     REQUIRE(typeSection.node.content.description.empty());
-    REQUIRE(typeSection.node.content.members().empty());
+    REQUIRE(typeSection.node.content.elements().empty());
 }
 
 TEST_CASE("Parse markdown multi-line mson sample header type section", "[mson][type_section]")
@@ -352,10 +352,10 @@ TEST_CASE("Parse markdown multi-line mson sample header type section", "[mson][t
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());
 
-    REQUIRE(typeSection.node.type == mson::TypeSection::SampleType);
+    REQUIRE(typeSection.node.klass == mson::TypeSection::SampleClass);
     REQUIRE(typeSection.node.content.value == "- red\n\n- green");
     REQUIRE(typeSection.node.content.description.empty());
-    REQUIRE(typeSection.node.content.members().empty());
+    REQUIRE(typeSection.node.content.elements().empty());
 }
 
 TEST_CASE("Parse mson items list type section for values base type containing one of", "[mson][type_section]")
@@ -374,7 +374,7 @@ TEST_CASE("Parse mson items list type section for values base type containing on
     REQUIRE(typeSection.report.warnings.size() == 1);
     REQUIRE(typeSection.report.warnings[0].code == LogicalErrorWarning);
 
-    REQUIRE(typeSection.node.content.members().empty());
+    REQUIRE(typeSection.node.content.elements().empty());
 }
 
 TEST_CASE("Parse mson properties list type section for values base type", "[mson][type_section]")
@@ -402,7 +402,7 @@ TEST_CASE("Parse mson sample type section for a simple object", "[mson][type_sec
     "        - username: pksunkara\n"\
     "        - admin: false";
 
-    mson::MemberType member;
+    mson::Element member;
     ParseResult<mson::TypeSection> typeSection;
     typeSection.node.baseType = mson::ObjectBaseType;
     SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection);
@@ -410,24 +410,24 @@ TEST_CASE("Parse mson sample type section for a simple object", "[mson][type_sec
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());
 
-    REQUIRE(typeSection.node.type == mson::TypeSection::SampleType);
+    REQUIRE(typeSection.node.klass == mson::TypeSection::SampleClass);
     REQUIRE(typeSection.node.content.value.empty());
     REQUIRE(typeSection.node.content.description.empty());
-    REQUIRE(typeSection.node.content.members().size() == 1);
-    REQUIRE(typeSection.node.content.members().at(0).type == mson::MemberType::PropertyType);
-    REQUIRE(typeSection.node.content.members().at(0).content.property.name.literal == "user");
-    REQUIRE(typeSection.node.content.members().at(0).content.property.sections.size() == 1);
-    REQUIRE(typeSection.node.content.members().at(0).content.property.sections[0].type == mson::TypeSection::MemberType);
-    REQUIRE(typeSection.node.content.members().at(0).content.property.sections[0].content.members().size() == 2);
+    REQUIRE(typeSection.node.content.elements().size() == 1);
+    REQUIRE(typeSection.node.content.elements().at(0).klass == mson::Element::PropertyClass);
+    REQUIRE(typeSection.node.content.elements().at(0).content.property.name.literal == "user");
+    REQUIRE(typeSection.node.content.elements().at(0).content.property.sections.size() == 1);
+    REQUIRE(typeSection.node.content.elements().at(0).content.property.sections[0].klass == mson::TypeSection::MemberTypeClass);
+    REQUIRE(typeSection.node.content.elements().at(0).content.property.sections[0].content.elements().size() == 2);
 
-    member = typeSection.node.content.members().at(0).content.property.sections[0].content.members().at(0);
-    REQUIRE(member.type == mson::MemberType::PropertyType);
+    member = typeSection.node.content.elements().at(0).content.property.sections[0].content.elements().at(0);
+    REQUIRE(member.klass == mson::Element::PropertyClass);
     REQUIRE(member.content.property.name.literal == "username");
     REQUIRE(member.content.property.valueDefinition.values.size() == 1);
     REQUIRE(member.content.property.valueDefinition.values[0].literal == "pksunkara");
 
-    member = typeSection.node.content.members().at(0).content.property.sections[0].content.members().at(1);
-    REQUIRE(member.type == mson::MemberType::PropertyType);
+    member = typeSection.node.content.elements().at(0).content.property.sections[0].content.elements().at(1);
+    REQUIRE(member.klass == mson::Element::PropertyClass);
     REQUIRE(member.content.property.name.literal == "admin");
     REQUIRE(member.content.property.valueDefinition.values.size() == 1);
     REQUIRE(member.content.property.valueDefinition.values[0].literal == "false");
@@ -444,7 +444,7 @@ TEST_CASE("Parse mson sample type section for a complex object", "[mson][type_se
     "            - (object)\n"\
     "                - admin: false";
 
-    mson::MemberType member, submember;
+    mson::Element member, submember;
     ParseResult<mson::TypeSection> typeSection;
     typeSection.node.baseType = mson::ObjectBaseType;
     SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection);
@@ -452,47 +452,47 @@ TEST_CASE("Parse mson sample type section for a complex object", "[mson][type_se
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());
 
-    REQUIRE(typeSection.node.type == mson::TypeSection::SampleType);
+    REQUIRE(typeSection.node.klass == mson::TypeSection::SampleClass);
     REQUIRE(typeSection.node.content.value.empty());
     REQUIRE(typeSection.node.content.description.empty());
-    REQUIRE(typeSection.node.content.members().size() == 1);
-    REQUIRE(typeSection.node.content.members().at(0).type == mson::MemberType::PropertyType);
-    REQUIRE(typeSection.node.content.members().at(0).content.property.name.literal == "user");
-    REQUIRE(typeSection.node.content.members().at(0).content.property.sections.size() == 1);
-    REQUIRE(typeSection.node.content.members().at(0).content.property.sections[0].type == mson::TypeSection::MemberType);
-    REQUIRE(typeSection.node.content.members().at(0).content.property.sections[0].content.members().size() == 1);
+    REQUIRE(typeSection.node.content.elements().size() == 1);
+    REQUIRE(typeSection.node.content.elements().at(0).klass == mson::Element::PropertyClass);
+    REQUIRE(typeSection.node.content.elements().at(0).content.property.name.literal == "user");
+    REQUIRE(typeSection.node.content.elements().at(0).content.property.sections.size() == 1);
+    REQUIRE(typeSection.node.content.elements().at(0).content.property.sections[0].klass == mson::TypeSection::MemberTypeClass);
+    REQUIRE(typeSection.node.content.elements().at(0).content.property.sections[0].content.elements().size() == 1);
 
-    member = typeSection.node.content.members().at(0).content.property.sections[0].content.members().at(0);
-    REQUIRE(member.type == mson::MemberType::PropertyType);
+    member = typeSection.node.content.elements().at(0).content.property.sections[0].content.elements().at(0);
+    REQUIRE(member.klass == mson::Element::PropertyClass);
     REQUIRE(member.content.property.name.literal == "data");
     REQUIRE(member.content.property.valueDefinition.values.empty());
     REQUIRE(member.content.property.valueDefinition.typeDefinition.baseType == mson::ValueBaseType);
     REQUIRE(member.content.property.sections.size() == 1);
-    REQUIRE(member.content.property.sections[0].type == mson::TypeSection::MemberType);
-    REQUIRE(member.content.property.sections[0].content.members().size() == 3);
+    REQUIRE(member.content.property.sections[0].klass == mson::TypeSection::MemberTypeClass);
+    REQUIRE(member.content.property.sections[0].content.elements().size() == 3);
 
-    submember = member.content.property.sections[0].content.members().at(0);
-    REQUIRE(submember.type == mson::MemberType::ValueType);
+    submember = member.content.property.sections[0].content.elements().at(0);
+    REQUIRE(submember.klass == mson::Element::ValueClass);
     REQUIRE(submember.content.value.valueDefinition.values.size() == 1);
     REQUIRE(submember.content.value.valueDefinition.values[0].literal == "pksunkara");
     REQUIRE(submember.content.value.sections.empty());
 
-    submember = member.content.property.sections[0].content.members().at(1);
-    REQUIRE(submember.type == mson::MemberType::ValueType);
+    submember = member.content.property.sections[0].content.elements().at(1);
+    REQUIRE(submember.klass == mson::Element::ValueClass);
     REQUIRE(submember.content.value.valueDefinition.values.size() == 1);
     REQUIRE(submember.content.value.valueDefinition.values[0].literal == "1200");
     REQUIRE(submember.content.value.sections.empty());
 
-    submember = member.content.property.sections[0].content.members().at(2);
-    REQUIRE(submember.type == mson::MemberType::ValueType);
+    submember = member.content.property.sections[0].content.elements().at(2);
+    REQUIRE(submember.klass == mson::Element::ValueClass);
     REQUIRE(submember.content.value.valueDefinition.values.empty());
     REQUIRE(submember.content.value.valueDefinition.typeDefinition.baseType == mson::ObjectBaseType);
     REQUIRE(submember.content.value.sections.size() == 1);
-    REQUIRE(submember.content.value.sections[0].type == mson::TypeSection::MemberType);
-    REQUIRE(submember.content.value.sections[0].content.members().size() == 1);
+    REQUIRE(submember.content.value.sections[0].klass == mson::TypeSection::MemberTypeClass);
+    REQUIRE(submember.content.value.sections[0].content.elements().size() == 1);
 
-    member = submember.content.value.sections[0].content.members().at(0);
-    REQUIRE(member.type == mson::MemberType::PropertyType);
+    member = submember.content.value.sections[0].content.elements().at(0);
+    REQUIRE(member.klass == mson::Element::PropertyClass);
     REQUIRE(member.content.property.name.literal == "admin");
     REQUIRE(member.content.property.valueDefinition.values.size() == 1);
     REQUIRE(member.content.property.valueDefinition.values[0].literal == "false");

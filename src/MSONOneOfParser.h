@@ -42,7 +42,7 @@ namespace snowcrash {
                              SectionParserData& pd,
                              const ParseResultRef<mson::OneOf>& out) {
 
-            if (out.node.members().empty()) {
+            if (out.node.empty()) {
 
                 // WARN: one of type do not have nested members
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);

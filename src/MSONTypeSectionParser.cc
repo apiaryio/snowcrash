@@ -20,7 +20,7 @@ namespace snowcrash {
         MarkdownNodeIterator cur = node;
         SectionType parentSectionType = pd.parentSectionContext();
 
-        mson::MemberType memberType;
+        mson::Element element;
 
         if (node->type == mdp::HeaderMarkdownNodeType) {
             return cur;
@@ -35,7 +35,7 @@ namespace snowcrash {
                     IntermediateParseResult<mson::Mixin> mixin(out.report);
                     cur = MSONMixinParser::parse(node, siblings, pd, mixin);
 
-                    memberType.build(mixin.node);
+                    element.build(mixin.node);
                     break;
                 }
 
@@ -55,7 +55,7 @@ namespace snowcrash {
                     IntermediateParseResult<mson::OneOf> oneOf(out.report);
                     cur = MSONOneOfParser::parse(node, siblings, pd, oneOf);
 
-                    memberType.build(oneOf.node);
+                    element.build(oneOf.node);
                     break;
                 }
 
@@ -66,14 +66,14 @@ namespace snowcrash {
                         IntermediateParseResult<mson::PropertyMember> propertyMember(out.report);
                         cur = MSONPropertyMemberParser::parse(node, siblings, pd, propertyMember);
 
-                        memberType.build(propertyMember.node);
+                        element.build(propertyMember.node);
                     }
                     else {
 
                         IntermediateParseResult<mson::ValueMember> valueMember(out.report);
                         cur = MSONValueMemberParser::parse(node, siblings, pd, valueMember);
 
-                        memberType.build(valueMember.node);
+                        element.build(valueMember.node);
                     }
 
                     break;
@@ -103,13 +103,14 @@ namespace snowcrash {
 
                 case MSONSectionType:
                 {
-                    if (out.node.baseType == mson::ValueBaseType &&
+                    if ((out.node.baseType == mson::ValueBaseType ||
+                         out.node.baseType == mson::ImplicitValueBaseType) &&
                         node->type == mdp::ListItemMarkdownNodeType) {
 
                         IntermediateParseResult<mson::ValueMember> valueMember(out.report);
                         cur = MSONValueMemberParser::parse(node, siblings, pd, valueMember);
 
-                        memberType.build(valueMember.node);
+                        element.build(valueMember.node);
                     }
                     else if ((out.node.baseType == mson::ObjectBaseType ||
                               out.node.baseType == mson::ImplicitObjectBaseType) &&
@@ -118,7 +119,7 @@ namespace snowcrash {
                         IntermediateParseResult<mson::PropertyMember> propertyMember(out.report);
                         cur = MSONPropertyMemberParser::parse(node, siblings, pd, propertyMember);
 
-                        memberType.build(propertyMember.node);
+                        element.build(propertyMember.node);
                     }
                     if (out.node.baseType == mson::PrimitiveBaseType ||
                         out.node.baseType == mson::ImplicitPrimitiveBaseType) {
@@ -139,8 +140,8 @@ namespace snowcrash {
             }
         }
 
-        if (memberType.type != mson::MemberType::UndefinedType) {
-            out.node.content.members().push_back(memberType);
+        if (element.klass != mson::Element::UndefinedClass) {
+            out.node.content.elements().push_back(element);
         }
 
         return cur;

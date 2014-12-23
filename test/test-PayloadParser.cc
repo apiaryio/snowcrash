@@ -679,11 +679,11 @@ TEST_CASE("Parse a payload with attributes", "[payload]")
     REQUIRE(payload.node.description.empty());
     REQUIRE(payload.node.attributes.resolved.empty());
     REQUIRE(payload.node.attributes.source.name.empty());
-    REQUIRE(payload.node.attributes.source.base.attributes == 0);
-    REQUIRE(payload.node.attributes.source.base.typeSpecification.name.name == mson::ObjectTypeName);
+    REQUIRE(payload.node.attributes.source.typeDefinition.attributes == 0);
+    REQUIRE(payload.node.attributes.source.typeDefinition.typeSpecification.name.base == mson::ObjectTypeName);
     REQUIRE(payload.node.attributes.source.sections.size() == 1);
-    REQUIRE(payload.node.attributes.source.sections[0].type == mson::TypeSection::MemberType);
-    REQUIRE(payload.node.attributes.source.sections[0].content.members().size() == 4);
+    REQUIRE(payload.node.attributes.source.sections[0].klass == mson::TypeSection::MemberTypeClass);
+    REQUIRE(payload.node.attributes.source.sections[0].content.elements().size() == 4);
 }
 
 TEST_CASE("Parse a request with attributes and no body", "[payload]")
@@ -706,9 +706,9 @@ TEST_CASE("Parse a request with attributes and no body", "[payload]")
     REQUIRE(payload.node.description.empty());
     REQUIRE(payload.node.attributes.resolved.empty());
     REQUIRE(payload.node.attributes.source.name.empty());
-    REQUIRE(payload.node.attributes.source.base.attributes == 0);
-    REQUIRE(payload.node.attributes.source.base.typeSpecification.name.name == mson::ArrayTypeName);
-    REQUIRE(payload.node.attributes.source.base.typeSpecification.nestedTypes.size() == 1);
-    REQUIRE(payload.node.attributes.source.base.typeSpecification.nestedTypes[0].symbol.literal == "Coupon");
+    REQUIRE(payload.node.attributes.source.typeDefinition.attributes == 0);
+    REQUIRE(payload.node.attributes.source.typeDefinition.typeSpecification.name.base == mson::ArrayTypeName);
+    REQUIRE(payload.node.attributes.source.typeDefinition.typeSpecification.nestedTypes.size() == 1);
+    REQUIRE(payload.node.attributes.source.typeDefinition.typeSpecification.nestedTypes[0].symbol.literal == "Coupon");
     REQUIRE(payload.node.attributes.source.sections.empty());
 }

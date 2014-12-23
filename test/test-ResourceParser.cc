@@ -967,9 +967,9 @@ TEST_CASE("Parse resource attributes", "[resource]")
 
     REQUIRE(resource.node.name == "Coupons");
     REQUIRE(resource.node.attributes.source.name.symbol.literal == "Coupons");
-    REQUIRE(resource.node.attributes.source.base.typeSpecification.name.name == mson::ArrayTypeName);
-    REQUIRE(resource.node.attributes.source.base.typeSpecification.nestedTypes.size() == 1);
-    REQUIRE(resource.node.attributes.source.base.typeSpecification.nestedTypes[0].symbol.literal == "Coupon");
+    REQUIRE(resource.node.attributes.source.typeDefinition.typeSpecification.name.base == mson::ArrayTypeName);
+    REQUIRE(resource.node.attributes.source.typeDefinition.typeSpecification.nestedTypes.size() == 1);
+    REQUIRE(resource.node.attributes.source.typeDefinition.typeSpecification.nestedTypes[0].symbol.literal == "Coupon");
 
     REQUIRE(resource.node.actions.size() == 1);
     REQUIRE(resource.node.actions[0].examples.size() == 1);
@@ -996,9 +996,9 @@ TEST_CASE("Parse unnamed resource attributes", "[resource]")
 
     REQUIRE(resource.node.name.empty());
     REQUIRE(resource.node.attributes.source.name.empty());
-    REQUIRE(resource.node.attributes.source.base.typeSpecification.name.name == mson::ArrayTypeName);
-    REQUIRE(resource.node.attributes.source.base.typeSpecification.nestedTypes.size() == 1);
-    REQUIRE(resource.node.attributes.source.base.typeSpecification.nestedTypes[0].symbol.literal == "Coupon");
+    REQUIRE(resource.node.attributes.source.typeDefinition.typeSpecification.name.base == mson::ArrayTypeName);
+    REQUIRE(resource.node.attributes.source.typeDefinition.typeSpecification.nestedTypes.size() == 1);
+    REQUIRE(resource.node.attributes.source.typeDefinition.typeSpecification.nestedTypes[0].symbol.literal == "Coupon");
 
     REQUIRE(resource.node.actions.size() == 1);
     REQUIRE(resource.node.actions[0].examples.size() == 1);

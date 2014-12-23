@@ -46,11 +46,11 @@ TEST_CASE("Parse canonical mson mixin", "[mson][mixin]")
     REQUIRE(mixin.report.error.code == Error::OK);
     REQUIRE(mixin.report.warnings.empty());
 
-    REQUIRE(mixin.node.typeDefinition.attributes == 0);
-    REQUIRE(mixin.node.typeDefinition.typeSpecification.name.name == mson::UndefinedTypeName);
-    REQUIRE(mixin.node.typeDefinition.typeSpecification.name.symbol.literal == "Person");
-    REQUIRE(mixin.node.typeDefinition.typeSpecification.name.symbol.variable == false);
-    REQUIRE(mixin.node.typeDefinition.typeSpecification.nestedTypes.empty());
+    REQUIRE(mixin.node.attributes == 0);
+    REQUIRE(mixin.node.typeSpecification.name.base == mson::UndefinedTypeName);
+    REQUIRE(mixin.node.typeSpecification.name.symbol.literal == "Person");
+    REQUIRE(mixin.node.typeSpecification.name.symbol.variable == false);
+    REQUIRE(mixin.node.typeSpecification.nestedTypes.empty());
 }
 
 TEST_CASE("Parse mson mixin with canonical type definition", "[mson][mixin]")
@@ -66,11 +66,11 @@ TEST_CASE("Parse mson mixin with canonical type definition", "[mson][mixin]")
     REQUIRE(mixin.report.error.code == Error::OK);
     REQUIRE(mixin.report.warnings.empty());
 
-    REQUIRE(mixin.node.typeDefinition.attributes == mson::SampleTypeAttribute);
-    REQUIRE(mixin.node.typeDefinition.typeSpecification.name.name == mson::UndefinedTypeName);
-    REQUIRE(mixin.node.typeDefinition.typeSpecification.name.symbol.literal == "Person");
-    REQUIRE(mixin.node.typeDefinition.typeSpecification.name.symbol.variable == false);
-    REQUIRE(mixin.node.typeDefinition.typeSpecification.nestedTypes.empty());
+    REQUIRE(mixin.node.attributes == mson::SampleTypeAttribute);
+    REQUIRE(mixin.node.typeSpecification.name.base == mson::UndefinedTypeName);
+    REQUIRE(mixin.node.typeSpecification.name.symbol.literal == "Person");
+    REQUIRE(mixin.node.typeSpecification.name.symbol.variable == false);
+    REQUIRE(mixin.node.typeSpecification.nestedTypes.empty());
 }
 
 TEST_CASE("Parse mson mixin with base type definition", "[mson][mixin]")
@@ -84,10 +84,10 @@ TEST_CASE("Parse mson mixin with base type definition", "[mson][mixin]")
     REQUIRE(mixin.report.warnings.size() == 1);
     REQUIRE(mixin.report.warnings[0].code == FormattingWarning);
 
-    REQUIRE(mixin.node.typeDefinition.attributes == 0);
-    REQUIRE(mixin.node.typeDefinition.typeSpecification.name.name == mson::StringTypeName);
-    REQUIRE(mixin.node.typeDefinition.typeSpecification.name.symbol.empty());
-    REQUIRE(mixin.node.typeDefinition.typeSpecification.nestedTypes.empty());
+    REQUIRE(mixin.node.attributes == 0);
+    REQUIRE(mixin.node.typeSpecification.name.base == mson::StringTypeName);
+    REQUIRE(mixin.node.typeSpecification.name.symbol.empty());
+    REQUIRE(mixin.node.typeSpecification.nestedTypes.empty());
 }
 
 TEST_CASE("Parse mson mixin with nested type definition", "[mson][mixin]")
@@ -103,13 +103,13 @@ TEST_CASE("Parse mson mixin with nested type definition", "[mson][mixin]")
     REQUIRE(mixin.report.error.code == Error::OK);
     REQUIRE(mixin.report.warnings.empty());
 
-    REQUIRE(mixin.node.typeDefinition.attributes == mson::RequiredTypeAttribute);
-    REQUIRE(mixin.node.typeDefinition.typeSpecification.name.name == mson::UndefinedTypeName);
-    REQUIRE(mixin.node.typeDefinition.typeSpecification.name.symbol.literal == "Person");
-    REQUIRE(mixin.node.typeDefinition.typeSpecification.name.symbol.variable == false);
-    REQUIRE(mixin.node.typeDefinition.typeSpecification.nestedTypes.size() == 2);
-    REQUIRE(mixin.node.typeDefinition.typeSpecification.nestedTypes[0].name == mson::NumberTypeName);
-    REQUIRE(mixin.node.typeDefinition.typeSpecification.nestedTypes[0].symbol.empty());
-    REQUIRE(mixin.node.typeDefinition.typeSpecification.nestedTypes[1].name == mson::StringTypeName);
-    REQUIRE(mixin.node.typeDefinition.typeSpecification.nestedTypes[1].symbol.empty());
+    REQUIRE(mixin.node.attributes == mson::RequiredTypeAttribute);
+    REQUIRE(mixin.node.typeSpecification.name.base == mson::UndefinedTypeName);
+    REQUIRE(mixin.node.typeSpecification.name.symbol.literal == "Person");
+    REQUIRE(mixin.node.typeSpecification.name.symbol.variable == false);
+    REQUIRE(mixin.node.typeSpecification.nestedTypes.size() == 2);
+    REQUIRE(mixin.node.typeSpecification.nestedTypes[0].base == mson::NumberTypeName);
+    REQUIRE(mixin.node.typeSpecification.nestedTypes[0].symbol.empty());
+    REQUIRE(mixin.node.typeSpecification.nestedTypes[1].base == mson::StringTypeName);
+    REQUIRE(mixin.node.typeSpecification.nestedTypes[1].symbol.empty());
 }

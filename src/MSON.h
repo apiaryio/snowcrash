@@ -17,7 +17,7 @@
 #include "Platform.h"
 #include "MarkdownParser.h"
 
-#define MEMBERS_NOT_SET_ERR std::logic_error("no members set")
+#define ELEMENTS_NOT_SET_ERR std::logic_error("no elements set")
 
 /**
  * MSON Abstract Syntax Tree
@@ -46,7 +46,8 @@ namespace mson {
         ImplicitPrimitiveBaseType, // Primitive Types (implicit)
         ObjectBaseType,            // Object Structure Type
         ImplicitObjectBaseType,    // Object Structure Type (implicit)
-        ValueBaseType              // Array & Enum Structure Type
+        ValueBaseType,             // Array & Enum Structure Type
+        ImplicitValueBaseType      // Array & Enum Structure Type (implicit)
     };
 
     /** Named Types base type table */
@@ -107,11 +108,11 @@ namespace mson {
     struct TypeName {
 
         /** Constructor */
-        TypeName(const BaseTypeName& name_ = UndefinedTypeName)
-        : name(name_) {}
+        TypeName(const BaseTypeName& base_ = UndefinedTypeName)
+        : base(base_) {}
 
         /** EITHER Base type's value */
-        BaseTypeName name;
+        BaseTypeName base;
 
         /** OR Named type's identifier */
         Symbol symbol;
@@ -186,22 +187,22 @@ namespace mson {
         bool empty() const;
     };
 
-    /** Forward Declaration for member type */
-    struct MemberType;
+    /** Forward Declaration for element */
+    struct Element;
 
-    /** Collection of member types */
-    typedef std::vector<MemberType> MemberTypes;
+    /** Collection of elements */
+    typedef std::vector<Element> Elements;
 
     /** Section of a type */
     struct TypeSection {
 
-        /** Type of a type section */
-        enum Type {
-            UndefinedType = 0,    // Unknown
-            BlockDescriptionType, // Markdown block description
-            MemberType,           // Contains member types
-            SampleType,           // Sample member types
-            DefaultType           // Default member types
+        /** Class of a type section */
+        enum Class {
+            UndefinedClass = 0,    // Unknown
+            BlockDescriptionClass, // Markdown block description
+            MemberTypeClass,       // Contains member types
+            SampleClass,           // Sample value(s) for member types
+            DefaultClass           // Default value(s) for member types
         };
 
         /** Content of the type section */
@@ -213,9 +214,9 @@ namespace mson {
             /** OR Literal value */
             Literal value;
 
-            /** OR Array of member types */
-            MemberTypes& members();
-            const MemberTypes& members() const;
+            /** OR Collection of elements */
+            Elements& elements();
+            const Elements& elements() const;
 
             /** Constructor */
             Content(const Markdown& description_ = Markdown(), const Literal& value_ = Literal());
@@ -230,18 +231,18 @@ namespace mson {
             ~Content();
 
         private:
-            std::auto_ptr<MemberTypes> m_members;
+            std::auto_ptr<Elements> m_elements;
         };
 
         /** Constructor */
-        TypeSection(const TypeSection::Type& type_ = TypeSection::UndefinedType)
-        : baseType(UndefinedBaseType), type(type_) {}
+        TypeSection(const TypeSection::Class& klass_ = TypeSection::UndefinedClass)
+        : baseType(UndefinedBaseType), klass(klass_) {}
 
         /** Base Type (for the parent of the type section) */
         BaseType baseType;
 
-        /** Denotes the type of the section */
-        TypeSection::Type type;
+        /** Denotes the class of the type section */
+        TypeSection::Class klass;
 
         /** Content of the type section */
         TypeSection::Content content;
@@ -260,7 +261,7 @@ namespace mson {
         TypeName name;
 
         /** The ancestor type definition */
-        TypeDefinition base;
+        TypeDefinition typeDefinition;
 
         /** List of named type's sections */
         TypeSections sections;
@@ -309,61 +310,25 @@ namespace mson {
     };
 
     /** Mixin type */
-    struct Mixin {
-
-        /** Type definition of the type to be included */
-        TypeDefinition typeDefinition;
-
-        /** Check if empty */
-        bool empty() const;
-    };
-
-    /** Collection of Member types */
-    struct Members {
-
-        /** List of mutually exclusive member types */
-        MemberTypes& members();
-        const MemberTypes& members() const;
-
-        /** Builds the member structures from the list of member types */
-        Members& operator=(const MemberTypes& rhs);
-
-        /** Constructor */
-        Members();
-
-        /** Copy constructor */
-        Members(const Members& rhs);
-
-        /** Assignment operator */
-        Members& operator=(const Members& rhs);
-
-        /** Desctructor */
-        ~Members();
-
-        /** Check if empty */
-        bool empty() const;
-
-    protected:
-        std::auto_ptr<MemberTypes> m_members;
-    };
+    typedef TypeDefinition Mixin;
 
     /** One Of type */
-    typedef Members OneOf;
+    typedef Elements OneOf;
 
-    /** Member of a structure */
-    struct MemberType {
+    /** Element of a type section */
+    struct Element {
 
-        /** Type of a member type */
-        enum Type {
-            UndefinedType = 0, // Unknown
-            PropertyType,      // Property member
-            ValueType,         // Value member
-            MixinType,         // Mixin
-            OneOfType,         // One of
-            MembersType        // Members collection
+        /** Class of an element */
+        enum Class {
+            UndefinedClass = 0, // Unknown
+            PropertyClass,      // Property member
+            ValueClass,         // Value member
+            MixinClass,         // Mixin
+            OneOfClass,         // One of
+            GroupClass          // Group of elements
         };
 
-        /** Content of the member type */
+        /** Content of the element */
         struct Content {
 
             /** EITHER Property member */
@@ -376,37 +341,58 @@ namespace mson {
             Mixin mixin;
 
             /** OR One of member */
-            OneOf oneOf;
+            OneOf& oneOf();
+            const OneOf& oneOf() const;
 
-            /** OR Members collection */
-            Members members;
+            /** OR Collection of elements */
+            Elements& elements();
+            const Elements& elements() const;
+
+            /** Builds the structure from group of elements */
+            Element::Content& operator=(const Elements& rhs);
+
+            /** Constructor */
+            Content();
+
+            /** Copy constructor */
+            Content(const Element::Content& rhs);
+
+            /** Assignment operator */
+            Content& operator=(const Element::Content& rhs);
+
+            /** Destructor */
+            ~Content();
+
+        private:
+            std::auto_ptr<Elements> m_elements;
         };
 
-        /** Type of the member type */
-        MemberType::Type type;
+        /** Class of the element */
+        Element::Class klass;
 
-        /** Content of the member type */
-        MemberType::Content content;
+        /** Content of the element */
+        Element::Content content;
 
         /** Constructor */
-        MemberType(const MemberType::Type& type_ = MemberType::UndefinedType);
+        Element(const Element::Class& klass_ = Element::UndefinedClass);
 
         /** Copy constructor */
-        MemberType(const MemberType& rhs);
+        Element(const Element& rhs);
 
         /** Assignment operator */
-        MemberType& operator=(const MemberType& rhs);
+        Element& operator=(const Element& rhs);
 
         /** Functions which allow the building of member type */
         void build(const PropertyMember& propertyMember);
         void build(const ValueMember& valueMember);
         void build(const Mixin& mixin);
         void build(const OneOf& oneOf);
-        void build(const MemberTypes& memberTypes);
         void build(const Value& value);
 
+        void buildFromElements(const Elements& elements);
+
         /** Desctructor */
-        ~MemberType();
+        ~Element();
     };
 }
 

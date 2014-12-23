@@ -51,18 +51,19 @@ namespace snowcrash {
 
             if (IEqual<std::string>()(signature.identifier, "Default")) {
 
-                out.node.type = mson::TypeSection::DefaultType;
+                out.node.klass = mson::TypeSection::DefaultClass;
                 assignValues = true;
             }
             else if (IEqual<std::string>()(signature.identifier, "Sample")) {
 
-                out.node.type = mson::TypeSection::SampleType;
+                out.node.klass = mson::TypeSection::SampleClass;
                 assignValues = true;
             }
             else if (IEqual<std::string>()(signature.identifier, "Items") ||
                      IEqual<std::string>()(signature.identifier, "Members")) {
 
-                if (out.node.baseType != mson::ValueBaseType) {
+                if (out.node.baseType != mson::ValueBaseType &&
+                    out.node.baseType != mson::ImplicitValueBaseType) {
 
                     //WARN: Items/Members should only be allowed for value types
                     std::stringstream ss;
@@ -78,7 +79,7 @@ namespace snowcrash {
                     return node;
                 }
 
-                out.node.type = mson::TypeSection::MemberType;
+                out.node.klass = mson::TypeSection::MemberTypeClass;
             }
             else if (IEqual<std::string>()(signature.identifier, "Properties")) {
 
@@ -99,7 +100,7 @@ namespace snowcrash {
                     return node;
                 }
 
-                out.node.type = mson::TypeSection::MemberType;
+                out.node.klass = mson::TypeSection::MemberTypeClass;
             }
 
             if (assignValues &&
@@ -110,14 +111,15 @@ namespace snowcrash {
 
                     out.node.content.value = signature.value;
                 }
-                else if (out.node.baseType == mson::ValueBaseType) {
+                else if (out.node.baseType == mson::ValueBaseType ||
+                         out.node.baseType == mson::ImplicitValueBaseType) {
 
                     for (size_t i = 0; i < signature.values.size(); i++) {
 
-                        mson::MemberType memberType;
-                        memberType.build(mson::parseValue(signature.values[i]));
+                        mson::Element element;
+                        element.build(mson::parseValue(signature.values[i]));
 
-                        out.node.content.members().push_back(memberType);
+                        out.node.content.elements().push_back(element);
                     }
                 }
                 else if (out.node.baseType == mson::ObjectBaseType ||

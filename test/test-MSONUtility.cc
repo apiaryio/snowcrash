@@ -79,7 +79,7 @@ TEST_CASE("Parse canonical type name", "[mson][utility]")
 
     parseTypeName(source, typeName);
 
-    REQUIRE(typeName.name == UndefinedTypeName);
+    REQUIRE(typeName.base == UndefinedTypeName);
     REQUIRE(typeName.symbol.literal == "Person");
     REQUIRE(typeName.symbol.variable == false);
 }
@@ -91,7 +91,7 @@ TEST_CASE("Parse boolean type name", "[mson][utility]")
 
     parseTypeName(source, typeName);
 
-    REQUIRE(typeName.name == BooleanTypeName);
+    REQUIRE(typeName.base == BooleanTypeName);
     REQUIRE(typeName.symbol.empty());
 }
 
@@ -102,7 +102,7 @@ TEST_CASE("Parse string type name", "[mson][utility]")
 
     parseTypeName(source, typeName);
 
-    REQUIRE(typeName.name == StringTypeName);
+    REQUIRE(typeName.base == StringTypeName);
     REQUIRE(typeName.symbol.empty());
 }
 
@@ -113,7 +113,7 @@ TEST_CASE("Parse number type name", "[mson][utility]")
 
     parseTypeName(source, typeName);
 
-    REQUIRE(typeName.name == NumberTypeName);
+    REQUIRE(typeName.base == NumberTypeName);
     REQUIRE(typeName.symbol.empty());
 }
 
@@ -124,7 +124,7 @@ TEST_CASE("Parse array type name", "[mson][utility]")
 
     parseTypeName(source, typeName);
 
-    REQUIRE(typeName.name == ArrayTypeName);
+    REQUIRE(typeName.base == ArrayTypeName);
     REQUIRE(typeName.symbol.empty());
 }
 
@@ -135,7 +135,7 @@ TEST_CASE("Parse enum type name", "[mson][utility]")
 
     parseTypeName(source, typeName);
 
-    REQUIRE(typeName.name == EnumTypeName);
+    REQUIRE(typeName.base == EnumTypeName);
     REQUIRE(typeName.symbol.empty());
 }
 
@@ -146,7 +146,7 @@ TEST_CASE("Parse object type name", "[mson][utility]")
 
     parseTypeName(source, typeName);
 
-    REQUIRE(typeName.name == ObjectTypeName);
+    REQUIRE(typeName.base == ObjectTypeName);
     REQUIRE(typeName.symbol.empty());
 }
 
@@ -157,7 +157,7 @@ TEST_CASE("Parse variable type name", "[mson][utility]")
 
     parseTypeName(source, typeName);
 
-    REQUIRE(typeName.name == UndefinedTypeName);
+    REQUIRE(typeName.base == UndefinedTypeName);
     REQUIRE(typeName.symbol.literal == "T");
     REQUIRE(typeName.symbol.variable == true);
 }
@@ -169,7 +169,7 @@ TEST_CASE("Parse wildcard type name", "[mson][utility]")
 
     parseTypeName(source, typeName);
 
-    REQUIRE(typeName.name == UndefinedTypeName);
+    REQUIRE(typeName.base == UndefinedTypeName);
     REQUIRE(typeName.symbol.literal.empty());
     REQUIRE(typeName.symbol.variable == true);
 }
@@ -277,7 +277,7 @@ TEST_CASE("Parse canonical type specification", "[mson][utility]")
 
     parseTypeSpecification(source, typeSpecification);
 
-    REQUIRE(typeSpecification.name.name == ObjectTypeName);
+    REQUIRE(typeSpecification.name.base == ObjectTypeName);
     REQUIRE(typeSpecification.name.symbol.empty());
     REQUIRE(typeSpecification.nestedTypes.empty());
 }
@@ -289,7 +289,7 @@ TEST_CASE("Parse linked type specification", "[mson][utility]")
 
     parseTypeSpecification(source, typeSpecification);
 
-    REQUIRE(typeSpecification.name.name == UndefinedTypeName);
+    REQUIRE(typeSpecification.name.base == UndefinedTypeName);
     REQUIRE(typeSpecification.name.symbol.literal == "Person");
     REQUIRE(typeSpecification.name.symbol.variable == false);
     REQUIRE(typeSpecification.nestedTypes.empty());
@@ -302,7 +302,7 @@ TEST_CASE("Parse implicit linked type specification", "[mson][utility]")
 
     parseTypeSpecification(source, typeSpecification);
 
-    REQUIRE(typeSpecification.name.name == UndefinedTypeName);
+    REQUIRE(typeSpecification.name.base == UndefinedTypeName);
     REQUIRE(typeSpecification.name.symbol.literal == "Person");
     REQUIRE(typeSpecification.name.symbol.variable == false);
     REQUIRE(typeSpecification.nestedTypes.empty());
@@ -315,14 +315,14 @@ TEST_CASE("Parse nested types in type specification", "[mson][utility]")
 
     parseTypeSpecification(source, typeSpecification);
 
-    REQUIRE(typeSpecification.name.name == ArrayTypeName);
+    REQUIRE(typeSpecification.name.base == ArrayTypeName);
     REQUIRE(typeSpecification.name.symbol.empty());
     REQUIRE(typeSpecification.nestedTypes.size() == 2);
 
-    REQUIRE(typeSpecification.nestedTypes[0].name == ObjectTypeName);
+    REQUIRE(typeSpecification.nestedTypes[0].base == ObjectTypeName);
     REQUIRE(typeSpecification.nestedTypes[0].symbol.empty());
 
-    REQUIRE(typeSpecification.nestedTypes[1].name == UndefinedTypeName);
+    REQUIRE(typeSpecification.nestedTypes[1].base == UndefinedTypeName);
     REQUIRE(typeSpecification.nestedTypes[1].symbol.literal == "Link");
     REQUIRE(typeSpecification.nestedTypes[1].symbol.variable == false);
 }
@@ -334,16 +334,16 @@ TEST_CASE("Parse linked nested types in type specification", "[mson][utility]")
 
     parseTypeSpecification(source, typeSpecification);
 
-    REQUIRE(typeSpecification.name.name == UndefinedTypeName);
+    REQUIRE(typeSpecification.name.base == UndefinedTypeName);
     REQUIRE(typeSpecification.name.symbol.literal == "Links");
     REQUIRE(typeSpecification.name.symbol.variable == false);
     REQUIRE(typeSpecification.nestedTypes.size() == 2);
 
-    REQUIRE(typeSpecification.nestedTypes[0].name == UndefinedTypeName);
+    REQUIRE(typeSpecification.nestedTypes[0].base == UndefinedTypeName);
     REQUIRE(typeSpecification.nestedTypes[0].symbol.literal == "Repo");
     REQUIRE(typeSpecification.nestedTypes[0].symbol.variable == false);
 
-    REQUIRE(typeSpecification.nestedTypes[1].name == UndefinedTypeName);
+    REQUIRE(typeSpecification.nestedTypes[1].base == UndefinedTypeName);
     REQUIRE(typeSpecification.nestedTypes[1].symbol.literal == "Search");
     REQUIRE(typeSpecification.nestedTypes[1].symbol.variable == false);
 }
@@ -369,7 +369,7 @@ TEST_CASE("Parse canonical type definition", "[mson][utility]")
     REQUIRE(typeDefinition.report.error.code == snowcrash::Error::OK);
     REQUIRE(typeDefinition.report.warnings.empty());
 
-    REQUIRE(typeDefinition.node.typeSpecification.name.name == NumberTypeName);
+    REQUIRE(typeDefinition.node.typeSpecification.name.base == NumberTypeName);
     REQUIRE(typeDefinition.node.typeSpecification.name.symbol.empty());
     REQUIRE(typeDefinition.node.typeSpecification.nestedTypes.empty());
     REQUIRE(typeDefinition.node.attributes == RequiredTypeAttribute);
@@ -398,7 +398,7 @@ TEST_CASE("Parse type definition with non recognized type attribute", "[mson][ut
     REQUIRE(typeDefinition.report.error.code == snowcrash::Error::OK);
     REQUIRE(typeDefinition.report.warnings.size() == 1);
 
-    REQUIRE(typeDefinition.node.typeSpecification.name.name == UndefinedTypeName);
+    REQUIRE(typeDefinition.node.typeSpecification.name.base == UndefinedTypeName);
     REQUIRE(typeDefinition.node.typeSpecification.name.symbol.literal == "Person");
     REQUIRE(typeDefinition.node.typeSpecification.name.symbol.variable == false);
     REQUIRE(typeDefinition.node.typeSpecification.nestedTypes.empty());
@@ -428,7 +428,7 @@ TEST_CASE("Parse type definition when non-structure type has nested types", "[ms
     REQUIRE(typeDefinition.report.warnings.size() == 1);
     REQUIRE(typeDefinition.report.warnings[0].code == snowcrash::LogicalErrorWarning);
 
-    REQUIRE(typeDefinition.node.typeSpecification.name.name == UndefinedTypeName);
+    REQUIRE(typeDefinition.node.typeSpecification.name.base == UndefinedTypeName);
     REQUIRE(typeDefinition.node.typeSpecification.name.symbol.literal == "Person");
     REQUIRE(typeDefinition.node.typeSpecification.name.symbol.variable == false);
     REQUIRE(typeDefinition.node.typeSpecification.nestedTypes.size() == 2);
@@ -438,59 +438,57 @@ TEST_CASE("Parse type definition when non-structure type has nested types", "[ms
 TEST_CASE("Build member type from one of", "[mson][utility]")
 {
     OneOf oneOf;
-    MemberType memberType;
+    Element element;
 
-    memberType.build(oneOf);
+    element.build(oneOf);
 
-    REQUIRE(memberType.type == MemberType::OneOfType);
+    REQUIRE(element.klass == Element::OneOfClass);
 }
 
 TEST_CASE("Build member type from mixin", "[mson][utility]")
 {
     Mixin mixin;
-    MemberType memberType;
+    Element element;
 
-    memberType.build(mixin);
+    element.build(mixin);
 
-    REQUIRE(memberType.type == MemberType::MixinType);
+    REQUIRE(element.klass == Element::MixinClass);
 }
 
 TEST_CASE("Build member type from value member", "[mson][utility]")
 {
     ValueMember valueMember;
-    MemberType memberType;
+    Element element;
 
-    memberType.build(valueMember);
+    element.build(valueMember);
 
-    REQUIRE(memberType.type == MemberType::ValueType);
+    REQUIRE(element.klass == Element::ValueClass);
 }
 
 TEST_CASE("Build member type from property memeber", "[mson][utility]")
 {
     PropertyMember propertyMember;
-    MemberType memberType;
+    Element element;
 
-    memberType.build(propertyMember);
+    element.build(propertyMember);
 
-    REQUIRE(memberType.type == MemberType::PropertyType);
+    REQUIRE(element.klass == Element::PropertyClass);
 }
 
 TEST_CASE("Build memebr type from members collection", "[mson][utility]")
 {
-    MemberTypes members;
-    MemberType memberType;
-
+    Element element;
     TypeSection typeSection;
     PropertyMember propertyMember;
-    MemberType propertyMemberType;
+    Element propertyMemberElement;
 
-    memberType.build(propertyMember);
-    typeSection.content.members().push_back(propertyMemberType);
+    element.build(propertyMember);
+    typeSection.content.elements().push_back(propertyMemberElement);
 
-    memberType.build(typeSection.content.members());
+    element.buildFromElements(typeSection.content.elements());
 
-    REQUIRE(memberType.type == MemberType::MembersType);
-    REQUIRE(memberType.content.members.members().size() == 1);
+    REQUIRE(element.klass == Element::GroupClass);
+    REQUIRE(element.content.elements().size() == 1);
 }
 
 TEST_CASE("Parsing base type from base type name", "[mson][utility]")
@@ -563,7 +561,7 @@ TEST_CASE("Parse variable property name", "[mson][utility]")
     REQUIRE(propertyName.node.variable.values[0].literal == "rel");
     REQUIRE(propertyName.node.variable.values[0].variable == false);
     REQUIRE(propertyName.node.variable.typeDefinition.attributes == 0);
-    REQUIRE(propertyName.node.variable.typeDefinition.typeSpecification.name.name == UndefinedTypeName);
+    REQUIRE(propertyName.node.variable.typeDefinition.typeSpecification.name.base == UndefinedTypeName);
     REQUIRE(propertyName.node.variable.typeDefinition.typeSpecification.name.symbol.literal == "Custom String");
     REQUIRE(propertyName.node.variable.typeDefinition.typeSpecification.name.symbol.variable == false);
 }
@@ -593,7 +591,7 @@ TEST_CASE("Parse multi-value variable property name", "[mson][utility]")
     REQUIRE(propertyName.node.variable.values[0].literal == "1, 2");
     REQUIRE(propertyName.node.variable.values[0].variable == false);
     REQUIRE(propertyName.node.variable.typeDefinition.attributes == 0);
-    REQUIRE(propertyName.node.variable.typeDefinition.typeSpecification.name.name == UndefinedTypeName);
+    REQUIRE(propertyName.node.variable.typeDefinition.typeSpecification.name.base == UndefinedTypeName);
     REQUIRE(propertyName.node.variable.typeDefinition.typeSpecification.name.symbol.literal == "Custom");
     REQUIRE(propertyName.node.variable.typeDefinition.typeSpecification.name.symbol.variable == false);
 }
