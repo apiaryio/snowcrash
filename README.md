@@ -86,7 +86,19 @@ Refer to [AST Serialization Media Types](https://github.com/apiaryio/api-bluepri
 	```
 	
 We love **Windows** too! Please refer to [Building on Windows](https://github.com/apiaryio/snowcrash/wiki/Building-on-Windows).
-		
+
+## Build using docker
+
+	```sh
+	$ sudo docker build -t "apiaryio/snowcrash" . && sudo docker run -it "apiaryio/snowcrash"
+	```
+
+If you want to debug the environment, you can enter the container using
+
+	```sh
+	$ sudo docker run -it "apiaryio/snowcrash" /bin/bash
+	```
+
 ### Snow Crash command line tool
 1. Build `snowcrash`:
 	
