@@ -12,7 +12,7 @@
 using namespace snowcrash;
 using namespace snowcrashtest;
 
-TEST_CASE("Parse canonical mson named type", "[mson][named_type][now]")
+TEST_CASE("Parse canonical mson named type", "[mson][named_type]")
 {
     mdp::ByteBuffer source = \
     "# User (object)\n"\

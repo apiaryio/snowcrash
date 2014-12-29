@@ -49,23 +49,42 @@ namespace snowcrash {
     struct SourceMap : public SourceMapBase {
     };
 
-    /** Source Map of Collection of Values */
-    SOURCE_MAP_COLLECTION(mson::Value, mson::Values)
-
     /** Source Map of Collection of Type Names */
     SOURCE_MAP_COLLECTION(mson::TypeName, mson::TypeNames)
 
-    /** Source Map structure for Value Definition */
+    /** Forward Declaration for Source Map of Element */
     template<>
-    struct SourceMap<mson::ValueDefinition> : public SourceMapBase {
+    struct SourceMap<mson::Element>;
 
-        /** Source Map of Type Definition */
-        SourceMap<mson::TypeDefinition> typeDefinition;
+    /** Source Map of Collection of Elements */
+    SOURCE_MAP_COLLECTION(mson::Element, mson::Elements)
+
+    /** Source Map structure for Type Section */
+    template<>
+    struct SourceMap<mson::TypeSection> : public SourceMapBase {
+
+        /** EITHER Source Map of Block Description */
+        SourceMap<mson::Markdown> description;
+
+        /** OR Source Map of Literal */
+        SourceMap<mson::Literal> value;
+
+        /** OR Source Map of Collection of elements */
+        //TODO
     };
+
+    /** Source Map of Collection of Type Sections */
+    SOURCE_MAP_COLLECTION(mson::TypeSection, mson::TypeSections)
 
     /** Source Map structure for Named Type */
     template<>
-    struct SourceMap<mson::NamedType> {
+    struct SourceMap<mson::NamedType> : public SourceMapBase {
+
+        /** Source Map of Type Name */
+        SourceMap<mson::TypeName> name;
+
+        /** Source Map of Type Definition */
+        SourceMap<mson::TypeDefinition> typeDefinition;
 
         /** Source Map of Type Sections */
         SourceMap<mson::TypeSections> sections;
@@ -93,8 +112,28 @@ namespace snowcrash {
         SourceMap<mson::PropertyName> name;
     };
 
-    /** Source Map of Mixin */
-    // 'Mixin' type is same as 'TypeDefinition'
+    /** Source Map structure for One Of */
+    // `OneOf` is the same as `Elements`
+
+    /** Source Map structure for Element */
+    template<>
+    struct SourceMap<mson::Element> : public SourceMapBase {
+
+        /** EITHER Source Map of Property Member */
+        SourceMap<mson::PropertyMember> property;
+
+        /** OR Source Map of Value Member */
+        SourceMap<mson::ValueMember> value;
+
+        /** OR Source Map of Mixin */
+        SourceMap<mson::Mixin> mixin;
+
+        /** OR Source Map of One Of */
+        //TODO
+
+        /** OR Source Map of Collection of elements */
+        //TODO
+    };
 }
 
 #endif
