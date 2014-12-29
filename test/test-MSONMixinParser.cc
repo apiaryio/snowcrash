@@ -41,7 +41,7 @@ TEST_CASE("Parse canonical mson mixin", "[mson][mixin]")
     NamedTypeHelper::build("Person", mson::ObjectBaseType, namedTypes);
 
     ParseResult<mson::Mixin> mixin;
-    SectionParserHelper<mson::Mixin, MSONMixinParser>::parseMSON(source, MSONMixinSectionType, mixin, 0, namedTypes);
+    SectionParserHelper<mson::Mixin, MSONMixinParser>::parseMSON(source, MSONMixinSectionType, mixin, ExportSourcemapOption, namedTypes);
 
     REQUIRE(mixin.report.error.code == Error::OK);
     REQUIRE(mixin.report.warnings.empty());
@@ -51,6 +51,10 @@ TEST_CASE("Parse canonical mson mixin", "[mson][mixin]")
     REQUIRE(mixin.node.typeSpecification.name.symbol.literal == "Person");
     REQUIRE(mixin.node.typeSpecification.name.symbol.variable == false);
     REQUIRE(mixin.node.typeSpecification.nestedTypes.empty());
+
+    REQUIRE(mixin.sourceMap.sourceMap.size() == 1);
+    REQUIRE(mixin.sourceMap.sourceMap[0].location == 0);
+    REQUIRE(mixin.sourceMap.sourceMap[0].length == 17);
 }
 
 TEST_CASE("Parse mson mixin with canonical type definition", "[mson][mixin]")
@@ -61,7 +65,7 @@ TEST_CASE("Parse mson mixin with canonical type definition", "[mson][mixin]")
     NamedTypeHelper::build("Person", mson::ObjectBaseType, namedTypes);
 
     ParseResult<mson::Mixin> mixin;
-    SectionParserHelper<mson::Mixin, MSONMixinParser>::parseMSON(source, MSONMixinSectionType, mixin, 0, namedTypes);
+    SectionParserHelper<mson::Mixin, MSONMixinParser>::parseMSON(source, MSONMixinSectionType, mixin, ExportSourcemapOption, namedTypes);
 
     REQUIRE(mixin.report.error.code == Error::OK);
     REQUIRE(mixin.report.warnings.empty());
@@ -71,6 +75,10 @@ TEST_CASE("Parse mson mixin with canonical type definition", "[mson][mixin]")
     REQUIRE(mixin.node.typeSpecification.name.symbol.literal == "Person");
     REQUIRE(mixin.node.typeSpecification.name.symbol.variable == false);
     REQUIRE(mixin.node.typeSpecification.nestedTypes.empty());
+
+    REQUIRE(mixin.sourceMap.sourceMap.size() == 1);
+    REQUIRE(mixin.sourceMap.sourceMap[0].location == 0);
+    REQUIRE(mixin.sourceMap.sourceMap[0].length == 27);
 }
 
 TEST_CASE("Parse mson mixin with base type definition", "[mson][mixin]")
@@ -78,7 +86,7 @@ TEST_CASE("Parse mson mixin with base type definition", "[mson][mixin]")
     mdp::ByteBuffer source = "- Include (string)";
 
     ParseResult<mson::Mixin> mixin;
-    SectionParserHelper<mson::Mixin, MSONMixinParser>::parse(source, MSONMixinSectionType, mixin);
+    SectionParserHelper<mson::Mixin, MSONMixinParser>::parse(source, MSONMixinSectionType, mixin, ExportSourcemapOption);
 
     REQUIRE(mixin.report.error.code == Error::OK);
     REQUIRE(mixin.report.warnings.size() == 1);
@@ -88,6 +96,10 @@ TEST_CASE("Parse mson mixin with base type definition", "[mson][mixin]")
     REQUIRE(mixin.node.typeSpecification.name.base == mson::StringTypeName);
     REQUIRE(mixin.node.typeSpecification.name.symbol.empty());
     REQUIRE(mixin.node.typeSpecification.nestedTypes.empty());
+
+    REQUIRE(mixin.sourceMap.sourceMap.size() == 1);
+    REQUIRE(mixin.sourceMap.sourceMap[0].location == 0);
+    REQUIRE(mixin.sourceMap.sourceMap[0].length == 19);
 }
 
 TEST_CASE("Parse mson mixin with nested type definition", "[mson][mixin]")
@@ -98,7 +110,7 @@ TEST_CASE("Parse mson mixin with nested type definition", "[mson][mixin]")
     NamedTypeHelper::build("Person", mson::ValueBaseType, namedTypes);
 
     ParseResult<mson::Mixin> mixin;
-    SectionParserHelper<mson::Mixin, MSONMixinParser>::parseMSON(source, MSONMixinSectionType, mixin, 0, namedTypes);
+    SectionParserHelper<mson::Mixin, MSONMixinParser>::parseMSON(source, MSONMixinSectionType, mixin, ExportSourcemapOption, namedTypes);
 
     REQUIRE(mixin.report.error.code == Error::OK);
     REQUIRE(mixin.report.warnings.empty());
@@ -112,4 +124,8 @@ TEST_CASE("Parse mson mixin with nested type definition", "[mson][mixin]")
     REQUIRE(mixin.node.typeSpecification.nestedTypes[0].symbol.empty());
     REQUIRE(mixin.node.typeSpecification.nestedTypes[1].base == mson::StringTypeName);
     REQUIRE(mixin.node.typeSpecification.nestedTypes[1].symbol.empty());
+
+    REQUIRE(mixin.sourceMap.sourceMap.size() == 1);
+    REQUIRE(mixin.sourceMap.sourceMap[0].location == 0);
+    REQUIRE(mixin.sourceMap.sourceMap[0].length == 45);
 }
