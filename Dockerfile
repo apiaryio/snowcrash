@@ -1,4 +1,4 @@
-FROM apiaryio/base-cpp:1.0.0
+FROM apiaryio/base-dev-cpp:1.0.0
 MAINTAINER Lukas Linhart "lukas@apiary.io"
 
 # RUN apt-get install -y \
