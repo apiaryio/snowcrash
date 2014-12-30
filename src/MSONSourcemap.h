@@ -70,7 +70,25 @@ namespace snowcrash {
         SourceMap<mson::Literal> value;
 
         /** OR Source Map of Collection of elements */
-        //TODO
+        SourceMap<mson::Elements>& elements();
+        const SourceMap<mson::Elements>& elements() const;
+
+        /** Constructor */
+        SourceMap(const SourceMap<mson::Markdown>& description_ = SourceMap<mson::Markdown>(),
+                  const SourceMap<mson::Literal>& value_ = SourceMap<mson::Literal>());
+
+        /** Copy constructor */
+        SourceMap(const SourceMap<mson::TypeSection>& rhs);
+
+        /** Assignment operator */
+        SourceMap<mson::TypeSection>& operator=(const SourceMap<mson::TypeSection>& rhs);
+
+        /** Desctructor */
+        ~SourceMap();
+
+    private:
+        std::auto_ptr<SourceMap<mson::Elements> > m_elements;
+
     };
 
     /** Source Map of Collection of Type Sections */
@@ -129,10 +147,30 @@ namespace snowcrash {
         SourceMap<mson::Mixin> mixin;
 
         /** OR Source Map of One Of */
-        //TODO
+        SourceMap<mson::OneOf>& oneOf();
+        const SourceMap<mson::OneOf>& oneOf() const;
 
         /** OR Source Map of Collection of elements */
-        //TODO
+        SourceMap<mson::Elements>& elements();
+        const SourceMap<mson::Elements>& elements() const;
+
+        /** Builds the structure from group of elements */
+        SourceMap<mson::Element>& operator=(const SourceMap<mson::Elements>& rhs);
+
+        /** Constructor */
+        SourceMap();
+
+        /** Copy constructor */
+        SourceMap(const SourceMap<mson::Element>& rhs);
+
+        /** Assignment operator */
+        SourceMap<mson::Element>& operator=(const SourceMap<mson::Element>& rhs);
+
+        /** Destructor */
+        ~SourceMap();
+
+    private:
+        std::auto_ptr<SourceMap<mson::Elements> > m_elements;
     };
 }
 

@@ -42,7 +42,7 @@ TEST_CASE("Parse canonical mson one of", "[mson][one_of]")
     "  - province: Madras";
 
     ParseResult<mson::OneOf> oneOf;
-    SectionParserHelper<mson::OneOf, MSONOneOfParser>::parseMSON(source, MSONOneOfSectionType, oneOf);
+    SectionParserHelper<mson::OneOf, MSONOneOfParser>::parseMSON(source, MSONOneOfSectionType, oneOf, ExportSourcemapOption);
 
     REQUIRE(oneOf.report.error.code == Error::OK);
     REQUIRE(oneOf.report.warnings.empty());
@@ -68,6 +68,22 @@ TEST_CASE("Parse canonical mson one of", "[mson][one_of]")
     REQUIRE(oneOf.node.at(1).content.property.sections.empty());
     REQUIRE(oneOf.node.at(1).content.property.description.empty());
     REQUIRE(oneOf.node.at(1).content.property.name.variable.empty());
+
+    REQUIRE(oneOf.sourceMap.collection.size() == 2);
+
+    REQUIRE(oneOf.sourceMap.collection[0].property.name.sourceMap.size() == 1);
+    REQUIRE(oneOf.sourceMap.collection[0].property.name.sourceMap[0].location == 13);
+    REQUIRE(oneOf.sourceMap.collection[0].property.name.sourceMap[0].length == 22);
+    REQUIRE(oneOf.sourceMap.collection[0].property.valueDefinition.sourceMap.size() == 1);
+    REQUIRE(oneOf.sourceMap.collection[0].property.valueDefinition.sourceMap[0].location == 13);
+    REQUIRE(oneOf.sourceMap.collection[0].property.valueDefinition.sourceMap[0].length == 22);
+
+    REQUIRE(oneOf.sourceMap.collection[1].property.name.sourceMap.size() == 1);
+    REQUIRE(oneOf.sourceMap.collection[1].property.name.sourceMap[0].location == 37);
+    REQUIRE(oneOf.sourceMap.collection[1].property.name.sourceMap[0].length == 19);
+    REQUIRE(oneOf.sourceMap.collection[1].property.valueDefinition.sourceMap.size() == 1);
+    REQUIRE(oneOf.sourceMap.collection[1].property.valueDefinition.sourceMap[0].location == 37);
+    REQUIRE(oneOf.sourceMap.collection[1].property.valueDefinition.sourceMap[0].length == 19);
 }
 
 TEST_CASE("Parse mson one of without any nested members", "[mson][one_of]")
@@ -75,13 +91,14 @@ TEST_CASE("Parse mson one of without any nested members", "[mson][one_of]")
     mdp::ByteBuffer source = "- One of\n";
 
     ParseResult<mson::OneOf> oneOf;
-    SectionParserHelper<mson::OneOf, MSONOneOfParser>::parseMSON(source, MSONOneOfSectionType, oneOf);
+    SectionParserHelper<mson::OneOf, MSONOneOfParser>::parseMSON(source, MSONOneOfSectionType, oneOf, ExportSourcemapOption);
 
     REQUIRE(oneOf.report.error.code == Error::OK);
     REQUIRE(oneOf.report.warnings.size() == 1);
     REQUIRE(oneOf.report.warnings[0].code == EmptyDefinitionWarning);
 
-    REQUIRE(oneOf.node.size() == 0);
+    REQUIRE(oneOf.node.empty());
+    REQUIRE(oneOf.sourceMap.collection.empty());
 }
 
 TEST_CASE("Parse mson one of with one of", "[mson][one_of]")
@@ -94,12 +111,13 @@ TEST_CASE("Parse mson one of with one of", "[mson][one_of]")
     "        - suffixed_name";
 
     ParseResult<mson::OneOf> oneOf;
-    SectionParserHelper<mson::OneOf, MSONOneOfParser>::parseMSON(source, MSONOneOfSectionType, oneOf);
+    SectionParserHelper<mson::OneOf, MSONOneOfParser>::parseMSON(source, MSONOneOfSectionType, oneOf, ExportSourcemapOption);
 
     REQUIRE(oneOf.report.error.code == Error::OK);
     REQUIRE(oneOf.report.warnings.empty());
 
     REQUIRE(oneOf.node.size() == 2);
+
     REQUIRE(oneOf.node.at(0).klass == mson::Element::PropertyClass);
     REQUIRE(oneOf.node.at(0).content.property.name.literal == "last_name");
     REQUIRE(oneOf.node.at(0).content.property.sections.empty());
@@ -114,9 +132,20 @@ TEST_CASE("Parse mson one of with one of", "[mson][one_of]")
     REQUIRE(oneOf.node.at(1).content.oneOf().at(1).klass == mson::Element::PropertyClass);
     REQUIRE(oneOf.node.at(1).content.oneOf().at(1).content.property.name.literal == "suffixed_name");
     REQUIRE(oneOf.node.at(1).content.oneOf().at(1).content.property.valueDefinition.empty());
+
+    REQUIRE(oneOf.sourceMap.collection.size() == 2);
+
+    REQUIRE(oneOf.sourceMap.collection[0].property.name.sourceMap.size() == 1);
+    REQUIRE(oneOf.sourceMap.collection[0].property.name.sourceMap[0].location == 15);
+    REQUIRE(oneOf.sourceMap.collection[0].property.name.sourceMap[0].length == 10);
+    REQUIRE(oneOf.sourceMap.collection[0].property.valueDefinition.sourceMap.empty());
+
+    REQUIRE(oneOf.sourceMap.collection[1].oneOf().collection.size() == 2);
+    REQUIRE(oneOf.sourceMap.collection[1].oneOf().collection[0].property.name.sourceMap.size() == 1);
+    REQUIRE(oneOf.sourceMap.collection[1].oneOf().collection[1].property.name.sourceMap.size() == 1);
 }
 
-TEST_CASE("Parse mson one of with member group")
+TEST_CASE("Parse mson one of with member group", "[mson][one_of]")
 {
     mdp::ByteBuffer source = \
     "- One Of\n"\
@@ -126,7 +155,7 @@ TEST_CASE("Parse mson one of with member group")
     "        - last_name";
 
     ParseResult<mson::OneOf> oneOf;
-    SectionParserHelper<mson::OneOf, MSONOneOfParser>::parseMSON(source, MSONOneOfSectionType, oneOf);
+    SectionParserHelper<mson::OneOf, MSONOneOfParser>::parseMSON(source, MSONOneOfSectionType, oneOf, ExportSourcemapOption);
 
     REQUIRE(oneOf.report.error.code == Error::OK);
     REQUIRE(oneOf.report.warnings.empty());
@@ -146,4 +175,19 @@ TEST_CASE("Parse mson one of with member group")
     REQUIRE(oneOf.node.at(1).content.elements().at(0).content.property.name.literal == "first_name");
     REQUIRE(oneOf.node.at(1).content.elements().at(1).klass == mson::Element::PropertyClass);
     REQUIRE(oneOf.node.at(1).content.elements().at(1).content.property.name.literal == "last_name");
+
+    REQUIRE(oneOf.sourceMap.collection.size() == 2);
+
+    REQUIRE(oneOf.sourceMap.collection[0].property.name.sourceMap.size() == 1);
+    REQUIRE(oneOf.sourceMap.collection[0].property.name.sourceMap[0].location == 15);
+    REQUIRE(oneOf.sourceMap.collection[0].property.name.sourceMap[0].length == 10);
+    REQUIRE(oneOf.sourceMap.collection[0].property.valueDefinition.sourceMap.empty());
+
+    REQUIRE(oneOf.sourceMap.collection[1].oneOf().collection.size() == 2);
+    REQUIRE(oneOf.sourceMap.collection[1].oneOf().collection[0].property.name.sourceMap.size() == 1);
+    REQUIRE(oneOf.sourceMap.collection[1].oneOf().collection[0].property.name.sourceMap[0].location == 52);
+    REQUIRE(oneOf.sourceMap.collection[1].oneOf().collection[0].property.name.sourceMap[0].location == 11);
+    REQUIRE(oneOf.sourceMap.collection[1].oneOf().collection[1].property.name.sourceMap.size() == 1);
+    REQUIRE(oneOf.sourceMap.collection[1].oneOf().collection[1].property.name.sourceMap[0].location == 71);
+    REQUIRE(oneOf.sourceMap.collection[1].oneOf().collection[1].property.name.sourceMap[0].location == 12);
 }

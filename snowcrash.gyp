@@ -70,6 +70,7 @@
         'src/HTTP.h',
         'src/MSON.cc',
         'src/MSONOneOfParser.cc',
+        'src/MSONSourcemap.cc',
         'src/MSONTypeSectionParser.cc',
         'src/MSONValueMemberParser.cc',
         'src/Section.cc',
