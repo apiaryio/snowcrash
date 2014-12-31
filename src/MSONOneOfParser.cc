@@ -31,7 +31,7 @@ namespace snowcrash {
                 element.build(mixin.node);
 
                 if (pd.exportSourceMap()) {
-                    elementSM.mixin.sourceMap = node->sourceMap;
+                    elementSM.mixin = mixin.sourceMap;
                 }
 
                 break;

@@ -104,6 +104,10 @@ namespace snowcrash {
 
             valueMember.description = signature.content;
 
+            if (pd.exportSourceMap() && !signature.content.empty()) {
+                sourceMap.description.sourceMap = node->sourceMap;
+            }
+
             mson::parseTypeDefinition(node, pd, signature.attributes, report, valueMember.valueDefinition.typeDefinition);
             parseRemainingContent(node, pd, signature.remainingContent, valueMember.sections, sourceMap.sections);
 
@@ -124,6 +128,10 @@ namespace snowcrash {
                  it++) {
 
                 valueMember.valueDefinition.values.push_back(mson::parseValue(*it));
+            }
+
+            if (pd.exportSourceMap() && !valueMember.valueDefinition.empty()) {
+                sourceMap.valueDefinition.sourceMap = node->sourceMap;
             }
 
             return ++MarkdownNodeIterator(node);
@@ -152,6 +160,14 @@ namespace snowcrash {
 
             typeSection.content.description = remainingContent;
             sections.push_back(typeSection);
+
+            if (pd.exportSourceMap()) {
+
+                SourceMap<mson::TypeSection> typeSectionSM;
+
+                typeSectionSM.description.sourceMap = node->sourceMap;
+                sourceMap.collection.push_back(typeSectionSM);
+            }
         }
 
         /**
@@ -175,6 +191,12 @@ namespace snowcrash {
 
                     mson::TypeSection typeSection(mson::TypeSection::BlockDescriptionClass);
                     sections.push_back(typeSection);
+
+                    if (pd.exportSourceMap()) {
+
+                        SourceMap<mson::TypeSection> typeSectionSM;
+                        sourceMap.collection.push_back(typeSectionSM);
+                    }
                 }
 
                 if (!sections[0].content.description.empty()) {
@@ -183,6 +205,10 @@ namespace snowcrash {
 
                 mdp::ByteBuffer content = mdp::MapBytesRangeSet(node->sourceMap, pd.sourceData);
                 sections[0].content.description += content;
+
+                if (pd.exportSourceMap() && !content.empty()) {
+                    sourceMap.collection[0].description.sourceMap.append(node->sourceMap);
+                }
 
                 return ++MarkdownNodeIterator(node);
             }
@@ -226,6 +252,10 @@ namespace snowcrash {
 
                 if (typeSection.node.klass != mson::TypeSection::UndefinedClass) {
                     sections.node.push_back(typeSection.node);
+
+                    if (pd.exportSourceMap()) {
+                        sections.sourceMap.collection.push_back(typeSection.sourceMap);
+                    }
                 }
             }
 

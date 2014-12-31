@@ -186,8 +186,8 @@ TEST_CASE("Parse mson one of with member group", "[mson][one_of]")
     REQUIRE(oneOf.sourceMap.collection[1].oneOf().collection.size() == 2);
     REQUIRE(oneOf.sourceMap.collection[1].oneOf().collection[0].property.name.sourceMap.size() == 1);
     REQUIRE(oneOf.sourceMap.collection[1].oneOf().collection[0].property.name.sourceMap[0].location == 52);
-    REQUIRE(oneOf.sourceMap.collection[1].oneOf().collection[0].property.name.sourceMap[0].location == 11);
+    REQUIRE(oneOf.sourceMap.collection[1].oneOf().collection[0].property.name.sourceMap[0].length == 11);
     REQUIRE(oneOf.sourceMap.collection[1].oneOf().collection[1].property.name.sourceMap.size() == 1);
     REQUIRE(oneOf.sourceMap.collection[1].oneOf().collection[1].property.name.sourceMap[0].location == 71);
-    REQUIRE(oneOf.sourceMap.collection[1].oneOf().collection[1].property.name.sourceMap[0].location == 12);
+    REQUIRE(oneOf.sourceMap.collection[1].oneOf().collection[1].property.name.sourceMap[0].length == 12);
 }
