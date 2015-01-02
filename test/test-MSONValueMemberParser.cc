@@ -18,7 +18,7 @@ TEST_CASE("Parse canonical mson value member", "[mson][value_member]")
     "- red (string, required) - A color";
 
     ParseResult<mson::ValueMember> valueMember;
-    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(source, MSONValueMemberSectionType, valueMember);
+    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(source, MSONValueMemberSectionType, valueMember, ExportSourcemapOption);
 
     REQUIRE(valueMember.report.error.code == Error::OK);
     REQUIRE(valueMember.report.warnings.empty());
@@ -30,6 +30,9 @@ TEST_CASE("Parse canonical mson value member", "[mson][value_member]")
     REQUIRE(valueMember.node.valueDefinition.typeDefinition.typeSpecification.name.symbol.empty());
     REQUIRE(valueMember.node.valueDefinition.typeDefinition.typeSpecification.nestedTypes.empty());
     REQUIRE(valueMember.node.valueDefinition.typeDefinition.attributes == mson::RequiredTypeAttribute);
+
+    SourceMapHelper::check(valueMember.sourceMap.valueDefinition.sourceMap, 0, 35);
+    SourceMapHelper::check(valueMember.sourceMap.description.sourceMap, 0, 35);
 }
 
 TEST_CASE("Parse mson value member with description not on new line", "[mson][value_member]")
@@ -39,7 +42,7 @@ TEST_CASE("Parse mson value member with description not on new line", "[mson][va
     "  Which is also very nice\n\n";
 
     ParseResult<mson::ValueMember> valueMember;
-    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(source, MSONValueMemberSectionType, valueMember);
+    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(source, MSONValueMemberSectionType, valueMember, ExportSourcemapOption);
 
     REQUIRE(valueMember.report.error.code == Error::OK);
     REQUIRE(valueMember.report.warnings.empty());
@@ -50,6 +53,11 @@ TEST_CASE("Parse mson value member with description not on new line", "[mson][va
     REQUIRE(valueMember.node.sections[0].klass == mson::TypeSection::BlockDescriptionClass);
     REQUIRE(valueMember.node.sections[0].content.description == "Which is also very nice\n");
     REQUIRE(valueMember.node.sections[0].content.elements().empty());
+
+    SourceMapHelper::check(valueMember.sourceMap.valueDefinition.sourceMap, 0, 62);
+    SourceMapHelper::check(valueMember.sourceMap.description.sourceMap, 0, 62);
+    REQUIRE(valueMember.sourceMap.sections.collection.size() == 1);
+    SourceMapHelper::check(valueMember.sourceMap.sections.collection[0].description.sourceMap, 0, 62);
 }
 
 TEST_CASE("Parse mson value member with block description", "[mson][value_member]")
@@ -61,7 +69,7 @@ TEST_CASE("Parse mson value member with block description", "[mson][value_member
     "and really really nice\n\n";
 
     ParseResult<mson::ValueMember> valueMember;
-    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(source, MSONValueMemberSectionType, valueMember);
+    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(source, MSONValueMemberSectionType, valueMember, ExportSourcemapOption);
 
     REQUIRE(valueMember.report.error.code == Error::OK);
     REQUIRE(valueMember.report.warnings.empty());
@@ -72,6 +80,13 @@ TEST_CASE("Parse mson value member with block description", "[mson][value_member
     REQUIRE(valueMember.node.sections.size() == 1);
     REQUIRE(valueMember.node.sections[0].klass == mson::TypeSection::BlockDescriptionClass);
     REQUIRE(valueMember.node.sections[0].content.description == "Which is also very nice\n\n- and awesome\n");
+
+    SourceMapHelper::check(valueMember.sourceMap.valueDefinition.sourceMap, 2, 34);
+    SourceMapHelper::check(valueMember.sourceMap.description.sourceMap, 2, 34);
+    REQUIRE(valueMember.sourceMap.sections.collection.size() == 1);
+    REQUIRE(valueMember.sourceMap.sections.collection[0].description.sourceMap.size() == 2);
+    SourceMapHelper::check(valueMember.sourceMap.sections.collection[0].description.sourceMap, 40, 24, 1);
+    SourceMapHelper::check(valueMember.sourceMap.sections.collection[0].description.sourceMap, 69, 14, 2);
 }
 
 TEST_CASE("Parse mson value member with block description, default and sample", "[mson][value_member]")
@@ -85,7 +100,7 @@ TEST_CASE("Parse mson value member with block description, default and sample", 
     "        green\n";
 
     ParseResult<mson::ValueMember> valueMember;
-    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(source, MSONValueMemberSectionType, valueMember);
+    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(source, MSONValueMemberSectionType, valueMember, ExportSourcemapOption);
 
     REQUIRE(valueMember.report.error.code == Error::OK);
     REQUIRE(valueMember.report.warnings.empty());
@@ -100,6 +115,15 @@ TEST_CASE("Parse mson value member with block description, default and sample", 
     REQUIRE(valueMember.node.sections[1].content.value == "yellow");
     REQUIRE(valueMember.node.sections[2].klass == mson::TypeSection::SampleClass);
     REQUIRE(valueMember.node.sections[2].content.value == "green\n");
+
+    SourceMapHelper::check(valueMember.sourceMap.valueDefinition.sourceMap, 2, 24);
+    SourceMapHelper::check(valueMember.sourceMap.description.sourceMap, 2, 24);
+    REQUIRE(valueMember.sourceMap.sections.collection.size() == 3);
+    REQUIRE(valueMember.sourceMap.sections.collection[0].description.sourceMap.size() == 2);
+    SourceMapHelper::check(valueMember.sourceMap.sections.collection[0].description.sourceMap, 30, 24, 1);
+    SourceMapHelper::check(valueMember.sourceMap.sections.collection[0].description.sourceMap, 59, 14, 2);
+    SourceMapHelper::check(valueMember.sourceMap.sections.collection[1].value.sourceMap, 80, 16);
+    SourceMapHelper::check(valueMember.sourceMap.sections.collection[2].value.sourceMap, 118, 6);
 }
 
 TEST_CASE("Parse mson value member array with sample", "[mson][value_member]")
@@ -114,7 +138,7 @@ TEST_CASE("Parse mson value member array with sample", "[mson][value_member]")
     "        - yellow\n";
 
     ParseResult<mson::ValueMember> valueMember;
-    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(source, MSONValueMemberSectionType, valueMember);
+    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(source, MSONValueMemberSectionType, valueMember, ExportSourcemapOption);
 
     REQUIRE(valueMember.report.error.code == Error::OK);
     REQUIRE(valueMember.report.warnings.empty());
@@ -126,6 +150,12 @@ TEST_CASE("Parse mson value member array with sample", "[mson][value_member]")
     REQUIRE(valueMember.node.sections[0].content.description == "Lots and lots of them\n");
     REQUIRE(valueMember.node.sections[1].klass == mson::TypeSection::SampleClass);
     REQUIRE(valueMember.node.sections[1].content.elements().size() == 4);
+
+    SourceMapHelper::check(valueMember.sourceMap.valueDefinition.sourceMap, 2, 26);
+    SourceMapHelper::check(valueMember.sourceMap.description.sourceMap, 2, 26);
+    REQUIRE(valueMember.sourceMap.sections.collection.size() == 2);
+    SourceMapHelper::check(valueMember.sourceMap.sections.collection[0].description.sourceMap, 32, 22);
+    REQUIRE(valueMember.sourceMap.sections.collection[1].elements().collection.size() == 4);
 }
 
 TEST_CASE("Parse mson value member with multiple values", "[mson][value_member]")
@@ -134,7 +164,7 @@ TEST_CASE("Parse mson value member with multiple values", "[mson][value_member]"
     "- 1, yellow, true";
 
     ParseResult<mson::ValueMember> valueMember;
-    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(source, MSONValueMemberSectionType, valueMember);
+    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(source, MSONValueMemberSectionType, valueMember, ExportSourcemapOption);
 
     REQUIRE(valueMember.report.error.code == Error::OK);
     REQUIRE(valueMember.report.warnings.empty());
@@ -145,6 +175,10 @@ TEST_CASE("Parse mson value member with multiple values", "[mson][value_member]"
     REQUIRE(valueMember.node.valueDefinition.values[0].literal == "1");
     REQUIRE(valueMember.node.valueDefinition.values[1].literal == "yellow");
     REQUIRE(valueMember.node.valueDefinition.values[2].literal == "true");
+
+    SourceMapHelper::check(valueMember.sourceMap.valueDefinition.sourceMap, 0, 18);
+    REQUIRE(valueMember.sourceMap.description.sourceMap.empty());
+    REQUIRE(valueMember.sourceMap.sections.collection.empty());
 }
 
 TEST_CASE("Parse mson value member array with items", "[mson][value_member]")
@@ -155,7 +189,7 @@ TEST_CASE("Parse mson value member array with items", "[mson][value_member]")
     "    - green (string)";
 
     ParseResult<mson::ValueMember> valueMember;
-    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(source, MSONValueMemberSectionType, valueMember);
+    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(source, MSONValueMemberSectionType, valueMember, ExportSourcemapOption);
 
     REQUIRE(valueMember.report.error.code == Error::OK);
     REQUIRE(valueMember.report.warnings.empty());
@@ -173,4 +207,17 @@ TEST_CASE("Parse mson value member array with items", "[mson][value_member]")
     REQUIRE(valueMember.node.sections[0].content.elements().at(0).content.value.description == "A sample value");
     REQUIRE(valueMember.node.sections[0].content.elements().at(1).klass == mson::Element::ValueClass);
     REQUIRE(valueMember.node.sections[0].content.elements().at(1).content.value.valueDefinition.values.size() == 1);
+
+    SourceMapHelper::check(valueMember.sourceMap.valueDefinition.sourceMap, 2, 8);
+    REQUIRE(valueMember.sourceMap.sections.collection.size() == 1);
+    REQUIRE(valueMember.sourceMap.sections.collection[0].elements().collection.size() == 2);
+
+    SourceMap<mson::ValueMember> valueMemberSM;
+
+    valueMemberSM = valueMember.sourceMap.sections.collection[0].elements().collection[0].value;
+    SourceMapHelper::check(valueMemberSM.valueDefinition.sourceMap, 16, 30);
+    SourceMapHelper::check(valueMemberSM.description.sourceMap, 16, 30);
+
+    valueMemberSM = valueMember.sourceMap.sections.collection[0].elements().collection[1].value;
+    SourceMapHelper::check(valueMemberSM.valueDefinition.sourceMap, 50, 17);
 }

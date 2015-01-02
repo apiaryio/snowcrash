@@ -116,6 +116,11 @@ namespace snowcrash {
                 if (valueMember.valueDefinition.typeDefinition.baseType == mson::PrimitiveBaseType) {
 
                     valueMember.valueDefinition.values.push_back(mson::parseValue(signature.value));
+
+                    if (pd.exportSourceMap()) {
+                        sourceMap.valueDefinition.sourceMap = node->sourceMap;
+                    }
+
                     return ++MarkdownNodeIterator(node);
                 }
                 else if (valueMember.valueDefinition.typeDefinition.baseType == mson::UndefinedBaseType) {

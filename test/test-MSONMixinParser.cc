@@ -52,9 +52,7 @@ TEST_CASE("Parse canonical mson mixin", "[mson][mixin]")
     REQUIRE(mixin.node.typeSpecification.name.symbol.variable == false);
     REQUIRE(mixin.node.typeSpecification.nestedTypes.empty());
 
-    REQUIRE(mixin.sourceMap.sourceMap.size() == 1);
-    REQUIRE(mixin.sourceMap.sourceMap[0].location == 0);
-    REQUIRE(mixin.sourceMap.sourceMap[0].length == 17);
+    SourceMapHelper::check(mixin.sourceMap.sourceMap, 0, 17);
 }
 
 TEST_CASE("Parse mson mixin with canonical type definition", "[mson][mixin]")
@@ -76,9 +74,7 @@ TEST_CASE("Parse mson mixin with canonical type definition", "[mson][mixin]")
     REQUIRE(mixin.node.typeSpecification.name.symbol.variable == false);
     REQUIRE(mixin.node.typeSpecification.nestedTypes.empty());
 
-    REQUIRE(mixin.sourceMap.sourceMap.size() == 1);
-    REQUIRE(mixin.sourceMap.sourceMap[0].location == 0);
-    REQUIRE(mixin.sourceMap.sourceMap[0].length == 27);
+    SourceMapHelper::check(mixin.sourceMap.sourceMap, 0, 27);
 }
 
 TEST_CASE("Parse mson mixin with base type definition", "[mson][mixin]")
@@ -97,9 +93,7 @@ TEST_CASE("Parse mson mixin with base type definition", "[mson][mixin]")
     REQUIRE(mixin.node.typeSpecification.name.symbol.empty());
     REQUIRE(mixin.node.typeSpecification.nestedTypes.empty());
 
-    REQUIRE(mixin.sourceMap.sourceMap.size() == 1);
-    REQUIRE(mixin.sourceMap.sourceMap[0].location == 0);
-    REQUIRE(mixin.sourceMap.sourceMap[0].length == 19);
+    SourceMapHelper::check(mixin.sourceMap.sourceMap, 0, 19);
 }
 
 TEST_CASE("Parse mson mixin with nested type definition", "[mson][mixin]")
@@ -125,7 +119,5 @@ TEST_CASE("Parse mson mixin with nested type definition", "[mson][mixin]")
     REQUIRE(mixin.node.typeSpecification.nestedTypes[1].base == mson::StringTypeName);
     REQUIRE(mixin.node.typeSpecification.nestedTypes[1].symbol.empty());
 
-    REQUIRE(mixin.sourceMap.sourceMap.size() == 1);
-    REQUIRE(mixin.sourceMap.sourceMap[0].location == 0);
-    REQUIRE(mixin.sourceMap.sourceMap[0].length == 45);
+    SourceMapHelper::check(mixin.sourceMap.sourceMap, 0, 45);
 }

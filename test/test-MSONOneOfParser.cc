@@ -71,19 +71,10 @@ TEST_CASE("Parse canonical mson one of", "[mson][one_of]")
 
     REQUIRE(oneOf.sourceMap.collection.size() == 2);
 
-    REQUIRE(oneOf.sourceMap.collection[0].property.name.sourceMap.size() == 1);
-    REQUIRE(oneOf.sourceMap.collection[0].property.name.sourceMap[0].location == 13);
-    REQUIRE(oneOf.sourceMap.collection[0].property.name.sourceMap[0].length == 22);
-    REQUIRE(oneOf.sourceMap.collection[0].property.valueDefinition.sourceMap.size() == 1);
-    REQUIRE(oneOf.sourceMap.collection[0].property.valueDefinition.sourceMap[0].location == 13);
-    REQUIRE(oneOf.sourceMap.collection[0].property.valueDefinition.sourceMap[0].length == 22);
-
-    REQUIRE(oneOf.sourceMap.collection[1].property.name.sourceMap.size() == 1);
-    REQUIRE(oneOf.sourceMap.collection[1].property.name.sourceMap[0].location == 37);
-    REQUIRE(oneOf.sourceMap.collection[1].property.name.sourceMap[0].length == 19);
-    REQUIRE(oneOf.sourceMap.collection[1].property.valueDefinition.sourceMap.size() == 1);
-    REQUIRE(oneOf.sourceMap.collection[1].property.valueDefinition.sourceMap[0].location == 37);
-    REQUIRE(oneOf.sourceMap.collection[1].property.valueDefinition.sourceMap[0].length == 19);
+    SourceMapHelper::check(oneOf.sourceMap.collection[0].property.name.sourceMap, 13, 22);
+    SourceMapHelper::check(oneOf.sourceMap.collection[0].property.valueDefinition.sourceMap, 13, 22);
+    SourceMapHelper::check(oneOf.sourceMap.collection[1].property.name.sourceMap, 37, 19);
+    SourceMapHelper::check(oneOf.sourceMap.collection[1].property.valueDefinition.sourceMap, 37, 19);
 }
 
 TEST_CASE("Parse mson one of without any nested members", "[mson][one_of]")
@@ -135,14 +126,12 @@ TEST_CASE("Parse mson one of with one of", "[mson][one_of]")
 
     REQUIRE(oneOf.sourceMap.collection.size() == 2);
 
-    REQUIRE(oneOf.sourceMap.collection[0].property.name.sourceMap.size() == 1);
-    REQUIRE(oneOf.sourceMap.collection[0].property.name.sourceMap[0].location == 15);
-    REQUIRE(oneOf.sourceMap.collection[0].property.name.sourceMap[0].length == 10);
+    SourceMapHelper::check(oneOf.sourceMap.collection[0].property.name.sourceMap, 15, 10);
     REQUIRE(oneOf.sourceMap.collection[0].property.valueDefinition.sourceMap.empty());
 
     REQUIRE(oneOf.sourceMap.collection[1].oneOf().collection.size() == 2);
-    REQUIRE(oneOf.sourceMap.collection[1].oneOf().collection[0].property.name.sourceMap.size() == 1);
-    REQUIRE(oneOf.sourceMap.collection[1].oneOf().collection[1].property.name.sourceMap.size() == 1);
+    SourceMapHelper::check(oneOf.sourceMap.collection[1].oneOf().collection[0].property.name.sourceMap, 48, 11);
+    SourceMapHelper::check(oneOf.sourceMap.collection[1].oneOf().collection[1].property.name.sourceMap, 67, 16);
 }
 
 TEST_CASE("Parse mson one of with member group", "[mson][one_of]")
@@ -178,16 +167,10 @@ TEST_CASE("Parse mson one of with member group", "[mson][one_of]")
 
     REQUIRE(oneOf.sourceMap.collection.size() == 2);
 
-    REQUIRE(oneOf.sourceMap.collection[0].property.name.sourceMap.size() == 1);
-    REQUIRE(oneOf.sourceMap.collection[0].property.name.sourceMap[0].location == 15);
-    REQUIRE(oneOf.sourceMap.collection[0].property.name.sourceMap[0].length == 10);
+    SourceMapHelper::check(oneOf.sourceMap.collection[0].property.name.sourceMap, 15, 10);
     REQUIRE(oneOf.sourceMap.collection[0].property.valueDefinition.sourceMap.empty());
 
-    REQUIRE(oneOf.sourceMap.collection[1].oneOf().collection.size() == 2);
-    REQUIRE(oneOf.sourceMap.collection[1].oneOf().collection[0].property.name.sourceMap.size() == 1);
-    REQUIRE(oneOf.sourceMap.collection[1].oneOf().collection[0].property.name.sourceMap[0].location == 52);
-    REQUIRE(oneOf.sourceMap.collection[1].oneOf().collection[0].property.name.sourceMap[0].length == 11);
-    REQUIRE(oneOf.sourceMap.collection[1].oneOf().collection[1].property.name.sourceMap.size() == 1);
-    REQUIRE(oneOf.sourceMap.collection[1].oneOf().collection[1].property.name.sourceMap[0].location == 71);
-    REQUIRE(oneOf.sourceMap.collection[1].oneOf().collection[1].property.name.sourceMap[0].length == 12);
+    REQUIRE(oneOf.sourceMap.collection[1].elements().collection.size() == 2);
+    SourceMapHelper::check(oneOf.sourceMap.collection[1].elements().collection[0].property.name.sourceMap, 52, 11);
+    SourceMapHelper::check(oneOf.sourceMap.collection[1].elements().collection[1].property.name.sourceMap, 71, 12);
 }

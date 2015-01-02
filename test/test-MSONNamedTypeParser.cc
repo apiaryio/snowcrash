@@ -27,9 +27,10 @@ TEST_CASE("Parse canonical mson named type", "[mson][named_type]")
     "        - name: Medium (string)\n";
 
     ParseResult<mson::NamedType> namedType;
-    SectionParserHelper<mson::NamedType, MSONNamedTypeParser>::parse(source, MSONNamedTypeSectionType, namedType);
+    SectionParserHelper<mson::NamedType, MSONNamedTypeParser>::parse(source, MSONNamedTypeSectionType, namedType, ExportSourcemapOption);
 
     mson::Element element, subelement;
+    SourceMap<mson::Element> elementSM, subelementSM;
 
     REQUIRE(namedType.report.error.code == Error::OK);
     REQUIRE(namedType.report.warnings.empty());
@@ -106,6 +107,48 @@ TEST_CASE("Parse canonical mson named type", "[mson][named_type]")
     REQUIRE(subelement.content.property.valueDefinition.typeDefinition.typeSpecification.name.base == mson::StringTypeName);
     REQUIRE(subelement.content.property.valueDefinition.values.size() == 1);
     REQUIRE(subelement.content.property.valueDefinition.values[0].literal == "Medium");
+
+    SourceMapHelper::check(namedType.sourceMap.name.sourceMap, 0, 16);
+    SourceMapHelper::check(namedType.sourceMap.typeDefinition.sourceMap, 0, 16);
+    REQUIRE(namedType.sourceMap.sections.collection.size() == 1);
+    REQUIRE(namedType.sourceMap.sections.collection[0].elements().collection.size() == 5);
+
+    elementSM = namedType.sourceMap.sections.collection[0].elements().collection[0];
+    SourceMapHelper::check(elementSM.property.name.sourceMap, 18, 26);
+    SourceMapHelper::check(elementSM.property.valueDefinition.sourceMap, 18, 26);
+    REQUIRE(elementSM.property.sections.collection.empty());
+
+    elementSM = namedType.sourceMap.sections.collection[0].elements().collection[1];
+    SourceMapHelper::check(elementSM.property.name.sourceMap, 46, 45);
+    SourceMapHelper::check(elementSM.property.valueDefinition.sourceMap, 46, 45);
+    REQUIRE(elementSM.property.sections.collection.empty());
+
+    elementSM = namedType.sourceMap.sections.collection[0].elements().collection[2];
+    SourceMapHelper::check(elementSM.property.name.sourceMap, 93, 32);
+    SourceMapHelper::check(elementSM.property.valueDefinition.sourceMap, 93, 32);
+    REQUIRE(elementSM.property.sections.collection.empty());
+
+    elementSM = namedType.sourceMap.sections.collection[0].elements().collection[3];
+    SourceMapHelper::check(elementSM.property.name.sourceMap, 127, 28);
+    SourceMapHelper::check(elementSM.property.valueDefinition.sourceMap, 127, 28);
+    REQUIRE(elementSM.property.sections.collection.empty());
+
+    elementSM = namedType.sourceMap.sections.collection[0].elements().collection[4];
+    SourceMapHelper::check(elementSM.property.name.sourceMap, 155, 135);
+    SourceMapHelper::check(elementSM.property.valueDefinition.sourceMap, 155, 135);
+    REQUIRE(elementSM.property.sections.collection.size() == 2);
+    SourceMapHelper::check(elementSM.property.sections.collection[0].description.sourceMap, 155, 135);
+    REQUIRE(elementSM.property.sections.collection[1].elements().collection.size() == 2);
+
+    subelementSM = elementSM.property.sections.collection[1].elements().collection[0];
+    SourceMapHelper::check(subelementSM.property.name.sourceMap, 236, 22);
+    SourceMapHelper::check(subelementSM.property.valueDefinition.sourceMap, 236, 22);
+    REQUIRE(subelementSM.property.sections.collection.empty());
+
+    subelementSM = elementSM.property.sections.collection[1].elements().collection[1];
+    SourceMapHelper::check(subelementSM.property.name.sourceMap, 268, 22);
+    SourceMapHelper::check(subelementSM.property.valueDefinition.sourceMap, 268, 22);
+    REQUIRE(subelementSM.property.sections.collection.empty());
 }
 
 TEST_CASE("Parse named type with a type section", "[mson][named_type]")
@@ -115,7 +158,7 @@ TEST_CASE("Parse named type with a type section", "[mson][named_type]")
     "## Sample: pksunkara";
 
     ParseResult<mson::NamedType> namedType;
-    SectionParserHelper<mson::NamedType, MSONNamedTypeParser>::parse(source, MSONNamedTypeSectionType, namedType);
+    SectionParserHelper<mson::NamedType, MSONNamedTypeParser>::parse(source, MSONNamedTypeSectionType, namedType, ExportSourcemapOption);
 
     REQUIRE(namedType.report.error.code == Error::OK);
     REQUIRE(namedType.report.warnings.empty());
@@ -129,6 +172,11 @@ TEST_CASE("Parse named type with a type section", "[mson][named_type]")
     REQUIRE(namedType.node.sections.size() == 1);
     REQUIRE(namedType.node.sections[0].klass == mson::TypeSection::SampleClass);
     REQUIRE(namedType.node.sections[0].content.value == "pksunkara");
+
+    SourceMapHelper::check(namedType.sourceMap.name.sourceMap, 0, 16);
+    SourceMapHelper::check(namedType.sourceMap.typeDefinition.sourceMap, 0, 16);
+    REQUIRE(namedType.sourceMap.sections.collection.size() == 1);
+    SourceMapHelper::check(namedType.sourceMap.sections.collection[0].value.sourceMap, 16, 20);
 }
 
 TEST_CASE("Parse named type without type specification", "[mson][named_type]")
@@ -138,7 +186,7 @@ TEST_CASE("Parse named type without type specification", "[mson][named_type]")
     "## Sample: pksunkara";
 
     ParseResult<mson::NamedType> namedType;
-    SectionParserHelper<mson::NamedType, MSONNamedTypeParser>::parse(source, MSONNamedTypeSectionType, namedType);
+    SectionParserHelper<mson::NamedType, MSONNamedTypeParser>::parse(source, MSONNamedTypeSectionType, namedType, ExportSourcemapOption);
 
     REQUIRE(namedType.report.error.code == Error::OK);
     REQUIRE(namedType.report.warnings.size() == 1);
@@ -151,4 +199,9 @@ TEST_CASE("Parse named type without type specification", "[mson][named_type]")
     REQUIRE(namedType.node.sections.size() == 1);
     REQUIRE(namedType.node.sections[0].klass == mson::TypeSection::SampleClass);
     REQUIRE(namedType.node.sections[0].baseType == mson::ImplicitObjectBaseType);
+
+    SourceMapHelper::check(namedType.sourceMap.name.sourceMap, 0, 7);
+    REQUIRE(namedType.sourceMap.typeDefinition.sourceMap.empty());
+    REQUIRE(namedType.sourceMap.sections.collection.size() == 1);
+    REQUIRE(namedType.sourceMap.sections.collection[0].value.sourceMap.empty());
 }
