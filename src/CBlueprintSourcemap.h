@@ -7,25 +7,22 @@
 //  Copyright (c) 2014 Apiary Inc. All rights reserved.
 //
 
-#ifndef SC_C_BLUEPRINT_SOURCEMAP_H
-#define SC_C_BLUEPRINT_SOURCEMAP_H
+#ifndef SNOWCRASH_C_BLUEPRINTSOURCEMAP_H
+#define SNOWCRASH_C_BLUEPRINTSOURCEMAP_H
 
 #include "Platform.h"
 #include "stdlib.h"
+#include "CMSONSourcemap.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-    /** Class source map wrapper */
-    struct sc_source_map_s;
-    typedef struct sc_source_map_s sc_source_map_t;
-
     /** Class Blueprint source map wrapper */
     struct sc_sm_blueprint_s;
     typedef struct sc_sm_blueprint_s sc_sm_blueprint_t;
 
-    /** Array Metadata source map wrapper */
+    /** Array Metadata Collection source map wrapper */
     struct sc_sm_metadata_collection_s;
     typedef struct sc_sm_metadata_collection_s sc_sm_metadata_collection_t;
 
@@ -107,17 +104,6 @@ extern "C" {
 
     /*----------------------------------------------------------------------*/
 
-    /** \returns size of the source map */
-    SC_API size_t sc_source_map_size(const sc_source_map_t* source_map);
-
-    /** \returns Location of the source map item at index */
-    SC_API size_t sc_source_map_length(const sc_source_map_t* source_map, size_t index);
-
-    /** \returns Length of the source map item at index */
-    SC_API size_t sc_source_map_location(const sc_source_map_t* source_map, size_t index);
-
-    /*----------------------------------------------------------------------*/
-
     /** \returns pointer to allocated Blueprint source map */
     SC_API sc_sm_blueprint_t* sc_sm_blueprint_new();
 
@@ -125,39 +111,39 @@ extern "C" {
     SC_API void sc_sm_blueprint_free(sc_sm_blueprint_t* blueprint);
 
     /** \returns Blueprint name source map */
-    SC_API const sc_source_map_t* sc_sm_blueprint_name(const sc_sm_blueprint_t* blueprint);
+    SC_API const sc_source_map_t* sc_sm_blueprint_name(const sc_sm_blueprint_t* handle);
 
     /** \returns Blueprint description source map */
-    SC_API const sc_source_map_t* sc_sm_blueprint_description(const sc_sm_blueprint_t* blueprint);
+    SC_API const sc_source_map_t* sc_sm_blueprint_description(const sc_sm_blueprint_t* handle);
 
     /*----------------------------------------------------------------------*/
 
-    /** \returns Metadata source map array handle */
-    SC_API const sc_sm_metadata_collection_t* sc_sm_metadata_collection_handle(const sc_sm_blueprint_t* blueprint);
+    /** \returns Metadata Collection source map array handle */
+    SC_API const sc_sm_metadata_collection_t* sc_sm_metadata_collection_handle(const sc_sm_blueprint_t* handle);
 
-    /** \returns size of Metadata source map array */
-    SC_API size_t sc_sm_metadata_collection_size(const sc_sm_metadata_collection_t* metadata);
+    /** \returns size of Metadata Collection source map array */
+    SC_API size_t sc_sm_metadata_collection_size(const sc_sm_metadata_collection_t* handle);
 
     /*----------------------------------------------------------------------*/
 
     /** \returns Metadata source map at `index` handle */
-    SC_API const sc_sm_metadata_t* sc_sm_metadata_handle(const sc_sm_metadata_collection_t* metadata_col, size_t index);
+    SC_API const sc_sm_metadata_t* sc_sm_metadata_handle(const sc_sm_metadata_collection_t* handle, size_t index);
 
     /** \returns Metadata source map */
-    SC_API const sc_source_map_t* sc_sm_metadata(const sc_sm_metadata_t* metadata);
+    SC_API const sc_source_map_t* sc_sm_metadata(const sc_sm_metadata_t* handle);
 
     /*----------------------------------------------------------------------*/
 
     /** \returns Resource Group Collection source map array handle */
-    SC_API const sc_sm_resource_group_collection_t* sc_sm_resource_group_collection_handle(const sc_sm_blueprint_t* blueprint);
+    SC_API const sc_sm_resource_group_collection_t* sc_sm_resource_group_collection_handle(const sc_sm_blueprint_t* handle);
 
     /** \returns size of Resource Group Collection source map array */
-    SC_API size_t sc_sm_resource_group_collection_size(const sc_sm_resource_group_collection_t* resource);
+    SC_API size_t sc_sm_resource_group_collection_size(const sc_sm_resource_group_collection_t* handle);
 
     /*----------------------------------------------------------------------*/
 
-    /** \returns Resource Group source map handle */
-    SC_API const sc_sm_resource_group_t* sc_sm_resource_group_handle(const sc_sm_resource_group_collection_t* resource, size_t index);
+    /** \returns Resource Group source map at `index` handle */
+    SC_API const sc_sm_resource_group_t* sc_sm_resource_group_handle(const sc_sm_resource_group_collection_t* handle, size_t index);
 
     /** \returns Resource Group name source map */
     SC_API const sc_source_map_t* sc_sm_resource_group_name(const sc_sm_resource_group_t* handle);
@@ -171,12 +157,12 @@ extern "C" {
     SC_API const sc_sm_resource_collection_t* sc_sm_resource_collection_handle(const sc_sm_resource_group_t* handle);
 
     /** \returns Resource source map array size */
-    SC_API size_t sc_sm_resource_collection_size(const sc_sm_resource_collection_t* resource);
+    SC_API size_t sc_sm_resource_collection_size(const sc_sm_resource_collection_t* handle);
 
     /*----------------------------------------------------------------------*/
 
-    /** \returns Resource source map handle */
-    SC_API const sc_sm_resource_t* sc_sm_resource_handle(const sc_sm_resource_collection_t* resource, size_t index);
+    /** \returns Resource source map at `index` handle */
+    SC_API const sc_sm_resource_t* sc_sm_resource_handle(const sc_sm_resource_collection_t* handle, size_t index);
 
     /** \returns Resource URITemplate source map */
     SC_API const sc_source_map_t* sc_sm_resource_uritemplate(const sc_sm_resource_t* handle);
@@ -242,7 +228,7 @@ extern "C" {
 
     /*----------------------------------------------------------------------*/
 
-    /** \returns Parameter source map handle */
+    /** \returns Parameter source map at `index` handle */
     SC_API const sc_sm_parameter_t* sc_sm_parameter_handle(const sc_sm_parameter_collection_t* handle, size_t index);
 
     /** \returns Parameter name source map */
@@ -295,7 +281,7 @@ extern "C" {
 
     /*----------------------------------------------------------------------*/
 
-    /** \returns Header source map handle */
+    /** \returns Header source map at `index` handle */
     SC_API const sc_sm_header_t* sc_sm_header_handle(const sc_sm_header_collection_t* handle, size_t index);
 
     /** \returns Header source map */
@@ -311,7 +297,7 @@ extern "C" {
 
     /*----------------------------------------------------------------------*/
 
-    /** \returns Action source map handle */
+    /** \returns Action source map at `index` handle */
     SC_API const sc_sm_action_t* sc_sm_action_handle(const sc_sm_action_collection_t* handle, size_t index);
 
     /** \returns Action HTTPMethod source map */
@@ -333,7 +319,7 @@ extern "C" {
 
     /*----------------------------------------------------------------------*/
 
-    /** \returns Transaction Example source map handle */
+    /** \returns Transaction Example source map at `index` handle */
     SC_API const sc_sm_transaction_example_t* sc_sm_transaction_example_handle(const sc_sm_transaction_example_collection_t* handle, size_t index);
 
     /** \returns Transaction Example name source map */

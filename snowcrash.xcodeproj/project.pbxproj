@@ -24,6 +24,10 @@
 		4079DBA71A138C310075B534 /* MSONOneOfParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4079DBA61A138C310075B534 /* MSONOneOfParser.cc */; };
 		4079DBA91A138C580075B534 /* MSONTypeSectionParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4079DBA81A138C580075B534 /* MSONTypeSectionParser.cc */; };
 		408F38DA1A153AB200104774 /* MSONValueMemberParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = 408F38D91A153AB200104774 /* MSONValueMemberParser.cc */; };
+		4097909F1A5CF1620056792A /* CMSON.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4097909D1A5CF1620056792A /* CMSON.cc */; };
+		409790A01A5CF1620056792A /* CMSON.h in Headers */ = {isa = PBXBuildFile; fileRef = 4097909E1A5CF1620056792A /* CMSON.h */; };
+		409790A31A5CF1A40056792A /* CMSONSourcemap.cc in Sources */ = {isa = PBXBuildFile; fileRef = 409790A11A5CF1A40056792A /* CMSONSourcemap.cc */; };
+		409790A41A5CF1A40056792A /* CMSONSourcemap.h in Headers */ = {isa = PBXBuildFile; fileRef = 409790A21A5CF1A40056792A /* CMSONSourcemap.h */; };
 		40A1EE0B19EC0A0B00DB894A /* MSON.h in Headers */ = {isa = PBXBuildFile; fileRef = 40A1EE0A19EC0A0B00DB894A /* MSON.h */; };
 		40BCDEAA1A0A9489008C6C84 /* MSONPropertyMemberParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 40BCDEA91A0A9489008C6C84 /* MSONPropertyMemberParser.h */; };
 		40BCDEAC1A0A96F8008C6C84 /* MSONMixinParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 40BCDEAB1A0A96F8008C6C84 /* MSONMixinParser.h */; };
@@ -176,6 +180,10 @@
 		4079DBA61A138C310075B534 /* MSONOneOfParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MSONOneOfParser.cc; path = src/MSONOneOfParser.cc; sourceTree = "<group>"; };
 		4079DBA81A138C580075B534 /* MSONTypeSectionParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MSONTypeSectionParser.cc; path = src/MSONTypeSectionParser.cc; sourceTree = "<group>"; };
 		408F38D91A153AB200104774 /* MSONValueMemberParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MSONValueMemberParser.cc; path = src/MSONValueMemberParser.cc; sourceTree = "<group>"; };
+		4097909D1A5CF1620056792A /* CMSON.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CMSON.cc; path = src/CMSON.cc; sourceTree = "<group>"; };
+		4097909E1A5CF1620056792A /* CMSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CMSON.h; path = src/CMSON.h; sourceTree = "<group>"; };
+		409790A11A5CF1A40056792A /* CMSONSourcemap.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CMSONSourcemap.cc; path = src/CMSONSourcemap.cc; sourceTree = "<group>"; };
+		409790A21A5CF1A40056792A /* CMSONSourcemap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CMSONSourcemap.h; path = src/CMSONSourcemap.h; sourceTree = "<group>"; };
 		40A1EE0A19EC0A0B00DB894A /* MSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MSON.h; path = src/MSON.h; sourceTree = "<group>"; };
 		40BCDEA91A0A9489008C6C84 /* MSONPropertyMemberParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MSONPropertyMemberParser.h; path = src/MSONPropertyMemberParser.h; sourceTree = "<group>"; };
 		40BCDEAB1A0A96F8008C6C84 /* MSONMixinParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MSONMixinParser.h; path = src/MSONMixinParser.h; sourceTree = "<group>"; };
@@ -406,6 +414,10 @@
 				BBFC8410196C0C0F001A236A /* CBlueprint.h */,
 				4070F30219E4C30A004892C8 /* CBlueprintSourcemap.cc */,
 				4070F30319E4C30A004892C8 /* CBlueprintSourcemap.h */,
+				4097909D1A5CF1620056792A /* CMSON.cc */,
+				4097909E1A5CF1620056792A /* CMSON.h */,
+				409790A11A5CF1A40056792A /* CMSONSourcemap.cc */,
+				409790A21A5CF1A40056792A /* CMSONSourcemap.h */,
 				BBC2D85E18301FEC00FBCEA7 /* CodeBlockUtility.h */,
 				BBFC8411196C0C0F001A236A /* csnowcrash.cc */,
 				BBFC8412196C0C0F001A236A /* csnowcrash.h */,
@@ -423,8 +435,8 @@
 				4079DBA61A138C310075B534 /* MSONOneOfParser.cc */,
 				40BCDEAD1A0A9724008C6C84 /* MSONOneOfParser.h */,
 				40BCDEA91A0A9489008C6C84 /* MSONPropertyMemberParser.h */,
-				404CD8381A07D38300AB1416 /* MSONSourcemap.h */,
 				406AB4C61A57B66200BD381C /* MSONSourcemap.cc */,
+				404CD8381A07D38300AB1416 /* MSONSourcemap.h */,
 				4079DBA81A138C580075B534 /* MSONTypeSectionParser.cc */,
 				40DE0C0D1A091ECE00D2F0A8 /* MSONTypeSectionParser.h */,
 				4075AA1019F95398003C2649 /* MSONUtility.h */,
@@ -477,6 +489,7 @@
 				BBFF48D6170C4F30001E5FB2 /* Blueprint.h in Headers */,
 				BBD73564192ED417009FE09E /* HeadersParser.h in Headers */,
 				BBCC855F19542DA100B99E90 /* ValuesParser.h in Headers */,
+				409790A01A5CF1620056792A /* CMSON.h in Headers */,
 				BBA91DC2171D402600649B05 /* BlueprintParser.h in Headers */,
 				4055EB531A2DB25900587C41 /* DataStructuresParser.h in Headers */,
 				BBCEF19218FBF7B000A0FA24 /* Version.h in Headers */,
@@ -491,6 +504,7 @@
 				40BCDEAE1A0A9724008C6C84 /* MSONOneOfParser.h in Headers */,
 				40DE0C0E1A091ECE00D2F0A8 /* MSONTypeSectionParser.h in Headers */,
 				40CA216119FE989F0086531D /* ModelTable.h in Headers */,
+				409790A41A5CF1A40056792A /* CMSONSourcemap.h in Headers */,
 				40A1EE0B19EC0A0B00DB894A /* MSON.h in Headers */,
 				4075AA1119F95398003C2649 /* MSONUtility.h in Headers */,
 				404CD83B1A07D38300AB1416 /* MSONValueMemberParser.h in Headers */,
@@ -644,6 +658,7 @@
 				BB8C3E7419241C1600EF36FA /* Section.cc in Sources */,
 				BBE53564174132B100BCA7AD /* Serialize.cc in Sources */,
 				BBCC856919545FCE00B99E90 /* Signature.cc in Sources */,
+				409790A31A5CF1A40056792A /* CMSONSourcemap.cc in Sources */,
 				BBE53565174132B100BCA7AD /* SerializeJSON.cc in Sources */,
 				BBFC8418196C0C0F001A236A /* CBlueprint.cc in Sources */,
 				BBFC841C196C0C0F001A236A /* CSourceAnnotation.cc in Sources */,
@@ -654,6 +669,7 @@
 				BB65939117845C2D00321230 /* RegexMatch.cc in Sources */,
 				406AB4C71A57B66200BD381C /* MSONSourcemap.cc in Sources */,
 				BBE53566174132B100BCA7AD /* SerializeYAML.cc in Sources */,
+				4097909F1A5CF1620056792A /* CMSON.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
