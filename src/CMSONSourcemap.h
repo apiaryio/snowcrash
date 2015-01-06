@@ -50,10 +50,10 @@ extern "C" {
     typedef struct sc_mson_sm_value_member_s sc_mson_sm_value_member_t;
 
     /** Class Mixin source map wrapper (alias of source map) */
-    typedef struct sc_source_map_s sc_mson_sm_mixin_t;
+    typedef sc_source_map_t sc_mson_sm_mixin_t;
 
     /** Class One Of source map wrapper (alias of Element Collection source map) */
-    typedef struct sc_mson_sm_element_collection_s sc_mson_sm_one_of_collection_t;
+    typedef sc_mson_sm_element_collection_t sc_mson_sm_one_of_collection_t;
 
     /*----------------------------------------------------------------------*/
 
@@ -144,12 +144,12 @@ extern "C" {
 
     /** \returns One Of handle */
     SC_API const sc_mson_sm_one_of_collection_t* sc_mson_sm_one_of_handle(const sc_mson_sm_element_t* handle);
-    
+
     /*----------------------------------------------------------------------*/
-    
+
     /** \retuns Mixin handle */
     SC_API const sc_mson_sm_mixin_t* sc_mson_sm_mixin_handle(const sc_mson_sm_element_t* handle);
-    
+
     /*----------------------------------------------------------------------*/
 
 #ifdef __cplusplus

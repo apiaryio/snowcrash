@@ -149,7 +149,7 @@ extern "C" {
     SC_API const sc_mson_type_name_t* sc_mson_type_name_handle_type_specification(const sc_mson_type_specification_t* handle);
 
     /** \returns Base Type Name */
-    SC_API const sc_mson_base_type_name_t sc_mson_base_type_name(const sc_mson_type_name_t* handle);
+    SC_API sc_mson_base_type_name_t sc_mson_base_type_name(const sc_mson_type_name_t* handle);
 
     /*----------------------------------------------------------------------*/
 
@@ -160,7 +160,7 @@ extern "C" {
     SC_API const char* sc_mson_symbol_literal(const sc_mson_symbol_t* handle);
 
     /** \returns Symbol variable */
-    SC_API const bool sc_mson_symbol_variable(const sc_mson_symbol_t* handle);
+    SC_API bool sc_mson_symbol_variable(const sc_mson_symbol_t* handle);
 
     /*----------------------------------------------------------------------*/
 
@@ -178,7 +178,7 @@ extern "C" {
     /*----------------------------------------------------------------------*/
 
     /** \returns Type Attributes */
-    SC_API const sc_mson_type_attributes_t sc_mson_type_attributes(const sc_mson_type_specification_t* handle);
+    SC_API sc_mson_type_attributes_t sc_mson_type_attributes(const sc_mson_type_specification_t* handle);
 
     /*----------------------------------------------------------------------*/
 
@@ -200,7 +200,7 @@ extern "C" {
     SC_API const sc_mson_type_section_t* sc_mson_type_section_handle(const sc_mson_type_section_collection_t* handle, size_t index);
 
     /** \returns Type Section class */
-    SC_API const sc_mson_type_section_class_t sc_mson_type_section_class(const sc_mson_type_section_t* handle);
+    SC_API sc_mson_type_section_class_t sc_mson_type_section_class(const sc_mson_type_section_t* handle);
 
     /** \returns Type Section description */
     SC_API const char* sc_mson_type_section_description(const sc_mson_type_section_t* handle);
@@ -222,10 +222,10 @@ extern "C" {
     /*----------------------------------------------------------------------*/
 
     /** \returns Element at `index` handle */
-    SC_API const sc_mson_element_t* sc_mson_element_handle(const sc_mson_element_t* handle, size_t index);
+    SC_API const sc_mson_element_t* sc_mson_element_handle(const sc_mson_element_collection_t* handle, size_t index);
 
     /** \returns Element class */
-    SC_API const sc_mson_element_class_t sc_mson_element_class(const sc_mson_element_t* handle);
+    SC_API sc_mson_element_class_t sc_mson_element_class(const sc_mson_element_t* handle);
 
     /*----------------------------------------------------------------------*/
 
@@ -271,7 +271,7 @@ extern "C" {
     SC_API const char* sc_mson_value_literal(const sc_mson_value_t* handle);
 
     /** \returns Value variable */
-    SC_API const bool sc_mson_value_variable(const sc_mson_value_t* handle);
+    SC_API bool sc_mson_value_variable(const sc_mson_value_t* handle);
 
     /*----------------------------------------------------------------------*/
 

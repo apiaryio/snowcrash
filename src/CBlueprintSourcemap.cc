@@ -10,33 +10,6 @@
 #include "CBlueprintSourcemap.h"
 #include "snowcrash.h"
 
-SC_API size_t sc_source_map_size(const sc_source_map_t* source_map)
-{
-    const mdp::BytesRangeSet* p = AS_CTYPE(mdp::BytesRangeSet, source_map);
-    if(!p)
-        return 0;
-
-    return p->size();
-}
-
-SC_API size_t sc_source_map_length(const sc_source_map_t* source_map, size_t index)
-{
-    const mdp::BytesRangeSet* p = AS_CTYPE(mdp::BytesRangeSet, source_map);
-    if(!p)
-        return 0;
-
-    return p->at(index).length;
-}
-
-SC_API size_t sc_source_map_location(const sc_source_map_t* source_map, size_t index)
-{
-    const mdp::BytesRangeSet* p = AS_CTYPE(mdp::BytesRangeSet, source_map);
-    if(!p)
-        return 0;
-
-    return p->at(index).location;
-}
-
 /*----------------------------------------------------------------------*/
 
 SC_API sc_sm_blueprint_t* sc_sm_blueprint_new()
@@ -49,18 +22,18 @@ SC_API void sc_sm_blueprint_free(sc_sm_blueprint_t* blueprint)
     ::delete AS_TYPE(snowcrash::SourceMap<snowcrash::Blueprint>, blueprint);
 }
 
-SC_API const sc_source_map_t* sc_sm_blueprint_name(const sc_sm_blueprint_t* blueprint)
+SC_API const sc_source_map_t* sc_sm_blueprint_name(const sc_sm_blueprint_t* handle)
 {
-    const snowcrash::SourceMap<snowcrash::Blueprint>* p = AS_CTYPE(snowcrash::SourceMap<snowcrash::Blueprint>, blueprint);
+    const snowcrash::SourceMap<snowcrash::Blueprint>* p = AS_CTYPE(snowcrash::SourceMap<snowcrash::Blueprint>, handle);
     if (!p)
         return NULL;
 
     return AS_CTYPE(sc_source_map_t, &p->name.sourceMap);
 }
 
-SC_API const sc_source_map_t* sc_sm_blueprint_description(const sc_sm_blueprint_t* blueprint)
+SC_API const sc_source_map_t* sc_sm_blueprint_description(const sc_sm_blueprint_t* handle)
 {
-    const snowcrash::SourceMap<snowcrash::Blueprint>* p = AS_CTYPE(snowcrash::SourceMap<snowcrash::Blueprint>, blueprint);
+    const snowcrash::SourceMap<snowcrash::Blueprint>* p = AS_CTYPE(snowcrash::SourceMap<snowcrash::Blueprint>, handle);
     if (!p)
         return NULL;
 
@@ -69,18 +42,18 @@ SC_API const sc_source_map_t* sc_sm_blueprint_description(const sc_sm_blueprint_
 
 /*----------------------------------------------------------------------*/
 
-SC_API const sc_sm_metadata_collection_t* sc_sm_metadata_collection_handle(const sc_sm_blueprint_t* blueprint)
+SC_API const sc_sm_metadata_collection_t* sc_sm_metadata_collection_handle(const sc_sm_blueprint_t* handle)
 {
-    const snowcrash::SourceMap<snowcrash::Blueprint>* p = AS_CTYPE(snowcrash::SourceMap<snowcrash::Blueprint>, blueprint);
+    const snowcrash::SourceMap<snowcrash::Blueprint>* p = AS_CTYPE(snowcrash::SourceMap<snowcrash::Blueprint>, handle);
     if (!p)
         return NULL;
 
     return AS_CTYPE(sc_sm_metadata_collection_t, &p->metadata);
 }
 
-SC_API size_t sc_sm_metadata_collection_size(const sc_sm_metadata_collection_t* metadata)
+SC_API size_t sc_sm_metadata_collection_size(const sc_sm_metadata_collection_t* handle)
 {
-    const snowcrash::SourceMap<snowcrash::MetadataCollection>* p = AS_CTYPE(snowcrash::SourceMap<snowcrash::MetadataCollection>, metadata);
+    const snowcrash::SourceMap<snowcrash::MetadataCollection>* p = AS_CTYPE(snowcrash::SourceMap<snowcrash::MetadataCollection>, handle);
     if (!p)
         return 0;
 
@@ -89,18 +62,18 @@ SC_API size_t sc_sm_metadata_collection_size(const sc_sm_metadata_collection_t* 
 
 /*----------------------------------------------------------------------*/
 
-SC_API const sc_sm_metadata_t* sc_sm_metadata_handle(const sc_sm_metadata_collection_t* metadata_col, size_t index)
+SC_API const sc_sm_metadata_t* sc_sm_metadata_handle(const sc_sm_metadata_collection_t* handle, size_t index)
 {
-    const snowcrash::SourceMap<snowcrash::MetadataCollection>* p = AS_CTYPE(snowcrash::SourceMap<snowcrash::MetadataCollection>, metadata_col);
+    const snowcrash::SourceMap<snowcrash::MetadataCollection>* p = AS_CTYPE(snowcrash::SourceMap<snowcrash::MetadataCollection>, handle);
     if (!p)
         return NULL;
 
     return AS_CTYPE(sc_sm_metadata_t, &p->collection.at(index));
 }
 
-SC_API const sc_source_map_t* sc_sm_metadata(const sc_sm_metadata_t* metadata)
+SC_API const sc_source_map_t* sc_sm_metadata(const sc_sm_metadata_t* handle)
 {
-    const snowcrash::SourceMap<snowcrash::Metadata>* p = AS_CTYPE(snowcrash::SourceMap<snowcrash::Metadata>, metadata);
+    const snowcrash::SourceMap<snowcrash::Metadata>* p = AS_CTYPE(snowcrash::SourceMap<snowcrash::Metadata>, handle);
     if (!p)
         return NULL;
 
@@ -109,18 +82,18 @@ SC_API const sc_source_map_t* sc_sm_metadata(const sc_sm_metadata_t* metadata)
 
 /*----------------------------------------------------------------------*/
 
-SC_API const sc_sm_resource_group_collection_t* sc_sm_resource_group_collection_handle(const sc_sm_blueprint_t* blueprint)
+SC_API const sc_sm_resource_group_collection_t* sc_sm_resource_group_collection_handle(const sc_sm_blueprint_t* handle)
 {
-    const snowcrash::SourceMap<snowcrash::Blueprint>* p = AS_CTYPE(snowcrash::SourceMap<snowcrash::Blueprint>, blueprint);
+    const snowcrash::SourceMap<snowcrash::Blueprint>* p = AS_CTYPE(snowcrash::SourceMap<snowcrash::Blueprint>, handle);
     if (!p)
         return NULL;
 
     return AS_CTYPE(sc_sm_resource_group_collection_t, &p->resourceGroups);
 }
 
-SC_API size_t sc_sm_resource_group_collection_size(const sc_sm_resource_group_collection_t* resource)
+SC_API size_t sc_sm_resource_group_collection_size(const sc_sm_resource_group_collection_t* handle)
 {
-    const snowcrash::SourceMap<snowcrash::ResourceGroups>* p = AS_CTYPE(snowcrash::SourceMap<snowcrash::ResourceGroups>, resource);
+    const snowcrash::SourceMap<snowcrash::ResourceGroups>* p = AS_CTYPE(snowcrash::SourceMap<snowcrash::ResourceGroups>, handle);
     if (!p)
         return 0;
 
@@ -129,9 +102,9 @@ SC_API size_t sc_sm_resource_group_collection_size(const sc_sm_resource_group_co
 
 /*----------------------------------------------------------------------*/
 
-SC_API const sc_sm_resource_group_t* sc_sm_resource_group_handle(const sc_sm_resource_group_collection_t* resource, size_t index)
+SC_API const sc_sm_resource_group_t* sc_sm_resource_group_handle(const sc_sm_resource_group_collection_t* handle, size_t index)
 {
-    const snowcrash::SourceMap<snowcrash::ResourceGroups>* p = AS_CTYPE(snowcrash::SourceMap<snowcrash::ResourceGroups>, resource);
+    const snowcrash::SourceMap<snowcrash::ResourceGroups>* p = AS_CTYPE(snowcrash::SourceMap<snowcrash::ResourceGroups>, handle);
     if (!p)
         return NULL;
 
@@ -167,9 +140,9 @@ SC_API const sc_sm_resource_collection_t* sc_sm_resource_collection_handle(const
     return AS_CTYPE(sc_sm_resource_collection_t, &p->resources);
 }
 
-SC_API size_t sc_sm_resource_collection_size(const sc_sm_resource_collection_t* resource)
+SC_API size_t sc_sm_resource_collection_size(const sc_sm_resource_collection_t* handle)
 {
-    const snowcrash::SourceMap<snowcrash::Resources>* p = AS_CTYPE(snowcrash::SourceMap<snowcrash::Resources>, resource);
+    const snowcrash::SourceMap<snowcrash::Resources>* p = AS_CTYPE(snowcrash::SourceMap<snowcrash::Resources>, handle);
     if (!p)
         return 0;
 
@@ -178,9 +151,9 @@ SC_API size_t sc_sm_resource_collection_size(const sc_sm_resource_collection_t* 
 
 /*----------------------------------------------------------------------*/
 
-SC_API const sc_sm_resource_t* sc_sm_resource_handle(const sc_sm_resource_collection_t* resource, size_t index)
+SC_API const sc_sm_resource_t* sc_sm_resource_handle(const sc_sm_resource_collection_t* handle, size_t index)
 {
-    const snowcrash::SourceMap<snowcrash::Resources>* p = AS_CTYPE(snowcrash::SourceMap<snowcrash::Resources>, resource);
+    const snowcrash::SourceMap<snowcrash::Resources>* p = AS_CTYPE(snowcrash::SourceMap<snowcrash::Resources>, handle);
     if (!p)
         return NULL;
 
