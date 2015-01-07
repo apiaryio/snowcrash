@@ -260,7 +260,7 @@ static void serialize(const Collection<SourceMap<Metadata> >::type& metadata, st
 
 /**
  * \brief Serialize Parameters into output stream.
- * \param prarameters   Parameters to serialize.
+ * \param parameters    Parameters to serialize.
  * \param level         Level of indentation.
  * \param os            An output stream to serialize into.
  */
@@ -347,7 +347,7 @@ static void serialize(const Parameters& parameters, size_t level, std::ostream &
 
 /**
  * \brief Serialize Parameters source map into output stream.
- * \param prarameters   Parameters source map to serialize.
+ * \param parameters    Parameters source map to serialize.
  * \param level         Level of indentation.
  * \param os            An output stream to serialize into.
  */
