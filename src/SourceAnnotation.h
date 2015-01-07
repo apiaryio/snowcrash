@@ -15,6 +15,79 @@
 
 namespace snowcrash {
 
+    /**
+     *  \brief  A resolution annotation.
+     *
+     *  A resolution to a source annotation describing how to fix an issue described by the source annotation.
+     *  Includes a location within the source data, the resolved source data and an optional message.
+     */
+    struct ResolutionAnnotation {
+
+        /**
+         *  \brief  %ResolutionAnnotation default constructor.
+         *
+         *  Creates an empty resolution annotation.
+         */
+        ResolutionAnnotation() {}
+
+        /**
+         *  \brief  %ResolutionAnnotation copy constructor.
+         *  \param  rhs  An annotation to be copied.
+         */
+        ResolutionAnnotation(const ResolutionAnnotation& rhs) {
+
+            this->message = rhs.message;
+            this->location = rhs.location;
+            this->resolvedSource = rhs.resolvedSource;
+        }
+
+        /**
+         *  \brief  %ResolutionAnnotation constructor.
+         *  \param  message     An annotation message.
+         *  \param  resolvedSource   The resolved source data.
+         *  \param  location    A location of the annotation.
+         */
+        ResolutionAnnotation(const std::string& message,
+            const mdp::ByteBuffer&  resolvedSource = mdp::ByteBuffer(),
+            const mdp::BytesRange& location = mdp::BytesRange()) {
+
+            this->message = message;
+
+            this->resolvedSource.clear();
+            if (!resolvedSource.empty())
+                this->resolvedSource.assign(resolvedSource.begin(), resolvedSource.end());
+
+            this->location = location;
+        }
+
+        /** \brief  %ResolutionAnnotation destructor. */
+        ~ResolutionAnnotation() {}
+
+        /**
+         *  \brief  %ResolutionAnnotation assignment operator
+         *  \param  rhs  A resolution annotation to be assigned to this annotation.
+         */
+        ResolutionAnnotation& operator=(const ResolutionAnnotation& rhs) {
+            this->message = rhs.message;
+            this->location = rhs.location;
+            this->resolvedSource = rhs.resolvedSource;
+            return *this;
+        }
+
+        /** The location of this resolution within the source data buffer. */
+        mdp::BytesRange location;
+
+        /** The source data amended to resolve the issues described in the message */
+        mdp::ByteBuffer resolvedSource;
+
+        /** An annotation message. */
+        std::string message;
+    };
+
+    /**
+     *  A set of resolution source annotations.
+     */
+    typedef std::vector<ResolutionAnnotation> Resolutions;
 
     /**
      *  \brief  A source data annotation.
@@ -34,16 +107,16 @@ namespace snowcrash {
          *
          *  Creates an empty annotation with the default annotation code.
          */
-        SourceAnnotation() : code(OK) {}
+        SourceAnnotation() : code(OK), subCode(OK) {}
 
         /**
          *  \brief  %SourceAnnotation copy constructor.
          *  \param  rhs  An annotation to be copied.
          */
-        SourceAnnotation(const SourceAnnotation& rhs) {
-
+        SourceAnnotation(const SourceAnnotation& rhs) : resolutions(rhs.resolutions) {
             this->message = rhs.message;
             this->code = rhs.code;
+            this->subCode = rhs.subCode;
             this->location = rhs.location;
         }
 
@@ -51,15 +124,36 @@ namespace snowcrash {
          *  \brief  %SourceAnnotation constructor.
          *  \param  message     An annotation message.
          *  \param  code        Annotation code.
+         *  \param  subCode     Annotation subCode.
          *  \param  location    A location of the annotation.
          */
         SourceAnnotation(const std::string& message,
-                         int code = OK,
-                         const mdp::CharactersRangeSet& location = mdp::CharactersRangeSet()) {
+            int code,
+            const mdp::CharactersRangeSet& location) {
 
             this->message = message;
             this->code = code;
+            this->subCode = OK;
+            this->location.clear();
+            if (!location.empty())
+                this->location.assign(location.begin(), location.end());
+        }
 
+        /**
+         *  \brief  %SourceAnnotation constructor.
+         *  \param  message     An annotation message.
+         *  \param  code        Annotation code.
+         *  \param  subCode        Annotation subCode.
+         *  \param  location    A location of the annotation.
+         */
+        SourceAnnotation(const std::string& message,
+            int code = OK,
+            int subCode = OK,
+            const mdp::CharactersRangeSet& location = mdp::CharactersRangeSet()) {
+
+            this->message = message;
+            this->code = code;
+            this->subCode = subCode;
             this->location.clear();
             if (!location.empty())
                 this->location.assign(location.begin(), location.end());
@@ -76,6 +170,7 @@ namespace snowcrash {
             this->message = rhs.message;
             this->code = rhs.code;
             this->location = rhs.location;
+            this->resolutions = rhs.resolutions;
             return *this;
         }
 
@@ -85,8 +180,14 @@ namespace snowcrash {
         /** An annotation code. */
         int code;
 
-        /** A annotation message. */
+        /** An annotation subCode. */
+        int subCode;
+
+        /** An annotation message. */
         std::string message;
+
+        /** Resolutions to the issue described in the annotation */
+        Resolutions resolutions;
     };
 
     /**
@@ -127,6 +228,21 @@ namespace snowcrash {
         AmbiguityWarning = 11,
         URIWarning = 12,
         HTTPWarning = 13
+    };
+
+    /**
+     * UriTemplate warning subCodes
+     */
+    enum UriTemplateWarningSubCode {
+        NoUriTemplateWarningSubCode = 0,
+        SquareBracketWarningUriTemplateWarningSubCode = 1,
+        NestedCurlyBracketsWarningUriTemplateWarningSubCode = 2,
+        MismatchedCurlyBracketsWarningUriTemplateWarningSubCode = 3,
+        ContainsSpacesWarningUriTemplateWarningSubCode = 4,
+        ContainsHyphensWarningUriTemplateWarningSubCode = 5,
+        ContainsAssignmentWarningUriTemplateWarningSubCode = 6,
+        InvalidCharactersWarningUriTemplateWarningSubCode = 7,
+        UnsupportedExpressionWarningUriTemplateWarningSubCode = 8
     };
 
     /**
