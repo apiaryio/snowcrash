@@ -11,6 +11,7 @@
 
 #include <ostream>
 #include "BlueprintSourcemap.h"
+#include "sosJSON.h"
 
 namespace snowcrash {
 
