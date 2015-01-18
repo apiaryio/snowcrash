@@ -9,6 +9,10 @@
 /* Begin PBXBuildFile section */
 		4002148B1A61834800BECFED /* sos.h in Headers */ = {isa = PBXBuildFile; fileRef = 4002148A1A61834800BECFED /* sos.h */; };
 		4002148D1A62DBCC00BECFED /* sosJSON.h in Headers */ = {isa = PBXBuildFile; fileRef = 4002148C1A62DBCC00BECFED /* sosJSON.h */; };
+		400D04731A6BF6E7006EBD4A /* SerializeAST.cc in Sources */ = {isa = PBXBuildFile; fileRef = 400D04711A6BF6E7006EBD4A /* SerializeAST.cc */; };
+		400D04741A6BF6E7006EBD4A /* SerializeAST.h in Headers */ = {isa = PBXBuildFile; fileRef = 400D04721A6BF6E7006EBD4A /* SerializeAST.h */; };
+		400D04771A6BF705006EBD4A /* SerializeSourcemap.cc in Sources */ = {isa = PBXBuildFile; fileRef = 400D04751A6BF705006EBD4A /* SerializeSourcemap.cc */; };
+		400D04781A6BF705006EBD4A /* SerializeSourcemap.h in Headers */ = {isa = PBXBuildFile; fileRef = 400D04761A6BF705006EBD4A /* SerializeSourcemap.h */; };
 		401E5E661A24B545009570D0 /* AttributesParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 401E5E651A24B545009570D0 /* AttributesParser.h */; };
 		401E5E681A24B56B009570D0 /* test-AttributesParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = 401E5E671A24B56B009570D0 /* test-AttributesParser.cc */; };
 		402ED5A61A639ACA007AF84D /* sosYAML.h in Headers */ = {isa = PBXBuildFile; fileRef = 402ED5A51A639ACA007AF84D /* sosYAML.h */; };
@@ -164,6 +168,10 @@
 /* Begin PBXFileReference section */
 		4002148A1A61834800BECFED /* sos.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sos.h; path = ext/sos/sos.h; sourceTree = "<group>"; };
 		4002148C1A62DBCC00BECFED /* sosJSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sosJSON.h; path = ext/sos/sosJSON.h; sourceTree = "<group>"; };
+		400D04711A6BF6E7006EBD4A /* SerializeAST.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SerializeAST.cc; path = src/SerializeAST.cc; sourceTree = "<group>"; };
+		400D04721A6BF6E7006EBD4A /* SerializeAST.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SerializeAST.h; path = src/SerializeAST.h; sourceTree = "<group>"; };
+		400D04751A6BF705006EBD4A /* SerializeSourcemap.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SerializeSourcemap.cc; path = src/SerializeSourcemap.cc; sourceTree = "<group>"; };
+		400D04761A6BF705006EBD4A /* SerializeSourcemap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SerializeSourcemap.h; path = src/SerializeSourcemap.h; sourceTree = "<group>"; };
 		401E5E651A24B545009570D0 /* AttributesParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AttributesParser.h; path = src/AttributesParser.h; sourceTree = "<group>"; };
 		401E5E671A24B56B009570D0 /* test-AttributesParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-AttributesParser.cc"; path = "test/test-AttributesParser.cc"; sourceTree = "<group>"; };
 		402ED5A51A639ACA007AF84D /* sosYAML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sosYAML.h; path = ext/sos/sosYAML.h; sourceTree = "<group>"; };
@@ -462,8 +470,12 @@
 				BB8C3E611923D45700EF36FA /* SectionProcessor.h */,
 				BBE5355E174132B100BCA7AD /* Serialize.cc */,
 				BBE5355B174132B100BCA7AD /* Serialize.h */,
+				400D04711A6BF6E7006EBD4A /* SerializeAST.cc */,
+				400D04721A6BF6E7006EBD4A /* SerializeAST.h */,
 				BBE5355F174132B100BCA7AD /* SerializeJSON.cc */,
 				BBE5355C174132B100BCA7AD /* SerializeJSON.h */,
+				400D04751A6BF705006EBD4A /* SerializeSourcemap.cc */,
+				400D04761A6BF705006EBD4A /* SerializeSourcemap.h */,
 				BBE53560174132B100BCA7AD /* SerializeYAML.cc */,
 				BBE5355D174132B100BCA7AD /* SerializeYAML.h */,
 				BBCC856819545FCE00B99E90 /* Signature.cc */,
@@ -510,6 +522,7 @@
 				40CA216119FE989F0086531D /* ModelTable.h in Headers */,
 				40A1EE0B19EC0A0B00DB894A /* MSON.h in Headers */,
 				4075AA1119F95398003C2649 /* MSONUtility.h in Headers */,
+				400D04741A6BF6E7006EBD4A /* SerializeAST.h in Headers */,
 				404CD83B1A07D38300AB1416 /* MSONValueMemberParser.h in Headers */,
 				BBD5F9CE17353CE00049BBEE /* ResourceParser.h in Headers */,
 				4070F30419E4C30A004892C8 /* BlueprintSourcemap.h in Headers */,
@@ -523,6 +536,7 @@
 				40BCDEAA1A0A9489008C6C84 /* MSONPropertyMemberParser.h in Headers */,
 				4002148D1A62DBCC00BECFED /* sosJSON.h in Headers */,
 				BBCC855E19542DA100B99E90 /* ParameterParser.h in Headers */,
+				400D04781A6BF705006EBD4A /* SerializeSourcemap.h in Headers */,
 				BBE53562174132B100BCA7AD /* SerializeJSON.h in Headers */,
 				40BCDEB21A0A9790008C6C84 /* MSONNamedTypeParser.h in Headers */,
 				BB088F78192D7901003AA95C /* SectionParserData.h in Headers */,
@@ -660,6 +674,7 @@
 				BBFF48CD170B3EDE001E5FB2 /* snowcrash.cc in Sources */,
 				4070F30519E4C30A004892C8 /* CBlueprintSourcemap.cc in Sources */,
 				BB92D891178EF7C10098A63C /* HTTP.cc in Sources */,
+				400D04771A6BF705006EBD4A /* SerializeSourcemap.cc in Sources */,
 				4079DBA71A138C310075B534 /* MSONOneOfParser.cc in Sources */,
 				BB8C3E7419241C1600EF36FA /* Section.cc in Sources */,
 				BBE53564174132B100BCA7AD /* Serialize.cc in Sources */,
@@ -673,6 +688,7 @@
 				4079DBA91A138C580075B534 /* MSONTypeSectionParser.cc in Sources */,
 				BB65939117845C2D00321230 /* RegexMatch.cc in Sources */,
 				406AB4C71A57B66200BD381C /* MSONSourcemap.cc in Sources */,
+				400D04731A6BF6E7006EBD4A /* SerializeAST.cc in Sources */,
 				BBE53566174132B100BCA7AD /* SerializeYAML.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

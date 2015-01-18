@@ -10,6 +10,8 @@
 #define SNOWCRASH_SERIALIZE_H
 
 #include <string>
+#include "BlueprintSourcemap.h"
+#include "sos.h"
 
 /** Version of API Blueprint AST serialization */
 #define AST_SERIALIZATION_VERSION "2.1"
