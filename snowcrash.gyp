@@ -192,7 +192,8 @@
         'src/snowcrash',
         'ext/markdown-parser/src',
         'ext/markdown-parser/ext/sundown/src',
-        'ext/cmdline'
+        'ext/cmdline',
+        'ext/sos'
       ],
       'sources': [
         'src/snowcrash/snowcrash.cc'
@@ -210,6 +211,7 @@
         'ext/markdown-parser/src',
         'ext/markdown-parser/ext/sundown/src',
         'ext/cmdline',
+        'ext/sos',
         'test',
         'test/performance',
       ],
