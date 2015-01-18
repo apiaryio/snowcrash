@@ -6,10 +6,6 @@
 //  Copyright (c) 2013 Apiary Inc. All rights reserved.
 //
 
-#include <string>
-#include <sstream>
-#include <algorithm>
-#include <iterator>
 #include "Serialize.h"
 #include "StringUtility.h"
 

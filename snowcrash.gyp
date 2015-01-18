@@ -57,7 +57,8 @@
         'src',
         'ext/markdown-parser/src',
         'ext/markdown-parser/ext/sundown/src',
-        'ext/markdown-parser/ext/sundown/html'
+        'ext/markdown-parser/ext/sundown/html',
+        'ext/sos'
       ],
       'sources': [
         'src/CBlueprint.cc',
@@ -81,8 +82,12 @@
         'src/Section.h',
         'src/Serialize.cc',
         'src/Serialize.h',
+        'src/SerializeAST.cc',
+        'src/SerializeAST.h',
         'src/SerializeJSON.cc',
         'src/SerializeJSON.h',
+        'src/SerializeSourcemap.cc',
+        'src/SerializeSourcemap.h',
         'src/SerializeYAML.cc',
         'src/SerializeYAML.h',
         'src/Signature.cc',
@@ -148,7 +153,8 @@
         'test/vendor/Catch/include',
         'ext/markdown-parser/src',
         'ext/markdown-parser/ext/sundown/src',
-        'ext/markdown-parser/ext/sundown/html'
+        'ext/markdown-parser/ext/sundown/html',
+        'ext/sos'
       ],
       'sources': [
         'test/test-ActionParser.cc',
