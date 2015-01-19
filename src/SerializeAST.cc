@@ -10,6 +10,346 @@
 
 using namespace snowcrash;
 
+sos::Object wrapValue(const mson::Value& value)
+{
+    sos::Object valueObject = sos::Object();
+
+    // Literal
+    valueObject.set(SerializeKey::Literal.c_str(), sos::String(value.literal));
+
+    // Variable
+    valueObject.set(SerializeKey::Variable.c_str(), sos::Boolean(value.variable));
+
+    return valueObject;
+}
+
+sos::Object wrapSymbol(const mson::Symbol& symbol)
+{
+    sos::Object symbolObject = sos::Object();
+
+    // Literal
+    symbolObject.set(SerializeKey::Literal.c_str(), sos::String(symbol.literal));
+
+    // Variable
+    symbolObject.set(SerializeKey::Variable.c_str(), sos::Boolean(symbol.variable));
+
+    return symbolObject;
+}
+
+sos::Base wrapTypeName(const mson::TypeName& typeName)
+{
+    if (typeName.base != mson::UndefinedTypeName) {
+
+        std::string baseTypeName = "";
+
+        switch (typeName.base) {
+
+            case mson::BooleanTypeName:
+                baseTypeName = "boolean";
+                break;
+
+            case mson::StringTypeName:
+                baseTypeName = "string";
+                break;
+
+            case mson::NumberTypeName:
+                baseTypeName = "number";
+                break;
+
+            case mson::ArrayTypeName:
+                baseTypeName = "array";
+                break;
+
+            case mson::EnumTypeName:
+                baseTypeName = "enum";
+                break;
+
+            case mson::ObjectTypeName:
+                baseTypeName = "object";
+                break;
+
+            default:
+                break;
+        }
+
+        return sos::String(baseTypeName);
+    }
+
+    return wrapSymbol(typeName.symbol);
+}
+
+sos::Object wrapTypeSpecification(const mson::TypeSpecification& typeSpecification)
+{
+    sos::Object typeSpecificationObject = sos::Object();
+
+    // Name
+    typeSpecificationObject.set(SerializeKey::Name.c_str(), wrapTypeName(typeSpecification.name));
+
+    // Nested Types
+    sos::Array nestedTypes = sos::Array();
+
+    for (mson::TypeNames::const_iterator it = typeSpecification.nestedTypes.begin();
+         it != typeSpecification.nestedTypes.end();
+         ++it) {
+
+        nestedTypes.push(wrapTypeName(*it));
+    }
+
+    typeSpecificationObject.set(SerializeKey::NestedTypes.c_str(), nestedTypes);
+
+    return typeSpecificationObject;
+}
+
+sos::Array wrapTypeAttributes(const mson::TypeAttributes& typeAttributes)
+{
+    sos::Array typeAttributesArray = sos::Array();
+
+    if (typeAttributes & mson::RequiredTypeAttribute) {
+        typeAttributesArray.push(sos::String("required"));
+    }
+    else if (typeAttributes & mson::OptionalTypeAttribute) {
+        typeAttributesArray.push(sos::String("optional"));
+    }
+    else if (typeAttributes & mson::DefaultTypeAttribute) {
+        typeAttributesArray.push(sos::String("default"));
+    }
+    else if (typeAttributes & mson::SampleTypeAttribute) {
+        typeAttributesArray.push(sos::String("sample"));
+    }
+    else if (typeAttributes & mson::FixedTypeAttribute) {
+        typeAttributesArray.push(sos::String("fixed"));
+    }
+
+    return typeAttributesArray;
+}
+
+sos::Object wrapTypeDefinition(const mson::TypeDefinition& typeDefinition)
+{
+    sos::Object typeDefinitionObject = sos::Object();
+
+    // Type Specification
+    typeDefinitionObject.set(SerializeKey::TypeSpecification.c_str(), wrapTypeSpecification(typeDefinition.typeSpecification));
+
+    // Type Attributes
+    typeDefinitionObject.set(SerializeKey::Attributes.c_str(), wrapTypeAttributes(typeDefinition.attributes));
+
+    return typeDefinitionObject;
+}
+
+sos::Object wrapValueDefinition(const mson::ValueDefinition& valueDefinition)
+{
+    sos::Object valueDefinitionObject = sos::Object();
+
+    // Values
+    sos::Array values = sos::Array();
+
+    for (mson::Values::const_iterator it = valueDefinition.values.begin();
+         it != valueDefinition.values.end();
+         ++it) {
+
+        values.push(wrapValue(*it));
+    }
+
+    valueDefinitionObject.set(SerializeKey::Values.c_str(), values);
+
+    // Type Definition
+    valueDefinitionObject.set(SerializeKey::TypeDefinition.c_str(), wrapTypeDefinition(valueDefinition.typeDefinition));
+
+    return valueDefinitionObject;
+}
+
+sos::Object wrapPropertyName(const mson::PropertyName& propertyName)
+{
+    sos::Object propertyNameObject = sos::Object();
+
+    if (!propertyName.literal.empty()) {
+        propertyNameObject.set(SerializeKey::Literal.c_str(), sos::String(propertyName.literal));
+    }
+    else if (!propertyName.variable.empty()) {
+        propertyNameObject.set(SerializeKey::Variable.c_str(), wrapValueDefinition(propertyName.variable));
+    }
+
+    return propertyNameObject;
+}
+
+// Forward declarations
+sos::Array wrapTypeSections(const mson::TypeSections& typeSections);
+sos::Array wrapElements(const mson::Elements& elements);
+
+sos::Object wrapPropertyMember(const mson::PropertyMember& propertyMember)
+{
+    sos::Object propertyMemberObject = sos::Object();
+
+    // Name
+    propertyMemberObject.set(SerializeKey::Name.c_str(), wrapPropertyName(propertyMember.name));
+
+    // Description
+    propertyMemberObject.set(SerializeKey::Description.c_str(), sos::String(propertyMember.description.c_str()));
+
+    // Value Definition
+    propertyMemberObject.set(SerializeKey::ValueDefinition.c_str(), wrapValueDefinition(propertyMember.valueDefinition));
+
+    // Type Sections
+    propertyMemberObject.set(SerializeKey::Sections.c_str(), wrapTypeSections(propertyMember.sections));
+
+    return propertyMemberObject;
+}
+
+sos::Object wrapValueMember(const mson::ValueMember& valueMember)
+{
+    sos::Object valueMemberObject = sos::Object();
+
+    // Description
+    valueMemberObject.set(SerializeKey::Description.c_str(), sos::String(valueMember.description.c_str()));
+
+    // Value Definition
+    valueMemberObject.set(SerializeKey::ValueDefinition.c_str(), wrapValueDefinition(valueMember.valueDefinition));
+
+    // Type Sections
+    valueMemberObject.set(SerializeKey::Sections.c_str(), wrapTypeSections(valueMember.sections));
+
+    return valueMemberObject;
+}
+
+sos::Object wrapMixin(const mson::Mixin& mixin)
+{
+    return wrapTypeDefinition(mixin);
+}
+
+sos::Array wrapOneOf(const mson::OneOf& oneOf)
+{
+    return wrapElements(oneOf);
+}
+
+sos::Object wrapElement(const mson::Element& element)
+{
+    sos::Object elementObject = sos::Object();
+    std::string klass = "";
+
+    switch (element.klass) {
+
+        case mson::Element::PropertyClass:
+        {
+            klass = "property";
+            elementObject.set(SerializeKey::Content.c_str(), wrapPropertyMember(element.content.property));
+            break;
+        }
+
+        case mson::Element::ValueClass:
+        {
+            klass = "value";
+            elementObject.set(SerializeKey::Content.c_str(), wrapValueMember(element.content.value));
+            break;
+        }
+
+        case mson::Element::MixinClass:
+        {
+            klass = "mixin";
+            elementObject.set(SerializeKey::Content.c_str(), wrapMixin(element.content.mixin));
+            break;
+        }
+
+        case mson::Element::OneOfClass:
+        {
+            klass = "oneOf";
+            elementObject.set(SerializeKey::Content.c_str(), wrapOneOf(element.content.oneOf()));
+            break;
+        }
+
+        case mson::Element::GroupClass:
+        {
+            klass = "group";
+            elementObject.set(SerializeKey::Content.c_str(), wrapElements(element.content.elements()));
+            break;
+        }
+
+        default:
+            break;
+    }
+
+    elementObject.set(SerializeKey::Class.c_str(), sos::String(klass));
+
+    return elementObject;
+}
+
+sos::Array wrapElements(const mson::Elements& elements)
+{
+    sos::Array elementsArray = sos::Array();
+
+    for (mson::Elements::const_iterator it = elements.begin(); it != elements.end(); ++it) {
+        elementsArray.push(wrapElement(*it));
+    }
+
+    return elementsArray;
+}
+
+sos::Array wrapTypeSections(const mson::TypeSections& sections)
+{
+    sos::Array sectionsArray = sos::Array();
+
+    for (mson::TypeSections::const_iterator it = sections.begin(); it != sections.end(); ++it) {
+
+        sos::Object section = sos::Object();
+
+        // Class
+        std::string klass = "";
+
+        switch (it->klass) {
+            case mson::TypeSection::BlockDescriptionClass:
+                klass = "blockDescription";
+                break;
+
+            case mson::TypeSection::MemberTypeClass:
+                klass = "memberType";
+                break;
+
+            case mson::TypeSection::SampleClass:
+                klass = "sample";
+                break;
+
+            case mson::TypeSection::DefaultClass:
+                klass = "default";
+                break;
+
+            default:
+                break;
+        }
+
+        section.set(SerializeKey::Class.c_str(), sos::String(klass));
+
+        // Content
+        if (!it->content.description.empty()) {
+            section.set(SerializeKey::Content.c_str(), sos::String(it->content.description));
+        }
+        else if (!it->content.value.empty()) {
+            section.set(SerializeKey::Content.c_str(), sos::String(it->content.value));
+        }
+        else if (!it->content.elements().empty()) {
+            section.set(SerializeKey::Content.c_str(), wrapElements(it->content.elements()));
+        }
+
+        sectionsArray.push(section);
+    }
+
+    return sectionsArray;
+}
+
+sos::Object wrapNamedType(const mson::NamedType& namedType)
+{
+    sos::Object namedTypeObject = sos::Object();
+
+    // Name
+    namedTypeObject.set(SerializeKey::Name.c_str(), wrapTypeName(namedType.name));
+
+    // Type Definition
+    namedTypeObject.set(SerializeKey::TypeDefinition.c_str(), wrapTypeDefinition(namedType.typeDefinition));
+
+    // Type Sections
+    namedTypeObject.set(SerializeKey::Sections.c_str(), wrapTypeSections(namedType.sections));
+
+    return namedTypeObject;
+}
+
 sos::Object wrapKeyValue(const KeyValuePair& keyValue)
 {
     sos::Object keyValueObject = sos::Object();
@@ -249,7 +589,7 @@ sos::Object wrapResourceGroup(const ResourceGroup& resourceGroup)
     return resourceGroupObject;
 }
 
-sos::Object wrapBlueprint(const Blueprint& blueprint)
+sos::Object snowcrash::wrapBlueprint(const Blueprint& blueprint)
 {
     sos::Object blueprintObject = sos::Object();
 

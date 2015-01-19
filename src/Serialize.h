@@ -50,6 +50,7 @@ namespace snowcrash {
         static const std::string URITemplate;
         static const std::string Actions;
         static const std::string Action;
+        static const std::string Attributes;
         static const std::string Examples;
         static const std::string Transaction;
         static const std::string Method;
@@ -67,6 +68,15 @@ namespace snowcrash {
         static const std::string Example;
         static const std::string Values;
 
+        static const std::string Literal;
+        static const std::string Variable;
+        static const std::string TypeDefinition;
+        static const std::string TypeSpecification;
+        static const std::string NestedTypes;
+        static const std::string Sections;
+        static const std::string Class;
+        static const std::string Content;
+        static const std::string ValueDefinition;
     };
 }
 

@@ -23,6 +23,7 @@ const std::string SerializeKey::URI = "uri";
 const std::string SerializeKey::URITemplate = "uriTemplate";
 const std::string SerializeKey::Actions = "actions";
 const std::string SerializeKey::Action = "action";
+const std::string SerializeKey::Attributes = "attributes";
 const std::string SerializeKey::Method = "method";
 const std::string SerializeKey::Examples = "examples";
 const std::string SerializeKey::Requests = "requests";
@@ -38,6 +39,16 @@ const std::string SerializeKey::Required = "required";
 const std::string SerializeKey::Default = "default";
 const std::string SerializeKey::Example = "example";
 const std::string SerializeKey::Values = "values";
+
+const std::string SerializeKey::Literal = "literal";
+const std::string SerializeKey::Variable = "variable";
+const std::string SerializeKey::TypeDefinition = "typeDefinition";
+const std::string SerializeKey::TypeSpecification = "typeSpecification";
+const std::string SerializeKey::NestedTypes = "nestedTypes";
+const std::string SerializeKey::Sections = "sections";
+const std::string SerializeKey::Class = "class";
+const std::string SerializeKey::Content = "content";
+const std::string SerializeKey::ValueDefinition = "valueDefinition";
 
 std::string snowcrash::EscapeNewlines(const std::string& input)
 {

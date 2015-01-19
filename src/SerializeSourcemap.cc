@@ -29,6 +29,126 @@ sos::Array wrapSourcemap(const SourceMapBase& value)
     return sourceMap;
 }
 
+// Forward declarations
+sos::Array wrapTypeSectionsSourcemap(const SourceMap<mson::TypeSections>& typeSections);
+sos::Array wrapElementsSourcemap(const SourceMap<mson::Elements>& elements);
+
+sos::Object wrapPropertyMemberSourcemap(const SourceMap<mson::PropertyMember>& propertyMember)
+{
+    sos::Object propertyMemberObject = sos::Object();
+
+    // Name
+    propertyMemberObject.set(SerializeKey::Name.c_str(), wrapSourcemap(propertyMember.name));
+
+    // Description
+    propertyMemberObject.set(SerializeKey::Description.c_str(), wrapSourcemap(propertyMember.description));
+
+    // Value Definition
+    propertyMemberObject.set(SerializeKey::ValueDefinition.c_str(), wrapSourcemap(propertyMember.valueDefinition));
+
+    // Type Sections
+    propertyMemberObject.set(SerializeKey::Sections.c_str(), wrapTypeSectionsSourcemap(propertyMember.sections));
+
+    return propertyMemberObject;
+}
+
+sos::Object wrapValueMemberSourcemap(const SourceMap<mson::ValueMember>& valueMember)
+{
+    sos::Object valueMemberObject = sos::Object();
+
+    // Description
+    valueMemberObject.set(SerializeKey::Description.c_str(), wrapSourcemap(valueMember.description));
+
+    // Value Definition
+    valueMemberObject.set(SerializeKey::ValueDefinition.c_str(), wrapSourcemap(valueMember.valueDefinition));
+
+    // Type Sections
+    valueMemberObject.set(SerializeKey::Sections.c_str(), wrapTypeSectionsSourcemap(valueMember.sections));
+
+    return valueMemberObject;
+}
+
+sos::Array wrapMixinSourcemap(const SourceMap<mson::Mixin>& mixin)
+{
+    return wrapSourcemap(mixin);
+}
+
+sos::Array wrapOneOf(const SourceMap<mson::OneOf>& oneOf)
+{
+    return wrapElementsSourcemap(oneOf);
+}
+
+sos::Base wrapElementSourcemap(const SourceMap<mson::Element>& element)
+{
+    if (!element.elements().collection.empty()) {
+        // Same for oneOf
+        return wrapElementsSourcemap(element.elements());
+    }
+    else if (!element.mixin.sourceMap.empty()) {
+        return wrapMixinSourcemap(element.mixin);
+    }
+    else if (!element.value.empty()) {
+        return wrapValueMemberSourcemap(element.value);
+    }
+    else if (!element.property.empty()) {
+        return wrapPropertyMemberSourcemap(element.property);
+    }
+
+    return sos::Null();
+}
+
+sos::Array wrapElementsSourcemap(const SourceMap<mson::Elements>& elements)
+{
+    sos::Array elementsArray = sos::Array();
+
+    for (Collection<SourceMap<mson::Element> >::const_iterator it = elements.collection.begin();
+         it != elements.collection.end();
+         ++it) {
+
+        elementsArray.push(wrapElementSourcemap(*it));
+    }
+
+    return elementsArray;
+}
+
+sos::Array wrapTypeSectionsSourcemap(const SourceMap<mson::TypeSections>& sections)
+{
+    sos::Array sectionsArray = sos::Array();
+
+    for (Collection<SourceMap<mson::TypeSection> >::const_iterator it = sections.collection.begin();
+         it != sections.collection.end();
+         ++it) {
+
+        if (!it->description.sourceMap.empty()) {
+            sectionsArray.push(wrapSourcemap(it->description));
+        }
+        else if (!it->value.sourceMap.empty()) {
+            sectionsArray.push(wrapSourcemap(it->value));
+        }
+        else if (!it->elements().collection.empty()) {
+            sectionsArray.push(wrapElementsSourcemap(it->elements()));
+        }
+    }
+    
+    return sectionsArray;
+}
+
+sos::Object wrapNamedTypeSourcemap(const SourceMap<mson::NamedType>& namedType)
+{
+    sos::Object namedTypeObject = sos::Object();
+
+    // Name
+    namedTypeObject.set(SerializeKey::Name.c_str(), wrapSourcemap(namedType.name));
+
+    // Type Definition
+    namedTypeObject.set(SerializeKey::TypeDefinition.c_str(), wrapSourcemap(namedType.typeDefinition));
+
+    // Type Sections
+    namedTypeObject.set(SerializeKey::Sections.c_str(), wrapTypeSectionsSourcemap(namedType.sections));
+
+    return namedTypeObject;
+}
+
 sos::Object wrapPayloadSourcemap(const SourceMap<Payload>& payload)
 {
     sos::Object payloadObject = sos::Object();
@@ -239,7 +359,7 @@ sos::Object wrapResourceGroupSourcemap(const SourceMap<ResourceGroup>& resourceG
     return resourceGroupObject;
 }
 
-sos::Object wrapBlueprintSourcemap(const SourceMap<Blueprint>& blueprint)
+sos::Object snowcrash::wrapBlueprintSourcemap(const SourceMap<Blueprint>& blueprint)
 {
     sos::Object blueprintObject = sos::Object();
 
