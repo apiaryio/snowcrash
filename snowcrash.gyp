@@ -149,8 +149,7 @@
         'test/vendor/Catch/include',
         'ext/markdown-parser/src',
         'ext/markdown-parser/ext/sundown/src',
-        'ext/markdown-parser/ext/sundown/html',
-        'ext/sos'
+        'ext/markdown-parser/ext/sundown/html'
       ],
       'sources': [
         'test/test-ActionParser.cc',

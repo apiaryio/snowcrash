@@ -120,6 +120,9 @@ namespace snowcrash {
 
         /** Source Map of Type Sections */
         SourceMap<mson::TypeSections> sections;
+
+        /** Check if empty */
+        bool empty() const;
     };
 
     /** Source Map structure for Property Member */
@@ -128,6 +131,9 @@ namespace snowcrash {
 
         /** Source Map for Property Name */
         SourceMap<mson::PropertyName> name;
+
+        /** Check if empty */
+        bool empty() const;
     };
 
     /** Source Map structure for One Of */

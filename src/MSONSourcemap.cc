@@ -10,6 +10,21 @@
 
 using namespace snowcrash;
 
+bool SourceMap<mson::ValueMember>::empty() const
+{
+    return (description.sourceMap.empty() &&
+            valueDefinition.sourceMap.empty() &&
+            sections.collection.empty());
+}
+
+bool SourceMap<mson::PropertyMember>::empty() const
+{
+    return (name.sourceMap.empty() &&
+            description.sourceMap.empty() &&
+            valueDefinition.sourceMap.empty() &&
+            sections.collection.empty());
+}
+
 SourceMap<mson::Elements>& SourceMap<mson::TypeSection>::elements()
 {
     if (!m_elements.get())
