@@ -10,9 +10,11 @@
 #include <sstream>
 #include <fstream>
 #include "snowcrash.h"
-#include "SerializeJSON.h"
-#include "SerializeYAML.h"
+#include "SerializeAST.h"
+#include "SerializeSourcemap.h"
 #include "cmdline.h"
+#include "sosJSON.h"
+#include "sosYAML.h"
 #include "Version.h"
 
 using snowcrash::SourceAnnotation;
@@ -266,15 +268,22 @@ int main(int argc, const char *argv[])
         std::stringstream outputStream;
         std::stringstream sourcemapOutputStream;
 
+        sos::Object outputObject = snowcrash::wrapBlueprint(blueprint.node);
+        sos::Object sourcemapOutputObject = snowcrash::wrapBlueprintSourcemap(blueprint.sourceMap);
+
         if (argumentParser.get<std::string>(FormatArgument) == "json") {
 
-            SerializeJSON(blueprint.node, outputStream);
-            SerializeSourceMapJSON(blueprint.sourceMap, sourcemapOutputStream);
+            sos::SerializeJSON serializer = sos::SerializeJSON();
+
+            serializer.process(outputObject, outputStream);
+            serializer.process(sourcemapOutputObject, sourcemapOutputStream);
         }
         else if (argumentParser.get<std::string>(FormatArgument) == "yaml") {
 
-            SerializeYAML(blueprint.node, outputStream);
-            SerializeSourceMapYAML(blueprint.sourceMap, sourcemapOutputStream);
+            sos::SerializeJSON serializer = sos::SerializeJSON();
+
+            serializer.process(outputObject, outputStream);
+            serializer.process(sourcemapOutputObject, sourcemapOutputStream);
         }
 
         std::string outputFileName = argumentParser.get<std::string>(OutputArgument);

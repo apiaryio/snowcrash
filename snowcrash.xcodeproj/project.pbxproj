@@ -89,11 +89,7 @@
 		BBD73564192ED417009FE09E /* HeadersParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD73563192ED417009FE09E /* HeadersParser.h */; };
 		BBD73566192ED45D009FE09E /* test-HeadersParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD73565192ED45D009FE09E /* test-HeadersParser.cc */; };
 		BBE53561174132B100BCA7AD /* Serialize.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE5355B174132B100BCA7AD /* Serialize.h */; };
-		BBE53562174132B100BCA7AD /* SerializeJSON.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE5355C174132B100BCA7AD /* SerializeJSON.h */; };
-		BBE53563174132B100BCA7AD /* SerializeYAML.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE5355D174132B100BCA7AD /* SerializeYAML.h */; };
 		BBE53564174132B100BCA7AD /* Serialize.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBE5355E174132B100BCA7AD /* Serialize.cc */; };
-		BBE53565174132B100BCA7AD /* SerializeJSON.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBE5355F174132B100BCA7AD /* SerializeJSON.cc */; };
-		BBE53566174132B100BCA7AD /* SerializeYAML.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBE53560174132B100BCA7AD /* SerializeYAML.cc */; };
 		BBE57061173927870086CE22 /* PayloadParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE5705F173927870086CE22 /* PayloadParser.h */; };
 		BBE7FEBE1922CAF300A1649E /* test-Blueprint.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBFF48D7170C57F1001E5FB2 /* test-Blueprint.cc */; };
 		BBFC8418196C0C0F001A236A /* CBlueprint.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBFC840F196C0C0F001A236A /* CBlueprint.cc */; };
@@ -261,11 +257,7 @@
 		BBD73563192ED417009FE09E /* HeadersParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = HeadersParser.h; path = src/HeadersParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BBD73565192ED45D009FE09E /* test-HeadersParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-HeadersParser.cc"; path = "test/test-HeadersParser.cc"; sourceTree = "<group>"; };
 		BBE5355B174132B100BCA7AD /* Serialize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Serialize.h; path = src/Serialize.h; sourceTree = "<group>"; };
-		BBE5355C174132B100BCA7AD /* SerializeJSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SerializeJSON.h; path = src/SerializeJSON.h; sourceTree = "<group>"; };
-		BBE5355D174132B100BCA7AD /* SerializeYAML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SerializeYAML.h; path = src/SerializeYAML.h; sourceTree = "<group>"; };
 		BBE5355E174132B100BCA7AD /* Serialize.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Serialize.cc; path = src/Serialize.cc; sourceTree = "<group>"; };
-		BBE5355F174132B100BCA7AD /* SerializeJSON.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = SerializeJSON.cc; path = src/SerializeJSON.cc; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
-		BBE53560174132B100BCA7AD /* SerializeYAML.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = SerializeYAML.cc; path = src/SerializeYAML.cc; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		BBE5705C173922B70086CE22 /* test-PayloadParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-PayloadParser.cc"; path = "test/test-PayloadParser.cc"; sourceTree = "<group>"; };
 		BBE5705F173927870086CE22 /* PayloadParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = PayloadParser.h; path = src/PayloadParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BBFC840F196C0C0F001A236A /* CBlueprint.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CBlueprint.cc; path = src/CBlueprint.cc; sourceTree = "<group>"; };
@@ -484,12 +476,8 @@
 				BBE5355B174132B100BCA7AD /* Serialize.h */,
 				400D04711A6BF6E7006EBD4A /* SerializeAST.cc */,
 				400D04721A6BF6E7006EBD4A /* SerializeAST.h */,
-				BBE5355F174132B100BCA7AD /* SerializeJSON.cc */,
-				BBE5355C174132B100BCA7AD /* SerializeJSON.h */,
 				400D04751A6BF705006EBD4A /* SerializeSourcemap.cc */,
 				400D04761A6BF705006EBD4A /* SerializeSourcemap.h */,
-				BBE53560174132B100BCA7AD /* SerializeYAML.cc */,
-				BBE5355D174132B100BCA7AD /* SerializeYAML.h */,
 				BBCC856819545FCE00B99E90 /* Signature.cc */,
 				BB8C3E721924192600EF36FA /* Signature.h */,
 				40C61A2519F16C7300EC506D /* SignatureSectionProcessor.h */,
@@ -551,11 +539,9 @@
 				4002148D1A62DBCC00BECFED /* sosJSON.h in Headers */,
 				BBCC855E19542DA100B99E90 /* ParameterParser.h in Headers */,
 				400D04781A6BF705006EBD4A /* SerializeSourcemap.h in Headers */,
-				BBE53562174132B100BCA7AD /* SerializeJSON.h in Headers */,
 				40BCDEB21A0A9790008C6C84 /* MSONNamedTypeParser.h in Headers */,
 				BB088F78192D7901003AA95C /* SectionParserData.h in Headers */,
 				BBFC8420196C0C0F001A236A /* UriTemplateParser.h in Headers */,
-				BBE53563174132B100BCA7AD /* SerializeYAML.h in Headers */,
 				404CD83A1A07D38300AB1416 /* MSONSourcemap.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -694,7 +680,6 @@
 				BBE53564174132B100BCA7AD /* Serialize.cc in Sources */,
 				BBCC856919545FCE00B99E90 /* Signature.cc in Sources */,
 				409790A31A5CF1A40056792A /* CMSONSourcemap.cc in Sources */,
-				BBE53565174132B100BCA7AD /* SerializeJSON.cc in Sources */,
 				BBFC8418196C0C0F001A236A /* CBlueprint.cc in Sources */,
 				BBFC841C196C0C0F001A236A /* CSourceAnnotation.cc in Sources */,
 				40DE0C0C1A08F3CF00D2F0A8 /* MSON.cc in Sources */,
@@ -704,7 +689,6 @@
 				BB65939117845C2D00321230 /* RegexMatch.cc in Sources */,
 				406AB4C71A57B66200BD381C /* MSONSourcemap.cc in Sources */,
 				400D04731A6BF6E7006EBD4A /* SerializeAST.cc in Sources */,
-				BBE53566174132B100BCA7AD /* SerializeYAML.cc in Sources */,
 				4097909F1A5CF1620056792A /* CMSON.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
