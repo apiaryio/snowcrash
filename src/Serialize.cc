@@ -49,13 +49,3 @@ const std::string SerializeKey::Sections = "sections";
 const std::string SerializeKey::Class = "class";
 const std::string SerializeKey::Content = "content";
 const std::string SerializeKey::ValueDefinition = "valueDefinition";
-
-std::string snowcrash::EscapeNewlines(const std::string& input)
-{
-    return ReplaceString(input, "\n", "\\n");
-}
-
-std::string snowcrash::EscapeDoubleQuotes(const std::string& input)
-{
-    return ReplaceString(input, "\"", "\\\"");
-}

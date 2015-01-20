@@ -7,15 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		4002148B1A61834800BECFED /* sos.h in Headers */ = {isa = PBXBuildFile; fileRef = 4002148A1A61834800BECFED /* sos.h */; };
-		4002148D1A62DBCC00BECFED /* sosJSON.h in Headers */ = {isa = PBXBuildFile; fileRef = 4002148C1A62DBCC00BECFED /* sosJSON.h */; };
 		400D04731A6BF6E7006EBD4A /* SerializeAST.cc in Sources */ = {isa = PBXBuildFile; fileRef = 400D04711A6BF6E7006EBD4A /* SerializeAST.cc */; };
 		400D04741A6BF6E7006EBD4A /* SerializeAST.h in Headers */ = {isa = PBXBuildFile; fileRef = 400D04721A6BF6E7006EBD4A /* SerializeAST.h */; };
 		400D04771A6BF705006EBD4A /* SerializeSourcemap.cc in Sources */ = {isa = PBXBuildFile; fileRef = 400D04751A6BF705006EBD4A /* SerializeSourcemap.cc */; };
 		400D04781A6BF705006EBD4A /* SerializeSourcemap.h in Headers */ = {isa = PBXBuildFile; fileRef = 400D04761A6BF705006EBD4A /* SerializeSourcemap.h */; };
 		401E5E661A24B545009570D0 /* AttributesParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 401E5E651A24B545009570D0 /* AttributesParser.h */; };
 		401E5E681A24B56B009570D0 /* test-AttributesParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = 401E5E671A24B56B009570D0 /* test-AttributesParser.cc */; };
-		402ED5A61A639ACA007AF84D /* sosYAML.h in Headers */ = {isa = PBXBuildFile; fileRef = 402ED5A51A639ACA007AF84D /* sosYAML.h */; };
 		403D48971A2DCE8C002443E5 /* test-DataStructuresParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = 403D48961A2DCE8C002443E5 /* test-DataStructuresParser.cc */; };
 		404CD83A1A07D38300AB1416 /* MSONSourcemap.h in Headers */ = {isa = PBXBuildFile; fileRef = 404CD8381A07D38300AB1416 /* MSONSourcemap.h */; };
 		404CD83B1A07D38300AB1416 /* MSONValueMemberParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 404CD8391A07D38300AB1416 /* MSONValueMemberParser.h */; };
@@ -32,6 +29,8 @@
 		4079DBA91A138C580075B534 /* MSONTypeSectionParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4079DBA81A138C580075B534 /* MSONTypeSectionParser.cc */; };
 		408F38DA1A153AB200104774 /* MSONValueMemberParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = 408F38D91A153AB200104774 /* MSONValueMemberParser.cc */; };
 		40A1EE0B19EC0A0B00DB894A /* MSON.h in Headers */ = {isa = PBXBuildFile; fileRef = 40A1EE0A19EC0A0B00DB894A /* MSON.h */; };
+		40A60E1D1A6E4B7F00371FC1 /* sos.cc in Sources */ = {isa = PBXBuildFile; fileRef = 40A60E1B1A6E4B7F00371FC1 /* sos.cc */; };
+		40A60E1E1A6E4B7F00371FC1 /* sos.h in Headers */ = {isa = PBXBuildFile; fileRef = 40A60E1C1A6E4B7F00371FC1 /* sos.h */; };
 		40BCDEAA1A0A9489008C6C84 /* MSONPropertyMemberParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 40BCDEA91A0A9489008C6C84 /* MSONPropertyMemberParser.h */; };
 		40BCDEAC1A0A96F8008C6C84 /* MSONMixinParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 40BCDEAB1A0A96F8008C6C84 /* MSONMixinParser.h */; };
 		40BCDEAE1A0A9724008C6C84 /* MSONOneOfParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 40BCDEAD1A0A9724008C6C84 /* MSONOneOfParser.h */; };
@@ -162,15 +161,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		4002148A1A61834800BECFED /* sos.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sos.h; path = ext/sos/sos.h; sourceTree = "<group>"; };
-		4002148C1A62DBCC00BECFED /* sosJSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sosJSON.h; path = ext/sos/sosJSON.h; sourceTree = "<group>"; };
 		400D04711A6BF6E7006EBD4A /* SerializeAST.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SerializeAST.cc; path = src/SerializeAST.cc; sourceTree = "<group>"; };
 		400D04721A6BF6E7006EBD4A /* SerializeAST.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SerializeAST.h; path = src/SerializeAST.h; sourceTree = "<group>"; };
 		400D04751A6BF705006EBD4A /* SerializeSourcemap.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SerializeSourcemap.cc; path = src/SerializeSourcemap.cc; sourceTree = "<group>"; };
 		400D04761A6BF705006EBD4A /* SerializeSourcemap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SerializeSourcemap.h; path = src/SerializeSourcemap.h; sourceTree = "<group>"; };
 		401E5E651A24B545009570D0 /* AttributesParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AttributesParser.h; path = src/AttributesParser.h; sourceTree = "<group>"; };
 		401E5E671A24B56B009570D0 /* test-AttributesParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-AttributesParser.cc"; path = "test/test-AttributesParser.cc"; sourceTree = "<group>"; };
-		402ED5A51A639ACA007AF84D /* sosYAML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sosYAML.h; path = ext/sos/sosYAML.h; sourceTree = "<group>"; };
 		403D48961A2DCE8C002443E5 /* test-DataStructuresParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-DataStructuresParser.cc"; path = "test/test-DataStructuresParser.cc"; sourceTree = "<group>"; };
 		404CD8381A07D38300AB1416 /* MSONSourcemap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MSONSourcemap.h; path = src/MSONSourcemap.h; sourceTree = "<group>"; };
 		404CD8391A07D38300AB1416 /* MSONValueMemberParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MSONValueMemberParser.h; path = src/MSONValueMemberParser.h; sourceTree = "<group>"; };
@@ -187,6 +183,10 @@
 		4079DBA81A138C580075B534 /* MSONTypeSectionParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MSONTypeSectionParser.cc; path = src/MSONTypeSectionParser.cc; sourceTree = "<group>"; };
 		408F38D91A153AB200104774 /* MSONValueMemberParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MSONValueMemberParser.cc; path = src/MSONValueMemberParser.cc; sourceTree = "<group>"; };
 		40A1EE0A19EC0A0B00DB894A /* MSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MSON.h; path = src/MSON.h; sourceTree = "<group>"; };
+		40A60E1B1A6E4B7F00371FC1 /* sos.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sos.cc; path = ext/sos/src/sos.cc; sourceTree = "<group>"; };
+		40A60E1C1A6E4B7F00371FC1 /* sos.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sos.h; path = ext/sos/src/sos.h; sourceTree = "<group>"; };
+		40A60E1F1A6E4B9300371FC1 /* sosJSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sosJSON.h; path = ext/sos/src/sosJSON.h; sourceTree = "<group>"; };
+		40A60E201A6E4B9300371FC1 /* sosYAML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sosYAML.h; path = ext/sos/src/sosYAML.h; sourceTree = "<group>"; };
 		40BCDEA91A0A9489008C6C84 /* MSONPropertyMemberParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MSONPropertyMemberParser.h; path = src/MSONPropertyMemberParser.h; sourceTree = "<group>"; };
 		40BCDEAB1A0A96F8008C6C84 /* MSONMixinParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MSONMixinParser.h; path = src/MSONMixinParser.h; sourceTree = "<group>"; };
 		40BCDEAD1A0A9724008C6C84 /* MSONOneOfParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MSONOneOfParser.h; path = src/MSONOneOfParser.h; sourceTree = "<group>"; };
@@ -313,9 +313,10 @@
 		400214891A61831000BECFED /* sos */ = {
 			isa = PBXGroup;
 			children = (
-				4002148A1A61834800BECFED /* sos.h */,
-				4002148C1A62DBCC00BECFED /* sosJSON.h */,
-				402ED5A51A639ACA007AF84D /* sosYAML.h */,
+				40A60E1B1A6E4B7F00371FC1 /* sos.cc */,
+				40A60E1C1A6E4B7F00371FC1 /* sos.h */,
+				40A60E1F1A6E4B9300371FC1 /* sosJSON.h */,
+				40A60E201A6E4B9300371FC1 /* sosYAML.h */,
 			);
 			name = sos;
 			sourceTree = "<group>";
@@ -516,13 +517,11 @@
 				4070F30419E4C30A004892C8 /* BlueprintSourcemap.h in Headers */,
 				BBE57061173927870086CE22 /* PayloadParser.h in Headers */,
 				BBFC841D196C0C0F001A236A /* CSourceAnnotation.h in Headers */,
+				40A60E1E1A6E4B7F00371FC1 /* sos.h in Headers */,
 				BB8C3E651923D83C00EF36FA /* Section.h in Headers */,
-				4002148B1A61834800BECFED /* sos.h in Headers */,
 				4070F30619E4C30A004892C8 /* CBlueprintSourcemap.h in Headers */,
-				402ED5A61A639ACA007AF84D /* sosYAML.h in Headers */,
 				BBE53561174132B100BCA7AD /* Serialize.h in Headers */,
 				40BCDEAA1A0A9489008C6C84 /* MSONPropertyMemberParser.h in Headers */,
-				4002148D1A62DBCC00BECFED /* sosJSON.h in Headers */,
 				BBCC855E19542DA100B99E90 /* ParameterParser.h in Headers */,
 				400D04781A6BF705006EBD4A /* SerializeSourcemap.h in Headers */,
 				40BCDEB21A0A9790008C6C84 /* MSONNamedTypeParser.h in Headers */,
@@ -674,6 +673,7 @@
 				BB65939117845C2D00321230 /* RegexMatch.cc in Sources */,
 				406AB4C71A57B66200BD381C /* MSONSourcemap.cc in Sources */,
 				400D04731A6BF6E7006EBD4A /* SerializeAST.cc in Sources */,
+				40A60E1D1A6E4B7F00371FC1 /* sos.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
