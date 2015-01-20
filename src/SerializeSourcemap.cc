@@ -129,7 +129,7 @@ sos::Array wrapTypeSectionsSourcemap(const SourceMap<mson::TypeSections>& sectio
             sectionsArray.push(wrapElementsSourcemap(it->elements()));
         }
     }
-    
+
     return sectionsArray;
 }
 
@@ -292,12 +292,12 @@ sos::Object wrapActionSourcemap(const SourceMap<Action>& action)
     for (Collection<SourceMap<TransactionExample> >::const_iterator it = action.examples.collection.begin();
          it != action.examples.collection.end();
          ++it) {
-        
+
         transactionExamples.push(wrapTransactionExampleSourcemap(*it));
     }
-    
+
     actionObject.set(SerializeKey::Examples.c_str(), transactionExamples);
-    
+
     return actionObject;
 }
 
@@ -332,7 +332,7 @@ sos::Object wrapResourceSourcemap(const SourceMap<Resource>& resource)
     }
 
     resourceObject.set(SerializeKey::Actions.c_str(), actions);
-    
+
     return resourceObject;
 }
 
