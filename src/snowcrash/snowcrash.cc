@@ -280,11 +280,14 @@ int main(int argc, const char *argv[])
         }
         else if (argumentParser.get<std::string>(FormatArgument) == "yaml") {
 
-            sos::SerializeJSON serializer = sos::SerializeJSON();
+            sos::SerializeYAML serializer = sos::SerializeYAML();
 
             serializer.process(outputObject, outputStream);
             serializer.process(sourcemapOutputObject, sourcemapOutputStream);
         }
+
+        outputStream << "\n";
+        sourcemapOutputStream << "\n";
 
         std::string outputFileName = argumentParser.get<std::string>(OutputArgument);
         std::string sourcemapOutputFileName = argumentParser.get<std::string>(SourcemapArgument);

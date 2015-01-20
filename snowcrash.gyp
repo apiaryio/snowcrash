@@ -4,6 +4,19 @@
   ],
   'targets' : [
     {
+      'target_name': 'libsos',
+      'type': 'static_library',
+      'include_dirs': [
+        'ext/sos/src'
+      ],
+      'sources': [
+        'ext/sos/src/sos.cc',
+        'ext/sos/src/sos.h',
+        'ext/sos/src/sosJSON.h',
+        'ext/sos/src/sosYAML.h'
+      ]
+    },
+    {
       'target_name': 'libsundown',
       'type': 'static_library',
       'include_dirs': [
@@ -58,7 +71,7 @@
         'ext/markdown-parser/src',
         'ext/markdown-parser/ext/sundown/src',
         'ext/markdown-parser/ext/sundown/html',
-        'ext/sos'
+        'ext/sos/src'
       ],
       'sources': [
         'src/CBlueprint.cc',
@@ -137,7 +150,8 @@
         ]
       ],
       'dependencies': [
-          'libmarkdownparser'
+          'libmarkdownparser',
+          'libsos'
       ]
     },
     {
@@ -198,14 +212,15 @@
         'ext/markdown-parser/src',
         'ext/markdown-parser/ext/sundown/src',
         'ext/cmdline',
-        'ext/sos'
+        'ext/sos/src'
       ],
       'sources': [
         'src/snowcrash/snowcrash.cc'
       ],
       'dependencies': [
         'libsnowcrash',
-        'libmarkdownparser'
+        'libmarkdownparser',
+        'libsos'
       ]
     },
     {
@@ -216,7 +231,7 @@
         'ext/markdown-parser/src',
         'ext/markdown-parser/ext/sundown/src',
         'ext/cmdline',
-        'ext/sos',
+        'ext/sos/src',
         'test',
         'test/performance',
       ],
@@ -225,7 +240,8 @@
       ],
       'dependencies': [
         'libsnowcrash',
-        'libmarkdownparser'
+        'libmarkdownparser',
+        'libsos'
       ]
     }
   ]

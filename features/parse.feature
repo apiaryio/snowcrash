@@ -2,7 +2,7 @@ Feature: Parse a blueprint
 
   Scenario: Parse a blueprint file into YAML
 
-    When I run `snowcrash blueprint.apib` 
+    When I run `snowcrash blueprint.apib`
     Then the output should contain the content of file "ast.yaml"
 
   Scenario: Parse a blueprint input into YAML
@@ -13,7 +13,7 @@ Feature: Parse a blueprint
 
   Scenario: Parse a blueprint file into JSON
 
-    When I run `snowcrash --format=json blueprint.apib` 
+    When I run `snowcrash --format=json blueprint.apib`
     Then the output should contain the content of file "ast.json"
 
   Scenario: Parse a blueprint input into JSON

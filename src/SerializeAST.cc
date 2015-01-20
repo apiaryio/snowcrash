@@ -390,13 +390,13 @@ sos::Object wrapPayload(const Payload& payload)
     // Name
     payloadObject.set(SerializeKey::Name.c_str(), sos::String(payload.name.c_str()));
 
-    // Description
-    payloadObject.set(SerializeKey::Description.c_str(), sos::String(payload.description.c_str()));
-
     // Reference
     if (!payload.reference.id.empty()) {
         payloadObject.set(SerializeKey::Reference.c_str(), wrapReference(payload.reference));
     }
+
+    // Description
+    payloadObject.set(SerializeKey::Description.c_str(), sos::String(payload.description.c_str()));
 
     // Headers
     sos::Array headers = sos::Array();
@@ -439,11 +439,11 @@ sos::Array wrapParameters(const Parameters& parameters)
         // Use
         parameter.set(SerializeKey::Required.c_str(), sos::Boolean(it->use != snowcrash::OptionalParameterUse));
 
-        // Example Value
-        parameter.set(SerializeKey::Example.c_str(), sos::String(it->exampleValue.c_str()));
-
         // Default Value
         parameter.set(SerializeKey::Default.c_str(), sos::String(it->defaultValue.c_str()));
+
+        // Example Value
+        parameter.set(SerializeKey::Example.c_str(), sos::String(it->exampleValue.c_str()));
 
         // Values
         sos::Array values = sos::Array();
@@ -458,6 +458,8 @@ sos::Array wrapParameters(const Parameters& parameters)
         }
 
         parameter.set(SerializeKey::Values.c_str(), values);
+
+        parametersArray.push(parameter);
     }
 
     return parametersArray;
@@ -586,12 +588,17 @@ sos::Object wrapResourceGroup(const ResourceGroup& resourceGroup)
         resources.push(wrapResource(*it));
     }
 
+    resourceGroupObject.set(SerializeKey::Resources.c_str(), resources);
+
     return resourceGroupObject;
 }
 
 sos::Object snowcrash::wrapBlueprint(const Blueprint& blueprint)
 {
     sos::Object blueprintObject = sos::Object();
+
+    // Version
+    blueprintObject.set(SerializeKey::ASTVersion, sos::String(AST_SERIALIZATION_VERSION));
 
     // Metadata
     sos::Array metadata = sos::Array();
