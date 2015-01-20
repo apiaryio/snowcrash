@@ -161,7 +161,7 @@ namespace snowcrash {
                 sections.report.warnings.push_back(Warning("ignorning unrecognized block",
                                                            IgnoringWarning,
                                                            sourceMap));
-                
+
                 cur = ++MarkdownNodeIterator(node);
             }
         }
