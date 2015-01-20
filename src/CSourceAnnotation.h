@@ -7,8 +7,8 @@
 //  Copyright (c) 2014 Apiary Inc. All rights reserved.
 //
 
-#ifndef SC_C_SOURCEANNOTATION_H
-#define SC_C_SOURCEANNOTATION_H
+#ifndef SNOWCRASH_C_SOURCEANNOTATION_H
+#define SNOWCRASH_C_SOURCEANNOTATION_H
 
 #include "Platform.h"
 #include "stdlib.h"

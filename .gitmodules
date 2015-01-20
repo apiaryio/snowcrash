@@ -7,3 +7,6 @@
 [submodule "ext/markdown-parser"]
 	path = ext/markdown-parser
 	url = git://github.com/apiaryio/markdown-parser.git
+[submodule "ext/sos"]
+	path = ext/sos
+	url = git://github.com/apiaryio/sos.git

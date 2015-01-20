@@ -6,8 +6,8 @@
 //  Copyright (c) 2014 Apiary Inc. All rights reserved.
 //
 
-#ifndef SNOWCRASH_BLUEPRINT_SOURCEMAP_H
-#define SNOWCRASH_BLUEPRINT_SOURCEMAP_H
+#ifndef SNOWCRASH_BLUEPRINTSOURCEMAP_H
+#define SNOWCRASH_BLUEPRINTSOURCEMAP_H
 
 #include "Blueprint.h"
 

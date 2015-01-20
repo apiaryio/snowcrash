@@ -1,87 +1,112 @@
-_version: 2.1
-metadata:
-- name: "Format"
-  value: "1A"
+
+_version: "2.1"
+metadata: 
+  - 
+    name: "Format"
+    value: "1A"
 name: "<API name>"
 description: "<API description>\n\n"
-resourceGroups:
-- name: "<resource group name>"
-  description: "<resource group description>\n\n"
-  resources:
-  - name: "<resource name>"
-    description: "<resource description>\n\n"
-    uriTemplate: "/resource/{parameter}"
-    model:
-      name: "<resource name>"
-      description: "<resource model description>"
-      headers:
-      - name: "<header1>"
-        value: "<header1 value>"
-      body: "<resource model body>\n"
-      schema: "<resource model schema>\n"
-    parameters:
-    - name: "parameter"
-      description: "<description>"
-      type: "<type>"
-      required: false
-      default: "<default value>"
-      example: "<example value>"
-      values:
-      - value: "<element>"
-    actions:
-    - name: "<action name>"
-      description: "<action description>\n\n"
-      method: "POST"
-      parameters:
-      - name: "parameter"
-        description: "<description>"
-        type: "<type>"
-        required: false
-        default: "<default value>"
-        example: "<example value>"
-        values:
-        - value: "<element>"
-      examples:
-      - name:
-        description:
-        requests:
-        - name: "<request name>"
-          description: "<request description>\n"
-          headers:
-          - name: "<header2>"
-            value: "<header2 value>"
-          - name: "<header3>"
-            value: "<header3 value>"
-          - name: "Content-Type"
-            value: "text/plain"
-          - name: "<header4>"
-            value: "<header4 value>"
-          body: "<request body>\n"
-          schema: "<request schema>\n"
-        responses:
-        - name: "200"
-          description: "<response description>\n"
-          headers:
-          - name: "<header2>"
-            value: "<header2 value>"
-          - name: "<header3>"
-            value: "<header3 value>"
-          - name: "Content-Type"
-            value: "text/plain"
-          - name: "<header5>"
-            value: "<header5 value>"
-          body: "<response body>\n"
-          schema: "<response schema>\n"
-        - name: "201"
-          reference:
-            id: "<resource name>"
+resourceGroups: 
+  - 
+    name: "<resource group name>"
+    description: "<resource group description>\n\n"
+    resources: 
+      - 
+        name: "<resource name>"
+        description: "<resource description>\n\n"
+        uriTemplate: "/resource/{parameter}"
+        model: 
+          name: "<resource name>"
           description: "<resource model description>"
-          headers:
-          - name: "<header2>"
-            value: "<header2 value>"
-          - name: "<header3>"
-            value: "<header3 value>"
-          - name: "<header1>"
-            value: "<header1 value>"
+          headers: 
+            - 
+              name: "<header1>"
+              value: "<header1 value>"
           body: "<resource model body>\n"
           schema: "<resource model schema>\n"
+        parameters: 
+          - 
+            name: "parameter"
+            description: "<description>"
+            type: "<type>"
+            required: false
+            default: "<default value>"
+            example: "<example value>"
+            values: 
+              - 
+                value: "<element>"
+        actions: 
+          - 
+            name: "<action name>"
+            description: "<action description>\n\n"
+            method: "POST"
+            parameters: 
+              - 
+                name: "parameter"
+                description: "<description>"
+                type: "<type>"
+                required: false
+                default: "<default value>"
+                example: "<example value>"
+                values: 
+                  - 
+                    value: "<element>"
+            examples: 
+              - 
+                name: ""
+                description: ""
+                requests: 
+                  - 
+                    name: "<request name>"
+                    description: "<request description>\n"
+                    headers: 
+                      - 
+                        name: "<header2>"
+                        value: "<header2 value>"
+                      - 
+                        name: "<header3>"
+                        value: "<header3 value>"
+                      - 
+                        name: "Content-Type"
+                        value: "text/plain"
+                      - 
+                        name: "<header4>"
+                        value: "<header4 value>"
+                    body: "<request body>\n"
+                    schema: "<request schema>\n"
+                responses: 
+                  - 
+                    name: "200"
+                    description: "<response description>\n"
+                    headers: 
+                      - 
+                        name: "<header2>"
+                        value: "<header2 value>"
+                      - 
+                        name: "<header3>"
+                        value: "<header3 value>"
+                      - 
+                        name: "Content-Type"
+                        value: "text/plain"
+                      - 
+                        name: "<header5>"
+                        value: "<header5 value>"
+                    body: "<response body>\n"
+                    schema: "<response schema>\n"
+                  - 
+                    name: "201"
+                    reference: 
+                      id: "<resource name>"
+                    description: "<resource model description>"
+                    headers: 
+                      - 
+                        name: "<header2>"
+                        value: "<header2 value>"
+                      - 
+                        name: "<header3>"
+                        value: "<header3 value>"
+                      - 
+                        name: "<header1>"
+                        value: "<header1 value>"
+                    body: "<resource model body>\n"
+                    schema: "<resource model schema>\n"

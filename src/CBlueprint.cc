@@ -10,6 +10,8 @@
 #include "CBlueprint.h"
 #include "snowcrash.h"
 
+/*----------------------------------------------------------------------*/
+
 SC_API sc_blueprint_t* sc_blueprint_new()
 {
     return AS_TYPE(sc_blueprint_t, ::new snowcrash::Blueprint);
@@ -20,18 +22,18 @@ SC_API void sc_blueprint_free(sc_blueprint_t* blueprint)
     ::delete AS_TYPE(snowcrash::Blueprint, blueprint);
 }
 
-SC_API const char* sc_blueprint_name(const sc_blueprint_t* blueprint)
+SC_API const char* sc_blueprint_name(const sc_blueprint_t* handle)
 {
-    const snowcrash::Blueprint* p = AS_CTYPE(snowcrash::Blueprint, blueprint);
+    const snowcrash::Blueprint* p = AS_CTYPE(snowcrash::Blueprint, handle);
     if (!p)
         return "";
 
     return p->name.c_str();
 }
 
-SC_API const char* sc_blueprint_description(const sc_blueprint_t* blueprint)
+SC_API const char* sc_blueprint_description(const sc_blueprint_t* handle)
 {
-    const snowcrash::Blueprint* p = AS_CTYPE(snowcrash::Blueprint, blueprint);
+    const snowcrash::Blueprint* p = AS_CTYPE(snowcrash::Blueprint, handle);
     if (!p)
         return "";
 
@@ -40,18 +42,18 @@ SC_API const char* sc_blueprint_description(const sc_blueprint_t* blueprint)
 
 /*----------------------------------------------------------------------*/
 
-SC_API const sc_metadata_collection_t* sc_metadata_collection_handle(const sc_blueprint_t* blueprint)
+SC_API const sc_metadata_collection_t* sc_metadata_collection_handle(const sc_blueprint_t* handle)
 {
-    const snowcrash::Blueprint* p = AS_CTYPE(snowcrash::Blueprint, blueprint);
+    const snowcrash::Blueprint* p = AS_CTYPE(snowcrash::Blueprint, handle);
     if (!p)
         return NULL;
 
     return AS_CTYPE(sc_metadata_collection_t, &p->metadata);
 }
 
-SC_API size_t sc_metadata_collection_size(const sc_metadata_collection_t* metadata)
+SC_API size_t sc_metadata_collection_size(const sc_metadata_collection_t* handle)
 {
-    const snowcrash::MetadataCollection* p = AS_CTYPE(snowcrash::MetadataCollection, metadata);
+    const snowcrash::MetadataCollection* p = AS_CTYPE(snowcrash::MetadataCollection, handle);
     if (!p)
         return 0;
 
@@ -60,27 +62,27 @@ SC_API size_t sc_metadata_collection_size(const sc_metadata_collection_t* metada
 
 /*----------------------------------------------------------------------*/
 
-SC_API const sc_metadata_t* sc_metadata_handle(const sc_metadata_collection_t* metadata_col, size_t index)
+SC_API const sc_metadata_t* sc_metadata_handle(const sc_metadata_collection_t* handle, size_t index)
 {
-    const snowcrash::MetadataCollection* p = AS_CTYPE(snowcrash::MetadataCollection, metadata_col);
+    const snowcrash::MetadataCollection* p = AS_CTYPE(snowcrash::MetadataCollection, handle);
     if (!p)
         return NULL;
 
     return AS_CTYPE(sc_metadata_t, &p->at(index));
 }
 
-SC_API const char* sc_metadata_key(const sc_metadata_t* metadata)
+SC_API const char* sc_metadata_key(const sc_metadata_t* handle)
 {
-    const snowcrash::Metadata* p = AS_CTYPE(snowcrash::Metadata, metadata);
+    const snowcrash::Metadata* p = AS_CTYPE(snowcrash::Metadata, handle);
     if (!p)
         return "";
 
     return p->first.c_str();
 }
 
-SC_API const char* sc_metadata_value(const sc_metadata_t* metadata)
+SC_API const char* sc_metadata_value(const sc_metadata_t* handle)
 {
-    const snowcrash::Metadata* p = AS_CTYPE(snowcrash::Metadata, metadata);
+    const snowcrash::Metadata* p = AS_CTYPE(snowcrash::Metadata, handle);
     if (!p)
         return "";
 
@@ -89,18 +91,18 @@ SC_API const char* sc_metadata_value(const sc_metadata_t* metadata)
 
 /*----------------------------------------------------------------------*/
 
-SC_API const sc_resource_group_collection_t* sc_resource_group_collection_handle(const sc_blueprint_t* blueprint)
+SC_API const sc_resource_group_collection_t* sc_resource_group_collection_handle(const sc_blueprint_t* handle)
 {
-    const snowcrash::Blueprint* p = AS_CTYPE(snowcrash::Blueprint, blueprint);
+    const snowcrash::Blueprint* p = AS_CTYPE(snowcrash::Blueprint, handle);
     if (!p)
         return NULL;
 
     return AS_CTYPE(sc_resource_group_collection_t, &p->resourceGroups);
 }
 
-SC_API size_t sc_resource_group_collection_size(const sc_resource_group_collection_t* resource)
+SC_API size_t sc_resource_group_collection_size(const sc_resource_group_collection_t* handle)
 {
-    const snowcrash::ResourceGroups* p = AS_CTYPE(snowcrash::ResourceGroups, resource);
+    const snowcrash::ResourceGroups* p = AS_CTYPE(snowcrash::ResourceGroups, handle);
     if (!p)
         return 0;
 
@@ -109,9 +111,9 @@ SC_API size_t sc_resource_group_collection_size(const sc_resource_group_collecti
 
 /*----------------------------------------------------------------------*/
 
-SC_API const sc_resource_group_t* sc_resource_group_handle(const sc_resource_group_collection_t* resource, size_t index)
+SC_API const sc_resource_group_t* sc_resource_group_handle(const sc_resource_group_collection_t* handle, size_t index)
 {
-    const snowcrash::ResourceGroups* p = AS_CTYPE(snowcrash::ResourceGroups, resource);
+    const snowcrash::ResourceGroups* p = AS_CTYPE(snowcrash::ResourceGroups, handle);
     if (!p)
         return NULL;
 
@@ -147,9 +149,9 @@ SC_API const sc_resource_collection_t* sc_resource_collection_handle(const sc_re
     return AS_CTYPE(sc_resource_collection_t, &p->resources);
 }
 
-SC_API size_t sc_resource_collection_size(const sc_resource_collection_t* resource)
+SC_API size_t sc_resource_collection_size(const sc_resource_collection_t* handle)
 {
-    const snowcrash::Resources* p = AS_CTYPE(snowcrash::Resources, resource);
+    const snowcrash::Resources* p = AS_CTYPE(snowcrash::Resources, handle);
     if (!p)
         return 0;
 
@@ -158,9 +160,9 @@ SC_API size_t sc_resource_collection_size(const sc_resource_collection_t* resour
 
 /*----------------------------------------------------------------------*/
 
-SC_API const sc_resource_t* sc_resource_handle(const sc_resource_collection_t* resource, size_t index)
+SC_API const sc_resource_t* sc_resource_handle(const sc_resource_collection_t* handle, size_t index)
 {
-    const snowcrash::Resources* p = AS_CTYPE(snowcrash::Resources, resource);
+    const snowcrash::Resources* p = AS_CTYPE(snowcrash::Resources, handle);
     if (!p)
         return NULL;
 

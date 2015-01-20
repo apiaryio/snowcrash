@@ -7,8 +7,8 @@
 //  Copyright (c) 2014 Apiary Inc. All rights reserved.
 //
 
-#ifndef SC_C_BLUEPRINT_H
-#define SC_C_BLUEPRINT_H
+#ifndef SNOWCRASH_C_BLUEPRINT_H
+#define SNOWCRASH_C_BLUEPRINT_H
 
 #include "Platform.h"
 #include "stdlib.h"
@@ -21,11 +21,11 @@ extern "C" {
     typedef unsigned int sc_blueprint_parser_options;
 
     /** brief Blueprint Parser Options Enums */
-    enum sc_blueprint_parser_option {
+    typedef enum sc_blueprint_parser_option {
         SC_RENDER_DESCRIPTIONS_OPTION = (1 << 0),       /// < Render Markdown in description.
         SC_REQUIRE_BLUEPRINT_NAME_OPTION = (1 << 1),    /// < Treat missing blueprint name as error
         SC_EXPORT_SORUCEMAP_OPTION = (1 << 2)           /// < Export source maps AST
-    };
+    } sc_blueprint_parser_option;
 
     /** Parameter Use flag */
     typedef enum sc_parameter_use {
@@ -34,6 +34,7 @@ extern "C" {
         SC_REQUIRED_PARAMETER_USE
     } sc_parameter_use;
 
+    /** Reference type flag */
     typedef enum sc_reference_type_t {
         SC_TYPE_MODEL_REFERENCE
     } sc_reference_type_t;
@@ -42,7 +43,7 @@ extern "C" {
     struct sc_blueprint_s;
     typedef struct sc_blueprint_s sc_blueprint_t;
 
-    /** Array Metadata wrapper */
+    /** Array Metadata Collection wrapper */
     struct sc_metadata_collection_s;
     typedef struct sc_metadata_collection_s sc_metadata_collection_t;
 
@@ -131,42 +132,42 @@ extern "C" {
     SC_API void sc_blueprint_free(sc_blueprint_t* blueprint);
 
     /** \returns Blueprint name */
-    SC_API const char* sc_blueprint_name(const sc_blueprint_t* blueprint);
+    SC_API const char* sc_blueprint_name(const sc_blueprint_t* handle);
 
     /** \returns Blueprint description */
-    SC_API const char* sc_blueprint_description(const sc_blueprint_t* blueprint);
+    SC_API const char* sc_blueprint_description(const sc_blueprint_t* handle);
 
     /*----------------------------------------------------------------------*/
 
-    /** \returns Metadata array handle */
-    SC_API const sc_metadata_collection_t* sc_metadata_collection_handle(const sc_blueprint_t* blueprint);
+    /** \returns Metadata Collection array handle */
+    SC_API const sc_metadata_collection_t* sc_metadata_collection_handle(const sc_blueprint_t* handle);
 
-    /** \returns size of Metadata array */
-    SC_API size_t sc_metadata_collection_size(const sc_metadata_collection_t* metadata);
+    /** \returns size of Metadata Collection array */
+    SC_API size_t sc_metadata_collection_size(const sc_metadata_collection_t* handle);
 
     /*----------------------------------------------------------------------*/
 
     /** \returns Metadata at `index` handle */
-    SC_API const sc_metadata_t* sc_metadata_handle(const sc_metadata_collection_t* metadata_col, size_t index);
+    SC_API const sc_metadata_t* sc_metadata_handle(const sc_metadata_collection_t* handle, size_t index);
 
     /** \returns Metadata key */
-    SC_API const char* sc_metadata_key(const sc_metadata_t* metadata);
+    SC_API const char* sc_metadata_key(const sc_metadata_t* handle);
 
     /** \returns Metadata value */
-    SC_API const char* sc_metadata_value(const sc_metadata_t* metadata);
+    SC_API const char* sc_metadata_value(const sc_metadata_t* handle);
 
     /*----------------------------------------------------------------------*/
 
     /** \returns Resource Group Collection array handle */
-    SC_API const sc_resource_group_collection_t* sc_resource_group_collection_handle(const sc_blueprint_t* blueprint);
+    SC_API const sc_resource_group_collection_t* sc_resource_group_collection_handle(const sc_blueprint_t* handle);
 
     /** \returns size of Resource Group Collection array */
-    SC_API size_t sc_resource_group_collection_size(const sc_resource_group_collection_t* resource);
+    SC_API size_t sc_resource_group_collection_size(const sc_resource_group_collection_t* handle);
 
     /*----------------------------------------------------------------------*/
 
-    /** \returns Resource Group handle */
-    SC_API const sc_resource_group_t* sc_resource_group_handle(const sc_resource_group_collection_t* resource, size_t index);
+    /** \returns Resource Group at `index` handle */
+    SC_API const sc_resource_group_t* sc_resource_group_handle(const sc_resource_group_collection_t* handle, size_t index);
 
     /** \returns Resource Group name */
     SC_API const char* sc_resource_group_name(const sc_resource_group_t* handle);
@@ -180,12 +181,12 @@ extern "C" {
     SC_API const sc_resource_collection_t* sc_resource_collection_handle(const sc_resource_group_t* handle);
 
     /** \returns Resource array size */
-    SC_API size_t sc_resource_collection_size(const sc_resource_collection_t* resource);
+    SC_API size_t sc_resource_collection_size(const sc_resource_collection_t* handle);
 
     /*----------------------------------------------------------------------*/
 
-    /** \returns Resource handle */
-    SC_API const sc_resource_t* sc_resource_handle(const sc_resource_collection_t* resource, size_t index);
+    /** \returns Resource at `index` handle */
+    SC_API const sc_resource_t* sc_resource_handle(const sc_resource_collection_t* handle, size_t index);
 
     /** \returns Resource URITemplate */
     SC_API const char* sc_resource_uritemplate(const sc_resource_t* handle);
@@ -254,7 +255,7 @@ extern "C" {
 
     /*----------------------------------------------------------------------*/
 
-    /** \returns Parameter handle */
+    /** \returns Parameter at `index` handle */
     SC_API const sc_parameter_t* sc_parameter_handle(const sc_parameter_collection_t* handle, size_t index);
 
     /** \returns Parameter name */
@@ -285,7 +286,7 @@ extern "C" {
 
     /*----------------------------------------------------------------------*/
 
-    /** \returns Value handle */
+    /** \returns Value at `index` handle */
     SC_API const sc_value_t* sc_value_handle(const sc_value_collection_t* handle, size_t index);
 
     /** \returns Value string */
@@ -307,7 +308,7 @@ extern "C" {
 
     /*----------------------------------------------------------------------*/
 
-    /** \returns Header handle */
+    /** \returns Header at `index` handle */
     SC_API const sc_header_t* sc_header_handle(const sc_header_collection_t* handle, size_t index);
 
     /** \returns Header Key */
@@ -326,7 +327,7 @@ extern "C" {
 
     /*----------------------------------------------------------------------*/
 
-    /** \returns Action handle */
+    /** \returns Action at `index` handle */
     SC_API const sc_action_t* sc_action_handle(const sc_action_collection_t* handle, size_t index);
 
     /** \returns Action HTTPMethod */

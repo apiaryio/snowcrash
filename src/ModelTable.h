@@ -62,7 +62,7 @@ namespace snowcrash {
              it != modelTable.end();
              ++it) {
 
-            std::cout << "- " << it->first << " - body: '" << EscapeNewlines(it->second.body) << "'\n";
+            std::cout << "- " << it->first << " - body: '" << sos::escapeNewlines(it->second.body) << "'\n";
         }
 
         std::cout << std::endl;
