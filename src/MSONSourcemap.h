@@ -49,23 +49,60 @@ namespace snowcrash {
     struct SourceMap : public SourceMapBase {
     };
 
-    /** Source Map of Collection of Values */
-    SOURCE_MAP_COLLECTION(mson::Value, mson::Values)
-
     /** Source Map of Collection of Type Names */
     SOURCE_MAP_COLLECTION(mson::TypeName, mson::TypeNames)
 
-    /** Source Map structure for Value Definition */
+    /** Forward Declaration for Source Map of Element */
     template<>
-    struct SourceMap<mson::ValueDefinition> : public SourceMapBase {
+    struct SourceMap<mson::Element>;
 
-        /** Source Map of Type Definition */
-        SourceMap<mson::TypeDefinition> typeDefinition;
+    /** Source Map of Collection of Elements */
+    SOURCE_MAP_COLLECTION(mson::Element, mson::Elements)
+
+    /** Source Map structure for Type Section */
+    template<>
+    struct SourceMap<mson::TypeSection> : public SourceMapBase {
+
+        /** EITHER Source Map of Block Description */
+        SourceMap<mson::Markdown> description;
+
+        /** OR Source Map of Literal */
+        SourceMap<mson::Literal> value;
+
+        /** OR Source Map of Collection of elements */
+        SourceMap<mson::Elements>& elements();
+        const SourceMap<mson::Elements>& elements() const;
+
+        /** Constructor */
+        SourceMap(const SourceMap<mson::Markdown>& description_ = SourceMap<mson::Markdown>(),
+                  const SourceMap<mson::Literal>& value_ = SourceMap<mson::Literal>());
+
+        /** Copy constructor */
+        SourceMap(const SourceMap<mson::TypeSection>& rhs);
+
+        /** Assignment operator */
+        SourceMap<mson::TypeSection>& operator=(const SourceMap<mson::TypeSection>& rhs);
+
+        /** Desctructor */
+        ~SourceMap();
+
+    private:
+        std::auto_ptr<SourceMap<mson::Elements> > m_elements;
+
     };
+
+    /** Source Map of Collection of Type Sections */
+    SOURCE_MAP_COLLECTION(mson::TypeSection, mson::TypeSections)
 
     /** Source Map structure for Named Type */
     template<>
-    struct SourceMap<mson::NamedType> {
+    struct SourceMap<mson::NamedType> : public SourceMapBase {
+
+        /** Source Map of Type Name */
+        SourceMap<mson::TypeName> name;
+
+        /** Source Map of Type Definition */
+        SourceMap<mson::TypeDefinition> typeDefinition;
 
         /** Source Map of Type Sections */
         SourceMap<mson::TypeSections> sections;
@@ -93,8 +130,48 @@ namespace snowcrash {
         SourceMap<mson::PropertyName> name;
     };
 
-    /** Source Map of Mixin */
-    // 'Mixin' type is same as 'TypeDefinition'
+    /** Source Map structure for One Of */
+    // `OneOf` is the same as `Elements`
+
+    /** Source Map structure for Element */
+    template<>
+    struct SourceMap<mson::Element> : public SourceMapBase {
+
+        /** EITHER Source Map of Property Member */
+        SourceMap<mson::PropertyMember> property;
+
+        /** OR Source Map of Value Member */
+        SourceMap<mson::ValueMember> value;
+
+        /** OR Source Map of Mixin */
+        SourceMap<mson::Mixin> mixin;
+
+        /** OR Source Map of One Of */
+        SourceMap<mson::OneOf>& oneOf();
+        const SourceMap<mson::OneOf>& oneOf() const;
+
+        /** OR Source Map of Collection of elements */
+        SourceMap<mson::Elements>& elements();
+        const SourceMap<mson::Elements>& elements() const;
+
+        /** Builds the structure from group of elements */
+        SourceMap<mson::Element>& operator=(const SourceMap<mson::Elements>& rhs);
+
+        /** Constructor */
+        SourceMap();
+
+        /** Copy constructor */
+        SourceMap(const SourceMap<mson::Element>& rhs);
+
+        /** Assignment operator */
+        SourceMap<mson::Element>& operator=(const SourceMap<mson::Element>& rhs);
+
+        /** Destructor */
+        ~SourceMap();
+
+    private:
+        std::auto_ptr<SourceMap<mson::Elements> > m_elements;
+    };
 }
 
 #endif

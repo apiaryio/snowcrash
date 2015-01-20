@@ -90,7 +90,7 @@ TEST_CASE("Parse canonical mson sample list type section", "[mson][type_section]
 
     ParseResult<mson::TypeSection> typeSection;
     typeSection.node.baseType = mson::PrimitiveBaseType;
-    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection);
+    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection, ExportSourcemapOption);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());
@@ -99,6 +99,10 @@ TEST_CASE("Parse canonical mson sample list type section", "[mson][type_section]
     REQUIRE(typeSection.node.content.value == "75");
     REQUIRE(typeSection.node.content.description.empty());
     REQUIRE(typeSection.node.content.elements().empty());
+
+    SourceMapHelper::check(typeSection.sourceMap.value.sourceMap, 0, 13);
+    REQUIRE(typeSection.sourceMap.description.sourceMap.empty());
+    REQUIRE(typeSection.sourceMap.elements().collection.empty());
 }
 
 TEST_CASE("Parse array mson sample list type section", "[mson][type_section]")
@@ -108,7 +112,7 @@ TEST_CASE("Parse array mson sample list type section", "[mson][type_section]")
 
     ParseResult<mson::TypeSection> typeSection;
     typeSection.node.baseType = mson::ValueBaseType;
-    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection);
+    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection, ExportSourcemapOption);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());
@@ -123,6 +127,12 @@ TEST_CASE("Parse array mson sample list type section", "[mson][type_section]")
     REQUIRE(typeSection.node.content.elements().at(1).klass == mson::Element::ValueClass);
     REQUIRE(typeSection.node.content.elements().at(1).content.value.valueDefinition.values.size() == 1);
     REQUIRE(typeSection.node.content.elements().at(1).content.value.valueDefinition.values[0].literal == "100");
+
+    REQUIRE(typeSection.sourceMap.value.sourceMap.empty());
+    REQUIRE(typeSection.sourceMap.description.sourceMap.empty());
+    REQUIRE(typeSection.sourceMap.elements().collection.size() == 2);
+    SourceMapHelper::check(typeSection.sourceMap.elements().collection[0].value.valueDefinition.sourceMap, 0, 18);
+    SourceMapHelper::check(typeSection.sourceMap.elements().collection[1].value.valueDefinition.sourceMap, 0, 18);
 }
 
 TEST_CASE("Parse mson sample list type section for a string but having values", "[mson][type_section]")
@@ -132,7 +142,7 @@ TEST_CASE("Parse mson sample list type section for a string but having values", 
 
     ParseResult<mson::TypeSection> typeSection;
     typeSection.node.baseType = mson::PrimitiveBaseType;
-    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection);
+    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection, ExportSourcemapOption);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());
@@ -141,6 +151,10 @@ TEST_CASE("Parse mson sample list type section for a string but having values", 
     REQUIRE(typeSection.node.content.value == "75, 100");
     REQUIRE(typeSection.node.content.description.empty());
     REQUIRE(typeSection.node.content.elements().empty());
+
+    SourceMapHelper::check(typeSection.sourceMap.value.sourceMap, 0, 18);
+    REQUIRE(typeSection.sourceMap.description.sourceMap.empty());
+    REQUIRE(typeSection.sourceMap.elements().collection.empty());
 }
 
 TEST_CASE("Parse mson sample list type section for an object with a value", "[mson][type_section]")
@@ -150,7 +164,7 @@ TEST_CASE("Parse mson sample list type section for an object with a value", "[ms
 
     ParseResult<mson::TypeSection> typeSection;
     typeSection.node.baseType = mson::ObjectBaseType;
-    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection);
+    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection, ExportSourcemapOption);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.size() == 1);
@@ -160,6 +174,10 @@ TEST_CASE("Parse mson sample list type section for an object with a value", "[ms
     REQUIRE(typeSection.node.content.value.empty());
     REQUIRE(typeSection.node.content.description.empty());
     REQUIRE(typeSection.node.content.elements().empty());
+
+    REQUIRE(typeSection.sourceMap.value.sourceMap.empty());
+    REQUIRE(typeSection.sourceMap.description.sourceMap.empty());
+    REQUIRE(typeSection.sourceMap.elements().collection.empty());
 }
 
 TEST_CASE("Parse mson sample list type section with values as list items", "[mson][type_section]")
@@ -171,7 +189,7 @@ TEST_CASE("Parse mson sample list type section with values as list items", "[mso
 
     ParseResult<mson::TypeSection> typeSection;
     typeSection.node.baseType = mson::ValueBaseType;
-    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection);
+    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection, ExportSourcemapOption);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());
@@ -186,6 +204,12 @@ TEST_CASE("Parse mson sample list type section with values as list items", "[mso
     REQUIRE(typeSection.node.content.elements().at(1).klass == mson::Element::ValueClass);
     REQUIRE(typeSection.node.content.elements().at(1).content.value.valueDefinition.values.size() == 1);
     REQUIRE(typeSection.node.content.elements().at(1).content.value.valueDefinition.values[0].literal == "green");
+
+    REQUIRE(typeSection.sourceMap.value.sourceMap.empty());
+    REQUIRE(typeSection.sourceMap.description.sourceMap.empty());
+    REQUIRE(typeSection.sourceMap.elements().collection.size() == 2);
+    SourceMapHelper::check(typeSection.sourceMap.elements().collection[0].value.valueDefinition.sourceMap, 13, 4);
+    SourceMapHelper::check(typeSection.sourceMap.elements().collection[1].value.valueDefinition.sourceMap, 21, 6);
 }
 
 TEST_CASE("Parse multi-line mson sample list type section without newline", "[mson][type_section]")
@@ -198,7 +222,7 @@ TEST_CASE("Parse multi-line mson sample list type section without newline", "[ms
 
     ParseResult<mson::TypeSection> typeSection;
     typeSection.node.baseType = mson::PrimitiveBaseType;
-    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection);
+    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection, ExportSourcemapOption);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());
@@ -207,6 +231,14 @@ TEST_CASE("Parse multi-line mson sample list type section without newline", "[ms
     REQUIRE(typeSection.node.content.value == " red\n   green\n\nyellow");
     REQUIRE(typeSection.node.content.description.empty());
     REQUIRE(typeSection.node.content.elements().empty());
+
+    REQUIRE(typeSection.sourceMap.value.sourceMap.size() == 4);
+    SourceMapHelper::check(typeSection.sourceMap.value.sourceMap, 2, 7, 1);
+    SourceMapHelper::check(typeSection.sourceMap.value.sourceMap, 13, 5, 2);
+    SourceMapHelper::check(typeSection.sourceMap.value.sourceMap, 22, 10, 3);
+    SourceMapHelper::check(typeSection.sourceMap.value.sourceMap, 33, 6, 4);
+    REQUIRE(typeSection.sourceMap.description.sourceMap.empty());
+    REQUIRE(typeSection.sourceMap.elements().collection.empty());
 }
 
 TEST_CASE("Parse multi-line mson sample list type section with newline", "[mson][type_section]")
@@ -219,7 +251,7 @@ TEST_CASE("Parse multi-line mson sample list type section with newline", "[mson]
 
     ParseResult<mson::TypeSection> typeSection;
     typeSection.node.baseType = mson::PrimitiveBaseType;
-    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection);
+    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection, ExportSourcemapOption);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());
@@ -228,6 +260,12 @@ TEST_CASE("Parse multi-line mson sample list type section with newline", "[mson]
     REQUIRE(typeSection.node.content.value == " red\n   green\nyellow");
     REQUIRE(typeSection.node.content.description.empty());
     REQUIRE(typeSection.node.content.elements().empty());
+
+    REQUIRE(typeSection.sourceMap.value.sourceMap.size() == 2);
+    SourceMapHelper::check(typeSection.sourceMap.value.sourceMap, 14, 5, 1);
+    SourceMapHelper::check(typeSection.sourceMap.value.sourceMap, 23, 15, 2);
+    REQUIRE(typeSection.sourceMap.description.sourceMap.empty());
+    REQUIRE(typeSection.sourceMap.elements().collection.empty());
 }
 
 TEST_CASE("Parse mson sample list type section with values as para for values base type", "[mson][type_section]")
@@ -239,7 +277,7 @@ TEST_CASE("Parse mson sample list type section with values as para for values ba
 
     ParseResult<mson::TypeSection> typeSection;
     typeSection.node.baseType = mson::ValueBaseType;
-    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection);
+    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection, ExportSourcemapOption);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());
@@ -248,6 +286,10 @@ TEST_CASE("Parse mson sample list type section with values as para for values ba
     REQUIRE(typeSection.node.content.value.empty());
     REQUIRE(typeSection.node.content.description.empty());
     REQUIRE(typeSection.node.content.elements().empty());
+
+    REQUIRE(typeSection.sourceMap.value.sourceMap.empty());
+    REQUIRE(typeSection.sourceMap.description.sourceMap.empty());
+    REQUIRE(typeSection.sourceMap.elements().collection.empty());
 }
 
 TEST_CASE("Parse markdown multi-line mson sample list type section", "[mson][type_section]")
@@ -259,7 +301,7 @@ TEST_CASE("Parse markdown multi-line mson sample list type section", "[mson][typ
 
     ParseResult<mson::TypeSection> typeSection;
     typeSection.node.baseType = mson::PrimitiveBaseType;
-    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection);
+    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection, ExportSourcemapOption);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());
@@ -268,6 +310,12 @@ TEST_CASE("Parse markdown multi-line mson sample list type section", "[mson][typ
     REQUIRE(typeSection.node.content.value == "- red\n\n- green");
     REQUIRE(typeSection.node.content.description.empty());
     REQUIRE(typeSection.node.content.elements().empty());
+
+    REQUIRE(typeSection.sourceMap.value.sourceMap.size() == 2);
+    SourceMapHelper::check(typeSection.sourceMap.value.sourceMap, 11, 6, 1);
+    SourceMapHelper::check(typeSection.sourceMap.value.sourceMap, 20, 7, 2);
+    REQUIRE(typeSection.sourceMap.description.sourceMap.empty());
+    REQUIRE(typeSection.sourceMap.elements().collection.empty());
 }
 
 TEST_CASE("Parse mson sample header type section with values as list items", "[mson][type_section]")
@@ -279,7 +327,7 @@ TEST_CASE("Parse mson sample header type section with values as list items", "[m
 
     ParseResult<mson::TypeSection> typeSection;
     typeSection.node.baseType = mson::ValueBaseType;
-    SectionParserHelper<mson::TypeSection, MSONTypeSectionHeaderParser>::parse(source, MSONSampleDefaultSectionType, typeSection);
+    SectionParserHelper<mson::TypeSection, MSONTypeSectionHeaderParser>::parse(source, MSONSampleDefaultSectionType, typeSection, ExportSourcemapOption);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());
@@ -294,6 +342,12 @@ TEST_CASE("Parse mson sample header type section with values as list items", "[m
     REQUIRE(typeSection.node.content.elements().at(1).klass == mson::Element::ValueClass);
     REQUIRE(typeSection.node.content.elements().at(1).content.value.valueDefinition.values.size() == 1);
     REQUIRE(typeSection.node.content.elements().at(1).content.value.valueDefinition.values[0].literal == "green");
+
+    REQUIRE(typeSection.sourceMap.value.sourceMap.empty());
+    REQUIRE(typeSection.sourceMap.description.sourceMap.empty());
+    REQUIRE(typeSection.sourceMap.elements().collection.size() == 2);
+    SourceMapHelper::check(typeSection.sourceMap.elements().collection[0].value.valueDefinition.sourceMap, 13, 4);
+    SourceMapHelper::check(typeSection.sourceMap.elements().collection[1].value.valueDefinition.sourceMap, 21, 6);
 }
 
 TEST_CASE("Parse multi-line mson sample header type section", "[mson][type_section]")
@@ -306,7 +360,7 @@ TEST_CASE("Parse multi-line mson sample header type section", "[mson][type_secti
 
     ParseResult<mson::TypeSection> typeSection;
     typeSection.node.baseType = mson::PrimitiveBaseType;
-    SectionParserHelper<mson::TypeSection, MSONTypeSectionHeaderParser>::parse(source, MSONSampleDefaultSectionType, typeSection);
+    SectionParserHelper<mson::TypeSection, MSONTypeSectionHeaderParser>::parse(source, MSONSampleDefaultSectionType, typeSection, ExportSourcemapOption);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());
@@ -315,6 +369,10 @@ TEST_CASE("Parse multi-line mson sample header type section", "[mson][type_secti
     REQUIRE(typeSection.node.content.value == "   red\n     green\nyellow");
     REQUIRE(typeSection.node.content.description.empty());
     REQUIRE(typeSection.node.content.elements().empty());
+
+    SourceMapHelper::check(typeSection.sourceMap.value.sourceMap, 9, 24);
+    REQUIRE(typeSection.sourceMap.description.sourceMap.empty());
+    REQUIRE(typeSection.sourceMap.elements().collection.empty());
 }
 
 TEST_CASE("Parse multi-line mson sample header type section with multiple nested nodes", "[mson][type_section]")
@@ -327,7 +385,7 @@ TEST_CASE("Parse multi-line mson sample header type section with multiple nested
 
     ParseResult<mson::TypeSection> typeSection;
     typeSection.node.baseType = mson::PrimitiveBaseType;
-    SectionParserHelper<mson::TypeSection, MSONTypeSectionHeaderParser>::parse(source, MSONSampleDefaultSectionType, typeSection);
+    SectionParserHelper<mson::TypeSection, MSONTypeSectionHeaderParser>::parse(source, MSONSampleDefaultSectionType, typeSection, ExportSourcemapOption);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());
@@ -336,6 +394,10 @@ TEST_CASE("Parse multi-line mson sample header type section with multiple nested
     REQUIRE(typeSection.node.content.value == "   red\n     green\n\n yellow");
     REQUIRE(typeSection.node.content.description.empty());
     REQUIRE(typeSection.node.content.elements().empty());
+
+    SourceMapHelper::check(typeSection.sourceMap.value.sourceMap, 9, 26, 1);
+    REQUIRE(typeSection.sourceMap.description.sourceMap.empty());
+    REQUIRE(typeSection.sourceMap.elements().collection.empty());
 }
 
 TEST_CASE("Parse markdown multi-line mson sample header type section", "[mson][type_section]")
@@ -347,7 +409,7 @@ TEST_CASE("Parse markdown multi-line mson sample header type section", "[mson][t
 
     ParseResult<mson::TypeSection> typeSection;
     typeSection.node.baseType = mson::PrimitiveBaseType;
-    SectionParserHelper<mson::TypeSection, MSONTypeSectionHeaderParser>::parse(source, MSONSampleDefaultSectionType, typeSection);
+    SectionParserHelper<mson::TypeSection, MSONTypeSectionHeaderParser>::parse(source, MSONSampleDefaultSectionType, typeSection, ExportSourcemapOption);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());
@@ -356,6 +418,10 @@ TEST_CASE("Parse markdown multi-line mson sample header type section", "[mson][t
     REQUIRE(typeSection.node.content.value == "- red\n\n- green");
     REQUIRE(typeSection.node.content.description.empty());
     REQUIRE(typeSection.node.content.elements().empty());
+
+    SourceMapHelper::check(typeSection.sourceMap.value.sourceMap, 9, 14);
+    REQUIRE(typeSection.sourceMap.description.sourceMap.empty());
+    REQUIRE(typeSection.sourceMap.elements().collection.empty());
 }
 
 TEST_CASE("Parse mson items list type section for values base type containing one of", "[mson][type_section]")
@@ -368,13 +434,17 @@ TEST_CASE("Parse mson items list type section for values base type containing on
 
     ParseResult<mson::TypeSection> typeSection;
     typeSection.node.baseType = mson::ValueBaseType;
-    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection);
+    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection, ExportSourcemapOption);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.size() == 1);
     REQUIRE(typeSection.report.warnings[0].code == LogicalErrorWarning);
 
     REQUIRE(typeSection.node.content.elements().empty());
+
+    REQUIRE(typeSection.sourceMap.value.sourceMap.empty());
+    REQUIRE(typeSection.sourceMap.description.sourceMap.empty());
+    REQUIRE(typeSection.sourceMap.elements().collection.empty());
 }
 
 TEST_CASE("Parse mson properties list type section for values base type", "[mson][type_section]")
@@ -386,12 +456,16 @@ TEST_CASE("Parse mson properties list type section for values base type", "[mson
 
     ParseResult<mson::TypeSection> typeSection;
     typeSection.node.baseType = mson::ValueBaseType;
-    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection);
+    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection, ExportSourcemapOption);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.size() == 1);
     REQUIRE(typeSection.report.warnings[0].code == LogicalErrorWarning);
     REQUIRE(typeSection.node.empty());
+
+    REQUIRE(typeSection.sourceMap.value.sourceMap.empty());
+    REQUIRE(typeSection.sourceMap.description.sourceMap.empty());
+    REQUIRE(typeSection.sourceMap.elements().collection.empty());
 }
 
 TEST_CASE("Parse mson sample type section for a simple object", "[mson][type_section]")
@@ -403,9 +477,11 @@ TEST_CASE("Parse mson sample type section for a simple object", "[mson][type_sec
     "        - admin: false";
 
     mson::Element member;
+    SourceMap<mson::Element> memberSM;
+
     ParseResult<mson::TypeSection> typeSection;
     typeSection.node.baseType = mson::ObjectBaseType;
-    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection);
+    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection, ExportSourcemapOption);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());
@@ -431,6 +507,22 @@ TEST_CASE("Parse mson sample type section for a simple object", "[mson][type_sec
     REQUIRE(member.content.property.name.literal == "admin");
     REQUIRE(member.content.property.valueDefinition.values.size() == 1);
     REQUIRE(member.content.property.valueDefinition.values[0].literal == "false");
+
+    REQUIRE(typeSection.sourceMap.value.sourceMap.empty());
+    REQUIRE(typeSection.sourceMap.description.sourceMap.empty());
+    REQUIRE(typeSection.sourceMap.elements().collection.size() == 1);
+    SourceMapHelper::check(typeSection.sourceMap.elements().collection[0].property.name.sourceMap, 15, 14);
+    SourceMapHelper::check(typeSection.sourceMap.elements().collection[0].property.valueDefinition.sourceMap, 15, 14);
+    REQUIRE(typeSection.sourceMap.elements().collection[0].property.sections.collection.size() == 1);
+    REQUIRE(typeSection.sourceMap.elements().collection[0].property.sections.collection[0].elements().collection.size() == 2);
+
+    memberSM = typeSection.sourceMap.elements().collection[0].property.sections.collection[0].elements().collection[0];
+    SourceMapHelper::check(memberSM.property.name.sourceMap, 39, 20);
+    SourceMapHelper::check(memberSM.property.valueDefinition.sourceMap, 39, 20);
+
+    memberSM = typeSection.sourceMap.elements().collection[0].property.sections.collection[0].elements().collection[1];
+    SourceMapHelper::check(memberSM.property.name.sourceMap, 67, 15);
+    SourceMapHelper::check(memberSM.property.valueDefinition.sourceMap, 67, 15);
 }
 
 TEST_CASE("Parse mson sample type section for a complex object", "[mson][type_section]")
@@ -445,9 +537,11 @@ TEST_CASE("Parse mson sample type section for a complex object", "[mson][type_se
     "                - admin: false";
 
     mson::Element member, submember;
+    SourceMap<mson::Element> memberSM, submemberSM;
+
     ParseResult<mson::TypeSection> typeSection;
     typeSection.node.baseType = mson::ObjectBaseType;
-    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection);
+    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection, ExportSourcemapOption);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());
@@ -497,4 +591,36 @@ TEST_CASE("Parse mson sample type section for a complex object", "[mson][type_se
     REQUIRE(member.content.property.valueDefinition.values.size() == 1);
     REQUIRE(member.content.property.valueDefinition.values[0].literal == "false");
     REQUIRE(member.content.property.sections.empty());
+
+    REQUIRE(typeSection.sourceMap.value.sourceMap.empty());
+    REQUIRE(typeSection.sourceMap.description.sourceMap.empty());
+    REQUIRE(typeSection.sourceMap.elements().collection.size() == 1);
+    SourceMapHelper::check(typeSection.sourceMap.elements().collection[0].property.name.sourceMap, 15, 14);
+    SourceMapHelper::check(typeSection.sourceMap.elements().collection[0].property.valueDefinition.sourceMap, 15, 14);
+    REQUIRE(typeSection.sourceMap.elements().collection[0].property.sections.collection.size() == 1);
+    REQUIRE(typeSection.sourceMap.elements().collection[0].property.sections.collection[0].elements().collection.size() == 1);
+
+    memberSM = typeSection.sourceMap.elements().collection[0].property.sections.collection[0].elements().collection[0];
+    SourceMapHelper::check(memberSM.property.name.sourceMap, 39, 13);
+    SourceMapHelper::check(memberSM.property.valueDefinition.sourceMap, 39, 13);
+    REQUIRE(memberSM.property.sections.collection.size() == 1);
+    REQUIRE(memberSM.property.sections.collection[0].elements().collection.size() == 3);
+
+    submemberSM = memberSM.property.sections.collection[0].elements().collection[0];
+    SourceMapHelper::check(submemberSM.value.valueDefinition.sourceMap, 66, 10);
+    REQUIRE(submemberSM.value.sections.collection.empty());
+
+    submemberSM = memberSM.property.sections.collection[0].elements().collection[1];
+    SourceMapHelper::check(submemberSM.value.valueDefinition.sourceMap, 90, 5);
+    REQUIRE(submemberSM.value.sections.collection.empty());
+
+    submemberSM = memberSM.property.sections.collection[0].elements().collection[2];
+    SourceMapHelper::check(submemberSM.value.valueDefinition.sourceMap, 109, 9);
+    REQUIRE(submemberSM.value.sections.collection.size() == 1);
+    REQUIRE(submemberSM.value.sections.collection[0].elements().collection.size() == 1);
+
+    memberSM = submemberSM.value.sections.collection[0].elements().collection[0];
+    SourceMapHelper::check(memberSM.property.name.sourceMap, 134, 15);
+    SourceMapHelper::check(memberSM.property.valueDefinition.sourceMap, 134, 15);
+    REQUIRE(memberSM.property.sections.collection.empty());
 }

@@ -146,6 +146,27 @@ namespace snowcrashtest {
             return signature;
         }
     };
+
+    /**
+     * \brief Helper to test source maps
+     */
+    struct SourceMapHelper {
+
+        /**
+         * If 'nth' is not given, sourceMap is of size 1 and checks the 0th element
+         */
+        static void check(mdp::BytesRangeSet& sourceMap, int loc, int len, int nth = 0) {
+
+            if (nth == 0) {
+
+                nth = 1;
+                REQUIRE(sourceMap.size() == 1);
+            }
+
+            REQUIRE(sourceMap[nth - 1].location == loc);
+            REQUIRE(sourceMap[nth - 1].length == len);
+        }
+    };
 }
 
 #endif
