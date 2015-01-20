@@ -153,7 +153,11 @@ namespace snowcrashtest {
     struct SourceMapHelper {
 
         /**
-         * If 'nth' is not given, sourceMap is of size 1 and checks the 0th element
+         * If 'nth' is not given, check that the given sourceMap is of size 1
+         * and also check the first row of the given sourceMap with the given location & length.
+         *
+         * If 'nth' is given, check that particular row of the given sourceMap with the
+         * given location & length.
          */
         static void check(mdp::BytesRangeSet& sourceMap, int loc, int len, int nth = 0) {
 
