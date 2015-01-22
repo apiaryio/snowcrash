@@ -273,14 +273,14 @@ int main(int argc, const char *argv[])
 
         if (argumentParser.get<std::string>(FormatArgument) == "json") {
 
-            sos::SerializeJSON serializer = sos::SerializeJSON();
+            sos::SerializeJSON serializer;
 
             serializer.process(outputObject, outputStream);
             serializer.process(sourcemapOutputObject, sourcemapOutputStream);
         }
         else if (argumentParser.get<std::string>(FormatArgument) == "yaml") {
 
-            sos::SerializeYAML serializer = sos::SerializeYAML();
+            sos::SerializeYAML serializer;
 
             serializer.process(outputObject, outputStream);
             serializer.process(sourcemapOutputObject, sourcemapOutputStream);
