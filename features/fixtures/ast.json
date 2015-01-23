@@ -27,7 +27,17 @@
               }
             ],
             "body": "<resource model body>\n",
-            "schema": "<resource model schema>\n"
+            "schema": "<resource model schema>\n",
+            "assets": {
+              "body": {
+                "source": "<resource model body>\n",
+                "resolved": ""
+              },
+              "schema": {
+                "source": "<resource model schema>\n",
+                "resolved": ""
+              }
+            }
           },
           "parameters": [
             {
@@ -91,7 +101,17 @@
                         }
                       ],
                       "body": "<request body>\n",
-                      "schema": "<request schema>\n"
+                      "schema": "<request schema>\n",
+                      "assets": {
+                        "body": {
+                          "source": "<request body>\n",
+                          "resolved": ""
+                        },
+                        "schema": {
+                          "source": "<request schema>\n",
+                          "resolved": ""
+                        }
+                      }
                     }
                   ],
                   "responses": [
@@ -117,7 +137,17 @@
                         }
                       ],
                       "body": "<response body>\n",
-                      "schema": "<response schema>\n"
+                      "schema": "<response schema>\n",
+                      "assets": {
+                        "body": {
+                          "source": "<response body>\n",
+                          "resolved": ""
+                        },
+                        "schema": {
+                          "source": "<response schema>\n",
+                          "resolved": ""
+                        }
+                      }
                     },
                     {
                       "name": "201",
@@ -140,7 +170,17 @@
                         }
                       ],
                       "body": "<resource model body>\n",
-                      "schema": "<resource model schema>\n"
+                      "schema": "<resource model schema>\n",
+                      "assets": {
+                        "body": {
+                          "source": "<resource model body>\n",
+                          "resolved": ""
+                        },
+                        "schema": {
+                          "source": "<resource model schema>\n",
+                          "resolved": ""
+                        }
+                      }
                     }
                   ]
                 }

@@ -23,6 +23,13 @@ resourceGroups:
               value: "<header1 value>"
           body: "<resource model body>\n"
           schema: "<resource model schema>\n"
+          assets:
+            body:
+              source: "<resource model body>\n"
+              resolved: ""
+            schema:
+              source: "<resource model schema>\n"
+              resolved: ""
         parameters:
           -
             name: "parameter"
@@ -73,6 +80,13 @@ resourceGroups:
                         value: "<header4 value>"
                     body: "<request body>\n"
                     schema: "<request schema>\n"
+                    assets:
+                      body:
+                        source: "<request body>\n"
+                        resolved: ""
+                      schema:
+                        source: "<request schema>\n"
+                        resolved: ""
                 responses:
                   -
                     name: "200"
@@ -92,6 +106,13 @@ resourceGroups:
                         value: "<header5 value>"
                     body: "<response body>\n"
                     schema: "<response schema>\n"
+                    assets:
+                      body:
+                        source: "<response body>\n"
+                        resolved: ""
+                      schema:
+                        source: "<response schema>\n"
+                        resolved: ""
                   -
                     name: "201"
                     reference:
@@ -109,3 +130,10 @@ resourceGroups:
                         value: "<header1 value>"
                     body: "<resource model body>\n"
                     schema: "<resource model schema>\n"
+                    assets:
+                      body:
+                        source: "<resource model body>\n"
+                        resolved: ""
+                      schema:
+                        source: "<resource model schema>\n"
+                        resolved: ""
