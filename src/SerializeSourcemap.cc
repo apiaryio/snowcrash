@@ -177,10 +177,18 @@ sos::Object WrapPayloadSourcemap(const SourceMap<Payload>& payload)
     payloadObject.set(SerializeKey::Headers, headers);
 
     // Body
-    payloadObject.set(SerializeKey::Body, WrapSourcemap(payload.body));
+    payloadObject.set(SerializeKey::Body, WrapSourcemap(payload.assets.body));
 
     // Schema
-    payloadObject.set(SerializeKey::Schema, WrapSourcemap(payload.schema));
+    payloadObject.set(SerializeKey::Schema, WrapSourcemap(payload.assets.schema));
+
+    // Assets
+    sos::Object assets;
+
+    assets.set(SerializeKey::Body, WrapSourcemap(payload.assets.body));
+    assets.set(SerializeKey::Schema, WrapSourcemap(payload.assets.schema));
+
+    payloadObject.set(SerializeKey::Assets, assets);
 
     return payloadObject;
 }
