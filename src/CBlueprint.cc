@@ -267,7 +267,7 @@ SC_API const char* sc_payload_body(const sc_payload_t* handle)
     if(!p)
         return "";
 
-    return p->body.c_str();
+    return p->assets.body.source.c_str();
 }
 
 SC_API const char* sc_payload_schema(const sc_payload_t* handle)
@@ -276,7 +276,45 @@ SC_API const char* sc_payload_schema(const sc_payload_t* handle)
     if(!p)
         return "";
 
-    return p->schema.c_str();
+    return p->assets.schema.source.c_str();
+}
+
+/*----------------------------------------------------------------------*/
+
+SC_API const sc_asset_t* sc_asset_body_handle(const sc_payload_t* handle)
+{
+    const snowcrash::Payload* p = AS_CTYPE(snowcrash::Payload, handle);
+    if (!p)
+        return NULL;
+
+    return AS_CTYPE(sc_asset_t, &p->assets.body);
+}
+
+SC_API const sc_asset_t* sc_asset_schema_handle(const sc_payload_t* handle)
+{
+    const snowcrash::Payload* p = AS_CTYPE(snowcrash::Payload, handle);
+    if (!p)
+        return NULL;
+
+    return AS_CTYPE(sc_asset_t, &p->assets.schema);
+}
+
+SC_API const char* sc_asset_source(const sc_asset_t* handle)
+{
+    const snowcrash::Asset* p = AS_CTYPE(snowcrash::Asset, handle);
+    if (!p)
+        return "";
+
+    return p->source.c_str();
+}
+
+SC_API const char* sc_asset_resolved(const sc_asset_t* handle)
+{
+    const snowcrash::Asset* p = AS_CTYPE(snowcrash::Asset, handle);
+    if (!p)
+        return "";
+
+    return p->resolved.c_str();
 }
 
 /*----------------------------------------------------------------------*/
