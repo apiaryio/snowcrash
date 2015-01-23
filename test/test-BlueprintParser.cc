@@ -161,7 +161,7 @@ TEST_CASE("Parse API with Name and abbreviated resource", "[blueprint]")
     REQUIRE(resource.actions.size() == 1);
     REQUIRE(resource.actions.front().examples.size() == 1);
     REQUIRE(resource.actions.front().examples.front().responses.size() == 1);
-    REQUIRE(resource.actions.front().examples.front().responses.front().body == "{}\n");
+    REQUIRE(resource.actions.front().examples.front().responses.front().assets.body.source == "{}\n");
 
     REQUIRE(blueprint.sourceMap.name.sourceMap.size() == 1);
     REQUIRE(blueprint.sourceMap.name.sourceMap[0].location == 0);

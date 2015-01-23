@@ -93,10 +93,13 @@ namespace snowcrashtest {
 
             model.description = "Foo";
             model.body = "Bar";
-            models.modelTable[name] = model;
+            model.assets.body.source = "Bar";
 
             modelSM.description.sourceMap = sourcemap;
             modelSM.body.sourceMap = sourcemap;
+            modelSM.assets.body.sourceMap = sourcemap;
+
+            models.modelTable[name] = model;
             models.modelSourceMapTable[name] = modelSM;
         }
     };
