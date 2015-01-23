@@ -268,8 +268,8 @@ int main(int argc, const char *argv[])
         std::stringstream outputStream;
         std::stringstream sourcemapOutputStream;
 
-        sos::Object outputObject = snowcrash::wrapBlueprint(blueprint.node);
-        sos::Object sourcemapOutputObject = snowcrash::wrapBlueprintSourcemap(blueprint.sourceMap);
+        sos::Object outputObject = snowcrash::WrapBlueprint(blueprint.node);
+        sos::Object sourcemapOutputObject = snowcrash::WrapBlueprintSourcemap(blueprint.sourceMap);
 
         if (argumentParser.get<std::string>(FormatArgument) == "json") {
 

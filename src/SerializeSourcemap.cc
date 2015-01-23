@@ -10,7 +10,7 @@
 
 using namespace snowcrash;
 
-sos::Array wrapSourcemap(const SourceMapBase& value)
+sos::Array WrapSourcemap(const SourceMapBase& value)
 {
     sos::Array sourceMap;
 
@@ -30,74 +30,74 @@ sos::Array wrapSourcemap(const SourceMapBase& value)
 }
 
 // Forward declarations
-sos::Array wrapTypeSectionsSourcemap(const SourceMap<mson::TypeSections>& typeSections);
-sos::Array wrapElementsSourcemap(const SourceMap<mson::Elements>& elements);
+sos::Array WrapTypeSectionsSourcemap(const SourceMap<mson::TypeSections>& typeSections);
+sos::Array WrapElementsSourcemap(const SourceMap<mson::Elements>& elements);
 
-sos::Object wrapPropertyMemberSourcemap(const SourceMap<mson::PropertyMember>& propertyMember)
+sos::Object WrapPropertyMemberSourcemap(const SourceMap<mson::PropertyMember>& propertyMember)
 {
     sos::Object propertyMemberObject;
 
     // Name
-    propertyMemberObject.set(SerializeKey::Name.c_str(), wrapSourcemap(propertyMember.name));
+    propertyMemberObject.set(SerializeKey::Name, WrapSourcemap(propertyMember.name));
 
     // Description
-    propertyMemberObject.set(SerializeKey::Description.c_str(), wrapSourcemap(propertyMember.description));
+    propertyMemberObject.set(SerializeKey::Description, WrapSourcemap(propertyMember.description));
 
     // Value Definition
-    propertyMemberObject.set(SerializeKey::ValueDefinition.c_str(), wrapSourcemap(propertyMember.valueDefinition));
+    propertyMemberObject.set(SerializeKey::ValueDefinition, WrapSourcemap(propertyMember.valueDefinition));
 
     // Type Sections
-    propertyMemberObject.set(SerializeKey::Sections.c_str(), wrapTypeSectionsSourcemap(propertyMember.sections));
+    propertyMemberObject.set(SerializeKey::Sections, WrapTypeSectionsSourcemap(propertyMember.sections));
 
     return propertyMemberObject;
 }
 
-sos::Object wrapValueMemberSourcemap(const SourceMap<mson::ValueMember>& valueMember)
+sos::Object WrapValueMemberSourcemap(const SourceMap<mson::ValueMember>& valueMember)
 {
     sos::Object valueMemberObject;
 
     // Description
-    valueMemberObject.set(SerializeKey::Description.c_str(), wrapSourcemap(valueMember.description));
+    valueMemberObject.set(SerializeKey::Description, WrapSourcemap(valueMember.description));
 
     // Value Definition
-    valueMemberObject.set(SerializeKey::ValueDefinition.c_str(), wrapSourcemap(valueMember.valueDefinition));
+    valueMemberObject.set(SerializeKey::ValueDefinition, WrapSourcemap(valueMember.valueDefinition));
 
     // Type Sections
-    valueMemberObject.set(SerializeKey::Sections.c_str(), wrapTypeSectionsSourcemap(valueMember.sections));
+    valueMemberObject.set(SerializeKey::Sections, WrapTypeSectionsSourcemap(valueMember.sections));
 
     return valueMemberObject;
 }
 
-sos::Array wrapMixinSourcemap(const SourceMap<mson::Mixin>& mixin)
+sos::Array WrapMixinSourcemap(const SourceMap<mson::Mixin>& mixin)
 {
-    return wrapSourcemap(mixin);
+    return WrapSourcemap(mixin);
 }
 
-sos::Array wrapOneOf(const SourceMap<mson::OneOf>& oneOf)
+sos::Array WrapOneOf(const SourceMap<mson::OneOf>& oneOf)
 {
-    return wrapElementsSourcemap(oneOf);
+    return WrapElementsSourcemap(oneOf);
 }
 
-sos::Base wrapElementSourcemap(const SourceMap<mson::Element>& element)
+sos::Base WrapElementSourcemap(const SourceMap<mson::Element>& element)
 {
     if (!element.elements().collection.empty()) {
         // Same for oneOf
-        return wrapElementsSourcemap(element.elements());
+        return WrapElementsSourcemap(element.elements());
     }
     else if (!element.mixin.sourceMap.empty()) {
-        return wrapMixinSourcemap(element.mixin);
+        return WrapMixinSourcemap(element.mixin);
     }
     else if (!element.value.empty()) {
-        return wrapValueMemberSourcemap(element.value);
+        return WrapValueMemberSourcemap(element.value);
     }
     else if (!element.property.empty()) {
-        return wrapPropertyMemberSourcemap(element.property);
+        return WrapPropertyMemberSourcemap(element.property);
     }
 
     return sos::Null();
 }
 
-sos::Array wrapElementsSourcemap(const SourceMap<mson::Elements>& elements)
+sos::Array WrapElementsSourcemap(const SourceMap<mson::Elements>& elements)
 {
     sos::Array elementsArray;
 
@@ -105,13 +105,13 @@ sos::Array wrapElementsSourcemap(const SourceMap<mson::Elements>& elements)
          it != elements.collection.end();
          ++it) {
 
-        elementsArray.push(wrapElementSourcemap(*it));
+        elementsArray.push(WrapElementSourcemap(*it));
     }
 
     return elementsArray;
 }
 
-sos::Array wrapTypeSectionsSourcemap(const SourceMap<mson::TypeSections>& sections)
+sos::Array WrapTypeSectionsSourcemap(const SourceMap<mson::TypeSections>& sections)
 {
     sos::Array sectionsArray;
 
@@ -120,48 +120,48 @@ sos::Array wrapTypeSectionsSourcemap(const SourceMap<mson::TypeSections>& sectio
          ++it) {
 
         if (!it->description.sourceMap.empty()) {
-            sectionsArray.push(wrapSourcemap(it->description));
+            sectionsArray.push(WrapSourcemap(it->description));
         }
         else if (!it->value.sourceMap.empty()) {
-            sectionsArray.push(wrapSourcemap(it->value));
+            sectionsArray.push(WrapSourcemap(it->value));
         }
         else if (!it->elements().collection.empty()) {
-            sectionsArray.push(wrapElementsSourcemap(it->elements()));
+            sectionsArray.push(WrapElementsSourcemap(it->elements()));
         }
     }
 
     return sectionsArray;
 }
 
-sos::Object wrapNamedTypeSourcemap(const SourceMap<mson::NamedType>& namedType)
+sos::Object WrapNamedTypeSourcemap(const SourceMap<mson::NamedType>& namedType)
 {
     sos::Object namedTypeObject;
 
     // Name
-    namedTypeObject.set(SerializeKey::Name.c_str(), wrapSourcemap(namedType.name));
+    namedTypeObject.set(SerializeKey::Name, WrapSourcemap(namedType.name));
 
     // Type Definition
-    namedTypeObject.set(SerializeKey::TypeDefinition.c_str(), wrapSourcemap(namedType.typeDefinition));
+    namedTypeObject.set(SerializeKey::TypeDefinition, WrapSourcemap(namedType.typeDefinition));
 
     // Type Sections
-    namedTypeObject.set(SerializeKey::Sections.c_str(), wrapTypeSectionsSourcemap(namedType.sections));
+    namedTypeObject.set(SerializeKey::Sections, WrapTypeSectionsSourcemap(namedType.sections));
 
     return namedTypeObject;
 }
 
-sos::Object wrapPayloadSourcemap(const SourceMap<Payload>& payload)
+sos::Object WrapPayloadSourcemap(const SourceMap<Payload>& payload)
 {
     sos::Object payloadObject;
 
     // Name
-    payloadObject.set(SerializeKey::Name.c_str(), wrapSourcemap(payload.name));
+    payloadObject.set(SerializeKey::Name, WrapSourcemap(payload.name));
 
     // Description
-    payloadObject.set(SerializeKey::Description.c_str(), wrapSourcemap(payload.description));
+    payloadObject.set(SerializeKey::Description, WrapSourcemap(payload.description));
 
     // Reference
     if (!payload.reference.sourceMap.empty()) {
-        payloadObject.set(SerializeKey::Reference.c_str(), wrapSourcemap(payload.reference));
+        payloadObject.set(SerializeKey::Reference, WrapSourcemap(payload.reference));
     }
 
     // Headers
@@ -171,21 +171,21 @@ sos::Object wrapPayloadSourcemap(const SourceMap<Payload>& payload)
          it != payload.headers.collection.end();
          ++it) {
 
-        headers.push(wrapSourcemap(*it));
+        headers.push(WrapSourcemap(*it));
     }
 
-    payloadObject.set(SerializeKey::Headers.c_str(), headers);
+    payloadObject.set(SerializeKey::Headers, headers);
 
     // Body
-    payloadObject.set(SerializeKey::Body.c_str(), wrapSourcemap(payload.body));
+    payloadObject.set(SerializeKey::Body, WrapSourcemap(payload.body));
 
     // Schema
-    payloadObject.set(SerializeKey::Schema.c_str(), wrapSourcemap(payload.schema));
+    payloadObject.set(SerializeKey::Schema, WrapSourcemap(payload.schema));
 
     return payloadObject;
 }
 
-sos::Array wrapParametersSourcemap(const SourceMap<Parameters>& parameters)
+sos::Array WrapParametersSourcemap(const SourceMap<Parameters>& parameters)
 {
     sos::Array parametersArray;
 
@@ -196,22 +196,22 @@ sos::Array wrapParametersSourcemap(const SourceMap<Parameters>& parameters)
         sos::Object parameter;
 
         // Name
-        parameter.set(SerializeKey::Name.c_str(), wrapSourcemap(it->name));
+        parameter.set(SerializeKey::Name, WrapSourcemap(it->name));
 
         // Description
-        parameter.set(SerializeKey::Description.c_str(), wrapSourcemap(it->description));
+        parameter.set(SerializeKey::Description, WrapSourcemap(it->description));
 
         // Type
-        parameter.set(SerializeKey::Type.c_str(), wrapSourcemap(it->type));
+        parameter.set(SerializeKey::Type, WrapSourcemap(it->type));
 
         // Use
-        parameter.set(SerializeKey::Required.c_str(), wrapSourcemap(it->use));
+        parameter.set(SerializeKey::Required, WrapSourcemap(it->use));
 
         // Example Value
-        parameter.set(SerializeKey::Example.c_str(), wrapSourcemap(it->exampleValue));
+        parameter.set(SerializeKey::Example, WrapSourcemap(it->exampleValue));
 
         // Default Value
-        parameter.set(SerializeKey::Default.c_str(), wrapSourcemap(it->defaultValue));
+        parameter.set(SerializeKey::Default, WrapSourcemap(it->defaultValue));
 
         // Values
         sos::Array values;
@@ -222,26 +222,26 @@ sos::Array wrapParametersSourcemap(const SourceMap<Parameters>& parameters)
 
             sos::Object value;
 
-            value.set(SerializeKey::Value.c_str(), wrapSourcemap(*valIt));
+            value.set(SerializeKey::Value, WrapSourcemap(*valIt));
 
             values.push(value);
         }
 
-        parameter.set(SerializeKey::Values.c_str(), values);
+        parameter.set(SerializeKey::Values, values);
     }
 
     return parametersArray;
 }
 
-sos::Object wrapTransactionExampleSourcemap(const SourceMap<TransactionExample>& example)
+sos::Object WrapTransactionExampleSourcemap(const SourceMap<TransactionExample>& example)
 {
     sos::Object exampleObject;
 
     // Name
-    exampleObject.set(SerializeKey::Name.c_str(), wrapSourcemap(example.name));
+    exampleObject.set(SerializeKey::Name, WrapSourcemap(example.name));
 
     // Description
-    exampleObject.set(SerializeKey::Description.c_str(), wrapSourcemap(example.description));
+    exampleObject.set(SerializeKey::Description, WrapSourcemap(example.description));
 
     // Requests
     sos::Array requests;
@@ -250,10 +250,10 @@ sos::Object wrapTransactionExampleSourcemap(const SourceMap<TransactionExample>&
          it != example.requests.collection.end();
          ++it) {
 
-        requests.push(wrapPayloadSourcemap(*it));
+        requests.push(WrapPayloadSourcemap(*it));
     }
 
-    exampleObject.set(SerializeKey::Requests.c_str(), requests);
+    exampleObject.set(SerializeKey::Requests, requests);
 
     // Responses
     sos::Array responses;
@@ -262,29 +262,29 @@ sos::Object wrapTransactionExampleSourcemap(const SourceMap<TransactionExample>&
          it != example.responses.collection.end();
          ++it) {
 
-        responses.push(wrapPayloadSourcemap(*it));
+        responses.push(WrapPayloadSourcemap(*it));
     }
 
-    exampleObject.set(SerializeKey::Responses.c_str(), responses);
+    exampleObject.set(SerializeKey::Responses, responses);
 
     return exampleObject;
 }
 
-sos::Object wrapActionSourcemap(const SourceMap<Action>& action)
+sos::Object WrapActionSourcemap(const SourceMap<Action>& action)
 {
     sos::Object actionObject;
 
     // Name
-    actionObject.set(SerializeKey::Name.c_str(), wrapSourcemap(action.name));
+    actionObject.set(SerializeKey::Name, WrapSourcemap(action.name));
 
     // Description
-    actionObject.set(SerializeKey::Description.c_str(), wrapSourcemap(action.description));
+    actionObject.set(SerializeKey::Description, WrapSourcemap(action.description));
 
     // HTTP Method
-    actionObject.set(SerializeKey::Method.c_str(), wrapSourcemap(action.method));
+    actionObject.set(SerializeKey::Method, WrapSourcemap(action.method));
 
     // Parameters
-    actionObject.set(SerializeKey::Parameters.c_str(), wrapParametersSourcemap(action.parameters));
+    actionObject.set(SerializeKey::Parameters, WrapParametersSourcemap(action.parameters));
 
     // Transaction Examples
     sos::Array transactionExamples;
@@ -293,33 +293,33 @@ sos::Object wrapActionSourcemap(const SourceMap<Action>& action)
          it != action.examples.collection.end();
          ++it) {
 
-        transactionExamples.push(wrapTransactionExampleSourcemap(*it));
+        transactionExamples.push(WrapTransactionExampleSourcemap(*it));
     }
 
-    actionObject.set(SerializeKey::Examples.c_str(), transactionExamples);
+    actionObject.set(SerializeKey::Examples, transactionExamples);
 
     return actionObject;
 }
 
-sos::Object wrapResourceSourcemap(const SourceMap<Resource>& resource)
+sos::Object WrapResourceSourcemap(const SourceMap<Resource>& resource)
 {
     sos::Object resourceObject;
 
     // Name
-    resourceObject.set(SerializeKey::Name.c_str(), wrapSourcemap(resource.name));
+    resourceObject.set(SerializeKey::Name, WrapSourcemap(resource.name));
 
     // Description
-    resourceObject.set(SerializeKey::Description.c_str(), wrapSourcemap(resource.description));
+    resourceObject.set(SerializeKey::Description, WrapSourcemap(resource.description));
 
     // URI Template
-    resourceObject.set(SerializeKey::URITemplate.c_str(), wrapSourcemap(resource.uriTemplate));
+    resourceObject.set(SerializeKey::URITemplate, WrapSourcemap(resource.uriTemplate));
 
     // Model
-    sos::Object model = (resource.model.name.sourceMap.empty() ? sos::Object() : wrapPayloadSourcemap(resource.model));
-    resourceObject.set(SerializeKey::Model.c_str(), model);
+    sos::Object model = (resource.model.name.sourceMap.empty() ? sos::Object() : WrapPayloadSourcemap(resource.model));
+    resourceObject.set(SerializeKey::Model, model);
 
     // Parameters
-    resourceObject.set(SerializeKey::Parameters.c_str(), wrapParametersSourcemap(resource.parameters));
+    resourceObject.set(SerializeKey::Parameters, WrapParametersSourcemap(resource.parameters));
 
     // Actions
     sos::Array actions;
@@ -328,23 +328,23 @@ sos::Object wrapResourceSourcemap(const SourceMap<Resource>& resource)
          it != resource.actions.collection.end();
          ++it) {
 
-        actions.push(wrapActionSourcemap(*it));
+        actions.push(WrapActionSourcemap(*it));
     }
 
-    resourceObject.set(SerializeKey::Actions.c_str(), actions);
+    resourceObject.set(SerializeKey::Actions, actions);
 
     return resourceObject;
 }
 
-sos::Object wrapResourceGroupSourcemap(const SourceMap<ResourceGroup>& resourceGroup)
+sos::Object WrapResourceGroupSourcemap(const SourceMap<ResourceGroup>& resourceGroup)
 {
     sos::Object resourceGroupObject;
 
     // Name
-    resourceGroupObject.set(SerializeKey::Name.c_str(), wrapSourcemap(resourceGroup.name));
+    resourceGroupObject.set(SerializeKey::Name, WrapSourcemap(resourceGroup.name));
 
     // Description
-    resourceGroupObject.set(SerializeKey::Description.c_str(), wrapSourcemap(resourceGroup.description));
+    resourceGroupObject.set(SerializeKey::Description, WrapSourcemap(resourceGroup.description));
 
     // Resources
     sos::Array resources;
@@ -353,13 +353,13 @@ sos::Object wrapResourceGroupSourcemap(const SourceMap<ResourceGroup>& resourceG
          it != resourceGroup.resources.collection.end();
          ++it) {
 
-        resources.push(wrapResourceSourcemap(*it));
+        resources.push(WrapResourceSourcemap(*it));
     }
 
     return resourceGroupObject;
 }
 
-sos::Object snowcrash::wrapBlueprintSourcemap(const SourceMap<Blueprint>& blueprint)
+sos::Object snowcrash::WrapBlueprintSourcemap(const SourceMap<Blueprint>& blueprint)
 {
     sos::Object blueprintObject;
 
@@ -370,16 +370,16 @@ sos::Object snowcrash::wrapBlueprintSourcemap(const SourceMap<Blueprint>& bluepr
          it != blueprint.metadata.collection.end();
          ++it) {
 
-        metadata.push(wrapSourcemap(*it));
+        metadata.push(WrapSourcemap(*it));
     }
 
-    blueprintObject.set(SerializeKey::Metadata.c_str(), metadata);
+    blueprintObject.set(SerializeKey::Metadata, metadata);
 
     // Name
-    blueprintObject.set(SerializeKey::Name.c_str(), wrapSourcemap(blueprint.name));
+    blueprintObject.set(SerializeKey::Name, WrapSourcemap(blueprint.name));
 
     // Description
-    blueprintObject.set(SerializeKey::Description.c_str(), wrapSourcemap(blueprint.description));
+    blueprintObject.set(SerializeKey::Description, WrapSourcemap(blueprint.description));
 
     // Resource Groups
     sos::Array resourceGroups;
@@ -388,10 +388,10 @@ sos::Object snowcrash::wrapBlueprintSourcemap(const SourceMap<Blueprint>& bluepr
          it != blueprint.resourceGroups.collection.end();
          ++it) {
 
-        resourceGroups.push(wrapResourceGroupSourcemap(*it));
+        resourceGroups.push(WrapResourceGroupSourcemap(*it));
     }
 
-    blueprintObject.set(SerializeKey::ResourceGroups.c_str(), resourceGroups);
+    blueprintObject.set(SerializeKey::ResourceGroups, resourceGroups);
 
     return blueprintObject;
 }

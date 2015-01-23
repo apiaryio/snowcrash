@@ -13,7 +13,7 @@
 
 namespace snowcrash {
 
-    sos::Object wrapBlueprintSourcemap(const SourceMap<Blueprint>& blueprint);
+    sos::Object WrapBlueprintSourcemap(const SourceMap<Blueprint>& blueprint);
 }
 
 #endif

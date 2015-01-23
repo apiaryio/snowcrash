@@ -10,37 +10,37 @@
 
 using namespace snowcrash;
 
-sos::Object wrapValue(const mson::Value& value)
+sos::Object WrapValue(const mson::Value& value)
 {
     sos::Object valueObject;
 
     // Literal
-    valueObject.set(SerializeKey::Literal.c_str(), sos::String(value.literal));
+    valueObject.set(SerializeKey::Literal, sos::String(value.literal));
 
     // Variable
-    valueObject.set(SerializeKey::Variable.c_str(), sos::Boolean(value.variable));
+    valueObject.set(SerializeKey::Variable, sos::Boolean(value.variable));
 
     return valueObject;
 }
 
-sos::Object wrapSymbol(const mson::Symbol& symbol)
+sos::Object WrapSymbol(const mson::Symbol& symbol)
 {
     sos::Object symbolObject;
 
     // Literal
-    symbolObject.set(SerializeKey::Literal.c_str(), sos::String(symbol.literal));
+    symbolObject.set(SerializeKey::Literal, sos::String(symbol.literal));
 
     // Variable
-    symbolObject.set(SerializeKey::Variable.c_str(), sos::Boolean(symbol.variable));
+    symbolObject.set(SerializeKey::Variable, sos::Boolean(symbol.variable));
 
     return symbolObject;
 }
 
-sos::Base wrapTypeName(const mson::TypeName& typeName)
+sos::Base WrapTypeName(const mson::TypeName& typeName)
 {
     if (typeName.base != mson::UndefinedTypeName) {
 
-        std::string baseTypeName = "";
+        std::string baseTypeName;
 
         switch (typeName.base) {
 
@@ -75,15 +75,15 @@ sos::Base wrapTypeName(const mson::TypeName& typeName)
         return sos::String(baseTypeName);
     }
 
-    return wrapSymbol(typeName.symbol);
+    return WrapSymbol(typeName.symbol);
 }
 
-sos::Object wrapTypeSpecification(const mson::TypeSpecification& typeSpecification)
+sos::Object WrapTypeSpecification(const mson::TypeSpecification& typeSpecification)
 {
     sos::Object typeSpecificationObject;
 
     // Name
-    typeSpecificationObject.set(SerializeKey::Name.c_str(), wrapTypeName(typeSpecification.name));
+    typeSpecificationObject.set(SerializeKey::Name, WrapTypeName(typeSpecification.name));
 
     // Nested Types
     sos::Array nestedTypes;
@@ -92,15 +92,15 @@ sos::Object wrapTypeSpecification(const mson::TypeSpecification& typeSpecificati
          it != typeSpecification.nestedTypes.end();
          ++it) {
 
-        nestedTypes.push(wrapTypeName(*it));
+        nestedTypes.push(WrapTypeName(*it));
     }
 
-    typeSpecificationObject.set(SerializeKey::NestedTypes.c_str(), nestedTypes);
+    typeSpecificationObject.set(SerializeKey::NestedTypes, nestedTypes);
 
     return typeSpecificationObject;
 }
 
-sos::Array wrapTypeAttributes(const mson::TypeAttributes& typeAttributes)
+sos::Array WrapTypeAttributes(const mson::TypeAttributes& typeAttributes)
 {
     sos::Array typeAttributesArray;
 
@@ -123,20 +123,20 @@ sos::Array wrapTypeAttributes(const mson::TypeAttributes& typeAttributes)
     return typeAttributesArray;
 }
 
-sos::Object wrapTypeDefinition(const mson::TypeDefinition& typeDefinition)
+sos::Object WrapTypeDefinition(const mson::TypeDefinition& typeDefinition)
 {
     sos::Object typeDefinitionObject;
 
     // Type Specification
-    typeDefinitionObject.set(SerializeKey::TypeSpecification.c_str(), wrapTypeSpecification(typeDefinition.typeSpecification));
+    typeDefinitionObject.set(SerializeKey::TypeSpecification, WrapTypeSpecification(typeDefinition.typeSpecification));
 
     // Type Attributes
-    typeDefinitionObject.set(SerializeKey::Attributes.c_str(), wrapTypeAttributes(typeDefinition.attributes));
+    typeDefinitionObject.set(SerializeKey::Attributes, WrapTypeAttributes(typeDefinition.attributes));
 
     return typeDefinitionObject;
 }
 
-sos::Object wrapValueDefinition(const mson::ValueDefinition& valueDefinition)
+sos::Object WrapValueDefinition(const mson::ValueDefinition& valueDefinition)
 {
     sos::Object valueDefinitionObject;
 
@@ -147,119 +147,119 @@ sos::Object wrapValueDefinition(const mson::ValueDefinition& valueDefinition)
          it != valueDefinition.values.end();
          ++it) {
 
-        values.push(wrapValue(*it));
+        values.push(WrapValue(*it));
     }
 
-    valueDefinitionObject.set(SerializeKey::Values.c_str(), values);
+    valueDefinitionObject.set(SerializeKey::Values, values);
 
     // Type Definition
-    valueDefinitionObject.set(SerializeKey::TypeDefinition.c_str(), wrapTypeDefinition(valueDefinition.typeDefinition));
+    valueDefinitionObject.set(SerializeKey::TypeDefinition, WrapTypeDefinition(valueDefinition.typeDefinition));
 
     return valueDefinitionObject;
 }
 
-sos::Object wrapPropertyName(const mson::PropertyName& propertyName)
+sos::Object WrapPropertyName(const mson::PropertyName& propertyName)
 {
     sos::Object propertyNameObject;
 
     if (!propertyName.literal.empty()) {
-        propertyNameObject.set(SerializeKey::Literal.c_str(), sos::String(propertyName.literal));
+        propertyNameObject.set(SerializeKey::Literal, sos::String(propertyName.literal));
     }
     else if (!propertyName.variable.empty()) {
-        propertyNameObject.set(SerializeKey::Variable.c_str(), wrapValueDefinition(propertyName.variable));
+        propertyNameObject.set(SerializeKey::Variable, WrapValueDefinition(propertyName.variable));
     }
 
     return propertyNameObject;
 }
 
 // Forward declarations
-sos::Array wrapTypeSections(const mson::TypeSections& typeSections);
-sos::Array wrapElements(const mson::Elements& elements);
+sos::Array WrapTypeSections(const mson::TypeSections& typeSections);
+sos::Array WrapElements(const mson::Elements& elements);
 
-sos::Object wrapPropertyMember(const mson::PropertyMember& propertyMember)
+sos::Object WrapPropertyMember(const mson::PropertyMember& propertyMember)
 {
     sos::Object propertyMemberObject;
 
     // Name
-    propertyMemberObject.set(SerializeKey::Name.c_str(), wrapPropertyName(propertyMember.name));
+    propertyMemberObject.set(SerializeKey::Name, WrapPropertyName(propertyMember.name));
 
     // Description
-    propertyMemberObject.set(SerializeKey::Description.c_str(), sos::String(propertyMember.description.c_str()));
+    propertyMemberObject.set(SerializeKey::Description, sos::String(propertyMember.description));
 
     // Value Definition
-    propertyMemberObject.set(SerializeKey::ValueDefinition.c_str(), wrapValueDefinition(propertyMember.valueDefinition));
+    propertyMemberObject.set(SerializeKey::ValueDefinition, WrapValueDefinition(propertyMember.valueDefinition));
 
     // Type Sections
-    propertyMemberObject.set(SerializeKey::Sections.c_str(), wrapTypeSections(propertyMember.sections));
+    propertyMemberObject.set(SerializeKey::Sections, WrapTypeSections(propertyMember.sections));
 
     return propertyMemberObject;
 }
 
-sos::Object wrapValueMember(const mson::ValueMember& valueMember)
+sos::Object WrapValueMember(const mson::ValueMember& valueMember)
 {
     sos::Object valueMemberObject;
 
     // Description
-    valueMemberObject.set(SerializeKey::Description.c_str(), sos::String(valueMember.description.c_str()));
+    valueMemberObject.set(SerializeKey::Description, sos::String(valueMember.description));
 
     // Value Definition
-    valueMemberObject.set(SerializeKey::ValueDefinition.c_str(), wrapValueDefinition(valueMember.valueDefinition));
+    valueMemberObject.set(SerializeKey::ValueDefinition, WrapValueDefinition(valueMember.valueDefinition));
 
     // Type Sections
-    valueMemberObject.set(SerializeKey::Sections.c_str(), wrapTypeSections(valueMember.sections));
+    valueMemberObject.set(SerializeKey::Sections, WrapTypeSections(valueMember.sections));
 
     return valueMemberObject;
 }
 
-sos::Object wrapMixin(const mson::Mixin& mixin)
+sos::Object WrapMixin(const mson::Mixin& mixin)
 {
-    return wrapTypeDefinition(mixin);
+    return WrapTypeDefinition(mixin);
 }
 
-sos::Array wrapOneOf(const mson::OneOf& oneOf)
+sos::Array WrapOneOf(const mson::OneOf& oneOf)
 {
-    return wrapElements(oneOf);
+    return WrapElements(oneOf);
 }
 
-sos::Object wrapElement(const mson::Element& element)
+sos::Object WrapElement(const mson::Element& element)
 {
     sos::Object elementObject;
-    std::string klass = "";
+    std::string klass;
 
     switch (element.klass) {
 
         case mson::Element::PropertyClass:
         {
             klass = "property";
-            elementObject.set(SerializeKey::Content.c_str(), wrapPropertyMember(element.content.property));
+            elementObject.set(SerializeKey::Content, WrapPropertyMember(element.content.property));
             break;
         }
 
         case mson::Element::ValueClass:
         {
             klass = "value";
-            elementObject.set(SerializeKey::Content.c_str(), wrapValueMember(element.content.value));
+            elementObject.set(SerializeKey::Content, WrapValueMember(element.content.value));
             break;
         }
 
         case mson::Element::MixinClass:
         {
             klass = "mixin";
-            elementObject.set(SerializeKey::Content.c_str(), wrapMixin(element.content.mixin));
+            elementObject.set(SerializeKey::Content, WrapMixin(element.content.mixin));
             break;
         }
 
         case mson::Element::OneOfClass:
         {
             klass = "oneOf";
-            elementObject.set(SerializeKey::Content.c_str(), wrapOneOf(element.content.oneOf()));
+            elementObject.set(SerializeKey::Content, WrapOneOf(element.content.oneOf()));
             break;
         }
 
         case mson::Element::GroupClass:
         {
             klass = "group";
-            elementObject.set(SerializeKey::Content.c_str(), wrapElements(element.content.elements()));
+            elementObject.set(SerializeKey::Content, WrapElements(element.content.elements()));
             break;
         }
 
@@ -267,23 +267,23 @@ sos::Object wrapElement(const mson::Element& element)
             break;
     }
 
-    elementObject.set(SerializeKey::Class.c_str(), sos::String(klass));
+    elementObject.set(SerializeKey::Class, sos::String(klass));
 
     return elementObject;
 }
 
-sos::Array wrapElements(const mson::Elements& elements)
+sos::Array WrapElements(const mson::Elements& elements)
 {
     sos::Array elementsArray;
 
     for (mson::Elements::const_iterator it = elements.begin(); it != elements.end(); ++it) {
-        elementsArray.push(wrapElement(*it));
+        elementsArray.push(WrapElement(*it));
     }
 
     return elementsArray;
 }
 
-sos::Array wrapTypeSections(const mson::TypeSections& sections)
+sos::Array WrapTypeSections(const mson::TypeSections& sections)
 {
     sos::Array sectionsArray;
 
@@ -292,7 +292,7 @@ sos::Array wrapTypeSections(const mson::TypeSections& sections)
         sos::Object section;
 
         // Class
-        std::string klass = "";
+        std::string klass;
 
         switch (it->klass) {
             case mson::TypeSection::BlockDescriptionClass:
@@ -315,17 +315,17 @@ sos::Array wrapTypeSections(const mson::TypeSections& sections)
                 break;
         }
 
-        section.set(SerializeKey::Class.c_str(), sos::String(klass));
+        section.set(SerializeKey::Class, sos::String(klass));
 
         // Content
         if (!it->content.description.empty()) {
-            section.set(SerializeKey::Content.c_str(), sos::String(it->content.description));
+            section.set(SerializeKey::Content, sos::String(it->content.description));
         }
         else if (!it->content.value.empty()) {
-            section.set(SerializeKey::Content.c_str(), sos::String(it->content.value));
+            section.set(SerializeKey::Content, sos::String(it->content.value));
         }
         else if (!it->content.elements().empty()) {
-            section.set(SerializeKey::Content.c_str(), wrapElements(it->content.elements()));
+            section.set(SerializeKey::Content, WrapElements(it->content.elements()));
         }
 
         sectionsArray.push(section);
@@ -334,69 +334,69 @@ sos::Array wrapTypeSections(const mson::TypeSections& sections)
     return sectionsArray;
 }
 
-sos::Object wrapNamedType(const mson::NamedType& namedType)
+sos::Object WrapNamedType(const mson::NamedType& namedType)
 {
     sos::Object namedTypeObject;
 
     // Name
-    namedTypeObject.set(SerializeKey::Name.c_str(), wrapTypeName(namedType.name));
+    namedTypeObject.set(SerializeKey::Name, WrapTypeName(namedType.name));
 
     // Type Definition
-    namedTypeObject.set(SerializeKey::TypeDefinition.c_str(), wrapTypeDefinition(namedType.typeDefinition));
+    namedTypeObject.set(SerializeKey::TypeDefinition, WrapTypeDefinition(namedType.typeDefinition));
 
     // Type Sections
-    namedTypeObject.set(SerializeKey::Sections.c_str(), wrapTypeSections(namedType.sections));
+    namedTypeObject.set(SerializeKey::Sections, WrapTypeSections(namedType.sections));
 
     return namedTypeObject;
 }
 
-sos::Object wrapKeyValue(const KeyValuePair& keyValue)
+sos::Object WrapKeyValue(const KeyValuePair& keyValue)
 {
     sos::Object keyValueObject;
 
     // Name
-    keyValueObject.set(SerializeKey::Name.c_str(), sos::String(keyValue.first.c_str()));
+    keyValueObject.set(SerializeKey::Name, sos::String(keyValue.first));
 
     // Value
-    keyValueObject.set(SerializeKey::Value.c_str(), sos::String(keyValue.second.c_str()));
+    keyValueObject.set(SerializeKey::Value, sos::String(keyValue.second));
 
     return keyValueObject;
 }
 
-sos::Object wrapMetadata(const Metadata& metadata)
+sos::Object WrapMetadata(const Metadata& metadata)
 {
-    return wrapKeyValue(metadata);
+    return WrapKeyValue(metadata);
 }
 
-sos::Object wrapHeader(const Header& header)
+sos::Object WrapHeader(const Header& header)
 {
-    return wrapKeyValue(header);
+    return WrapKeyValue(header);
 }
 
-sos::Object wrapReference(const Reference& reference)
+sos::Object WrapReference(const Reference& reference)
 {
     sos::Object referenceObject;
 
     // Id
-    referenceObject.set(SerializeKey::Id.c_str(), sos::String(reference.id.c_str()));
+    referenceObject.set(SerializeKey::Id, sos::String(reference.id));
 
     return referenceObject;
 }
 
-sos::Object wrapPayload(const Payload& payload)
+sos::Object WrapPayload(const Payload& payload)
 {
     sos::Object payloadObject;
 
     // Name
-    payloadObject.set(SerializeKey::Name.c_str(), sos::String(payload.name.c_str()));
+    payloadObject.set(SerializeKey::Name, sos::String(payload.name));
 
     // Reference
     if (!payload.reference.id.empty()) {
-        payloadObject.set(SerializeKey::Reference.c_str(), wrapReference(payload.reference));
+        payloadObject.set(SerializeKey::Reference, WrapReference(payload.reference));
     }
 
     // Description
-    payloadObject.set(SerializeKey::Description.c_str(), sos::String(payload.description.c_str()));
+    payloadObject.set(SerializeKey::Description, sos::String(payload.description));
 
     // Headers
     sos::Array headers;
@@ -405,21 +405,21 @@ sos::Object wrapPayload(const Payload& payload)
          it != payload.headers.end();
          ++it) {
 
-        headers.push(wrapHeader(*it));
+        headers.push(WrapHeader(*it));
     }
 
-    payloadObject.set(SerializeKey::Headers.c_str(), headers);
+    payloadObject.set(SerializeKey::Headers, headers);
 
     // Body
-    payloadObject.set(SerializeKey::Body.c_str(), sos::String(payload.body.c_str()));
+    payloadObject.set(SerializeKey::Body, sos::String(payload.body));
 
     // Schema
-    payloadObject.set(SerializeKey::Schema.c_str(), sos::String(payload.schema.c_str()));
+    payloadObject.set(SerializeKey::Schema, sos::String(payload.schema));
 
     return payloadObject;
 }
 
-sos::Array wrapParameters(const Parameters& parameters)
+sos::Array WrapParameters(const Parameters& parameters)
 {
     sos::Array parametersArray;
 
@@ -428,22 +428,22 @@ sos::Array wrapParameters(const Parameters& parameters)
         sos::Object parameter;
 
         // Name
-        parameter.set(SerializeKey::Name.c_str(), sos::String(it->name.c_str()));
+        parameter.set(SerializeKey::Name, sos::String(it->name));
 
         // Description
-        parameter.set(SerializeKey::Description.c_str(), sos::String(it->description.c_str()));
+        parameter.set(SerializeKey::Description, sos::String(it->description));
 
         // Type
-        parameter.set(SerializeKey::Type.c_str(), sos::String(it->type.c_str()));
+        parameter.set(SerializeKey::Type, sos::String(it->type));
 
         // Use
-        parameter.set(SerializeKey::Required.c_str(), sos::Boolean(it->use != snowcrash::OptionalParameterUse));
+        parameter.set(SerializeKey::Required, sos::Boolean(it->use != snowcrash::OptionalParameterUse));
 
         // Default Value
-        parameter.set(SerializeKey::Default.c_str(), sos::String(it->defaultValue.c_str()));
+        parameter.set(SerializeKey::Default, sos::String(it->defaultValue));
 
         // Example Value
-        parameter.set(SerializeKey::Example.c_str(), sos::String(it->exampleValue.c_str()));
+        parameter.set(SerializeKey::Example, sos::String(it->exampleValue));
 
         // Values
         sos::Array values;
@@ -452,12 +452,12 @@ sos::Array wrapParameters(const Parameters& parameters)
 
             sos::Object value;
 
-            value.set(SerializeKey::Value.c_str(), sos::String(valIt->c_str()));
+            value.set(SerializeKey::Value, sos::String(valIt->c_str()));
 
             values.push(value);
         }
 
-        parameter.set(SerializeKey::Values.c_str(), values);
+        parameter.set(SerializeKey::Values, values);
 
         parametersArray.push(parameter);
     }
@@ -465,15 +465,15 @@ sos::Array wrapParameters(const Parameters& parameters)
     return parametersArray;
 }
 
-sos::Object wrapTransactionExample(const TransactionExample& example)
+sos::Object WrapTransactionExample(const TransactionExample& example)
 {
     sos::Object exampleObject;
 
     // Name
-    exampleObject.set(SerializeKey::Name.c_str(), sos::String(example.name.c_str()));
+    exampleObject.set(SerializeKey::Name, sos::String(example.name));
 
     // Description
-    exampleObject.set(SerializeKey::Description.c_str(), sos::String(example.description.c_str()));
+    exampleObject.set(SerializeKey::Description, sos::String(example.description));
 
     // Requests
     sos::Array requests;
@@ -482,10 +482,10 @@ sos::Object wrapTransactionExample(const TransactionExample& example)
          it != example.requests.end();
          ++it) {
 
-        requests.push(wrapPayload(*it));
+        requests.push(WrapPayload(*it));
     }
 
-    exampleObject.set(SerializeKey::Requests.c_str(), requests);
+    exampleObject.set(SerializeKey::Requests, requests);
 
     // Responses
     sos::Array responses;
@@ -494,29 +494,29 @@ sos::Object wrapTransactionExample(const TransactionExample& example)
          it != example.responses.end();
          ++it) {
 
-        responses.push(wrapPayload(*it));
+        responses.push(WrapPayload(*it));
     }
 
-    exampleObject.set(SerializeKey::Responses.c_str(), responses);
+    exampleObject.set(SerializeKey::Responses, responses);
 
     return exampleObject;
 }
 
-sos::Object wrapAction(const Action& action)
+sos::Object WrapAction(const Action& action)
 {
     sos::Object actionObject;
 
     // Name
-    actionObject.set(SerializeKey::Name.c_str(), sos::String(action.name.c_str()));
+    actionObject.set(SerializeKey::Name, sos::String(action.name));
 
     // Description
-    actionObject.set(SerializeKey::Description.c_str(), sos::String(action.description.c_str()));
+    actionObject.set(SerializeKey::Description, sos::String(action.description));
 
     // HTTP Method
-    actionObject.set(SerializeKey::Method.c_str(), sos::String(action.method.c_str()));
+    actionObject.set(SerializeKey::Method, sos::String(action.method));
 
     // Parameters
-    actionObject.set(SerializeKey::Parameters.c_str(), wrapParameters(action.parameters));
+    actionObject.set(SerializeKey::Parameters, WrapParameters(action.parameters));
 
     // Transaction Examples
     sos::Array transactionExamples;
@@ -525,33 +525,33 @@ sos::Object wrapAction(const Action& action)
          it != action.examples.end();
          ++it) {
 
-        transactionExamples.push(wrapTransactionExample(*it));
+        transactionExamples.push(WrapTransactionExample(*it));
     }
 
-    actionObject.set(SerializeKey::Examples.c_str(), transactionExamples);
+    actionObject.set(SerializeKey::Examples, transactionExamples);
 
     return actionObject;
 }
 
-sos::Object wrapResource(const Resource& resource)
+sos::Object WrapResource(const Resource& resource)
 {
     sos::Object resourceObject;
 
     // Name
-    resourceObject.set(SerializeKey::Name.c_str(), sos::String(resource.name.c_str()));
+    resourceObject.set(SerializeKey::Name, sos::String(resource.name));
 
     // Description
-    resourceObject.set(SerializeKey::Description.c_str(), sos::String(resource.description.c_str()));
+    resourceObject.set(SerializeKey::Description, sos::String(resource.description));
 
     // URI Template
-    resourceObject.set(SerializeKey::URITemplate.c_str(), sos::String(resource.uriTemplate.c_str()));
+    resourceObject.set(SerializeKey::URITemplate, sos::String(resource.uriTemplate));
 
     // Model
-    sos::Object model = (resource.model.name.empty() ? sos::Object() : wrapPayload(resource.model));
-    resourceObject.set(SerializeKey::Model.c_str(), model);
+    sos::Object model = (resource.model.name.empty() ? sos::Object() : WrapPayload(resource.model));
+    resourceObject.set(SerializeKey::Model, model);
 
     // Parameters
-    resourceObject.set(SerializeKey::Parameters.c_str(), wrapParameters(resource.parameters));
+    resourceObject.set(SerializeKey::Parameters, WrapParameters(resource.parameters));
 
     // Actions
     sos::Array actions;
@@ -560,23 +560,23 @@ sos::Object wrapResource(const Resource& resource)
          it != resource.actions.end();
          ++it) {
 
-        actions.push(wrapAction(*it));
+        actions.push(WrapAction(*it));
     }
 
-    resourceObject.set(SerializeKey::Actions.c_str(), actions);
+    resourceObject.set(SerializeKey::Actions, actions);
 
     return resourceObject;
 }
 
-sos::Object wrapResourceGroup(const ResourceGroup& resourceGroup)
+sos::Object WrapResourceGroup(const ResourceGroup& resourceGroup)
 {
     sos::Object resourceGroupObject;
 
     // Name
-    resourceGroupObject.set(SerializeKey::Name.c_str(), sos::String(resourceGroup.name.c_str()));
+    resourceGroupObject.set(SerializeKey::Name, sos::String(resourceGroup.name));
 
     // Description
-    resourceGroupObject.set(SerializeKey::Description.c_str(), sos::String(resourceGroup.description.c_str()));
+    resourceGroupObject.set(SerializeKey::Description, sos::String(resourceGroup.description));
 
     // Resources
     sos::Array resources;
@@ -585,15 +585,15 @@ sos::Object wrapResourceGroup(const ResourceGroup& resourceGroup)
          it != resourceGroup.resources.end();
          ++it) {
 
-        resources.push(wrapResource(*it));
+        resources.push(WrapResource(*it));
     }
 
-    resourceGroupObject.set(SerializeKey::Resources.c_str(), resources);
+    resourceGroupObject.set(SerializeKey::Resources, resources);
 
     return resourceGroupObject;
 }
 
-sos::Object snowcrash::wrapBlueprint(const Blueprint& blueprint)
+sos::Object snowcrash::WrapBlueprint(const Blueprint& blueprint)
 {
     sos::Object blueprintObject;
 
@@ -607,16 +607,16 @@ sos::Object snowcrash::wrapBlueprint(const Blueprint& blueprint)
          it != blueprint.metadata.end();
          ++it) {
 
-        metadata.push(wrapMetadata(*it));
+        metadata.push(WrapMetadata(*it));
     }
 
-    blueprintObject.set(SerializeKey::Metadata.c_str(), metadata);
+    blueprintObject.set(SerializeKey::Metadata, metadata);
 
     // Name
-    blueprintObject.set(SerializeKey::Name.c_str(), sos::String(blueprint.name.c_str()));
+    blueprintObject.set(SerializeKey::Name, sos::String(blueprint.name));
 
     // Description
-    blueprintObject.set(SerializeKey::Description.c_str(), sos::String(blueprint.description.c_str()));
+    blueprintObject.set(SerializeKey::Description, sos::String(blueprint.description));
 
     // Resource Groups
     sos::Array resourceGroups;
@@ -625,10 +625,10 @@ sos::Object snowcrash::wrapBlueprint(const Blueprint& blueprint)
          it != blueprint.resourceGroups.end();
          ++it) {
 
-        resourceGroups.push(wrapResourceGroup(*it));
+        resourceGroups.push(WrapResourceGroup(*it));
     }
 
-    blueprintObject.set(SerializeKey::ResourceGroups.c_str(), resourceGroups);
+    blueprintObject.set(SerializeKey::ResourceGroups, resourceGroups);
 
     return blueprintObject;
 }

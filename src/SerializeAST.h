@@ -13,7 +13,7 @@
 
 namespace snowcrash {
 
-    sos::Object wrapBlueprint(const Blueprint& blueprint);
+    sos::Object WrapBlueprint(const Blueprint& blueprint);
 }
 
 #endif
