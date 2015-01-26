@@ -131,6 +131,15 @@ TEST_CASE("Parse simple blueprint with C interface", "[cinterface]")
     REQUIRE(std::string(sc_payload_name(resp)) == "200");
     REQUIRE(std::string(sc_payload_body(resp)) == "Hello World!\n");
 
+    const sc_asset_t* asset_body = sc_asset_body_handle(resp);
+    const sc_asset_t* asset_schema = sc_asset_schema_handle(resp);
+
+    REQUIRE(std::string(sc_asset_source(asset_body)) == "Hello World!\n");
+    REQUIRE(std::string(sc_asset_resolved(asset_body)) == "");
+
+    REQUIRE(std::string(sc_asset_source(asset_schema)) == "");
+    REQUIRE(std::string(sc_asset_resolved(asset_schema)) == "");
+
     const sc_source_map_t* sm_resp_name = sc_sm_payload_name(sm_resp);
     const sc_source_map_t* sm_resp_body = sc_sm_payload_body(sm_resp);
 

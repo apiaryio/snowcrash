@@ -66,7 +66,8 @@ TEST_CASE("Parse body asset", "[asset]")
 
     REQUIRE(asset.report.error.code == Error::OK);
     REQUIRE(asset.report.warnings.empty());
-    REQUIRE(asset.node == "Lorem Ipsum\n");
+    REQUIRE(asset.node.source == "Lorem Ipsum\n");
+    REQUIRE(asset.node.resolved.empty());
 
     REQUIRE(asset.sourceMap.sourceMap.size() == 1);
     REQUIRE(asset.sourceMap.sourceMap[0].location == 12);
@@ -80,7 +81,8 @@ TEST_CASE("Parse schema asset", "[asset]")
 
     REQUIRE(asset.report.error.code == Error::OK);
     REQUIRE(asset.report.warnings.empty());
-    REQUIRE(asset.node == "Dolor Sit Amet\n");
+    REQUIRE(asset.node.source == "Dolor Sit Amet\n");
+    REQUIRE(asset.node.resolved.empty());
 
     REQUIRE(asset.sourceMap.sourceMap.size() == 1);
     REQUIRE(asset.sourceMap.sourceMap[0].location == 14);
@@ -100,7 +102,8 @@ TEST_CASE("Foreign block inside", "[asset]")
     REQUIRE(asset.report.error.code == Error::OK);
     REQUIRE(asset.report.warnings.size() == 1);
     REQUIRE(asset.report.warnings[0].code == IndentationWarning);
-    REQUIRE(asset.node == "Lorem Ipsum\nHello World!\n");
+    REQUIRE(asset.node.source == "Lorem Ipsum\nHello World!\n");
+    REQUIRE(asset.node.resolved.empty());
 
     REQUIRE(asset.sourceMap.sourceMap.size() == 2);
     REQUIRE(asset.sourceMap.sourceMap[0].location == 12);
@@ -122,7 +125,8 @@ TEST_CASE("Nested list block inside", "[asset]")
     REQUIRE(asset.report.error.code == Error::OK);
     REQUIRE(asset.report.warnings.size() == 1);
     REQUIRE(asset.report.warnings[0].code == IndentationWarning);
-    REQUIRE(asset.node == "Lorem Ipsum\n+ Hello World!\n");
+    REQUIRE(asset.node.source == "Lorem Ipsum\n+ Hello World!\n");
+    REQUIRE(asset.node.resolved.empty());
 
     REQUIRE(asset.sourceMap.sourceMap.size() == 2);
     REQUIRE(asset.sourceMap.sourceMap[0].location == 12);
@@ -145,7 +149,8 @@ TEST_CASE("Multiline signature", "[asset]")
     REQUIRE(asset.report.error.code == Error::OK);
     REQUIRE(asset.report.warnings.size() == 1);
     REQUIRE(asset.report.warnings[0].code == IndentationWarning);
-    REQUIRE(asset.node == "Multiline Signature Content\nHello World!\n");
+    REQUIRE(asset.node.source == "Multiline Signature Content\nHello World!\n");
+    REQUIRE(asset.node.resolved.empty());
 
     REQUIRE(asset.sourceMap.sourceMap.size() == 3);
     REQUIRE(asset.sourceMap.sourceMap[0].location == 2);
@@ -174,7 +179,8 @@ TEST_CASE("Multiple blocks", "[asset]")
     REQUIRE(asset.report.warnings.size() == 2);
     REQUIRE(asset.report.warnings[0].code == IndentationWarning);
     REQUIRE(asset.report.warnings[1].code == IndentationWarning);
-    REQUIRE(asset.node == "Block 1\n\nBlock 2\nBlock 3\n");
+    REQUIRE(asset.node.source == "Block 1\n\nBlock 2\nBlock 3\n");
+    REQUIRE(asset.node.resolved.empty());
 
     REQUIRE(asset.sourceMap.sourceMap.size() == 3);
     REQUIRE(asset.sourceMap.sourceMap[0].location == 12);
@@ -197,7 +203,8 @@ TEST_CASE("Extra spaces before signature", "[asset]")
 
     REQUIRE(asset.report.error.code == Error::OK);
     REQUIRE(asset.report.warnings.empty());
-    REQUIRE(asset.node == "Lorem Ipsum\n");
+    REQUIRE(asset.node.source == "Lorem Ipsum\n");
+    REQUIRE(asset.node.resolved.empty());
 
     REQUIRE(asset.sourceMap.sourceMap.size() == 1);
     REQUIRE(asset.sourceMap.sourceMap[0].location == 14);
@@ -216,7 +223,8 @@ TEST_CASE("Asset parser greediness", "[asset]")
 
     REQUIRE(asset.report.error.code == Error::OK);
     REQUIRE(asset.report.warnings.empty());
-    REQUIRE(asset.node == "Lorem Ipsum\n");
+    REQUIRE(asset.node.source == "Lorem Ipsum\n");
+    REQUIRE(asset.node.resolved.empty());
 
     REQUIRE(asset.sourceMap.sourceMap.size() == 1);
     REQUIRE(asset.sourceMap.sourceMap[0].location == 12);

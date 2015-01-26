@@ -92,11 +92,12 @@ namespace snowcrashtest {
             sourcemap.push_back(mdp::BytesRange(0, 1));
 
             model.description = "Foo";
-            model.body = "Bar";
-            models.modelTable[name] = model;
+            model.assets.body.source = "Bar";
 
             modelSM.description.sourceMap = sourcemap;
-            modelSM.body.sourceMap = sourcemap;
+            modelSM.assets.body.sourceMap = sourcemap;
+
+            models.modelTable[name] = model;
             models.modelSourceMapTable[name] = modelSM;
         }
     };
@@ -159,7 +160,7 @@ namespace snowcrashtest {
          * If 'nth' is given, check that particular row of the given sourceMap with the
          * given location & length.
          */
-        static void check(mdp::BytesRangeSet& sourceMap, int loc, int len, int nth = 0) {
+        static void check(mdp::BytesRangeSet& sourceMap, int loc, int len, size_t nth = 0) {
 
             if (nth == 0) {
 

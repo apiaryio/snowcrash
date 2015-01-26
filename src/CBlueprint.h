@@ -82,6 +82,10 @@ extern "C" {
     struct sc_payload_s;
     typedef struct sc_payload_s sc_payload_t;
 
+    /** Class Asset wrapper */
+    struct sc_asset_s;
+    typedef struct sc_asset_s sc_asset_t;
+
     /** Array Parameter wrapper */
     struct sc_parameter_collection_s;
     typedef struct sc_parameter_collection_s sc_parameter_collection_t;
@@ -226,6 +230,20 @@ extern "C" {
 
     /** \returns Payload schema */
     SC_API const char* sc_payload_schema(const sc_payload_t* handle);
+
+    /*----------------------------------------------------------------------*/
+
+    /** \returns Body asset handle from payload */
+    SC_API const sc_asset_t* sc_asset_body_handle(const sc_payload_t* handle);
+
+    /** \returns Schema asset handle from payload */
+    SC_API const sc_asset_t* sc_asset_schema_handle(const sc_payload_t* handle);
+
+    /** \returns Asset source */
+    SC_API const char* sc_asset_source(const sc_asset_t* handle);
+
+    /** \returns Asset resolved */
+    SC_API const char* sc_asset_resolved(const sc_asset_t* handle);
 
     /*----------------------------------------------------------------------*/
 
