@@ -383,6 +383,19 @@ sos::Object WrapReference(const Reference& reference)
     return referenceObject;
 }
 
+sos::Object WrapAsset(const Asset& asset)
+{
+    sos::Object assetObject;
+
+    // Source
+    assetObject.set(SerializeKey::Source, sos::String(asset.source));
+
+    // Resolved
+    assetObject.set(SerializeKey::Resolved, sos::String(asset.resolved));
+
+    return assetObject;
+}
+
 sos::Object WrapPayload(const Payload& payload)
 {
     sos::Object payloadObject;
@@ -411,10 +424,18 @@ sos::Object WrapPayload(const Payload& payload)
     payloadObject.set(SerializeKey::Headers, headers);
 
     // Body
-    payloadObject.set(SerializeKey::Body, sos::String(payload.body));
+    payloadObject.set(SerializeKey::Body, sos::String(payload.assets.body.source));
 
     // Schema
-    payloadObject.set(SerializeKey::Schema, sos::String(payload.schema));
+    payloadObject.set(SerializeKey::Schema, sos::String(payload.assets.schema.source));
+
+    // Assets
+    sos::Object assets;
+
+    assets.set(SerializeKey::Body, WrapAsset(payload.assets.body));
+    assets.set(SerializeKey::Schema, WrapAsset(payload.assets.schema));
+
+    payloadObject.set(SerializeKey::Assets, assets);
 
     return payloadObject;
 }

@@ -287,7 +287,7 @@ SC_API const sc_source_map_t* sc_sm_payload_body(const sc_sm_payload_t* handle)
     if(!p)
         return NULL;
 
-    return AS_CTYPE(sc_source_map_t, &p->body.sourceMap);
+    return AS_CTYPE(sc_source_map_t, &p->assets.body.sourceMap);
 }
 
 SC_API const sc_source_map_t* sc_sm_payload_schema(const sc_sm_payload_t* handle)
@@ -296,7 +296,7 @@ SC_API const sc_source_map_t* sc_sm_payload_schema(const sc_sm_payload_t* handle
     if(!p)
         return NULL;
 
-    return AS_CTYPE(sc_source_map_t, &p->schema.sourceMap);
+    return AS_CTYPE(sc_source_map_t, &p->assets.schema.sourceMap);
 }
 
 /*----------------------------------------------------------------------*/

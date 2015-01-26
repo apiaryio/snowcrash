@@ -21,6 +21,7 @@ const std::string SerializeKey::ResourceGroups = "resourceGroups";
 const std::string SerializeKey::Resources = "resources";
 const std::string SerializeKey::URI = "uri";
 const std::string SerializeKey::URITemplate = "uriTemplate";
+const std::string SerializeKey::Assets = "assets";
 const std::string SerializeKey::Actions = "actions";
 const std::string SerializeKey::Action = "action";
 const std::string SerializeKey::Attributes = "attributes";
@@ -39,6 +40,9 @@ const std::string SerializeKey::Required = "required";
 const std::string SerializeKey::Default = "default";
 const std::string SerializeKey::Example = "example";
 const std::string SerializeKey::Values = "values";
+
+const std::string SerializeKey::Source = "source";
+const std::string SerializeKey::Resolved = "resolved";
 
 const std::string SerializeKey::Literal = "literal";
 const std::string SerializeKey::Variable = "variable";

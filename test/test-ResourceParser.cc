@@ -72,7 +72,7 @@ TEST_CASE("Parse resource", "[resource]")
     REQUIRE(resource.node.headers.empty());
 
     REQUIRE(resource.node.model.name == "Resource");
-    REQUIRE(resource.node.model.body == "X.O.\n");
+    REQUIRE(resource.node.model.assets.body.source == "X.O.\n");
 
     REQUIRE(resource.node.parameters.size() == 2);
     REQUIRE(resource.node.parameters[0].name == "id");
@@ -102,9 +102,9 @@ TEST_CASE("Parse resource", "[resource]")
     REQUIRE(resource.sourceMap.model.name.sourceMap.size() == 1);
     REQUIRE(resource.sourceMap.model.name.sourceMap[0].location == 63);
     REQUIRE(resource.sourceMap.model.name.sourceMap[0].length == 29);
-    REQUIRE(resource.sourceMap.model.body.sourceMap.size() == 1);
-    REQUIRE(resource.sourceMap.model.body.sourceMap[0].location == 96);
-    REQUIRE(resource.sourceMap.model.body.sourceMap[0].length == 9);
+    REQUIRE(resource.sourceMap.model.assets.body.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.model.assets.body.sourceMap[0].location == 96);
+    REQUIRE(resource.sourceMap.model.assets.body.sourceMap[0].length == 9);
     REQUIRE(resource.sourceMap.actions.collection.size() == 1);
     REQUIRE(resource.sourceMap.actions.collection[0].method.sourceMap.size() == 1);
     REQUIRE(resource.sourceMap.actions.collection[0].method.sourceMap[0].location == 278);
@@ -131,7 +131,7 @@ TEST_CASE("Parse partially defined resource", "[resource]")
     REQUIRE(resource.node.uriTemplate == "/1");
     REQUIRE(resource.node.description.empty());
     REQUIRE(resource.node.model.name.empty());
-    REQUIRE(resource.node.model.body.empty());
+    REQUIRE(resource.node.model.assets.body.source.empty());
     REQUIRE(resource.node.actions.size() == 1);
     REQUIRE(resource.node.actions.front().method == "GET");
     REQUIRE(resource.node.actions.front().description.empty());
@@ -139,7 +139,7 @@ TEST_CASE("Parse partially defined resource", "[resource]")
     REQUIRE(resource.node.actions.front().examples.front().requests.size() == 1);
     REQUIRE(resource.node.actions.front().examples.front().requests.front().name.empty());
     REQUIRE(resource.node.actions.front().examples.front().requests.front().description.empty());
-    REQUIRE(resource.node.actions.front().examples.front().requests.front().body == "p1\n\n");
+    REQUIRE(resource.node.actions.front().examples.front().requests.front().assets.body.source == "p1\n\n");
 
     REQUIRE(resource.sourceMap.name.sourceMap.empty());
     REQUIRE(resource.sourceMap.description.sourceMap.empty());
@@ -170,7 +170,7 @@ TEST_CASE("Parse multiple method descriptions", "[resource]")
     REQUIRE(resource.node.uriTemplate == "/1");
     REQUIRE(resource.node.description.empty());
     REQUIRE(resource.node.model.name.empty());
-    REQUIRE(resource.node.model.body.empty());
+    REQUIRE(resource.node.model.assets.body.source.empty());
     REQUIRE(resource.node.actions.size() == 2);
     REQUIRE(resource.node.actions[0].method == "GET");
     REQUIRE(resource.node.actions[0].description == "p1\n");
@@ -219,7 +219,7 @@ TEST_CASE("Parse multiple methods", "[resource]")
     REQUIRE(resource.node.uriTemplate == "/1");
     REQUIRE(resource.node.description == "A\n");
     REQUIRE(resource.node.model.name.empty());
-    REQUIRE(resource.node.model.body.empty());
+    REQUIRE(resource.node.model.assets.body.source.empty());
     REQUIRE(resource.node.actions.size() == 3);
 
     REQUIRE(resource.node.actions[0].method == "GET");
@@ -229,7 +229,7 @@ TEST_CASE("Parse multiple methods", "[resource]")
     REQUIRE(resource.node.actions[0].examples[0].responses.size() == 1);
     REQUIRE(resource.node.actions[0].examples[0].responses[0].name == "200");
     REQUIRE(resource.node.actions[0].examples[0].responses[0].description.empty());
-    REQUIRE(resource.node.actions[0].examples[0].responses[0].body == "Code 1\n");
+    REQUIRE(resource.node.actions[0].examples[0].responses[0].assets.body.source == "Code 1\n");
 
     REQUIRE(resource.node.actions[1].method == "POST");
     REQUIRE(resource.node.actions[1].description == "C\n");
@@ -241,7 +241,7 @@ TEST_CASE("Parse multiple methods", "[resource]")
     REQUIRE(resource.node.actions[1].examples[0].responses.size() == 1);
     REQUIRE(resource.node.actions[1].examples[0].responses[0].name == "200");
     REQUIRE(resource.node.actions[1].examples[0].responses[0].description.empty());
-    REQUIRE(resource.node.actions[1].examples[0].responses[0].body == "{}\n");
+    REQUIRE(resource.node.actions[1].examples[0].responses[0].assets.body.source == "{}\n");
 
     REQUIRE(resource.node.actions[2].method == "PUT");
     REQUIRE(resource.node.actions[2].description == "E\n");
@@ -280,7 +280,7 @@ TEST_CASE("Parse description with list", "[resource]")
     REQUIRE(resource.node.uriTemplate == "/1");
     REQUIRE(resource.node.description == "+ A\n\n+ B\n\np1\n");
     REQUIRE(resource.node.model.name.empty());
-    REQUIRE(resource.node.model.body.empty());
+    REQUIRE(resource.node.model.assets.body.source.empty());
     REQUIRE(resource.node.actions.empty());
 
     REQUIRE(resource.sourceMap.name.sourceMap.empty());
@@ -310,7 +310,7 @@ TEST_CASE("Parse resource with a HR", "[resource][block]")
     REQUIRE(resource.node.uriTemplate == "/1");
     REQUIRE(resource.node.description == "A\n---\n\nB\n");
     REQUIRE(resource.node.model.name.empty());
-    REQUIRE(resource.node.model.body.empty());
+    REQUIRE(resource.node.model.assets.body.source.empty());
     REQUIRE(resource.node.actions.empty());
 
     REQUIRE(resource.sourceMap.name.sourceMap.empty());
@@ -346,7 +346,7 @@ TEST_CASE("Parse resource method abbreviation", "[resource]")
 
     REQUIRE(resource.node.actions[0].examples[0].responses.size() == 1);
     REQUIRE(resource.node.actions[0].examples[0].responses[0].description.empty());
-    REQUIRE(resource.node.actions[0].examples[0].responses[0].body == "{}\n");
+    REQUIRE(resource.node.actions[0].examples[0].responses[0].assets.body.source == "{}\n");
 
     REQUIRE(resource.sourceMap.name.sourceMap.empty());
     REQUIRE(resource.sourceMap.description.sourceMap.empty());
@@ -372,7 +372,7 @@ TEST_CASE("Parse resource without name", "[resource]")
     REQUIRE(resource.node.uriTemplate == "/resource");
     REQUIRE(resource.node.name.empty());
     REQUIRE(resource.node.model.name.empty());
-    REQUIRE(resource.node.model.body.empty());
+    REQUIRE(resource.node.model.assets.body.source.empty());
     REQUIRE(resource.node.actions.size() == 0);
 
     REQUIRE(resource.sourceMap.name.sourceMap.empty());
@@ -434,7 +434,7 @@ TEST_CASE("Parse nameless resource with named model", "[resource][model][source]
     REQUIRE(resource.report.warnings.empty());
 
     REQUIRE(resource.node.model.name == "Super");
-    REQUIRE(resource.node.model.body == "AAA\n");
+    REQUIRE(resource.node.model.assets.body.source == "AAA\n");
     REQUIRE(resource.node.actions.empty());
 
     REQUIRE(resource.sourceMap.name.sourceMap.empty());
@@ -494,14 +494,14 @@ TEST_CASE("Parse named resource with nameless model", "[resource][model][source]
     REQUIRE(resource.report.warnings.empty());
 
     REQUIRE(resource.node.model.name == "Message");
-    REQUIRE(resource.node.model.body == "AAA\n");
+    REQUIRE(resource.node.model.assets.body.source == "AAA\n");
     REQUIRE(resource.node.actions.size() == 1);
     REQUIRE(resource.node.actions[0].name == "Retrieve a message");
     REQUIRE(resource.node.actions[0].method == "GET");
     REQUIRE(resource.node.actions[0].examples.size() == 1);
     REQUIRE(resource.node.actions[0].examples[0].responses.size() == 1);
     REQUIRE(resource.node.actions[0].examples[0].responses[0].name == "200");
-    REQUIRE(resource.node.actions[0].examples[0].responses[0].body == "AAA\n");
+    REQUIRE(resource.node.actions[0].examples[0].responses[0].assets.body.source == "AAA\n");
 
     REQUIRE(resource.sourceMap.name.sourceMap.size() == 1);
     REQUIRE(resource.sourceMap.name.sourceMap[0].location == 0);
@@ -538,14 +538,14 @@ TEST_CASE("Parse model with unrecognised resource", "[resource][model]")
     REQUIRE(resource.report.warnings[0].code == IgnoringWarning);
 
     REQUIRE(resource.node.model.name == "Resource");
-    REQUIRE(resource.node.model.body == "AAA\n");
+    REQUIRE(resource.node.model.assets.body.source == "AAA\n");
     REQUIRE(resource.node.actions.size() == 1);
     REQUIRE(resource.node.actions[0].name == "Retrieve a resource");
     REQUIRE(resource.node.actions[0].method == "GET");
     REQUIRE(resource.node.actions[0].examples.size() == 1);
     REQUIRE(resource.node.actions[0].examples[0].responses.size() == 1);
     REQUIRE(resource.node.actions[0].examples[0].responses[0].name == "200");
-    REQUIRE(resource.node.actions[0].examples[0].responses[0].body == "[Resource][]\n");
+    REQUIRE(resource.node.actions[0].examples[0].responses[0].assets.body.source == "[Resource][]\n");
     REQUIRE(resource.node.actions[0].examples[0].responses[0].description == "");
 }
 
@@ -583,7 +583,7 @@ TEST_CASE("Parse named resource with lazy referencing", "[resource][model][issue
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples.size() == 1);
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body == "`resource model` 2\n");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].assets.body.source == "`resource model` 2\n");
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers.size() == 1);
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[0].first == "Content-Type");
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[0].second == "text/plain");
@@ -650,7 +650,7 @@ TEST_CASE("Parse named resource with lazy referencing with both response and req
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].requests.size() == 1);
 
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].requests[0].name == "");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].requests[0].body == "{ item }\n");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].requests[0].assets.body.source == "{ item }\n");
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].requests[0].headers.size() == 1);
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].requests[0].headers[0].first == "Content-Type");
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].requests[0].headers[0].second == "application/json");
@@ -661,7 +661,7 @@ TEST_CASE("Parse named resource with lazy referencing with both response and req
 
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body == "[ { item 1 }, { item 2 } ]\n");
+    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].assets.body.source == "[ { item 1 }, { item 2 } ]\n");
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers.size() == 1);
 
     REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].reference.id == "Collection of Items");
@@ -863,7 +863,7 @@ TEST_CASE("Parse resource with multi-word named model", "[resource][model]")
     REQUIRE(resource.report.warnings.empty());
 
     REQUIRE(resource.node.model.name == "a really good name");
-    REQUIRE(resource.node.model.body == "body of the `model`\n");
+    REQUIRE(resource.node.model.assets.body.source == "body of the `model`\n");
     REQUIRE(resource.node.actions.empty());
 }
 
@@ -901,22 +901,22 @@ TEST_CASE("Dangling transaction example assets", "[resource]")
     REQUIRE(resource.node.actions[0].examples.size() == 1);
     REQUIRE(resource.node.actions[0].examples[0].requests.size() == 1);
     REQUIRE(resource.node.actions[0].examples[0].requests[0].name == "A");
-    REQUIRE(resource.node.actions[0].examples[0].requests[0].body == "dangling request body\n\n");
+    REQUIRE(resource.node.actions[0].examples[0].requests[0].assets.body.source == "dangling request body\n\n");
 
     REQUIRE(resource.node.actions[0].examples[0].responses.size() == 1);
     REQUIRE(resource.node.actions[0].examples[0].responses[0].name == "200");
-    REQUIRE(resource.node.actions[0].examples[0].responses[0].body == "dangling response body\n\n");
+    REQUIRE(resource.node.actions[0].examples[0].responses[0].assets.body.source == "dangling response body\n\n");
 
     REQUIRE(resource.sourceMap.actions.collection.size() == 1);
     REQUIRE(resource.sourceMap.actions.collection[0].examples.collection.size() == 1);
     REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].requests.collection.size() == 1);
-    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].requests.collection[0].body.sourceMap.size() == 1);
-    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].requests.collection[0].body.sourceMap[0].location == 29);
-    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].requests.collection[0].body.sourceMap[0].length == 33);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].requests.collection[0].assets.body.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].requests.collection[0].assets.body.sourceMap[0].location == 29);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].requests.collection[0].assets.body.sourceMap[0].length == 33);
     REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].responses.collection.size() == 1);
-    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].responses.collection[0].body.sourceMap.size() == 1);
-    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].responses.collection[0].body.sourceMap[0].location == 78);
-    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].responses.collection[0].body.sourceMap[0].length == 31);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].responses.collection[0].assets.body.sourceMap.size() == 1);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].responses.collection[0].assets.body.sourceMap[0].location == 78);
+    REQUIRE(resource.sourceMap.actions.collection[0].examples.collection[0].responses.collection[0].assets.body.sourceMap[0].length == 31);
 }
 
 TEST_CASE("Body list item in description", "[resource][regression][#190]")

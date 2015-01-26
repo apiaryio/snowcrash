@@ -171,7 +171,7 @@ TEST_CASE("Parse multiple resources with payloads", "[resource_group]")
     REQUIRE(resource1.actions[0].examples[0].requests.size() == 1);
     REQUIRE(resource1.actions[0].examples[0].requests[0].name.empty());
     REQUIRE(resource1.actions[0].examples[0].requests[0].description.empty());
-    REQUIRE(resource1.actions[0].examples[0].requests[0].body.empty());
+    REQUIRE(resource1.actions[0].examples[0].requests[0].assets.body.source.empty());
     REQUIRE(resource1.actions[0].examples[0].responses.empty());
 
     Resource resource2 = resourceGroup.node.resources[1];
@@ -183,7 +183,7 @@ TEST_CASE("Parse multiple resources with payloads", "[resource_group]")
     REQUIRE(resource2.actions[0].examples.size() == 1);
     REQUIRE(resource2.actions[0].examples[0].requests[0].name.empty());
     REQUIRE(resource2.actions[0].examples[0].requests[0].description.empty());
-    REQUIRE(resource2.actions[0].examples[0].requests[0].body.empty());
+    REQUIRE(resource2.actions[0].examples[0].requests[0].assets.body.source.empty());
     REQUIRE(resource2.actions[0].examples[0].responses.empty());
 
     REQUIRE(resourceGroup.sourceMap.name.sourceMap.empty());
@@ -335,7 +335,7 @@ TEST_CASE("Parse resource method abbreviation followed by a foreign method", "[r
     REQUIRE(resourceGroup.node.resources[0].name.empty());
     REQUIRE(resourceGroup.node.resources[0].uriTemplate == "/resource");
     REQUIRE(resourceGroup.node.resources[0].model.name.empty());
-    REQUIRE(resourceGroup.node.resources[0].model.body.empty());
+    REQUIRE(resourceGroup.node.resources[0].model.assets.body.source.empty());
     REQUIRE(resourceGroup.node.resources[0].actions.size() == 1);
     REQUIRE(resourceGroup.node.resources[0].actions[0].method == "GET");
 
@@ -367,13 +367,13 @@ TEST_CASE("Parse resource method abbreviation followed by another", "[resource_g
     REQUIRE(resourceGroup.node.resources[0].name.empty());
     REQUIRE(resourceGroup.node.resources[0].uriTemplate == "/resource");
     REQUIRE(resourceGroup.node.resources[0].model.name.empty());
-    REQUIRE(resourceGroup.node.resources[0].model.body.empty());
+    REQUIRE(resourceGroup.node.resources[0].model.assets.body.source.empty());
     REQUIRE(resourceGroup.node.resources[0].actions.size() == 1);
     REQUIRE(resourceGroup.node.resources[0].actions[0].method == "GET");
     REQUIRE(resourceGroup.node.resources[1].name.empty());
     REQUIRE(resourceGroup.node.resources[1].uriTemplate == "/2");
     REQUIRE(resourceGroup.node.resources[1].model.name.empty());
-    REQUIRE(resourceGroup.node.resources[1].model.body.empty());
+    REQUIRE(resourceGroup.node.resources[1].model.assets.body.source.empty());
     REQUIRE(resourceGroup.node.resources[1].actions.size() == 1);
     REQUIRE(resourceGroup.node.resources[1].actions[0].method == "POST");
 
