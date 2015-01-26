@@ -4,6 +4,19 @@
   ],
   'targets' : [
     {
+      'target_name': 'libsos',
+      'type': 'static_library',
+      'include_dirs': [
+        'ext/sos/src'
+      ],
+      'sources': [
+        'ext/sos/src/sos.cc',
+        'ext/sos/src/sos.h',
+        'ext/sos/src/sosJSON.h',
+        'ext/sos/src/sosYAML.h'
+      ]
+    },
+    {
       'target_name': 'libsundown',
       'type': 'static_library',
       'include_dirs': [
@@ -57,7 +70,8 @@
         'src',
         'ext/markdown-parser/src',
         'ext/markdown-parser/ext/sundown/src',
-        'ext/markdown-parser/ext/sundown/html'
+        'ext/markdown-parser/ext/sundown/html',
+        'ext/sos/src'
       ],
       'sources': [
         'src/CBlueprint.cc',
@@ -77,10 +91,10 @@
         'src/Section.h',
         'src/Serialize.cc',
         'src/Serialize.h',
-        'src/SerializeJSON.cc',
-        'src/SerializeJSON.h',
-        'src/SerializeYAML.cc',
-        'src/SerializeYAML.h',
+        'src/SerializeAST.cc',
+        'src/SerializeAST.h',
+        'src/SerializeSourcemap.cc',
+        'src/SerializeSourcemap.h',
         'src/Signature.cc',
         'src/Signature.h',
         'src/snowcrash.cc',
@@ -132,7 +146,8 @@
         ]
       ],
       'dependencies': [
-          'libmarkdownparser'
+          'libmarkdownparser',
+          'libsos'
       ]
     },
     {
@@ -192,14 +207,16 @@
         'src/snowcrash',
         'ext/markdown-parser/src',
         'ext/markdown-parser/ext/sundown/src',
-        'ext/cmdline'
+        'ext/cmdline',
+        'ext/sos/src'
       ],
       'sources': [
         'src/snowcrash/snowcrash.cc'
       ],
       'dependencies': [
         'libsnowcrash',
-        'libmarkdownparser'
+        'libmarkdownparser',
+        'libsos'
       ]
     },
     {
@@ -210,6 +227,7 @@
         'ext/markdown-parser/src',
         'ext/markdown-parser/ext/sundown/src',
         'ext/cmdline',
+        'ext/sos/src',
         'test',
         'test/performance',
       ],
@@ -218,7 +236,8 @@
       ],
       'dependencies': [
         'libsnowcrash',
-        'libmarkdownparser'
+        'libmarkdownparser',
+        'libsos'
       ]
     }
   ]

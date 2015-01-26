@@ -10,27 +10,13 @@
 #define SNOWCRASH_SERIALIZE_H
 
 #include <string>
+#include "BlueprintSourcemap.h"
+#include "sos.h"
 
 /** Version of API Blueprint AST serialization */
 #define AST_SERIALIZATION_VERSION "2.1"
 
 namespace snowcrash {
-
-    /**
-     *  \brief  Escape new lines in input string.
-     *  \param  input   A string to escape its new lines.
-     *  \return A new string with lines escaped.
-     *
-     *  This function replaces all occurences of "\n" with "\\n".
-     */
-    std::string EscapeNewlines(const std::string& input);
-
-    /**
-     *  \brief  Escape every double quote in input string.
-     *  \param  input   A string to escape its double quotes.
-     *  \return A new string with double quotes escaped.
-     */
-    std::string EscapeDoubleQuotes(const std::string& input);
 
     /**
      *  AST entities serialization keys
@@ -48,6 +34,7 @@ namespace snowcrash {
         static const std::string URITemplate;
         static const std::string Actions;
         static const std::string Action;
+        static const std::string Attributes;
         static const std::string Examples;
         static const std::string Transaction;
         static const std::string Method;
@@ -65,6 +52,15 @@ namespace snowcrash {
         static const std::string Example;
         static const std::string Values;
 
+        static const std::string Literal;
+        static const std::string Variable;
+        static const std::string TypeDefinition;
+        static const std::string TypeSpecification;
+        static const std::string NestedTypes;
+        static const std::string Sections;
+        static const std::string Class;
+        static const std::string Content;
+        static const std::string ValueDefinition;
     };
 }
 
