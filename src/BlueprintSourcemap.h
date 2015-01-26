@@ -70,8 +70,6 @@ namespace snowcrash {
     /** Source Map of Attributes */
     // 'Attributes' type is same as 'DataStructure'
 
-    SOURCE_MAP_COLLECTION(DataStructure, DataStructures)
-
     /**
      * Source Map Structure for Assets in Payload
      */
@@ -190,7 +188,7 @@ namespace snowcrash {
      *  Source Map Structure for API Resource
      */
     template<>
-    struct SourceMap<Resource> : public SourceMapBase {
+    struct SourceMap<Resource> {
 
         /** Source Map of URI template */
         SourceMap<URITemplate> uriTemplate;
@@ -231,24 +229,90 @@ namespace snowcrash {
     /** Source Map of Collection of Resources */
     SOURCE_MAP_COLLECTION(Resource, Resources)
 
+    /** Forward Declaration for Source Map of Element */
+    template<>
+    struct SourceMap<Element>;
+
+    /** Source Map of Collection of Elements */
+    SOURCE_MAP_COLLECTION(Element, Elements)
+
     /**
-     *  Source Map Structure for Group of API Resources
+     * Source Map Structure for Element
      */
     template<>
-    struct SourceMap<ResourceGroup> : public SourceMapBase {
+    struct SourceMap<Element> : public SourceMapBase {
 
-        /** Source Map of a Group Name */
-        SourceMap<Name> name;
+        /** Source Map Structure for Attributes of the Element */
+        struct Attributes {
 
-        /** Source Map of Group description */
-        SourceMap<Description> description;
+            /** Source Map of a Element Name */
+            SourceMap<Name> name;
+        };
 
-        /** Resources */
-        SourceMap<Resources> resources;
+        /** Source Map Structure for Content of the Element */
+        struct Content {
+
+            /** EITHER Source Map of Copy */
+            SourceMap<std::string> copy;
+
+            /** OR Source Map of Resource */
+            SourceMap<Resource> resource;
+
+            /** OR Source Map of Data Structure */
+            SourceMap<DataStructure> dataStructure;
+
+            /** OR Source Map of Collection of elements */
+            SourceMap<Elements>& elements();
+            const SourceMap<Elements>& elements() const;
+
+            /** Constructor */
+            Content();
+
+            /** Copy constructor */
+            Content(const SourceMap<Element>::Content& rhs);
+
+            /** Assignment operator */
+            SourceMap<Element>::Content& operator=(const SourceMap<Element>::Content& rhs);
+
+            /** Destructor */
+            ~Content();
+
+        private:
+            std::auto_ptr<SourceMap<Elements> > m_elements;
+        };
+
+        /** Source Map of Attributes of the Element */
+        Attributes attributes;
+
+        /** Source Map of Content of the Element */
+        Content content;
+
+        /** Constructor */
+        SourceMap();
+
+        /** Copy constructor */
+        SourceMap(const SourceMap<Element>& rhs);
+
+        /** Assignment operator */
+        SourceMap<Element>& operator=(const SourceMap<Element>& rhs);
+
+        /** Destructor */
+        ~SourceMap();
     };
 
-    /** Source Map of Collection of Resource groups */
-    SOURCE_MAP_COLLECTION(ResourceGroup, ResourceGroups)
+    /**
+     *  Source Map Structure for Group of API Resources (Category Element)
+     */
+    template<>
+    struct SourceMap<ResourceGroup> : public SourceMap<Element> {
+    };
+
+    /**
+     * Source Map Structure for Group of Data Structures (Category Element)
+     */
+    template<>
+    struct SourceMap<DataStructureGroup> : public SourceMap<Element> {
+    };
 
     /**
      *  \brief API Blueprint Sourcemap AST
@@ -257,22 +321,16 @@ namespace snowcrash {
      *  Start reading a parsed API here.
      */
     template<>
-    struct SourceMap<Blueprint> : public SourceMapBase {
-
-        /** Source Map of API Blueprint metadata */
-        SourceMap<MetadataCollection> metadata;
+    struct SourceMap<Blueprint> : public SourceMap<Element> {
 
         /** Source Map of the API Name */
         SourceMap<Name> name;
 
+        /** Source Map of API Blueprint metadata */
+        SourceMap<MetadataCollection> metadata;
+
         /** Source Map of an API Overview description */
         SourceMap<Description> description;
-
-        /** The set of API Resource Groups */
-        SourceMap<ResourceGroups> resourceGroups;
-
-        /** List of Data Structures */
-        SourceMap<DataStructures> dataStructures;
     };
 }
 

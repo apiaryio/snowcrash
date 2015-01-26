@@ -16,6 +16,9 @@
 #include "MarkdownNode.h"
 #include "MSONSourcemap.h"
 
+#define RESOURCE_NOT_SET_ERR std::logic_error("no resource set")
+#define DATA_STRUCTURE_NOT_SET_ERR std::logic_error("no data structure set")
+
 /**
  *  API Blueprint Abstract Syntax Tree
  *  -----------------------------------
@@ -119,7 +122,7 @@ namespace snowcrash {
         Values values;
     };
 
-    /** Source Map of Collection of Parameters */
+    /** Collection of Parameters */
     typedef Collection<Parameter>::type Parameters;
 
     /** Identifier(name) of Reference */
@@ -174,9 +177,6 @@ namespace snowcrash {
         /** As resolved by subsequent tooling */
         mson::NamedType resolved;
     };
-
-    /** Collection of Data Structures */
-    typedef Collection<DataStructure>::type DataStructures;
 
     /**
      *  Attributes
@@ -349,23 +349,96 @@ namespace snowcrash {
     /** Collection of Resources */
     typedef Collection<Resource>::type Resources;
 
-    /**
-     *  Group of API Resources
-     */
-    struct ResourceGroup {
+    /** Forward declaration of Element */
+    struct Element;
 
-        /** A Group Name */
-        Name name;
+    /** Collection of elements */
+    typedef std::vector<Element> Elements;
 
-        /** Group description */
-        Description description;
+    /** Element */
+    struct Element {
 
-        /** Resources */
-        Resources resources;
+        /** Class of an element */
+        enum Class {
+            UndefinedElement = 0, // Unknown
+            CategoryElement,      // Group of other elements
+            CopyElement,          // Human readable text
+            ResourceElement,      // Resource
+            DataStructureElement  // Data Structure
+        };
+
+        /** Attributes of an element */
+        struct Attributes {
+
+            /** Human readable name of the element */
+            Name name;
+        };
+
+        /** Content of an element */
+        struct Content {
+
+            /** EITHER Copy */
+            std::string copy;
+
+            /** OR Resource */
+            Resource resource;
+
+            /** OR Data Structure */
+            DataStructure dataStructure;
+
+            /** OR Collection of elements */
+            Elements& elements();
+            const Elements& elements() const;
+
+            /** Constructor */
+            Content();
+
+            /** Copy constructor */
+            Content(const Element::Content& rhs);
+
+            /** Assignment operator */
+            Content& operator=(const Element::Content& rhs);
+
+            /** Destructor */
+            ~Content();
+
+        private:
+            std::auto_ptr<Elements> m_elements;
+        };
+
+        /** Type of the element */
+        Element::Class element;
+
+        /** Attributes of the element */
+        Element::Attributes attributes;
+
+        /** Content of the element */
+        Element::Content content;
+
+        /** Constructor */
+        Element(const Element::Class& element_ = Element::UndefinedElement);
+
+        /** Copy constructor */
+        Element(const Element& rhs);
+
+        /** Assignment operator */
+        Element& operator=(const Element& rhs);
+
+        /** Destructor */
+        ~Element();
     };
 
-    /** Collection of Resource groups */
-    typedef Collection<ResourceGroup>::type ResourceGroups;
+    /**
+     *  Group of API Resources (Category Element)
+     */
+    struct ResourceGroup : public Element {
+    };
+
+    /**
+     * Group of Data Structures (Category Element)
+     */
+    struct DataStructureGroup : public Element {
+    };
 
     /**
      *  \brief API Blueprint AST
@@ -373,7 +446,7 @@ namespace snowcrash {
      *  This is top-level (or root if you prefer) of API Blueprint abstract syntax tree.
      *  Start reading a parsed API here.
      */
-    struct Blueprint {
+    struct Blueprint : public Element {
 
         /** Metadata */
         MetadataCollection metadata;
@@ -383,12 +456,6 @@ namespace snowcrash {
 
         /** An API Overview description */
         Description description;
-
-        /** The set of API Resource Groups */
-        ResourceGroups resourceGroups;
-
-        /** List of Data Structures */
-        DataStructures dataStructures;
     };
 }
 
