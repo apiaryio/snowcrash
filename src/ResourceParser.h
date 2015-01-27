@@ -11,7 +11,7 @@
 
 #include "SectionParser.h"
 #include "ActionParser.h"
-#include "DataStructuresParser.h"
+#include "DataStructureGroupParser.h"
 #include "HeadersParser.h"
 #include "ParametersParser.h"
 #include "UriTemplateParser.h"
@@ -110,7 +110,7 @@ namespace snowcrash {
 
                     if (!out.node.name.empty()) {
 
-                        if (SectionProcessor<DataStructures>::isNamedTypeDuplicate(pd.blueprint, out.node.name)) {
+                        if (SectionProcessor<DataStructureGroup>::isNamedTypeDuplicate(pd.blueprint, out.node.name)) {
 
                             // WARN: duplicate named type
                             std::stringstream ss;

@@ -11,7 +11,7 @@
 
 #include "ResourceParser.h"
 #include "ResourceGroupParser.h"
-#include "DataStructuresParser.h"
+#include "DataStructureGroupParser.h"
 #include "SectionParser.h"
 #include "RegexMatch.h"
 #include "CodeBlockUtility.h"
@@ -95,6 +95,8 @@ namespace snowcrash {
                                                          SectionParserData& pd,
                                                          const ParseResultRef<Blueprint>& out) {
 
+            MarkdownNodeIterator cur = node;
+
             if (pd.sectionContext() == ResourceGroupSectionType ||
                 pd.sectionContext() == ResourceSectionType) {
 
@@ -131,13 +133,19 @@ namespace snowcrash {
 
                 return cur;
             }
-            else if (pd.sectionContext() == DataStructuresSectionType) {
+            else if (pd.sectionContext() == DataStructureGroupSectionType) {
 
-                ParseResultRef<DataStructures> dataStructures(out.report, out.node.dataStructures, out.sourceMap.dataStructures);
-                return DataStructuresParser::parse(node, siblings, pd, dataStructures);
+                IntermediateParseResult<DataStructureGroup> dataStructureGroup(out.report);
+                cur = DataStructureGroupParser::parse(node, siblings, pd, dataStructureGroup);
+
+                out.node.content.elements().push_back(dataStructureGroup.node);
+
+                if (pd.exportSourceMap()) {
+                    out.sourceMap.content.elements().collection.push_back(dataStructureGroup.sourceMap);
+                }
             }
 
-            return node;
+            return cur;
         }
 
         /**
@@ -173,24 +181,24 @@ namespace snowcrash {
                     // If the current node is a Resource or DataStructures section, assign it as context
                     // Otherwise, make sure the current context is not DataStructures section and remove the context
                     if (sectionType == ResourceSectionType ||
-                        sectionType == DataStructuresSectionType) {
+                        sectionType == DataStructureGroupSectionType) {
 
                         contextSectionType = sectionType;
                         contextCur = cur;
                     }
-                    else if (contextSectionType != DataStructuresSectionType) {
+                    else if (contextSectionType != DataStructureGroupSectionType) {
 
                         contextSectionType = UndefinedSectionType;
                     }
 
                     // If context is DataStructures section, NamedTypes should be filled
-                    if (contextSectionType == DataStructuresSectionType) {
+                    if (contextSectionType == DataStructureGroupSectionType) {
 
                         if (sectionType != MSONSampleDefaultSectionType &&
                             sectionType != MSONPropertyMembersSectionType &&
                             sectionType != MSONValueMembersSectionType &&
                             sectionType != UndefinedSectionType &&
-                            sectionType != DataStructuresSectionType) {
+                            sectionType != DataStructureGroupSectionType) {
 
                             contextSectionType = UndefinedSectionType;
                         }
@@ -242,7 +250,7 @@ namespace snowcrash {
             }
 
             // Check if DataStructures section
-            nestedType = SectionProcessor<DataStructures>::sectionType(node);
+            nestedType = SectionProcessor<DataStructureGroup>::sectionType(node);
 
             if (nestedType != UndefinedSectionType) {
                 return nestedType;
