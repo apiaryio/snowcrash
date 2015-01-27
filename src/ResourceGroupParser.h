@@ -47,12 +47,12 @@ namespace snowcrash {
             CaptureGroups captureGroups;
 
             if (RegexCapture(node->text, GroupHeaderRegex, captureGroups, 3)) {
-                out.node.name = captureGroups[1];
-                TrimString(out.node.name);
+                out.node.attributes.name = captureGroups[1];
+                TrimString(out.node.attributes.name);
             }
 
-            if (pd.exportSourceMap() && !out.node.name.empty()) {
-                out.sourceMap.name.sourceMap = node->sourceMap;
+            if (pd.exportSourceMap() && !out.node.attributes.name.empty()) {
+                out.sourceMap.attributes.name.sourceMap = node->sourceMap;
             }
 
             return ++MarkdownNodeIterator(node);
@@ -63,21 +63,21 @@ namespace snowcrash {
                                                          SectionParserData& pd,
                                                          const ParseResultRef<ResourceGroup>& out) {
 
+            MarkdownNodeIterator cur = node;
+
             if (pd.sectionContext() == ResourceSectionType) {
 
                 IntermediateParseResult<Resource> resource(out.report);
+                cur = ResourceParser::parse(node, siblings, pd, resource);
 
-                MarkdownNodeIterator cur = ResourceParser::parse(node, siblings, pd, resource);
+                bool duplicate = SectionProcessor<Resource>::isResourceDuplicate(out.node.content.elements(), resource.node.uriTemplate);
+                bool globalDuplicate;
 
-                ResourceIterator duplicate = SectionProcessor<Resource>::findResource(out.node.resources, resource.node);
-                ResourceIteratorPair globalDuplicate;
-
-                if (duplicate == out.node.resources.end()) {
-                    globalDuplicate = findResource(pd.blueprint, resource.node);
+                if (!duplicate) {
+                    globalDuplicate = isResourceDuplicate(pd.blueprint, resource.node.uriTemplate);
                 }
 
-                if (duplicate != out.node.resources.end() ||
-                    globalDuplicate.first != pd.blueprint.resourceGroups.end()) {
+                if (duplicate || globalDuplicate) {
 
                     // WARN: Duplicate resource
                     mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
@@ -86,16 +86,21 @@ namespace snowcrash {
                                                           sourceMap));
                 }
 
-                out.node.resources.push_back(resource.node);
+                Element resourceElement(Element::ResourceElement);
+                resourceElement.content.resource = resource.node;
+
+                out.node.content.elements().push_back(resourceElement);
 
                 if (pd.exportSourceMap()) {
-                    out.sourceMap.resources.collection.push_back(resource.sourceMap);
-                }
 
-                return cur;
+                    SourceMap<Element> resourceElementSM;
+                    resourceElementSM.content.resource = resource.sourceMap;
+
+                    out.sourceMap.content.elements().collection.push_back(resourceElementSM);
+                }
             }
 
-            return node;
+            return cur;
         }
 
         static MarkdownNodeIterator processUnexpectedNode(const MarkdownNodeIterator& node,
@@ -105,7 +110,7 @@ namespace snowcrash {
                                                           const ParseResultRef<ResourceGroup>& out) {
 
             if (SectionProcessor<Action>::actionType(node) == DependentActionType &&
-                !out.node.resources.empty()) {
+                isResourcePresent(out.node.content.elements())) {
 
                 mdp::ByteBuffer method;
                 mdp::ByteBuffer name;
@@ -115,7 +120,7 @@ namespace snowcrash {
 
                 // WARN: Unexpected action
                 std::stringstream ss;
-                ss << "unexpected action '" << method << "', to define multiple actions for the '" << out.node.resources.back().uriTemplate;
+                ss << "unexpected action '" << method << "', to define multiple actions for the '" << lastResource(out.node.content.elements()).uriTemplate;
                 ss << "' resource omit the HTTP method in its definition, e.g. '# /resource'";
 
                 out.report.warnings.push_back(Warning(ss.str(),
@@ -126,6 +131,13 @@ namespace snowcrash {
             }
 
             return SectionProcessorBase<ResourceGroup>::processUnexpectedNode(node, siblings, pd, lastSectionType, out);
+        }
+
+        static void finalize(const MarkdownNodeIterator& node,
+                             SectionParserData& pd,
+                             const ParseResultRef<ResourceGroup>& out) {
+
+            out.node.element = Element::CategoryElement;
         }
 
         static SectionType sectionType(const MarkdownNodeIterator& node) {
@@ -183,22 +195,63 @@ namespace snowcrash {
             return SectionProcessorBase<ResourceGroup>::isUnexpectedNode(node, sectionType);
         }
 
-        /** Finds a resource in blueprint by its URI template */
-        static ResourceIteratorPair findResource(const Blueprint& blueprint,
-                                                 const Resource& resource) {
+        /**
+         * \brief Given a blueprint, Check if a resource already exists with the given uri template
+         *
+         * \param blueprint The blueprint which is formed until now
+         * \param uri The resource uri template to be checked
+         */
+        static bool isResourceDuplicate(const Blueprint& blueprint,
+                                        const URITemplate& uri) {
 
-            for (ResourceGroupIterator it = blueprint.resourceGroups.begin();
-                  it != blueprint.resourceGroups.end();
+            for (Elements::const_iterator it = blueprint.content.elements().begin();
+                  it != blueprint.content.elements().end();
                   ++it) {
 
-                ResourceIterator match = SectionProcessor<Resource>::findResource(it->resources, resource);
+                if (it->element == Element::CategoryElement &&
+                    SectionProcessor<Resource>::isResourceDuplicate(it->content.elements(), uri)) {
 
-                if (match != it->resources.end()) {
-                    return std::make_pair(it, match);
+                    return true;
                 }
-             }
+            }
 
-             return std::make_pair(blueprint.resourceGroups.end(), ResourceIterator());
+            return false;
+        }
+
+        /**
+         * \brief Given list of elements, return true if none of them is a resource element
+         *
+         * \param elements Collection of elements
+         */
+        static bool isResourcePresent(const Elements& elements) {
+
+            for (Elements::const_iterator it = elements.begin(); it != elements.end(); ++it) {
+
+                if (it->element == Element::ResourceElement) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /**
+         * \brief Given list of elements, get the last resource
+         *
+         * \param elements Collection fo elements
+         */
+        static Resource lastResource(const Elements& elements) {
+
+            Resource last;
+
+            for (Elements::const_iterator it = elements.begin(); it != elements.end(); ++it) {
+
+                if (it->element == Element::ResourceElement) {
+                    last = it->content.resource;
+                }
+            }
+
+            return last;
         }
     };
 

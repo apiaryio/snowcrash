@@ -101,20 +101,17 @@ namespace snowcrash {
                 pd.sectionContext() == ResourceSectionType) {
 
                 IntermediateParseResult<ResourceGroup> resourceGroup(out.report);
+                cur = ResourceGroupParser::parse(node, siblings, pd, resourceGroup);
 
-                MarkdownNodeIterator cur = ResourceGroupParser::parse(node, siblings, pd, resourceGroup);
-
-                ResourceGroupIterator duplicate = findResourceGroup(out.node.resourceGroups, resourceGroup.node);
-
-                if (duplicate != out.node.resourceGroups.end()) {
+                if (isResourceGroupDuplicate(out.node, resourceGroup.node.attributes.name)) {
 
                     // WARN: duplicate resource group
                     std::stringstream ss;
 
-                    if (resourceGroup.node.name.empty()) {
+                    if (resourceGroup.node.attributes.name.empty()) {
                         ss << "anonymous group";
                     } else {
-                        ss << "group '" << resourceGroup.node.name << "'";
+                        ss << "group '" << resourceGroup.node.attributes.name << "'";
                     }
 
                     ss << " is already defined";
@@ -125,13 +122,11 @@ namespace snowcrash {
                                                           sourceMap));
                 }
 
-                out.node.resourceGroups.push_back(resourceGroup.node);
+                out.node.content.elements().push_back(resourceGroup.node);
 
                 if (pd.exportSourceMap()) {
-                    out.sourceMap.resourceGroups.collection.push_back(resourceGroup.sourceMap);
+                    out.sourceMap.content.elements().collection.push_back(resourceGroup.sourceMap);
                 }
-
-                return cur;
             }
             else if (pd.sectionContext() == DataStructureGroupSectionType) {
 
@@ -457,13 +452,23 @@ namespace snowcrash {
             }
         }
 
-        /** Finds a resource group inside an resource groups collection */
-        static ResourceGroupIterator findResourceGroup(const ResourceGroups& resourceGroups,
-                                                       const ResourceGroup& resourceGroup) {
+        /**
+         * \brief Check if a resource group already exists with the given name
+         *
+         * \param blueprint The blueprint which is formed until now
+         * \param name The resource group name to be checked
+         */
+        static bool isResourceGroupDuplicate(const Blueprint& blueprint,
+                                             mdp::ByteBuffer& name) {
 
-            return std::find_if(resourceGroups.begin(),
-                                resourceGroups.end(),
-                                std::bind2nd(MatchName<ResourceGroup>(), resourceGroup));
+            for (Elements::const_iterator it = blueprint.content.elements().begin();
+                 it != blueprint.content.elements().end();
+                 ++it) {
+
+                // TODO: Distinguish resource group using metadata
+            }
+
+            return false;
         }
 
         /**

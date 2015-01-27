@@ -55,22 +55,20 @@ TEST_CASE("Parse canonical resource group", "[resource_group]")
     REQUIRE(resourceGroup.report.error.code == Error::OK);
     REQUIRE(resourceGroup.report.warnings.empty());
 
-    REQUIRE(resourceGroup.node.name == "First");
-    REQUIRE(resourceGroup.node.description == "Fiber Optics\n\n");
-    REQUIRE(resourceGroup.node.resources.size() == 1);
-    REQUIRE(resourceGroup.node.resources.front().uriTemplate == "/resource/{id}");
-    REQUIRE(resourceGroup.node.resources.front().name == "My Resource");
+    REQUIRE(resourceGroup.node.attributes.name == "First");
+    REQUIRE(resourceGroup.node.element == Element::CategoryElement);
+    REQUIRE(resourceGroup.node.content.elements().size() == 2);
 
-    REQUIRE(resourceGroup.sourceMap.name.sourceMap.size() == 1);
-    REQUIRE(resourceGroup.sourceMap.name.sourceMap[0].location == 0);
-    REQUIRE(resourceGroup.sourceMap.name.sourceMap[0].length == 15);
-    REQUIRE(resourceGroup.sourceMap.description.sourceMap.size() == 1);
-    REQUIRE(resourceGroup.sourceMap.description.sourceMap[0].location == 15);
-    REQUIRE(resourceGroup.sourceMap.description.sourceMap[0].length == 14);
-    REQUIRE(resourceGroup.sourceMap.resources.collection.size() == 1);
-    REQUIRE(resourceGroup.sourceMap.resources.collection[0].name.sourceMap.size() == 1);
-    REQUIRE(resourceGroup.sourceMap.resources.collection[0].name.sourceMap[0].location == 29);
-    REQUIRE(resourceGroup.sourceMap.resources.collection[0].name.sourceMap[0].length == 32);
+    REQUIRE(resourceGroup.node.content.elements().at(0).element == Element::CopyElement);
+    REQUIRE(resourceGroup.node.content.elements().at(0).content.copy == "Fiber Optics\n\n");
+
+    REQUIRE(resourceGroup.node.content.elements().at(1).element == Element::ResourceElement);
+    REQUIRE(resourceGroup.node.content.elements().at(1).content.resource.uriTemplate == "/resource/{id}");
+    REQUIRE(resourceGroup.node.content.elements().at(1).content.resource.name == "My Resource");
+
+    SourceMapHelper::check(resourceGroup.sourceMap.attributes.name.sourceMap, 0, 15);
+    SourceMapHelper::check(resourceGroup.sourceMap.content.elements().collection[0].content.copy.sourceMap, 15, 14);
+    SourceMapHelper::check(resourceGroup.sourceMap.content.elements().collection[1].content.resource.name.sourceMap, 29, 32);
 }
 
 TEST_CASE("Parse resource group with empty resource", "[resource_group]")
@@ -89,21 +87,19 @@ TEST_CASE("Parse resource group with empty resource", "[resource_group]")
     REQUIRE(resourceGroup.report.error.code == Error::OK);
     REQUIRE(resourceGroup.report.warnings.empty());
 
-    REQUIRE(resourceGroup.node.name == "Name");
-    REQUIRE(resourceGroup.node.description == "p1\n");
-    REQUIRE(resourceGroup.node.resources.size() == 1);
-    REQUIRE(resourceGroup.node.resources.front().uriTemplate == "/resource");
+    REQUIRE(resourceGroup.node.attributes.name == "Name");
+    REQUIRE(resourceGroup.node.element == Element::CategoryElement);
+    REQUIRE(resourceGroup.node.content.elements().size() == 2);
 
-    REQUIRE(resourceGroup.sourceMap.name.sourceMap.size() == 1);
-    REQUIRE(resourceGroup.sourceMap.name.sourceMap[0].location == 0);
-    REQUIRE(resourceGroup.sourceMap.name.sourceMap[0].length == 13);
-    REQUIRE(resourceGroup.sourceMap.description.sourceMap.size() == 1);
-    REQUIRE(resourceGroup.sourceMap.description.sourceMap[0].location == 13);
-    REQUIRE(resourceGroup.sourceMap.description.sourceMap[0].length == 3);
-    REQUIRE(resourceGroup.sourceMap.resources.collection.size() == 1);
-    REQUIRE(resourceGroup.sourceMap.resources.collection[0].uriTemplate.sourceMap.size() == 1);
-    REQUIRE(resourceGroup.sourceMap.resources.collection[0].uriTemplate.sourceMap[0].location == 16);
-    REQUIRE(resourceGroup.sourceMap.resources.collection[0].uriTemplate.sourceMap[0].length == 12);
+    REQUIRE(resourceGroup.node.content.elements().at(0).element == Element::CopyElement);
+    REQUIRE(resourceGroup.node.content.elements().at(0).content.copy == "p1\n");
+
+    REQUIRE(resourceGroup.node.content.elements().at(1).element == Element::ResourceElement);
+    REQUIRE(resourceGroup.node.content.elements().at(1).content.resource.uriTemplate == "/resource");
+
+    SourceMapHelper::check(resourceGroup.sourceMap.attributes.name.sourceMap, 0, 13);
+    SourceMapHelper::check(resourceGroup.sourceMap.content.elements().collection[0].content.copy.sourceMap, 13, 3);
+    SourceMapHelper::check(resourceGroup.sourceMap.content.elements().collection[1].content.resource.name.sourceMap, 16, 12);
 }
 
 TEST_CASE("Parse multiple resource in anonymous group", "[resource_group]")
@@ -124,17 +120,20 @@ TEST_CASE("Parse multiple resource in anonymous group", "[resource_group]")
     REQUIRE(resourceGroup.report.error.code == Error::OK);
     REQUIRE(resourceGroup.report.warnings.empty());
 
-    REQUIRE(resourceGroup.node.name.empty());
-    REQUIRE(resourceGroup.node.description.empty());
-    REQUIRE(resourceGroup.node.resources.size() == 2);
-    REQUIRE(resourceGroup.node.resources[0].uriTemplate == "/r1");
-    REQUIRE(resourceGroup.node.resources[0].description == "p1\n");
-    REQUIRE(resourceGroup.node.resources[1].uriTemplate == "/r2");
-    REQUIRE(resourceGroup.node.resources[1].description == "p2\n");
+    REQUIRE(resourceGroup.node.attributes.name.empty());
+    REQUIRE(resourceGroup.node.element == Element::CategoryElement);
+    REQUIRE(resourceGroup.node.content.elements().size() == 2);
 
-    REQUIRE(resourceGroup.sourceMap.name.sourceMap.empty());
-    REQUIRE(resourceGroup.sourceMap.description.sourceMap.empty());
-    REQUIRE(resourceGroup.sourceMap.resources.collection.size() == 2);
+    REQUIRE(resourceGroup.node.content.elements().at(0).element == Element::ResourceElement);
+    REQUIRE(resourceGroup.node.content.elements().at(0).content.resource.uriTemplate == "/r1");
+    REQUIRE(resourceGroup.node.content.elements().at(0).content.resource.description == "p1\n");
+
+    REQUIRE(resourceGroup.node.content.elements().at(1).element == Element::ResourceElement);
+    REQUIRE(resourceGroup.node.content.elements().at(1).content.resource.uriTemplate == "/r2");
+    REQUIRE(resourceGroup.node.content.elements().at(1).content.resource.description == "p2\n");
+
+    REQUIRE(resourceGroup.sourceMap.attributes.name.sourceMap.empty());
+    REQUIRE(resourceGroup.sourceMap.content.elements().collection.size() == 2);
 }
 
 TEST_CASE("Parse multiple resources with payloads", "[resource_group]")
@@ -157,11 +156,13 @@ TEST_CASE("Parse multiple resources with payloads", "[resource_group]")
     REQUIRE(resourceGroup.report.error.code == Error::OK);
     REQUIRE(resourceGroup.report.warnings.size() == 4);
 
-    REQUIRE(resourceGroup.node.name.empty());
-    REQUIRE(resourceGroup.node.description.empty());
-    REQUIRE(resourceGroup.node.resources.size() == 2);
+    REQUIRE(resourceGroup.node.attributes.name.empty());
+    REQUIRE(resourceGroup.node.element == Element::CategoryElement);
+    REQUIRE(resourceGroup.node.content.elements().size() == 2);
 
-    Resource resource1 = resourceGroup.node.resources[0];
+    REQUIRE(resourceGroup.node.content.elements().at(0).element == Element::ResourceElement);
+    Resource resource1 = resourceGroup.node.content.elements().at(0).content.resource;
+
     REQUIRE(resource1.uriTemplate == "/1");
     REQUIRE(resource1.description.empty());
     REQUIRE(resource1.actions.size() == 1);
@@ -174,7 +175,7 @@ TEST_CASE("Parse multiple resources with payloads", "[resource_group]")
     REQUIRE(resource1.actions[0].examples[0].requests[0].assets.body.source.empty());
     REQUIRE(resource1.actions[0].examples[0].responses.empty());
 
-    Resource resource2 = resourceGroup.node.resources[1];
+    Resource resource2 = resourceGroup.node.content.elements().at(1).content.resource;
     REQUIRE(resource2.uriTemplate == "/2");
     REQUIRE(resource2.description.empty());
     REQUIRE(resource2.actions.size() == 1);
@@ -186,9 +187,8 @@ TEST_CASE("Parse multiple resources with payloads", "[resource_group]")
     REQUIRE(resource2.actions[0].examples[0].requests[0].assets.body.source.empty());
     REQUIRE(resource2.actions[0].examples[0].responses.empty());
 
-    REQUIRE(resourceGroup.sourceMap.name.sourceMap.empty());
-    REQUIRE(resourceGroup.sourceMap.description.sourceMap.empty());
-    REQUIRE(resourceGroup.sourceMap.resources.collection.size() == 2);
+    REQUIRE(resourceGroup.sourceMap.attributes.name.sourceMap.empty());
+    REQUIRE(resourceGroup.sourceMap.content.elements().collection.size() == 2);
 }
 
 TEST_CASE("Parse multiple resources with the same name", "[resource_group]")
@@ -208,13 +208,12 @@ TEST_CASE("Parse multiple resources with the same name", "[resource_group]")
     REQUIRE(resourceGroup.report.warnings.size() == 1);
     REQUIRE(resourceGroup.report.warnings[0].code == DuplicateWarning);
 
-    REQUIRE(resourceGroup.node.name.empty());
-    REQUIRE(resourceGroup.node.description.empty());
-    REQUIRE(resourceGroup.node.resources.size() == 2);
+    REQUIRE(resourceGroup.node.attributes.name.empty());
+    REQUIRE(resourceGroup.node.element == Element::CategoryElement);
+    REQUIRE(resourceGroup.node.content.elements().size() == 2);
 
-    REQUIRE(resourceGroup.sourceMap.name.sourceMap.empty());
-    REQUIRE(resourceGroup.sourceMap.description.sourceMap.empty());
-    REQUIRE(resourceGroup.sourceMap.resources.collection.size() == 2);
+    REQUIRE(resourceGroup.sourceMap.attributes.name.sourceMap.empty());
+    REQUIRE(resourceGroup.sourceMap.content.elements().collection.size() == 2);
 }
 
 TEST_CASE("Parse resource with list in its description", "[resource_group]")
@@ -236,19 +235,21 @@ TEST_CASE("Parse resource with list in its description", "[resource_group]")
     REQUIRE(resourceGroup.report.error.code == Error::OK);
     REQUIRE(resourceGroup.report.warnings.size() == 3);   // preformatted asset & ignoring unrecognized node & no response
 
-    REQUIRE(resourceGroup.node.name.empty());
-    REQUIRE(resourceGroup.node.description.empty());
-    REQUIRE(resourceGroup.node.resources.size() == 1);
-    REQUIRE(resourceGroup.node.resources[0].uriTemplate == "/1");
-    REQUIRE(resourceGroup.node.resources[0].description.empty());
-    REQUIRE(resourceGroup.node.resources[0].actions.size() == 1);
-    REQUIRE(resourceGroup.node.resources[0].actions[0].method == "GET");
-    REQUIRE(resourceGroup.node.resources[0].actions[0].description == "");
-    REQUIRE(resourceGroup.node.resources[0].actions[0].examples.size() == 1);
+    REQUIRE(resourceGroup.node.attributes.name.empty());
+    REQUIRE(resourceGroup.node.element == Element::CategoryElement);
+    REQUIRE(resourceGroup.node.content.elements().size() == 1);
+    REQUIRE(resourceGroup.node.content.elements().at(0).element == Element::ResourceElement);
 
-    REQUIRE(resourceGroup.sourceMap.name.sourceMap.empty());
-    REQUIRE(resourceGroup.sourceMap.description.sourceMap.empty());
-    REQUIRE(resourceGroup.sourceMap.resources.collection.size() == 1);
+    Resource resource = resourceGroup.node.content.elements().at(0).content.resource;
+    REQUIRE(resource.uriTemplate == "/1");
+    REQUIRE(resource.description.empty());
+    REQUIRE(resource.actions.size() == 1);
+    REQUIRE(resource.actions[0].method == "GET");
+    REQUIRE(resource.actions[0].description == "");
+    REQUIRE(resource.actions[0].examples.size() == 1);
+
+    REQUIRE(resourceGroup.sourceMap.attributes.name.sourceMap.empty());
+    REQUIRE(resourceGroup.sourceMap.content.elements().collection.size() == 1);
 }
 
 TEST_CASE("Parse resource groups with hr in description", "[resource_group]")
@@ -267,17 +268,14 @@ TEST_CASE("Parse resource groups with hr in description", "[resource_group]")
     REQUIRE(resourceGroup.report.error.code == Error::OK);
     REQUIRE(resourceGroup.report.warnings.empty());
 
-    REQUIRE(resourceGroup.node.name == "1");
-    REQUIRE(resourceGroup.node.description == "---\n\nA\n");
-    REQUIRE(resourceGroup.node.resources.empty());
+    REQUIRE(resourceGroup.node.attributes.name == "1");
+    REQUIRE(resourceGroup.node.element == Element::CategoryElement);
+    REQUIRE(resourceGroup.node.content.elements().size() == 1);
+    REQUIRE(resourceGroup.node.content.elements().at(0).element == Element::CopyElement);
+    REQUIRE(resourceGroup.node.content.elements().at(0).content.copy == "---\n\nA\n");
 
-    REQUIRE(resourceGroup.sourceMap.name.sourceMap.size() == 1);
-    REQUIRE(resourceGroup.sourceMap.name.sourceMap[0].location == 0);
-    REQUIRE(resourceGroup.sourceMap.name.sourceMap[0].length == 10);
-    REQUIRE(resourceGroup.sourceMap.description.sourceMap.size() == 1);
-    REQUIRE(resourceGroup.sourceMap.description.sourceMap[0].location == 10);
-    REQUIRE(resourceGroup.sourceMap.description.sourceMap[0].length == 6);
-    REQUIRE(resourceGroup.sourceMap.resources.collection.empty());
+    SourceMapHelper::check(resourceGroup.sourceMap.attributes.name.sourceMap, 0, 10);
+    SourceMapHelper::check(resourceGroup.sourceMap.content.elements().collection[0].content.copy.sourceMap, 10, 6);
 }
 
 TEST_CASE("Make sure method followed by a group does not eat the group", "[resource_group]")
@@ -297,19 +295,19 @@ TEST_CASE("Make sure method followed by a group does not eat the group", "[resou
     REQUIRE(resourceGroup.report.error.code == Error::OK);
     REQUIRE(resourceGroup.report.warnings.size() == 1); // no response
 
-    REQUIRE(resourceGroup.node.name == "One");
-    REQUIRE(resourceGroup.node.description.empty());
-    REQUIRE(resourceGroup.node.resources.size() == 1);
-    REQUIRE(resourceGroup.node.resources[0].uriTemplate == "/1");
-    REQUIRE(resourceGroup.node.resources[0].actions.size() == 1);
-    REQUIRE(resourceGroup.node.resources[0].actions[0].method == "POST");
-    REQUIRE(resourceGroup.node.resources[0].actions[0].description.empty());
+    REQUIRE(resourceGroup.node.attributes.name == "One");
+    REQUIRE(resourceGroup.node.element == Element::CategoryElement);
+    REQUIRE(resourceGroup.node.content.elements().size() == 1);
+    REQUIRE(resourceGroup.node.content.elements().at(0).element == Element::ResourceElement);
 
-    REQUIRE(resourceGroup.sourceMap.name.sourceMap.size() == 1);
-    REQUIRE(resourceGroup.sourceMap.name.sourceMap[0].location == 0);
-    REQUIRE(resourceGroup.sourceMap.name.sourceMap[0].length == 12);
-    REQUIRE(resourceGroup.sourceMap.description.sourceMap.empty());
-    REQUIRE(resourceGroup.sourceMap.resources.collection.size() == 1);
+    Resource resource = resourceGroup.node.content.elements().at(0).content.resource;
+    REQUIRE(resource.uriTemplate == "/1");
+    REQUIRE(resource.actions.size() == 1);
+    REQUIRE(resource.actions[0].method == "POST");
+    REQUIRE(resource.actions[0].description.empty());
+
+    SourceMapHelper::check(resourceGroup.sourceMap.attributes.name.sourceMap, 0, 12);
+    REQUIRE(resourceGroup.sourceMap.content.elements().collection.size() == 1);
 }
 
 TEST_CASE("Parse resource method abbreviation followed by a foreign method", "[resource_group]")
@@ -329,19 +327,21 @@ TEST_CASE("Parse resource method abbreviation followed by a foreign method", "[r
     REQUIRE(resourceGroup.report.warnings[0].code == EmptyDefinitionWarning);
     REQUIRE(resourceGroup.report.warnings[1].code == IgnoringWarning);
 
-    REQUIRE(resourceGroup.node.name.empty());
-    REQUIRE(resourceGroup.node.description.empty());
-    REQUIRE(resourceGroup.node.resources.size() == 1);
-    REQUIRE(resourceGroup.node.resources[0].name.empty());
-    REQUIRE(resourceGroup.node.resources[0].uriTemplate == "/resource");
-    REQUIRE(resourceGroup.node.resources[0].model.name.empty());
-    REQUIRE(resourceGroup.node.resources[0].model.assets.body.source.empty());
-    REQUIRE(resourceGroup.node.resources[0].actions.size() == 1);
-    REQUIRE(resourceGroup.node.resources[0].actions[0].method == "GET");
+    REQUIRE(resourceGroup.node.attributes.name.empty());
+    REQUIRE(resourceGroup.node.element == Element::CategoryElement);
+    REQUIRE(resourceGroup.node.content.elements().size() == 1);
+    REQUIRE(resourceGroup.node.content.elements().at(0).element == Element::ResourceElement);
 
-    REQUIRE(resourceGroup.sourceMap.name.sourceMap.empty());
-    REQUIRE(resourceGroup.sourceMap.description.sourceMap.empty());
-    REQUIRE(resourceGroup.sourceMap.resources.collection.size() == 1);
+    Resource resource = resourceGroup.node.content.elements().at(0).content.resource;
+    REQUIRE(resource.name.empty());
+    REQUIRE(resource.uriTemplate == "/resource");
+    REQUIRE(resource.model.name.empty());
+    REQUIRE(resource.model.assets.body.source.empty());
+    REQUIRE(resource.actions.size() == 1);
+    REQUIRE(resource.actions[0].method == "GET");
+
+    REQUIRE(resourceGroup.sourceMap.attributes.name.sourceMap.empty());
+    REQUIRE(resourceGroup.sourceMap.content.elements().collection.size() == 1);
 }
 
 TEST_CASE("Parse resource method abbreviation followed by another", "[resource_group]")
@@ -361,27 +361,30 @@ TEST_CASE("Parse resource method abbreviation followed by another", "[resource_g
     REQUIRE(resourceGroup.report.warnings[0].code == EmptyDefinitionWarning);
     REQUIRE(resourceGroup.report.warnings[1].code == EmptyDefinitionWarning);
 
-    REQUIRE(resourceGroup.node.name.empty());
-    REQUIRE(resourceGroup.node.description.empty());
-    REQUIRE(resourceGroup.node.resources.size() == 2);
-    REQUIRE(resourceGroup.node.resources[0].name.empty());
-    REQUIRE(resourceGroup.node.resources[0].uriTemplate == "/resource");
-    REQUIRE(resourceGroup.node.resources[0].model.name.empty());
-    REQUIRE(resourceGroup.node.resources[0].model.assets.body.source.empty());
-    REQUIRE(resourceGroup.node.resources[0].actions.size() == 1);
-    REQUIRE(resourceGroup.node.resources[0].actions[0].method == "GET");
-    REQUIRE(resourceGroup.node.resources[1].name.empty());
-    REQUIRE(resourceGroup.node.resources[1].uriTemplate == "/2");
-    REQUIRE(resourceGroup.node.resources[1].model.name.empty());
-    REQUIRE(resourceGroup.node.resources[1].model.assets.body.source.empty());
-    REQUIRE(resourceGroup.node.resources[1].actions.size() == 1);
-    REQUIRE(resourceGroup.node.resources[1].actions[0].method == "POST");
+    REQUIRE(resourceGroup.node.attributes.name.empty());
+    REQUIRE(resourceGroup.node.element == Element::CategoryElement);
+    REQUIRE(resourceGroup.node.content.elements().size() == 2);
+    REQUIRE(resourceGroup.node.content.elements().at(0).element == Element::ResourceElement);
+    REQUIRE(resourceGroup.node.content.elements().at(1).element == Element::ResourceElement);
 
-    REQUIRE(resourceGroup.sourceMap.name.sourceMap.empty());
-    REQUIRE(resourceGroup.sourceMap.description.sourceMap.empty());
-    REQUIRE(resourceGroup.sourceMap.resources.collection.size() == 2);
-    REQUIRE(resourceGroup.sourceMap.resources.collection[0].actions.collection.size() == 1);
-    REQUIRE(resourceGroup.sourceMap.resources.collection[1].actions.collection.size() == 1);
+    Resource resource = resourceGroup.node.content.elements().at(0).content.resource;
+    REQUIRE(resource.name.empty());
+    REQUIRE(resource.uriTemplate == "/resource");
+    REQUIRE(resource.model.name.empty());
+    REQUIRE(resource.model.assets.body.source.empty());
+    REQUIRE(resource.actions.size() == 1);
+    REQUIRE(resource.actions[0].method == "GET");
+
+    resource = resourceGroup.node.content.elements().at(1).content.resource;
+    REQUIRE(resource.name.empty());
+    REQUIRE(resource.uriTemplate == "/2");
+    REQUIRE(resource.model.name.empty());
+    REQUIRE(resource.model.assets.body.source.empty());
+    REQUIRE(resource.actions.size() == 1);
+    REQUIRE(resource.actions[0].method == "POST");
+
+    REQUIRE(resourceGroup.sourceMap.attributes.name.sourceMap.empty());
+    REQUIRE(resourceGroup.sourceMap.content.elements().collection.size() == 2);
 }
 
 TEST_CASE("Resource followed by a complete action", "[resource_group][regression][#185]")
@@ -400,32 +403,33 @@ TEST_CASE("Resource followed by a complete action", "[resource_group][regression
     REQUIRE(resourceGroup.report.error.code == Error::OK);
     REQUIRE(resourceGroup.report.warnings.empty());
 
-    REQUIRE(resourceGroup.node.name.empty());
-    REQUIRE(resourceGroup.node.description.empty());
+    REQUIRE(resourceGroup.node.attributes.name.empty());
+    REQUIRE(resourceGroup.node.element == Element::CategoryElement);
+    REQUIRE(resourceGroup.node.content.elements().size() == 2);
+    REQUIRE(resourceGroup.node.content.elements().at(0).element == Element::ResourceElement);
+    REQUIRE(resourceGroup.node.content.elements().at(1).element == Element::ResourceElement);
 
-    REQUIRE(resourceGroup.node.resources.size() == 2);
-    REQUIRE(resourceGroup.node.resources[0].name == "Resource");
-    REQUIRE(resourceGroup.node.resources[0].uriTemplate == "/A");
-    REQUIRE(resourceGroup.node.resources[1].name.empty());
-    REQUIRE(resourceGroup.node.resources[1].uriTemplate == "/B");
-    REQUIRE(resourceGroup.node.resources[1].actions.size() == 1);
-    REQUIRE(resourceGroup.node.resources[1].actions[0].method == "POST");
+    Resource resource = resourceGroup.node.content.elements().at(0).content.resource;
+    REQUIRE(resource.name == "Resource");
+    REQUIRE(resource.uriTemplate == "/A");
 
-    REQUIRE(resourceGroup.sourceMap.resources.collection.size() == 2);
-    REQUIRE(resourceGroup.sourceMap.resources.collection[0].name.sourceMap.size() == 1);
-    REQUIRE(resourceGroup.sourceMap.resources.collection[0].name.sourceMap[0].location == 0);
-    REQUIRE(resourceGroup.sourceMap.resources.collection[0].name.sourceMap[0].length == 16);
-    REQUIRE(resourceGroup.sourceMap.resources.collection[0].uriTemplate.sourceMap.size() == 1);
-    REQUIRE(resourceGroup.sourceMap.resources.collection[0].uriTemplate.sourceMap[0].location == 0);
-    REQUIRE(resourceGroup.sourceMap.resources.collection[0].uriTemplate.sourceMap[0].length == 16);
-    REQUIRE(resourceGroup.sourceMap.resources.collection[1].name.sourceMap.empty());
-    REQUIRE(resourceGroup.sourceMap.resources.collection[1].uriTemplate.sourceMap.size() == 1);
-    REQUIRE(resourceGroup.sourceMap.resources.collection[1].uriTemplate.sourceMap[0].location == 16);
-    REQUIRE(resourceGroup.sourceMap.resources.collection[1].uriTemplate.sourceMap[0].length == 10);
-    REQUIRE(resourceGroup.sourceMap.resources.collection[1].actions.collection.size() == 1);
-    REQUIRE(resourceGroup.sourceMap.resources.collection[1].actions.collection[0].method.sourceMap.size() == 1);
-    REQUIRE(resourceGroup.sourceMap.resources.collection[1].actions.collection[0].method.sourceMap[0].location == 16);
-    REQUIRE(resourceGroup.sourceMap.resources.collection[1].actions.collection[0].method.sourceMap[0].length == 10);
+    resource = resourceGroup.node.content.elements().at(1).content.resource;
+    REQUIRE(resource.name.empty());
+    REQUIRE(resource.uriTemplate == "/B");
+    REQUIRE(resource.actions.size() == 1);
+    REQUIRE(resource.actions[0].method == "POST");
+
+    SourceMap<Resource> resourceSM = resourceGroup.sourceMap.content.elements().collection[0].content.resource;
+    SourceMapHelper::check(resourceSM.name.sourceMap, 0, 16);
+    SourceMapHelper::check(resourceSM.uriTemplate.sourceMap, 0, 16);
+
+    resourceSM = resourceGroup.sourceMap.content.elements().collection[1].content.resource;
+    REQUIRE(resourceSM.name.sourceMap.empty());
+    SourceMapHelper::check(resourceSM.uriTemplate.sourceMap, 16, 10);
+    REQUIRE(resourceSM.actions.collection.size() == 1);
+    REQUIRE(resourceSM.actions.collection[0].method.sourceMap.size() == 1);
+    REQUIRE(resourceSM.actions.collection[0].method.sourceMap[0].location == 16);
+    REQUIRE(resourceSM.actions.collection[0].method.sourceMap[0].length == 10);
 }
 
 TEST_CASE("Too eager complete action processing", "[resource_group][regression][#187]")
@@ -448,10 +452,11 @@ TEST_CASE("Too eager complete action processing", "[resource_group][regression][
     REQUIRE(resourceGroup.report.error.code == Error::OK);
     REQUIRE(resourceGroup.report.warnings.empty());
 
-    REQUIRE(resourceGroup.node.name == "A");
-    REQUIRE(resourceGroup.node.description == "```\nGET /A\n```\n\nLorem Ipsum\n");
+    REQUIRE(resourceGroup.node.attributes.name == "A");
+    REQUIRE(resourceGroup.node.element == Element::CategoryElement);
+    REQUIRE(resourceGroup.node.content.elements().size() == 1);
+    REQUIRE(resourceGroup.node.content.elements().at(0).element == Element::CopyElement);
+    REQUIRE(resourceGroup.node.content.elements().at(0).content.copy == "```\nGET /A\n```\n\nLorem Ipsum\n");
 
-    REQUIRE(resourceGroup.sourceMap.description.sourceMap.size() == 1);
-    REQUIRE(resourceGroup.sourceMap.description.sourceMap[0].location == 11);
-    REQUIRE(resourceGroup.sourceMap.description.sourceMap[0].length == 28);
+    SourceMapHelper::check(resourceGroup.sourceMap.content.elements().collection[0].content.copy.sourceMap, 11, 28);
 }

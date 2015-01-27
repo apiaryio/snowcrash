@@ -570,30 +570,32 @@ TEST_CASE("Parse named resource with lazy referencing", "[resource][model][issue
     REQUIRE(blueprint.node.name == "api name");
     REQUIRE(blueprint.node.description == "");
 
-    REQUIRE(blueprint.node.resourceGroups.size() == 1);
-    REQUIRE(blueprint.node.resourceGroups[0].resources.size() == 2);
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].uriTemplate == "/1");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].name == "Resource 1");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].name == "Resource 1");
+    REQUIRE(blueprint.node.content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 2);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).element == Element::ResourceElement);
 
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions.size() == 1);
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].method == "GET");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].name == "Retrieve");
+    Resource resource = blueprint.node.content.elements().at(0).content.elements().at(0).content.resource;
+    REQUIRE(resource.uriTemplate == "/1");
+    REQUIRE(resource.name == "Resource 1");
 
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples.size() == 1);
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].assets.body.source == "`resource model` 2\n");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers.size() == 1);
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[0].first == "Content-Type");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[0].second == "text/plain");
+    REQUIRE(resource.actions.size() == 1);
+    REQUIRE(resource.actions[0].method == "GET");
+    REQUIRE(resource.actions[0].name == "Retrieve");
 
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].reference.id == "Resource 2");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].reference.type == Reference::ModelReference);
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].reference.meta.state == Reference::StateResolved);
+    REQUIRE(resource.actions[0].examples.size() == 1);
+    REQUIRE(resource.actions[0].examples[0].responses.size() == 1);
+    REQUIRE(resource.actions[0].examples[0].responses[0].name == "200");
+    REQUIRE(resource.actions[0].examples[0].responses[0].assets.body.source == "`resource model` 2\n");
+    REQUIRE(resource.actions[0].examples[0].responses[0].headers.size() == 1);
+    REQUIRE(resource.actions[0].examples[0].responses[0].headers[0].first == "Content-Type");
+    REQUIRE(resource.actions[0].examples[0].responses[0].headers[0].second == "text/plain");
 
-    SourceMap<Resources> resourcesSourceMap = blueprint.sourceMap.resourceGroups.collection[0].resources;
-    SourceMap<TransactionExamples> examplesSourceMap = resourcesSourceMap.collection[0].actions.collection[0].examples;
+    REQUIRE(resource.actions[0].examples[0].responses[0].reference.id == "Resource 2");
+    REQUIRE(resource.actions[0].examples[0].responses[0].reference.type == Reference::ModelReference);
+    REQUIRE(resource.actions[0].examples[0].responses[0].reference.meta.state == Reference::StateResolved);
+
+    SourceMap<TransactionExamples> examplesSourceMap = blueprint.sourceMap.content.elements().collection[0].content.elements().collection[0].content.resource.actions.collection[0].examples;
 
     REQUIRE(examplesSourceMap.collection[0].responses.collection[0].headers.collection[0].sourceMap.size() == 1);
     REQUIRE(examplesSourceMap.collection[0].responses.collection[0].headers.collection[0].sourceMap[0].length == 20);
@@ -637,36 +639,40 @@ TEST_CASE("Parse named resource with lazy referencing with both response and req
     REQUIRE(blueprint.node.name == "API");
     REQUIRE(blueprint.node.description == "");
 
-    REQUIRE(blueprint.node.resourceGroups.size() == 1);
-    REQUIRE(blueprint.node.resourceGroups[0].resources.size() == 2);
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].uriTemplate == "/items");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].name == "Collection of Items");
+    REQUIRE(blueprint.node.content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 2);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).element == Element::ResourceElement);
 
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions.size() == 1);
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].method == "POST");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].name == "Create New Item");
+    Resource resource = blueprint.node.content.elements().at(0).content.elements().at(0).content.resource;
+    REQUIRE(resource.uriTemplate == "/items");
+    REQUIRE(resource.name == "Collection of Items");
 
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples.size() == 1);
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].requests.size() == 1);
+    REQUIRE(resource.actions.size() == 1);
+    REQUIRE(resource.actions[0].method == "POST");
+    REQUIRE(resource.actions[0].name == "Create New Item");
 
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].requests[0].name == "");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].requests[0].assets.body.source == "{ item }\n");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].requests[0].headers.size() == 1);
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].requests[0].headers[0].first == "Content-Type");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].requests[0].headers[0].second == "application/json");
+    REQUIRE(resource.actions[0].examples.size() == 1);
+    REQUIRE(resource.actions[0].examples[0].requests.size() == 1);
 
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].requests[0].reference.id == "Item");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].requests[0].reference.type == Reference::ModelReference);
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].requests[0].reference.meta.state == Reference::StateResolved);
+    REQUIRE(resource.actions[0].examples[0].requests[0].name == "");
+    REQUIRE(resource.actions[0].examples[0].requests[0].assets.body.source == "{ item }\n");
+    REQUIRE(resource.actions[0].examples[0].requests[0].headers.size() == 1);
+    REQUIRE(resource.actions[0].examples[0].requests[0].headers[0].first == "Content-Type");
+    REQUIRE(resource.actions[0].examples[0].requests[0].headers[0].second == "application/json");
 
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].assets.body.source == "[ { item 1 }, { item 2 } ]\n");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers.size() == 1);
+    REQUIRE(resource.actions[0].examples[0].requests[0].reference.id == "Item");
+    REQUIRE(resource.actions[0].examples[0].requests[0].reference.type == Reference::ModelReference);
+    REQUIRE(resource.actions[0].examples[0].requests[0].reference.meta.state == Reference::StateResolved);
 
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].reference.id == "Collection of Items");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].reference.type == Reference::ModelReference);
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].reference.meta.state == Reference::StateResolved);
+    REQUIRE(resource.actions[0].examples[0].responses.size() == 1);
+    REQUIRE(resource.actions[0].examples[0].responses[0].name == "200");
+    REQUIRE(resource.actions[0].examples[0].responses[0].assets.body.source == "[ { item 1 }, { item 2 } ]\n");
+    REQUIRE(resource.actions[0].examples[0].responses[0].headers.size() == 1);
+
+    REQUIRE(resource.actions[0].examples[0].responses[0].reference.id == "Collection of Items");
+    REQUIRE(resource.actions[0].examples[0].responses[0].reference.type == Reference::ModelReference);
+    REQUIRE(resource.actions[0].examples[0].responses[0].reference.meta.state == Reference::StateResolved);
 }
 
 TEST_CASE("Expect to have a warning when 100 responce's reference has a body", "[resource][model]")
