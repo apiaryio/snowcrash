@@ -74,10 +74,6 @@
         'ext/sos/src'
       ],
       'sources': [
-        'src/CBlueprint.cc',
-        'src/CBlueprint.h',
-        'src/CBlueprintSourcemap.cc',
-        'src/CBlueprintSourcemap.h',
         'src/CSourceAnnotation.cc',
         'src/CSourceAnnotation.h',
         'src/HTTP.cc',
@@ -93,10 +89,6 @@
         'src/Section.h',
         'src/Serialize.cc',
         'src/Serialize.h',
-        'src/SerializeAST.cc',
-        'src/SerializeAST.h',
-        'src/SerializeSourcemap.cc',
-        'src/SerializeSourcemap.h',
         'src/Signature.cc',
         'src/Signature.h',
         'src/snowcrash.cc',
@@ -193,7 +185,6 @@
         'test/test-UriTemplateParser.cc',
         'test/test-ValuesParser.cc',
         'test/test-Warnings.cc',
-        'test/test-csnowcrash.cc',
         'test/test-snowcrash.cc'
       ],
       'dependencies': [
