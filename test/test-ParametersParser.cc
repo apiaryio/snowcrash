@@ -295,15 +295,19 @@ TEST_CASE("Percentage encoded characters in parameter name ", "[parameters][perc
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
 
-    REQUIRE(blueprint.node.resourceGroups.size() == 1);
-    REQUIRE(blueprint.node.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions.size() == 1);
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].description.empty());
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].parameters.size() == 1);
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].parameters[0].name == "id%5b%5d");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].parameters[0].type == "oData");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].parameters[0].exampleValue == "substringof('homer', id)");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].parameters[0].description == "test");
+    REQUIRE(blueprint.node.content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).element == Element::ResourceElement);
+
+    Resource resource = blueprint.node.content.elements().at(0).content.elements().at(0).content.resource;
+    REQUIRE(resource.actions.size() == 1);
+    REQUIRE(resource.actions[0].description.empty());
+    REQUIRE(resource.actions[0].parameters.size() == 1);
+    REQUIRE(resource.actions[0].parameters[0].name == "id%5b%5d");
+    REQUIRE(resource.actions[0].parameters[0].type == "oData");
+    REQUIRE(resource.actions[0].parameters[0].exampleValue == "substringof('homer', id)");
+    REQUIRE(resource.actions[0].parameters[0].description == "test");
 }
 
 TEST_CASE("Invalid percentage encoded characters in parameter name ", "[invalid][parameters][percentageencoding][issue][#107]")

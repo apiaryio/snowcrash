@@ -259,7 +259,7 @@ namespace snowcrash {
 
             // Resource Group & descendants
             nested.push_back(ResourceGroupSectionType);
-            nested.push_back(DataStructuresSectionType);
+            nested.push_back(DataStructureGroupSectionType);
             SectionTypes types = SectionProcessor<ResourceGroup>::nestedSectionTypes();
             nested.insert(nested.end(), types.begin(), types.end());
 
@@ -271,6 +271,7 @@ namespace snowcrash {
                              const ParseResultRef<Blueprint>& out) {
 
             checkLazyReferencing(pd, out);
+            out.node.element = Element::CategoryElement;
 
             if (!out.node.name.empty())
                 return;
@@ -479,58 +480,66 @@ namespace snowcrash {
         static void checkLazyReferencing(SectionParserData& pd,
                                          const ParseResultRef<Blueprint>& out) {
 
-            Collection<SourceMap<ResourceGroup> >::iterator resourceGroupSourceMapIt;
+            Collection<SourceMap<Element> >::iterator elementSourceMapIt;
 
             if (pd.exportSourceMap()) {
-                resourceGroupSourceMapIt = out.sourceMap.resourceGroups.collection.begin();
+                elementSourceMapIt = out.sourceMap.content.elements().collection.begin();
             }
 
-            for (ResourceGroups::iterator resourceGroupIt = out.node.resourceGroups.begin();
-                 resourceGroupIt != out.node.resourceGroups.end();
-                 ++resourceGroupIt) {
+            for (Elements::iterator elementIt = out.node.content.elements().begin();
+                 elementIt != out.node.content.elements().end();
+                 ++elementIt) {
 
-                checkResourceLazyReferencing(*resourceGroupIt, resourceGroupSourceMapIt, pd, out);
+                if (elementIt->element != Element::CategoryElement) {
+                    continue;
+                }
+
+                checkResourceLazyReferencing(*elementIt, *elementSourceMapIt, pd, out);
 
                 if (pd.exportSourceMap()) {
-                    resourceGroupSourceMapIt++;
+                    elementSourceMapIt++;
                 }
             }
         }
 
         /** Traverses Resource Collection to resolve references with `Pending` state (Lazy referencing) */
-        static void checkResourceLazyReferencing(ResourceGroup& resourceGroup,
-                                                 Collection<SourceMap<ResourceGroup> >::iterator resourceGroupSourceMapIt,
+        static void checkResourceLazyReferencing(Element& element,
+                                                 SourceMap<Element>& elementSourceMap,
                                                  SectionParserData& pd,
                                                  const ParseResultRef<Blueprint>& out) {
 
-            Collection<SourceMap<Resource> >::iterator resourceSourceMapIt;
+            Collection<SourceMap<Element> >::iterator resourceElementSourceMapIt;
 
             if (pd.exportSourceMap()) {
-                resourceSourceMapIt = resourceGroupSourceMapIt->resources.collection.begin();
+                resourceElementSourceMapIt = elementSourceMap.content.elements().collection.begin();
             }
 
-            for (Resources::iterator resourceIt = resourceGroup.resources.begin();
-                 resourceIt != resourceGroup.resources.end();
-                 ++resourceIt) {
+            for (Elements::iterator resourceElementIt = element.content.elements().begin();
+                 resourceElementIt != element.content.elements().end();
+                 ++resourceElementIt) {
 
-                checkActionLazyReferencing(*resourceIt, resourceSourceMapIt, pd, out);
+                if (resourceElementIt->element != Element::ResourceElement) {
+                    continue;
+                }
+
+                checkActionLazyReferencing(resourceElementIt->content.resource, resourceElementSourceMapIt->content.resource, pd, out);
 
                 if (pd.exportSourceMap()) {
-                    resourceSourceMapIt++;
+                    resourceElementSourceMapIt++;
                 }
             }
         }
 
         /** Traverses Action Collection to resolve references with `Pending` state (Lazy referencing) */
         static void checkActionLazyReferencing(Resource& resource,
-                                               Collection<SourceMap<Resource> >::iterator resourceSourceMapIt,
+                                               SourceMap<Resource>& resourceSourceMap,
                                                SectionParserData& pd,
                                                const ParseResultRef<Blueprint>& out) {
 
             Collection<SourceMap<Action> >::iterator actionSourceMapIt;
 
             if (pd.exportSourceMap()) {
-                actionSourceMapIt = resourceSourceMapIt->actions.collection.begin();
+                actionSourceMapIt = resourceSourceMap.actions.collection.begin();
             }
 
             for (Actions::iterator actionIt = resource.actions.begin();

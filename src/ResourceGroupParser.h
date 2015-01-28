@@ -58,6 +58,41 @@ namespace snowcrash {
             return ++MarkdownNodeIterator(node);
         }
 
+        static MarkdownNodeIterator processDescription(const MarkdownNodeIterator& node,
+                                                       const MarkdownNodes& siblings,
+                                                       SectionParserData& pd,
+                                                       const ParseResultRef<ResourceGroup>& out) {
+
+            // Check for a description child element
+            if (out.node.content.elements().empty() ||
+                (!out.node.content.elements().empty() &&
+                 out.node.content.elements().back().element != Element::CopyElement)) {
+
+                Element description(Element::CopyElement);
+                out.node.content.elements().push_back(description);
+
+                if (pd.exportSourceMap()) {
+
+                    SourceMap<Element> descriptionSM;
+                    out.sourceMap.content.elements().collection.push_back(descriptionSM);
+                }
+            }
+
+            if (!out.node.content.elements().back().content.copy.empty()) {
+                TwoNewLines(out.node.content.elements().back().content.copy);
+            }
+
+            mdp::ByteBuffer content = mdp::MapBytesRangeSet(node->sourceMap, pd.sourceData);
+
+            if (pd.exportSourceMap() && !content.empty()) {
+                out.sourceMap.content.elements().collection.back().content.copy.sourceMap.append(node->sourceMap);
+            }
+
+            out.node.content.elements().back().content.copy += content;
+
+            return ++MarkdownNodeIterator(node);
+        }
+
         static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
                                                          const MarkdownNodes& siblings,
                                                          SectionParserData& pd,

@@ -87,6 +87,8 @@
         'src/MSONSourcemap.cc',
         'src/MSONTypeSectionParser.cc',
         'src/MSONValueMemberParser.cc',
+        'src/Blueprint.cc',
+        'src/BlueprintSourcemap.cc',
         'src/Section.cc',
         'src/Section.h',
         'src/Serialize.cc',

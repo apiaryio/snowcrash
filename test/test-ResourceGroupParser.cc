@@ -99,7 +99,7 @@ TEST_CASE("Parse resource group with empty resource", "[resource_group]")
 
     SourceMapHelper::check(resourceGroup.sourceMap.attributes.name.sourceMap, 0, 13);
     SourceMapHelper::check(resourceGroup.sourceMap.content.elements().collection[0].content.copy.sourceMap, 13, 3);
-    SourceMapHelper::check(resourceGroup.sourceMap.content.elements().collection[1].content.resource.name.sourceMap, 16, 12);
+    SourceMapHelper::check(resourceGroup.sourceMap.content.elements().collection[1].content.resource.uriTemplate.sourceMap, 16, 12);
 }
 
 TEST_CASE("Parse multiple resource in anonymous group", "[resource_group]")
