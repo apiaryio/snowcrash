@@ -582,7 +582,7 @@ sos::Object WrapAction(const Action& action)
     return actionObject;
 }
 
-sos::Object WrapResource(const Resource& resource)
+sos::Object WrapResource(const Resource& resource, bool printElementValue = false)
 {
     sos::Object resourceObject;
 
@@ -591,6 +591,11 @@ sos::Object WrapResource(const Resource& resource)
 
     // Description
     resourceObject.set(SerializeKey::Description, sos::String(resource.description));
+
+    // Element
+    if (printElementValue) {
+        resourceObject.set(SerializeKey::Element, WrapElementClass(Element::ResourceElement));
+    }
 
     // URI Template
     resourceObject.set(SerializeKey::URITemplate, sos::String(resource.uriTemplate));
@@ -668,15 +673,12 @@ sos::Object WrapElement(const Element& element)
 {
     // Resource Element is special case
     if (element.element == Element::ResourceElement) {
-
-        sos::Object resourceObject = WrapResource(element.content.resource);
-
-        resourceObject.set(SerializeKey::Element, WrapElementClass(element.element));
-
-        return resourceObject;
+        return WrapResource(element.content.resource, true);
     }
 
     sos::Object elementObject;
+
+    elementObject.set(SerializeKey::Element, WrapElementClass(element.element));
 
     if (!element.attributes.name.empty()) {
 
@@ -685,8 +687,6 @@ sos::Object WrapElement(const Element& element)
         attributes.set(SerializeKey::Name, sos::String(element.attributes.name));
         elementObject.set(SerializeKey::Attributes, attributes);
     }
-
-    elementObject.set(SerializeKey::Element, WrapElementClass(element.element));
 
     switch (element.element) {
         case Element::CopyElement:
