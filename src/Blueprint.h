@@ -406,6 +406,13 @@ namespace snowcrash {
             std::auto_ptr<Elements> m_elements;
         };
 
+        /** Type of Category element (parser internal flag) */
+        enum Category {
+            UndefinedCategory = 0,     // Unknown
+            ResourceGroupCategory,     // Resource Group
+            DataStructureGroupCategory // Data Structure Group
+        };
+
         /** Type of the element */
         Element::Class element;
 
@@ -414,6 +421,9 @@ namespace snowcrash {
 
         /** Content of the element */
         Element::Content content;
+
+        /** Type of Category element */
+        Element::Category category;
 
         /** Constructor */
         Element(const Element::Class& element_ = Element::UndefinedElement);

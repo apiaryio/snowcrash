@@ -77,6 +77,7 @@ namespace snowcrash {
                              const ParseResultRef<DataStructureGroup>& out) {
 
             out.node.element = Element::CategoryElement;
+            out.node.category = Element::DataStructureGroupCategory;
         }
 
         static SectionType sectionType(const MarkdownNodeIterator& node) {

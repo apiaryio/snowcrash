@@ -466,7 +466,12 @@ namespace snowcrash {
                  it != blueprint.content.elements().end();
                  ++it) {
 
-                // TODO: Distinguish resource group using metadata
+                if (it->element == Element::CategoryElement &&
+                    it->category == Element::ResourceGroupCategory &&
+                    it->attributes.name == name) {
+
+                    return true;
+                }
             }
 
             return false;
@@ -490,11 +495,9 @@ namespace snowcrash {
                  elementIt != out.node.content.elements().end();
                  ++elementIt) {
 
-                if (elementIt->element != Element::CategoryElement) {
-                    continue;
+                if (elementIt->element == Element::CategoryElement) {
+                    checkResourceLazyReferencing(*elementIt, *elementSourceMapIt, pd, out);
                 }
-
-                checkResourceLazyReferencing(*elementIt, *elementSourceMapIt, pd, out);
 
                 if (pd.exportSourceMap()) {
                     elementSourceMapIt++;
@@ -518,11 +521,9 @@ namespace snowcrash {
                  resourceElementIt != element.content.elements().end();
                  ++resourceElementIt) {
 
-                if (resourceElementIt->element != Element::ResourceElement) {
-                    continue;
+                if (resourceElementIt->element == Element::ResourceElement) {
+                    checkActionLazyReferencing(resourceElementIt->content.resource, resourceElementSourceMapIt->content.resource, pd, out);
                 }
-
-                checkActionLazyReferencing(resourceElementIt->content.resource, resourceElementSourceMapIt->content.resource, pd, out);
 
                 if (pd.exportSourceMap()) {
                     resourceElementSourceMapIt++;

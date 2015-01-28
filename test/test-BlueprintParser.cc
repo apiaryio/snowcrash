@@ -250,7 +250,7 @@ TEST_CASE("Parse two groups with the same name", "[blueprint]")
 
     REQUIRE(blueprint.node.content.elements().at(0).attributes.name == "Name");
     REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 1);
-    REQUIRE(blueprint.node.content.elements().at(0).element == Element::ResourceElement);
+    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
 
     REQUIRE(blueprint.node.content.elements().at(1).attributes.name == "Name");
     REQUIRE(blueprint.node.content.elements().at(1).content.elements().empty());

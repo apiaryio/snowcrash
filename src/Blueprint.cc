@@ -63,6 +63,7 @@ Element::Element(const Element& rhs)
     this->element = rhs.element;
     this->attributes = rhs.attributes;
     this->content = rhs.content;
+    this->category = rhs.category;
 }
 
 Element& Element::operator=(const Element& rhs)
@@ -70,6 +71,7 @@ Element& Element::operator=(const Element& rhs)
     this->element = rhs.element;
     this->attributes = rhs.attributes;
     this->content = rhs.content;
+    this->category = rhs.category;
 
     return *this;
 }

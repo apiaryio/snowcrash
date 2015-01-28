@@ -173,6 +173,7 @@ namespace snowcrash {
                              const ParseResultRef<ResourceGroup>& out) {
 
             out.node.element = Element::CategoryElement;
+            out.node.category = Element::ResourceGroupCategory;
         }
 
         static SectionType sectionType(const MarkdownNodeIterator& node) {
