@@ -11,7 +11,7 @@
 
 #include "ResourceParser.h"
 #include "ResourceGroupParser.h"
-#include "DataStructuresParser.h"
+#include "DataStructureGroupParser.h"
 #include "SectionParser.h"
 #include "RegexMatch.h"
 #include "CodeBlockUtility.h"
@@ -95,24 +95,23 @@ namespace snowcrash {
                                                          SectionParserData& pd,
                                                          const ParseResultRef<Blueprint>& out) {
 
+            MarkdownNodeIterator cur = node;
+
             if (pd.sectionContext() == ResourceGroupSectionType ||
                 pd.sectionContext() == ResourceSectionType) {
 
                 IntermediateParseResult<ResourceGroup> resourceGroup(out.report);
+                cur = ResourceGroupParser::parse(node, siblings, pd, resourceGroup);
 
-                MarkdownNodeIterator cur = ResourceGroupParser::parse(node, siblings, pd, resourceGroup);
-
-                ResourceGroupIterator duplicate = findResourceGroup(out.node.resourceGroups, resourceGroup.node);
-
-                if (duplicate != out.node.resourceGroups.end()) {
+                if (isResourceGroupDuplicate(out.node, resourceGroup.node.attributes.name)) {
 
                     // WARN: duplicate resource group
                     std::stringstream ss;
 
-                    if (resourceGroup.node.name.empty()) {
+                    if (resourceGroup.node.attributes.name.empty()) {
                         ss << "anonymous group";
                     } else {
-                        ss << "group '" << resourceGroup.node.name << "'";
+                        ss << "group '" << resourceGroup.node.attributes.name << "'";
                     }
 
                     ss << " is already defined";
@@ -123,21 +122,25 @@ namespace snowcrash {
                                                           sourceMap));
                 }
 
-                out.node.resourceGroups.push_back(resourceGroup.node);
+                out.node.content.elements().push_back(resourceGroup.node);
 
                 if (pd.exportSourceMap()) {
-                    out.sourceMap.resourceGroups.collection.push_back(resourceGroup.sourceMap);
+                    out.sourceMap.content.elements().collection.push_back(resourceGroup.sourceMap);
                 }
-
-                return cur;
             }
-            else if (pd.sectionContext() == DataStructuresSectionType) {
+            else if (pd.sectionContext() == DataStructureGroupSectionType) {
 
-                ParseResultRef<DataStructures> dataStructures(out.report, out.node.dataStructures, out.sourceMap.dataStructures);
-                return DataStructuresParser::parse(node, siblings, pd, dataStructures);
+                IntermediateParseResult<DataStructureGroup> dataStructureGroup(out.report);
+                cur = DataStructureGroupParser::parse(node, siblings, pd, dataStructureGroup);
+
+                out.node.content.elements().push_back(dataStructureGroup.node);
+
+                if (pd.exportSourceMap()) {
+                    out.sourceMap.content.elements().collection.push_back(dataStructureGroup.sourceMap);
+                }
             }
 
-            return node;
+            return cur;
         }
 
         /**
@@ -173,24 +176,24 @@ namespace snowcrash {
                     // If the current node is a Resource or DataStructures section, assign it as context
                     // Otherwise, make sure the current context is not DataStructures section and remove the context
                     if (sectionType == ResourceSectionType ||
-                        sectionType == DataStructuresSectionType) {
+                        sectionType == DataStructureGroupSectionType) {
 
                         contextSectionType = sectionType;
                         contextCur = cur;
                     }
-                    else if (contextSectionType != DataStructuresSectionType) {
+                    else if (contextSectionType != DataStructureGroupSectionType) {
 
                         contextSectionType = UndefinedSectionType;
                     }
 
                     // If context is DataStructures section, NamedTypes should be filled
-                    if (contextSectionType == DataStructuresSectionType) {
+                    if (contextSectionType == DataStructureGroupSectionType) {
 
                         if (sectionType != MSONSampleDefaultSectionType &&
                             sectionType != MSONPropertyMembersSectionType &&
                             sectionType != MSONValueMembersSectionType &&
                             sectionType != UndefinedSectionType &&
-                            sectionType != DataStructuresSectionType) {
+                            sectionType != DataStructureGroupSectionType) {
 
                             contextSectionType = UndefinedSectionType;
                         }
@@ -242,7 +245,7 @@ namespace snowcrash {
             }
 
             // Check if DataStructures section
-            nestedType = SectionProcessor<DataStructures>::sectionType(node);
+            nestedType = SectionProcessor<DataStructureGroup>::sectionType(node);
 
             if (nestedType != UndefinedSectionType) {
                 return nestedType;
@@ -256,7 +259,7 @@ namespace snowcrash {
 
             // Resource Group & descendants
             nested.push_back(ResourceGroupSectionType);
-            nested.push_back(DataStructuresSectionType);
+            nested.push_back(DataStructureGroupSectionType);
             SectionTypes types = SectionProcessor<ResourceGroup>::nestedSectionTypes();
             nested.insert(nested.end(), types.begin(), types.end());
 
@@ -268,6 +271,11 @@ namespace snowcrash {
                              const ParseResultRef<Blueprint>& out) {
 
             checkLazyReferencing(pd, out);
+            out.node.element = Element::CategoryElement;
+
+            if (pd.exportSourceMap()) {
+                out.sourceMap.element = out.node.element;
+            }
 
             if (!out.node.name.empty())
                 return;
@@ -449,13 +457,28 @@ namespace snowcrash {
             }
         }
 
-        /** Finds a resource group inside an resource groups collection */
-        static ResourceGroupIterator findResourceGroup(const ResourceGroups& resourceGroups,
-                                                       const ResourceGroup& resourceGroup) {
+        /**
+         * \brief Check if a resource group already exists with the given name
+         *
+         * \param blueprint The blueprint which is formed until now
+         * \param name The resource group name to be checked
+         */
+        static bool isResourceGroupDuplicate(const Blueprint& blueprint,
+                                             mdp::ByteBuffer& name) {
 
-            return std::find_if(resourceGroups.begin(),
-                                resourceGroups.end(),
-                                std::bind2nd(MatchName<ResourceGroup>(), resourceGroup));
+            for (Elements::const_iterator it = blueprint.content.elements().begin();
+                 it != blueprint.content.elements().end();
+                 ++it) {
+
+                if (it->element == Element::CategoryElement &&
+                    it->category == Element::ResourceGroupCategory &&
+                    it->attributes.name == name) {
+
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /**
@@ -466,58 +489,62 @@ namespace snowcrash {
         static void checkLazyReferencing(SectionParserData& pd,
                                          const ParseResultRef<Blueprint>& out) {
 
-            Collection<SourceMap<ResourceGroup> >::iterator resourceGroupSourceMapIt;
+            Collection<SourceMap<Element> >::iterator elementSourceMapIt;
 
             if (pd.exportSourceMap()) {
-                resourceGroupSourceMapIt = out.sourceMap.resourceGroups.collection.begin();
+                elementSourceMapIt = out.sourceMap.content.elements().collection.begin();
             }
 
-            for (ResourceGroups::iterator resourceGroupIt = out.node.resourceGroups.begin();
-                 resourceGroupIt != out.node.resourceGroups.end();
-                 ++resourceGroupIt) {
+            for (Elements::iterator elementIt = out.node.content.elements().begin();
+                 elementIt != out.node.content.elements().end();
+                 ++elementIt) {
 
-                checkResourceLazyReferencing(*resourceGroupIt, resourceGroupSourceMapIt, pd, out);
+                if (elementIt->element == Element::CategoryElement) {
+                    checkResourceLazyReferencing(*elementIt, *elementSourceMapIt, pd, out);
+                }
 
                 if (pd.exportSourceMap()) {
-                    resourceGroupSourceMapIt++;
+                    elementSourceMapIt++;
                 }
             }
         }
 
         /** Traverses Resource Collection to resolve references with `Pending` state (Lazy referencing) */
-        static void checkResourceLazyReferencing(ResourceGroup& resourceGroup,
-                                                 Collection<SourceMap<ResourceGroup> >::iterator resourceGroupSourceMapIt,
+        static void checkResourceLazyReferencing(Element& element,
+                                                 SourceMap<Element>& elementSourceMap,
                                                  SectionParserData& pd,
                                                  const ParseResultRef<Blueprint>& out) {
 
-            Collection<SourceMap<Resource> >::iterator resourceSourceMapIt;
+            Collection<SourceMap<Element> >::iterator resourceElementSourceMapIt;
 
             if (pd.exportSourceMap()) {
-                resourceSourceMapIt = resourceGroupSourceMapIt->resources.collection.begin();
+                resourceElementSourceMapIt = elementSourceMap.content.elements().collection.begin();
             }
 
-            for (Resources::iterator resourceIt = resourceGroup.resources.begin();
-                 resourceIt != resourceGroup.resources.end();
-                 ++resourceIt) {
+            for (Elements::iterator resourceElementIt = element.content.elements().begin();
+                 resourceElementIt != element.content.elements().end();
+                 ++resourceElementIt) {
 
-                checkActionLazyReferencing(*resourceIt, resourceSourceMapIt, pd, out);
+                if (resourceElementIt->element == Element::ResourceElement) {
+                    checkActionLazyReferencing(resourceElementIt->content.resource, resourceElementSourceMapIt->content.resource, pd, out);
+                }
 
                 if (pd.exportSourceMap()) {
-                    resourceSourceMapIt++;
+                    resourceElementSourceMapIt++;
                 }
             }
         }
 
         /** Traverses Action Collection to resolve references with `Pending` state (Lazy referencing) */
         static void checkActionLazyReferencing(Resource& resource,
-                                               Collection<SourceMap<Resource> >::iterator resourceSourceMapIt,
+                                               SourceMap<Resource>& resourceSourceMap,
                                                SectionParserData& pd,
                                                const ParseResultRef<Blueprint>& out) {
 
             Collection<SourceMap<Action> >::iterator actionSourceMapIt;
 
             if (pd.exportSourceMap()) {
-                actionSourceMapIt = resourceSourceMapIt->actions.collection.begin();
+                actionSourceMapIt = resourceSourceMap.actions.collection.begin();
             }
 
             for (Actions::iterator actionIt = resource.actions.begin();

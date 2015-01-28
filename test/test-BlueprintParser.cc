@@ -63,15 +63,19 @@ TEST_CASE("Parse canonical blueprint", "[blueprint]")
 
     REQUIRE(blueprint.node.name == "Snowcrash API");
     REQUIRE(blueprint.node.description == "## Character\n\nUncle Enzo\n\n");
-    REQUIRE(blueprint.node.resourceGroups.size() == 2);
+    REQUIRE(blueprint.node.content.elements().size() == 2);
 
-    REQUIRE(blueprint.node.resourceGroups[0].name == "First");
-    REQUIRE(blueprint.node.resourceGroups[0].description == "p1\n");
-    REQUIRE(blueprint.node.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.node.content.elements().at(0).attributes.name == "First");
+    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 2);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).element == Element::CopyElement);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).content.copy == "p1\n");
 
-    REQUIRE(blueprint.node.resourceGroups[1].name == "Second");
-    REQUIRE(blueprint.node.resourceGroups[1].description == "p2\n");
-    REQUIRE(blueprint.node.resourceGroups[1].resources.empty());
+    REQUIRE(blueprint.node.content.elements().at(1).attributes.name == "Second");
+    REQUIRE(blueprint.node.content.elements().at(1).element == Element::CategoryElement);
+    REQUIRE(blueprint.node.content.elements().at(1).content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(0).element == Element::CopyElement);
+    REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(0).content.copy == "p2\n");
 
     REQUIRE(blueprint.sourceMap.name.sourceMap.size() == 1);
     REQUIRE(blueprint.sourceMap.name.sourceMap[0].location == 13);
@@ -83,7 +87,7 @@ TEST_CASE("Parse canonical blueprint", "[blueprint]")
     REQUIRE(blueprint.sourceMap.metadata.collection[0].sourceMap.size() == 1);
     REQUIRE(blueprint.sourceMap.metadata.collection[0].sourceMap[0].location == 0);
     REQUIRE(blueprint.sourceMap.metadata.collection[0].sourceMap[0].length == 13);
-    REQUIRE(blueprint.sourceMap.resourceGroups.collection.size() == 2);
+    REQUIRE(blueprint.sourceMap.content.elements().collection.size() == 2);
 }
 
 TEST_CASE("Parse blueprint with multiple metadata sections", "[blueprint]")
@@ -105,15 +109,19 @@ TEST_CASE("Parse blueprint with multiple metadata sections", "[blueprint]")
 
     REQUIRE(blueprint.node.name == "Snowcrash API");
     REQUIRE(blueprint.node.description == "## Character\n\nUncle Enzo\n\n");
-    REQUIRE(blueprint.node.resourceGroups.size() == 2);
+    REQUIRE(blueprint.node.content.elements().size() == 2);
 
-    REQUIRE(blueprint.node.resourceGroups[0].name == "First");
-    REQUIRE(blueprint.node.resourceGroups[0].description == "p1\n");
-    REQUIRE(blueprint.node.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.node.content.elements().at(0).attributes.name == "First");
+    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 2);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).element == Element::CopyElement);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).content.copy == "p1\n");
 
-    REQUIRE(blueprint.node.resourceGroups[1].name == "Second");
-    REQUIRE(blueprint.node.resourceGroups[1].description == "p2\n");
-    REQUIRE(blueprint.node.resourceGroups[1].resources.empty());
+    REQUIRE(blueprint.node.content.elements().at(1).attributes.name == "Second");
+    REQUIRE(blueprint.node.content.elements().at(1).element == Element::CategoryElement);
+    REQUIRE(blueprint.node.content.elements().at(1).content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(0).element == Element::CopyElement);
+    REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(0).content.copy == "p2\n");
 
     REQUIRE(blueprint.sourceMap.name.sourceMap.size() == 1);
     REQUIRE(blueprint.sourceMap.name.sourceMap[0].location == 25);
@@ -128,7 +136,7 @@ TEST_CASE("Parse blueprint with multiple metadata sections", "[blueprint]")
     REQUIRE(blueprint.sourceMap.metadata.collection[1].sourceMap.size() == 1);
     REQUIRE(blueprint.sourceMap.metadata.collection[1].sourceMap[0].location == 12);
     REQUIRE(blueprint.sourceMap.metadata.collection[1].sourceMap[0].length == 13);
-    REQUIRE(blueprint.sourceMap.resourceGroups.collection.size() == 2);
+    REQUIRE(blueprint.sourceMap.content.elements().collection.size() == 2);
 }
 
 TEST_CASE("Parse API with Name and abbreviated resource", "[blueprint]")
@@ -149,14 +157,14 @@ TEST_CASE("Parse API with Name and abbreviated resource", "[blueprint]")
 
     REQUIRE(blueprint.node.name == "API");
     REQUIRE(blueprint.node.description == "A\n");
-    REQUIRE(blueprint.node.resourceGroups.size() == 1);
+    REQUIRE(blueprint.node.content.elements().size() == 1);
 
-    ResourceGroup group = blueprint.node.resourceGroups.front();
-    REQUIRE(group.name.empty());
-    REQUIRE(group.description.empty());
-    REQUIRE(group.resources.size() == 1);
+    REQUIRE(blueprint.node.content.elements().at(0).attributes.name.empty());
+    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).element == Element::ResourceElement);
 
-    Resource resource = group.resources.front();
+    Resource resource = blueprint.node.content.elements().at(0).content.elements().at(0).content.resource;
     REQUIRE(resource.uriTemplate == "/resource");
     REQUIRE(resource.actions.size() == 1);
     REQUIRE(resource.actions.front().examples.size() == 1);
@@ -170,7 +178,7 @@ TEST_CASE("Parse API with Name and abbreviated resource", "[blueprint]")
     REQUIRE(blueprint.sourceMap.description.sourceMap[0].location == 6);
     REQUIRE(blueprint.sourceMap.description.sourceMap[0].length == 2);
     REQUIRE(blueprint.sourceMap.metadata.collection.size() == 0);
-    REQUIRE(blueprint.sourceMap.resourceGroups.collection.size() == 1);
+    REQUIRE(blueprint.sourceMap.content.elements().collection.size() == 1);
 }
 
 TEST_CASE("Parse nameless blueprint description", "[blueprint]")
@@ -188,14 +196,14 @@ TEST_CASE("Parse nameless blueprint description", "[blueprint]")
 
     REQUIRE(blueprint.node.name.empty());
     REQUIRE(blueprint.node.description == "A\n\n# B\n");
-    REQUIRE(blueprint.node.resourceGroups.size() == 0);
+    REQUIRE(blueprint.node.content.elements().size() == 0);
 
     REQUIRE(blueprint.sourceMap.name.sourceMap.empty());
     REQUIRE(blueprint.sourceMap.description.sourceMap.size() == 1);
     REQUIRE(blueprint.sourceMap.description.sourceMap[0].location == 0);
     REQUIRE(blueprint.sourceMap.description.sourceMap[0].length == 6);
     REQUIRE(blueprint.sourceMap.metadata.collection.size() == 0);
-    REQUIRE(blueprint.sourceMap.resourceGroups.collection.size() == 0);
+    REQUIRE(blueprint.sourceMap.content.elements().collection.size() == 0);
 }
 
 TEST_CASE("Parse nameless blueprint with a list description", "[blueprint]")
@@ -211,14 +219,14 @@ TEST_CASE("Parse nameless blueprint with a list description", "[blueprint]")
 
     REQUIRE(blueprint.node.name.empty());
     REQUIRE(blueprint.node.description == "+ List\n");
-    REQUIRE(blueprint.node.resourceGroups.size() == 0);
+    REQUIRE(blueprint.node.content.elements().size() == 0);
 
     REQUIRE(blueprint.sourceMap.name.sourceMap.empty());
     REQUIRE(blueprint.sourceMap.description.sourceMap.size() == 1);
     REQUIRE(blueprint.sourceMap.description.sourceMap[0].location == 0);
     REQUIRE(blueprint.sourceMap.description.sourceMap[0].length == 7);
     REQUIRE(blueprint.sourceMap.metadata.collection.size() == 0);
-    REQUIRE(blueprint.sourceMap.resourceGroups.collection.size() == 0);
+    REQUIRE(blueprint.sourceMap.content.elements().collection.size() == 0);
 }
 
 TEST_CASE("Parse two groups with the same name", "[blueprint]")
@@ -238,21 +246,21 @@ TEST_CASE("Parse two groups with the same name", "[blueprint]")
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.size() == 2); // groups with same name & no response
 
-    REQUIRE(blueprint.node.resourceGroups.size() == 2);
+    REQUIRE(blueprint.node.content.elements().size() == 2);
 
-    REQUIRE(blueprint.node.resourceGroups[0].name == "Name");
-    REQUIRE(blueprint.node.resourceGroups[0].description.empty());
-    REQUIRE(blueprint.node.resourceGroups[0].resources.size() == 1);
+    REQUIRE(blueprint.node.content.elements().at(0).attributes.name == "Name");
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
 
-    REQUIRE(blueprint.node.resourceGroups[1].name == "Name");
-    REQUIRE(blueprint.node.resourceGroups[1].description.empty());
+    REQUIRE(blueprint.node.content.elements().at(1).attributes.name == "Name");
+    REQUIRE(blueprint.node.content.elements().at(1).content.elements().empty());
 
     REQUIRE(blueprint.sourceMap.name.sourceMap.size() == 1);
     REQUIRE(blueprint.sourceMap.name.sourceMap[0].location == 0);
     REQUIRE(blueprint.sourceMap.name.sourceMap[0].length == 6);
     REQUIRE(blueprint.sourceMap.description.sourceMap.empty());
     REQUIRE(blueprint.sourceMap.metadata.collection.size() == 0);
-    REQUIRE(blueprint.sourceMap.resourceGroups.collection.size() == 2);
+    REQUIRE(blueprint.sourceMap.content.elements().collection.size() == 2);
 }
 
 TEST_CASE("Test parser options - required blueprint name", "[blueprint]")
@@ -298,7 +306,7 @@ TEST_CASE("Should parse nested lists in description", "[blueprint]")
 
     REQUIRE(blueprint.node.name == "API");
     REQUIRE(blueprint.node.description == "+ List\n   + Nested Item\n");
-    REQUIRE(blueprint.node.resourceGroups.empty());
+    REQUIRE(blueprint.node.content.elements().empty());
 
     REQUIRE(blueprint.sourceMap.name.sourceMap.size() == 1);
     REQUIRE(blueprint.sourceMap.name.sourceMap[0].location == 0);
@@ -307,7 +315,7 @@ TEST_CASE("Should parse nested lists in description", "[blueprint]")
     REQUIRE(blueprint.sourceMap.description.sourceMap[0].location == 6);
     REQUIRE(blueprint.sourceMap.description.sourceMap[0].length == 24);
     REQUIRE(blueprint.sourceMap.metadata.collection.size() == 0);
-    REQUIRE(blueprint.sourceMap.resourceGroups.collection.size() == 0);
+    REQUIRE(blueprint.sourceMap.content.elements().collection.size() == 0);
 }
 
 TEST_CASE("Should parse paragraph without final newline", "[blueprint]")
@@ -324,7 +332,7 @@ TEST_CASE("Should parse paragraph without final newline", "[blueprint]")
 
     REQUIRE(blueprint.node.name == "API");
     REQUIRE(blueprint.node.description == "Lorem Ipsum");
-    REQUIRE(blueprint.node.resourceGroups.empty());
+    REQUIRE(blueprint.node.content.elements().empty());
 }
 
 TEST_CASE("Blueprint starting with Resource Group should be parsed", "[blueprint]")
@@ -341,15 +349,16 @@ TEST_CASE("Blueprint starting with Resource Group should be parsed", "[blueprint
 
     REQUIRE(blueprint.node.name.empty());
     REQUIRE(blueprint.node.description.empty());
-    REQUIRE(blueprint.node.resourceGroups.size() == 1);
-    REQUIRE(blueprint.node.resourceGroups.front().name == "Posts");
-    REQUIRE(blueprint.node.resourceGroups.front().resources.size() == 1);
-    REQUIRE(blueprint.node.resourceGroups.front().resources.front().uriTemplate == "/posts");
+    REQUIRE(blueprint.node.content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements().at(0).attributes.name == "Posts");
+    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).content.resource.uriTemplate == "/posts");
 
     REQUIRE(blueprint.sourceMap.name.sourceMap.empty());
     REQUIRE(blueprint.sourceMap.description.sourceMap.empty());
     REQUIRE(blueprint.sourceMap.metadata.collection.size() == 0);
-    REQUIRE(blueprint.sourceMap.resourceGroups.collection.size() == 1);
+    REQUIRE(blueprint.sourceMap.content.elements().collection.size() == 1);
 }
 
 TEST_CASE("Blueprint starting with Resource should be parsed", "[blueprint]")
@@ -364,15 +373,16 @@ TEST_CASE("Blueprint starting with Resource should be parsed", "[blueprint]")
 
     REQUIRE(blueprint.node.name.empty());
     REQUIRE(blueprint.node.description.empty());
-    REQUIRE(blueprint.node.resourceGroups.size() == 1);
-    REQUIRE(blueprint.node.resourceGroups.front().name.empty());
-    REQUIRE(blueprint.node.resourceGroups.front().resources.size() == 1);
-    REQUIRE(blueprint.node.resourceGroups.front().resources.front().uriTemplate == "/posts");
+    REQUIRE(blueprint.node.content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements().at(0).attributes.name.empty());
+    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).content.resource.uriTemplate == "/posts");
 
     REQUIRE(blueprint.sourceMap.name.sourceMap.empty());
     REQUIRE(blueprint.sourceMap.description.sourceMap.empty());
     REQUIRE(blueprint.sourceMap.metadata.collection.size() == 0);
-    REQUIRE(blueprint.sourceMap.resourceGroups.collection.size() == 1);
+    REQUIRE(blueprint.sourceMap.content.elements().collection.size() == 1);
 }
 
 TEST_CASE("Checking a resource with global resources for duplicates", "[blueprint]")
@@ -392,24 +402,27 @@ TEST_CASE("Checking a resource with global resources for duplicates", "[blueprin
 
     REQUIRE(blueprint.node.name.empty());
     REQUIRE(blueprint.node.description.empty());
-    REQUIRE(blueprint.node.resourceGroups.size() == 2);
+    REQUIRE(blueprint.node.content.elements().size() == 2);
 
-    REQUIRE(blueprint.node.resourceGroups[0].name.empty());
-    REQUIRE(blueprint.node.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions.empty());
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].uriTemplate == "/posts");
+    REQUIRE(blueprint.node.content.elements().at(0).attributes.name.empty());
+    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).content.resource.uriTemplate == "/posts");
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).content.resource.actions.empty());
 
-    REQUIRE(blueprint.node.resourceGroups[1].name == "Posts");
-    REQUIRE(blueprint.node.resourceGroups[1].resources.size() == 1);
-    REQUIRE(blueprint.node.resourceGroups[1].resources[0].actions.size() == 2);
-    REQUIRE(blueprint.node.resourceGroups[1].resources[0].uriTemplate == "/posts");
+    REQUIRE(blueprint.node.content.elements().at(1).attributes.name == "Posts");
+    REQUIRE(blueprint.node.content.elements().at(1).element == Element::CategoryElement);
+    REQUIRE(blueprint.node.content.elements().at(1).content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(0).content.resource.uriTemplate == "/posts");
+    REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(0).content.resource.actions.size() == 2);
+
 
     REQUIRE(blueprint.sourceMap.name.sourceMap.empty());
     REQUIRE(blueprint.sourceMap.description.sourceMap.empty());
     REQUIRE(blueprint.sourceMap.metadata.collection.size() == 0);
-    REQUIRE(blueprint.sourceMap.resourceGroups.collection.size() == 2);
-    REQUIRE(blueprint.sourceMap.resourceGroups.collection[0].resources.collection.size() == 1);
-    REQUIRE(blueprint.sourceMap.resourceGroups.collection[1].resources.collection.size() == 1);
+    REQUIRE(blueprint.sourceMap.content.elements().collection.size() == 2);
+    REQUIRE(blueprint.sourceMap.content.elements().collection[0].content.elements().collection.size() == 1);
+    REQUIRE(blueprint.sourceMap.content.elements().collection[1].content.elements().collection.size() == 1);
 }
 
 TEST_CASE("Parsing unexpected blocks", "[blueprint]")
@@ -441,11 +454,15 @@ TEST_CASE("Parsing unexpected blocks", "[blueprint]")
     REQUIRE(blueprint.node.metadata[0].first == "FORMAT");
     REQUIRE(blueprint.node.metadata[0].second == "1A");
 
-    REQUIRE(blueprint.node.resourceGroups.size() == 1);
-    REQUIRE(blueprint.node.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions.size() == 1);
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].uriTemplate == "/");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].method == "GET");
+    REQUIRE(blueprint.node.content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements().at(0).attributes.name.empty());
+    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 1);
+
+    Resource resource = blueprint.node.content.elements().at(0).content.elements().at(0).content.resource;
+    REQUIRE(resource.uriTemplate == "/");
+    REQUIRE(resource.actions.size() == 1);
+    REQUIRE(resource.actions[0].method == "GET");
 
     REQUIRE(blueprint.sourceMap.name.sourceMap.size() == 1);
     REQUIRE(blueprint.sourceMap.name.sourceMap[0].location == 12);
@@ -457,7 +474,7 @@ TEST_CASE("Parsing unexpected blocks", "[blueprint]")
     REQUIRE(blueprint.sourceMap.metadata.collection[0].sourceMap.size() == 1);
     REQUIRE(blueprint.sourceMap.metadata.collection[0].sourceMap[0].location == 0);
     REQUIRE(blueprint.sourceMap.metadata.collection[0].sourceMap[0].length == 12);
-    REQUIRE(blueprint.sourceMap.resourceGroups.collection.size() == 1);
+    REQUIRE(blueprint.sourceMap.content.elements().collection.size() == 1);
 }
 
 TEST_CASE("Parsing blueprint with mson data structures", "[blueprint]")
@@ -569,11 +586,12 @@ TEST_CASE("Parsing blueprint with mson data structures", "[blueprint]")
     REQUIRE(inheritanceIt != pd.namedTypeInheritanceTable.end());
     REQUIRE(inheritanceIt->second == "Plan Base");
 
-    REQUIRE(blueprint.node.resourceGroups.size() == 2);
-    REQUIRE(blueprint.node.resourceGroups[1].resources.size() == 1);
-    REQUIRE(blueprint.node.dataStructures.size() == 2);
-    REQUIRE(blueprint.node.dataStructures[0].source.name.symbol.literal == "Plan Base");
-    REQUIRE(blueprint.node.dataStructures[1].source.name.symbol.literal == "Timestamp");
+    REQUIRE(blueprint.node.content.elements().size() == 3);
+    REQUIRE(blueprint.node.content.elements().at(2).element == Element::CategoryElement);
+    REQUIRE(blueprint.node.content.elements().at(2).content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements().at(1).content.elements().size() == 2);
+    REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(0).content.dataStructure.source.name.symbol.literal == "Plan Base");
+    REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(1).content.dataStructure.source.name.symbol.literal == "Timestamp");
 }
 
 TEST_CASE("Parse blueprint with two named types having the same name", "[blueprint]")
@@ -594,8 +612,11 @@ TEST_CASE("Parse blueprint with two named types having the same name", "[bluepri
     REQUIRE(blueprint.report.warnings.size() == 1);
     REQUIRE(blueprint.report.warnings[0].code == DuplicateWarning);
 
-    REQUIRE(blueprint.node.resourceGroups.size() == 1);
-    REQUIRE(blueprint.node.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].attributes.source.empty());
-    REQUIRE(blueprint.node.dataStructures.size() == 1);
+    REQUIRE(blueprint.node.content.elements().size() == 2);
+    REQUIRE(blueprint.node.content.elements().at(1).element == Element::CategoryElement);
+    REQUIRE(blueprint.node.content.elements().at(1).content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(0).element == Element::ResourceElement);
+    REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(0).content.resource.attributes.source.empty());
+    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 1);
 }

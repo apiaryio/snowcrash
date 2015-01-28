@@ -19,7 +19,7 @@ namespace snowcrash {
     enum SectionType {
         UndefinedSectionType = 0,       /// < Undefined section
         BlueprintSectionType,           /// < Blueprint overview
-        DataStructuresSectionType,      /// < Data Structures
+        DataStructureGroupSectionType,  /// < Data Structure Group
         ResourceGroupSectionType,       /// < Resource group
         ResourceSectionType,            /// < Resource
         ActionSectionType,              /// < Action

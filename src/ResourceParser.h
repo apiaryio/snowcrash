@@ -11,7 +11,7 @@
 
 #include "SectionParser.h"
 #include "ActionParser.h"
-#include "DataStructuresParser.h"
+#include "DataStructureGroupParser.h"
 #include "HeadersParser.h"
 #include "ParametersParser.h"
 #include "UriTemplateParser.h"
@@ -110,7 +110,7 @@ namespace snowcrash {
 
                     if (!out.node.name.empty()) {
 
-                        if (SectionProcessor<DataStructures>::isNamedTypeDuplicate(pd.blueprint, out.node.name)) {
+                        if (SectionProcessor<DataStructureGroup>::isNamedTypeDuplicate(pd.blueprint, out.node.name)) {
 
                             // WARN: duplicate named type
                             std::stringstream ss;
@@ -502,13 +502,25 @@ namespace snowcrash {
             }
         }
 
-        /** Finds a resource inside an resources collection */
-        static ResourceIterator findResource(const Resources& resources,
-                                             const Resource& resource) {
+        /**
+         * \brief Given a list of elements, Check if a resource already exists with the given uri template
+         *
+         * \param elements Collection of elements
+         * \param uri The resource uri template to be checked
+         */
+        static bool isResourceDuplicate(const Elements& elements,
+                                        const URITemplate& uri) {
 
-            return std::find_if(resources.begin(),
-                                resources.end(),
-                                std::bind2nd(MatchResource(), resource));
+            for (Elements::const_iterator it = elements.begin(); it != elements.end(); ++it) {
+
+                if (it->element == Element::ResourceElement &&
+                    it->content.resource.uriTemplate == uri) {
+
+                    return true;
+                }
+            }
+
+            return false;
         }
     };
 

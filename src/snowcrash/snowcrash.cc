@@ -268,23 +268,24 @@ int main(int argc, const char *argv[])
         std::stringstream outputStream;
         std::stringstream sourcemapOutputStream;
 
-        sos::Object outputObject = snowcrash::WrapBlueprint(blueprint.node);
-        sos::Object sourcemapOutputObject = snowcrash::WrapBlueprintSourcemap(blueprint.sourceMap);
-
-        if (argumentParser.get<std::string>(FormatArgument) == "json") {
-
-            sos::SerializeJSON serializer;
-
-            serializer.process(outputObject, outputStream);
-            serializer.process(sourcemapOutputObject, sourcemapOutputStream);
-        }
-        else if (argumentParser.get<std::string>(FormatArgument) == "yaml") {
-
-            sos::SerializeYAML serializer;
-
-            serializer.process(outputObject, outputStream);
-            serializer.process(sourcemapOutputObject, sourcemapOutputStream);
-        }
+// TODO: Uncomment this after serialization
+//        sos::Object outputObject = snowcrash::WrapBlueprint(blueprint.node);
+//        sos::Object sourcemapOutputObject = snowcrash::WrapBlueprintSourcemap(blueprint.sourceMap);
+//
+//        if (argumentParser.get<std::string>(FormatArgument) == "json") {
+//
+//            sos::SerializeJSON serializer;
+//
+//            serializer.process(outputObject, outputStream);
+//            serializer.process(sourcemapOutputObject, sourcemapOutputStream);
+//        }
+//        else if (argumentParser.get<std::string>(FormatArgument) == "yaml") {
+//
+//            sos::SerializeYAML serializer;
+//
+//            serializer.process(outputObject, outputStream);
+//            serializer.process(sourcemapOutputObject, sourcemapOutputStream);
+//        }
 
         outputStream << "\n";
         sourcemapOutputStream << "\n";
