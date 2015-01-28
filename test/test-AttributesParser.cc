@@ -43,6 +43,10 @@ TEST_CASE("Parse canonical attributes", "[attributes]")
     REQUIRE(attributes.node.source.typeDefinition.typeSpecification.nestedTypes.size() == 1);
     REQUIRE(attributes.node.source.typeDefinition.typeSpecification.nestedTypes[0].symbol.literal == "Coupon");
     REQUIRE(attributes.node.source.typeDefinition.baseType == mson::ValueBaseType);
+
+    REQUIRE(attributes.sourceMap.name.sourceMap.empty());
+    SourceMapHelper::check(attributes.sourceMap.typeDefinition.sourceMap, 0, 40);
+    REQUIRE(attributes.sourceMap.sections.collection.empty());
 }
 
 TEST_CASE("Parse attributes with nested members", "[attributes]")
@@ -52,7 +56,6 @@ TEST_CASE("Parse attributes with nested members", "[attributes]")
     "    + message (string) - The blog post article\n"\
     "    + author: john@appleseed.com (string) - Author of the blog post";
 
-    mson::Element element;
     ParseResult<Attributes> attributes;
     SectionParserHelper<Attributes, AttributesParser>::parse(source, AttributesSectionType, attributes, ExportSourcemapOption);
 
@@ -61,14 +64,13 @@ TEST_CASE("Parse attributes with nested members", "[attributes]")
 
     REQUIRE(attributes.node.resolved.empty());
     REQUIRE(attributes.node.source.name.empty());
-    REQUIRE(attributes.node.source.typeDefinition.attributes == 0);
-    REQUIRE(attributes.node.source.typeDefinition.typeSpecification.empty());
+    REQUIRE(attributes.node.source.typeDefinition.empty());
     REQUIRE(attributes.node.source.typeDefinition.baseType == mson::ImplicitObjectBaseType);
     REQUIRE(attributes.node.source.sections.size() == 1);
     REQUIRE(attributes.node.source.sections[0].klass == mson::TypeSection::MemberTypeClass);
     REQUIRE(attributes.node.source.sections[0].content.elements().size() == 2);
 
-    element = attributes.node.source.sections[0].content.elements().at(0);
+    mson::Element element = attributes.node.source.sections[0].content.elements().at(0);
     REQUIRE(element.klass == mson::Element::PropertyClass);
     REQUIRE(element.content.property.name.literal == "message");
     REQUIRE(element.content.property.description == "The blog post article");
@@ -82,6 +84,21 @@ TEST_CASE("Parse attributes with nested members", "[attributes]")
     REQUIRE(element.content.property.valueDefinition.values.size() == 1);
     REQUIRE(element.content.property.valueDefinition.values[0].literal == "john@appleseed.com");
     REQUIRE(element.content.property.valueDefinition.typeDefinition.typeSpecification.name.base == mson::StringTypeName);
+
+    REQUIRE(attributes.sourceMap.name.sourceMap.empty());
+    REQUIRE(attributes.sourceMap.typeDefinition.sourceMap.empty());
+    REQUIRE(attributes.sourceMap.sections.collection.size() == 1);
+    REQUIRE(attributes.sourceMap.sections.collection[0].elements().collection.size() == 2);
+
+    SourceMap<mson::Element> elementSM = attributes.sourceMap.sections.collection[0].elements().collection[0];
+    SourceMapHelper::check(elementSM.property.name.sourceMap, 18, 41);
+    SourceMapHelper::check(elementSM.property.description.sourceMap, 18, 41);
+    SourceMapHelper::check(elementSM.property.valueDefinition.sourceMap, 18, 41);
+
+    elementSM = attributes.sourceMap.sections.collection[0].elements().collection[1];
+    SourceMapHelper::check(elementSM.property.name.sourceMap, 63, 64);
+    SourceMapHelper::check(elementSM.property.description.sourceMap, 63, 64);
+    SourceMapHelper::check(elementSM.property.valueDefinition.sourceMap, 63, 64);
 }
 
 TEST_CASE("Parse attributes with block description", "[attributes]")
@@ -101,12 +118,19 @@ TEST_CASE("Parse attributes with block description", "[attributes]")
 
     REQUIRE(attributes.node.resolved.empty());
     REQUIRE(attributes.node.source.name.empty());
-    REQUIRE(attributes.node.source.typeDefinition.attributes == 0);
-    REQUIRE(attributes.node.source.typeDefinition.typeSpecification.empty());
+    REQUIRE(attributes.node.source.typeDefinition.empty());
     REQUIRE(attributes.node.source.typeDefinition.baseType == mson::ImplicitObjectBaseType);
     REQUIRE(attributes.node.source.sections.size() == 2);
     REQUIRE(attributes.node.source.sections[0].klass == mson::TypeSection::BlockDescriptionClass);
     REQUIRE(attributes.node.source.sections[0].content.description == "Awesome description\n\n+ With list\n");
     REQUIRE(attributes.node.source.sections[1].klass == mson::TypeSection::MemberTypeClass);
     REQUIRE(attributes.node.source.sections[1].content.elements().size() == 1);
+
+    REQUIRE(attributes.sourceMap.name.sourceMap.empty());
+    REQUIRE(attributes.sourceMap.typeDefinition.sourceMap.empty());
+    REQUIRE(attributes.sourceMap.sections.collection.size() == 2);
+    SourceMapHelper::check(attributes.sourceMap.sections.collection[0].description.sourceMap, 2, 11, 1);
+    SourceMapHelper::check(attributes.sourceMap.sections.collection[0].description.sourceMap, 17, 20, 2);
+    SourceMapHelper::check(attributes.sourceMap.sections.collection[0].description.sourceMap, 42, 12, 3);
+    REQUIRE(attributes.sourceMap.sections.collection[1].elements().collection.size() == 1);
 }

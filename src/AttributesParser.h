@@ -46,6 +46,13 @@ namespace snowcrash {
 
             mson::parseTypeDefinition(node, pd, signature.attributes, out.report, out.node.source.typeDefinition);
 
+            if (pd.exportSourceMap()) {
+
+                if (!out.node.source.typeDefinition.empty()) {
+                    out.sourceMap.typeDefinition.sourceMap = node->sourceMap;
+                }
+            }
+
             // Default to `object` type specification
             if (out.node.source.typeDefinition.baseType == mson::UndefinedBaseType) {
                 out.node.source.typeDefinition.baseType = mson::ImplicitObjectBaseType;

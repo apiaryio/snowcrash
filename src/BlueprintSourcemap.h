@@ -67,8 +67,8 @@ namespace snowcrash {
     struct SourceMap<DataStructure> : public SourceMap<mson::NamedType> {
     };
 
-    /** Source Map of Attributes */
-    // 'Attributes' type is same as 'DataStructure'
+    /** Source Map Structure for Attributes */
+    // 'Attributes' is the same as 'DataStructure'
 
     /**
      * Source Map Structure for Assets in Payload

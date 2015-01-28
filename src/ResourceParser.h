@@ -128,6 +128,10 @@ namespace snowcrash {
                         }
 
                         attributes.node.source.name.symbol.literal = out.node.name;
+
+                        if (pd.exportSourceMap()) {
+                            attributes.sourceMap.name.sourceMap = out.sourceMap.name.sourceMap;
+                        }
                     }
 
                     return cur;
