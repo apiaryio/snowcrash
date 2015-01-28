@@ -273,6 +273,10 @@ namespace snowcrash {
             checkLazyReferencing(pd, out);
             out.node.element = Element::CategoryElement;
 
+            if (pd.exportSourceMap()) {
+                out.sourceMap.element = out.node.element;
+            }
+
             if (!out.node.name.empty())
                 return;
 

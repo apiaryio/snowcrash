@@ -53,20 +53,25 @@ SourceMap<Element>::Content::~Content()
 {
 }
 
-SourceMap<Element>::SourceMap()
+SourceMap<Element>::SourceMap(const Element::Class& element_)
+: element(element_)
 {
 }
 
 SourceMap<Element>::SourceMap(const SourceMap<Element>& rhs)
 {
+    this->element = rhs.element;
     this->attributes = rhs.attributes;
     this->content = rhs.content;
+    this->category = rhs.category;
 }
 
 SourceMap<Element>& SourceMap<Element>::operator=(const SourceMap<Element>& rhs)
 {
+    this->element = rhs.element;
     this->attributes = rhs.attributes;
     this->content = rhs.content;
+    this->category = rhs.category;
 
     return *this;
 }

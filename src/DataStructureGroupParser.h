@@ -58,7 +58,7 @@ namespace snowcrash {
 
                     if (pd.exportSourceMap()) {
 
-                        SourceMap<Element> elementSM;
+                        SourceMap<Element> elementSM(Element::DataStructureElement);
 
                         elementSM.content.dataStructure.name = namedType.sourceMap.name;
                         elementSM.content.dataStructure.typeDefinition = namedType.sourceMap.typeDefinition;
@@ -78,6 +78,12 @@ namespace snowcrash {
 
             out.node.element = Element::CategoryElement;
             out.node.category = Element::DataStructureGroupCategory;
+
+            if (pd.exportSourceMap()) {
+
+                out.sourceMap.element = out.node.element;
+                out.sourceMap.category = out.node.category;
+            }
         }
 
         static SectionType sectionType(const MarkdownNodeIterator& node) {
@@ -130,17 +136,17 @@ namespace snowcrash {
 
                         if (subIt->element == Element::DataStructureElement &&
                             subIt->content.dataStructure.source.name.symbol.literal == name) {
-                            
+
                             return true;
                         }
                     }
                 }
             }
-            
+
             return false;
         }
     };
-    
+
     /** Data Structures Parser */
     typedef SectionParser<DataStructureGroup, HeaderSectionAdapter> DataStructureGroupParser;
 }

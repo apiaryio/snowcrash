@@ -281,14 +281,20 @@ namespace snowcrash {
             std::auto_ptr<SourceMap<Elements> > m_elements;
         };
 
+        /** Class of the Element (to be used internally only) */
+        Element::Class element;
+
         /** Source Map of Attributes of the Element */
         Attributes attributes;
 
         /** Source Map of Content of the Element */
         Content content;
 
+        /** Type of the Category element (to be used internally only) */
+        Element::Category category;
+
         /** Constructor */
-        SourceMap();
+        SourceMap(const Element::Class& element_ = Element::UndefinedElement);
 
         /** Copy constructor */
         SourceMap(const SourceMap<Element>& rhs);

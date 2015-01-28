@@ -16,9 +16,6 @@
 #include "MarkdownNode.h"
 #include "MSONSourcemap.h"
 
-#define RESOURCE_NOT_SET_ERR std::logic_error("no resource set")
-#define DATA_STRUCTURE_NOT_SET_ERR std::logic_error("no data structure set")
-
 /**
  *  API Blueprint Abstract Syntax Tree
  *  -----------------------------------
@@ -422,7 +419,7 @@ namespace snowcrash {
         /** Content of the element */
         Element::Content content;
 
-        /** Type of Category element */
+        /** Type of Category element (to be used internally only) */
         Element::Category category;
 
         /** Constructor */

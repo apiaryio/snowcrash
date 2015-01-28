@@ -73,7 +73,7 @@ namespace snowcrash {
 
                 if (pd.exportSourceMap()) {
 
-                    SourceMap<Element> descriptionSM;
+                    SourceMap<Element> descriptionSM(Element::CopyElement);
                     out.sourceMap.content.elements().collection.push_back(descriptionSM);
                 }
             }
@@ -128,7 +128,7 @@ namespace snowcrash {
 
                 if (pd.exportSourceMap()) {
 
-                    SourceMap<Element> resourceElementSM;
+                    SourceMap<Element> resourceElementSM(Element::ResourceElement);
                     resourceElementSM.content.resource = resource.sourceMap;
 
                     out.sourceMap.content.elements().collection.push_back(resourceElementSM);
@@ -174,6 +174,12 @@ namespace snowcrash {
 
             out.node.element = Element::CategoryElement;
             out.node.category = Element::ResourceGroupCategory;
+
+            if (pd.exportSourceMap()) {
+
+                out.sourceMap.element = out.node.element;
+                out.sourceMap.category = out.node.category;
+            }
         }
 
         static SectionType sectionType(const MarkdownNodeIterator& node) {
