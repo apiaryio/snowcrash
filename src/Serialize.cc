@@ -53,3 +53,5 @@ const std::string SerializeKey::Sections = "sections";
 const std::string SerializeKey::Class = "class";
 const std::string SerializeKey::Content = "content";
 const std::string SerializeKey::ValueDefinition = "valueDefinition";
+
+const std::string SerializeKey::Element = "element";
