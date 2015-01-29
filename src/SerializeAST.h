@@ -9,7 +9,6 @@
 #ifndef SNOWCRASH_SERIALIZE_AST_H
 #define SNOWCRASH_SERIALIZE_AST_H
 
-#include "StringUtility.h"
 #include "Serialize.h"
 
 namespace snowcrash {

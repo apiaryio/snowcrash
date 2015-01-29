@@ -6,6 +6,7 @@
 //  Copyright (c) 2015 Apiary Inc. All rights reserved.
 //
 
+#include "StringUtility.h"
 #include "SerializeAST.h"
 
 using namespace snowcrash;
@@ -582,6 +583,7 @@ sos::Object WrapAction(const Action& action)
     return actionObject;
 }
 
+/** If printElementValue is given, print the element key (new AST format) */
 sos::Object WrapResource(const Resource& resource, bool printElementValue = false)
 {
     sos::Object resourceObject;
