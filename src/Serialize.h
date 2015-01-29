@@ -65,6 +65,8 @@ namespace snowcrash {
         static const std::string Class;
         static const std::string Content;
         static const std::string ValueDefinition;
+
+        static const std::string Element;
     };
 }
 

@@ -6,6 +6,7 @@
 //  Copyright (c) 2015 Apiary Inc. All rights reserved.
 //
 
+#include "StringUtility.h"
 #include "SerializeAST.h"
 
 using namespace snowcrash;
@@ -174,7 +175,7 @@ sos::Object WrapPropertyName(const mson::PropertyName& propertyName)
 
 // Forward declarations
 sos::Array WrapTypeSections(const mson::TypeSections& typeSections);
-sos::Array WrapElements(const mson::Elements& elements);
+sos::Array WrapMSONElements(const mson::Elements& elements);
 
 sos::Object WrapPropertyMember(const mson::PropertyMember& propertyMember)
 {
@@ -218,10 +219,10 @@ sos::Object WrapMixin(const mson::Mixin& mixin)
 
 sos::Array WrapOneOf(const mson::OneOf& oneOf)
 {
-    return WrapElements(oneOf);
+    return WrapMSONElements(oneOf);
 }
 
-sos::Object WrapElement(const mson::Element& element)
+sos::Object WrapMSONElement(const mson::Element& element)
 {
     sos::Object elementObject;
     std::string klass;
@@ -259,7 +260,7 @@ sos::Object WrapElement(const mson::Element& element)
         case mson::Element::GroupClass:
         {
             klass = "group";
-            elementObject.set(SerializeKey::Content, WrapElements(element.content.elements()));
+            elementObject.set(SerializeKey::Content, WrapMSONElements(element.content.elements()));
             break;
         }
 
@@ -272,12 +273,12 @@ sos::Object WrapElement(const mson::Element& element)
     return elementObject;
 }
 
-sos::Array WrapElements(const mson::Elements& elements)
+sos::Array WrapMSONElements(const mson::Elements& elements)
 {
     sos::Array elementsArray;
 
     for (mson::Elements::const_iterator it = elements.begin(); it != elements.end(); ++it) {
-        elementsArray.push(WrapElement(*it));
+        elementsArray.push(WrapMSONElement(*it));
     }
 
     return elementsArray;
@@ -325,7 +326,7 @@ sos::Array WrapTypeSections(const mson::TypeSections& sections)
             section.set(SerializeKey::Content, sos::String(it->content.value));
         }
         else if (!it->content.elements().empty()) {
-            section.set(SerializeKey::Content, WrapElements(it->content.elements()));
+            section.set(SerializeKey::Content, WrapMSONElements(it->content.elements()));
         }
 
         sectionsArray.push(section);
@@ -348,6 +349,34 @@ sos::Object WrapNamedType(const mson::NamedType& namedType)
     namedTypeObject.set(SerializeKey::Sections, WrapTypeSections(namedType.sections));
 
     return namedTypeObject;
+}
+
+sos::String WrapElementClass(const Element::Class& element)
+{
+    std::string str;
+
+    switch (element) {
+        case Element::CategoryElement:
+            str = "category";
+            break;
+
+        case Element::CopyElement:
+            str = "copy";
+            break;
+
+        case Element::ResourceElement:
+            str = "resource";
+            break;
+
+        case Element::DataStructureElement:
+            str = "dataStructure";
+            break;
+
+        default:
+            break;
+    }
+
+    return sos::String(str);
 }
 
 sos::Object WrapKeyValue(const KeyValuePair& keyValue)
@@ -554,7 +583,8 @@ sos::Object WrapAction(const Action& action)
     return actionObject;
 }
 
-sos::Object WrapResource(const Resource& resource)
+/** If printElementValue is given, print the element key (new AST format) */
+sos::Object WrapResource(const Resource& resource, bool printElementValue = false)
 {
     sos::Object resourceObject;
 
@@ -563,6 +593,11 @@ sos::Object WrapResource(const Resource& resource)
 
     // Description
     resourceObject.set(SerializeKey::Description, sos::String(resource.description));
+
+    // Element
+    if (printElementValue) {
+        resourceObject.set(SerializeKey::Element, WrapElementClass(Element::ResourceElement));
+    }
 
     // URI Template
     resourceObject.set(SerializeKey::URITemplate, sos::String(resource.uriTemplate));
@@ -589,29 +624,105 @@ sos::Object WrapResource(const Resource& resource)
     return resourceObject;
 }
 
-sos::Object WrapResourceGroup(const ResourceGroup& resourceGroup)
+sos::Object WrapResourceGroup(const Element& resourceGroup)
 {
     sos::Object resourceGroupObject;
 
     // Name
-    resourceGroupObject.set(SerializeKey::Name, sos::String(resourceGroup.name));
+    resourceGroupObject.set(SerializeKey::Name, sos::String(resourceGroup.attributes.name));
 
-    // Description
-    resourceGroupObject.set(SerializeKey::Description, sos::String(resourceGroup.description));
-
-    // Resources
+    // Description && Resources
+    std::string description;
     sos::Array resources;
 
-    for (Resources::const_iterator it = resourceGroup.resources.begin();
-         it != resourceGroup.resources.end();
+    for (Elements::const_iterator it = resourceGroup.content.elements().begin();
+         it != resourceGroup.content.elements().end();
          ++it) {
 
-        resources.push(WrapResource(*it));
+        if (it->element == Element::ResourceElement) {
+            resources.push(WrapResource(it->content.resource));
+        }
+        else if (it->element == Element::CopyElement) {
+
+            if (!description.empty()) {
+                TwoNewLines(description);
+            }
+
+            description += it->content.copy;
+        }
     }
 
+    resourceGroupObject.set(SerializeKey::Description, sos::String(description));
     resourceGroupObject.set(SerializeKey::Resources, resources);
 
     return resourceGroupObject;
+}
+
+sos::Object WrapDataStructureContent(const DataStructure& dataStructure)
+{
+    sos::Object dataStructureObject;
+
+    // Source
+    dataStructureObject.set(SerializeKey::Source, WrapNamedType(dataStructure.source));
+
+    // Resolved
+    dataStructureObject.set(SerializeKey::Resolved, sos::Object());
+
+    return dataStructureObject;
+}
+
+sos::Object WrapElement(const Element& element)
+{
+    // Resource Element is special case
+    if (element.element == Element::ResourceElement) {
+        return WrapResource(element.content.resource, true);
+    }
+
+    sos::Object elementObject;
+
+    elementObject.set(SerializeKey::Element, WrapElementClass(element.element));
+
+    if (!element.attributes.name.empty()) {
+
+        sos::Object attributes;
+
+        attributes.set(SerializeKey::Name, sos::String(element.attributes.name));
+        elementObject.set(SerializeKey::Attributes, attributes);
+    }
+
+    switch (element.element) {
+        case Element::CopyElement:
+        {
+            elementObject.set(SerializeKey::Content, sos::String(element.content.copy));
+            break;
+        }
+
+        case Element::DataStructureElement:
+        {
+            elementObject.set(SerializeKey::Content, WrapDataStructureContent(element.content.dataStructure));
+            break;
+        }
+
+        case Element::CategoryElement:
+        {
+            sos::Array content;
+
+            for (Elements::const_iterator it = element.content.elements().begin();
+                 it != element.content.elements().end();
+                 ++it) {
+
+                content.push(WrapElement(*it));
+            }
+
+            elementObject.set(SerializeKey::Content, content);
+            break;
+        }
+
+        default:
+            break;
+    }
+
+    return elementObject;
 }
 
 sos::Object snowcrash::WrapBlueprint(const Blueprint& blueprint)
@@ -639,17 +750,36 @@ sos::Object snowcrash::WrapBlueprint(const Blueprint& blueprint)
     // Description
     blueprintObject.set(SerializeKey::Description, sos::String(blueprint.description));
 
+    // Element
+    blueprintObject.set(SerializeKey::Element, WrapElementClass(blueprint.element));
+
     // Resource Groups
     sos::Array resourceGroups;
 
-    for (ResourceGroups::const_iterator it = blueprint.resourceGroups.begin();
-         it != blueprint.resourceGroups.end();
+    for (Elements::const_iterator it = blueprint.content.elements().begin();
+         it != blueprint.content.elements().end();
          ++it) {
 
-        resourceGroups.push(WrapResourceGroup(*it));
+        if (it->element == Element::CategoryElement &&
+            it->category == Element::ResourceGroupCategory) {
+
+            resourceGroups.push(WrapResourceGroup(*it));
+        }
     }
 
     blueprintObject.set(SerializeKey::ResourceGroups, resourceGroups);
+
+    // Content
+    sos::Array content;
+
+    for (Elements::const_iterator it = blueprint.content.elements().begin();
+         it != blueprint.content.elements().end();
+         ++it) {
+
+        content.push(WrapElement(*it));
+    }
+
+    blueprintObject.set(SerializeKey::Content, content);
 
     return blueprintObject;
 }

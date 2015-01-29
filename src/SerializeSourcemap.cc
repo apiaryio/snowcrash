@@ -344,27 +344,96 @@ sos::Object WrapResourceSourcemap(const SourceMap<Resource>& resource)
     return resourceObject;
 }
 
-sos::Object WrapResourceGroupSourcemap(const SourceMap<ResourceGroup>& resourceGroup)
+sos::Object WrapResourceGroupSourcemap(const SourceMap<Element>& resourceGroup)
 {
     sos::Object resourceGroupObject;
 
     // Name
-    resourceGroupObject.set(SerializeKey::Name, WrapSourcemap(resourceGroup.name));
+    resourceGroupObject.set(SerializeKey::Name, WrapSourcemap(resourceGroup.attributes.name));
 
-    // Description
-    resourceGroupObject.set(SerializeKey::Description, WrapSourcemap(resourceGroup.description));
-
-    // Resources
+    // Description & Resources
+    SourceMap<Description> description;
     sos::Array resources;
 
-    for (Collection<SourceMap<Resource> >::const_iterator it = resourceGroup.resources.collection.begin();
-         it != resourceGroup.resources.collection.end();
+    for (Collection<SourceMap<Element> >::const_iterator it = resourceGroup.content.elements().collection.begin();
+         it != resourceGroup.content.elements().collection.end();
          ++it) {
 
-        resources.push(WrapResourceSourcemap(*it));
+        if (it->element == Element::ResourceElement) {
+            resources.push(WrapResourceSourcemap(it->content.resource));
+        }
+        else if (it->element == Element::CopyElement) {
+            description.sourceMap.append(it->content.copy.sourceMap);
+        }
     }
 
+    resourceGroupObject.set(SerializeKey::Description, WrapSourcemap(description));
+    resourceGroupObject.set(SerializeKey::Resources, resources);
+
     return resourceGroupObject;
+}
+
+
+sos::Object WrapDataStructureContent(const SourceMap<DataStructure>& dataStructure)
+{
+    sos::Object dataStructureObject;
+
+    // Source
+    dataStructureObject.set(SerializeKey::Source, WrapNamedTypeSourcemap(dataStructure));
+
+    return dataStructureObject;
+}
+
+sos::Object WrapElementSourcemap(const SourceMap<Element>& element)
+{
+    // Resource Element is special case
+    if (element.element == Element::ResourceElement) {
+        return WrapResourceSourcemap(element.content.resource);
+    }
+
+    sos::Object elementObject;
+
+    if (!element.attributes.name.sourceMap.empty()) {
+
+        sos::Object attributes;
+
+        attributes.set(SerializeKey::Name, WrapSourcemap(element.attributes.name));
+        elementObject.set(SerializeKey::Attributes, attributes);
+    }
+
+    switch (element.element) {
+        case Element::CopyElement:
+        {
+            elementObject.set(SerializeKey::Content, WrapSourcemap(element.content.copy));
+            break;
+        }
+
+        case Element::DataStructureElement:
+        {
+            elementObject.set(SerializeKey::Content, WrapDataStructureContent(element.content.dataStructure));
+            break;
+        }
+
+        case Element::CategoryElement:
+        {
+            sos::Array content;
+
+            for (Collection<SourceMap<Element> >::const_iterator it = element.content.elements().collection.begin();
+                 it != element.content.elements().collection.end();
+                 ++it) {
+
+                content.push(WrapElementSourcemap(*it));
+            }
+
+            elementObject.set(SerializeKey::Content, content);
+            break;
+        }
+
+        default:
+            break;
+    }
+
+    return elementObject;
 }
 
 sos::Object snowcrash::WrapBlueprintSourcemap(const SourceMap<Blueprint>& blueprint)
@@ -392,14 +461,30 @@ sos::Object snowcrash::WrapBlueprintSourcemap(const SourceMap<Blueprint>& bluepr
     // Resource Groups
     sos::Array resourceGroups;
 
-    for (Collection<SourceMap<ResourceGroup> >::const_iterator it = blueprint.resourceGroups.collection.begin();
-         it != blueprint.resourceGroups.collection.end();
+    for (Collection<SourceMap<Element> >::const_iterator it = blueprint.content.elements().collection.begin();
+         it != blueprint.content.elements().collection.end();
          ++it) {
 
-        resourceGroups.push(WrapResourceGroupSourcemap(*it));
+        if (it->element == Element::CategoryElement &&
+            it->category == Element::ResourceGroupCategory) {
+
+            resourceGroups.push(WrapResourceGroupSourcemap(*it));
+        }
     }
 
     blueprintObject.set(SerializeKey::ResourceGroups, resourceGroups);
+
+    // Content
+    sos::Array content;
+
+    for (Collection<SourceMap<Element> >::const_iterator it = blueprint.content.elements().collection.begin();
+         it != blueprint.content.elements().collection.end();
+         ++it) {
+
+        content.push(WrapElementSourcemap(*it));
+    }
+
+    blueprintObject.set(SerializeKey::Content, content);
 
     return blueprintObject;
 }
