@@ -10,6 +10,15 @@
 
 using namespace snowcrash;
 
+DataStructure& DataStructure::operator=(const mson::NamedType &rhs)
+{
+    this->name = rhs.name;
+    this->typeDefinition = rhs.typeDefinition;
+    this->sections = rhs.sections;
+
+    return *this;
+}
+
 Elements& Element::Content::elements()
 {
     if (!m_elements.get())

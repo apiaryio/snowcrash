@@ -122,12 +122,12 @@ namespace snowcrash {
                                                                   sourceMap));
 
                             // Remove the attributes data from the AST since we are ignoring this
-                            out.node.attributes.source = mson::NamedType();
+                            out.node.attributes = mson::NamedType();
 
                             return cur;
                         }
 
-                        attributes.node.source.name.symbol.literal = out.node.name;
+                        attributes.node.name.symbol.literal = out.node.name;
 
                         if (pd.exportSourceMap()) {
                             attributes.sourceMap.name.sourceMap = out.sourceMap.name.sourceMap;

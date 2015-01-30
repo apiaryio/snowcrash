@@ -425,17 +425,36 @@ sos::Object WrapAsset(const Asset& asset)
     return assetObject;
 }
 
+sos::Object WrapDataStructure(const DataStructure& dataStructure)
+{
+    sos::Object dataStructureObject;
+
+    // Element
+    dataStructureObject.set(SerializeKey::Element, WrapElementClass(Element::DataStructureElement));
+
+    // Name
+    dataStructureObject.set(SerializeKey::Name, WrapTypeName(dataStructure.name));
+
+    // Type Definition
+    dataStructureObject.set(SerializeKey::TypeDefinition, WrapTypeDefinition(dataStructure.typeDefinition));
+
+    // Type Sections
+    dataStructureObject.set(SerializeKey::Sections, WrapTypeSections(dataStructure.sections));
+
+    return dataStructureObject;
+}
+
 sos::Object WrapPayload(const Payload& payload)
 {
     sos::Object payloadObject;
-
-    // Name
-    payloadObject.set(SerializeKey::Name, sos::String(payload.name));
 
     // Reference
     if (!payload.reference.id.empty()) {
         payloadObject.set(SerializeKey::Reference, WrapReference(payload.reference));
     }
+
+    // Name
+    payloadObject.set(SerializeKey::Name, sos::String(payload.name));
 
     // Description
     payloadObject.set(SerializeKey::Description, sos::String(payload.description));
@@ -451,6 +470,15 @@ sos::Object WrapPayload(const Payload& payload)
     }
 
     payloadObject.set(SerializeKey::Headers, headers);
+
+    // Content
+    sos::Array content;
+
+    if (!payload.attributes.empty()) {
+        content.push(WrapDataStructure(payload.attributes));
+    }
+
+    payloadObject.set(SerializeKey::Content, content);
 
     // Body
     payloadObject.set(SerializeKey::Body, sos::String(payload.assets.body.source));
@@ -568,6 +596,15 @@ sos::Object WrapAction(const Action& action)
     // Parameters
     actionObject.set(SerializeKey::Parameters, WrapParameters(action.parameters));
 
+    // Content
+    sos::Array content;
+
+    if (!action.attributes.empty()) {
+        content.push(WrapDataStructure(action.attributes));
+    }
+
+    actionObject.set(SerializeKey::Content, content);
+
     // Transaction Examples
     sos::Array transactionExamples;
 
@@ -583,21 +620,18 @@ sos::Object WrapAction(const Action& action)
     return actionObject;
 }
 
-/** If printElementValue is given, print the element key (new AST format) */
-sos::Object WrapResource(const Resource& resource, bool printElementValue = false)
+sos::Object WrapResource(const Resource& resource)
 {
     sos::Object resourceObject;
+
+    // Element
+    resourceObject.set(SerializeKey::Element, WrapElementClass(Element::ResourceElement));
 
     // Name
     resourceObject.set(SerializeKey::Name, sos::String(resource.name));
 
     // Description
     resourceObject.set(SerializeKey::Description, sos::String(resource.description));
-
-    // Element
-    if (printElementValue) {
-        resourceObject.set(SerializeKey::Element, WrapElementClass(Element::ResourceElement));
-    }
 
     // URI Template
     resourceObject.set(SerializeKey::URITemplate, sos::String(resource.uriTemplate));
@@ -620,6 +654,15 @@ sos::Object WrapResource(const Resource& resource, bool printElementValue = fals
     }
 
     resourceObject.set(SerializeKey::Actions, actions);
+
+    // Content
+    sos::Array content;
+
+    if (!resource.attributes.empty()) {
+        content.push(WrapDataStructure(resource.attributes));
+    }
+
+    resourceObject.set(SerializeKey::Content, content);
 
     return resourceObject;
 }
@@ -658,26 +701,8 @@ sos::Object WrapResourceGroup(const Element& resourceGroup)
     return resourceGroupObject;
 }
 
-sos::Object WrapDataStructureContent(const DataStructure& dataStructure)
-{
-    sos::Object dataStructureObject;
-
-    // Source
-    dataStructureObject.set(SerializeKey::Source, WrapNamedType(dataStructure.source));
-
-    // Resolved
-    dataStructureObject.set(SerializeKey::Resolved, sos::Object());
-
-    return dataStructureObject;
-}
-
 sos::Object WrapElement(const Element& element)
 {
-    // Resource Element is special case
-    if (element.element == Element::ResourceElement) {
-        return WrapResource(element.content.resource, true);
-    }
-
     sos::Object elementObject;
 
     elementObject.set(SerializeKey::Element, WrapElementClass(element.element));
@@ -697,12 +722,6 @@ sos::Object WrapElement(const Element& element)
             break;
         }
 
-        case Element::DataStructureElement:
-        {
-            elementObject.set(SerializeKey::Content, WrapDataStructureContent(element.content.dataStructure));
-            break;
-        }
-
         case Element::CategoryElement:
         {
             sos::Array content;
@@ -716,6 +735,16 @@ sos::Object WrapElement(const Element& element)
 
             elementObject.set(SerializeKey::Content, content);
             break;
+        }
+
+        case Element::DataStructureElement:
+        {
+            return WrapDataStructure(element.content.dataStructure);
+        }
+
+        case Element::ResourceElement:
+        {
+            return WrapResource(element.content.resource);
         }
 
         default:

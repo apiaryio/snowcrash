@@ -590,8 +590,8 @@ TEST_CASE("Parsing blueprint with mson data structures", "[blueprint]")
     REQUIRE(blueprint.node.content.elements().at(2).element == Element::CategoryElement);
     REQUIRE(blueprint.node.content.elements().at(2).content.elements().size() == 1);
     REQUIRE(blueprint.node.content.elements().at(1).content.elements().size() == 2);
-    REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(0).content.dataStructure.source.name.symbol.literal == "Plan Base");
-    REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(1).content.dataStructure.source.name.symbol.literal == "Timestamp");
+    REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(0).content.dataStructure.name.symbol.literal == "Plan Base");
+    REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(1).content.dataStructure.name.symbol.literal == "Timestamp");
 }
 
 TEST_CASE("Parse blueprint with two named types having the same name", "[blueprint]")
@@ -616,7 +616,7 @@ TEST_CASE("Parse blueprint with two named types having the same name", "[bluepri
     REQUIRE(blueprint.node.content.elements().at(1).element == Element::CategoryElement);
     REQUIRE(blueprint.node.content.elements().at(1).content.elements().size() == 1);
     REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(0).element == Element::ResourceElement);
-    REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(0).content.resource.attributes.source.empty());
+    REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(0).content.resource.attributes.empty());
     REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
     REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 1);
 }

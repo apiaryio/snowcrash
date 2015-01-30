@@ -166,13 +166,10 @@ namespace snowcrash {
     /**
      * Data Structure
      */
-    struct DataStructure {
+    struct DataStructure : public mson::NamedType {
 
-        /** As described in source */
-        mson::NamedType source;
-
-        /** As resolved by subsequent tooling */
-        mson::NamedType resolved;
+        /** Assignment operator for Named Type */
+        DataStructure& operator=(const mson::NamedType& rhs);
     };
 
     /**
@@ -207,7 +204,7 @@ namespace snowcrash {
         /** Payload-specific Headers */
         Headers headers;
 
-        /** Payload-specific Attributes */
+        /** Payload-specific Attributes (THIS SHOULD NOT BE HERE - should be under content) */
         Attributes attributes;
 
         /** Body (deprecated - only present in serialization & c-interface) */
@@ -278,7 +275,7 @@ namespace snowcrash {
         /** Action-specific Parameters */
         Parameters parameters;
 
-        /** Action-specific Attributes */
+        /** Action-specific Attributes (THIS SHOULD NOT BE HERE - should be under content) */
         Attributes attributes;
 
         /**
@@ -319,7 +316,7 @@ namespace snowcrash {
         /** Model representing this Resource */
         ResourceModel model;
 
-        /** Resource-specific Attributes */
+        /** Resource-specific Attributes (THIS SHOULD NOT BE HERE - should be under content) */
         Attributes attributes;
 
         /** Parameters */

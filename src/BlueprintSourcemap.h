@@ -101,7 +101,7 @@ namespace snowcrash {
         /** Source Map of Payload-specific Headers */
         SourceMap<Headers> headers;
 
-        /** Source Map of Payload-specific Attributes */
+        /** Source Map of Payload-specific Attributes (THIS SHOULD NOT BE HERE - should be under content) */
         SourceMap<Attributes> attributes;
 
         /** Source Map of Body (deprecated - only present in serialization & c-interface) */
@@ -160,7 +160,7 @@ namespace snowcrash {
         /** Action-specific Parameters */
         SourceMap<Parameters> parameters;
 
-        /** Action-specific Attributes */
+        /** Action-specific Attributes (THIS SHOULD NOT BE HERE - should be under content) */
         SourceMap<Attributes> attributes;
 
         /**
@@ -202,7 +202,7 @@ namespace snowcrash {
         /** Model representing this Resource */
         SourceMap<ResourceModel> model;
 
-        /** Source Map of Resource-specific Attributes */
+        /** Source Map of Resource-specific Attributes (THIS SHOULD NOT BE HERE - should be under content) */
         SourceMap<Attributes> attributes;
 
         /** Parameters */
