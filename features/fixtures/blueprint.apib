@@ -9,7 +9,12 @@ Format: 1A
 ## <resource name> [/resource/{parameter}]
 <resource description>
 
++ Attributes (object)
+
+    + `<attribute property name>`: `<attribute property value>` (number) - <attribute property description>
+
 + Model
+
     <resource model description>
 
     + Headers
@@ -28,7 +33,8 @@ Format: 1A
     + parameter = `<default value>` (<type>, optional, `<example value>`) ... <description>
 
         + Values
-            + `<element>`
+            + `<default value>`
+            + `<example value>`
 
 + Headers
 
@@ -41,7 +47,8 @@ Format: 1A
     + parameter = `<default value>` (<type>, optional, `<example value>`) ... <description>
 
         + Values
-            + `<element>`
+            + `<default value>`
+            + `<example value>`
 
 + Headers
 
@@ -82,3 +89,15 @@ Format: 1A
 + Response 201
 
     [<resource name>][]
+
++ Response 201 (application/json)
+
+    + Attributes (<data structure name>)
+
+# Data Structures
+
+## <data structure name>
+<data structure description>
+
+### Properties
++ `<data structure property name>`: `<data structure property value>` (number) - <data structure property description>
