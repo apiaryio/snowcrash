@@ -609,7 +609,7 @@ namespace snowcrash {
                 }
             }
 
-            if (out.node.assets.body.source.empty() && out.node.attributes.source.empty() &&
+            if (out.node.assets.body.source.empty() && out.node.attributes.empty() &&
                 out.node.reference.meta.state != Reference::StatePending) {
 
                 // Warn when content-length or transfer-encoding is specified or both headers and body are empty

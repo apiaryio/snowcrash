@@ -44,15 +44,22 @@ namespace snowcrash {
                 return node;
             }
 
-            mson::parseTypeDefinition(node, pd, signature.attributes, out.report, out.node.source.typeDefinition);
+            mson::parseTypeDefinition(node, pd, signature.attributes, out.report, out.node.typeDefinition);
+
+            if (pd.exportSourceMap()) {
+
+                if (!out.node.typeDefinition.empty()) {
+                    out.sourceMap.typeDefinition.sourceMap = node->sourceMap;
+                }
+            }
 
             // Default to `object` type specification
-            if (out.node.source.typeDefinition.baseType == mson::UndefinedBaseType) {
-                out.node.source.typeDefinition.baseType = mson::ImplicitObjectBaseType;
+            if (out.node.typeDefinition.baseType == mson::UndefinedBaseType) {
+                out.node.typeDefinition.baseType = mson::ImplicitObjectBaseType;
             }
 
             SectionProcessor<mson::ValueMember>::parseRemainingContent(node, pd, signature.remainingContent,
-                                                                       out.node.source.sections, out.sourceMap.sections);
+                                                                       out.node.sections, out.sourceMap.sections);
 
             return ++MarkdownNodeIterator(node);
         }
@@ -62,7 +69,7 @@ namespace snowcrash {
                                                        SectionParserData& pd,
                                                        const ParseResultRef<Attributes>& out) {
 
-            return SectionProcessor<mson::ValueMember>::blockDescription(node, pd, out.node.source.sections, out.sourceMap.sections);
+            return SectionProcessor<mson::ValueMember>::blockDescription(node, pd, out.node.sections, out.sourceMap.sections);
         }
 
         static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
@@ -70,11 +77,11 @@ namespace snowcrash {
                                                          SectionParserData& pd,
                                                          const ParseResultRef<Attributes>& out) {
 
-            ParseResultRef<mson::TypeSections> typeSections(out.report, out.node.source.sections, out.sourceMap.sections);
+            ParseResultRef<mson::TypeSections> typeSections(out.report, out.node.sections, out.sourceMap.sections);
 
             return SectionProcessor<mson::ValueMember>
                     ::processNestedMembers<MSONTypeSectionListParser>(node, siblings, pd, typeSections,
-                                                                      out.node.source.typeDefinition.baseType);
+                                                                      out.node.typeDefinition.baseType);
         }
 
         static bool isDescriptionNode(const MarkdownNodeIterator& node,

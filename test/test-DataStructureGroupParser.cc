@@ -35,9 +35,8 @@ TEST_CASE("Parse canonical data structures", "[data_structure_group]")
     "- last_name\n\n"\
     "## Email (array[string])";
 
-    DataStructure dataStructure;
     ParseResult<DataStructureGroup> dataStructureGroup;
-    SectionParserHelper<DataStructureGroup, DataStructureGroupParser>::parse(source, DataStructureGroupSectionType, dataStructureGroup);
+    SectionParserHelper<DataStructureGroup, DataStructureGroupParser>::parse(source, DataStructureGroupSectionType, dataStructureGroup, ExportSourcemapOption);
 
     REQUIRE(dataStructureGroup.report.error.code == Error::OK);
     REQUIRE(dataStructureGroup.report.warnings.empty());
@@ -47,22 +46,27 @@ TEST_CASE("Parse canonical data structures", "[data_structure_group]")
     REQUIRE(dataStructureGroup.node.content.elements().at(0).element == Element::DataStructureElement);
     REQUIRE(dataStructureGroup.node.content.elements().at(1).element == Element::DataStructureElement);
 
-    dataStructure = dataStructureGroup.node.content.elements().at(0).content.dataStructure;
-    REQUIRE(dataStructure.resolved.empty());
-    REQUIRE(dataStructure.source.name.symbol.literal == "User");
-    REQUIRE(dataStructure.source.typeDefinition.baseType == mson::ImplicitObjectBaseType);
-    REQUIRE(dataStructure.source.typeDefinition.attributes == 0);
-    REQUIRE(dataStructure.source.typeDefinition.typeSpecification.name.empty());
-    REQUIRE(dataStructure.source.typeDefinition.typeSpecification.nestedTypes.empty());
-    REQUIRE(dataStructure.source.sections.size() == 1);
-    REQUIRE(dataStructure.source.sections[0].klass == mson::TypeSection::MemberTypeClass);
-    REQUIRE(dataStructure.source.sections[0].content.elements().size() == 2);
+    DataStructure dataStructure = dataStructureGroup.node.content.elements().at(0).content.dataStructure;
+    REQUIRE(dataStructure.name.symbol.literal == "User");
+    REQUIRE(dataStructure.typeDefinition.baseType == mson::ImplicitObjectBaseType);
+    REQUIRE(dataStructure.typeDefinition.empty());
+    REQUIRE(dataStructure.sections.size() == 1);
+    REQUIRE(dataStructure.sections[0].klass == mson::TypeSection::MemberTypeClass);
+    REQUIRE(dataStructure.sections[0].content.elements().size() == 2);
 
     dataStructure = dataStructureGroup.node.content.elements().at(1).content.dataStructure;
-    REQUIRE(dataStructure.resolved.empty());
-    REQUIRE(dataStructure.source.name.symbol.literal == "Email");
-    REQUIRE(dataStructure.source.typeDefinition.typeSpecification.name.base == mson::ArrayTypeName);
-    REQUIRE(dataStructure.source.typeDefinition.typeSpecification.nestedTypes.size() == 1);
+    REQUIRE(dataStructure.name.symbol.literal == "Email");
+    REQUIRE(dataStructure.typeDefinition.typeSpecification.name.base == mson::ArrayTypeName);
+    REQUIRE(dataStructure.typeDefinition.typeSpecification.nestedTypes.size() == 1);
+
+    SourceMap<DataStructure> dataStructureSM = dataStructureGroup.sourceMap.content.elements().collection[0].content.dataStructure;
+    SourceMapHelper::check(dataStructureSM.name.sourceMap, 19, 9);
+    REQUIRE(dataStructureSM.typeDefinition.sourceMap.empty());
+    REQUIRE(dataStructureSM.sections.collection[0].elements().collection.size() == 2);
+
+    dataStructureSM = dataStructureGroup.sourceMap.content.elements().collection[1].content.dataStructure;
+    SourceMapHelper::check(dataStructureSM.name.sourceMap, 54, 24);
+    SourceMapHelper::check(dataStructureSM.typeDefinition.sourceMap, 54, 24);
 }
 
 TEST_CASE("Parse multiple data structures with type sections", "[data_structure_group]")
@@ -81,9 +85,8 @@ TEST_CASE("Parse multiple data structures with type sections", "[data_structure_
     "\n"\
     "## Email (array[string])";
 
-    DataStructure dataStructure;
     ParseResult<DataStructureGroup> dataStructureGroup;
-    SectionParserHelper<DataStructureGroup, DataStructureGroupParser>::parse(source, DataStructureGroupSectionType, dataStructureGroup);
+    SectionParserHelper<DataStructureGroup, DataStructureGroupParser>::parse(source, DataStructureGroupSectionType, dataStructureGroup, ExportSourcemapOption);
 
     REQUIRE(dataStructureGroup.report.error.code == Error::OK);
     REQUIRE(dataStructureGroup.report.warnings.empty());
@@ -93,22 +96,28 @@ TEST_CASE("Parse multiple data structures with type sections", "[data_structure_
     REQUIRE(dataStructureGroup.node.content.elements().at(0).element == Element::DataStructureElement);
     REQUIRE(dataStructureGroup.node.content.elements().at(1).element == Element::DataStructureElement);
 
-    dataStructure = dataStructureGroup.node.content.elements().at(0).content.dataStructure;
-    REQUIRE(dataStructure.resolved.empty());
-    REQUIRE(dataStructure.source.name.symbol.literal == "User");
-    REQUIRE(dataStructure.source.typeDefinition.baseType == mson::ImplicitObjectBaseType);
-    REQUIRE(dataStructure.source.typeDefinition.attributes == 0);
-    REQUIRE(dataStructure.source.typeDefinition.typeSpecification.name.empty());
-    REQUIRE(dataStructure.source.typeDefinition.typeSpecification.nestedTypes.empty());
-    REQUIRE(dataStructure.source.sections.size() == 2);
-    REQUIRE(dataStructure.source.sections[0].klass == mson::TypeSection::BlockDescriptionClass);
-    REQUIRE(dataStructure.source.sections[0].content.description == "Some description\n\n");
-    REQUIRE(dataStructure.source.sections[1].klass == mson::TypeSection::MemberTypeClass);
-    REQUIRE(dataStructure.source.sections[1].content.elements().size() == 2);
+    DataStructure dataStructure = dataStructureGroup.node.content.elements().at(0).content.dataStructure;
+    REQUIRE(dataStructure.name.symbol.literal == "User");
+    REQUIRE(dataStructure.typeDefinition.baseType == mson::ImplicitObjectBaseType);
+    REQUIRE(dataStructure.typeDefinition.empty());
+    REQUIRE(dataStructure.sections.size() == 2);
+    REQUIRE(dataStructure.sections[0].klass == mson::TypeSection::BlockDescriptionClass);
+    REQUIRE(dataStructure.sections[0].content.description == "Some description\n\n");
+    REQUIRE(dataStructure.sections[1].klass == mson::TypeSection::MemberTypeClass);
+    REQUIRE(dataStructure.sections[1].content.elements().size() == 2);
 
     dataStructure = dataStructureGroup.node.content.elements().at(1).content.dataStructure;
-    REQUIRE(dataStructure.resolved.empty());
-    REQUIRE(dataStructure.source.name.symbol.literal == "Email");
-    REQUIRE(dataStructure.source.typeDefinition.typeSpecification.name.base == mson::ArrayTypeName);
-    REQUIRE(dataStructure.source.typeDefinition.typeSpecification.nestedTypes.size() == 1);
+    REQUIRE(dataStructure.name.symbol.literal == "Email");
+    REQUIRE(dataStructure.typeDefinition.typeSpecification.name.base == mson::ArrayTypeName);
+    REQUIRE(dataStructure.typeDefinition.typeSpecification.nestedTypes.size() == 1);
+
+    SourceMap<DataStructure> dataStructureSM = dataStructureGroup.sourceMap.content.elements().collection[0].content.dataStructure;
+    SourceMapHelper::check(dataStructureSM.name.sourceMap, 19, 9);
+    REQUIRE(dataStructureSM.typeDefinition.sourceMap.empty());
+    SourceMapHelper::check(dataStructureSM.sections.collection[0].description.sourceMap, 28, 18);
+    REQUIRE(dataStructureSM.sections.collection[1].elements().collection.size() == 2);
+
+    dataStructureSM = dataStructureGroup.sourceMap.content.elements().collection[1].content.dataStructure;
+    SourceMapHelper::check(dataStructureSM.name.sourceMap, 88, 24);
+    SourceMapHelper::check(dataStructureSM.typeDefinition.sourceMap, 88, 24);
 }

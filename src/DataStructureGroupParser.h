@@ -52,7 +52,7 @@ namespace snowcrash {
                 else {
 
                     Element element(Element::DataStructureElement);
-                    element.content.dataStructure.source = namedType.node;
+                    element.content.dataStructure = namedType.node;
 
                     out.node.content.elements().push_back(element);
 
@@ -129,13 +129,13 @@ namespace snowcrash {
                          ++subIt) {
 
                         if (subIt->element == Element::ResourceElement &&
-                            subIt->content.resource.attributes.source.name.symbol.literal == name) {
+                            subIt->content.resource.attributes.name.symbol.literal == name) {
 
                             return true;
                         }
 
                         if (subIt->element == Element::DataStructureElement &&
-                            subIt->content.dataStructure.source.name.symbol.literal == name) {
+                            subIt->content.dataStructure.name.symbol.literal == name) {
 
                             return true;
                         }

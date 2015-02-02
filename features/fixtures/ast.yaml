@@ -12,16 +12,18 @@ resourceGroups:
     description: "<resource group description>\n\n"
     resources:
       -
+        element: "resource"
         name: "<resource name>"
         description: "<resource description>\n\n"
         uriTemplate: "/resource/{parameter}"
         model:
           name: "<resource name>"
-          description: "<resource model description>"
+          description: "<resource model description>\n"
           headers:
             -
               name: "<header1>"
               value: "<header1 value>"
+          content: []
           body: "<resource model body>\n"
           schema: "<resource model schema>\n"
           assets:
@@ -41,7 +43,9 @@ resourceGroups:
             example: "<example value>"
             values:
               -
-                value: "<element>"
+                value: "<default value>"
+              -
+                value: "<example value>"
         actions:
           -
             name: "<action name>"
@@ -57,7 +61,10 @@ resourceGroups:
                 example: "<example value>"
                 values:
                   -
-                    value: "<element>"
+                    value: "<default value>"
+                  -
+                    value: "<example value>"
+            content: []
             examples:
               -
                 name: ""
@@ -79,6 +86,7 @@ resourceGroups:
                       -
                         name: "<header4>"
                         value: "<header4 value>"
+                    content: []
                     body: "<request body>\n"
                     schema: "<request schema>\n"
                     assets:
@@ -105,6 +113,7 @@ resourceGroups:
                       -
                         name: "<header5>"
                         value: "<header5 value>"
+                    content: []
                     body: "<response body>\n"
                     schema: "<response schema>\n"
                     assets:
@@ -115,10 +124,10 @@ resourceGroups:
                         source: "<response schema>\n"
                         resolved: ""
                   -
-                    name: "201"
                     reference:
                       id: "<resource name>"
-                    description: "<resource model description>"
+                    name: "201"
+                    description: "<resource model description>\n"
                     headers:
                       -
                         name: "<header2>"
@@ -129,6 +138,7 @@ resourceGroups:
                       -
                         name: "<header1>"
                         value: "<header1 value>"
+                    content: []
                     body: "<resource model body>\n"
                     schema: "<resource model schema>\n"
                     assets:
@@ -138,6 +148,74 @@ resourceGroups:
                       schema:
                         source: "<resource model schema>\n"
                         resolved: ""
+                  -
+                    name: "201"
+                    description: ""
+                    headers:
+                      -
+                        name: "<header2>"
+                        value: "<header2 value>"
+                      -
+                        name: "<header3>"
+                        value: "<header3 value>"
+                      -
+                        name: "Content-Type"
+                        value: "application/json"
+                    content:
+                      -
+                        element: "dataStructure"
+                        name:
+                          literal: ""
+                          variable: false
+                        typeDefinition:
+                          typeSpecification:
+                            name:
+                              literal: "<data structure name>"
+                              variable: false
+                            nestedTypes: []
+                          attributes: []
+                        sections: []
+                    body: ""
+                    schema: ""
+                    assets:
+                      body:
+                        source: ""
+                        resolved: ""
+                      schema:
+                        source: ""
+                        resolved: ""
+        content:
+          -
+            element: "dataStructure"
+            name:
+              literal: "<resource name>"
+              variable: false
+            typeDefinition:
+              typeSpecification:
+                name: "object"
+                nestedTypes: []
+              attributes: []
+            sections:
+              -
+                class: "memberType"
+                content:
+                  -
+                    content:
+                      name:
+                        literal: "<attribute property name>"
+                      description: "<attribute property description>"
+                      valueDefinition:
+                        values:
+                          -
+                            literal: "<attribute property value>"
+                            variable: false
+                        typeDefinition:
+                          typeSpecification:
+                            name: "number"
+                            nestedTypes: []
+                          attributes: []
+                      sections: []
+                    class: "property"
 content:
   -
     element: "category"
@@ -148,17 +226,18 @@ content:
         element: "copy"
         content: "<resource group description>\n\n"
       -
+        element: "resource"
         name: "<resource name>"
         description: "<resource description>\n\n"
-        element: "resource"
         uriTemplate: "/resource/{parameter}"
         model:
           name: "<resource name>"
-          description: "<resource model description>"
+          description: "<resource model description>\n"
           headers:
             -
               name: "<header1>"
               value: "<header1 value>"
+          content: []
           body: "<resource model body>\n"
           schema: "<resource model schema>\n"
           assets:
@@ -178,7 +257,9 @@ content:
             example: "<example value>"
             values:
               -
-                value: "<element>"
+                value: "<default value>"
+              -
+                value: "<example value>"
         actions:
           -
             name: "<action name>"
@@ -194,7 +275,10 @@ content:
                 example: "<example value>"
                 values:
                   -
-                    value: "<element>"
+                    value: "<default value>"
+                  -
+                    value: "<example value>"
+            content: []
             examples:
               -
                 name: ""
@@ -216,6 +300,7 @@ content:
                       -
                         name: "<header4>"
                         value: "<header4 value>"
+                    content: []
                     body: "<request body>\n"
                     schema: "<request schema>\n"
                     assets:
@@ -242,6 +327,7 @@ content:
                       -
                         name: "<header5>"
                         value: "<header5 value>"
+                    content: []
                     body: "<response body>\n"
                     schema: "<response schema>\n"
                     assets:
@@ -252,10 +338,10 @@ content:
                         source: "<response schema>\n"
                         resolved: ""
                   -
-                    name: "201"
                     reference:
                       id: "<resource name>"
-                    description: "<resource model description>"
+                    name: "201"
+                    description: "<resource model description>\n"
                     headers:
                       -
                         name: "<header2>"
@@ -266,6 +352,7 @@ content:
                       -
                         name: "<header1>"
                         value: "<header1 value>"
+                    content: []
                     body: "<resource model body>\n"
                     schema: "<resource model schema>\n"
                     assets:
@@ -275,3 +362,110 @@ content:
                       schema:
                         source: "<resource model schema>\n"
                         resolved: ""
+                  -
+                    name: "201"
+                    description: ""
+                    headers:
+                      -
+                        name: "<header2>"
+                        value: "<header2 value>"
+                      -
+                        name: "<header3>"
+                        value: "<header3 value>"
+                      -
+                        name: "Content-Type"
+                        value: "application/json"
+                    content:
+                      -
+                        element: "dataStructure"
+                        name:
+                          literal: ""
+                          variable: false
+                        typeDefinition:
+                          typeSpecification:
+                            name:
+                              literal: "<data structure name>"
+                              variable: false
+                            nestedTypes: []
+                          attributes: []
+                        sections: []
+                    body: ""
+                    schema: ""
+                    assets:
+                      body:
+                        source: ""
+                        resolved: ""
+                      schema:
+                        source: ""
+                        resolved: ""
+        content:
+          -
+            element: "dataStructure"
+            name:
+              literal: "<resource name>"
+              variable: false
+            typeDefinition:
+              typeSpecification:
+                name: "object"
+                nestedTypes: []
+              attributes: []
+            sections:
+              -
+                class: "memberType"
+                content:
+                  -
+                    content:
+                      name:
+                        literal: "<attribute property name>"
+                      description: "<attribute property description>"
+                      valueDefinition:
+                        values:
+                          -
+                            literal: "<attribute property value>"
+                            variable: false
+                        typeDefinition:
+                          typeSpecification:
+                            name: "number"
+                            nestedTypes: []
+                          attributes: []
+                      sections: []
+                    class: "property"
+  -
+    element: "category"
+    content:
+      -
+        element: "dataStructure"
+        name:
+          literal: "<data structure name>"
+          variable: false
+        typeDefinition:
+          typeSpecification:
+            name:
+              literal: ""
+              variable: false
+            nestedTypes: []
+          attributes: []
+        sections:
+          -
+            class: "blockDescription"
+            content: "<data structure description>\n\n"
+          -
+            class: "memberType"
+            content:
+              -
+                content:
+                  name:
+                    literal: "<data structure property name>"
+                  description: "<data structure property description>"
+                  valueDefinition:
+                    values:
+                      -
+                        literal: "<data structure property value>"
+                        variable: false
+                    typeDefinition:
+                      typeSpecification:
+                        name: "number"
+                        nestedTypes: []
+                      attributes: []
+                  sections: []
+                class: "property"
