@@ -351,6 +351,26 @@ sos::Object WrapNamedType(const mson::NamedType& namedType)
     return namedTypeObject;
 }
 
+sos::String WrapElementRole(const Element::Role& role)
+{
+    std::string str;
+
+    switch (role) {
+        case Element::BodyExampleRole:
+            str = "bodyExample";
+            break;
+
+        case Element::BodySchemaRole:
+            str = "bodySchema";
+            break;
+
+        default:
+            break;
+    }
+
+    return sos::String(str);
+}
+
 sos::String WrapElementClass(const Element::Class& element)
 {
     std::string str;
@@ -416,7 +436,7 @@ sos::Object WrapReference(const Reference& reference)
     return referenceObject;
 }
 
-sos::Object WrapAsset(const Asset& asset, const std::string& role)
+sos::Object WrapAsset(const Asset& asset, const Element::Role& role)
 {
     sos::Object assetObject;
 
@@ -427,7 +447,7 @@ sos::Object WrapAsset(const Asset& asset, const std::string& role)
     sos::Object attributes;
 
     /// Role
-    attributes.set(SerializeKey::Role, sos::String(role));
+    attributes.set(SerializeKey::Role, WrapElementRole(role));
 
     assetObject.set(SerializeKey::Attributes, attributes);
 
@@ -499,12 +519,12 @@ sos::Object WrapPayload(const Payload& payload)
 
     /// Asset 'bodyExample'
     if (!payload.body.empty()) {
-        content.push(WrapAsset(payload.body, 'bodyExample'));
+        content.push(WrapAsset(payload.body, Element::BodyExampleRole));
     }
 
     /// Asset 'bodySchema'
     if (!payload.schema.empty()) {
-        content.push(WrapAsset(payload.schema, 'bodySchema'));
+        content.push(WrapAsset(payload.schema, Element::BodySchemaRole));
     }
 
     payloadObject.set(SerializeKey::Content, content);

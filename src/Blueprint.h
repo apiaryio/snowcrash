@@ -345,6 +345,13 @@ namespace snowcrash {
             DataStructureElement  // Data Structure
         };
 
+        /** Role of an element */
+        enum Role {
+            UndefinedRole = 0,   // Unknown
+            BodyExampleRole,     // Body example for asset
+            BodySchemaRole       // Body schema for asset
+        };
+
         /** Attributes of an element */
         struct Attributes {
 
