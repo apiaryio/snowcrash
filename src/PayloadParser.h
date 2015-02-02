@@ -318,7 +318,8 @@ namespace snowcrash {
             if (sectionType == RequestSectionType || sectionType == RequestBodySectionType) {
 
                 checkRequest(node, pd, out);
-            } else if (sectionType == ResponseSectionType || sectionType == ResponseBodySectionType) {
+            }
+            else if (sectionType == ResponseSectionType || sectionType == ResponseBodySectionType) {
 
                 checkResponse(node, pd, out);
             }

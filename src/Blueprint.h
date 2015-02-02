@@ -80,6 +80,13 @@ namespace snowcrash {
     /** Collection of Parameter Values */
     typedef Collection<Value>::type Values;
 
+    /** Role of an element */
+    enum AssetRole {
+        UndefinedAssetRole = 0,   // Unknown
+        BodyExampleAssetRole,     // Body example for asset
+        BodySchemaAssetRole       // Body schema for asset
+    };
+
     /** Parameter Use flag */
     enum ParameterUse {
         UndefinedParameterUse,
@@ -343,13 +350,6 @@ namespace snowcrash {
             AssetElement,         // Asset of API description
             ResourceElement,      // Resource
             DataStructureElement  // Data Structure
-        };
-
-        /** Role of an element */
-        enum Role {
-            UndefinedRole = 0,   // Unknown
-            BodyExampleRole,     // Body example for asset
-            BodySchemaRole       // Body schema for asset
         };
 
         /** Attributes of an element */
