@@ -10,6 +10,13 @@
 
 using namespace snowcrash;
 
+bool SourceMap<mson::NamedType>::empty() const
+{
+    return (name.sourceMap.empty() &&
+            typeDefinition.sourceMap.empty() &&
+            sections.collection.empty());
+}
+
 bool SourceMap<mson::ValueMember>::empty() const
 {
     return (description.sourceMap.empty() &&
