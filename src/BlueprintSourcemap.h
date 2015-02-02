@@ -71,19 +71,6 @@ namespace snowcrash {
     // 'Attributes' is the same as 'DataStructure'
 
     /**
-     * Source Map Structure for Assets in Payload
-     */
-    template<>
-    struct SourceMap<Payload::Assets> : public SourceMapBase {
-
-        /** Source Map of Body */
-        SourceMap<Asset> body;
-
-        /** Source Map of Schema */
-        SourceMap<Asset> schema;
-    };
-
-    /**
      * Source Map Structure for Payload
      */
     template<>
@@ -104,11 +91,11 @@ namespace snowcrash {
         /** Source Map of Payload-specific Attributes (THIS SHOULD NOT BE HERE - should be under content) */
         SourceMap<Attributes> attributes;
 
-        /** Source Map of Body (deprecated - only present in serialization & c-interface) */
-        /** Source Map of Schema (deprecated - only present in serialization & c-interface) */
+        /** Source Map of Body */
+        SourceMap<Asset> body;
 
-        /** Source Map of Assets */
-        SourceMap<Payload::Assets> assets;
+        /** Source Map of Schema */
+        SourceMap<Asset> schema;
 
         /** Source Map of Model Reference */
         SourceMap<Reference> reference;

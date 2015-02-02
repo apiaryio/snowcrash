@@ -83,11 +83,11 @@ namespace snowcrash {
                     // NOTE: NOT THE CORRECT WAY TO DO THIS
                     // https://github.com/apiaryio/snowcrash/commit/a7c5868e62df0048a85e2f9aeeb42c3b3e0a2f07#commitcomment-7322085
                     pd.sectionsContext.push_back(BodySectionType);
-                    CodeBlockUtility::signatureContentAsCodeBlock(node, pd, out.report, out.node.assets.body.source);
+                    CodeBlockUtility::signatureContentAsCodeBlock(node, pd, out.report, out.node.body);
                     pd.sectionsContext.pop_back();
 
-                    if (pd.exportSourceMap() && !out.node.assets.body.source.empty()) {
-                        out.sourceMap.assets.body.sourceMap.append(node->sourceMap);
+                    if (pd.exportSourceMap() && !out.node.body.empty()) {
+                        out.sourceMap.body.sourceMap.append(node->sourceMap);
                     }
                 }
             }
@@ -115,7 +115,7 @@ namespace snowcrash {
                                                       sourceMap));
             } else {
 
-                if (!out.node.assets.body.source.empty() ||
+                if (!out.node.body.empty() ||
                     node->type != mdp::ParagraphMarkdownNodeType ||
                     !parseModelReference(node, pd, node->text, out)) {
 
@@ -125,10 +125,10 @@ namespace snowcrash {
                     CodeBlockUtility::contentAsCodeBlock(node, pd, out.report, content);
                     pd.sectionsContext.pop_back();
 
-                    out.node.assets.body.source += content;
+                    out.node.body += content;
 
                     if (pd.exportSourceMap() && !content.empty()) {
-                        out.sourceMap.assets.body.sourceMap.append(node->sourceMap);
+                        out.sourceMap.body.sourceMap.append(node->sourceMap);
                     }
                 }
             }
@@ -156,7 +156,7 @@ namespace snowcrash {
 
                 case BodySectionType:
                 {
-                    if (!out.node.assets.body.source.empty()) {
+                    if (!out.node.body.empty()) {
                         // WARN: Multiple body section
                         mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
                         out.report.warnings.push_back(Warning("ignoring additional 'body' content, it is already defined",
@@ -164,13 +164,13 @@ namespace snowcrash {
                                                               sourceMap));
                     }
 
-                    ParseResultRef<Asset> asset(out.report, out.node.assets.body, out.sourceMap.assets.body);
+                    ParseResultRef<Asset> asset(out.report, out.node.body, out.sourceMap.body);
                     return AssetParser::parse(node, siblings, pd, asset);
                 }
 
                 case SchemaSectionType:
                 {
-                    if (!out.node.assets.schema.source.empty()) {
+                    if (!out.node.schema.empty()) {
                         // WARN: Multiple schema section
                         mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
                         out.report.warnings.push_back(Warning("ignoring additional 'schema' content, it is already defined",
@@ -178,7 +178,7 @@ namespace snowcrash {
                                                               sourceMap));
                     }
 
-                    ParseResultRef<Asset> asset(out.report, out.node.assets.schema, out.sourceMap.assets.schema);
+                    ParseResultRef<Asset> asset(out.report, out.node.schema, out.sourceMap.schema);
                     return AssetParser::parse(node, siblings, pd, asset);
                 }
 
@@ -199,10 +199,10 @@ namespace snowcrash {
                  node->type == mdp::CodeMarkdownNodeType) &&
                 sectionType == BodySectionType) {
 
-                mdp::ByteBuffer content = CodeBlockUtility::addDanglingAsset(node, pd, sectionType, out.report, out.node.assets.body.source);
+                mdp::ByteBuffer content = CodeBlockUtility::addDanglingAsset(node, pd, sectionType, out.report, out.node.body);
 
                 if (pd.exportSourceMap() && !content.empty()) {
-                    out.sourceMap.assets.body.sourceMap.append(node->sourceMap);
+                    out.sourceMap.body.sourceMap.append(node->sourceMap);
                 }
 
                 return ++MarkdownNodeIterator(node);
@@ -316,9 +316,10 @@ namespace snowcrash {
             SectionType sectionType = pd.sectionContext();
 
             if (sectionType == RequestSectionType || sectionType == RequestBodySectionType) {
+
                 checkRequest(node, pd, out);
-            }
-            else if (sectionType == ResponseSectionType || sectionType == ResponseBodySectionType) {
+            } else if (sectionType == ResponseSectionType || sectionType == ResponseBodySectionType) {
+
                 checkResponse(node, pd, out);
             }
         }
@@ -505,6 +506,7 @@ namespace snowcrash {
                 if (pd.modelTable.find(symbol) == pd.modelTable.end()) {
 
                     out.node.reference.meta.state = Reference::StatePending;
+
                     return true;
                 }
 
@@ -561,8 +563,8 @@ namespace snowcrash {
                 out.node.headers = model.headers;
             }
 
-            out.node.assets.body.source = model.assets.body.source;
-            out.node.assets.schema.source = model.assets.schema.source;
+            out.node.body = model.body;
+            out.node.schema = model.schema;
 
             if (pd.exportSourceMap()) {
 
@@ -570,8 +572,8 @@ namespace snowcrash {
 
                 out.sourceMap.description = modelSM.description;
                 out.sourceMap.parameters = modelSM.parameters;
-                out.sourceMap.assets.body = modelSM.assets.body;
-                out.sourceMap.assets.schema = modelSM.assets.schema;
+                out.sourceMap.body = modelSM.body;
+                out.sourceMap.schema = modelSM.schema;
 
                 if (isPayloadContentType && !isModelContentType) {
                     out.sourceMap.headers.collection.insert(out.sourceMap.headers.collection.end(), modelSM.headers.collection.begin(), modelSM.headers.collection.end());
@@ -609,7 +611,8 @@ namespace snowcrash {
                 }
             }
 
-            if (out.node.assets.body.source.empty() && out.node.attributes.empty() &&
+
+            if (out.node.body.empty() && out.node.attributes.empty() &&
                 out.node.reference.meta.state != Reference::StatePending) {
 
                 // Warn when content-length or transfer-encoding is specified or both headers and body are empty
@@ -658,7 +661,7 @@ namespace snowcrash {
             StatusCodeTraits statusCodeTraits = GetStatusCodeTrait(code);
 
             if (!statusCodeTraits.allowBody &&
-                !out.node.assets.body.source.empty() &&
+                !out.node.body.empty() &&
                 out.node.reference.meta.state != Reference::StatePending) {
 
                 // WARN: not empty body

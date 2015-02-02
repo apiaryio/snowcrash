@@ -54,6 +54,9 @@ namespace snowcrash {
     /** A generic key - value pair */
     typedef std::pair<std::string, std::string> KeyValuePair;
 
+    /** An asset data */
+    typedef std::string Asset;
+
     /**
      *  \brief Metadata key-value pair,
      *
@@ -82,16 +85,6 @@ namespace snowcrash {
         UndefinedParameterUse,
         OptionalParameterUse,
         RequiredParameterUse
-    };
-
-    /** Asset */
-    struct Asset {
-
-        /** Asset as written in source */
-        std::string source;
-
-        /** Asset as resolved by tooling */
-        std::string resolved;
     };
 
     /** Parameter */
@@ -182,16 +175,6 @@ namespace snowcrash {
      */
     struct Payload {
 
-        /** Assets Structure of the Payload */
-        struct Assets {
-
-            /** Body */
-            Asset body;
-
-            /** Schema */
-            Asset schema;
-        };
-
         /** A Payload Name */
         Name name;
 
@@ -207,11 +190,11 @@ namespace snowcrash {
         /** Payload-specific Attributes (THIS SHOULD NOT BE HERE - should be under content) */
         Attributes attributes;
 
-        /** Body (deprecated - only present in serialization & c-interface) */
-        /** Schema (deprecated - only present in serialization & c-interface) */
+        /** Body */
+        Asset body;
 
-        /** Assets of the Payload */
-        Assets assets;
+        /** Schema */
+        Asset schema;
 
         /** Reference */
         Reference reference;

@@ -172,7 +172,7 @@ TEST_CASE("Parse multiple resources with payloads", "[resource_group]")
     REQUIRE(resource1.actions[0].examples[0].requests.size() == 1);
     REQUIRE(resource1.actions[0].examples[0].requests[0].name.empty());
     REQUIRE(resource1.actions[0].examples[0].requests[0].description.empty());
-    REQUIRE(resource1.actions[0].examples[0].requests[0].assets.body.source.empty());
+    REQUIRE(resource1.actions[0].examples[0].requests[0].body.empty());
     REQUIRE(resource1.actions[0].examples[0].responses.empty());
 
     Resource resource2 = resourceGroup.node.content.elements().at(1).content.resource;
@@ -184,7 +184,7 @@ TEST_CASE("Parse multiple resources with payloads", "[resource_group]")
     REQUIRE(resource2.actions[0].examples.size() == 1);
     REQUIRE(resource2.actions[0].examples[0].requests[0].name.empty());
     REQUIRE(resource2.actions[0].examples[0].requests[0].description.empty());
-    REQUIRE(resource2.actions[0].examples[0].requests[0].assets.body.source.empty());
+    REQUIRE(resource2.actions[0].examples[0].requests[0].body.empty());
     REQUIRE(resource2.actions[0].examples[0].responses.empty());
 
     REQUIRE(resourceGroup.sourceMap.attributes.name.sourceMap.empty());
@@ -336,7 +336,7 @@ TEST_CASE("Parse resource method abbreviation followed by a foreign method", "[r
     REQUIRE(resource.name.empty());
     REQUIRE(resource.uriTemplate == "/resource");
     REQUIRE(resource.model.name.empty());
-    REQUIRE(resource.model.assets.body.source.empty());
+    REQUIRE(resource.model.body.empty());
     REQUIRE(resource.actions.size() == 1);
     REQUIRE(resource.actions[0].method == "GET");
 
@@ -371,7 +371,7 @@ TEST_CASE("Parse resource method abbreviation followed by another", "[resource_g
     REQUIRE(resource.name.empty());
     REQUIRE(resource.uriTemplate == "/resource");
     REQUIRE(resource.model.name.empty());
-    REQUIRE(resource.model.assets.body.source.empty());
+    REQUIRE(resource.model.body.empty());
     REQUIRE(resource.actions.size() == 1);
     REQUIRE(resource.actions[0].method == "GET");
 
@@ -379,7 +379,7 @@ TEST_CASE("Parse resource method abbreviation followed by another", "[resource_g
     REQUIRE(resource.name.empty());
     REQUIRE(resource.uriTemplate == "/2");
     REQUIRE(resource.model.name.empty());
-    REQUIRE(resource.model.assets.body.source.empty());
+    REQUIRE(resource.model.body.empty());
     REQUIRE(resource.actions.size() == 1);
     REQUIRE(resource.actions[0].method == "POST");
 
