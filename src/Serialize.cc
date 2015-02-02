@@ -55,3 +55,4 @@ const std::string SerializeKey::Content = "content";
 const std::string SerializeKey::ValueDefinition = "valueDefinition";
 
 const std::string SerializeKey::Element = "element";
+const std::string SerializeKey::Role = "role";

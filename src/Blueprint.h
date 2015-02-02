@@ -190,10 +190,10 @@ namespace snowcrash {
         /** Payload-specific Attributes (THIS SHOULD NOT BE HERE - should be under content) */
         Attributes attributes;
 
-        /** Body */
+        /** Body (THIS SHOULD NOT BE HERE - should be under content) */
         Asset body;
 
-        /** Schema */
+        /** Schema (THIS SHOULD NOT BE HERE - should be under content) */
         Asset schema;
 
         /** Reference */
@@ -340,6 +340,7 @@ namespace snowcrash {
             UndefinedElement = 0, // Unknown
             CategoryElement,      // Group of other elements
             CopyElement,          // Human readable text
+            AssetElement,         // Asset of API description
             ResourceElement,      // Resource
             DataStructureElement  // Data Structure
         };

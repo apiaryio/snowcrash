@@ -91,10 +91,10 @@ namespace snowcrash {
         /** Source Map of Payload-specific Attributes (THIS SHOULD NOT BE HERE - should be under content) */
         SourceMap<Attributes> attributes;
 
-        /** Source Map of Body */
+        /** Source Map of Body (THIS SHOULD NOT BE HERE - should be under content) */
         SourceMap<Asset> body;
 
-        /** Source Map of Schema */
+        /** Source Map of Schema (THIS SHOULD NOT BE HERE - should be under content) */
         SourceMap<Asset> schema;
 
         /** Source Map of Model Reference */
