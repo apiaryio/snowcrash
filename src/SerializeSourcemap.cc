@@ -149,20 +149,46 @@ sos::Object WrapNamedTypeSourcemap(const SourceMap<mson::NamedType>& namedType)
     return namedTypeObject;
 }
 
+sos::Object WrapDataStructureSourcemap(const SourceMap<DataStructure>& dataStructure)
+{
+    sos::Object dataStructureObject;
+
+    // Name
+    dataStructureObject.set(SerializeKey::Name, WrapSourcemap(dataStructure.name));
+
+    // Type Definition
+    dataStructureObject.set(SerializeKey::TypeDefinition, WrapSourcemap(dataStructure.typeDefinition));
+
+    // Type Sections
+    dataStructureObject.set(SerializeKey::Sections, WrapTypeSectionsSourcemap(dataStructure.sections));
+
+    return dataStructureObject;
+}
+
+sos::Object WrapAssetSourcemap(const SourceMap<Asset>& asset)
+{
+    sos::Object assetObject;
+
+    // Content
+    assetObject.set(SerializeKey::Content, WrapSourcemap(asset));
+
+    return assetObject;
+}
+
 sos::Object WrapPayloadSourcemap(const SourceMap<Payload>& payload)
 {
     sos::Object payloadObject;
+
+    // Reference
+    if (!payload.reference.sourceMap.empty()) {
+        payloadObject.set(SerializeKey::Reference, WrapSourcemap(payload.reference));
+    }
 
     // Name
     payloadObject.set(SerializeKey::Name, WrapSourcemap(payload.name));
 
     // Description
     payloadObject.set(SerializeKey::Description, WrapSourcemap(payload.description));
-
-    // Reference
-    if (!payload.reference.sourceMap.empty()) {
-        payloadObject.set(SerializeKey::Reference, WrapSourcemap(payload.reference));
-    }
 
     // Headers
     sos::Array headers;
@@ -181,6 +207,26 @@ sos::Object WrapPayloadSourcemap(const SourceMap<Payload>& payload)
 
     // Schema
     payloadObject.set(SerializeKey::Schema, WrapSourcemap(payload.schema));
+
+    // Content
+    sos::Array content;
+
+    /// Attributes
+    if (!payload.attributes.empty()) {
+        content.push(WrapDataStructureSourcemap(payload.attributes));
+    }
+
+    /// Asset 'bodyExample'
+    if (!payload.body.sourceMap.empty()) {
+        content.push(WrapAssetSourcemap(payload.body));
+    }
+
+    /// Asset 'bodySchema'
+    if (!payload.schema.sourceMap.empty()) {
+        content.push(WrapAssetSourcemap(payload.schema));
+    }
+
+    payloadObject.set(SerializeKey::Content, content);
 
     return payloadObject;
 }
@@ -298,6 +344,16 @@ sos::Object WrapActionSourcemap(const SourceMap<Action>& action)
 
     actionObject.set(SerializeKey::Examples, transactionExamples);
 
+    // Content
+    sos::Array content;
+
+    /// Attributes
+    if (!action.attributes.empty()) {
+        content.push(WrapDataStructureSourcemap(action.attributes));
+    }
+
+    actionObject.set(SerializeKey::Content, content);
+
     return actionObject;
 }
 
@@ -332,6 +388,16 @@ sos::Object WrapResourceSourcemap(const SourceMap<Resource>& resource)
     }
 
     resourceObject.set(SerializeKey::Actions, actions);
+
+    // Content
+    sos::Array content;
+
+    /// Attributes
+    if (!resource.attributes.empty()) {
+        content.push(WrapDataStructureSourcemap(resource.attributes));
+    }
+
+    resourceObject.set(SerializeKey::Content, content);
 
     return resourceObject;
 }
@@ -378,11 +444,6 @@ sos::Object WrapDataStructureContent(const SourceMap<DataStructure>& dataStructu
 
 sos::Object WrapElementSourcemap(const SourceMap<Element>& element)
 {
-    // Resource Element is special case
-    if (element.element == Element::ResourceElement) {
-        return WrapResourceSourcemap(element.content.resource);
-    }
-
     sos::Object elementObject;
 
     if (!element.attributes.name.sourceMap.empty()) {
@@ -402,8 +463,12 @@ sos::Object WrapElementSourcemap(const SourceMap<Element>& element)
 
         case Element::DataStructureElement:
         {
-            elementObject.set(SerializeKey::Content, WrapDataStructureContent(element.content.dataStructure));
-            break;
+            return WrapDataStructureSourcemap(element.content.dataStructure);
+        }
+
+        case Element::ResourceElement:
+        {
+            return WrapResourceSourcemap(element.content.resource);
         }
 
         case Element::CategoryElement:

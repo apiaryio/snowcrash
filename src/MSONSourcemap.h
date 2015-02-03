@@ -106,6 +106,9 @@ namespace snowcrash {
 
         /** Source Map of Type Sections */
         SourceMap<mson::TypeSections> sections;
+
+        /** Check if empty */
+        bool empty() const;
     };
 
     /** Source Map structure for Value Member */
