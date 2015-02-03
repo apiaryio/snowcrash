@@ -92,10 +92,10 @@ namespace snowcrashtest {
             sourcemap.push_back(mdp::BytesRange(0, 1));
 
             model.description = "Foo";
-            model.assets.body.source = "Bar";
+            model.body = "Bar";
 
             modelSM.description.sourceMap = sourcemap;
-            modelSM.assets.body.sourceMap = sourcemap;
+            modelSM.body.sourceMap = sourcemap;
 
             models.modelTable[name] = model;
             models.modelSourceMapTable[name] = modelSM;

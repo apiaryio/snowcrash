@@ -54,6 +54,9 @@ namespace snowcrash {
     /** A generic key - value pair */
     typedef std::pair<std::string, std::string> KeyValuePair;
 
+    /** An asset data */
+    typedef std::string Asset;
+
     /**
      *  \brief Metadata key-value pair,
      *
@@ -77,21 +80,18 @@ namespace snowcrash {
     /** Collection of Parameter Values */
     typedef Collection<Value>::type Values;
 
+    /** Role of an element */
+    enum AssetRole {
+        UndefinedAssetRole = 0,   // Unknown
+        BodyExampleAssetRole,     // Body example for asset
+        BodySchemaAssetRole       // Body schema for asset
+    };
+
     /** Parameter Use flag */
     enum ParameterUse {
         UndefinedParameterUse,
         OptionalParameterUse,
         RequiredParameterUse
-    };
-
-    /** Asset */
-    struct Asset {
-
-        /** Asset as written in source */
-        std::string source;
-
-        /** Asset as resolved by tooling */
-        std::string resolved;
     };
 
     /** Parameter */
@@ -182,16 +182,6 @@ namespace snowcrash {
      */
     struct Payload {
 
-        /** Assets Structure of the Payload */
-        struct Assets {
-
-            /** Body */
-            Asset body;
-
-            /** Schema */
-            Asset schema;
-        };
-
         /** A Payload Name */
         Name name;
 
@@ -207,11 +197,11 @@ namespace snowcrash {
         /** Payload-specific Attributes (THIS SHOULD NOT BE HERE - should be under content) */
         Attributes attributes;
 
-        /** Body (deprecated - only present in serialization & c-interface) */
-        /** Schema (deprecated - only present in serialization & c-interface) */
+        /** Body (THIS SHOULD NOT BE HERE - should be under content) */
+        Asset body;
 
-        /** Assets of the Payload */
-        Assets assets;
+        /** Schema (THIS SHOULD NOT BE HERE - should be under content) */
+        Asset schema;
 
         /** Reference */
         Reference reference;
@@ -357,6 +347,7 @@ namespace snowcrash {
             UndefinedElement = 0, // Unknown
             CategoryElement,      // Group of other elements
             CopyElement,          // Human readable text
+            AssetElement,         // Asset of API description
             ResourceElement,      // Resource
             DataStructureElement  // Data Structure
         };

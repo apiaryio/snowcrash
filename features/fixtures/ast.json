@@ -28,19 +28,24 @@
                 "value": "<header1 value>"
               }
             ],
-            "content": [],
             "body": "<resource model body>\n",
             "schema": "<resource model schema>\n",
-            "assets": {
-              "body": {
-                "source": "<resource model body>\n",
-                "resolved": ""
+            "content": [
+              {
+                "element": "asset",
+                "attributes": {
+                  "role": "bodyExample"
+                },
+                "content": "<resource model body>\n"
               },
-              "schema": {
-                "source": "<resource model schema>\n",
-                "resolved": ""
+              {
+                "element": "asset",
+                "attributes": {
+                  "role": "bodySchema"
+                },
+                "content": "<resource model schema>\n"
               }
-            }
+            ]
           },
           "parameters": [
             {
@@ -110,19 +115,24 @@
                           "value": "<header4 value>"
                         }
                       ],
-                      "content": [],
                       "body": "<request body>\n",
                       "schema": "<request schema>\n",
-                      "assets": {
-                        "body": {
-                          "source": "<request body>\n",
-                          "resolved": ""
+                      "content": [
+                        {
+                          "element": "asset",
+                          "attributes": {
+                            "role": "bodyExample"
+                          },
+                          "content": "<request body>\n"
                         },
-                        "schema": {
-                          "source": "<request schema>\n",
-                          "resolved": ""
+                        {
+                          "element": "asset",
+                          "attributes": {
+                            "role": "bodySchema"
+                          },
+                          "content": "<request schema>\n"
                         }
-                      }
+                      ]
                     }
                   ],
                   "responses": [
@@ -147,19 +157,24 @@
                           "value": "<header5 value>"
                         }
                       ],
-                      "content": [],
                       "body": "<response body>\n",
                       "schema": "<response schema>\n",
-                      "assets": {
-                        "body": {
-                          "source": "<response body>\n",
-                          "resolved": ""
+                      "content": [
+                        {
+                          "element": "asset",
+                          "attributes": {
+                            "role": "bodyExample"
+                          },
+                          "content": "<response body>\n"
                         },
-                        "schema": {
-                          "source": "<response schema>\n",
-                          "resolved": ""
+                        {
+                          "element": "asset",
+                          "attributes": {
+                            "role": "bodySchema"
+                          },
+                          "content": "<response schema>\n"
                         }
-                      }
+                      ]
                     },
                     {
                       "reference": {
@@ -181,19 +196,24 @@
                           "value": "<header1 value>"
                         }
                       ],
-                      "content": [],
                       "body": "<resource model body>\n",
                       "schema": "<resource model schema>\n",
-                      "assets": {
-                        "body": {
-                          "source": "<resource model body>\n",
-                          "resolved": ""
+                      "content": [
+                        {
+                          "element": "asset",
+                          "attributes": {
+                            "role": "bodyExample"
+                          },
+                          "content": "<resource model body>\n"
                         },
-                        "schema": {
-                          "source": "<resource model schema>\n",
-                          "resolved": ""
+                        {
+                          "element": "asset",
+                          "attributes": {
+                            "role": "bodySchema"
+                          },
+                          "content": "<resource model schema>\n"
                         }
-                      }
+                      ]
                     },
                     {
                       "name": "201",
@@ -212,6 +232,8 @@
                           "value": "application/json"
                         }
                       ],
+                      "body": "",
+                      "schema": "",
                       "content": [
                         {
                           "element": "dataStructure",
@@ -231,19 +253,7 @@
                           },
                           "sections": []
                         }
-                      ],
-                      "body": "",
-                      "schema": "",
-                      "assets": {
-                        "body": {
-                          "source": "",
-                          "resolved": ""
-                        },
-                        "schema": {
-                          "source": "",
-                          "resolved": ""
-                        }
-                      }
+                      ]
                     }
                   ]
                 }
@@ -327,19 +337,24 @@
                 "value": "<header1 value>"
               }
             ],
-            "content": [],
             "body": "<resource model body>\n",
             "schema": "<resource model schema>\n",
-            "assets": {
-              "body": {
-                "source": "<resource model body>\n",
-                "resolved": ""
+            "content": [
+              {
+                "element": "asset",
+                "attributes": {
+                  "role": "bodyExample"
+                },
+                "content": "<resource model body>\n"
               },
-              "schema": {
-                "source": "<resource model schema>\n",
-                "resolved": ""
+              {
+                "element": "asset",
+                "attributes": {
+                  "role": "bodySchema"
+                },
+                "content": "<resource model schema>\n"
               }
-            }
+            ]
           },
           "parameters": [
             {
@@ -409,19 +424,24 @@
                           "value": "<header4 value>"
                         }
                       ],
-                      "content": [],
                       "body": "<request body>\n",
                       "schema": "<request schema>\n",
-                      "assets": {
-                        "body": {
-                          "source": "<request body>\n",
-                          "resolved": ""
+                      "content": [
+                        {
+                          "element": "asset",
+                          "attributes": {
+                            "role": "bodyExample"
+                          },
+                          "content": "<request body>\n"
                         },
-                        "schema": {
-                          "source": "<request schema>\n",
-                          "resolved": ""
+                        {
+                          "element": "asset",
+                          "attributes": {
+                            "role": "bodySchema"
+                          },
+                          "content": "<request schema>\n"
                         }
-                      }
+                      ]
                     }
                   ],
                   "responses": [
@@ -446,19 +466,24 @@
                           "value": "<header5 value>"
                         }
                       ],
-                      "content": [],
                       "body": "<response body>\n",
                       "schema": "<response schema>\n",
-                      "assets": {
-                        "body": {
-                          "source": "<response body>\n",
-                          "resolved": ""
+                      "content": [
+                        {
+                          "element": "asset",
+                          "attributes": {
+                            "role": "bodyExample"
+                          },
+                          "content": "<response body>\n"
                         },
-                        "schema": {
-                          "source": "<response schema>\n",
-                          "resolved": ""
+                        {
+                          "element": "asset",
+                          "attributes": {
+                            "role": "bodySchema"
+                          },
+                          "content": "<response schema>\n"
                         }
-                      }
+                      ]
                     },
                     {
                       "reference": {
@@ -480,19 +505,24 @@
                           "value": "<header1 value>"
                         }
                       ],
-                      "content": [],
                       "body": "<resource model body>\n",
                       "schema": "<resource model schema>\n",
-                      "assets": {
-                        "body": {
-                          "source": "<resource model body>\n",
-                          "resolved": ""
+                      "content": [
+                        {
+                          "element": "asset",
+                          "attributes": {
+                            "role": "bodyExample"
+                          },
+                          "content": "<resource model body>\n"
                         },
-                        "schema": {
-                          "source": "<resource model schema>\n",
-                          "resolved": ""
+                        {
+                          "element": "asset",
+                          "attributes": {
+                            "role": "bodySchema"
+                          },
+                          "content": "<resource model schema>\n"
                         }
-                      }
+                      ]
                     },
                     {
                       "name": "201",
@@ -511,6 +541,8 @@
                           "value": "application/json"
                         }
                       ],
+                      "body": "",
+                      "schema": "",
                       "content": [
                         {
                           "element": "dataStructure",
@@ -530,19 +562,7 @@
                           },
                           "sections": []
                         }
-                      ],
-                      "body": "",
-                      "schema": "",
-                      "assets": {
-                        "body": {
-                          "source": "",
-                          "resolved": ""
-                        },
-                        "schema": {
-                          "source": "",
-                          "resolved": ""
-                        }
-                      }
+                      ]
                     }
                   ]
                 }

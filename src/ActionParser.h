@@ -191,10 +191,10 @@ namespace snowcrash {
                 !out.node.examples.empty() &&
                 !out.node.examples.back().responses.empty()) {
 
-                mdp::ByteBuffer content = CodeBlockUtility::addDanglingAsset(node, pd, sectionType, out.report, out.node.examples.back().responses.back().assets.body.source);
+                mdp::ByteBuffer content = CodeBlockUtility::addDanglingAsset(node, pd, sectionType, out.report, out.node.examples.back().responses.back().body);
 
                 if (pd.exportSourceMap() && !content.empty()) {
-                    out.sourceMap.examples.collection.back().responses.collection.back().assets.body.sourceMap.append(node->sourceMap);
+                    out.sourceMap.examples.collection.back().responses.collection.back().body.sourceMap.append(node->sourceMap);
                 }
 
                 return ++MarkdownNodeIterator(node);
@@ -207,10 +207,10 @@ namespace snowcrash {
                 !out.node.examples.empty() &&
                 !out.node.examples.back().requests.empty()) {
 
-                mdp::ByteBuffer content = CodeBlockUtility::addDanglingAsset(node, pd, sectionType, out.report, out.node.examples.back().requests.back().assets.body.source);
+                mdp::ByteBuffer content = CodeBlockUtility::addDanglingAsset(node, pd, sectionType, out.report, out.node.examples.back().requests.back().body);
 
                 if (pd.exportSourceMap() && !content.empty()) {
-                    out.sourceMap.examples.collection.back().requests.collection.back().assets.body.sourceMap.append(node->sourceMap);
+                    out.sourceMap.examples.collection.back().requests.collection.back().body.sourceMap.append(node->sourceMap);
                 }
 
                 return ++MarkdownNodeIterator(node);
@@ -382,7 +382,7 @@ namespace snowcrash {
 
                 HTTPMethodTraits methodTraits = GetMethodTrait(out.node.method);
 
-                if (!methodTraits.allowBody && !payload.assets.body.source.empty()) {
+                if (!methodTraits.allowBody && !payload.body.empty()) {
 
                     // WARN: Edge case for 2xx CONNECT
                     if (out.node.method == HTTPMethodName::Connect && code/100 == 2) {
@@ -393,8 +393,7 @@ namespace snowcrash {
                         out.report.warnings.push_back(Warning(ss.str(),
                                                               EmptyDefinitionWarning,
                                                               sourceMap));
-                    }
-                    else if (out.node.method != HTTPMethodName::Connect && !methodTraits.allowBody) {
+                    } else if (out.node.method != HTTPMethodName::Connect && !methodTraits.allowBody) {
 
                         std::stringstream ss;
                         ss << "the response for " << out.node.method << " request MUST NOT include a " << SectionName(BodySectionType);

@@ -38,7 +38,7 @@ TEST_CASE("Correct indentation", "[indentation]")
     REQUIRE(action.node.description.empty());
     REQUIRE(action.node.examples[0].responses.size() == 1);
     REQUIRE(action.node.examples[0].responses[0].name == "200");
-    REQUIRE(action.node.examples[0].responses[0].assets.body.source == "{ ... }\n");
+    REQUIRE(action.node.examples[0].responses[0].body == "{ ... }\n");
 }
 
 TEST_CASE("No Indentation & No Newline", "[indentation]")
@@ -59,7 +59,7 @@ TEST_CASE("No Indentation & No Newline", "[indentation]")
     REQUIRE(action.node.description.empty());
     REQUIRE(action.node.examples[0].responses.size() == 1);
     REQUIRE(action.node.examples[0].responses[0].name == "200");
-    REQUIRE(action.node.examples[0].responses[0].assets.body.source == "{ ... }\n\n");
+    REQUIRE(action.node.examples[0].responses[0].body == "{ ... }\n\n");
 }
 
 TEST_CASE("No Indentation", "[indentation]")
@@ -81,7 +81,7 @@ TEST_CASE("No Indentation", "[indentation]")
     REQUIRE(action.node.description.empty());
     REQUIRE(action.node.examples[0].responses.size() == 1);
     REQUIRE(action.node.examples[0].responses[0].name == "200");
-    REQUIRE(action.node.examples[0].responses[0].assets.body.source == "{ ... }\n\n");
+    REQUIRE(action.node.examples[0].responses[0].body == "{ ... }\n\n");
 }
 
 TEST_CASE("Poor Indentation & No Newline", "[indentation]")
@@ -102,7 +102,7 @@ TEST_CASE("Poor Indentation & No Newline", "[indentation]")
     REQUIRE(action.node.description.empty());
     REQUIRE(action.node.examples[0].responses.size() == 1);
     REQUIRE(action.node.examples[0].responses[0].name == "200");
-    REQUIRE(action.node.examples[0].responses[0].assets.body.source == "{ ... }\n\n");
+    REQUIRE(action.node.examples[0].responses[0].body == "{ ... }\n\n");
 }
 
 TEST_CASE("Poor Indentation", "[indentation]")
@@ -124,7 +124,7 @@ TEST_CASE("Poor Indentation", "[indentation]")
     REQUIRE(action.node.description.empty());
     REQUIRE(action.node.examples[0].responses.size() == 1);
     REQUIRE(action.node.examples[0].responses[0].name == "200");
-    REQUIRE(action.node.examples[0].responses[0].assets.body.source == "{ ... }\n");
+    REQUIRE(action.node.examples[0].responses[0].body == "{ ... }\n");
 }
 
 TEST_CASE("OK Indentation & No Newline", "[indentation]")
@@ -145,7 +145,7 @@ TEST_CASE("OK Indentation & No Newline", "[indentation]")
     REQUIRE(action.node.description.empty());
     REQUIRE(action.node.examples[0].responses.size() == 1);
     REQUIRE(action.node.examples[0].responses[0].name == "200");
-    REQUIRE(action.node.examples[0].responses[0].assets.body.source == "    { ... }\n\n");
+    REQUIRE(action.node.examples[0].responses[0].body == "    { ... }\n\n");
 }
 
 TEST_CASE("Full syntax - correct", "[indentation]")
@@ -166,7 +166,7 @@ TEST_CASE("Full syntax - correct", "[indentation]")
     REQUIRE(action.node.examples.size() == 1);
     REQUIRE(action.node.examples[0].responses.size() == 1);
     REQUIRE(action.node.examples[0].responses[0].name == "200");
-    REQUIRE(action.node.examples[0].responses[0].assets.body.source == "{ ... }\n");
+    REQUIRE(action.node.examples[0].responses[0].body == "{ ... }\n");
 }
 
 TEST_CASE("Full syntax - Poor Body Indentation", "[indentation]")
@@ -189,7 +189,7 @@ TEST_CASE("Full syntax - Poor Body Indentation", "[indentation]")
     REQUIRE(action.node.examples.size() == 1);
     REQUIRE(action.node.examples[0].responses.size() == 1);
     REQUIRE(action.node.examples[0].responses[0].name == "200");
-    REQUIRE(action.node.examples[0].responses[0].assets.body.source.empty());
+    REQUIRE(action.node.examples[0].responses[0].body.empty());
 }
 
 TEST_CASE("Full syntax - Poor Body & Body Asset Indentation", "[indentation]")
@@ -212,7 +212,7 @@ TEST_CASE("Full syntax - Poor Body & Body Asset Indentation", "[indentation]")
     REQUIRE(action.node.examples.size() == 1);
     REQUIRE(action.node.examples[0].responses.size() == 1);
     REQUIRE(action.node.examples[0].responses[0].name == "200");
-    REQUIRE(action.node.examples[0].responses[0].assets.body.source.empty());
+    REQUIRE(action.node.examples[0].responses[0].body.empty());
 }
 
 TEST_CASE("Full syntax - Poor Body & Body Asset Indentation & No Newline", "[indentation]")
@@ -234,7 +234,7 @@ TEST_CASE("Full syntax - Poor Body & Body Asset Indentation & No Newline", "[ind
     REQUIRE(action.node.examples.size() == 1);
     REQUIRE(action.node.examples[0].responses.size() == 1);
     REQUIRE(action.node.examples[0].responses[0].name == "200");
-    REQUIRE(action.node.examples[0].responses[0].assets.body.source.empty());
+    REQUIRE(action.node.examples[0].responses[0].body.empty());
 }
 
 TEST_CASE("Full syntax - No Indentation", "[indentation]")
@@ -259,7 +259,7 @@ TEST_CASE("Full syntax - No Indentation", "[indentation]")
     REQUIRE(action.node.examples.size() == 1);
     REQUIRE(action.node.examples[0].responses.size() == 1);
     REQUIRE(action.node.examples[0].responses[0].name == "200");
-    REQUIRE(action.node.examples[0].responses[0].assets.body.source == "{ ... }\n\n");
+    REQUIRE(action.node.examples[0].responses[0].body == "{ ... }\n\n");
 }
 
 TEST_CASE("Full syntax - No Indentation & No Newline", "[indentation]")
@@ -281,7 +281,7 @@ TEST_CASE("Full syntax - No Indentation & No Newline", "[indentation]")
     REQUIRE(action.node.examples.size() == 1);
     REQUIRE(action.node.examples[0].responses.size() == 1);
     REQUIRE(action.node.examples[0].responses[0].name == "200");
-    REQUIRE(action.node.examples[0].responses[0].assets.body.source.empty());
+    REQUIRE(action.node.examples[0].responses[0].body.empty());
 }
 
 TEST_CASE("Full syntax - Extra indentation", "[indentation]")
@@ -305,7 +305,7 @@ TEST_CASE("Full syntax - Extra indentation", "[indentation]")
     REQUIRE(action.node.examples.size() == 1);
     REQUIRE(action.node.examples[0].responses.size() == 1);
     REQUIRE(action.node.examples[0].responses[0].name == "200");
-    REQUIRE(action.node.examples[0].responses[0].assets.body.source == "+ Body\n\n        { ... }\n");
+    REQUIRE(action.node.examples[0].responses[0].body == "+ Body\n\n        { ... }\n");
 }
 
 TEST_CASE("No Indentation & No Newline multi-line", "[indentation]")
@@ -332,5 +332,5 @@ TEST_CASE("No Indentation & No Newline multi-line", "[indentation]")
     REQUIRE(action.node.examples.size() == 1);
     REQUIRE(action.node.examples[0].responses.size() == 1);
     REQUIRE(action.node.examples[0].responses[0].name == "200");
-    REQUIRE(action.node.examples[0].responses[0].assets.body.source == "{\nHello\n}\n");
+    REQUIRE(action.node.examples[0].responses[0].body == "{\nHello\n}\n");
 }

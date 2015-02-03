@@ -155,20 +155,20 @@ namespace snowcrash {
                 (sectionType == ModelBodySectionType ||
                  sectionType == ModelSectionType)) {
 
-                mdp::ByteBuffer content = CodeBlockUtility::addDanglingAsset(node, pd, sectionType, out.report, out.node.model.assets.body.source);
+                mdp::ByteBuffer content = CodeBlockUtility::addDanglingAsset(node, pd, sectionType, out.report, out.node.model.body);
 
                 if (pd.exportSourceMap() && !content.empty()) {
-                    out.sourceMap.model.assets.body.sourceMap.append(node->sourceMap);
+                    out.sourceMap.model.body.sourceMap.append(node->sourceMap);
                 }
 
                 // Update model in the model table as well
                 ModelTable::iterator it = pd.modelTable.find(out.node.model.name);
 
                 if (it != pd.modelTable.end()) {
-                    it->second.assets.body.source = out.node.model.assets.body.source;
+                    it->second.body = out.node.model.body;
 
                     if (pd.exportSourceMap()) {
-                        pd.modelSourceMapTable[out.node.model.name].assets.body = out.sourceMap.model.assets.body;
+                        pd.modelSourceMapTable[out.node.model.name].body = out.sourceMap.model.body;
                     }
                 }
 

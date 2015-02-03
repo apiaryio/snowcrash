@@ -53,7 +53,7 @@ TEST_CASE("Parsing action", "[action]")
     REQUIRE(action.node.examples.front().responses.size() == 1);
 
     REQUIRE(action.node.examples.front().responses[0].name == "200");
-    REQUIRE(action.node.examples.front().responses[0].assets.body.source == "OK.\n");
+    REQUIRE(action.node.examples.front().responses[0].body == "OK.\n");
     REQUIRE(action.node.examples.front().responses[0].headers.size() == 1);
     REQUIRE(action.node.examples.front().responses[0].headers[0].first == "Content-Type");
     REQUIRE(action.node.examples.front().responses[0].headers[0].second == "text/plain");
@@ -71,9 +71,9 @@ TEST_CASE("Parsing action", "[action]")
     REQUIRE(action.sourceMap.examples.collection[0].requests.collection.size() == 0);
     REQUIRE(action.sourceMap.examples.collection[0].responses.collection.size() == 1);
 
-    REQUIRE(action.sourceMap.examples.collection[0].responses.collection[0].assets.body.sourceMap.size() == 1);
-    REQUIRE(action.sourceMap.examples.collection[0].responses.collection[0].assets.body.sourceMap[0].location == 72);
-    REQUIRE(action.sourceMap.examples.collection[0].responses.collection[0].assets.body.sourceMap[0].length == 7);
+    REQUIRE(action.sourceMap.examples.collection[0].responses.collection[0].body.sourceMap.size() == 1);
+    REQUIRE(action.sourceMap.examples.collection[0].responses.collection[0].body.sourceMap[0].location == 72);
+    REQUIRE(action.sourceMap.examples.collection[0].responses.collection[0].body.sourceMap[0].length == 7);
     REQUIRE(action.sourceMap.examples.collection[0].responses.collection[0].name.sourceMap.size() == 1);
     REQUIRE(action.sourceMap.examples.collection[0].responses.collection[0].name.sourceMap[0].location == 41);
     REQUIRE(action.sourceMap.examples.collection[0].responses.collection[0].name.sourceMap[0].length == 27);
@@ -154,15 +154,15 @@ TEST_CASE("Parse method with multiple requests and responses", "[action]")
 
     REQUIRE(action.node.examples.front().requests[0].name == "A");
     REQUIRE(action.node.examples.front().requests[0].description == "B");
-    REQUIRE(action.node.examples.front().requests[0].assets.body.source == "C\n");
-    REQUIRE(action.node.examples.front().requests[0].assets.schema.source.empty());
+    REQUIRE(action.node.examples.front().requests[0].body == "C\n");
+    REQUIRE(action.node.examples.front().requests[0].schema.empty());
     REQUIRE(action.node.examples.front().requests[0].parameters.empty());
     REQUIRE(action.node.examples.front().requests[0].headers.empty());
 
     REQUIRE(action.node.examples.front().requests[1].name == "D");
     REQUIRE(action.node.examples.front().requests[1].description == "E");
-    REQUIRE(action.node.examples.front().requests[1].assets.body.source == "F\n");
-    REQUIRE(action.node.examples.front().requests[1].assets.schema.source.empty());
+    REQUIRE(action.node.examples.front().requests[1].body == "F\n");
+    REQUIRE(action.node.examples.front().requests[1].schema.empty());
     REQUIRE(action.node.examples.front().requests[1].parameters.empty());
     REQUIRE(action.node.examples.front().requests[1].headers.empty());
 
@@ -170,15 +170,15 @@ TEST_CASE("Parse method with multiple requests and responses", "[action]")
 
     REQUIRE(action.node.examples.front().responses[0].name == "200");
     REQUIRE(action.node.examples.front().responses[0].description == "G");
-    REQUIRE(action.node.examples.front().responses[0].assets.body.source == "H\n");
-    REQUIRE(action.node.examples.front().responses[0].assets.schema.source.empty());
+    REQUIRE(action.node.examples.front().responses[0].body == "H\n");
+    REQUIRE(action.node.examples.front().responses[0].schema.empty());
     REQUIRE(action.node.examples.front().responses[0].parameters.empty());
     REQUIRE(action.node.examples.front().responses[0].headers.empty());
 
     REQUIRE(action.node.examples.front().responses[1].name == "200");
     REQUIRE(action.node.examples.front().responses[1].description == "I");
-    REQUIRE(action.node.examples.front().responses[1].assets.body.source == "J\n");
-    REQUIRE(action.node.examples.front().responses[1].assets.schema.source.empty());
+    REQUIRE(action.node.examples.front().responses[1].body == "J\n");
+    REQUIRE(action.node.examples.front().responses[1].schema.empty());
     REQUIRE(action.node.examples.front().responses[1].parameters.empty());
     REQUIRE(action.node.examples.front().responses[1].headers.empty());
 
@@ -216,15 +216,15 @@ TEST_CASE("Parse method with multiple incomplete requests", "[action][blocks]")
 
     REQUIRE(action.node.examples.front().requests.size() == 2);
     REQUIRE(action.node.examples.front().requests[0].name == "A");
-    REQUIRE(action.node.examples.front().requests[0].assets.body.source.empty());
-    REQUIRE(action.node.examples.front().requests[0].assets.schema.source.empty());
+    REQUIRE(action.node.examples.front().requests[0].body.empty());
+    REQUIRE(action.node.examples.front().requests[0].schema.empty());
     REQUIRE(action.node.examples.front().requests[0].parameters.empty());
     REQUIRE(action.node.examples.front().requests[0].headers.empty());
 
     REQUIRE(action.node.examples.front().requests[1].name == "B");
     REQUIRE(action.node.examples.front().requests[1].description.empty());
-    REQUIRE(action.node.examples.front().requests[1].assets.body.source == "C\n\n");
-    REQUIRE(action.node.examples.front().requests[1].assets.schema.source.empty());
+    REQUIRE(action.node.examples.front().requests[1].body == "C\n\n");
+    REQUIRE(action.node.examples.front().requests[1].schema.empty());
     REQUIRE(action.node.examples.front().requests[1].parameters.empty());
     REQUIRE(action.node.examples.front().requests[1].headers.empty());
 
@@ -265,8 +265,8 @@ TEST_CASE("Parse method with foreign item", "[action]")
     REQUIRE(action.node.examples.size() == 1);
     REQUIRE(action.node.examples.front().requests.size() == 1);
     REQUIRE(action.node.examples.front().requests[0].name.empty());
-    REQUIRE(action.node.examples.front().requests[0].assets.body.source == "Foo\n");
-    REQUIRE(action.node.examples.front().requests[0].assets.schema.source.empty());
+    REQUIRE(action.node.examples.front().requests[0].body == "Foo\n");
+    REQUIRE(action.node.examples.front().requests[0].schema.empty());
     REQUIRE(action.node.examples.front().requests[0].parameters.empty());
     REQUIRE(action.node.examples.front().requests[0].headers.empty());
     REQUIRE(action.node.examples.front().responses.size() == 1);
@@ -386,7 +386,7 @@ TEST_CASE("Give a warning when 2xx CONNECT has a body", "[action]")
     REQUIRE(action.node.method == "CONNECT");
     REQUIRE(action.node.examples.size() == 1);
     REQUIRE(action.node.examples[0].responses.size() == 1);
-    REQUIRE(action.node.examples[0].responses[0].assets.body.source == "{}\n");
+    REQUIRE(action.node.examples[0].responses[0].body == "{}\n");
 
     REQUIRE(action.sourceMap.name.sourceMap.empty());
     REQUIRE(action.sourceMap.method.sourceMap.size() == 1);
@@ -415,7 +415,7 @@ TEST_CASE("Give a warning when response to HEAD has a body", "[action]")
     REQUIRE(action.node.method == "HEAD");
     REQUIRE(action.node.examples.size() == 1);
     REQUIRE(action.node.examples[0].responses.size() == 1);
-    REQUIRE(action.node.examples[0].responses[0].assets.body.source == "{}\n");
+    REQUIRE(action.node.examples[0].responses[0].body == "{}\n");
 
     REQUIRE(action.sourceMap.name.sourceMap.empty());
     REQUIRE(action.sourceMap.method.sourceMap.size() == 1);
