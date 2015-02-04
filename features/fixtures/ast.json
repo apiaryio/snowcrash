@@ -237,10 +237,7 @@
                       "content": [
                         {
                           "element": "dataStructure",
-                          "name": {
-                            "literal": "",
-                            "variable": false
-                          },
+                          "name": null,
                           "typeDefinition": {
                             "typeSpecification": {
                               "name": {
@@ -546,10 +543,7 @@
                       "content": [
                         {
                           "element": "dataStructure",
-                          "name": {
-                            "literal": "",
-                            "variable": false
-                          },
+                          "name": null,
                           "typeDefinition": {
                             "typeSpecification": {
                               "name": {
@@ -631,10 +625,7 @@
           },
           "typeDefinition": {
             "typeSpecification": {
-              "name": {
-                "literal": "",
-                "variable": false
-              },
+              "name": null,
               "nestedTypes": []
             },
             "attributes": []
