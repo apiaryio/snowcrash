@@ -578,3 +578,26 @@ TEST_CASE("Parse mson property containing list of value with string type specifi
     SourceMapHelper::check(propertyMember.sourceMap.name.sourceMap, 0, 25);
     SourceMapHelper::check(propertyMember.sourceMap.valueDefinition.sourceMap, 0, 25);
 }
+
+TEST_CASE("Parse mson property containing list of values inside a variable", "[mson][property_member][286]")
+{
+    mdp::ByteBuffer source = \
+    "- list: *3, 4* (enum)";
+
+    ParseResult<mson::PropertyMember> propertyMember;
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
+
+    REQUIRE(propertyMember.report.error.code == Error::OK);
+    REQUIRE(propertyMember.report.warnings.empty());
+
+    REQUIRE(propertyMember.node.name.literal == "list");
+    REQUIRE(propertyMember.node.valueDefinition.values.size() == 1);
+    REQUIRE(propertyMember.node.valueDefinition.values[0].literal == "3, 4");
+    REQUIRE(propertyMember.node.valueDefinition.values[0].variable);
+    REQUIRE(propertyMember.node.valueDefinition.typeDefinition.baseType == mson::ValueBaseType);
+    REQUIRE(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.name.base == mson::EnumTypeName);
+    REQUIRE(propertyMember.node.sections.empty());
+
+    SourceMapHelper::check(propertyMember.sourceMap.name.sourceMap, 0, 22);
+    SourceMapHelper::check(propertyMember.sourceMap.valueDefinition.sourceMap, 0, 22);
+}
