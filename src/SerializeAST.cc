@@ -39,6 +39,10 @@ sos::Object WrapSymbol(const mson::Symbol& symbol)
 
 sos::Base WrapTypeName(const mson::TypeName& typeName)
 {
+    if (typeName.empty()) {
+        return sos::Null();
+    }
+
     if (typeName.base != mson::UndefinedTypeName) {
 
         std::string baseTypeName;

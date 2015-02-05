@@ -178,9 +178,7 @@ resourceGroups:
                     content:
                       -
                         element: "dataStructure"
-                        name:
-                          literal: ""
-                          variable: false
+                        name: null
                         typeDefinition:
                           typeSpecification:
                             name:
@@ -397,9 +395,7 @@ content:
                     content:
                       -
                         element: "dataStructure"
-                        name:
-                          literal: ""
-                          variable: false
+                        name: null
                         typeDefinition:
                           typeSpecification:
                             name:
@@ -450,9 +446,7 @@ content:
           variable: false
         typeDefinition:
           typeSpecification:
-            name:
-              literal: ""
-              variable: false
+            name: null
             nestedTypes: []
           attributes: []
         sections:
