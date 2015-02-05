@@ -9,6 +9,7 @@
 #ifndef SNOWCRASH_MSONSOURCEMAP_H
 #define SNOWCRASH_MSONSOURCEMAP_H
 
+#include "Blueprint.h"
 #include "MSON.h"
 #include "MarkdownParser.h"
 
@@ -26,12 +27,6 @@ namespace snowcrash {
      *
      *  FIXME: Use C++11 template aliases when migrating to C++11.
      */
-    template<typename T>
-    struct Collection {
-        typedef std::vector<T> type;
-        typedef typename std::vector<T>::iterator iterator;
-        typedef typename std::vector<T>::const_iterator const_iterator;
-    };
 }
 
 #define SOURCE_MAP_COLLECTION(T, TC) template<>\

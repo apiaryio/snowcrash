@@ -10,7 +10,7 @@
 #define SNOWCRASH_BLUEPRINT_SOURCEMAP_H
 
 #include "Blueprint.h"
-
+#include "MSONSourcemap.h"
 /**
  *  API Blueprint Sourcemap Abstract Syntax Tree
  *  ---------------------------------------------

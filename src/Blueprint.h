@@ -14,7 +14,7 @@
 #include <utility>
 #include "Platform.h"
 #include "MarkdownNode.h"
-#include "MSONSourcemap.h"
+#include "MSON.h"
 
 /**
  *  API Blueprint Abstract Syntax Tree
@@ -70,6 +70,19 @@ namespace snowcrash {
      *  E.g. "Content-Type: application/json"
      */
     typedef KeyValuePair Header;
+
+    /**
+     * Default Container for collections.
+     *
+     *  FIXME: Use C++11 template aliases when migrating to C++11.
+     */
+
+    template<typename T>
+    struct Collection {
+        typedef std::vector<T> type;
+        typedef typename std::vector<T>::iterator iterator;
+        typedef typename std::vector<T>::const_iterator const_iterator;
+    };
 
     /** Metadata Collection */
     typedef Collection<Metadata>::type MetadataCollection;
