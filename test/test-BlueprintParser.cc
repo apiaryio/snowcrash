@@ -621,7 +621,7 @@ TEST_CASE("Parse blueprint with two named types having the same name", "[bluepri
     REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 1);
 }
 
-TEST_CASE("Parser blueprint correctly when having a big chain of inheritance in data structures", "[blueprint]")
+TEST_CASE("Parser blueprint correctly when having a big chain of inheritance in data structures", "[blueprint][now]")
 {
     mdp::ByteBuffer source = \
     "## GET /\n"\
@@ -660,4 +660,22 @@ TEST_CASE("Parser blueprint correctly when having a big chain of inheritance in 
     REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(1).content.dataStructure.name.symbol.literal == "Coupon Base");
     REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(2).element == Element::DataStructureElement);
     REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(2).content.dataStructure.name.symbol.literal == "Coupon A");
+}
+
+TEST_CASE("Report error when coming across a super type reference to non existent named type", "[blueprint]")
+{
+    mdp::ByteBuffer source = \
+    "# Data Structures\n"\
+    "\n"\
+    "## Timestamps (object)\n"\
+    "+ created (number)\n"\
+    "\n"\
+    "## Coupon Base (Timestamp)\n"\
+    "+ percent_off: 25 (number)\n"\
+    "+ redeem_by (number)\n";
+
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
+
+    REQUIRE(blueprint.report.error.code != Error::OK);
 }
