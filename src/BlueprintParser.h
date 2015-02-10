@@ -429,6 +429,11 @@ namespace snowcrash {
 
                 // Recursively, try to get a base type for the current super type
                 resolveNamedTypeTableEntry(pd, superType, inhIt->second, report);
+
+                if (report.error.code != Error::OK) {
+                    return;
+                }
+
                 baseType = pd.namedTypeBaseTable.find(superType)->second;
             }
             else {
