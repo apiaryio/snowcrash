@@ -218,7 +218,7 @@ namespace snowcrash {
             }
 
             // Resolve all named type base table entries
-            resolveNamedTypeTables(pd);
+            resolveNamedTypeTables(pd, out.report);
         }
 
         static SectionType sectionType(const MarkdownNodeIterator& node) {
@@ -370,8 +370,10 @@ namespace snowcrash {
          * \brief Resolve named type base table entries from the named type inheritance table
          *
          * \param pd Section parser data
+         * \param report Parse report
          */
-        static void resolveNamedTypeTables(SectionParserData& pd) {
+        static void resolveNamedTypeTables(SectionParserData& pd,
+                                           Report& report) {
 
             mson::NamedTypeInheritanceTable::iterator it;
             mson::NamedTypeBaseTable::iterator baseIt;
@@ -380,12 +382,65 @@ namespace snowcrash {
                  it != pd.namedTypeInheritanceTable.end();
                  it++) {
 
-                baseIt = pd.namedTypeBaseTable.find(it->second);
-
-                if (baseIt != pd.namedTypeBaseTable.end()) {
-                    pd.namedTypeBaseTable[it->first] = baseIt->second;
-                }
+                resolveNamedTypeTableEntry(pd, it->first, it->second, report);
             }
+        }
+
+        /**
+         * \brief For each entry in the named type inheritance table, resolve the sub-type's base type recursively
+         *
+         * \param pd Section parser data
+         * \param subType The sub named type between the two
+         * \param superType The super named type between the two
+         * \param report Parse report
+         */
+        static void resolveNamedTypeTableEntry(SectionParserData& pd,
+                                               const mson::Literal& subType,
+                                               const mson::Literal& superType,
+                                               Report& report) {
+
+            mson::BaseType baseType;
+            mson::NamedTypeBaseTable::iterator it = pd.namedTypeBaseTable.find(subType);
+
+            // If the base table entry is already filled, nothing else to do
+            if (it != pd.namedTypeBaseTable.end()) {
+                return;
+            }
+
+            // Otherwise, get the base type from super type
+            it = pd.namedTypeBaseTable.find(superType);
+
+            // If super type is not already resolved, then it means that it is a sub type of something else
+            if (it == pd.namedTypeBaseTable.end()) {
+
+                // Try to get the super type of the current super type
+                mson::NamedTypeInheritanceTable::iterator inhIt = pd.namedTypeInheritanceTable.find(superType);
+
+                if (inhIt == pd.namedTypeInheritanceTable.end()) {
+
+                    // We cannot find the super type in inheritance table at all
+                    // and there is not base type table entry for it, so, the blueprint is wrong
+                    std::stringstream ss;
+                    ss << "unable to find named type '" << superType << "' in the whole document";
+
+                    report.error = Error(ss.str(), BusinessError, mdp::CharactersRangeSet());
+                    return;
+                }
+
+                // Recursively, try to get a base type for the current super type
+                resolveNamedTypeTableEntry(pd, superType, inhIt->second, report);
+
+                if (report.error.code != Error::OK) {
+                    return;
+                }
+
+                baseType = pd.namedTypeBaseTable.find(superType)->second;
+            }
+            else {
+                baseType = it->second;
+            }
+
+            pd.namedTypeBaseTable[subType] = baseType;
         }
 
         static void parseMetadata(const MarkdownNodeIterator& node,
