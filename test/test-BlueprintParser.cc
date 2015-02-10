@@ -620,3 +620,44 @@ TEST_CASE("Parse blueprint with two named types having the same name", "[bluepri
     REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
     REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 1);
 }
+
+TEST_CASE("Parser blueprint correctly when having a big chain of inheritance in data structures", "[blueprint]")
+{
+    mdp::ByteBuffer source = \
+    "## GET /\n"\
+    "+ Response 200 (application/json)\n"\
+    "    + Attributes (Coupon A)\n"\
+    "\n"\
+    "# Data Structures\n"\
+    "\n"\
+    "## Timestamps (object)\n"\
+    "+ created (number)\n"\
+    "\n"\
+    "## Coupon Base (Timestamps)\n"\
+    "+ percent_off: 25 (number)\n"\
+    "+ redeem_by (number)\n"\
+    "\n"\
+    "## Coupon A (Coupon Base)\n"\
+    "Clone\n";
+
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
+
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.empty());
+
+    REQUIRE(blueprint.node.content.elements().size() == 2);
+    REQUIRE(blueprint.node.content.elements().size() == 2);
+    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).element == Element::ResourceElement);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).content.resource.attributes.empty());
+    REQUIRE(blueprint.node.content.elements().at(1).element == Element::CategoryElement);
+    REQUIRE(blueprint.node.content.elements().at(1).content.elements().size() == 3);
+    REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(0).element == Element::DataStructureElement);
+    REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(0).content.dataStructure.name.symbol.literal == "Timestamps");
+    REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(1).element == Element::DataStructureElement);
+    REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(1).content.dataStructure.name.symbol.literal == "Coupon Base");
+    REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(2).element == Element::DataStructureElement);
+    REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(2).content.dataStructure.name.symbol.literal == "Coupon A");
+}
