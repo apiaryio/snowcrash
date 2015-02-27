@@ -150,6 +150,9 @@ namespace snowcrash {
         /** Action-specific Attributes (THIS SHOULD NOT BE HERE - should be under content) */
         SourceMap<Attributes> attributes;
 
+        /** Source Map of URI Template (THIS SHOULD NOT BE HERE - should be under element attributes) */
+        SourceMap<URITemplate> uriTemplate;
+
         /**
          *  \brief Action-specific HTTP headers
          *

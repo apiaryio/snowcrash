@@ -21,7 +21,7 @@ namespace snowcrash {
     const char* const ActionHeaderRegex = "^[[:blank:]]*" HTTP_REQUEST_METHOD "[[:blank:]]*" URI_TEMPLATE "?$";
 
     /** Named action matching regex */
-    const char* const NamedActionHeaderRegex = "^[[:blank:]]*" SYMBOL_IDENTIFIER "\\[" HTTP_REQUEST_METHOD "]$";
+    const char* const NamedActionHeaderRegex = "^[[:blank:]]*" SYMBOL_IDENTIFIER "\\[" HTTP_REQUEST_METHOD "[[:blank:]]*" URI_TEMPLATE "?]$";
 
     /** Internal type alias for Collection iterator of Action */
     typedef Collection<Action>::const_iterator ActionIterator;
@@ -46,7 +46,7 @@ namespace snowcrash {
                                                      SectionLayout& layout,
                                                      const ParseResultRef<Action>& out) {
 
-            actionHTTPMethodAndName(node, out.node.method, out.node.name);
+            actionHTTPMethodAndName(node, out.node.method, out.node.name, out.node.uriTemplate);
             TrimString(out.node.name);
 
             mdp::ByteBuffer remainingContent;
@@ -59,6 +59,10 @@ namespace snowcrash {
 
                 if (!out.node.name.empty()) {
                     out.sourceMap.name.sourceMap = node->sourceMap;
+                }
+
+                if (!out.node.uriTemplate.empty()) {
+                    out.sourceMap.uriTemplate.sourceMap = node->sourceMap;
                 }
             }
 
@@ -480,7 +484,8 @@ namespace snowcrash {
         /** \return HTTP request method and name of an action */
         static void actionHTTPMethodAndName(const MarkdownNodeIterator& node,
                                             mdp::ByteBuffer& method,
-                                            mdp::ByteBuffer& name) {
+                                            mdp::ByteBuffer& name,
+                                            mdp::ByteBuffer& uriTemplate) {
 
             CaptureGroups captureGroups;
             mdp::ByteBuffer subject, remaining;
@@ -490,9 +495,10 @@ namespace snowcrash {
 
             if (RegexCapture(subject, ActionHeaderRegex, captureGroups, 3)) {
                 method = captureGroups[1];
-            } else if (RegexCapture(subject, NamedActionHeaderRegex, captureGroups, 3)) {
+            } else if (RegexCapture(subject, NamedActionHeaderRegex, captureGroups, 4)) {
                 name = captureGroups[1];
                 method = captureGroups[2];
+                uriTemplate = captureGroups[3];
             }
 
             return;

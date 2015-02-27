@@ -97,7 +97,7 @@ namespace snowcrash {
     template <class T>
     struct MatchAction : std::binary_function<T, T, bool> {
         bool operator()(const T& first, const T& second) const {
-            return first.method == second.method;
+            return first.uriTemplate.empty() && second.uriTemplate.empty() && first.method == second.method;
         }
     };
 }
