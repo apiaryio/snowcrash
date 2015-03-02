@@ -23,6 +23,7 @@ namespace snowcrash {
         ResourceGroupSectionType,       /// < Resource group
         ResourceSectionType,            /// < Resource
         ActionSectionType,              /// < Action
+        RelationSectionType,            /// < Link Relation
         RequestSectionType,             /// < Request
         RequestBodySectionType,         /// < Request & Payload body combined (abbrev)
         ResponseSectionType,            /// < Response

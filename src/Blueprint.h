@@ -262,6 +262,15 @@ namespace snowcrash {
     typedef Collection<TransactionExample>::type TransactionExamples;
 
     /**
+     *  Link relation
+     */
+    struct Relation {
+
+        /** String */
+        std::string str;
+    };
+
+    /**
      *  Action
      */
     struct Action {
@@ -283,6 +292,9 @@ namespace snowcrash {
 
         /** URI Template (THIS SHOULD NOT BE HERE - should be under element attributes) */
         URITemplate uriTemplate;
+
+        /** Link Relation (THIS SHOULD NOT BE HERE - should be under element attributes) */
+        Relation relation;
 
         /**
          *  \brief Action-specific HTTP headers

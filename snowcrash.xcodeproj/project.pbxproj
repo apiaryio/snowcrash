@@ -28,6 +28,8 @@
 		4075AA1119F95398003C2649 /* MSONUtility.h in Headers */ = {isa = PBXBuildFile; fileRef = 4075AA1019F95398003C2649 /* MSONUtility.h */; };
 		4079DBA71A138C310075B534 /* MSONOneOfParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4079DBA61A138C310075B534 /* MSONOneOfParser.cc */; };
 		4079DBA91A138C580075B534 /* MSONTypeSectionParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4079DBA81A138C580075B534 /* MSONTypeSectionParser.cc */; };
+		408E7FC61AA69EF000BF68B3 /* RelationParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 408E7FC51AA69EF000BF68B3 /* RelationParser.h */; };
+		408E7FC81AA69F0D00BF68B3 /* test-RelationParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = 408E7FC71AA69F0D00BF68B3 /* test-RelationParser.cc */; };
 		408F38DA1A153AB200104774 /* MSONValueMemberParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = 408F38D91A153AB200104774 /* MSONValueMemberParser.cc */; };
 		40A1EE0B19EC0A0B00DB894A /* MSON.h in Headers */ = {isa = PBXBuildFile; fileRef = 40A1EE0A19EC0A0B00DB894A /* MSON.h */; };
 		40A60E1D1A6E4B7F00371FC1 /* sos.cc in Sources */ = {isa = PBXBuildFile; fileRef = 40A60E1B1A6E4B7F00371FC1 /* sos.cc */; };
@@ -176,6 +178,8 @@
 		4075AA1019F95398003C2649 /* MSONUtility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MSONUtility.h; path = src/MSONUtility.h; sourceTree = "<group>"; };
 		4079DBA61A138C310075B534 /* MSONOneOfParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MSONOneOfParser.cc; path = src/MSONOneOfParser.cc; sourceTree = "<group>"; };
 		4079DBA81A138C580075B534 /* MSONTypeSectionParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MSONTypeSectionParser.cc; path = src/MSONTypeSectionParser.cc; sourceTree = "<group>"; };
+		408E7FC51AA69EF000BF68B3 /* RelationParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RelationParser.h; path = src/RelationParser.h; sourceTree = "<group>"; };
+		408E7FC71AA69F0D00BF68B3 /* test-RelationParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-RelationParser.cc"; path = "test/test-RelationParser.cc"; sourceTree = "<group>"; };
 		408F38D91A153AB200104774 /* MSONValueMemberParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MSONValueMemberParser.cc; path = src/MSONValueMemberParser.cc; sourceTree = "<group>"; };
 		40A1EE0A19EC0A0B00DB894A /* MSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MSON.h; path = src/MSON.h; sourceTree = "<group>"; };
 		40A60E1B1A6E4B7F00371FC1 /* sos.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sos.cc; path = ext/sos/src/sos.cc; sourceTree = "<group>"; };
@@ -368,6 +372,7 @@
 				401E5E671A24B56B009570D0 /* test-AttributesParser.cc */,
 				BBFF48D7170C57F1001E5FB2 /* test-Blueprint.cc */,
 				BBA01FF817292F9C0050B603 /* test-BlueprintParser.cc */,
+				40015D001AA58176002F0A55 /* test-BlueprintUtility.cc */,
 				402612211A777A9A00354E69 /* test-DataStructureGroupParser.cc */,
 				BBD73565192ED45D009FE09E /* test-HeadersParser.cc */,
 				BB45781D182326EE00D0293A /* test-Indentation.cc */,
@@ -383,13 +388,13 @@
 				BB03DC6517D3718D00C51E52 /* test-ParametersParser.cc */,
 				BBE5705C173922B70086CE22 /* test-PayloadParser.cc */,
 				BBB0F42B1731D04900C92465 /* test-RegexMatch.cc */,
+				408E7FC71AA69F0D00BF68B3 /* test-RelationParser.cc */,
 				BBB127871999700E0041E9AE /* test-ResourceGroupParser.cc */,
 				BBD5F9DD173578210049BBEE /* test-ResourceParser.cc */,
 				BBCC856619543A4D00B99E90 /* test-SectionParser.cc */,
 				4056BE0A19EE98C5003AC26C /* test-Signature.cc */,
 				BBFF48C9170B3C49001E5FB2 /* test-snowcrash.cc */,
 				40CA216419FE993E0086531D /* test-StringUtility.cc */,
-				40015D001AA58176002F0A55 /* test-BlueprintUtility.cc */,
 				BBCC04E518A51AA800C65A08 /* test-SymbolIdentifier.cc */,
 				BBFC8422196C0C27001A236A /* test-UriTemplateParser.cc */,
 				BBCC856119542DB300B99E90 /* test-ValuesParser.cc */,
@@ -436,6 +441,7 @@
 				BB0793BE1782C773005BB7CC /* Platform.h */,
 				BBB0F4271731CE0D00C92465 /* RegexMatch.cc */,
 				BBB0F4281731CE0D00C92465 /* RegexMatch.h */,
+				408E7FC51AA69EF000BF68B3 /* RelationParser.h */,
 				BBD5F9C717353C300049BBEE /* ResourceGroupParser.h */,
 				BBD5F9CC17353CE00049BBEE /* ResourceParser.h */,
 				BB8C3E7319241C1600EF36FA /* Section.cc */,
@@ -488,6 +494,7 @@
 				BB8C3E631923D6FE00EF36FA /* SectionParser.h in Headers */,
 				40BCDEAE1A0A9724008C6C84 /* MSONOneOfParser.h in Headers */,
 				40DE0C0E1A091ECE00D2F0A8 /* MSONTypeSectionParser.h in Headers */,
+				408E7FC61AA69EF000BF68B3 /* RelationParser.h in Headers */,
 				40CA216119FE989F0086531D /* ModelTable.h in Headers */,
 				40A1EE0B19EC0A0B00DB894A /* MSON.h in Headers */,
 				4075AA1119F95398003C2649 /* MSONUtility.h in Headers */,
@@ -659,6 +666,7 @@
 			files = (
 				BBFC8425196C1AD4001A236A /* test-ActionParser.cc in Sources */,
 				406B664F19FA6F63003CBD3A /* test-MSONUtility.cc in Sources */,
+				408E7FC81AA69F0D00BF68B3 /* test-RelationParser.cc in Sources */,
 				402612221A777A9A00354E69 /* test-DataStructureGroupParser.cc in Sources */,
 				BBCC856319542DB300B99E90 /* test-ValuesParser.cc in Sources */,
 				BBB1278C199970A80041E9AE /* test-SymbolIdentifier.cc in Sources */,

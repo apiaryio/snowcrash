@@ -13,6 +13,7 @@
 #include "SectionParser.h"
 #include "ParametersParser.h"
 #include "PayloadParser.h"
+#include "RelationParser.h"
 #include "RegexMatch.h"
 
 namespace snowcrash {
@@ -89,6 +90,12 @@ namespace snowcrash {
             mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
 
             switch (sectionType) {
+                case RelationSectionType:
+                {
+                    ParseResultRef<Relation> relation(out.report, out.node.relation, out.sourceMap.relation);
+                    return RelationParser::parse(node, siblings, pd, relation);
+                }
+
                 case ParametersSectionType:
                 {
                     ParseResultRef<Parameters> parameters(out.report, out.node.parameters, out.sourceMap.parameters);
@@ -263,6 +270,13 @@ namespace snowcrash {
 
             SectionType nestedType = UndefinedSectionType;
 
+            // Check if relation section
+            nestedType = SectionProcessor<Relation>::sectionType(node);
+
+            if (nestedType != UndefinedSectionType) {
+                return nestedType;
+            }
+
             // Check if parameters section
             nestedType = SectionProcessor<Parameters>::sectionType(node);
 
@@ -302,6 +316,7 @@ namespace snowcrash {
             nested.push_back(ResponseSectionType);
             nested.push_back(RequestBodySectionType);
             nested.push_back(RequestSectionType);
+            nested.push_back(RelationSectionType);
 
             types = SectionProcessor<Payload>::nestedSectionTypes();
             nested.insert(nested.end(), types.begin(), types.end());
