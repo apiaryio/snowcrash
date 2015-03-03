@@ -1010,3 +1010,41 @@ TEST_CASE("Parse unnamed resource attributes", "[resource]")
     REQUIRE(resource.node.actions[0].examples.size() == 1);
     REQUIRE(resource.node.actions[0].examples[0].responses.size() == 1);
 }
+
+TEST_CASE("Parse inline action", "[resource][now]")
+{
+    mdp::ByteBuffer source = \
+    "# Task [/task/{id}]\n"\
+    "+ Parameters\n"\
+    "    + id (string)\n"\
+    "\n"\
+    "## Retrieve [GET]\n"\
+    "+ response 200 (application/json)\n"\
+    "\n"\
+    "        {}\n"\
+    "\n"\
+    "## List all tasks [GET /tasks]\n"\
+    "+ response 200 (application/json)\n"\
+    "\n"\
+    "        {}";
+
+    ParseResult<Resource> resource;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource, ExportSourcemapOption);
+
+    REQUIRE(resource.report.error.code == Error::OK);
+    REQUIRE(resource.report.warnings.empty());
+
+    REQUIRE(resource.node.actions.size() == 2);
+    REQUIRE(resource.node.actions[0].name == "Retrieve");
+    REQUIRE(resource.node.actions[0].method == "GET");
+    REQUIRE(resource.node.actions[0].uriTemplate.empty());
+    REQUIRE(resource.node.actions[1].name == "List all tasks");
+    REQUIRE(resource.node.actions[1].method == "GET");
+    REQUIRE(resource.node.actions[1].uriTemplate == "/tasks");
+
+    REQUIRE(resource.sourceMap.actions.collection.size() == 2);
+    SourceMapHelper::check(resource.sourceMap.actions.collection[0].method.sourceMap, 52, 18);
+    REQUIRE(resource.sourceMap.actions.collection[0].uriTemplate.sourceMap.empty());
+    SourceMapHelper::check(resource.sourceMap.actions.collection[1].method.sourceMap, 117, 31);
+    SourceMapHelper::check(resource.sourceMap.actions.collection[1].uriTemplate.sourceMap, 117, 31);
+}

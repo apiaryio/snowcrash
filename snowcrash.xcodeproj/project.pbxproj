@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		40015D011AA58176002F0A55 /* test-BlueprintUtility.cc in Sources */ = {isa = PBXBuildFile; fileRef = 40015D001AA58176002F0A55 /* test-BlueprintUtility.cc */; };
 		400D04731A6BF6E7006EBD4A /* SerializeAST.cc in Sources */ = {isa = PBXBuildFile; fileRef = 400D04711A6BF6E7006EBD4A /* SerializeAST.cc */; };
 		400D04741A6BF6E7006EBD4A /* SerializeAST.h in Headers */ = {isa = PBXBuildFile; fileRef = 400D04721A6BF6E7006EBD4A /* SerializeAST.h */; };
 		400D04771A6BF705006EBD4A /* SerializeSourcemap.cc in Sources */ = {isa = PBXBuildFile; fileRef = 400D04751A6BF705006EBD4A /* SerializeSourcemap.cc */; };
@@ -154,6 +155,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		40015D001AA58176002F0A55 /* test-BlueprintUtility.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-BlueprintUtility.cc"; path = "test/test-BlueprintUtility.cc"; sourceTree = "<group>"; };
 		400D04711A6BF6E7006EBD4A /* SerializeAST.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SerializeAST.cc; path = src/SerializeAST.cc; sourceTree = "<group>"; };
 		400D04721A6BF6E7006EBD4A /* SerializeAST.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SerializeAST.h; path = src/SerializeAST.h; sourceTree = "<group>"; };
 		400D04751A6BF705006EBD4A /* SerializeSourcemap.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SerializeSourcemap.cc; path = src/SerializeSourcemap.cc; sourceTree = "<group>"; };
@@ -387,6 +389,7 @@
 				4056BE0A19EE98C5003AC26C /* test-Signature.cc */,
 				BBFF48C9170B3C49001E5FB2 /* test-snowcrash.cc */,
 				40CA216419FE993E0086531D /* test-StringUtility.cc */,
+				40015D001AA58176002F0A55 /* test-BlueprintUtility.cc */,
 				BBCC04E518A51AA800C65A08 /* test-SymbolIdentifier.cc */,
 				BBFC8422196C0C27001A236A /* test-UriTemplateParser.cc */,
 				BBCC856119542DB300B99E90 /* test-ValuesParser.cc */,
@@ -661,6 +664,7 @@
 				BBB1278C199970A80041E9AE /* test-SymbolIdentifier.cc in Sources */,
 				BBFC8426196C1AFD001A236A /* test-RegexMatch.cc in Sources */,
 				BBCC856219542DB300B99E90 /* test-ParameterParser.cc in Sources */,
+				40015D011AA58176002F0A55 /* test-BlueprintUtility.cc in Sources */,
 				BB8C3E661923EB3F00EF36FA /* test-AssetParser.cc in Sources */,
 				BBB127891999702B0041E9AE /* test-BlueprintParser.cc in Sources */,
 				40CA216519FE993E0086531D /* test-StringUtility.cc in Sources */,

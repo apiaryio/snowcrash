@@ -335,7 +335,6 @@ namespace snowcrash {
                                                   const ParseResultRef<Resource>& out) {
 
             IntermediateParseResult<Action> action(out.report);
-
             MarkdownNodeIterator cur = ActionParser::parse(node, siblings, pd, action);
 
             ActionIterator duplicate = SectionProcessor<Action>::findAction(out.node.actions, action.node);

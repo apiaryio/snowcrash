@@ -281,6 +281,9 @@ namespace snowcrash {
         /** Action-specific Attributes (THIS SHOULD NOT BE HERE - should be under content) */
         Attributes attributes;
 
+        /** URI Template (THIS SHOULD NOT BE HERE - should be under element attributes) */
+        URITemplate uriTemplate;
+
         /**
          *  \brief Action-specific HTTP headers
          *

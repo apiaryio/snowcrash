@@ -165,6 +165,7 @@
         'test/test-AttributesParser.cc',
         'test/test-Blueprint.cc',
         'test/test-BlueprintParser.cc',
+        'test/test-BlueprintUtility.cc',
         'test/test-DataStructureGroupParser.cc',
         'test/test-HeadersParser.cc',
         'test/test-Indentation.cc',
