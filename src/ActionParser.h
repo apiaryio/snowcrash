@@ -510,7 +510,7 @@ namespace snowcrash {
 
             return std::find_if(actions.begin(),
                                 actions.end(),
-                                std::bind2nd(MatchAction<Action>(), action));
+                                std::bind2nd(MatchAction(), action));
         }
     };
 
