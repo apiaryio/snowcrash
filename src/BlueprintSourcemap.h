@@ -153,6 +153,9 @@ namespace snowcrash {
         /** Source Map of URI Template (THIS SHOULD NOT BE HERE - should be under element attributes) */
         SourceMap<URITemplate> uriTemplate;
 
+        /** Source Map of Link Relation (THIS SHOULD NOT BE HERE - should be under element attributes) */
+        SourceMap<Relation> relation;
+
         /**
          *  \brief Action-specific HTTP headers
          *
