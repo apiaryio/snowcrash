@@ -74,8 +74,6 @@
         'ext/sos/src'
       ],
       'sources': [
-        'src/CSourceAnnotation.cc',
-        'src/CSourceAnnotation.h',
         'src/HTTP.cc',
         'src/HTTP.h',
         'src/MSON.cc',
@@ -97,8 +95,6 @@
         'src/Signature.h',
         'src/snowcrash.cc',
         'src/snowcrash.h',
-        'src/csnowcrash.cc',
-        'src/csnowcrash.h',
         'src/UriTemplateParser.cc',
         'src/UriTemplateParser.h',
         'src/PayloadParser.h',
