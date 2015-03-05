@@ -200,26 +200,6 @@
       ]
     },
     {
-      'target_name': 'snowcrash',
-      'type': 'executable',
-      'include_dirs': [
-        'src',
-        'src/snowcrash',
-        'ext/markdown-parser/src',
-        'ext/markdown-parser/ext/sundown/src',
-        'ext/cmdline',
-        'ext/sos/src'
-      ],
-      'sources': [
-        'src/snowcrash/snowcrash.cc'
-      ],
-      'dependencies': [
-        'libsnowcrash',
-        'libmarkdownparser',
-        'libsos'
-      ]
-    },
-    {
       'target_name': 'perf-libsnowcrash',
       'type': 'executable',
       'include_dirs': [
