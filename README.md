@@ -10,16 +10,6 @@ API Blueprint is Web API documentation language. You can find API Blueprint docu
 ## Status
 - [Format 1A7](https://github.com/apiaryio/api-blueprint/releases/tag/format-1A7) fully implemented 
 
-## Install
-OS X using Homebrew:
-
-```sh
-$ brew install --HEAD \
-  https://raw.github.com/apiaryio/snowcrash/master/tools/homebrew/snowcrash.rb
-```
-
-Other systems refer to [build notes](#build).
-
 ## Use
 
 ### C++ library
@@ -41,27 +31,11 @@ snowcrash::parse(blueprint, 0, ast);
 std::cout << "API Name: " << ast.node.name << std::endl;
 ```
 
-Refer to [`Blueprint.h`](src/Blueprint.h) for the details about the Snow Crash AST and [`BlueprintSourcemap.h`](src/BlueprintSourcemap.h) for details about Source Maps tree. See [Snow Crash bindings](#bindings) for using the library in **other languages**.
+Refer to [`Blueprint.h`](src/Blueprint.h) for the details about the Snow Crash AST and [`BlueprintSourcemap.h`](src/BlueprintSourcemap.h) for details about Source Maps tree.
 
 ### Command line tool
 
-```bash
-$ cat << 'EOF' > blueprint.apib
-# My API
-## GET /message
-+ Response 200 (text/plain)
-
-        Hello World!
-EOF
-
-$ snowcrash blueprint.apib 
-_version: 2.1
-metadata:
-name: "My API"
- ...
-```
-
-Refer to [AST Serialization Media Types](https://github.com/apiaryio/api-blueprint-ast) for the details on serialized media types. See [parse feature](features/parse.feature) for the details on using the `snowcrash` command line tool.
+CLI was removed. It is replaced by utility named [drafter](https://github.com/apiaryio/drafter)
 
 ## Build
 1. Clone the repo + fetch the submodules:
@@ -78,35 +52,7 @@ Refer to [AST Serialization Media Types](https://github.com/apiaryio/api-bluepri
 	$ make test
 	```
 
-	To include integration tests (using Cucumber) use the `--include-integration-tests` flag: 
-
-	```sh
-	$ ./configure --include-integration-tests
-	$ make test
-	```
-	
 We love **Windows** too! Please refer to [Building on Windows](https://github.com/apiaryio/snowcrash/wiki/Building-on-Windows).
-		
-### Snow Crash command line tool
-1. Build `snowcrash`:
-	
-	```sh
-	$ make snowcrash
-	```
-
-2. Install & use `snowcrash`:
-
-	```sh
-	$ sudo make install
-	$ snowcrash --help
-	```
-
-## Bindings
-Snow Crash bindings in other languages:
-
-- [Protagonist](https://github.com/apiaryio/protagonist) (Node.js)
-- [RedSnow](https://github.com/apiaryio/redsnow) (Ruby)
-- [Snow Crash .NET](https://github.com/brutski/snowcrash-dot-net-wrapper) (.NET)
 
 
 ## Contribute
