@@ -1,6 +1,7 @@
 ![logo](https://raw.github.com/apiaryio/api-blueprint/master/assets/logo_apiblueprint.png)
 
-# Snow Crash [![Build Status](https://travis-ci.org/apiaryio/snowcrash.svg?branch=master)](https://travis-ci.org/apiaryio/snowcrash)
+# Snow Crash [![Build Status](https://travis-ci.org/apiaryio/snowcrash.svg?branch=master)](https://travis-ci.org/apiaryio/snowcrash) [![Build status](https://ci.appveyor.com/api/projects/status/e72cip3aoe00igpt/branch/master?svg=true)](https://ci.appveyor.com/project/klokane/snowcrash/branch/master)
+
 
 ### API Blueprint Parser
 Snow Crash is the reference [API Blueprint](http://apiblueprint.org) parser built on top of the [Sundown](https://github.com/vmg/sundown) Markdown parser.
