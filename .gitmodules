@@ -1,12 +1,6 @@
 [submodule "test/vendor/Catch"]
 	path = test/vendor/Catch
 	url = git://github.com/philsquared/Catch.git
-[submodule "ext/cmdline"]
-	path = ext/cmdline
-	url = git://github.com/apiaryio/cmdline.git
 [submodule "ext/markdown-parser"]
 	path = ext/markdown-parser
 	url = git://github.com/apiaryio/markdown-parser.git
-[submodule "ext/sos"]
-	path = ext/sos
-	url = git://github.com/apiaryio/sos.git
