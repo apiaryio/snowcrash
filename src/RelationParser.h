@@ -15,7 +15,7 @@
 namespace snowcrash {
 
     /** Link Relation matching regex */
-    const char* const RelationRegex = "^[[:blank:]]*[Rr]elation[[:blank:]]*:" SYMBOL_IDENTIFIER "?$";
+    const char* const RelationRegex = "^[[:blank:]]*[Rr]elation[[:blank:]]*:[[:blank:]]*([a-z][a-z0-9.-]*)?[[:blank:]]*$";
 
     /**
      *  Relation Section Processor
@@ -33,8 +33,9 @@ namespace snowcrash {
             CaptureGroups captureGroups;
 
             signature = GetFirstLine(node->text, remainingContent);
+            TrimString(signature);
 
-            if (RegexCapture(node->text, RelationRegex, captureGroups, 3)) {
+            if (RegexCapture(signature, RelationRegex, captureGroups, 3)) {
                 out.node.str = captureGroups[1];
                 TrimString(out.node.str);
             }
