@@ -352,6 +352,20 @@ namespace snowcrash {
                                                       sourceMap));
             }
 
+            ActionIterator relationDuplicate = SectionProcessor<Action>::findRelation(out.node.actions, action.node.relation);
+
+            if (relationDuplicate != out.node.actions.end()) {
+
+                // WARN: duplicate relation identifier
+                std::stringstream ss;
+                ss << "relation identifier '" << action.node.relation.str << "' already defined for resource '" << out.node.uriTemplate << "'";
+
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                out.report.warnings.push_back(Warning(ss.str(),
+                                                      DuplicateWarning,
+                                                      sourceMap));
+            }
+
             if (!action.node.parameters.empty()) {
 
                 if (!action.node.uriTemplate.empty()) {

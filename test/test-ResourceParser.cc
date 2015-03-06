@@ -1072,3 +1072,28 @@ TEST_CASE("Parameters for action should consider action's uri template", "[resou
     REQUIRE(resource.report.error.code == Error::OK);
     REQUIRE(resource.report.warnings.empty());
 }
+
+TEST_CASE("Relation identifiers should be unique for a resource", "[resource]")
+{
+    mdp::ByteBuffer source = \
+    "## Users [/users]\n"\
+    "\n"\
+    "### Create [POST]\n"\
+    "+ Relation: create\n"\
+    "+ Response 204\n"\
+    "\n"\
+    "### Delte [DELETE]\n"\
+    "+ Relation: create\n"\
+    "+ Response 204";
+
+    ParseResult<Resource> resource;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource, ExportSourcemapOption);
+
+    REQUIRE(resource.report.error.code == Error::OK);
+    REQUIRE(resource.report.warnings.size() == 1);
+    REQUIRE(resource.report.warnings[0].code == DuplicateWarning);
+
+    REQUIRE(resource.node.actions.size() == 2);
+    REQUIRE(resource.node.actions[0].relation.str == "create");
+    REQUIRE(resource.node.actions[1].relation.str == "create");
+}

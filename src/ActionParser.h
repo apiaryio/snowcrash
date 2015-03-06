@@ -527,6 +527,15 @@ namespace snowcrash {
                                 actions.end(),
                                 std::bind2nd(MatchAction(), action));
         }
+
+        /** Finds a relation identifier inside an actions collection */
+        static ActionIterator findRelation(const Actions& actions,
+                                           const Relation& relation) {
+
+            return std::find_if(actions.begin(),
+                                actions.end(),
+                                std::bind2nd(MatchRelation(), relation));
+        }
     };
 
     /** Action Section Parser */
