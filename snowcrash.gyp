@@ -4,19 +4,6 @@
   ],
   'targets' : [
     {
-      'target_name': 'libsos',
-      'type': 'static_library',
-      'include_dirs': [
-        'ext/sos/src'
-      ],
-      'sources': [
-        'ext/sos/src/sos.cc',
-        'ext/sos/src/sos.h',
-        'ext/sos/src/sosJSON.h',
-        'ext/sos/src/sosYAML.h'
-      ]
-    },
-    {
       'target_name': 'libsundown',
       'type': 'static_library',
       'include_dirs': [
@@ -71,11 +58,8 @@
         'ext/markdown-parser/src',
         'ext/markdown-parser/ext/sundown/src',
         'ext/markdown-parser/ext/sundown/html',
-        'ext/sos/src'
       ],
       'sources': [
-        'src/CSourceAnnotation.cc',
-        'src/CSourceAnnotation.h',
         'src/HTTP.cc',
         'src/HTTP.h',
         'src/MSON.cc',
@@ -87,18 +71,10 @@
         'src/BlueprintSourcemap.cc',
         'src/Section.cc',
         'src/Section.h',
-        'src/Serialize.cc',
-        'src/Serialize.h',
-        'src/SerializeAST.cc',
-        'src/SerializeAST.h',
-        'src/SerializeSourcemap.cc',
-        'src/SerializeSourcemap.h',
         'src/Signature.cc',
         'src/Signature.h',
         'src/snowcrash.cc',
         'src/snowcrash.h',
-        'src/csnowcrash.cc',
-        'src/csnowcrash.h',
         'src/UriTemplateParser.cc',
         'src/UriTemplateParser.h',
         'src/PayloadParser.h',
@@ -146,7 +122,6 @@
       ],
       'dependencies': [
           'libmarkdownparser',
-          'libsos'
       ]
     },
     {
@@ -200,34 +175,12 @@
       ]
     },
     {
-      'target_name': 'snowcrash',
-      'type': 'executable',
-      'include_dirs': [
-        'src',
-        'src/snowcrash',
-        'ext/markdown-parser/src',
-        'ext/markdown-parser/ext/sundown/src',
-        'ext/cmdline',
-        'ext/sos/src'
-      ],
-      'sources': [
-        'src/snowcrash/snowcrash.cc'
-      ],
-      'dependencies': [
-        'libsnowcrash',
-        'libmarkdownparser',
-        'libsos'
-      ]
-    },
-    {
       'target_name': 'perf-libsnowcrash',
       'type': 'executable',
       'include_dirs': [
         'src',
         'ext/markdown-parser/src',
         'ext/markdown-parser/ext/sundown/src',
-        'ext/cmdline',
-        'ext/sos/src',
         'test',
         'test/performance',
       ],
@@ -237,7 +190,6 @@
       'dependencies': [
         'libsnowcrash',
         'libmarkdownparser',
-        'libsos'
       ]
     }
   ]

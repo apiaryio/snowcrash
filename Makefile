@@ -10,9 +10,9 @@ DESTDIR ?= /usr/local/bin
 V ?= 1
 
 # Targets
-all: libsnowcrash test-libsnowcrash snowcrash
+all: libsnowcrash test-libsnowcrash 
 
-.PHONY: libsnowcrash test-libsnowcrash snowcrash
+.PHONY: libsnowcrash test-libsnowcrash 
 
 libsnowcrash: config.gypi $(BUILD_DIR)/Makefile
 	$(MAKE) -C $(BUILD_DIR) V=$(V) libsnowcrash
@@ -26,11 +26,6 @@ perf-libsnowcrash: config.gypi $(BUILD_DIR)/Makefile
 	$(MAKE) -C $(BUILD_DIR) V=$(V) perf-libsnowcrash
 	mkdir -p ./bin
 	cp -f $(BUILD_DIR)/out/$(BUILDTYPE)/perf-libsnowcrash ./bin/perf-libsnowcrash
-
-snowcrash: config.gypi $(BUILD_DIR)/Makefile
-	$(MAKE) -C $(BUILD_DIR) V=$(V) snowcrash
-	mkdir -p ./bin
-	cp -f $(BUILD_DIR)/out/$(BUILDTYPE)/snowcrash ./bin/snowcrash
 
 config.gypi: configure
 	$(PYTHON) ./configure
@@ -48,7 +43,7 @@ distclean:
 	rm -f ./config.gypi
 	rm -rf ./bin
 
-test: test-libsnowcrash snowcrash
+test: test-libsnowcrash 
 	$(BUILD_DIR)/out/$(BUILDTYPE)/test-libsnowcrash
 
 ifdef INTEGRATION_TESTS
@@ -58,7 +53,4 @@ endif
 perf: perf-libsnowcrash
 	$(BUILD_DIR)/out/$(BUILDTYPE)/perf-libsnowcrash ./test/performance/fixtures/fixture-1.apib
 
-install: snowcrash
-	cp -f $(BUILD_DIR)/out/$(BUILDTYPE)/snowcrash $(DESTDIR)/snowcrash
-
-.PHONY: libsnowcrash test-libsnowcrash perf-libsnowcrash snowcrash clean distclean test
+.PHONY: libsnowcrash test-libsnowcrash perf-libsnowcrash clean distclean test
