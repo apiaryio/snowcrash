@@ -1,6 +1,6 @@
 ![logo](https://raw.github.com/apiaryio/api-blueprint/master/assets/logo_apiblueprint.png)
 
-# Snow Crash [![Build Status](https://travis-ci.org/apiaryio/snowcrash.svg?branch=master)](https://travis-ci.org/apiaryio/snowcrash) [![Build status](https://ci.appveyor.com/api/projects/status/e72cip3aoe00igpt/branch/master?svg=true)](https://ci.appveyor.com/project/klokane/snowcrash/branch/master)
+# Snow Crash [![Build Status](https://travis-ci.org/apiaryio/snowcrash.svg?branch=master)](https://travis-ci.org/apiaryio/snowcrash) [![Build status](https://ci.appveyor.com/api/projects/status/gupp1f7ymifxh3yn/branch/master?svg=true)](https://ci.appveyor.com/project/Apiary/snowcrash/branch/master)
 
 
 ### API Blueprint Parser
