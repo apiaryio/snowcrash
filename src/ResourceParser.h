@@ -354,7 +354,12 @@ namespace snowcrash {
 
             if (!action.node.parameters.empty()) {
 
-                checkParametersEligibility(node, pd, action.node.parameters, out);
+                if (!action.node.uriTemplate.empty()) {
+                    checkParametersEligibility<Action>(node, pd, action.node.parameters, action);
+                }
+                else {
+                    checkParametersEligibility<Resource>(node, pd, action.node.parameters, out);
+                }
             }
 
             out.node.actions.push_back(action.node);
@@ -378,7 +383,7 @@ namespace snowcrash {
 
             if (!parameters.node.empty()) {
 
-                checkParametersEligibility(node, pd, parameters.node, out);
+                checkParametersEligibility<Resource>(node, pd, parameters.node, out);
                 out.node.parameters.insert(out.node.parameters.end(), parameters.node.begin(), parameters.node.end());
 
                 if (pd.exportSourceMap()) {
@@ -474,11 +479,16 @@ namespace snowcrash {
             return cur;
         }
 
-        /** Check Parameters eligibility in URI template */
+        /**
+         * \brief Check Parameters eligibility in URI template
+         *
+         * \warning Do not specialise this.
+         */
+        template<typename T>
         static void checkParametersEligibility(const MarkdownNodeIterator& node,
                                                const SectionParserData& pd,
                                                Parameters& parameters,
-                                               const ParseResultRef<Resource>& out) {
+                                               const ParseResultRef<T>& out) {
 
             for (ParameterIterator it = parameters.begin();
                  it != parameters.end();
