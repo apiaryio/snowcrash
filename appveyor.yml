@@ -1,10 +1,14 @@
 version: 1.0.{build}
 
-build_script:
-  - git submodule update --init --recursive
-  - vcbuild.bat MSVC2013
+install:
+  - git submodule update --init --recursive  
 
-test_script:
+build_script:
+  - vcbuild.bat MSVC2013
+  
+before_test:
   - npm install -g cucumber
   - gem install bundle
+
+test_script:
   - vcbuild.bat MSVC2013 inttest
