@@ -1,0 +1,5 @@
+version: 1.0.{build}
+
+build_script:
+  - git submodule update --init --recursive
+  - vcbuild.bat MSVC2013

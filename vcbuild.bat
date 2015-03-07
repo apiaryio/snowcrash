@@ -35,7 +35,6 @@ if /i "%1"=="x64"           set target_arch=x64&goto arg-ok
 if /i "%1"=="noprojgen"     set noprojgen=1&goto arg-ok
 if /i "%1"=="nobuild"       set nobuild=1&goto arg-ok
 if /i "%1"=="test"          set test=test&goto arg-ok
-if /i "%1"=="inttest"       set inttest=1&goto arg-ok
 if /i "%1"=="MSVC2013"      set GYP_MSVS_VERSION=2013&goto arg-ok
 if /i "%1"=="MSVC2012"      set GYP_MSVS_VERSION=2012&goto arg-ok
 if /i "%1"=="MSVC2010"      set GYP_MSVS_VERSION=2010&goto arg-ok
@@ -58,7 +57,6 @@ if "%GYP_MSVS_VERSION%"=="" set GYP_MSVS_VERSION=2012
 @rem Generate the VS project.
 SETLOCAL
   if defined VS120COMNTOOLS call "%VS120COMNTOOLS%\VCVarsQueryRegistry.bat"
-  if defined inttest python configure %debug_arg% --dest-cpu=%target_arch% --include-integration-tests
   if not defined inttest python configure %debug_arg% --dest-cpu=%target_arch%
   if errorlevel 1 goto create-msvs-files-failed
   if not exist build/snowcrash.sln goto create-msvs-files-failed
@@ -116,62 +114,10 @@ if errorlevel 1 goto exit
 
 :run
 @rem Run tests if requested.
-if "%test%"=="" goto intigration-test
 echo Running tests...
 .\build\%config%\test-libsnowcrash.exe
 
-:intigration-test
-if defined inttest goto run-integration-test
-
 @rem All Done
-goto exit
-
-:run-integration-test
-if "%config%"=="Debug" (
-SET "Replacement=      ENV['PATH'] = "../../build/Debug""
-goto :run-cucumber
-)
-SET "Replacement=      ENV['PATH'] = "../../build/Release""
-goto :run-cucumber
-
-:run-cucumber
-SET "file=features\support\env-win.rb"
-if exist "%file%" goto env-exist
-SETLOCAL ENABLEDELAYEDEXPANSION
-SET "line=require 'aruba/cucumber'"
-ECHO !line! >"%file%"
-SET "line=require 'rbconfig'"
-ECHO !line! >>"%file%"
-SET "line=Before do"
-ECHO !line! >>"%file%"
-SET "line=  @dirs << "../../features/fixtures""
-ECHO !line! >>"%file%"
-SET "line=  case RbConfig::CONFIG['host_os']"
-ECHO !line! >>"%file%"
-SET "line=    when /mswin|msys|mingw|cygwin|bccwin|wince|emc/"
-ECHO !line! >>"%file%"
-ECHO !Replacement! >>"%file%"
-SET "line=end"
-ECHO !line! >>"%file%"
-SET "line=end"
-ECHO !line! >>"%file%"
-ENDLOCAL
-
-bundle exec cucumber
-goto exit
-
-:env-exist
-SET /a Line#ToSearch=7
-(FOR /f "tokens=1*delims=:" %%a IN ('findstr /n "^" "%file%"') DO (
-    SET "Line=%%b"
-    IF %%a equ %Line#ToSearch% SET "Line=%Replacement%"
-    SETLOCAL ENABLEDELAYEDEXPANSION
-    ECHO(!Line!)
-    ENDLOCAL
-)>"%file%.new"
-MOVE "%file%.new" "%file%" >nul
-
-bundle exec cucumber
 goto exit
 
 :create-msvs-files-failed
