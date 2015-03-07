@@ -7,7 +7,7 @@ build_script:
   - vcbuild.bat MSVC2013
   
 before_test:
-  - npm install -g cucumber
+  - gem install cucumber
   - gem install bundle
 
 test_script:
