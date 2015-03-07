@@ -16,7 +16,6 @@
 
 #ifdef DEBUG
 #include <iostream>
-#include "Serialize.h"
 #endif
 
 #include "BlueprintSourcemap.h"
@@ -53,6 +52,20 @@ namespace snowcrash {
     }
 
 #ifdef DEBUG
+    // Escape new lines
+    inline std::string EscapeNewlines(const std::string &input) {
+
+        size_t pos = 0;
+        std::string target(input);
+
+        while ((pos = target.find("\n", pos)) != std::string::npos) {
+            target.replace(pos, 1, "\\n");
+            pos += 2;
+        }
+
+        return target;
+    }
+
     // Prints markdown block recursively to stdout
     inline void PrintModelTable(const ModelTable& modelTable) {
 
@@ -62,7 +75,7 @@ namespace snowcrash {
              it != modelTable.end();
              ++it) {
 
-            std::cout << "- " << it->first << " - body: '" << sos::escapeNewlines(it->second.body) << "'\n";
+            std::cout << "- " << it->first << " - body: '" << EscapeNewlines(it->second.body) << "'\n";
         }
 
         std::cout << std::endl;

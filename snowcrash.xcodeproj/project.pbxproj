@@ -8,10 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		40015D011AA58176002F0A55 /* test-BlueprintUtility.cc in Sources */ = {isa = PBXBuildFile; fileRef = 40015D001AA58176002F0A55 /* test-BlueprintUtility.cc */; };
-		400D04731A6BF6E7006EBD4A /* SerializeAST.cc in Sources */ = {isa = PBXBuildFile; fileRef = 400D04711A6BF6E7006EBD4A /* SerializeAST.cc */; };
-		400D04741A6BF6E7006EBD4A /* SerializeAST.h in Headers */ = {isa = PBXBuildFile; fileRef = 400D04721A6BF6E7006EBD4A /* SerializeAST.h */; };
-		400D04771A6BF705006EBD4A /* SerializeSourcemap.cc in Sources */ = {isa = PBXBuildFile; fileRef = 400D04751A6BF705006EBD4A /* SerializeSourcemap.cc */; };
-		400D04781A6BF705006EBD4A /* SerializeSourcemap.h in Headers */ = {isa = PBXBuildFile; fileRef = 400D04761A6BF705006EBD4A /* SerializeSourcemap.h */; };
 		40148D501A7624E100961D74 /* Blueprint.cc in Sources */ = {isa = PBXBuildFile; fileRef = 40148D4F1A7624E100961D74 /* Blueprint.cc */; };
 		40148D521A76435F00961D74 /* BlueprintSourcemap.cc in Sources */ = {isa = PBXBuildFile; fileRef = 40148D511A76435F00961D74 /* BlueprintSourcemap.cc */; };
 		401E5E661A24B545009570D0 /* AttributesParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 401E5E651A24B545009570D0 /* AttributesParser.h */; };
@@ -32,8 +28,6 @@
 		408E7FC81AA69F0D00BF68B3 /* test-RelationParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = 408E7FC71AA69F0D00BF68B3 /* test-RelationParser.cc */; };
 		408F38DA1A153AB200104774 /* MSONValueMemberParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = 408F38D91A153AB200104774 /* MSONValueMemberParser.cc */; };
 		40A1EE0B19EC0A0B00DB894A /* MSON.h in Headers */ = {isa = PBXBuildFile; fileRef = 40A1EE0A19EC0A0B00DB894A /* MSON.h */; };
-		40A60E1D1A6E4B7F00371FC1 /* sos.cc in Sources */ = {isa = PBXBuildFile; fileRef = 40A60E1B1A6E4B7F00371FC1 /* sos.cc */; };
-		40A60E1E1A6E4B7F00371FC1 /* sos.h in Headers */ = {isa = PBXBuildFile; fileRef = 40A60E1C1A6E4B7F00371FC1 /* sos.h */; };
 		40BCDEAA1A0A9489008C6C84 /* MSONPropertyMemberParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 40BCDEA91A0A9489008C6C84 /* MSONPropertyMemberParser.h */; };
 		40BCDEAC1A0A96F8008C6C84 /* MSONMixinParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 40BCDEAB1A0A96F8008C6C84 /* MSONMixinParser.h */; };
 		40BCDEAE1A0A9724008C6C84 /* MSONOneOfParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 40BCDEAD1A0A9724008C6C84 /* MSONOneOfParser.h */; };
@@ -61,7 +55,6 @@
 		BB8C3E711923F09900EF36FA /* libmarkdownparser.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB8C3E701923F09900EF36FA /* libmarkdownparser.a */; };
 		BB8C3E7419241C1600EF36FA /* Section.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB8C3E7319241C1600EF36FA /* Section.cc */; };
 		BB92D891178EF7C10098A63C /* HTTP.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB92D890178EF7C10098A63C /* HTTP.cc */; };
-		BBA25671172BFEB800C1AD5E /* snowcrash.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA25670172BFEB800C1AD5E /* snowcrash.cc */; };
 		BBA35FB7199C359300B7C726 /* libmarkdownparser.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB8C3E701923F09900EF36FA /* libmarkdownparser.a */; };
 		BBA35FB8199C35A300B7C726 /* libmarkdownparser.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB8C3E701923F09900EF36FA /* libmarkdownparser.a */; };
 		BBA91DC2171D402600649B05 /* BlueprintParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA91DC0171D402600649B05 /* BlueprintParser.h */; };
@@ -85,8 +78,6 @@
 		BBD5F9CE17353CE00049BBEE /* ResourceParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD5F9CC17353CE00049BBEE /* ResourceParser.h */; };
 		BBD73564192ED417009FE09E /* HeadersParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD73563192ED417009FE09E /* HeadersParser.h */; };
 		BBD73566192ED45D009FE09E /* test-HeadersParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD73565192ED45D009FE09E /* test-HeadersParser.cc */; };
-		BBE53561174132B100BCA7AD /* Serialize.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE5355B174132B100BCA7AD /* Serialize.h */; };
-		BBE53564174132B100BCA7AD /* Serialize.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBE5355E174132B100BCA7AD /* Serialize.cc */; };
 		BBE57061173927870086CE22 /* PayloadParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE5705F173927870086CE22 /* PayloadParser.h */; };
 		BBE7FEBE1922CAF300A1649E /* test-Blueprint.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBFF48D7170C57F1001E5FB2 /* test-Blueprint.cc */; };
 		BBFC841F196C0C0F001A236A /* UriTemplateParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBFC8416196C0C0F001A236A /* UriTemplateParser.cc */; };
@@ -96,7 +87,6 @@
 		BBFC8426196C1AFD001A236A /* test-RegexMatch.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB0F42B1731D04900C92465 /* test-RegexMatch.cc */; };
 		BBFC8427196C1B1F001A236A /* test-ResourceParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD5F9DD173578210049BBEE /* test-ResourceParser.cc */; };
 		BBFC842A196C1B2B001A236A /* test-snowcrash.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBFF48C9170B3C49001E5FB2 /* test-snowcrash.cc */; };
-		BBFCD83A19DAEE240073813C /* cmdline.h in Headers */ = {isa = PBXBuildFile; fileRef = BBFCD83919DAEE240073813C /* cmdline.h */; };
 		BBFF48CD170B3EDE001E5FB2 /* snowcrash.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBFF48CC170B3EDE001E5FB2 /* snowcrash.cc */; };
 		BBFF48D2170B4224001E5FB2 /* snowcrash.h in Headers */ = {isa = PBXBuildFile; fileRef = BBFF48D1170B4224001E5FB2 /* snowcrash.h */; };
 		BBFF48D6170C4F30001E5FB2 /* Blueprint.h in Headers */ = {isa = PBXBuildFile; fileRef = BBFF48D4170C4F30001E5FB2 /* Blueprint.h */; };
@@ -158,10 +148,6 @@
 
 /* Begin PBXFileReference section */
 		40015D001AA58176002F0A55 /* test-BlueprintUtility.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-BlueprintUtility.cc"; path = "test/test-BlueprintUtility.cc"; sourceTree = "<group>"; };
-		400D04711A6BF6E7006EBD4A /* SerializeAST.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SerializeAST.cc; path = src/SerializeAST.cc; sourceTree = "<group>"; };
-		400D04721A6BF6E7006EBD4A /* SerializeAST.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SerializeAST.h; path = src/SerializeAST.h; sourceTree = "<group>"; };
-		400D04751A6BF705006EBD4A /* SerializeSourcemap.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SerializeSourcemap.cc; path = src/SerializeSourcemap.cc; sourceTree = "<group>"; };
-		400D04761A6BF705006EBD4A /* SerializeSourcemap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SerializeSourcemap.h; path = src/SerializeSourcemap.h; sourceTree = "<group>"; };
 		40148D4F1A7624E100961D74 /* Blueprint.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Blueprint.cc; path = src/Blueprint.cc; sourceTree = "<group>"; };
 		40148D511A76435F00961D74 /* BlueprintSourcemap.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BlueprintSourcemap.cc; path = src/BlueprintSourcemap.cc; sourceTree = "<group>"; };
 		401E5E651A24B545009570D0 /* AttributesParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AttributesParser.h; path = src/AttributesParser.h; sourceTree = "<group>"; };
@@ -182,10 +168,6 @@
 		408E7FC71AA69F0D00BF68B3 /* test-RelationParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-RelationParser.cc"; path = "test/test-RelationParser.cc"; sourceTree = "<group>"; };
 		408F38D91A153AB200104774 /* MSONValueMemberParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MSONValueMemberParser.cc; path = src/MSONValueMemberParser.cc; sourceTree = "<group>"; };
 		40A1EE0A19EC0A0B00DB894A /* MSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MSON.h; path = src/MSON.h; sourceTree = "<group>"; };
-		40A60E1B1A6E4B7F00371FC1 /* sos.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sos.cc; path = ext/sos/src/sos.cc; sourceTree = "<group>"; };
-		40A60E1C1A6E4B7F00371FC1 /* sos.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sos.h; path = ext/sos/src/sos.h; sourceTree = "<group>"; };
-		40A60E1F1A6E4B9300371FC1 /* sosJSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sosJSON.h; path = ext/sos/src/sosJSON.h; sourceTree = "<group>"; };
-		40A60E201A6E4B9300371FC1 /* sosYAML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sosYAML.h; path = ext/sos/src/sosYAML.h; sourceTree = "<group>"; };
 		40BCDEA91A0A9489008C6C84 /* MSONPropertyMemberParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MSONPropertyMemberParser.h; path = src/MSONPropertyMemberParser.h; sourceTree = "<group>"; };
 		40BCDEAB1A0A96F8008C6C84 /* MSONMixinParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MSONMixinParser.h; path = src/MSONMixinParser.h; sourceTree = "<group>"; };
 		40BCDEAD1A0A9724008C6C84 /* MSONOneOfParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MSONOneOfParser.h; path = src/MSONOneOfParser.h; sourceTree = "<group>"; };
@@ -225,8 +207,6 @@
 		BB92D892178EFA370098A63C /* BlueprintUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = BlueprintUtility.h; path = src/BlueprintUtility.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BB9E7029183342CB00ED5806 /* test-Warnings.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-Warnings.cc"; path = "test/test-Warnings.cc"; sourceTree = "<group>"; };
 		BBA01FF817292F9C0050B603 /* test-BlueprintParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = "test-BlueprintParser.cc"; path = "test/test-BlueprintParser.cc"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
-		BBA25667172BFE4C00C1AD5E /* snowcrash */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = snowcrash; sourceTree = BUILT_PRODUCTS_DIR; };
-		BBA25670172BFEB800C1AD5E /* snowcrash.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = snowcrash.cc; path = src/snowcrash/snowcrash.cc; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		BBA91DC0171D402600649B05 /* BlueprintParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = BlueprintParser.h; path = src/BlueprintParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BBB0F4271731CE0D00C92465 /* RegexMatch.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RegexMatch.cc; path = src/posix/RegexMatch.cc; sourceTree = "<group>"; };
 		BBB0F4281731CE0D00C92465 /* RegexMatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RegexMatch.h; path = src/RegexMatch.h; sourceTree = "<group>"; };
@@ -247,14 +227,11 @@
 		BBD5F9DD173578210049BBEE /* test-ResourceParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = "test-ResourceParser.cc"; path = "test/test-ResourceParser.cc"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		BBD73563192ED417009FE09E /* HeadersParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = HeadersParser.h; path = src/HeadersParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BBD73565192ED45D009FE09E /* test-HeadersParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-HeadersParser.cc"; path = "test/test-HeadersParser.cc"; sourceTree = "<group>"; };
-		BBE5355B174132B100BCA7AD /* Serialize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Serialize.h; path = src/Serialize.h; sourceTree = "<group>"; };
-		BBE5355E174132B100BCA7AD /* Serialize.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Serialize.cc; path = src/Serialize.cc; sourceTree = "<group>"; };
 		BBE5705C173922B70086CE22 /* test-PayloadParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-PayloadParser.cc"; path = "test/test-PayloadParser.cc"; sourceTree = "<group>"; };
 		BBE5705F173927870086CE22 /* PayloadParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = PayloadParser.h; path = src/PayloadParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BBFC8416196C0C0F001A236A /* UriTemplateParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UriTemplateParser.cc; path = src/UriTemplateParser.cc; sourceTree = "<group>"; };
 		BBFC8417196C0C0F001A236A /* UriTemplateParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UriTemplateParser.h; path = src/UriTemplateParser.h; sourceTree = "<group>"; };
 		BBFC8422196C0C27001A236A /* test-UriTemplateParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-UriTemplateParser.cc"; path = "test/test-UriTemplateParser.cc"; sourceTree = "<group>"; };
-		BBFCD83919DAEE240073813C /* cmdline.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cmdline.h; path = ext/cmdline/cmdline.h; sourceTree = "<group>"; };
 		BBFF4898170B34E6001E5FB2 /* libsnowcrash.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libsnowcrash.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BBFF48C0170B3C30001E5FB2 /* test-libsnowcrash */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "test-libsnowcrash"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BBFF48C9170B3C49001E5FB2 /* test-snowcrash.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-snowcrash.cc"; path = "test/test-snowcrash.cc"; sourceTree = "<group>"; };
@@ -302,17 +279,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		400214891A61831000BECFED /* sos */ = {
-			isa = PBXGroup;
-			children = (
-				40A60E1B1A6E4B7F00371FC1 /* sos.cc */,
-				40A60E1C1A6E4B7F00371FC1 /* sos.h */,
-				40A60E1F1A6E4B9300371FC1 /* sosJSON.h */,
-				40A60E201A6E4B9300371FC1 /* sosYAML.h */,
-			);
-			name = sos;
-			sourceTree = "<group>";
-		};
 		BB05B9CF180448E300243E1B /* perf-libsnowcrash */ = {
 			isa = PBXGroup;
 			children = (
@@ -322,32 +288,13 @@
 			path = "perf-snowcrash";
 			sourceTree = "<group>";
 		};
-		BB088F7B192EABEA003AA95C /* snowcrash */ = {
-			isa = PBXGroup;
-			children = (
-				BBA25670172BFEB800C1AD5E /* snowcrash.cc */,
-			);
-			name = snowcrash;
-			sourceTree = "<group>";
-		};
-		BB810F781779AB5400B89CD8 /* cmdline */ = {
-			isa = PBXGroup;
-			children = (
-				BBFCD83919DAEE240073813C /* cmdline.h */,
-			);
-			name = cmdline;
-			sourceTree = "<group>";
-		};
 		BBFF488F170B34E6001E5FB2 = {
 			isa = PBXGroup;
 			children = (
 				BB8C3E701923F09900EF36FA /* libmarkdownparser.a */,
-				BB810F781779AB5400B89CD8 /* cmdline */,
 				BBFF48CB170B3ECB001E5FB2 /* libsnowcrash */,
 				BB05B9CF180448E300243E1B /* perf-libsnowcrash */,
 				BBFF4899170B34E6001E5FB2 /* Products */,
-				BB088F7B192EABEA003AA95C /* snowcrash */,
-				400214891A61831000BECFED /* sos */,
 				BBFF48B9170B3AF6001E5FB2 /* test-libsnowcrash */,
 			);
 			sourceTree = "<group>";
@@ -357,7 +304,6 @@
 			children = (
 				BBFF4898170B34E6001E5FB2 /* libsnowcrash.a */,
 				BBFF48C0170B3C30001E5FB2 /* test-libsnowcrash */,
-				BBA25667172BFE4C00C1AD5E /* snowcrash */,
 				BB05B9CE180448E300243E1B /* perf-libsnowcrash */,
 			);
 			name = Products;
@@ -449,12 +395,6 @@
 				BB8C3E621923D6FE00EF36FA /* SectionParser.h */,
 				BB088F77192D7901003AA95C /* SectionParserData.h */,
 				BB8C3E611923D45700EF36FA /* SectionProcessor.h */,
-				BBE5355E174132B100BCA7AD /* Serialize.cc */,
-				BBE5355B174132B100BCA7AD /* Serialize.h */,
-				400D04711A6BF6E7006EBD4A /* SerializeAST.cc */,
-				400D04721A6BF6E7006EBD4A /* SerializeAST.h */,
-				400D04751A6BF705006EBD4A /* SerializeSourcemap.cc */,
-				400D04761A6BF705006EBD4A /* SerializeSourcemap.h */,
 				BBCC856819545FCE00B99E90 /* Signature.cc */,
 				BB8C3E721924192600EF36FA /* Signature.h */,
 				40C61A2519F16C7300EC506D /* SignatureSectionProcessor.h */,
@@ -479,7 +419,6 @@
 			files = (
 				40C61A2619F16C7300EC506D /* SignatureSectionProcessor.h in Headers */,
 				BBFF48D2170B4224001E5FB2 /* snowcrash.h in Headers */,
-				BBFCD83A19DAEE240073813C /* cmdline.h in Headers */,
 				BBFF48D6170C4F30001E5FB2 /* Blueprint.h in Headers */,
 				BBD73564192ED417009FE09E /* HeadersParser.h in Headers */,
 				BBCC855F19542DA100B99E90 /* ValuesParser.h in Headers */,
@@ -498,17 +437,13 @@
 				40CA216119FE989F0086531D /* ModelTable.h in Headers */,
 				40A1EE0B19EC0A0B00DB894A /* MSON.h in Headers */,
 				4075AA1119F95398003C2649 /* MSONUtility.h in Headers */,
-				400D04741A6BF6E7006EBD4A /* SerializeAST.h in Headers */,
 				404CD83B1A07D38300AB1416 /* MSONValueMemberParser.h in Headers */,
 				BBD5F9CE17353CE00049BBEE /* ResourceParser.h in Headers */,
 				4070F30419E4C30A004892C8 /* BlueprintSourcemap.h in Headers */,
 				BBE57061173927870086CE22 /* PayloadParser.h in Headers */,
-				40A60E1E1A6E4B7F00371FC1 /* sos.h in Headers */,
 				BB8C3E651923D83C00EF36FA /* Section.h in Headers */,
-				BBE53561174132B100BCA7AD /* Serialize.h in Headers */,
 				40BCDEAA1A0A9489008C6C84 /* MSONPropertyMemberParser.h in Headers */,
 				BBCC855E19542DA100B99E90 /* ParameterParser.h in Headers */,
-				400D04781A6BF705006EBD4A /* SerializeSourcemap.h in Headers */,
 				40BCDEB21A0A9790008C6C84 /* MSONNamedTypeParser.h in Headers */,
 				BB088F78192D7901003AA95C /* SectionParserData.h in Headers */,
 				BBFC8420196C0C0F001A236A /* UriTemplateParser.h in Headers */,
@@ -535,24 +470,6 @@
 			name = "perf-libsnowcrash";
 			productName = "perf-snowcrash";
 			productReference = BB05B9CE180448E300243E1B /* perf-libsnowcrash */;
-			productType = "com.apple.product-type.tool";
-		};
-		BBA25666172BFE4C00C1AD5E /* snowcrash */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = BBA2566F172BFE4C00C1AD5E /* Build configuration list for PBXNativeTarget "snowcrash" */;
-			buildPhases = (
-				BBA25663172BFE4C00C1AD5E /* Sources */,
-				BBA25664172BFE4C00C1AD5E /* Frameworks */,
-				BBA25665172BFE4C00C1AD5E /* CopyFiles */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				BB4D8E56172D15AA0024EB04 /* PBXTargetDependency */,
-			);
-			name = snowcrash;
-			productName = snowcrash;
-			productReference = BBA25667172BFE4C00C1AD5E /* snowcrash */;
 			productType = "com.apple.product-type.tool";
 		};
 		BBFF4897170B34E6001E5FB2 /* libsnowcrash */ = {
@@ -613,7 +530,6 @@
 			targets = (
 				BBFF4897170B34E6001E5FB2 /* libsnowcrash */,
 				BBFF48BF170B3C30001E5FB2 /* test-libsnowcrash */,
-				BBA25666172BFE4C00C1AD5E /* snowcrash */,
 				BB05B9CD180448E300243E1B /* perf-libsnowcrash */,
 			);
 		};
@@ -632,7 +548,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BBA25671172BFEB800C1AD5E /* snowcrash.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -643,10 +558,8 @@
 				40148D521A76435F00961D74 /* BlueprintSourcemap.cc in Sources */,
 				BBFF48CD170B3EDE001E5FB2 /* snowcrash.cc in Sources */,
 				BB92D891178EF7C10098A63C /* HTTP.cc in Sources */,
-				400D04771A6BF705006EBD4A /* SerializeSourcemap.cc in Sources */,
 				4079DBA71A138C310075B534 /* MSONOneOfParser.cc in Sources */,
 				BB8C3E7419241C1600EF36FA /* Section.cc in Sources */,
-				BBE53564174132B100BCA7AD /* Serialize.cc in Sources */,
 				BBCC856919545FCE00B99E90 /* Signature.cc in Sources */,
 				40DE0C0C1A08F3CF00D2F0A8 /* MSON.cc in Sources */,
 				BBFC841F196C0C0F001A236A /* UriTemplateParser.cc in Sources */,
@@ -655,8 +568,6 @@
 				BB65939117845C2D00321230 /* RegexMatch.cc in Sources */,
 				406AB4C71A57B66200BD381C /* MSONSourcemap.cc in Sources */,
 				40148D501A7624E100961D74 /* Blueprint.cc in Sources */,
-				400D04731A6BF6E7006EBD4A /* SerializeAST.cc in Sources */,
-				40A60E1D1A6E4B7F00371FC1 /* sos.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
