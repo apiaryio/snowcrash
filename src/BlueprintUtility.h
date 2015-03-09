@@ -99,6 +99,13 @@ namespace snowcrash {
             return first.uriTemplate == second.uriTemplate && first.method == second.method;
         }
     };
+
+    /** Relation matching predicate. */
+    struct MatchRelation : std::binary_function<Action, Relation, bool> {
+        bool operator()(const first_argument_type& first, const second_argument_type& second) const {
+            return !first.relation.str.empty() && !second.str.empty() && first.relation.str == second.str;
+        }
+    };
 }
 
 #endif

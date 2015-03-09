@@ -1011,7 +1011,7 @@ TEST_CASE("Parse unnamed resource attributes", "[resource]")
     REQUIRE(resource.node.actions[0].examples[0].responses.size() == 1);
 }
 
-TEST_CASE("Parse inline action", "[resource][now]")
+TEST_CASE("Parse inline action", "[resource]")
 {
     mdp::ByteBuffer source = \
     "# Task [/task/{id}]\n"\
@@ -1047,4 +1047,53 @@ TEST_CASE("Parse inline action", "[resource][now]")
     REQUIRE(resource.sourceMap.actions.collection[0].uriTemplate.sourceMap.empty());
     SourceMapHelper::check(resource.sourceMap.actions.collection[1].method.sourceMap, 117, 31);
     SourceMapHelper::check(resource.sourceMap.actions.collection[1].uriTemplate.sourceMap, 117, 31);
+}
+
+TEST_CASE("Parameters for action should consider action's uri template", "[resource]")
+{
+    mdp::ByteBuffer source = \
+    "## Users [/users]\n"\
+    "\n"\
+    "### Create [POST]\n"\
+    "\n"\
+    "+ Response 204\n"\
+    "\n"\
+    "### Add a friend [POST /users/{username}/friends/{friend}]\n"\
+    "\n"\
+    "+ Parameters\n"\
+    "    + username\n"\
+    "    + friend\n"\
+    "\n"\
+    "+ Response 204";
+
+    ParseResult<Resource> resource;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource, ExportSourcemapOption);
+
+    REQUIRE(resource.report.error.code == Error::OK);
+    REQUIRE(resource.report.warnings.empty());
+}
+
+TEST_CASE("Relation identifiers should be unique for a resource", "[resource]")
+{
+    mdp::ByteBuffer source = \
+    "## Users [/users]\n"\
+    "\n"\
+    "### Create [POST]\n"\
+    "+ Relation: create\n"\
+    "+ Response 204\n"\
+    "\n"\
+    "### Delte [DELETE]\n"\
+    "+ Relation: create\n"\
+    "+ Response 204";
+
+    ParseResult<Resource> resource;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource, ExportSourcemapOption);
+
+    REQUIRE(resource.report.error.code == Error::OK);
+    REQUIRE(resource.report.warnings.size() == 1);
+    REQUIRE(resource.report.warnings[0].code == DuplicateWarning);
+
+    REQUIRE(resource.node.actions.size() == 2);
+    REQUIRE(resource.node.actions[0].relation.str == "create");
+    REQUIRE(resource.node.actions[1].relation.str == "create");
 }

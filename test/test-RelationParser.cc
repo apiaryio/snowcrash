@@ -40,6 +40,62 @@ TEST_CASE("Relation signature without colon", "[relation]")
     REQUIRE(sectionType != RelationSectionType);
 }
 
+TEST_CASE("Relation identifier starting with non lower alphabet", "[relation]")
+{
+    mdp::ByteBuffer source = "+ Relation: 9delete";
+
+    mdp::MarkdownParser markdownParser;
+    mdp::MarkdownNode markdownAST;
+    SectionType sectionType;
+    markdownParser.parse(source, markdownAST);
+
+    REQUIRE(!markdownAST.children().empty());
+    sectionType = SectionProcessor<Relation>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType != RelationSectionType);
+}
+
+TEST_CASE("Relation identifier containing capital letters", "[relation]")
+{
+    mdp::ByteBuffer source = "+ Relation: deLete";
+
+    mdp::MarkdownParser markdownParser;
+    mdp::MarkdownNode markdownAST;
+    SectionType sectionType;
+    markdownParser.parse(source, markdownAST);
+
+    REQUIRE(!markdownAST.children().empty());
+    sectionType = SectionProcessor<Relation>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType != RelationSectionType);
+}
+
+TEST_CASE("Relation identifier containing special characters", "[relation]")
+{
+    mdp::ByteBuffer source = "+ Relation: del*et_e";
+
+    mdp::MarkdownParser markdownParser;
+    mdp::MarkdownNode markdownAST;
+    SectionType sectionType;
+    markdownParser.parse(source, markdownAST);
+
+    REQUIRE(!markdownAST.children().empty());
+    sectionType = SectionProcessor<Relation>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType != RelationSectionType);
+}
+
+TEST_CASE("Relation identifier consisting of dots and dashes", "[relation]")
+{
+    mdp::ByteBuffer source = "+ Relation: delete-task.2";
+
+    mdp::MarkdownParser markdownParser;
+    mdp::MarkdownNode markdownAST;
+    SectionType sectionType;
+    markdownParser.parse(source, markdownAST);
+
+    REQUIRE(!markdownAST.children().empty());
+    sectionType = SectionProcessor<Relation>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == RelationSectionType);
+}
+
 TEST_CASE("Parse canonical link relation", "[relation]")
 {
     ParseResult<Relation> relation;
