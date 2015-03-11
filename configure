@@ -1,17 +1,29 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 #
 # Attribution Notice
 # ------------------
 # This file uses parts of Node.js `configure`.
 # Please refer to https://github.com/joyent/node.
 #
+
+import sys
+
+
+if sys.version_info.major != 2:
+    # Since various Linux distros and OS X doesn't properly follow PEP 394,
+    # We've set the shebang line to `python` and erroring when it isn't
+    # Python 2.
+    print('{} requires Python 2, please install Python 2 and re-run this script.'.format(sys.argv[0]))
+    print('You may be able to do this with `python2 configure`.')
+    sys.exit()
+
+
 import optparse
 import os
 import pprint
 import re
 import shlex
 import subprocess
-import sys
 import platform
 
 CC = os.environ.get('CC', 'cc')
