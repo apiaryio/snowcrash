@@ -64,7 +64,7 @@ TEST_CASE("Parse ilegal parameter", "[parameters]")
 {
     mdp::ByteBuffer source = \
     "+ Parameters\n"\
-    "    + i:legal\n\n";
+    "    + i;legal\n\n";
 
     ParseResult<Parameters> parameters;
     SectionParserHelper<Parameters, ParametersParser>::parse(source, ParametersSectionType, parameters);
@@ -83,7 +83,7 @@ TEST_CASE("Parse illegal parameter among legal ones", "[parameters]")
     mdp::ByteBuffer source = \
     "+ Parameters\n"\
     "    + OK_1\n"\
-    "    + i:legal\n"\
+    "    + i;legal\n"\
     "    + OK-2\n";
 
     ParseResult<Parameters> parameters;

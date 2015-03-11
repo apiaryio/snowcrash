@@ -49,6 +49,14 @@ namespace snowcrash {
     /** Parameter description delimiter */
     const std::string DescriptionIdentifier = "...";
 
+    /** Parameter Definition Type */
+    enum ParameterType {
+        NotParameterType = 0,
+        OldParameterType,        /// Parameter defined using the old syntax
+        NewParameterType,        /// Parameter defined using the new MSON-like syntax
+        UndefinedParameterType = -1
+    };
+
     /**
      * Parameter section processor
      */
@@ -139,8 +147,14 @@ namespace snowcrash {
                 subject = GetFirstLine(node->children().front().text, remainingContent);
                 TrimString(subject);
 
-                if (isValidParameterSignature(subject)) {
+                ParameterType parameterType = getParameterType(subject);
+
+                if (parameterType == OldParameterType) {
                     return ParameterSectionType;
+                }
+
+                if (parameterType == NewParameterType) {
+                    return MSONParameterSectionType;
                 }
             }
 
@@ -168,10 +182,9 @@ namespace snowcrash {
             out.node.use = UndefinedParameterUse;
 
             TrimString(signature);
-
             CaptureGroups captureGroups;
 
-            if (isValidParameterSignature(signature)) {
+            if (getParameterType(signature) == OldParameterType) {
 
                 mdp::ByteBuffer innerSignature = signature;
                 innerSignature = TrimString(innerSignature);
@@ -396,72 +409,110 @@ namespace snowcrash {
             }
         }
 
-        /** Determine if a signature is a valid parameter*/
-        static bool isValidParameterSignature(const mdp::ByteBuffer& signature) {
+        /**
+         * \brief Determine the type of parameter using the signature
+         */
+        static ParameterType getParameterType(const mdp::ByteBuffer& signature) {
 
             mdp::ByteBuffer innerSignature = signature;
-            innerSignature = TrimString(innerSignature);
+            CaptureGroups captureGroups;
 
-            if (innerSignature.length() == 0) {
-                return false; // Empty string, invalid
+            TrimString(innerSignature);
+
+            if (innerSignature.empty()) {
+                return NotParameterType; // Empty string, invalid
             }
 
-            size_t firstSpace = innerSignature.find(" ");
+            if (RegexCapture(innerSignature, "^" PARAMETER_IDENTIFIER "[[:blank:]]*:?", captureGroups) &&
+                !captureGroups[0].empty()) {
 
-            if (firstSpace == std::string::npos) {
-                return RegexMatch(innerSignature, "^" PARAMETER_IDENTIFIER "$");
+                innerSignature = innerSignature.substr(captureGroups[0].size());
+
+                // If last char is ':', don't strip it from signature
+                if (captureGroups[0].substr(captureGroups[0].size() - 1) == ":") {
+                    innerSignature = ":" + innerSignature;
+                }
+
+                TrimString(innerSignature);
+            }
+            else {
+                return NotParameterType;
             }
 
-            std::string paramName = innerSignature.substr(0, firstSpace);
-
-            if (!RegexMatch(paramName, "^" PARAMETER_IDENTIFIER "$")) {
-                return false; // Invalid param name
+            // If contains only parameter name
+            if (innerSignature.empty()) {
+                return OldParameterType;
             }
 
-            // Remove param name
-            innerSignature = innerSignature.substr(firstSpace + 1);
-            size_t descriptionPos = innerSignature.find(snowcrash::DescriptionIdentifier);
+            std::string firstChar = innerSignature.substr(0, 1);
 
-            // Remove description
-            if (descriptionPos != std::string::npos) {
-                innerSignature = innerSignature.substr(0, descriptionPos);
-                innerSignature = TrimString(innerSignature);
+            // If first char is ':' or `=`
+            if (firstChar == ":" || firstChar == "=") {
+
+                innerSignature = innerSignature.substr(1);
+                TrimString(innerSignature);
+
+                if (innerSignature.empty()) {
+                    return NotParameterType; // No sample or default value
+                }
+
+                // Traverse over the value
+                while (!innerSignature.empty()) {
+
+                    std::string first = innerSignature.substr(0, 1);
+
+                    if (first == "`") {
+                        RetrieveEscaped(innerSignature);
+                        TrimString(innerSignature);
+                    }
+                    else if (first == "(") {
+                        break;
+                    }
+                    else {
+                        innerSignature = innerSignature.substr(1);
+                    }
+                }
+
+                return firstChar == ":" ? NewParameterType : OldParameterType;
             }
 
-            size_t attributesPos = innerSignature.find("(");
+            if (innerSignature.substr(0, 1) == "(") {
 
-            if (attributesPos != std::string::npos) {
+                // We should use `matchBrackets` if the parameters are supported to be more complex
                 size_t endOfAttributesPos = innerSignature.find_last_of(")");
 
                 if (endOfAttributesPos == std::string::npos) {
-                    return false; // Expecting close of attributes
+                    return NotParameterType; // Expecting close of attributes
                 }
 
-                // Remove attributes
-                innerSignature = innerSignature.substr(0, attributesPos);
-                innerSignature = TrimString(innerSignature);
-            }
+                std::string attributes = innerSignature.substr(1, endOfAttributesPos);
 
-            if (innerSignature.length() == 0) {
-                return true;
-            }
-
-            if (innerSignature.substr(0,1) == "=") {
-                innerSignature = innerSignature.substr(1);
-                innerSignature = TrimString(innerSignature);
-
-                if (innerSignature.length() == 0) {
-                    return false; // No default value
+                if (RegexMatch(attributes, "enum\\[[^][]+]")) {
+                    return NewParameterType;
                 }
 
-                if (innerSignature.substr(0,1) == "`" && innerSignature.substr(innerSignature.length()-1,1) == "`") {
-                    return true;
+                if (RegexMatch(attributes, "`")) {
+                    return OldParameterType;
+                }
+
+                innerSignature = innerSignature.substr(endOfAttributesPos + 1);
+                TrimString(innerSignature);
+
+                if (innerSignature.empty()) {
+                    return OldParameterType;
                 }
             }
 
-            return false;
+            if (innerSignature.substr(0, 1) == "-") {
+                return NewParameterType;
+            }
+
+            if (innerSignature.substr(0, 3) == "...") {
+                return OldParameterType;
+            }
+
+            return NotParameterType;
         }
-
     };
 
     /** Parameter Section Parser */
