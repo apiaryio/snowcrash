@@ -180,11 +180,9 @@ namespace snowcrash {
                                    const ParseResultRef<Parameter>& out) {
 
             out.node.use = UndefinedParameterUse;
-
             TrimString(signature);
-            CaptureGroups captureGroups;
 
-            if (getParameterType(signature) == OldParameterType) {
+            if (pd.sectionContext() == ParameterSectionType) {
 
                 mdp::ByteBuffer innerSignature = signature;
                 innerSignature = TrimString(innerSignature);
@@ -265,7 +263,8 @@ namespace snowcrash {
                                                           LogicalErrorWarning,
                                                           sourceMap));
                 }
-            } else {
+            }
+            else {
                 // ERR: unable to parse
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
                 out.report.error = Error("unable to parse parameter specification",

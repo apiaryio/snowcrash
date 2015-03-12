@@ -271,6 +271,28 @@ TEST_CASE("Parentheses in parameter example ", "[parameters][issue][#109]")
     REQUIRE(parameters.node[0].description == "test");
 }
 
+TEST_CASE("Parse parameters when it has parameter of both old and new syntax", "[parameter]")
+{
+    mdp::ByteBuffer source = \
+    "+ Parameters\n"\
+    "    + id (optional, string) ... Hello\n"\
+    "    + percent_off: 25 (required, number)";
+
+    ParseResult<Parameters> parameters;
+    SectionParserHelper<Parameters, ParametersParser>::parse(source, ParametersSectionType, parameters);
+
+    REQUIRE(parameters.report.error.code == Error::OK);
+    REQUIRE(parameters.report.warnings.empty());
+
+    REQUIRE(parameters.node.size() == 2);
+    REQUIRE(parameters.node[0].name == "id");
+    REQUIRE(parameters.node[0].type == "string");
+    REQUIRE(parameters.node[0].description == "Hello");
+    REQUIRE(parameters.node[1].name == "percent_off");
+    REQUIRE(parameters.node[1].type == "number");
+    REQUIRE(parameters.node[1].exampleValue == "25");
+}
+
 TEST_CASE("Percentage encoded characters in parameter name ", "[parameters][percentageencoding][issue][#107]")
 {
     // Blueprint in question:

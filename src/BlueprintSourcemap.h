@@ -57,6 +57,13 @@ namespace snowcrash {
         SourceMap<Values> values;
     };
 
+    /**
+     * Source Map Structure for MSON Parameter
+     */
+    template<>
+    struct SourceMap<MSONParameter> : public SourceMap<Parameter> {
+    };
+
     /** Source Map of Collection of Parameters */
     SOURCE_MAP_COLLECTION(Parameter, Parameters)
 
