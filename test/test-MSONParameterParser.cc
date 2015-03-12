@@ -92,3 +92,60 @@ TEST_CASE("Parse parameter when it has more than 2 traits", "[mson_parameter]")
     REQUIRE(parameter.sourceMap.use.sourceMap.empty());
 }
 
+TEST_CASE("Warn about implicit required vs default clash in new parameter", "[mson_parameter]")
+{
+    mdp::ByteBuffer source = \
+    "+ id\n"\
+    "    + Default: 42";
+
+    ParseResult<MSONParameter> parameter;
+    SectionParserHelper<MSONParameter, MSONParameterParser>::parse(source, MSONParameterSectionType, parameter);
+
+    REQUIRE(parameter.report.error.code == Error::OK);
+    REQUIRE(parameter.report.warnings.size() == 1);
+    REQUIRE(parameter.report.warnings[0].code == LogicalErrorWarning);
+
+    REQUIRE(parameter.node.name == "id");
+    REQUIRE(parameter.node.use == UndefinedParameterUse);
+    REQUIRE(parameter.node.defaultValue == "42");
+}
+
+TEST_CASE("Warn missing example item in values in new parameter syntax", "[mson_parameter]")
+{
+    mdp::ByteBuffer source = \
+    "+ id: `Value1` (optional, enum[string])\n"\
+    "    + Default: `Value2`\n"\
+    "    + Members\n"\
+    "        + `Value2`\n";
+
+    ParseResult<MSONParameter> parameter;
+    SectionParserHelper<MSONParameter, MSONParameterParser>::parse(source, MSONParameterSectionType, parameter);
+
+    REQUIRE(parameter.report.error.code == Error::OK);
+    REQUIRE(parameter.report.warnings.size() == 1);
+    REQUIRE(parameter.report.warnings[0].code == LogicalErrorWarning);
+
+    REQUIRE(parameter.node.name == "id");
+    REQUIRE(parameter.node.exampleValue == "Value1");
+    REQUIRE(parameter.node.defaultValue == "Value2");
+}
+
+TEST_CASE("Warn missing default value in values in new parameter syntax", "[mson_parameter]")
+{
+    mdp::ByteBuffer source = \
+    "+ id: `Value2` (optional, enum[string])\n"\
+    "    + Default: `Value1`\n"\
+    "    + Members\n"\
+    "        + `Value2`\n";
+
+    ParseResult<MSONParameter> parameter;
+    SectionParserHelper<MSONParameter, MSONParameterParser>::parse(source, MSONParameterSectionType, parameter);
+
+    REQUIRE(parameter.report.error.code == Error::OK);
+    REQUIRE(parameter.report.warnings.size() == 1);
+    REQUIRE(parameter.report.warnings[0].code == LogicalErrorWarning);
+
+    REQUIRE(parameter.node.name == "id");
+    REQUIRE(parameter.node.exampleValue == "Value2");
+    REQUIRE(parameter.node.defaultValue == "Value1");
+}

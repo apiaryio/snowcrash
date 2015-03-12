@@ -9,6 +9,7 @@
 #ifndef SNOWCRASH_MSONPARAMETERPARSER_H
 #define SNOWCRASH_MSONPARAMETERPARSER_H
 
+#include "ParameterParser.h"
 #include "MSONValueMemberParser.h"
 #include "MSONTypeSectionParser.h"
 
@@ -95,9 +96,19 @@ namespace snowcrash {
                     typeSection.node.baseType = mson::ImplicitValueBaseType;
                     cur = MSONTypeSectionListParser::parse(node, siblings, pd, typeSection);
 
+                    out.node.values.clear();
+
+                    if (pd.exportSourceMap()) {
+                        out.sourceMap.values.collection.clear();
+                    }
+
                     for (size_t i = 0; i < typeSection.node.content.elements().size(); i++) {
                         mson::ValueMember valueMember = typeSection.node.content.elements().at(i).content.value;
-                        SourceMap<mson::ValueMember> valueMemberSM = typeSection.sourceMap.elements().collection.at(i).value;
+                        SourceMap<mson::ValueMember> valueMemberSM;
+
+                        if (pd.exportSourceMap()) {
+                            valueMemberSM = typeSection.sourceMap.elements().collection.at(i).value;
+                        }
 
                         if (valueMember.valueDefinition.values.size() == 1) {
                             out.node.values.push_back(valueMember.valueDefinition.values[0].literal);
@@ -121,6 +132,19 @@ namespace snowcrash {
             return cur;
         }
 
+        static void finalize(const MarkdownNodeIterator& node,
+                             SectionParserData& pd,
+                             const ParseResultRef<MSONParameter>& out) {
+
+            SectionProcessor<Parameter>::checkDefaultAndRequiredClash<MSONParameter>(node, pd, out);
+
+            if ((!out.node.exampleValue.empty() || !out.node.defaultValue.empty()) &&
+                !out.node.values.empty()) {
+
+                SectionProcessor<Parameter>::checkExampleAndDefaultValue<MSONParameter>(node, pd, out);
+            }
+        }
+
         static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
 
             SectionType nestedType = UndefinedSectionType;
@@ -136,10 +160,11 @@ namespace snowcrash {
                                     const std::vector<mdp::ByteBuffer>& attributes,
                                     const ParseResultRef<MSONParameter>& out) {
 
+            out.node.use = UndefinedParameterUse;
+
             if (attributes.size() <= 2) {
                 size_t i = 0;
                 bool definedUse = false;
-                out.node.use = RequiredParameterUse;
 
                 // Traverse over parameter's traits
                 while (i < attributes.size()) {
@@ -148,6 +173,7 @@ namespace snowcrash {
                         definedUse = true;
                     }
                     else if (attributes[i] == "required" && !definedUse) {
+                        out.node.use = RequiredParameterUse;
                         definedUse = true;
                     }
                     else {
@@ -173,8 +199,6 @@ namespace snowcrash {
                 }
             }
             else {
-                out.node.use = UndefinedParameterUse;
-
                 // WARN: Additional parameters traits warning
                 std::stringstream ss;
 

@@ -132,7 +132,7 @@ namespace snowcrash {
             if ((!out.node.exampleValue.empty() || !out.node.defaultValue.empty()) &&
                  !out.node.values.empty()) {
 
-                checkExampleAndDefaultValue(node, pd, out);
+                checkExampleAndDefaultValue<Parameter>(node, pd, out);
             }
 
             return ++MarkdownNodeIterator(node);
@@ -249,20 +249,7 @@ namespace snowcrash {
                     }
                 }
 
-                // Check possible required vs default clash
-                if (out.node.use != OptionalParameterUse &&
-                    !out.node.defaultValue.empty()) {
-
-                    // WARN: Required vs default clash
-                    std::stringstream ss;
-                    ss << "specifying parameter '" << out.node.name << "' as required supersedes its default value"\
-                          ", declare the parameter as 'optional' to specify its default value";
-
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                    out.report.warnings.push_back(Warning(ss.str(),
-                                                          LogicalErrorWarning,
-                                                          sourceMap));
-                }
+                checkDefaultAndRequiredClash<Parameter>(node, pd, out);
             }
             else {
                 // ERR: unable to parse
@@ -361,9 +348,31 @@ namespace snowcrash {
             }
         }
 
+        template<typename T>
+        static void checkDefaultAndRequiredClash(const mdp::MarkdownNodeIterator& node,
+                                                 SectionParserData& pd,
+                                                 const ParseResultRef<T>& out) {
+
+            // Check possible required vs default clash
+            if (out.node.use != OptionalParameterUse &&
+                !out.node.defaultValue.empty()) {
+
+                // WARN: Required vs default clash
+                std::stringstream ss;
+                ss << "specifying parameter '" << out.node.name << "' as required supersedes its default value"\
+                ", declare the parameter as 'optional' to specify its default value";
+
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                out.report.warnings.push_back(Warning(ss.str(),
+                                                      LogicalErrorWarning,
+                                                      sourceMap));
+            }
+        }
+
+        template<typename T>
         static void checkExampleAndDefaultValue(const mdp::MarkdownNodeIterator& node,
                                                 SectionParserData& pd,
-                                                const ParseResultRef<Parameter>& out) {
+                                                const ParseResultRef<T>& out) {
 
             bool isExampleFound = false;
             bool isDefaultFound = false;
