@@ -39,6 +39,7 @@ namespace snowcrash {
         ForeignSectionType,             /// < Foreign, unexpected section
         ParametersSectionType,          /// < Parameters
         ParameterSectionType,           /// < One Parameter definition
+        MSONParameterSectionType,       /// < One Parameter definition using the MSON syntax
         ValuesSectionType,              /// < Value enumeration
         ValueSectionType,               /// < One Value
         MSONMixinSectionType,           /// < MSON Mixin

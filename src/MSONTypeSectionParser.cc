@@ -148,6 +148,7 @@ namespace snowcrash {
                             elementSM.property = propertyMember.sourceMap;
                         }
                     }
+
                     if (out.node.baseType == mson::PrimitiveBaseType ||
                         out.node.baseType == mson::ImplicitPrimitiveBaseType) {
 

@@ -132,6 +132,10 @@ namespace snowcrash {
         Values values;
     };
 
+    /** Parameter with MSON-like syntax */
+    struct MSONParameter : public Parameter {
+    };
+
     /** Collection of Parameters */
     typedef Collection<Parameter>::type Parameters;
 

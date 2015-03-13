@@ -10,10 +10,12 @@
 		40015D011AA58176002F0A55 /* test-BlueprintUtility.cc in Sources */ = {isa = PBXBuildFile; fileRef = 40015D001AA58176002F0A55 /* test-BlueprintUtility.cc */; };
 		40148D501A7624E100961D74 /* Blueprint.cc in Sources */ = {isa = PBXBuildFile; fileRef = 40148D4F1A7624E100961D74 /* Blueprint.cc */; };
 		40148D521A76435F00961D74 /* BlueprintSourcemap.cc in Sources */ = {isa = PBXBuildFile; fileRef = 40148D511A76435F00961D74 /* BlueprintSourcemap.cc */; };
+		401A542E1AB1D1BA00EB3F17 /* test-MSONParameterParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = 401A542D1AB1D1BA00EB3F17 /* test-MSONParameterParser.cc */; };
 		401E5E661A24B545009570D0 /* AttributesParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 401E5E651A24B545009570D0 /* AttributesParser.h */; };
 		401E5E681A24B56B009570D0 /* test-AttributesParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = 401E5E671A24B56B009570D0 /* test-AttributesParser.cc */; };
 		402612201A7779F600354E69 /* DataStructureGroupParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 4026121F1A7779F600354E69 /* DataStructureGroupParser.h */; };
 		402612221A777A9A00354E69 /* test-DataStructureGroupParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = 402612211A777A9A00354E69 /* test-DataStructureGroupParser.cc */; };
+		40481AD61AB1C3D9000B20A1 /* MSONParameterParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 40481AD51AB1C3D9000B20A1 /* MSONParameterParser.h */; };
 		404CD83A1A07D38300AB1416 /* MSONSourcemap.h in Headers */ = {isa = PBXBuildFile; fileRef = 404CD8381A07D38300AB1416 /* MSONSourcemap.h */; };
 		404CD83B1A07D38300AB1416 /* MSONValueMemberParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 404CD8391A07D38300AB1416 /* MSONValueMemberParser.h */; };
 		404CD83F1A07D3A800AB1416 /* test-MSONValueMemberParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = 404CD83E1A07D3A800AB1416 /* test-MSONValueMemberParser.cc */; };
@@ -46,7 +48,6 @@
 		BB05B9D81804493500243E1B /* perf-snowcrash.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB05B9D71804493500243E1B /* perf-snowcrash.cc */; };
 		BB05B9D918044C8200243E1B /* libsnowcrash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBFF4898170B34E6001E5FB2 /* libsnowcrash.a */; };
 		BB088F78192D7901003AA95C /* SectionParserData.h in Headers */ = {isa = PBXBuildFile; fileRef = BB088F77192D7901003AA95C /* SectionParserData.h */; };
-		BB4D8E57172D15CA0024EB04 /* libsnowcrash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBFF4898170B34E6001E5FB2 /* libsnowcrash.a */; };
 		BB65939117845C2D00321230 /* RegexMatch.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB0F4271731CE0D00C92465 /* RegexMatch.cc */; };
 		BB8C3E631923D6FE00EF36FA /* SectionParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BB8C3E621923D6FE00EF36FA /* SectionParser.h */; };
 		BB8C3E651923D83C00EF36FA /* Section.h in Headers */ = {isa = PBXBuildFile; fileRef = BB8C3E641923D83C00EF36FA /* Section.h */; };
@@ -56,7 +57,6 @@
 		BB8C3E7419241C1600EF36FA /* Section.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB8C3E7319241C1600EF36FA /* Section.cc */; };
 		BB92D891178EF7C10098A63C /* HTTP.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB92D890178EF7C10098A63C /* HTTP.cc */; };
 		BBA35FB7199C359300B7C726 /* libmarkdownparser.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB8C3E701923F09900EF36FA /* libmarkdownparser.a */; };
-		BBA35FB8199C35A300B7C726 /* libmarkdownparser.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB8C3E701923F09900EF36FA /* libmarkdownparser.a */; };
 		BBA91DC2171D402600649B05 /* BlueprintParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA91DC0171D402600649B05 /* BlueprintParser.h */; };
 		BBB0F42A1731CE0D00C92465 /* RegexMatch.h in Headers */ = {isa = PBXBuildFile; fileRef = BBB0F4281731CE0D00C92465 /* RegexMatch.h */; };
 		BBB127881999700E0041E9AE /* test-ResourceGroupParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB127871999700E0041E9AE /* test-ResourceGroupParser.cc */; };
@@ -93,13 +93,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		BB4D8E55172D15AA0024EB04 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = BBFF4890170B34E6001E5FB2 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = BBFF4897170B34E6001E5FB2;
-			remoteInfo = libsnowcrash;
-		};
 		BB8C3E6D1923F06E00EF36FA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = BBFF4890170B34E6001E5FB2 /* Project object */;
@@ -126,15 +119,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
-		BBA25665172BFE4C00C1AD5E /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = /usr/share/man/man1/;
-			dstSubfolderSpec = 0;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 1;
-		};
 		BBFF48BE170B3C30001E5FB2 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -150,10 +134,12 @@
 		40015D001AA58176002F0A55 /* test-BlueprintUtility.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-BlueprintUtility.cc"; path = "test/test-BlueprintUtility.cc"; sourceTree = "<group>"; };
 		40148D4F1A7624E100961D74 /* Blueprint.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Blueprint.cc; path = src/Blueprint.cc; sourceTree = "<group>"; };
 		40148D511A76435F00961D74 /* BlueprintSourcemap.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BlueprintSourcemap.cc; path = src/BlueprintSourcemap.cc; sourceTree = "<group>"; };
+		401A542D1AB1D1BA00EB3F17 /* test-MSONParameterParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-MSONParameterParser.cc"; path = "test/test-MSONParameterParser.cc"; sourceTree = "<group>"; };
 		401E5E651A24B545009570D0 /* AttributesParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AttributesParser.h; path = src/AttributesParser.h; sourceTree = "<group>"; };
 		401E5E671A24B56B009570D0 /* test-AttributesParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-AttributesParser.cc"; path = "test/test-AttributesParser.cc"; sourceTree = "<group>"; };
 		4026121F1A7779F600354E69 /* DataStructureGroupParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DataStructureGroupParser.h; path = src/DataStructureGroupParser.h; sourceTree = "<group>"; };
 		402612211A777A9A00354E69 /* test-DataStructureGroupParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-DataStructureGroupParser.cc"; path = "test/test-DataStructureGroupParser.cc"; sourceTree = "<group>"; };
+		40481AD51AB1C3D9000B20A1 /* MSONParameterParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MSONParameterParser.h; path = src/MSONParameterParser.h; sourceTree = "<group>"; };
 		404CD8381A07D38300AB1416 /* MSONSourcemap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MSONSourcemap.h; path = src/MSONSourcemap.h; sourceTree = "<group>"; };
 		404CD8391A07D38300AB1416 /* MSONValueMemberParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MSONValueMemberParser.h; path = src/MSONValueMemberParser.h; sourceTree = "<group>"; };
 		404CD83E1A07D3A800AB1416 /* test-MSONValueMemberParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-MSONValueMemberParser.cc"; path = "test/test-MSONValueMemberParser.cc"; sourceTree = "<group>"; };
@@ -251,15 +237,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		BBA25664172BFE4C00C1AD5E /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				BBA35FB8199C35A300B7C726 /* libmarkdownparser.a in Frameworks */,
-				BB4D8E57172D15CA0024EB04 /* libsnowcrash.a in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		BBFF4895170B34E6001E5FB2 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -326,6 +303,7 @@
 				40BCDEB51A0A981A008C6C84 /* test-MSONMixinParser.cc */,
 				40BCDEBC1A0A9892008C6C84 /* test-MSONNamedTypeParser.cc */,
 				40BCDEB71A0A9841008C6C84 /* test-MSONOneOfParser.cc */,
+				401A542D1AB1D1BA00EB3F17 /* test-MSONParameterParser.cc */,
 				40BCDEB31A0A97F6008C6C84 /* test-MSONPropertyMemberParser.cc */,
 				40DE0C0F1A091F6300D2F0A8 /* test-MSONTypeSectionParser.cc */,
 				406B664E19FA6F63003CBD3A /* test-MSONUtility.cc */,
@@ -373,6 +351,7 @@
 				40BCDEB11A0A9790008C6C84 /* MSONNamedTypeParser.h */,
 				4079DBA61A138C310075B534 /* MSONOneOfParser.cc */,
 				40BCDEAD1A0A9724008C6C84 /* MSONOneOfParser.h */,
+				40481AD51AB1C3D9000B20A1 /* MSONParameterParser.h */,
 				40BCDEA91A0A9489008C6C84 /* MSONPropertyMemberParser.h */,
 				406AB4C61A57B66200BD381C /* MSONSourcemap.cc */,
 				404CD8381A07D38300AB1416 /* MSONSourcemap.h */,
@@ -439,6 +418,7 @@
 				4075AA1119F95398003C2649 /* MSONUtility.h in Headers */,
 				404CD83B1A07D38300AB1416 /* MSONValueMemberParser.h in Headers */,
 				BBD5F9CE17353CE00049BBEE /* ResourceParser.h in Headers */,
+				40481AD61AB1C3D9000B20A1 /* MSONParameterParser.h in Headers */,
 				4070F30419E4C30A004892C8 /* BlueprintSourcemap.h in Headers */,
 				BBE57061173927870086CE22 /* PayloadParser.h in Headers */,
 				BB8C3E651923D83C00EF36FA /* Section.h in Headers */,
@@ -544,13 +524,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		BBA25663172BFE4C00C1AD5E /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		BBFF4894170B34E6001E5FB2 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -603,6 +576,7 @@
 				40CA216319FE99150086531D /* test-ModelTable.cc in Sources */,
 				4056BE0B19EE98C5003AC26C /* test-Signature.cc in Sources */,
 				BBFC8424196C0C27001A236A /* test-UriTemplateParser.cc in Sources */,
+				401A542E1AB1D1BA00EB3F17 /* test-MSONParameterParser.cc in Sources */,
 				BBFC842A196C1B2B001A236A /* test-snowcrash.cc in Sources */,
 				40DE0C101A091F6300D2F0A8 /* test-MSONTypeSectionParser.cc in Sources */,
 				40BCDEB41A0A97F6008C6C84 /* test-MSONPropertyMemberParser.cc in Sources */,
@@ -613,11 +587,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		BB4D8E56172D15AA0024EB04 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = BBFF4897170B34E6001E5FB2 /* libsnowcrash */;
-			targetProxy = BB4D8E55172D15AA0024EB04 /* PBXContainerItemProxy */;
-		};
 		BB8C3E6E1923F06E00EF36FA /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = BBFF4897170B34E6001E5FB2 /* libsnowcrash */;
@@ -643,28 +612,6 @@
 			name = Debug;
 		};
 		BB05B9D5180448E300243E1B /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/snowcrash-etyympsdikhephgzkvczxkaprkpp/Build/Products/Debug",
-				);
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Release;
-		};
-		BBA2566D172BFE4C00C1AD5E /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/snowcrash-etyympsdikhephgzkvczxkaprkpp/Build/Products/Debug",
-				);
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Debug;
-		};
-		BBA2566E172BFE4C00C1AD5E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				LIBRARY_SEARCH_PATHS = (
@@ -784,15 +731,6 @@
 			buildConfigurations = (
 				BB05B9D4180448E300243E1B /* Debug */,
 				BB05B9D5180448E300243E1B /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		BBA2566F172BFE4C00C1AD5E /* Build configuration list for PBXNativeTarget "snowcrash" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				BBA2566D172BFE4C00C1AD5E /* Debug */,
-				BBA2566E172BFE4C00C1AD5E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
