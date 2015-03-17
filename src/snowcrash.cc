@@ -8,6 +8,7 @@
 
 #include "snowcrash.h"
 #include "BlueprintParser.h"
+#include "UriTemplateResolvers.h"
 
 const int snowcrash::SourceAnnotation::OK = 0;
 
@@ -71,17 +72,23 @@ int snowcrash::parse(const mdp::ByteBuffer& source,
 
         // Parse Blueprint
         BlueprintParser::parse(markdownAST.children().begin(), markdownAST.children(), pd, out);
+
+        //Create Resolutions
+        if (options && snowcrash::ResolveWarningsAndErrorsOption) {
+            ResolutionService::getInstance().generateResolutions(source, out.report);
+        }
     }
     catch (const std::exception& e) {
 
         std::stringstream ss;
         ss << "parser exception: '" << e.what() << "'";
-        out.report.error = Error(ss.str(), 1);
+        out.report.error = Error(ss.str(), ApplicationError);
     }
     catch (...) {
 
-        out.report.error = Error("parser exception has occured", 1);
+        out.report.error = Error("parser exception has occured", 1, 0);
     }
 
     return out.report.error.code;
+
 }

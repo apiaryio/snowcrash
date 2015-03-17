@@ -33,6 +33,14 @@ extern "C" {
     struct sc_error_s;
     typedef struct sc_error_s sc_error_t;
 
+    /** Class resolution wrapper */
+    struct sc_resolution_s;
+    typedef struct sc_resolution_s sc_resolution_t;
+
+    /** Array resolutions wrapper */
+    struct sc_resolutions_s;
+    typedef struct sc_resolutions_s sc_resolutions_t;
+
     /** Class location wrapper */
     struct sc_location_s;
     typedef struct sc_location_s sc_location_t;
@@ -54,6 +62,9 @@ extern "C" {
     /** \returns location handler*/
     SC_API const sc_location_t* sc_location_handler(const sc_source_annotation_t* source);
 
+    /** \returns location handler for a resolution*/
+    SC_API const sc_location_t* sc_resolution_location_handler(const sc_resolution_t* source);
+
     /** \returns location array size*/
     SC_API size_t sc_location_size(const sc_location_t* location);
 
@@ -73,6 +84,9 @@ extern "C" {
 
     /** \returns error code*/
     SC_API int sc_error_code(const sc_error_t* error);
+
+    /** \returns error subcode*/
+    SC_API int sc_error_subCode(const sc_error_t* error);
 
     /** \returns error OK*/
     SC_API int sc_error_ok(const sc_error_t* error);
@@ -96,8 +110,26 @@ extern "C" {
     /** \returns warning code*/
     SC_API int sc_warning_code(const sc_warning_t* warning);
 
+    /** \returns warning subcode*/
+    SC_API int sc_warning_subCode(const sc_warning_t* warning);
+
     /** \returns warning OK*/
     SC_API int sc_warning_ok(const sc_warning_t* warning);
+
+    /*----------------------------------------------------------------------*/
+
+    /** \returns resolutions handler*/
+    SC_API const sc_resolutions_t* sc_resolutions_handler(const sc_source_annotation_t* source);
+
+    /** \returns resolutions array size*/
+    SC_API size_t sc_resolutions_size(const sc_resolutions_t* resolutions);
+
+    /** \returns resolution at `index` message*/
+    SC_API const char* sc_resolution_message(const sc_resolutions_t* resolutions, size_t index);
+
+    /** \returns resolution at `index` resolvedSource*/
+    SC_API const char* sc_resolution_resolvedSource(const sc_resolutions_t* resolutions, size_t index);
+
 
 #ifdef __cplusplus
 }

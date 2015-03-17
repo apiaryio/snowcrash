@@ -235,7 +235,7 @@ TEST_CASE("Parse uri template for invalid variable name, contains spaces", "[inv
     parser.parse(uri, sourceBlock, result);
 
     REQUIRE(result.report.warnings.size() == 1);
-    REQUIRE(result.report.warnings[0].message == "URI template expression \"?varone, vartwo\" contains spaces. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters");
+    REQUIRE(result.report.warnings[0].message == "URI template '?varone, vartwo' contains spaces");
 
 }
 
@@ -250,7 +250,7 @@ TEST_CASE("Parse uri template for invalid variable name, contains hyphens", "[in
     parser.parse(uri, sourceBlock, result);
 
     REQUIRE(result.report.warnings.size() == 1);
-    REQUIRE(result.report.warnings[0].message == "URI template expression \"?var-one,var-two\" contains hyphens. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters");
+    REQUIRE(result.report.warnings[0].message == "URI template '?var-one,var-two' contains hyphens");
 
 }
 
@@ -265,7 +265,7 @@ TEST_CASE("Parse uri template for invalid variable name, contains assignment", "
     parser.parse(uri, sourceBlock, result);
 
     REQUIRE(result.report.warnings.size() == 1);
-    REQUIRE(result.report.warnings[0].message == "URI template expression \"?varone=vartwo\" contains assignment. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters");
+    REQUIRE(result.report.warnings[0].message == "URI template '?varone=vartwo' contains assignment");
 
 }
 
@@ -280,7 +280,7 @@ TEST_CASE("Parse uri template for invalid variable name, invalid % encoded", "[i
     parser.parse(uri, sourceBlock, result);
 
     REQUIRE(result.report.warnings.size() == 1);
-    REQUIRE(result.report.warnings[0].message == "URI template expression \"?varone%2z\" contains invalid characters. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters");
+    REQUIRE(result.report.warnings[0].message == "URI template '?varone%2z' contains invalid characters");
 
 }
 
@@ -323,11 +323,11 @@ TEST_CASE("Parse uri template for consistent invalid character warning", "[inval
     parser.parse(urione, sourceBlock, result);
 
     REQUIRE(result.report.warnings.size() == 1);
-    REQUIRE(result.report.warnings[0].message == "URI template expression \"$a,b,c\" contains invalid characters. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters");
+    REQUIRE(result.report.warnings[0].message == "URI template '$a,b,c' contains invalid characters");
 
     parser.parse(urione, sourceBlock, result2);
 
     REQUIRE(result2.report.warnings.size() == 1);
-    REQUIRE(result2.report.warnings[0].message == "URI template expression \"$a,b,c\" contains invalid characters. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters");
+    REQUIRE(result2.report.warnings[0].message == "URI template '$a,b,c' contains invalid characters");
 
 }
