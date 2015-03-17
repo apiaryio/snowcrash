@@ -169,6 +169,7 @@ namespace snowcrash {
         SourceAnnotation& operator=(const SourceAnnotation& rhs) {
             this->message = rhs.message;
             this->code = rhs.code;
+            this->subCode = rhs.subCode;
             this->location = rhs.location;
             this->resolutions = rhs.resolutions;
             return *this;

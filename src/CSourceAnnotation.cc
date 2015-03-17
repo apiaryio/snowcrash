@@ -32,6 +32,15 @@ SC_API const sc_location_t* sc_location_handler(const sc_source_annotation_t* so
     return AS_CTYPE(sc_location_t, &p->location);
 }
 
+SC_API const sc_location_t* sc_resolution_location_handler(const sc_resolution_t* source)
+{
+    const snowcrash::ResolutionAnnotation* p = AS_CTYPE(snowcrash::ResolutionAnnotation, source);
+    if (!p)
+        return NULL;
+
+    return AS_CTYPE(sc_location_t, &p->location);
+}
+
 SC_API size_t sc_location_size(const sc_location_t* location)
 {
     const mdp::CharactersRangeSet* p = AS_CTYPE(mdp::CharactersRangeSet, location);
@@ -86,6 +95,15 @@ SC_API int sc_error_code(const sc_error_t* error)
         return 0;
 
     return p->code;
+}
+
+SC_API int sc_error_subCode(const sc_error_t* error)
+{
+    const snowcrash::Error* p = AS_CTYPE(snowcrash::Error, error);
+    if (!p)
+        return 0;
+
+    return p->subCode;
 }
 
 SC_API int sc_error_ok(const sc_error_t* error)
@@ -144,6 +162,15 @@ SC_API int sc_warning_code(const sc_warning_t* warning)
     return p->code;
 }
 
+SC_API int sc_warning_subCode(const sc_warning_t* warning)
+{
+    const snowcrash::Warning* p = AS_CTYPE(snowcrash::Warning, warning);
+    if (!p)
+        return 0;
+
+    return p->subCode;
+}
+
 SC_API int sc_warning_ok(const sc_warning_t* warning)
 {
     const snowcrash::Warning* p = AS_CTYPE(snowcrash::Warning, warning);
@@ -151,4 +178,25 @@ SC_API int sc_warning_ok(const sc_warning_t* warning)
         return 0;
 
     return p->OK;
+}
+/*----------------------------------------------------------------------*/
+
+/** \returns resolution at `index` message*/
+SC_API const char* sc_resolution_message(const sc_resolutions_t* resolutions, size_t index)
+{
+    const snowcrash::Resolutions* p = AS_CTYPE(snowcrash::Resolutions, resolutions);
+    if (!p)
+        return NULL;
+
+    return p->at(index).message.c_str();
+}
+
+/** \returns resolution at `index` resolvedSource*/
+SC_API const char* sc_resolution_resolvedSource(const sc_resolutions_t* resolutions, size_t index)
+{
+    const snowcrash::Resolutions* p = AS_CTYPE(snowcrash::Resolutions, resolutions);
+    if (!p)
+        return NULL;
+
+    return p->at(index).resolvedSource.c_str();
 }

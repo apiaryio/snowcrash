@@ -127,17 +127,17 @@ void URITemplateParser::parse(const URITemplate& uri, const mdp::CharactersRange
         result.path = groups[4];
 
         if (HasMismatchedCurlyBrackets(result.path)) {
-            result.report.warnings.push_back(Warning("The URI template contains mismatched expression brackets", URIWarning, MismatchedCurlyBracketsWarningUriTemplateWarningSubCode, sourceBlock));
+            result.report.warnings.push_back(Warning("the URI template contains mismatched expression brackets", URIWarning, MismatchedCurlyBracketsWarningUriTemplateWarningSubCode, sourceBlock));
             return;
         }
 
         if (HasNestedCurlyBrackets(result.path)) {
-            result.report.warnings.push_back(Warning("The URI template contains nested expression brackets", URIWarning, NestedCurlyBracketsWarningUriTemplateWarningSubCode, sourceBlock));
+            result.report.warnings.push_back(Warning("the URI template contains nested expression brackets", URIWarning, NestedCurlyBracketsWarningUriTemplateWarningSubCode, sourceBlock));
             return;
         }
 
         if (PathContainsSquareBrackets(result.path)) {
-            result.report.warnings.push_back(Warning("The URI template contains square brackets", URIWarning, SquareBracketWarningUriTemplateWarningSubCode, sourceBlock));
+            result.report.warnings.push_back(Warning("the URI template contains square brackets", URIWarning, SquareBracketWarningUriTemplateWarningSubCode, sourceBlock));
         }
 
         expressions = GetUriTemplateExpressions(result.path);
@@ -187,7 +187,7 @@ void URITemplateParser::parse(const URITemplate& uri, const mdp::CharactersRange
         }
     }
     else{
-        result.report.error = Error("Failed to parse URI Template", URIWarning, NoUriTemplateWarningSubCode);
+        result.report.warnings.push_back(Warning("failed to parse URI Template", URIWarning, NoUriTemplateWarningSubCode));
     }
 
 }
