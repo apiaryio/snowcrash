@@ -211,16 +211,12 @@ namespace snowcrash {
             }
             else {
                 // WARN: Additional parameters traits warning
-                std::stringstream ss;
-
-                ss << "unable to parse additional parameter traits";
-                ss << ", expected '([required | optional], [<type> | enum[<type>])'";
-                ss << ", e.g. '(optional, string)'";
-
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                out.report.warnings.push_back(Warning(ss.str(),
-                                                      FormattingWarning,
-                                                      sourceMap));
+                out.report.warnings(FormattingWarning, sourceMap)
+                    << "unable to parse additional parameter traits"
+                    << ", expected '([required | optional], [<type> | enum[<type>])'"
+                    << ", e.g. '(optional, string)'";
+
             }
         }
     };

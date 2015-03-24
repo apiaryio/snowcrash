@@ -51,14 +51,10 @@ namespace snowcrash {
                     TrimString(content);
 
                     // WARN: Ignoring the unexpected param value
-                    std::stringstream ss;
-                    ss << "ignoring the '" << content << "' element";
-                    ss << ", expected '`" << content << "`'";
-
                     mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                    out.report.warnings.push_back(Warning(ss.str(),
-                                                          IgnoringWarning,
-                                                          sourceMap));
+                    out.report.warnings(IgnoringWarning, sourceMap)
+                        << "ignoring the '" << content << "' element"
+                        << ", expected '`" << content << "`'";
                 }
 
                 return ++MarkdownNodeIterator(node);

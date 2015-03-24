@@ -60,9 +60,7 @@ namespace snowcrash {
 
                 // WARN: invalid mixin base type
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                out.report.warnings.push_back(Warning("mixin type may not include a type of a primitive sub-type",
-                                                      FormattingWarning,
-                                                      sourceMap));
+                out.report.warnings(FormattingWarning, sourceMap) << "mixin type may not include a type of a primitive sub-type";
             }
 
             return ++MarkdownNodeIterator(node);

@@ -46,14 +46,10 @@ namespace snowcrash {
             if (!remainingContent.empty()) {
 
                 // WARN: Extra content in parameters section
-                std::stringstream ss;
-                ss << "ignoring additional content after 'parameters' keyword,";
-                ss << " expected a nested list of parameters, one parameter per list item";
-
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                out.report.warnings.push_back(Warning(ss.str(),
-                                                      IgnoringWarning,
-                                                      sourceMap));
+                out.report.warnings(IgnoringWarning, sourceMap)
+                    << "ignoring additional content after 'parameters' keyword,"
+                    << " expected a nested list of parameters, one parameter per list item";
             }
 
             return ++MarkdownNodeIterator(node);
@@ -91,13 +87,9 @@ namespace snowcrash {
                 if (duplicate != out.node.end()) {
 
                     // WARN: Parameter already defined
-                    std::stringstream ss;
-                    ss << "overshadowing previous parameter '" << parameter.node.name << "' definition";
-
                     mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                    out.report.warnings.push_back(Warning(ss.str(),
-                                                          RedefinitionWarning,
-                                                          sourceMap));
+                    out.report.warnings(RedefinitionWarning, sourceMap)
+                        << "overshadowing previous parameter '" << parameter.node.name << "' definition";
                 }
             }
 
@@ -152,9 +144,7 @@ namespace snowcrash {
 
                 // WARN: No parameters defined
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                out.report.warnings.push_back(Warning(NoParametersMessage,
-                                                      FormattingWarning,
-                                                      sourceMap));
+                out.report.warnings(FormattingWarning, sourceMap) << NoParametersMessage;
             }
         }
 

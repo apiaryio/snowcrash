@@ -41,13 +41,10 @@ namespace snowcrash {
                 if (isNamedTypeDuplicate(pd.blueprint, namedType.node.name.symbol.literal)) {
 
                     // WARN: duplicate named type
-                    std::stringstream ss;
-                    ss << "named type with name '" << namedType.node.name.symbol.literal << "' already exists";
 
                     mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                    out.report.warnings.push_back(Warning(ss.str(),
-                                                          DuplicateWarning,
-                                                          sourceMap));
+                    out.report.warnings(DuplicateWarning, sourceMap) 
+                        << "named type with name '" << namedType.node.name.symbol.literal << "' already exists";
                 }
                 else {
 

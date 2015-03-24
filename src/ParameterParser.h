@@ -98,14 +98,9 @@ namespace snowcrash {
             // Check redefinition
             if (!out.node.values.empty()) {
                 // WARN: parameter values are already defined
-                std::stringstream ss;
-                ss << "overshadowing previous 'values' definition";
-                ss << " for parameter '" << out.node.name << "'";
-
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                out.report.warnings.push_back(Warning(ss.str(),
-                                                      RedefinitionWarning,
-                                                      sourceMap));
+                out.report.warnings(RedefinitionWarning, sourceMap)
+                    << "overshadowing previous 'values' definition" << " for parameter '" << out.node.name << "'";
             }
 
             // Clear any previous values
@@ -120,13 +115,9 @@ namespace snowcrash {
 
             if (out.node.values.empty()) {
                 // WARN: empty definition
-                std::stringstream ss;
-                ss << "no possible values specified for parameter '" << out.node.name << "'";
-
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                out.report.warnings.push_back(Warning(ss.str(),
-                                                      EmptyDefinitionWarning,
-                                                      sourceMap));
+                out.report.warnings(EmptyDefinitionWarning, sourceMap)
+                    << "no possible values specified for parameter '" << out.node.name << "'";
             }
 
             if ((!out.node.exampleValue.empty() || !out.node.defaultValue.empty()) &&
@@ -326,15 +317,11 @@ namespace snowcrash {
 
             if (!traits.empty()) {
                 // WARN: Additional parameters traits warning
-                std::stringstream ss;
-                ss << "unable to parse additional parameter traits";
-                ss << ", expected '([required | optional], [<type>], [`<example value>`])'";
-                ss << ", e.g. '(optional, string, `Hello World`)'";
-
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                out.report.warnings.push_back(Warning(ss.str(),
-                                                      FormattingWarning,
-                                                      sourceMap));
+                out.report.warnings(FormattingWarning, sourceMap)
+                    << "unable to parse additional parameter traits"
+                    << ", expected '([required | optional], [<type>], [`<example value>`])'"
+                    << ", e.g. '(optional, string, `Hello World`)'";
 
                 out.node.type.clear();
                 out.node.exampleValue.clear();
@@ -358,14 +345,10 @@ namespace snowcrash {
                 !out.node.defaultValue.empty()) {
 
                 // WARN: Required vs default clash
-                std::stringstream ss;
-                ss << "specifying parameter '" << out.node.name << "' as required supersedes its default value"\
-                ", declare the parameter as 'optional' to specify its default value";
-
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                out.report.warnings.push_back(Warning(ss.str(),
-                                                      LogicalErrorWarning,
-                                                      sourceMap));
+                out.report.warnings(LogicalErrorWarning, sourceMap)
+                    << "specifying parameter '" << out.node.name << "' as required supersedes its default value"
+                    << ", declare the parameter as 'optional' to specify its default value";
             }
         }
 
@@ -376,9 +359,6 @@ namespace snowcrash {
 
             bool isExampleFound = false;
             bool isDefaultFound = false;
-
-            std::stringstream ss;
-            bool printWarning = false;
 
             for (Collection<Value>::iterator it = out.node.values.begin();
                  it != out.node.values.end();
@@ -393,27 +373,22 @@ namespace snowcrash {
                 }
             }
 
-            if(!out.node.exampleValue.empty() &&
-               !isExampleFound) {
+            if(!out.node.exampleValue.empty() && !isExampleFound) {
 
                 // WARN: missing example in values.
-                ss << "the example value '" << out.node.exampleValue << "' of parameter '"<< out.node.name <<"' is not in its list of expected values";
-                printWarning = true;
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                out.report.warnings(LogicalErrorWarning, sourceMap)
+                    << "the example value '" << out.node.exampleValue << "' of parameter '"
+                    << out.node.name << "' is not in its list of expected values";
             }
 
-            if(!out.node.defaultValue.empty() &&
-               !isDefaultFound) {
+            if(!out.node.defaultValue.empty() && !isDefaultFound) {
 
                 // WARN: missing default in values.
-                ss << "the default value '" << out.node.defaultValue << "' of parameter '"<< out.node.name <<"' is not in its list of expected values";
-                printWarning = true;
-            }
-
-            if (printWarning) {
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                out.report.warnings.push_back(Warning(ss.str(),
-                                                      LogicalErrorWarning,
-                                                      sourceMap));
+                out.report.warnings(LogicalErrorWarning, sourceMap)
+                    << "the default value '" << out.node.defaultValue << "' of parameter '"
+                    << out.node.name << "' is not in its list of expected values";
             }
         }
 

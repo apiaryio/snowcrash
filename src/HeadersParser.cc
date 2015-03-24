@@ -100,9 +100,7 @@ bool HeaderParserValidator::operator()(const ValidateFunctorBase& rule) {
     bool rc = rule();
 
     if(!rc) {
-        out.report.warnings.push_back(Warning(rule.getMessage(),
-            HTTPWarning,
-            sourceMap));
+        out.report.warnings(HTTPWarning, sourceMap) << rule.getMessage();
     }
 
     return rc;

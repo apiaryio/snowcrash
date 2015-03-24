@@ -291,9 +291,7 @@ namespace snowcrash {
             }
             else if (!out.node.description.empty()) {
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                out.report.warnings.push_back(Warning(ExpectedAPINameMessage,
-                                                      APINameWarning,
-                                                      sourceMap));
+                out.report.warnings(APINameWarning, sourceMap) << ExpectedAPINameMessage;
             }
         }
 
@@ -492,13 +490,8 @@ namespace snowcrash {
                         duplicateKeys.push_back(it->first);
 
                         // WARN: duplicate metadata definition
-                        std::stringstream ss;
-                        ss << "duplicate definition of '" << it->first << "'";
-
                         mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                        out.report.warnings.push_back(Warning(ss.str(),
-                                                              DuplicateWarning,
-                                                              sourceMap));
+                        out.report.warnings(DuplicateWarning, sourceMap) << "duplicate definition of '" << it->first << "'";
                     }
                 }
             }
@@ -506,9 +499,7 @@ namespace snowcrash {
 
                 // WARN: malformed metadata block
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                out.report.warnings.push_back(Warning("ignoring possible metadata, expected '<key> : <value>', one one per line",
-                                                      FormattingWarning,
-                                                      sourceMap));
+                out.report.warnings(FormattingWarning, sourceMap) << "ignoring possible metadata, expected '<key> : <value>', one one per line";
             }
         }
 

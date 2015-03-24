@@ -66,15 +66,10 @@ namespace snowcrash {
                     out.node.baseType != mson::ImplicitValueBaseType) {
 
                     //WARN: Items/Members should only be allowed for value types
-                    std::stringstream ss;
-
-                    ss << "type section `" << signature.identifier;
-                    ss << "` not allowed for a type sub-typed from a primitive or object type";
-
                     mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                    out.report.warnings.push_back(Warning(ss.str(),
-                                                          LogicalErrorWarning,
-                                                          sourceMap));
+                    out.report.warnings(LogicalErrorWarning, sourceMap)
+                        << "type section `" << signature.identifier
+                        << "` not allowed for a type sub-typed from a primitive or object type";
 
                     return node;
                 }
@@ -87,15 +82,10 @@ namespace snowcrash {
                     out.node.baseType != mson::ImplicitObjectBaseType) {
 
                     //WARN: Properties should only be allowed for object types
-                    std::stringstream ss;
-
-                    ss << "type section `" << signature.identifier;
-                    ss << "` is only allowed for a type sub-typed from an object type";
-
                     mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                    out.report.warnings.push_back(Warning(ss.str(),
-                                                          LogicalErrorWarning,
-                                                          sourceMap));
+                    out.report.warnings(LogicalErrorWarning, sourceMap)
+                        << "type section `" << signature.identifier
+                        << "` is only allowed for a type sub-typed from an object type";
 
                     return node;
                 }
@@ -138,9 +128,8 @@ namespace snowcrash {
 
                     // WARN: sample/default is for an object but it has values in signature
                     mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                    out.report.warnings.push_back(Warning("a sample and/or default type section for a type which is sub-typed from an object cannot have value(s) beside the keyword",
-                                                          LogicalErrorWarning,
-                                                          sourceMap));
+                    out.report.warnings(LogicalErrorWarning, sourceMap) 
+                        << "a sample and/or default type section for a type which is sub-typed from an object cannot have value(s) beside the keyword";
                 }
             }
 

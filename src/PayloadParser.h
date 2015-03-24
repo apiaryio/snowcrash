@@ -65,9 +65,7 @@ namespace snowcrash {
                 (pd.sectionContext() == ResponseSectionType || pd.sectionContext() == ResponseBodySectionType)) {
 
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                out.report.warnings.push_back(Warning("missing response HTTP status code, assuming 'Response 200'",
-                                                      EmptyDefinitionWarning,
-                                                      sourceMap));
+                out.report.warnings(EmptyDefinitionWarning, sourceMap) << "missing response HTTP status code, assuming 'Response 200'";
                 out.node.name = "200";
             }
 
@@ -104,15 +102,11 @@ namespace snowcrash {
 
             if (!out.node.reference.id.empty()) {
                 //WARN: ignoring extraneous content after model reference
-                std::stringstream ss;
-
-                ss << "ignoring extraneous content after model reference";
-                ss << ", expected model reference only e.g. '[" << out.node.reference.id << "][]'";
 
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                out.report.warnings.push_back(Warning(ss.str(),
-                                                      IgnoringWarning,
-                                                      sourceMap));
+                out.report.warnings(IgnoringWarning, sourceMap)
+                    << "ignoring extraneous content after model reference"
+                    << ", expected model reference only e.g. '[" << out.node.reference.id << "][]'";
             } else {
 
                 if (!out.node.body.empty() ||
@@ -159,9 +153,7 @@ namespace snowcrash {
                     if (!out.node.body.empty()) {
                         // WARN: Multiple body section
                         mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                        out.report.warnings.push_back(Warning("ignoring additional 'body' content, it is already defined",
-                                                              RedefinitionWarning,
-                                                              sourceMap));
+                        out.report.warnings(RedefinitionWarning, sourceMap) << "ignoring additional 'body' content, it is already defined";
                     }
 
                     ParseResultRef<Asset> asset(out.report, out.node.body, out.sourceMap.body);
@@ -173,9 +165,7 @@ namespace snowcrash {
                     if (!out.node.schema.empty()) {
                         // WARN: Multiple schema section
                         mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                        out.report.warnings.push_back(Warning("ignoring additional 'schema' content, it is already defined",
-                                                              RedefinitionWarning,
-                                                              sourceMap));
+                        out.report.warnings(RedefinitionWarning, sourceMap) << "ignoring additional 'schema' content, it is already defined";
                     }
 
                     ParseResultRef<Asset> asset(out.report, out.node.schema, out.sourceMap.schema);
@@ -547,15 +537,10 @@ namespace snowcrash {
             if (isPayloadContentType && isModelContentType) {
 
                 // WARN: Ignoring payload content-type, when referencing a model with headers
-                std::stringstream ss;
-
-                ss << "ignoring additional " << SectionName(pd.sectionContext()) << " header(s), ";
-                ss << "specify this header(s) in the referenced model definition instead";
-
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(out.node.reference.meta.node->sourceMap, pd.sourceData);
-                out.report.warnings.push_back(Warning(ss.str(),
-                                                      IgnoringWarning,
-                                                      sourceMap));
+                out.report.warnings(IgnoringWarning, sourceMap)
+                    << "ignoring additional " << SectionName(pd.sectionContext()) << " header(s), "
+                    << "specify this header(s) in the referenced model definition instead";
             }
 
             if (isPayloadContentType && !isModelContentType) {
@@ -666,13 +651,9 @@ namespace snowcrash {
                 out.node.reference.meta.state != Reference::StatePending) {
 
                 // WARN: not empty body
-                std::stringstream ss;
-                ss << "the " << code << " response MUST NOT include a " << SectionName(BodySectionType);
-
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                out.report.warnings.push_back(Warning(ss.str(),
-                                                      EmptyDefinitionWarning,
-                                                      sourceMap));
+                out.report.warnings(EmptyDefinitionWarning, sourceMap)
+                    << "the " << code << " response MUST NOT include a " << SectionName(BodySectionType);
             }
         }
 

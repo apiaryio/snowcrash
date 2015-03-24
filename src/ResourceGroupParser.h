@@ -116,9 +116,8 @@ namespace snowcrash {
 
                     // WARN: Duplicate resource
                     mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                    out.report.warnings.push_back(Warning("the resource '" + resource.node.uriTemplate + "' is already defined",
-                                                          DuplicateWarning,
-                                                          sourceMap));
+                    out.report.warnings(DuplicateWarning, sourceMap) 
+                        << "the resource '" << resource.node.uriTemplate << "' is already defined";
                 }
 
                 Element resourceElement(Element::ResourceElement);
@@ -153,13 +152,10 @@ namespace snowcrash {
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
 
                 // WARN: Unexpected action
-                std::stringstream ss;
-                ss << "unexpected action '" << method << "', to define multiple actions for the '" << lastResource(out.node.content.elements()).uriTemplate;
-                ss << "' resource omit the HTTP method in its definition, e.g. '# /resource'";
-
-                out.report.warnings.push_back(Warning(ss.str(),
-                                                      IgnoringWarning,
-                                                      sourceMap));
+                out.report.warnings(IgnoringWarning, sourceMap)
+                    << "unexpected action '" << method << "', to define multiple actions for the '" 
+                    << lastResource(out.node.content.elements()).uriTemplate
+                    << "' resource omit the HTTP method in its definition, e.g. '# /resource'";
 
                 return ++MarkdownNodeIterator(node);
             }

@@ -51,9 +51,7 @@ namespace snowcrash {
 
                         // WARN: One of can not be a nested member for a non object structure type
                         mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                        out.report.warnings.push_back(Warning("one-of can not be a nested member for a type not sub typed from object",
-                                                              LogicalErrorWarning,
-                                                              sourceMap));
+                        out.report.warnings(LogicalErrorWarning, sourceMap) << "one-of can not be a nested member for a type not sub typed from object";
 
                         return cur;
                     }
@@ -109,14 +107,9 @@ namespace snowcrash {
                 case MSONOneOfSectionType:
                 {
                     // WARN: mixin and oneOf not supported in sample/default
-                    std::stringstream ss;
-
-                    ss << "sample and default type sections cannot have `" << SectionName(pd.sectionContext()) << "` type";
-
                     mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                    out.report.warnings.push_back(Warning(ss.str(),
-                                                          LogicalErrorWarning,
-                                                          sourceMap));
+                    out.report.warnings(LogicalErrorWarning, sourceMap)
+                        << "sample and default type sections cannot have `" << SectionName(pd.sectionContext()) << "` type";
                     break;
                 }
 

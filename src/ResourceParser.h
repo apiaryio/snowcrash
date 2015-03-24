@@ -113,13 +113,9 @@ namespace snowcrash {
                         if (SectionProcessor<DataStructureGroup>::isNamedTypeDuplicate(pd.blueprint, out.node.name)) {
 
                             // WARN: duplicate named type
-                            std::stringstream ss;
-                            ss << "named type with name '" << out.node.name << "' already exists";
-
                             mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                            out.report.warnings.push_back(Warning(ss.str(),
-                                                                  DuplicateWarning,
-                                                                  sourceMap));
+                            out.report.warnings(DuplicateWarning, sourceMap)
+                                << "named type with name '" << out.node.name << "' already exists";
 
                             // Remove the attributes data from the AST since we are ignoring this
                             out.node.attributes = mson::NamedType();
@@ -342,14 +338,10 @@ namespace snowcrash {
             if (duplicate != out.node.actions.end()) {
 
                 // WARN: duplicate method
-                std::stringstream ss;
-                ss << "action with method '" << action.node.method << "' already defined for resource '";
-                ss << out.node.uriTemplate << "'";
-
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                out.report.warnings.push_back(Warning(ss.str(),
-                                                      DuplicateWarning,
-                                                      sourceMap));
+                out.report.warnings(DuplicateWarning, sourceMap)
+                    << "action with method '" << action.node.method 
+                    << "' already defined for resource '" << out.node.uriTemplate << "'";
             }
 
             ActionIterator relationDuplicate = SectionProcessor<Action>::findRelation(out.node.actions, action.node.relation);
@@ -357,13 +349,10 @@ namespace snowcrash {
             if (relationDuplicate != out.node.actions.end()) {
 
                 // WARN: duplicate relation identifier
-                std::stringstream ss;
-                ss << "relation identifier '" << action.node.relation.str << "' already defined for resource '" << out.node.uriTemplate << "'";
-
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                out.report.warnings.push_back(Warning(ss.str(),
-                                                      DuplicateWarning,
-                                                      sourceMap));
+                out.report.warnings(DuplicateWarning, sourceMap)
+                    << "relation identifier '" << action.node.relation.str 
+                    << "' already defined for resource '" << out.node.uriTemplate << "'";
             }
 
             if (!action.node.parameters.empty()) {
