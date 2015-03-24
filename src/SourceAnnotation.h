@@ -65,6 +65,22 @@ namespace snowcrash {
                 this->location.assign(location.begin(), location.end());
         }
 
+        /**
+         *  \brief  %SourceAnnotation constructor.
+         *  \param  code        Annotation code.
+         *  \param  location    A location of the annotation.
+         *
+         *  \brief - used for stream flow "<<" interface
+         */
+        SourceAnnotation(int code, const mdp::CharactersRangeSet& location = mdp::CharactersRangeSet()) {
+
+            this->code = code;
+
+            this->location.clear();
+            if (!location.empty())
+                this->location.assign(location.begin(), location.end());
+        }
+
         /** \brief  %SourceAnnotation destructor. */
         ~SourceAnnotation() {}
 
@@ -87,6 +103,14 @@ namespace snowcrash {
 
         /** A annotation message. */
         std::string message;
+
+        template<typename T>
+        SourceAnnotation& operator<<(const T& input) {
+            std::ostringstream str;
+            str << input;
+            message.append(str.str());
+            return *this;
+        }
     };
 
     /**
@@ -132,7 +156,14 @@ namespace snowcrash {
     /**
      *  A set of warning source annotations.
      */
-    typedef std::vector<Warning> Warnings;
+    //typedef std::vector<Warning> Warnings;
+    struct Warnings : public std::vector<Warning> {
+        Warning& operator()(const WarningCode& code, const mdp::CharactersRangeSet& location) {
+            Warning warn(code,location);
+            push_back(warn);
+            return back();
+        }
+    };
 
     /**
      *  \brief A parsing report Report.
