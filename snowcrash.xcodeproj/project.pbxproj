@@ -80,6 +80,7 @@
 		BBD73566192ED45D009FE09E /* test-HeadersParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD73565192ED45D009FE09E /* test-HeadersParser.cc */; };
 		BBE57061173927870086CE22 /* PayloadParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE5705F173927870086CE22 /* PayloadParser.h */; };
 		BBE7FEBE1922CAF300A1649E /* test-Blueprint.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBFF48D7170C57F1001E5FB2 /* test-Blueprint.cc */; };
+		BBF055201AC18F2E00AEB54B /* HeadersParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBF0551F1AC18F2E00AEB54B /* HeadersParser.cc */; };
 		BBFC841F196C0C0F001A236A /* UriTemplateParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBFC8416196C0C0F001A236A /* UriTemplateParser.cc */; };
 		BBFC8420196C0C0F001A236A /* UriTemplateParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BBFC8417196C0C0F001A236A /* UriTemplateParser.h */; };
 		BBFC8424196C0C27001A236A /* test-UriTemplateParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBFC8422196C0C27001A236A /* test-UriTemplateParser.cc */; };
@@ -215,6 +216,7 @@
 		BBD73565192ED45D009FE09E /* test-HeadersParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-HeadersParser.cc"; path = "test/test-HeadersParser.cc"; sourceTree = "<group>"; };
 		BBE5705C173922B70086CE22 /* test-PayloadParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-PayloadParser.cc"; path = "test/test-PayloadParser.cc"; sourceTree = "<group>"; };
 		BBE5705F173927870086CE22 /* PayloadParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = PayloadParser.h; path = src/PayloadParser.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		BBF0551F1AC18F2E00AEB54B /* HeadersParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = HeadersParser.cc; path = src/HeadersParser.cc; sourceTree = "<group>"; };
 		BBFC8416196C0C0F001A236A /* UriTemplateParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UriTemplateParser.cc; path = src/UriTemplateParser.cc; sourceTree = "<group>"; };
 		BBFC8417196C0C0F001A236A /* UriTemplateParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UriTemplateParser.h; path = src/UriTemplateParser.h; sourceTree = "<group>"; };
 		BBFC8422196C0C27001A236A /* test-UriTemplateParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-UriTemplateParser.cc"; path = "test/test-UriTemplateParser.cc"; sourceTree = "<group>"; };
@@ -341,6 +343,7 @@
 				BB92D892178EFA370098A63C /* BlueprintUtility.h */,
 				BBC2D85E18301FEC00FBCEA7 /* CodeBlockUtility.h */,
 				4026121F1A7779F600354E69 /* DataStructureGroupParser.h */,
+				BBF0551F1AC18F2E00AEB54B /* HeadersParser.cc */,
 				BBD73563192ED417009FE09E /* HeadersParser.h */,
 				BB92D890178EF7C10098A63C /* HTTP.cc */,
 				BB92D88F178EF4160098A63C /* HTTP.h */,
@@ -537,6 +540,7 @@
 				40DE0C0C1A08F3CF00D2F0A8 /* MSON.cc in Sources */,
 				BBFC841F196C0C0F001A236A /* UriTemplateParser.cc in Sources */,
 				408F38DA1A153AB200104774 /* MSONValueMemberParser.cc in Sources */,
+				BBF055201AC18F2E00AEB54B /* HeadersParser.cc in Sources */,
 				4079DBA91A138C580075B534 /* MSONTypeSectionParser.cc in Sources */,
 				BB65939117845C2D00321230 /* RegexMatch.cc in Sources */,
 				406AB4C71A57B66200BD381C /* MSONSourcemap.cc in Sources */,
