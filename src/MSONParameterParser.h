@@ -130,7 +130,7 @@ namespace snowcrash {
 
                     break;
                 }
-                    
+
                 default:
                     break;
             }

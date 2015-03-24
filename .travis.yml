@@ -2,7 +2,7 @@ language: cpp
 compiler:
   - gcc
   - clang
-script: 
+script:
   - ./configure
   - make test
 before_install:

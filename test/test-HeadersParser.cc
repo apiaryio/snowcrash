@@ -314,7 +314,7 @@ TEST_CASE("Missing or wrong placed colon in header definition", "[headers][issue
         SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
 
         REQUIRE(headers.report.error.code == Error::OK); // no error
-        REQUIRE(headers.report.warnings.empty());    
+        REQUIRE(headers.report.warnings.empty());
 
         REQUIRE(headers.node[0].first == "Set-Cookie");
         REQUIRE(headers.node[0].second == ": chocolate cookie");
@@ -332,7 +332,7 @@ TEST_CASE("Allow parse nonvalid headers, provide apropriate warning", "[headers]
         SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
 
         REQUIRE(headers.report.error.code == Error::OK); // no error
-        REQUIRE(headers.report.warnings.empty());    
+        REQUIRE(headers.report.warnings.empty());
 
         REQUIRE(headers.node[0].first == "#");
         REQUIRE(headers.node[0].second == "chocolate cookie");
@@ -349,7 +349,7 @@ TEST_CASE("Allow parse nonvalid headers, provide apropriate warning", "[headers]
         REQUIRE(headers.report.error.code == Error::OK); // no error
 
         REQUIRE(headers.report.warnings.size() == 1);    // warning - header name is not defined correctly
-        REQUIRE(headers.report.warnings[0].message == "HTTP header field name contain illegal character '<'");    
+        REQUIRE(headers.report.warnings[0].message == "HTTP header field name contain illegal character '<'");
 
         REQUIRE(headers.node.size() == 1);
         REQUIRE(headers.node[0].first == "<Header>");
@@ -367,7 +367,7 @@ TEST_CASE("Allow parse nonvalid headers, provide apropriate warning", "[headers]
         REQUIRE(headers.report.error.code == Error::OK); // no error
 
         REQUIRE(headers.report.warnings.size() == 1);    // warning - header name is not defined correctly
-        REQUIRE(headers.report.warnings[0].message == "HTTP header has no value");    
+        REQUIRE(headers.report.warnings[0].message == "HTTP header has no value");
 
         REQUIRE(headers.node.size() == 1);
         REQUIRE(headers.node[0].first == "Header");
@@ -385,8 +385,8 @@ TEST_CASE("Allow parse nonvalid headers, provide apropriate warning", "[headers]
         REQUIRE(headers.report.error.code == Error::OK); // no error
 
         REQUIRE(headers.report.warnings.size() == 2);
-        REQUIRE(headers.report.warnings[0].message == "missing colon after header name");    
-        REQUIRE(headers.report.warnings[1].message == "HTTP header has no value");    
+        REQUIRE(headers.report.warnings[0].message == "missing colon after header name");
+        REQUIRE(headers.report.warnings[1].message == "HTTP header has no value");
 
         REQUIRE(headers.node.size() == 1);
         REQUIRE(headers.node[0].first == "Header");
