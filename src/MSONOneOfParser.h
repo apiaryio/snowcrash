@@ -16,7 +16,7 @@ using namespace scpl;
 namespace snowcrash {
 
     /** MSON One Of matching regex */
-    const char* const MSONOneOfRegex = "^[[:blank:]]*[Oo]ne [Oo]f[[:blank:]]*$";
+    const char* const MSONOneOfRegex = "^[[:blank:]]*[Oo]ne[[:blank:]]+[Oo]f[[:blank:]]*$";
 
     /**
      * MSON One Of Section Processor
