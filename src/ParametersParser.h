@@ -11,6 +11,7 @@
 
 #include "SectionParser.h"
 #include "ParameterParser.h"
+#include "MSONParameterParser.h"
 #include "RegexMatch.h"
 #include "StringUtility.h"
 #include "BlueprintUtility.h"
@@ -58,26 +59,30 @@ namespace snowcrash {
             return ++MarkdownNodeIterator(node);
         }
 
-        static MarkdownNodeIterator processDescription(const MarkdownNodeIterator& node,
-                                                       const MarkdownNodes& siblings,
-                                                       SectionParserData& pd,
-                                                       const ParseResultRef<Parameters>& out) {
-
-            return node;
-        }
+        NO_SECTION_DESCRIPTION(Parameters)
 
         static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
                                                          const MarkdownNodes& siblings,
                                                          SectionParserData& pd,
                                                          const ParseResultRef<Parameters>& out) {
 
-            if (pd.sectionContext() != ParameterSectionType) {
+            IntermediateParseResult<Parameter> parameter(out.report);
+            IntermediateParseResult<MSONParameter> msonParameter(out.report);
+
+            if (pd.sectionContext() == ParameterSectionType) {
+                ParameterParser::parse(node, siblings, pd, parameter);
+            }
+            else if (pd.sectionContext() == MSONParameterSectionType) {
+                MSONParameterParser::parse(node, siblings, pd, msonParameter);
+
+                // Copy values from MSON Parameter to normal parameter
+                parameter.report = msonParameter.report;
+                parameter.node = msonParameter.node;
+                parameter.sourceMap = msonParameter.sourceMap;
+            }
+            else {
                 return node;
             }
-
-            IntermediateParseResult<Parameter> parameter(out.report);
-
-            ParameterParser::parse(node, siblings, pd, parameter);
 
             if (!out.node.empty()) {
 
@@ -103,12 +108,6 @@ namespace snowcrash {
             }
 
             return ++MarkdownNodeIterator(node);
-        }
-
-        static bool isDescriptionNode(const MarkdownNodeIterator& node,
-                                      SectionType sectionType) {
-
-            return false;
         }
 
         static SectionType sectionType(const MarkdownNodeIterator& node) {

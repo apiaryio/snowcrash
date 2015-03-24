@@ -2,8 +2,8 @@ language: cpp
 compiler:
   - gcc
   - clang
-script:
-  - ./configure --include-integration-tests
+script: 
+  - ./configure
   - make test
 before_install:
   - git submodule update --init --recursive

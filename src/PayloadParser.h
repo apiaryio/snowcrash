@@ -14,6 +14,7 @@
 #include "AssetParser.h"
 #include "HeadersParser.h"
 #include "ParametersParser.h"
+#include "AttributesParser.h"
 
 /** Media type in brackets regex */
 #define MEDIA_TYPE "([[:blank:]]*\\(([^\\)]*)\\))"
@@ -147,6 +148,12 @@ namespace snowcrash {
                     return HeadersParser::parse(node, siblings, pd, headers);
                 }
 
+                case AttributesSectionType:
+                {
+                    ParseResultRef<Attributes> attributes(out.report, out.node.attributes, out.sourceMap.attributes);
+                    return AttributesParser::parse(node, siblings, pd, attributes);
+                }
+
                 case BodySectionType:
                 {
                     if (!out.node.body.empty()) {
@@ -276,6 +283,13 @@ namespace snowcrash {
                 return nestedType;
             }
 
+            // Check if attributes section
+            nestedType = SectionProcessor<Attributes>::sectionType(node);
+
+            if (nestedType != UndefinedSectionType) {
+                return nestedType;
+            }
+
             return UndefinedSectionType;
         }
 
@@ -285,6 +299,7 @@ namespace snowcrash {
             nested.push_back(HeadersSectionType);
             nested.push_back(BodySectionType);
             nested.push_back(SchemaSectionType);
+            nested.push_back(AttributesSectionType);
 
             // Parameters & descendants
             nested.push_back(ParametersSectionType);
@@ -303,7 +318,8 @@ namespace snowcrash {
             if (sectionType == RequestSectionType || sectionType == RequestBodySectionType) {
 
                 checkRequest(node, pd, out);
-            } else if (sectionType == ResponseSectionType || sectionType == ResponseBodySectionType) {
+            }
+            else if (sectionType == ResponseSectionType || sectionType == ResponseBodySectionType) {
 
                 checkResponse(node, pd, out);
             }
@@ -488,7 +504,7 @@ namespace snowcrash {
                 }
 
                 // If model has not been defined yet in model table
-                if (pd.modelTable.resourceModels.find(symbol) == pd.modelTable.resourceModels.end()) {
+                if (pd.modelTable.find(symbol) == pd.modelTable.end()) {
 
                     out.node.reference.meta.state = Reference::StatePending;
 
@@ -514,7 +530,7 @@ namespace snowcrash {
                                           const ParseResultRef<Payload>& out) {
 
             SourceMap<ResourceModel> modelSM;
-            ResourceModel model = pd.modelTable.resourceModels.at(out.node.reference.id);
+            ResourceModel model = pd.modelTable.find(out.node.reference.id)->second;
 
 
             out.node.description = model.description;
@@ -553,7 +569,7 @@ namespace snowcrash {
 
             if (pd.exportSourceMap()) {
 
-                modelSM = pd.modelSourceMapTable.resourceModels.at(out.node.reference.id);
+                modelSM = pd.modelSourceMapTable.at(out.node.reference.id);
 
                 out.sourceMap.description = modelSM.description;
                 out.sourceMap.parameters = modelSM.parameters;
@@ -596,7 +612,9 @@ namespace snowcrash {
                 }
             }
 
-            if (out.node.body.empty() && out.node.reference.meta.state != Reference::StatePending) {
+
+            if (out.node.body.empty() && out.node.attributes.empty() &&
+                out.node.reference.meta.state != Reference::StatePending) {
 
                 // Warn when content-length or transfer-encoding is specified or both headers and body are empty
                 if (out.node.headers.empty()) {

@@ -11,6 +11,7 @@
 
 #include "ResourceParser.h"
 #include "ResourceGroupParser.h"
+#include "DataStructureGroupParser.h"
 #include "SectionParser.h"
 #include "RegexMatch.h"
 #include "CodeBlockUtility.h"
@@ -68,7 +69,7 @@ namespace snowcrash {
 
                 SectionType nestedType = nestedSectionType(cur);
 
-                // Resources Groups only, parse as exclusive nested sections
+                // Nested Sections only, parse as exclusive nested sections
                 if (nestedType != UndefinedSectionType) {
                     layout = ExclusiveNestedSectionLayout;
                     return cur;
@@ -94,24 +95,23 @@ namespace snowcrash {
                                                          SectionParserData& pd,
                                                          const ParseResultRef<Blueprint>& out) {
 
+            MarkdownNodeIterator cur = node;
+
             if (pd.sectionContext() == ResourceGroupSectionType ||
                 pd.sectionContext() == ResourceSectionType) {
 
                 IntermediateParseResult<ResourceGroup> resourceGroup(out.report);
+                cur = ResourceGroupParser::parse(node, siblings, pd, resourceGroup);
 
-                MarkdownNodeIterator cur = ResourceGroupParser::parse(node, siblings, pd, resourceGroup);
-
-                ResourceGroupIterator duplicate = findResourceGroup(out.node.resourceGroups, resourceGroup.node);
-
-                if (duplicate != out.node.resourceGroups.end()) {
+                if (isResourceGroupDuplicate(out.node, resourceGroup.node.attributes.name)) {
 
                     // WARN: duplicate resource group
                     std::stringstream ss;
 
-                    if (resourceGroup.node.name.empty()) {
+                    if (resourceGroup.node.attributes.name.empty()) {
                         ss << "anonymous group";
                     } else {
-                        ss << "group '" << resourceGroup.node.name << "'";
+                        ss << "group '" << resourceGroup.node.attributes.name << "'";
                     }
 
                     ss << " is already defined";
@@ -122,16 +122,103 @@ namespace snowcrash {
                                                           sourceMap));
                 }
 
-                out.node.resourceGroups.push_back(resourceGroup.node);
+                out.node.content.elements().push_back(resourceGroup.node);
 
                 if (pd.exportSourceMap()) {
-                    out.sourceMap.resourceGroups.collection.push_back(resourceGroup.sourceMap);
+                    out.sourceMap.content.elements().collection.push_back(resourceGroup.sourceMap);
                 }
+            }
+            else if (pd.sectionContext() == DataStructureGroupSectionType) {
 
-                return cur;
+                IntermediateParseResult<DataStructureGroup> dataStructureGroup(out.report);
+                cur = DataStructureGroupParser::parse(node, siblings, pd, dataStructureGroup);
+
+                out.node.content.elements().push_back(dataStructureGroup.node);
+
+                if (pd.exportSourceMap()) {
+                    out.sourceMap.content.elements().collection.push_back(dataStructureGroup.sourceMap);
+                }
             }
 
-            return node;
+            return cur;
+        }
+
+        /**
+         * Look ahead through all the nested sections and gather list of all
+         * named types along with their base types and the types they are sub-typed from
+         */
+        static void preprocessNestedSections(const MarkdownNodeIterator& node,
+                                             const MarkdownNodes& siblings,
+                                             SectionParserData& pd,
+                                             const ParseResultRef<Blueprint>& out) {
+
+            MarkdownNodeIterator cur = node, contextCur;
+            SectionType sectionType = UndefinedSectionType;
+            SectionType contextSectionType = UndefinedSectionType;
+
+            // Iterate over nested sections
+            while (cur != siblings.end()) {
+
+                sectionType = SectionKeywordSignature(cur);
+
+                // Complete Action is recognized as resource section
+                if (sectionType == ResourceSectionType) {
+
+                    ActionType actionType = SectionProcessor<Action>::actionType(cur);
+
+                    if (actionType == CompleteActionType) {
+                        sectionType = ActionSectionType;
+                    }
+                }
+
+                if (cur->type == mdp::HeaderMarkdownNodeType) {
+
+                    // If the current node is a Resource or DataStructures section, assign it as context
+                    // Otherwise, make sure the current context is not DataStructures section and remove the context
+                    if (sectionType == ResourceSectionType ||
+                        sectionType == DataStructureGroupSectionType) {
+
+                        contextSectionType = sectionType;
+                        contextCur = cur;
+                    }
+                    else if (contextSectionType != DataStructureGroupSectionType) {
+
+                        contextSectionType = UndefinedSectionType;
+                    }
+
+                    // If context is DataStructures section, NamedTypes should be filled
+                    if (contextSectionType == DataStructureGroupSectionType) {
+
+                        if (sectionType != MSONSampleDefaultSectionType &&
+                            sectionType != MSONPropertyMembersSectionType &&
+                            sectionType != MSONValueMembersSectionType &&
+                            sectionType != UndefinedSectionType &&
+                            sectionType != DataStructureGroupSectionType) {
+
+                            contextSectionType = UndefinedSectionType;
+                        }
+                        else if (sectionType == UndefinedSectionType) {
+                            fillNamedTypeTables(cur, pd, cur->text, out.report);
+                        }
+                    }
+                }
+                else if (cur->type == mdp::ListItemMarkdownNodeType &&
+                         contextSectionType == ResourceSectionType &&
+                         sectionType == AttributesSectionType) {
+
+                    Resource resource;
+                    SectionProcessor<Resource>::matchNamedResourceHeader(contextCur, resource);
+
+                    if (!resource.name.empty()) {
+                        fillNamedTypeTables(cur, pd, cur->children().front().text, out.report, resource.name);
+                    }
+                }
+
+                cur++;
+            }
+
+            // Resolve all named type base table entries
+            resolveNamedTypeTables(pd, out.report);
         }
 
         static SectionType sectionType(const MarkdownNodeIterator& node) {
@@ -157,6 +244,13 @@ namespace snowcrash {
                 return nestedType;
             }
 
+            // Check if DataStructures section
+            nestedType = SectionProcessor<DataStructureGroup>::sectionType(node);
+
+            if (nestedType != UndefinedSectionType) {
+                return nestedType;
+            }
+
             return UndefinedSectionType;
         }
 
@@ -165,6 +259,7 @@ namespace snowcrash {
 
             // Resource Group & descendants
             nested.push_back(ResourceGroupSectionType);
+            nested.push_back(DataStructureGroupSectionType);
             SectionTypes types = SectionProcessor<ResourceGroup>::nestedSectionTypes();
             nested.insert(nested.end(), types.begin(), types.end());
 
@@ -174,8 +269,13 @@ namespace snowcrash {
         static void finalize(const MarkdownNodeIterator& node,
                              SectionParserData& pd,
                              const ParseResultRef<Blueprint>& out) {
-     
+
             checkLazyReferencing(pd, out);
+            out.node.element = Element::CategoryElement;
+
+            if (pd.exportSourceMap()) {
+                out.sourceMap.element = out.node.element;
+            }
 
             if (!out.node.name.empty())
                 return;
@@ -204,6 +304,144 @@ namespace snowcrash {
             return true;
         }
 
+        /**
+         * \brief Fill named type table entries from the signature information.
+         *        Both base table and inheritance table.
+         *
+         * \param node Markdown node to process
+         * \param pd Section parser data
+         * \param subject Signature of the named type
+         * \param report Parse report
+         * \param name Name of the named type (only given in case of named resource)
+         */
+        static void fillNamedTypeTables(const MarkdownNodeIterator& node,
+                                        SectionParserData& pd,
+                                        const mdp::ByteBuffer& subject,
+                                        Report& report,
+                                        const mdp::ByteBuffer& name = "") {
+
+            mdp::ByteBuffer buffer = subject;
+            mson::Literal identifier;
+            mson::TypeDefinition typeDefinition;
+            Report tmpReport;
+
+            SignatureTraits traits(SignatureTraits::IdentifierTrait |
+                                   SignatureTraits::AttributesTrait);
+
+            Signature signature = SignatureSectionProcessorBase<Blueprint>::parseSignature(node, pd, traits, tmpReport, buffer);
+            mson::parseTypeDefinition(node, pd, signature.attributes, tmpReport, typeDefinition);
+
+            // Name of the named types cannot be variable
+            if (!name.empty() && mson::checkVariable(signature.identifier)) {
+                return;
+            }
+
+            if (!name.empty()) {
+                identifier = name;
+            }
+            else {
+                identifier = signature.identifier;
+            }
+
+            // If named type already exists, do nothing
+            mson::NamedTypeBaseTable::iterator it = pd.namedTypeBaseTable.find(identifier);
+
+            if (it != pd.namedTypeBaseTable.end()) {
+                return;
+            }
+
+            // Otherwise, add the respective entries to the tables
+            if (typeDefinition.typeSpecification.name.base != mson::UndefinedTypeName) {
+                pd.namedTypeBaseTable[identifier] = mson::parseBaseType(typeDefinition.typeSpecification.name.base);
+            }
+            else if (!typeDefinition.typeSpecification.name.symbol.literal.empty() &&
+                     !typeDefinition.typeSpecification.name.symbol.variable) {
+
+                pd.namedTypeInheritanceTable[identifier] = typeDefinition.typeSpecification.name.symbol.literal;
+            }
+            else if (typeDefinition.typeSpecification.name.empty()) {
+
+                // If there is no specification, an object is assumed
+                pd.namedTypeBaseTable[identifier] = mson::ImplicitObjectBaseType;
+            }
+        }
+
+        /**
+         * \brief Resolve named type base table entries from the named type inheritance table
+         *
+         * \param pd Section parser data
+         * \param report Parse report
+         */
+        static void resolveNamedTypeTables(SectionParserData& pd,
+                                           Report& report) {
+
+            mson::NamedTypeInheritanceTable::iterator it;
+            mson::NamedTypeBaseTable::iterator baseIt;
+
+            for (it = pd.namedTypeInheritanceTable.begin();
+                 it != pd.namedTypeInheritanceTable.end();
+                 it++) {
+
+                resolveNamedTypeTableEntry(pd, it->first, it->second, report);
+            }
+        }
+
+        /**
+         * \brief For each entry in the named type inheritance table, resolve the sub-type's base type recursively
+         *
+         * \param pd Section parser data
+         * \param subType The sub named type between the two
+         * \param superType The super named type between the two
+         * \param report Parse report
+         */
+        static void resolveNamedTypeTableEntry(SectionParserData& pd,
+                                               const mson::Literal& subType,
+                                               const mson::Literal& superType,
+                                               Report& report) {
+
+            mson::BaseType baseType;
+            mson::NamedTypeBaseTable::iterator it = pd.namedTypeBaseTable.find(subType);
+
+            // If the base table entry is already filled, nothing else to do
+            if (it != pd.namedTypeBaseTable.end()) {
+                return;
+            }
+
+            // Otherwise, get the base type from super type
+            it = pd.namedTypeBaseTable.find(superType);
+
+            // If super type is not already resolved, then it means that it is a sub type of something else
+            if (it == pd.namedTypeBaseTable.end()) {
+
+                // Try to get the super type of the current super type
+                mson::NamedTypeInheritanceTable::iterator inhIt = pd.namedTypeInheritanceTable.find(superType);
+
+                if (inhIt == pd.namedTypeInheritanceTable.end()) {
+
+                    // We cannot find the super type in inheritance table at all
+                    // and there is not base type table entry for it, so, the blueprint is wrong
+                    std::stringstream ss;
+                    ss << "unable to find named type '" << superType << "' in the whole document";
+
+                    report.error = Error(ss.str(), BusinessError, mdp::CharactersRangeSet());
+                    return;
+                }
+
+                // Recursively, try to get a base type for the current super type
+                resolveNamedTypeTableEntry(pd, superType, inhIt->second, report);
+
+                if (report.error.code != Error::OK) {
+                    return;
+                }
+
+                baseType = pd.namedTypeBaseTable.find(superType)->second;
+            }
+            else {
+                baseType = it->second;
+            }
+
+            pd.namedTypeBaseTable[subType] = baseType;
+        }
 
         static void parseMetadata(const MarkdownNodeIterator& node,
                                   SectionParserData& pd,
@@ -274,13 +512,28 @@ namespace snowcrash {
             }
         }
 
-        /** Finds a resource group inside an resource groups collection */
-        static ResourceGroupIterator findResourceGroup(const ResourceGroups& resourceGroups,
-                                                       const ResourceGroup& resourceGroup) {
+        /**
+         * \brief Check if a resource group already exists with the given name
+         *
+         * \param blueprint The blueprint which is formed until now
+         * \param name The resource group name to be checked
+         */
+        static bool isResourceGroupDuplicate(const Blueprint& blueprint,
+                                             mdp::ByteBuffer& name) {
 
-            return std::find_if(resourceGroups.begin(),
-                                resourceGroups.end(),
-                                std::bind2nd(MatchName<ResourceGroup>(), resourceGroup));
+            for (Elements::const_iterator it = blueprint.content.elements().begin();
+                 it != blueprint.content.elements().end();
+                 ++it) {
+
+                if (it->element == Element::CategoryElement &&
+                    it->category == Element::ResourceGroupCategory &&
+                    it->attributes.name == name) {
+
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /**
@@ -291,58 +544,62 @@ namespace snowcrash {
         static void checkLazyReferencing(SectionParserData& pd,
                                          const ParseResultRef<Blueprint>& out) {
 
-            Collection<SourceMap<ResourceGroup> >::iterator resourceGroupSourceMapIt;
+            Collection<SourceMap<Element> >::iterator elementSourceMapIt;
 
             if (pd.exportSourceMap()) {
-                resourceGroupSourceMapIt = out.sourceMap.resourceGroups.collection.begin();
+                elementSourceMapIt = out.sourceMap.content.elements().collection.begin();
             }
 
-            for (ResourceGroups::iterator resourceGroupIt = out.node.resourceGroups.begin();
-                 resourceGroupIt != out.node.resourceGroups.end();
-                 ++resourceGroupIt) {
+            for (Elements::iterator elementIt = out.node.content.elements().begin();
+                 elementIt != out.node.content.elements().end();
+                 ++elementIt) {
 
-                checkResourceLazyReferencing(*resourceGroupIt, resourceGroupSourceMapIt, pd, out);
+                if (elementIt->element == Element::CategoryElement) {
+                    checkResourceLazyReferencing(*elementIt, *elementSourceMapIt, pd, out);
+                }
 
                 if (pd.exportSourceMap()) {
-                    resourceGroupSourceMapIt++;
+                    elementSourceMapIt++;
                 }
             }
         }
 
         /** Traverses Resource Collection to resolve references with `Pending` state (Lazy referencing) */
-        static void checkResourceLazyReferencing(ResourceGroup& resourceGroup,
-                                                 Collection<SourceMap<ResourceGroup> >::iterator resourceGroupSourceMapIt,
+        static void checkResourceLazyReferencing(Element& element,
+                                                 SourceMap<Element>& elementSourceMap,
                                                  SectionParserData& pd,
                                                  const ParseResultRef<Blueprint>& out) {
 
-            Collection<SourceMap<Resource> >::iterator resourceSourceMapIt;
+            Collection<SourceMap<Element> >::iterator resourceElementSourceMapIt;
 
             if (pd.exportSourceMap()) {
-                resourceSourceMapIt = resourceGroupSourceMapIt->resources.collection.begin();
+                resourceElementSourceMapIt = elementSourceMap.content.elements().collection.begin();
             }
 
-            for (Resources::iterator resourceIt = resourceGroup.resources.begin();
-                 resourceIt != resourceGroup.resources.end();
-                 ++resourceIt) {
+            for (Elements::iterator resourceElementIt = element.content.elements().begin();
+                 resourceElementIt != element.content.elements().end();
+                 ++resourceElementIt) {
 
-                checkActionLazyReferencing(*resourceIt, resourceSourceMapIt, pd, out);
+                if (resourceElementIt->element == Element::ResourceElement) {
+                    checkActionLazyReferencing(resourceElementIt->content.resource, resourceElementSourceMapIt->content.resource, pd, out);
+                }
 
                 if (pd.exportSourceMap()) {
-                    resourceSourceMapIt++;
+                    resourceElementSourceMapIt++;
                 }
             }
         }
 
         /** Traverses Action Collection to resolve references with `Pending` state (Lazy referencing) */
         static void checkActionLazyReferencing(Resource& resource,
-                                               Collection<SourceMap<Resource> >::iterator resourceSourceMapIt,
+                                               SourceMap<Resource>& resourceSourceMap,
                                                SectionParserData& pd,
                                                const ParseResultRef<Blueprint>& out) {
 
             Collection<SourceMap<Action> >::iterator actionSourceMapIt;
 
             if (pd.exportSourceMap()) {
-                actionSourceMapIt = resourceSourceMapIt->actions.collection.begin();
+                actionSourceMapIt = resourceSourceMap.actions.collection.begin();
             }
 
             for (Actions::iterator actionIt = resource.actions.begin();
@@ -470,7 +727,7 @@ namespace snowcrash {
         static void resolvePendingModels(SectionParserData& pd,
                                           const ParseResultRef<Payload>& out) {
 
-            if (pd.modelTable.resourceModels.find(out.node.reference.id) == pd.modelTable.resourceModels.end()) {
+            if (pd.modelTable.find(out.node.reference.id) == pd.modelTable.end()) {
 
                 // ERR: Undefined model reference
                 std::stringstream ss;

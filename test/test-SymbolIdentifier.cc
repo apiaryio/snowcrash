@@ -22,11 +22,15 @@ TEST_CASE("Punctuation in identifiers", "[symbol_identifier]")
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
 
-    REQUIRE(blueprint.node.resourceGroups.size() == 1);
-    REQUIRE(blueprint.node.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].name == "Parcel's sticker @#!$%^&*=-?><,.~`\"'");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].uriTemplate == "/");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions.empty());
+    REQUIRE(blueprint.node.content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).element == Element::ResourceElement);
+
+    Resource resource = blueprint.node.content.elements().at(0).content.elements().at(0).content.resource;
+    REQUIRE(resource.name == "Parcel's sticker @#!$%^&*=-?><,.~`\"'");
+    REQUIRE(resource.uriTemplate == "/");
+    REQUIRE(resource.actions.empty());
 }
 
 TEST_CASE("Non ASCII characters in identifiers", "[symbol_identifier]")
@@ -45,9 +49,13 @@ TEST_CASE("Non ASCII characters in identifiers", "[symbol_identifier]")
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
 
-    REQUIRE(blueprint.node.resourceGroups.size() == 1);
-    REQUIRE(blueprint.node.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].name == "\xD0\x9A\xD0\xB0\xD1\x82\xD0\xB5\xD0\xB3\xD0\xBE\xD1\x80\xD0\xB8\xD0\xB8");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].uriTemplate == "/");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions.empty());
+    REQUIRE(blueprint.node.content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).element == Element::ResourceElement);
+
+    Resource resource = blueprint.node.content.elements().at(0).content.elements().at(0).content.resource;
+    REQUIRE(resource.name == "\xD0\x9A\xD0\xB0\xD1\x82\xD0\xB5\xD0\xB3\xD0\xBE\xD1\x80\xD0\xB8\xD0\xB8");
+    REQUIRE(resource.uriTemplate == "/");
+    REQUIRE(resource.actions.empty());
 }

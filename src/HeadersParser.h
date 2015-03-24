@@ -125,13 +125,7 @@ namespace snowcrash {
             return ++MarkdownNodeIterator(node);
         }
 
-        static MarkdownNodeIterator processDescription(const MarkdownNodeIterator& node,
-                                                       const MarkdownNodes& siblings,
-                                                       SectionParserData& pd,
-                                                       const ParseResultRef<Headers>& out) {
-
-            return node;
-        }
+        NO_SECTION_DESCRIPTION(Headers)
 
         static MarkdownNodeIterator processContent(const MarkdownNodeIterator& node,
                                                    const MarkdownNodes& siblings,
@@ -144,12 +138,6 @@ namespace snowcrash {
             headersFromContent(node, content, pd, out);
 
             return ++MarkdownNodeIterator(node);
-        }
-
-        static bool isDescriptionNode(const MarkdownNodeIterator& node,
-                                      SectionType sectionType) {
-
-            return false;
         }
 
         static bool isContentNode(const MarkdownNodeIterator& node,

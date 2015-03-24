@@ -15,6 +15,8 @@
 #include "ParametersParser.h"
 #include "ResourceParser.h"
 #include "ResourceGroupParser.h"
+#include "MSONTypeSectionParser.h"
+#include "DataStructureGroupParser.h"
 
 using namespace snowcrash;
 
@@ -23,10 +25,16 @@ SectionType snowcrash::SectionKeywordSignature(const mdp::MarkdownNodeIterator& 
     // Note: Every-keyword defined section should be listed here...
     SectionType type = UndefinedSectionType;
 
+    if ((type = SectionProcessor<mson::TypeSection>::sectionType(node)) != UndefinedSectionType)
+        return type;
+
     if ((type = SectionProcessor<Headers>::sectionType(node)) != UndefinedSectionType)
         return type;
 
     if ((type = SectionProcessor<Asset>::sectionType(node)) != UndefinedSectionType)
+        return type;
+
+    if ((type = SectionProcessor<Attributes>::sectionType(node)) != UndefinedSectionType)
         return type;
 
     if ((type = SectionProcessor<Payload>::sectionType(node)) != UndefinedSectionType)
@@ -36,6 +44,9 @@ SectionType snowcrash::SectionKeywordSignature(const mdp::MarkdownNodeIterator& 
         return type;
 
     if ((type = SectionProcessor<Parameters>::sectionType(node)) != UndefinedSectionType)
+        return type;
+
+    if ((type = SectionProcessor<Relation>::sectionType(node)) != UndefinedSectionType)
         return type;
 
     /*
@@ -51,6 +62,9 @@ SectionType snowcrash::SectionKeywordSignature(const mdp::MarkdownNodeIterator& 
         return type;
 
     if ((type = SectionProcessor<ResourceGroup>::sectionType(node)) != UndefinedSectionType)
+        return type;
+
+    if ((type = SectionProcessor<DataStructureGroup>::sectionType(node)) != UndefinedSectionType)
         return type;
 
     return type;

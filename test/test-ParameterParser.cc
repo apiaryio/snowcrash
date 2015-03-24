@@ -31,6 +31,138 @@ TEST_CASE("Recognize parameter definition signature", "[parameter]")
     REQUIRE(sectionType == ParameterSectionType);
 }
 
+TEST_CASE("Recognize parameter with just parameter name", "[parameter]")
+{
+    mdp::MarkdownParser markdownParser;
+    mdp::MarkdownNode markdownAST;
+    markdownParser.parse("+ id", markdownAST);
+
+    REQUIRE(!markdownAST.children().empty());
+    SectionType sectionType = SectionProcessor<Parameter>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == ParameterSectionType);
+}
+
+TEST_CASE("Recognize parameter with parameter name and without any values or description", "[parameter]")
+{
+    mdp::MarkdownParser markdownParser;
+    mdp::MarkdownNode markdownAST;
+    markdownParser.parse("+ id (optional, string)", markdownAST);
+
+    REQUIRE(!markdownAST.children().empty());
+    SectionType sectionType = SectionProcessor<Parameter>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == ParameterSectionType);
+}
+
+TEST_CASE("Recognize parameter with parameter type as first trait", "[parameter]")
+{
+    mdp::MarkdownParser markdownParser;
+    mdp::MarkdownNode markdownAST;
+    markdownParser.parse("+ id (string, optional)", markdownAST);
+
+    REQUIRE(!markdownAST.children().empty());
+    SectionType sectionType = SectionProcessor<Parameter>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == ParameterSectionType);
+}
+
+TEST_CASE("Recognize parameter with new syntax example value", "[parameter]")
+{
+    mdp::MarkdownParser markdownParser;
+    mdp::MarkdownNode markdownAST;
+    markdownParser.parse("+ id : ``1`0`` (number)", markdownAST);
+
+    REQUIRE(!markdownAST.children().empty());
+    SectionType sectionType = SectionProcessor<Parameter>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == MSONParameterSectionType);
+}
+
+TEST_CASE("Recognize parameter with only new syntax example value", "[parameter]")
+{
+    mdp::MarkdownParser markdownParser;
+    mdp::MarkdownNode markdownAST;
+    markdownParser.parse("+ id: 10", markdownAST);
+
+    REQUIRE(!markdownAST.children().empty());
+    SectionType sectionType = SectionProcessor<Parameter>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == MSONParameterSectionType);
+}
+
+TEST_CASE("Recognize parameter with new syntax description which has old description identifier", "[parameter]")
+{
+    mdp::MarkdownParser markdownParser;
+    mdp::MarkdownNode markdownAST;
+    markdownParser.parse("+ id (string) - This is nice and ... awesome", markdownAST);
+
+    REQUIRE(!markdownAST.children().empty());
+    SectionType sectionType = SectionProcessor<Parameter>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == MSONParameterSectionType);
+}
+
+TEST_CASE("Recognize parameter with new syntax description", "[parameter]")
+{
+    mdp::MarkdownParser markdownParser;
+    mdp::MarkdownNode markdownAST;
+    markdownParser.parse("+ id (string) - This is nice and awesome", markdownAST);
+
+    REQUIRE(!markdownAST.children().empty());
+    SectionType sectionType = SectionProcessor<Parameter>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == MSONParameterSectionType);
+}
+
+TEST_CASE("Recognize parameter with only old syntax description", "[parameter]")
+{
+    mdp::MarkdownParser markdownParser;
+    mdp::MarkdownNode markdownAST;
+    markdownParser.parse("+ id ... The user id", markdownAST);
+
+    REQUIRE(!markdownAST.children().empty());
+    SectionType sectionType = SectionProcessor<Parameter>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == ParameterSectionType);
+}
+
+TEST_CASE("Recognize parameter with sample value in attributes", "[parameter]")
+{
+    mdp::MarkdownParser markdownParser;
+    mdp::MarkdownNode markdownAST;
+    markdownParser.parse("+ id (string, `10`)", markdownAST);
+
+    REQUIRE(!markdownAST.children().empty());
+    SectionType sectionType = SectionProcessor<Parameter>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == ParameterSectionType);
+}
+
+TEST_CASE("Recognize parameter with enum in attributes", "[parameter]")
+{
+    mdp::MarkdownParser markdownParser;
+    mdp::MarkdownNode markdownAST;
+    markdownParser.parse("+ id (enum[string])", markdownAST);
+
+    REQUIRE(!markdownAST.children().empty());
+    SectionType sectionType = SectionProcessor<Parameter>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == MSONParameterSectionType);
+}
+
+TEST_CASE("Recognize parameter with both sample value and enum in attributes", "[parameter]")
+{
+    mdp::MarkdownParser markdownParser;
+    mdp::MarkdownNode markdownAST;
+    markdownParser.parse("+ id (enum[string], `10`)", markdownAST);
+
+    REQUIRE(!markdownAST.children().empty());
+    SectionType sectionType = SectionProcessor<Parameter>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == MSONParameterSectionType);
+}
+
+TEST_CASE("Recognize parameter with old syntax default value but have enum in attributes", "[parameter]")
+{
+    mdp::MarkdownParser markdownParser;
+    mdp::MarkdownNode markdownAST;
+    markdownParser.parse("+ id = 10 (enum[number])", markdownAST);
+
+    REQUIRE(!markdownAST.children().empty());
+    SectionType sectionType = SectionProcessor<Parameter>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == ParameterSectionType);
+}
+
 TEST_CASE("Parse canonical parameter definition", "[parameter]")
 {
     ParseResult<Parameter> parameter;

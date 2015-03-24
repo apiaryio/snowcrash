@@ -10,8 +10,7 @@
 #define SNOWCRASH_BLUEPRINT_SOURCEMAP_H
 
 #include "Blueprint.h"
-#include "MarkdownParser.h"
-
+#include "MSONSourcemap.h"
 /**
  *  API Blueprint Sourcemap Abstract Syntax Tree
  *  ---------------------------------------------
@@ -19,20 +18,7 @@
  *  Data types in this documents define the API Blueprint Sourcemap AST.
  */
 
-#define SOURCE_MAP_COLLECTION(T, TC) template<>\
-struct SourceMap<TC> {\
-    Collection<SourceMap<T> >::type collection;\
-};\
-
 namespace snowcrash {
-
-    struct SourceMapBase {
-        mdp::BytesRangeSet sourceMap;
-    };
-
-    template<typename T>
-    struct SourceMap : public SourceMapBase {
-    };
 
     /** Source Map of Metadata Collection */
     SOURCE_MAP_COLLECTION(Metadata, MetadataCollection)
@@ -43,7 +29,9 @@ namespace snowcrash {
     /** Source Map of Collection of Parameter values */
     SOURCE_MAP_COLLECTION(Value, Values)
 
-    /** Source Map Structure for Parameter */
+    /**
+     * Source Map Structure for Parameter
+     */
     template<>
     struct SourceMap<Parameter> : public SourceMapBase {
 
@@ -69,8 +57,25 @@ namespace snowcrash {
         SourceMap<Values> values;
     };
 
+    /**
+     * Source Map Structure for MSON Parameter
+     */
+    template<>
+    struct SourceMap<MSONParameter> : public SourceMap<Parameter> {
+    };
+
     /** Source Map of Collection of Parameters */
     SOURCE_MAP_COLLECTION(Parameter, Parameters)
+
+    /**
+     * Source Map Structure for DataStructure
+     */
+    template<>
+    struct SourceMap<DataStructure> : public SourceMap<mson::NamedType> {
+    };
+
+    /** Source Map Structure for Attributes */
+    // 'Attributes' is the same as 'DataStructure'
 
     /**
      * Source Map Structure for Payload
@@ -84,16 +89,19 @@ namespace snowcrash {
         /** Source Map of Payload Description */
         SourceMap<Description> description;
 
-        /** Payload-specific Parameters */
+        /** Source Map of Payload-specific Parameters */
         SourceMap<Parameters> parameters;
 
-        /** Payload-specific Headers */
+        /** Source Map of Payload-specific Headers */
         SourceMap<Headers> headers;
 
-        /** Source Map of Body */
+        /** Source Map of Payload-specific Attributes (THIS SHOULD NOT BE HERE - should be under content) */
+        SourceMap<Attributes> attributes;
+
+        /** Source Map of Body (THIS SHOULD NOT BE HERE - should be under content) */
         SourceMap<Asset> body;
 
-        /** Source Map of Schema */
+        /** Source Map of Schema (THIS SHOULD NOT BE HERE - should be under content) */
         SourceMap<Asset> schema;
 
         /** Source Map of Model Reference */
@@ -146,6 +154,15 @@ namespace snowcrash {
         /** Action-specific Parameters */
         SourceMap<Parameters> parameters;
 
+        /** Action-specific Attributes (THIS SHOULD NOT BE HERE - should be under content) */
+        SourceMap<Attributes> attributes;
+
+        /** Source Map of URI Template (THIS SHOULD NOT BE HERE - should be under element attributes) */
+        SourceMap<URITemplate> uriTemplate;
+
+        /** Source Map of Link Relation (THIS SHOULD NOT BE HERE - should be under element attributes) */
+        SourceMap<Relation> relation;
+
         /**
          *  \brief Action-specific HTTP headers
          *
@@ -171,7 +188,7 @@ namespace snowcrash {
      *  Source Map Structure for API Resource
      */
     template<>
-    struct SourceMap<Resource> : public SourceMapBase {
+    struct SourceMap<Resource> {
 
         /** Source Map of URI template */
         SourceMap<URITemplate> uriTemplate;
@@ -184,6 +201,9 @@ namespace snowcrash {
 
         /** Model representing this Resource */
         SourceMap<ResourceModel> model;
+
+        /** Source Map of Resource-specific Attributes (THIS SHOULD NOT BE HERE - should be under content) */
+        SourceMap<Attributes> attributes;
 
         /** Parameters */
         SourceMap<Parameters> parameters;
@@ -209,24 +229,96 @@ namespace snowcrash {
     /** Source Map of Collection of Resources */
     SOURCE_MAP_COLLECTION(Resource, Resources)
 
+    /** Forward Declaration for Source Map of Element */
+    template<>
+    struct SourceMap<Element>;
+
+    /** Source Map of Collection of Elements */
+    SOURCE_MAP_COLLECTION(Element, Elements)
+
     /**
-     *  Source Map Structure for Group of API Resources
+     * Source Map Structure for Element
      */
     template<>
-    struct SourceMap<ResourceGroup> : public SourceMapBase {
+    struct SourceMap<Element> : public SourceMapBase {
 
-        /** Source Map of a Group Name */
-        SourceMap<Name> name;
+        /** Source Map Structure for Attributes of the Element */
+        struct Attributes {
 
-        /** Source Map of Group description */
-        SourceMap<Description> description;
+            /** Source Map of a Element Name */
+            SourceMap<Name> name;
+        };
 
-        /** Resources */
-        SourceMap<Resources> resources;
+        /** Source Map Structure for Content of the Element */
+        struct Content {
+
+            /** EITHER Source Map of Copy */
+            SourceMap<std::string> copy;
+
+            /** OR Source Map of Resource */
+            SourceMap<Resource> resource;
+
+            /** OR Source Map of Data Structure */
+            SourceMap<DataStructure> dataStructure;
+
+            /** OR Source Map of Collection of elements */
+            SourceMap<Elements>& elements();
+            const SourceMap<Elements>& elements() const;
+
+            /** Constructor */
+            Content();
+
+            /** Copy constructor */
+            Content(const SourceMap<Element>::Content& rhs);
+
+            /** Assignment operator */
+            SourceMap<Element>::Content& operator=(const SourceMap<Element>::Content& rhs);
+
+            /** Destructor */
+            ~Content();
+
+        private:
+            std::auto_ptr<SourceMap<Elements> > m_elements;
+        };
+
+        /** Class of the Element (to be used internally only) */
+        Element::Class element;
+
+        /** Source Map of Attributes of the Element */
+        Attributes attributes;
+
+        /** Source Map of Content of the Element */
+        Content content;
+
+        /** Type of the Category element (to be used internally only) */
+        Element::Category category;
+
+        /** Constructor */
+        SourceMap(const Element::Class& element_ = Element::UndefinedElement);
+
+        /** Copy constructor */
+        SourceMap(const SourceMap<Element>& rhs);
+
+        /** Assignment operator */
+        SourceMap<Element>& operator=(const SourceMap<Element>& rhs);
+
+        /** Destructor */
+        ~SourceMap();
     };
 
-    /** Source Map of Collection of Resource groups */
-    SOURCE_MAP_COLLECTION(ResourceGroup, ResourceGroups)
+    /**
+     *  Source Map Structure for Group of API Resources (Category Element)
+     */
+    template<>
+    struct SourceMap<ResourceGroup> : public SourceMap<Element> {
+    };
+
+    /**
+     * Source Map Structure for Group of Data Structures (Category Element)
+     */
+    template<>
+    struct SourceMap<DataStructureGroup> : public SourceMap<Element> {
+    };
 
     /**
      *  \brief API Blueprint Sourcemap AST
@@ -235,20 +327,19 @@ namespace snowcrash {
      *  Start reading a parsed API here.
      */
     template<>
-    struct SourceMap<Blueprint> : public SourceMapBase {
-
-        /** Source Map of API Blueprint metadata */
-        SourceMap<MetadataCollection> metadata;
+    struct SourceMap<Blueprint> : public SourceMap<Element> {
 
         /** Source Map of the API Name */
         SourceMap<Name> name;
 
+        /** Source Map of API Blueprint metadata */
+        SourceMap<MetadataCollection> metadata;
+
         /** Source Map of an API Overview description */
         SourceMap<Description> description;
-
-        /** The set of API Resource Groups */
-        SourceMap<ResourceGroups> resourceGroups;
     };
 }
+
+#undef SOURCE_MAP_COLLECTION
 
 #endif
