@@ -202,19 +202,14 @@ namespace snowcrash {
                                                           const ParseResultRef<T>& out) {
 
             // WARN: Ignoring unexpected node
-            std::stringstream ss;
-            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+            Warning& warn = WARNING(IgnoringWarning);
 
             if (node->type == mdp::HeaderMarkdownNodeType) {
-                ss << "unexpected header block, expected a group, resource or an action definition";
-                ss << ", e.g. '# Group <name>', '# <resource name> [<URI>]' or '# <HTTP method> <URI>'";
+                warn << "unexpected header block, expected a group, resource or an action definition";
+                warn << ", e.g. '# Group <name>', '# <resource name> [<URI>]' or '# <HTTP method> <URI>'";
             } else {
-                ss << "ignoring unrecognized block";
+                warn << "ignoring unrecognized block";
             }
-
-            out.report.warnings.push_back(Warning(ss.str(),
-                                                  IgnoringWarning,
-                                                  sourceMap));
 
             return ++MarkdownNodeIterator(node);
         }

@@ -106,20 +106,15 @@ namespace snowcrash {
                 if (isResourceGroupDuplicate(out.node, resourceGroup.node.attributes.name)) {
 
                     // WARN: duplicate resource group
-                    std::stringstream ss;
+                    Warning& warn = WARNING(DuplicateWarning);
 
                     if (resourceGroup.node.attributes.name.empty()) {
-                        ss << "anonymous group";
+                        warn << "anonymous group";
                     } else {
-                        ss << "group '" << resourceGroup.node.attributes.name << "'";
+                        warn << "group '" << resourceGroup.node.attributes.name << "'";
                     }
 
-                    ss << " is already defined";
-
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                    out.report.warnings.push_back(Warning(ss.str(),
-                                                          DuplicateWarning,
-                                                          sourceMap));
+                    warn << " is already defined";
                 }
 
                 out.node.content.elements().push_back(resourceGroup.node);
@@ -290,8 +285,7 @@ namespace snowcrash {
 
             }
             else if (!out.node.description.empty()) {
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                out.report.warnings(APINameWarning, sourceMap) << ExpectedAPINameMessage;
+                WARNING(APINameWarning) << ExpectedAPINameMessage;
             }
         }
 
@@ -490,16 +484,14 @@ namespace snowcrash {
                         duplicateKeys.push_back(it->first);
 
                         // WARN: duplicate metadata definition
-                        mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                        out.report.warnings(DuplicateWarning, sourceMap) << "duplicate definition of '" << it->first << "'";
+                        WARNING(DuplicateWarning) << "duplicate definition of '" << it->first << "'";
                     }
                 }
             }
             else if (!out.node.empty()) {
 
                 // WARN: malformed metadata block
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                out.report.warnings(FormattingWarning, sourceMap) << "ignoring possible metadata, expected '<key> : <value>', one one per line";
+                WARNING(FormattingWarning) << "ignoring possible metadata, expected '<key> : <value>', one one per line";
             }
         }
 

@@ -113,8 +113,7 @@ namespace snowcrash {
                         if (SectionProcessor<DataStructureGroup>::isNamedTypeDuplicate(pd.blueprint, out.node.name)) {
 
                             // WARN: duplicate named type
-                            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                            out.report.warnings(DuplicateWarning, sourceMap)
+                            WARNING(DuplicateWarning)
                                 << "named type with name '" << out.node.name << "' already exists";
 
                             // Remove the attributes data from the AST since we are ignoring this
@@ -338,8 +337,7 @@ namespace snowcrash {
             if (duplicate != out.node.actions.end()) {
 
                 // WARN: duplicate method
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                out.report.warnings(DuplicateWarning, sourceMap)
+                WARNING(DuplicateWarning)
                     << "action with method '" << action.node.method 
                     << "' already defined for resource '" << out.node.uriTemplate << "'";
             }
@@ -349,8 +347,7 @@ namespace snowcrash {
             if (relationDuplicate != out.node.actions.end()) {
 
                 // WARN: duplicate relation identifier
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                out.report.warnings(DuplicateWarning, sourceMap)
+                WARNING(DuplicateWarning)
                     << "relation identifier '" << action.node.relation.str 
                     << "' already defined for resource '" << out.node.uriTemplate << "'";
             }
@@ -413,21 +410,16 @@ namespace snowcrash {
             if (!out.node.model.name.empty()) {
 
                 // WARN: Model already defined
-                std::stringstream ss;
-                ss << "overshadowing previous model definition for '";
+                Warning& warn = WARNING(DuplicateWarning);
+                warn << "overshadowing previous model definition for '";
 
                 if (!out.node.name.empty()) {
-                    ss << out.node.name << "(" << out.node.uriTemplate << ")";
+                    warn << out.node.name << "(" << out.node.uriTemplate << ")";
                 } else {
-                    ss << out.node.uriTemplate;
+                    warn << out.node.uriTemplate;
                 }
 
-                ss << "' resource, a resource can be represented by a single model only";
-
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                out.report.warnings.push_back(Warning(ss.str(),
-                                                      DuplicateWarning,
-                                                      sourceMap));
+                warn << "' resource, a resource can be represented by a single model only";
             }
 
             if (model.node.name.empty()) {
@@ -501,19 +493,14 @@ namespace snowcrash {
                 if (out.node.uriTemplate.find(it->name) == std::string::npos) {
 
                     // WARN: parameter name not present
-                    std::stringstream ss;
-                    ss << "parameter '" << it->name << "' not specified in ";
+                    Warning& warn = WARNING(LogicalErrorWarning);
+                    warn << "parameter '" << it->name << "' not specified in ";
 
                     if (!out.node.name.empty()) {
-                        ss << "'" << out.node.name << "' ";
+                        warn << "'" << out.node.name << "' ";
                     }
 
-                    ss << "its '" << out.node.uriTemplate << "' URI template";
-
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                    out.report.warnings.push_back(Warning(ss.str(),
-                                                          LogicalErrorWarning,
-                                                          sourceMap));
+                    warn << "its '" << out.node.uriTemplate << "' URI template";
                 }
             }
         }

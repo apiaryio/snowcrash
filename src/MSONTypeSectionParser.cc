@@ -50,8 +50,7 @@ namespace snowcrash {
                     if (parentSectionType != MSONPropertyMembersSectionType) {
 
                         // WARN: One of can not be a nested member for a non object structure type
-                        mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                        out.report.warnings(LogicalErrorWarning, sourceMap) << "one-of can not be a nested member for a type not sub typed from object";
+                        WARNING(LogicalErrorWarning) << "one-of can not be a nested member for a type not sub typed from object";
 
                         return cur;
                     }
@@ -107,8 +106,7 @@ namespace snowcrash {
                 case MSONOneOfSectionType:
                 {
                     // WARN: mixin and oneOf not supported in sample/default
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                    out.report.warnings(LogicalErrorWarning, sourceMap)
+                    WARNING(LogicalErrorWarning)
                         << "sample and default type sections cannot have `" << SectionName(pd.sectionContext()) << "` type";
                     break;
                 }

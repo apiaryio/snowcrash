@@ -51,8 +51,7 @@ namespace snowcrash {
                     TrimString(content);
 
                     // WARN: Ignoring the unexpected param value
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                    out.report.warnings(IgnoringWarning, sourceMap)
+                    WARNING(IgnoringWarning)
                         << "ignoring the '" << content << "' element"
                         << ", expected '`" << content << "`'";
                 }

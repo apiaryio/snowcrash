@@ -232,20 +232,9 @@ namespace snowcrash {
             if (assetType != UndefinedSectionType) {
 
                 // WARN: Ignoring section
-                out.report.warnings(IgnoringWarning, mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData)) 
-                                   << "Ignoring " << SectionName(assetType) << " list item, " 
-                                   << SectionName(assetType) << " list item is expected to be indented by 4 spaces or 1 tab";
-
-
-                //std::stringstream ss;
-                //mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-
-                //ss << "Ignoring " << SectionName(assetType) << " list item, ";
-                //ss << SectionName(assetType) << " list item is expected to be indented by 4 spaces or 1 tab";
-
-                //out.report.warnings.push_back(Warning(ss.str(),
-                //                                      IgnoringWarning,
-                //                                      sourceMap));
+                WARNING(IgnoringWarning)
+                    << "Ignoring " << SectionName(assetType) << " list item, " 
+                    << SectionName(assetType) << " list item is expected to be indented by 4 spaces or 1 tab";
 
                 return ++MarkdownNodeIterator(node);
             }
@@ -346,27 +335,21 @@ namespace snowcrash {
             if (out.node.examples.empty()) {
 
                 // WARN: No response for action
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                out.report.warnings(EmptyDefinitionWarning, sourceMap) << "action is missing a response";
+                WARNING(EmptyDefinitionWarning) << "action is missing a response";
 
             } else if (!out.node.examples.empty() &&
                 !out.node.examples.back().requests.empty() &&
                 out.node.examples.back().responses.empty()) {
 
                 // WARN: No response for request
-                std::stringstream ss;
-                ss << "action is missing a response for ";
+                Warning& warn = WARNING(EmptyDefinitionWarning);
+                warn << "action is missing a response for ";
 
                 if (out.node.examples.back().requests.back().name.empty()) {
-                    ss << "a request";
+                    warn << "a request";
                 } else {
-                    ss << "the '" << out.node.examples.back().requests.back().name << "' request";
+                    warn << "the '" << out.node.examples.back().requests.back().name << "' request";
                 }
-
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                out.report.warnings.push_back(Warning(ss.str(),
-                                                      EmptyDefinitionWarning,
-                                                      sourceMap));
             }
         }
 
@@ -387,7 +370,8 @@ namespace snowcrash {
 
                 // WARN: Duplicate payload
                 out.report.warnings(DuplicateWarning, sourceMap) 
-                     << SectionName(sectionType) << " payload `" << payload.name << "`" << " already defined for `" << out.node.method << "` method";
+                     << SectionName(sectionType) << " payload `" << payload.name 
+                     << "` already defined for `" << out.node.method << "` method";
             }
 
             if (sectionType == ResponseSectionType || sectionType == ResponseBodySectionType) {
@@ -406,12 +390,14 @@ namespace snowcrash {
                     if (out.node.method == HTTPMethodName::Connect && code/100 == 2) {
 
                         out.report.warnings( EmptyDefinitionWarning, sourceMap)
-                            << "the response for " << code << " " << out.node.method << " request MUST NOT include a " << SectionName(BodySectionType);
+                            << "the response for " << code << " " << out.node.method 
+                            << " request MUST NOT include a " << SectionName(BodySectionType);
 
                     } else if (out.node.method != HTTPMethodName::Connect && !methodTraits.allowBody) {
 
                         out.report.warnings(EmptyDefinitionWarning, sourceMap)
-                            << "the response for " << out.node.method << " request MUST NOT include a " << SectionName(BodySectionType);
+                            << "the response for " << out.node.method 
+                            << " request MUST NOT include a " << SectionName(BodySectionType);
 
                     }
 
@@ -450,9 +436,9 @@ namespace snowcrash {
             MarkdownNodeIterator cur = HeadersParser::parse(node, siblings, pd, out);
 
             // WARN: Deprecated header sections
-            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-            out.report.warnings(DeprecatedWarning, sourceMap)
-                                << "the 'headers' section at this level is deprecated and will be removed in a future, use respective payload header section(s) instead";
+            WARNING(DeprecatedWarning)
+                << "the 'headers' section at this level is deprecated and will be removed in a future"
+                << ", use respective payload header section(s) instead";
 
             return cur;
         }

@@ -191,6 +191,8 @@ namespace snowcrash {
         /** Result warning source annotations */
         Warnings warnings;
     };
+
+#define WARNING(code) out.report.warnings(code, mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData))
 }
 
 #endif

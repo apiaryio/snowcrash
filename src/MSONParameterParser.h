@@ -211,8 +211,7 @@ namespace snowcrash {
             }
             else {
                 // WARN: Additional parameters traits warning
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                out.report.warnings(FormattingWarning, sourceMap)
+                WARNING(FormattingWarning)
                     << "unable to parse additional parameter traits"
                     << ", expected '([required | optional], [<type> | enum[<type>])'"
                     << ", e.g. '(optional, string)'";

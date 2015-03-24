@@ -64,8 +64,7 @@ namespace snowcrash {
             if (out.node.name.empty() &&
                 (pd.sectionContext() == ResponseSectionType || pd.sectionContext() == ResponseBodySectionType)) {
 
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                out.report.warnings(EmptyDefinitionWarning, sourceMap) << "missing response HTTP status code, assuming 'Response 200'";
+                WARNING(EmptyDefinitionWarning) << "missing response HTTP status code, assuming 'Response 200'";
                 out.node.name = "200";
             }
 
@@ -103,8 +102,7 @@ namespace snowcrash {
             if (!out.node.reference.id.empty()) {
                 //WARN: ignoring extraneous content after model reference
 
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                out.report.warnings(IgnoringWarning, sourceMap)
+                WARNING(IgnoringWarning)
                     << "ignoring extraneous content after model reference"
                     << ", expected model reference only e.g. '[" << out.node.reference.id << "][]'";
             } else {
@@ -152,8 +150,7 @@ namespace snowcrash {
                 {
                     if (!out.node.body.empty()) {
                         // WARN: Multiple body section
-                        mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                        out.report.warnings(RedefinitionWarning, sourceMap) << "ignoring additional 'body' content, it is already defined";
+                        WARNING(RedefinitionWarning) << "ignoring additional 'body' content, it is already defined";
                     }
 
                     ParseResultRef<Asset> asset(out.report, out.node.body, out.sourceMap.body);
@@ -164,8 +161,7 @@ namespace snowcrash {
                 {
                     if (!out.node.schema.empty()) {
                         // WARN: Multiple schema section
-                        mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                        out.report.warnings(RedefinitionWarning, sourceMap) << "ignoring additional 'schema' content, it is already defined";
+                        WARNING(RedefinitionWarning) << "ignoring additional 'schema' content, it is already defined";
                     }
 
                     ParseResultRef<Asset> asset(out.report, out.node.schema, out.sourceMap.schema);
@@ -433,10 +429,7 @@ namespace snowcrash {
                             return false;
                     }
 
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                    out.report.warnings.push_back(Warning(ss.str(),
-                                                          FormattingWarning,
-                                                          sourceMap));
+                    WARNING(FormattingWarning) << ss.str();
 
                     return false;
                 }
@@ -611,19 +604,14 @@ namespace snowcrash {
                 if (warnEmptyBody) {
 
                     // WARN: empty body
-                    std::stringstream ss;
-                    ss << "empty " << SectionName(RequestSectionType) << " " << SectionName(BodySectionType);
+                    Warning& warn = WARNING(EmptyDefinitionWarning);
+                    warn << "empty " << SectionName(RequestSectionType) << " " << SectionName(BodySectionType);
 
                     if (!contentLength.empty()) {
-                        ss << ", expected " << SectionName(BodySectionType) << " for '" << contentLength << "' Content-Length";
+                        warn << ", expected " << SectionName(BodySectionType) << " for '" << contentLength << "' Content-Length";
                     } else if (!transferEncoding.empty()) {
-                        ss << ", expected " << SectionName(BodySectionType) << " for '" << transferEncoding << "' Transfer-Encoding";
+                        warn << ", expected " << SectionName(BodySectionType) << " for '" << transferEncoding << "' Transfer-Encoding";
                     }
-
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                    out.report.warnings.push_back(Warning(ss.str(),
-                                                          EmptyDefinitionWarning,
-                                                          sourceMap));
                 }
             }
         }
@@ -651,8 +639,7 @@ namespace snowcrash {
                 out.node.reference.meta.state != Reference::StatePending) {
 
                 // WARN: not empty body
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                out.report.warnings(EmptyDefinitionWarning, sourceMap)
+                WARNING(EmptyDefinitionWarning)
                     << "the " << code << " response MUST NOT include a " << SectionName(BodySectionType);
             }
         }

@@ -46,8 +46,7 @@ namespace snowcrash {
             if (!remainingContent.empty()) {
 
                 // WARN: Extra content in parameters section
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                out.report.warnings(IgnoringWarning, sourceMap)
+                WARNING(IgnoringWarning)
                     << "ignoring additional content after 'parameters' keyword,"
                     << " expected a nested list of parameters, one parameter per list item";
             }
@@ -87,8 +86,7 @@ namespace snowcrash {
                 if (duplicate != out.node.end()) {
 
                     // WARN: Parameter already defined
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                    out.report.warnings(RedefinitionWarning, sourceMap)
+                    WARNING(RedefinitionWarning)
                         << "overshadowing previous parameter '" << parameter.node.name << "' definition";
                 }
             }
@@ -143,8 +141,7 @@ namespace snowcrash {
             if (out.node.empty()) {
 
                 // WARN: No parameters defined
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                out.report.warnings(FormattingWarning, sourceMap) << NoParametersMessage;
+                WARNING(FormattingWarning) << NoParametersMessage;
             }
         }
 

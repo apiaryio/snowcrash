@@ -98,8 +98,7 @@ namespace snowcrash {
             // Check redefinition
             if (!out.node.values.empty()) {
                 // WARN: parameter values are already defined
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                out.report.warnings(RedefinitionWarning, sourceMap)
+                WARNING(RedefinitionWarning)
                     << "overshadowing previous 'values' definition" << " for parameter '" << out.node.name << "'";
             }
 
@@ -115,8 +114,7 @@ namespace snowcrash {
 
             if (out.node.values.empty()) {
                 // WARN: empty definition
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                out.report.warnings(EmptyDefinitionWarning, sourceMap)
+                WARNING(EmptyDefinitionWarning)
                     << "no possible values specified for parameter '" << out.node.name << "'";
             }
 
@@ -317,8 +315,7 @@ namespace snowcrash {
 
             if (!traits.empty()) {
                 // WARN: Additional parameters traits warning
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                out.report.warnings(FormattingWarning, sourceMap)
+                WARNING(FormattingWarning)
                     << "unable to parse additional parameter traits"
                     << ", expected '([required | optional], [<type>], [`<example value>`])'"
                     << ", e.g. '(optional, string, `Hello World`)'";
@@ -343,10 +340,9 @@ namespace snowcrash {
             // Check possible required vs default clash
             if (out.node.use != OptionalParameterUse &&
                 !out.node.defaultValue.empty()) {
-
+                //
                 // WARN: Required vs default clash
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                out.report.warnings(LogicalErrorWarning, sourceMap)
+                WARNING(LogicalErrorWarning)
                     << "specifying parameter '" << out.node.name << "' as required supersedes its default value"
                     << ", declare the parameter as 'optional' to specify its default value";
             }
@@ -376,8 +372,7 @@ namespace snowcrash {
             if(!out.node.exampleValue.empty() && !isExampleFound) {
 
                 // WARN: missing example in values.
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                out.report.warnings(LogicalErrorWarning, sourceMap)
+                WARNING(LogicalErrorWarning)
                     << "the example value '" << out.node.exampleValue << "' of parameter '"
                     << out.node.name << "' is not in its list of expected values";
             }
@@ -385,8 +380,7 @@ namespace snowcrash {
             if(!out.node.defaultValue.empty() && !isDefaultFound) {
 
                 // WARN: missing default in values.
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                out.report.warnings(LogicalErrorWarning, sourceMap)
+                WARNING(LogicalErrorWarning)
                     << "the default value '" << out.node.defaultValue << "' of parameter '"
                     << out.node.name << "' is not in its list of expected values";
             }

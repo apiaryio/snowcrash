@@ -45,8 +45,7 @@ namespace snowcrash {
             if (out.node.empty()) {
 
                 // WARN: one of type do not have nested members
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                out.report.warnings(EmptyDefinitionWarning, sourceMap) << "one of type must have nested members";
+                WARNING(EmptyDefinitionWarning) << "one of type must have nested members";
             }
         }
 
