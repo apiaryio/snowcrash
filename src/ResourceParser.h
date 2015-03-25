@@ -11,6 +11,7 @@
 
 #include "SectionParser.h"
 #include "ActionParser.h"
+#include "DataStructureGroupParser.h"
 #include "HeadersParser.h"
 #include "ParametersParser.h"
 #include "UriTemplateParser.h"
@@ -63,11 +64,8 @@ namespace snowcrash {
 
                     return cur;
                 }
-            } else if (RegexCapture(node->text, NamedResourceHeaderRegex, captureGroups, 4)) {
-
-                out.node.name = captureGroups[1];
-                TrimString(out.node.name);
-                out.node.uriTemplate = captureGroups[2];
+            } else {
+                matchNamedResourceHeader(node, out.node);
             }
 
             if (pd.exportSourceMap()) {
@@ -105,6 +103,40 @@ namespace snowcrash {
                     return SectionProcessor<Action>::handleDeprecatedHeaders(node, siblings, pd, headers);
                 }
 
+                case AttributesSectionType:
+                {
+                    ParseResultRef<Attributes> attributes(out.report, out.node.attributes, out.sourceMap.attributes);
+                    MarkdownNodeIterator cur = AttributesParser::parse(node, siblings, pd, attributes);
+
+                    if (!out.node.name.empty()) {
+
+                        if (SectionProcessor<DataStructureGroup>::isNamedTypeDuplicate(pd.blueprint, out.node.name)) {
+
+                            // WARN: duplicate named type
+                            std::stringstream ss;
+                            ss << "named type with name '" << out.node.name << "' already exists";
+
+                            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                            out.report.warnings.push_back(Warning(ss.str(),
+                                                                  DuplicateWarning,
+                                                                  sourceMap));
+
+                            // Remove the attributes data from the AST since we are ignoring this
+                            out.node.attributes = mson::NamedType();
+
+                            return cur;
+                        }
+
+                        attributes.node.name.symbol.literal = out.node.name;
+
+                        if (pd.exportSourceMap()) {
+                            attributes.sourceMap.name.sourceMap = out.sourceMap.name.sourceMap;
+                        }
+                    }
+
+                    return cur;
+                }
+
                 default:
                     break;
             }
@@ -130,13 +162,13 @@ namespace snowcrash {
                 }
 
                 // Update model in the model table as well
-                ResourceModelTable::iterator it = pd.modelTable.resourceModels.find(out.node.model.name);
+                ModelTable::iterator it = pd.modelTable.find(out.node.model.name);
 
-                if (it != pd.modelTable.resourceModels.end()) {
+                if (it != pd.modelTable.end()) {
                     it->second.body = out.node.model.body;
 
                     if (pd.exportSourceMap()) {
-                        pd.modelSourceMapTable.resourceModels[out.node.model.name].body = out.sourceMap.model.body;
+                        pd.modelSourceMapTable[out.node.model.name].body = out.sourceMap.model.body;
                     }
                 }
 
@@ -189,7 +221,7 @@ namespace snowcrash {
             // Check if headers section
             nestedType = SectionProcessor<Headers>::sectionType(node);
 
-            if (nestedType == HeadersSectionType) {
+            if (nestedType != UndefinedSectionType) {
                 return nestedType;
             }
 
@@ -199,6 +231,13 @@ namespace snowcrash {
             if (nestedType == ModelSectionType ||
                 nestedType == ModelBodySectionType) {
 
+                return nestedType;
+            }
+
+            // Check if attributes section
+            nestedType = SectionProcessor<Attributes>::sectionType(node);
+
+            if (nestedType != UndefinedSectionType) {
                 return nestedType;
             }
 
@@ -252,14 +291,14 @@ namespace snowcrash {
             // Consolidate deprecated headers into subsequent payloads
             if (!out.node.headers.empty()) {
 
-                Collection<Action>::iterator actIt = out.node.actions.begin();
-                Collection<SourceMap<Action> >::iterator actSMIt = out.sourceMap.actions.collection.begin();
+                Collection<Action>::iterator actionIt = out.node.actions.begin();
+                Collection<SourceMap<Action> >::iterator actionSMIt = out.sourceMap.actions.collection.begin();
 
                 for (;
-                     actIt != out.node.actions.end();
-                     ++actIt, ++actSMIt) {
+                     actionIt != out.node.actions.end();
+                     ++actionIt, ++actionSMIt) {
 
-                    SectionProcessor<Headers>::injectDeprecatedHeaders(pd, out.node.headers, out.sourceMap.headers, actIt->examples, actSMIt->examples);
+                    SectionProcessor<Headers>::injectDeprecatedHeaders(pd, out.node.headers, out.sourceMap.headers, actionIt->examples, actionSMIt->examples);
                 }
 
                 out.node.headers.clear();
@@ -270,6 +309,25 @@ namespace snowcrash {
             }
         }
 
+        /**
+         * \brief Given a named resource header, retrieve the name and uriTemplate
+         *
+         * \param node Markdown node to process
+         * \param resource Resource data structure
+         */
+        static void matchNamedResourceHeader(const MarkdownNodeIterator& node,
+                                             Resource& resource) {
+
+            CaptureGroups captureGroups;
+
+            if (RegexCapture(node->text, NamedResourceHeaderRegex, captureGroups, 4)) {
+
+                resource.name = captureGroups[1];
+                TrimString(resource.name);
+                resource.uriTemplate = captureGroups[2];
+            }
+        }
+
         /** Process Action section */
         static MarkdownNodeIterator processAction(const MarkdownNodeIterator& node,
                                                   const MarkdownNodes& siblings,
@@ -277,7 +335,6 @@ namespace snowcrash {
                                                   const ParseResultRef<Resource>& out) {
 
             IntermediateParseResult<Action> action(out.report);
-
             MarkdownNodeIterator cur = ActionParser::parse(node, siblings, pd, action);
 
             ActionIterator duplicate = SectionProcessor<Action>::findAction(out.node.actions, action.node);
@@ -295,9 +352,28 @@ namespace snowcrash {
                                                       sourceMap));
             }
 
+            ActionIterator relationDuplicate = SectionProcessor<Action>::findRelation(out.node.actions, action.node.relation);
+
+            if (relationDuplicate != out.node.actions.end()) {
+
+                // WARN: duplicate relation identifier
+                std::stringstream ss;
+                ss << "relation identifier '" << action.node.relation.str << "' already defined for resource '" << out.node.uriTemplate << "'";
+
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                out.report.warnings.push_back(Warning(ss.str(),
+                                                      DuplicateWarning,
+                                                      sourceMap));
+            }
+
             if (!action.node.parameters.empty()) {
 
-                checkParametersEligibility(node, pd, action.node.parameters, out);
+                if (!action.node.uriTemplate.empty()) {
+                    checkParametersEligibility<Action>(node, pd, action.node.parameters, action);
+                }
+                else {
+                    checkParametersEligibility<Resource>(node, pd, action.node.parameters, out);
+                }
             }
 
             out.node.actions.push_back(action.node);
@@ -321,7 +397,7 @@ namespace snowcrash {
 
             if (!parameters.node.empty()) {
 
-                checkParametersEligibility(node, pd, parameters.node, out);
+                checkParametersEligibility<Resource>(node, pd, parameters.node, out);
                 out.node.parameters.insert(out.node.parameters.end(), parameters.node.begin(), parameters.node.end());
 
                 if (pd.exportSourceMap()) {
@@ -387,14 +463,14 @@ namespace snowcrash {
                 }
             }
 
-            ResourceModelTable::iterator it = pd.modelTable.resourceModels.find(model.node.name);
+            ModelTable::iterator it = pd.modelTable.find(model.node.name);
 
-            if (it == pd.modelTable.resourceModels.end()) {
+            if (it == pd.modelTable.end()) {
 
-                pd.modelTable.resourceModels[model.node.name] = model.node;
+                pd.modelTable[model.node.name] = model.node;
 
                 if (pd.exportSourceMap()) {
-                    pd.modelSourceMapTable.resourceModels[model.node.name] = model.sourceMap;
+                    pd.modelSourceMapTable[model.node.name] = model.sourceMap;
                 }
             } else {
 
@@ -417,11 +493,16 @@ namespace snowcrash {
             return cur;
         }
 
-        /** Check Parameters eligibility in URI template */
+        /**
+         * \brief Check Parameters eligibility in URI template
+         *
+         * \warning Do not specialise this.
+         */
+        template<typename T>
         static void checkParametersEligibility(const MarkdownNodeIterator& node,
                                                const SectionParserData& pd,
                                                Parameters& parameters,
-                                               const ParseResultRef<Resource>& out) {
+                                               const ParseResultRef<T>& out) {
 
             for (ParameterIterator it = parameters.begin();
                  it != parameters.end();
@@ -448,13 +529,25 @@ namespace snowcrash {
             }
         }
 
-        /** Finds a resource inside an resources collection */
-        static ResourceIterator findResource(const Resources& resources,
-                                             const Resource& resource) {
+        /**
+         * \brief Given a list of elements, Check if a resource already exists with the given uri template
+         *
+         * \param elements Collection of elements
+         * \param uri The resource uri template to be checked
+         */
+        static bool isResourceDuplicate(const Elements& elements,
+                                        const URITemplate& uri) {
 
-            return std::find_if(resources.begin(),
-                                resources.end(),
-                                std::bind2nd(MatchResource(), resource));
+            for (Elements::const_iterator it = elements.begin(); it != elements.end(); ++it) {
+
+                if (it->element == Element::ResourceElement &&
+                    it->content.resource.uriTemplate == uri) {
+
+                    return true;
+                }
+            }
+
+            return false;
         }
     };
 

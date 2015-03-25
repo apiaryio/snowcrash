@@ -312,7 +312,7 @@ TEST_CASE("Parse payload with dangling body", "[payload]")
 TEST_CASE("Parse inline payload with symbol reference", "[payload]")
 {
     Models models;
-    ModelHelper::buildModel("Symbol", models);
+    ModelHelper::build("Symbol", models);
 
     ParseResult<Payload> payload;
     SectionParserHelper<Payload, PayloadParser>::parse(ModelFixture, RequestBodySectionType, payload, ExportSourcemapOption, models);
@@ -345,7 +345,7 @@ TEST_CASE("Parse inline payload with symbol reference with extra indentation", "
     "        [Symbol][]\n";
 
     Models models;
-    ModelHelper::buildModel("Symbol", models);
+    ModelHelper::build("Symbol", models);
 
     ParseResult<Payload> payload;
     SectionParserHelper<Payload, PayloadParser>::parse(source, RequestBodySectionType, payload, ExportSourcemapOption, models);
@@ -376,7 +376,7 @@ TEST_CASE("Parse inline payload with symbol reference with foreign content", "[p
     source += "\n    Foreign\n";
 
     Models models;
-    ModelHelper::buildModel("Symbol", models);
+    ModelHelper::build("Symbol", models);
 
     ParseResult<Payload> payload;
     SectionParserHelper<Payload, PayloadParser>::parse(source, RequestBodySectionType, payload, ExportSourcemapOption, models);
@@ -654,4 +654,59 @@ TEST_CASE("Report ignoring nested request objects", "[payload][#163][#189]")
 
     REQUIRE(payload.node.headers.size() == 1);
     REQUIRE(payload.node.body.empty());
+}
+
+TEST_CASE("Parse a payload with attributes", "[payload]")
+{
+    mdp::ByteBuffer source = \
+    "+ Response 200 (application/json)\n"\
+    "    + Attributes (object)\n"\
+    "        + id: 250FF (string)\n"\
+    "        + created: 1415203908 (number) - Time stamp\n"\
+    "        + percent_off: 25 (number)\n\n"\
+    "          A positive integer between 1 and 100 that represents the discount the coupon will apply.\n\n"\
+    "        + redeem_by (number) - Date after which the coupon can no longer be redeemed";
+
+    ParseResult<Payload> payload;
+    SectionParserHelper<Payload, PayloadParser>::parse(source, ResponseSectionType, payload);
+
+    REQUIRE(payload.report.error.code == Error::OK);
+    REQUIRE(payload.report.warnings.empty());
+
+    REQUIRE(payload.node.headers.size() == 1);
+    REQUIRE(payload.node.body.empty());
+    REQUIRE(payload.node.schema.empty());
+    REQUIRE(payload.node.description.empty());
+    REQUIRE(payload.node.attributes.name.empty());
+    REQUIRE(payload.node.attributes.typeDefinition.attributes == 0);
+    REQUIRE(payload.node.attributes.typeDefinition.typeSpecification.name.base == mson::ObjectTypeName);
+    REQUIRE(payload.node.attributes.sections.size() == 1);
+    REQUIRE(payload.node.attributes.sections[0].klass == mson::TypeSection::MemberTypeClass);
+    REQUIRE(payload.node.attributes.sections[0].content.elements().size() == 4);
+}
+
+TEST_CASE("Parse a request with attributes and no body", "[payload]")
+{
+    mdp::ByteBuffer source = \
+    "+ Request (application/json)\n"\
+    "    + Headers\n\n"\
+    "            Transfer-Encoding: chunked\n\n"\
+    "    + Attributes (array[Coupon])";
+
+    ParseResult<Payload> payload;
+    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, payload);
+
+    REQUIRE(payload.report.error.code == Error::OK);
+    REQUIRE(payload.report.warnings.empty());
+
+    REQUIRE(payload.node.headers.size() == 2);
+    REQUIRE(payload.node.body.empty());
+    REQUIRE(payload.node.schema.empty());
+    REQUIRE(payload.node.description.empty());
+    REQUIRE(payload.node.attributes.name.empty());
+    REQUIRE(payload.node.attributes.typeDefinition.attributes == 0);
+    REQUIRE(payload.node.attributes.typeDefinition.typeSpecification.name.base == mson::ArrayTypeName);
+    REQUIRE(payload.node.attributes.typeDefinition.typeSpecification.nestedTypes.size() == 1);
+    REQUIRE(payload.node.attributes.typeDefinition.typeSpecification.nestedTypes[0].symbol.literal == "Coupon");
+    REQUIRE(payload.node.attributes.sections.empty());
 }

@@ -14,6 +14,7 @@
 #include <utility>
 #include "Platform.h"
 #include "MarkdownNode.h"
+#include "MSON.h"
 
 /**
  *  API Blueprint Abstract Syntax Tree
@@ -53,18 +54,6 @@ namespace snowcrash {
     /** A generic key - value pair */
     typedef std::pair<std::string, std::string> KeyValuePair;
 
-    /**
-     * Default Container for collections.
-     *
-     *  FIXME: Use C++11 template aliases when migrating to C++11.
-     */
-    template<typename T>
-    struct Collection {
-        typedef std::vector<T> type;
-        typedef typename std::vector<T>::iterator iterator;
-        typedef typename std::vector<T>::const_iterator const_iterator;
-    };
-
     /** An asset data */
     typedef std::string Asset;
 
@@ -82,6 +71,19 @@ namespace snowcrash {
      */
     typedef KeyValuePair Header;
 
+    /**
+     * Default Container for collections.
+     *
+     *  FIXME: Use C++11 template aliases when migrating to C++11.
+     */
+
+    template<typename T>
+    struct Collection {
+        typedef std::vector<T> type;
+        typedef typename std::vector<T>::iterator iterator;
+        typedef typename std::vector<T>::const_iterator const_iterator;
+    };
+
     /** Metadata Collection */
     typedef Collection<Metadata>::type MetadataCollection;
 
@@ -90,6 +92,13 @@ namespace snowcrash {
 
     /** Collection of Parameter Values */
     typedef Collection<Value>::type Values;
+
+    /** Role of an element */
+    enum AssetRole {
+        UndefinedAssetRole = 0,   // Unknown
+        BodyExampleAssetRole,     // Body example for asset
+        BodySchemaAssetRole       // Body schema for asset
+    };
 
     /** Parameter Use flag */
     enum ParameterUse {
@@ -123,7 +132,11 @@ namespace snowcrash {
         Values values;
     };
 
-    /** Source Map of Collection of Parameters */
+    /** Parameter with MSON-like syntax */
+    struct MSONParameter : public Parameter {
+    };
+
+    /** Collection of Parameters */
     typedef Collection<Parameter>::type Parameters;
 
     /** Identifier(name) of Reference */
@@ -152,6 +165,10 @@ namespace snowcrash {
 
         struct ReferenceMetadata {
 
+            /** Constructor */
+            ReferenceMetadata(State state_ = StateUnresolved)
+            : state(state_) {}
+
             /** Markdown AST reference source node (for source map) */
             mdp::MarkdownNodeIterator node;
 
@@ -162,7 +179,21 @@ namespace snowcrash {
         /** Metadata for the reference */
         ReferenceMetadata meta;
     };
-    
+
+    /**
+     * Data Structure
+     */
+    struct DataStructure : public mson::NamedType {
+
+        /** Assignment operator for Named Type */
+        DataStructure& operator=(const mson::NamedType& rhs);
+    };
+
+    /**
+     *  Attributes
+     */
+    typedef DataStructure Attributes;
+
     /**
      *  Payload
      */
@@ -180,10 +211,13 @@ namespace snowcrash {
         /** Payload-specific Headers */
         Headers headers;
 
-        /** Body */
+        /** Payload-specific Attributes (THIS SHOULD NOT BE HERE - should be under content) */
+        Attributes attributes;
+
+        /** Body (THIS SHOULD NOT BE HERE - should be under content) */
         Asset body;
 
-        /** Schema */
+        /** Schema (THIS SHOULD NOT BE HERE - should be under content) */
         Asset schema;
 
         /** Reference */
@@ -232,6 +266,15 @@ namespace snowcrash {
     typedef Collection<TransactionExample>::type TransactionExamples;
 
     /**
+     *  Link relation
+     */
+    struct Relation {
+
+        /** String */
+        std::string str;
+    };
+
+    /**
      *  Action
      */
     struct Action {
@@ -247,6 +290,15 @@ namespace snowcrash {
 
         /** Action-specific Parameters */
         Parameters parameters;
+
+        /** Action-specific Attributes (THIS SHOULD NOT BE HERE - should be under content) */
+        Attributes attributes;
+
+        /** URI Template (THIS SHOULD NOT BE HERE - should be under element attributes) */
+        URITemplate uriTemplate;
+
+        /** Link Relation (THIS SHOULD NOT BE HERE - should be under element attributes) */
+        Relation relation;
 
         /**
          *  \brief Action-specific HTTP headers
@@ -286,6 +338,9 @@ namespace snowcrash {
         /** Model representing this Resource */
         ResourceModel model;
 
+        /** Resource-specific Attributes (THIS SHOULD NOT BE HERE - should be under content) */
+        Attributes attributes;
+
         /** Parameters */
         Parameters parameters;
 
@@ -310,23 +365,107 @@ namespace snowcrash {
     /** Collection of Resources */
     typedef Collection<Resource>::type Resources;
 
-    /**
-     *  Group of API Resources
-     */
-    struct ResourceGroup {
+    /** Forward declaration of Element */
+    struct Element;
 
-        /** A Group Name */
-        Name name;
+    /** Collection of elements */
+    typedef std::vector<Element> Elements;
 
-        /** Group description */
-        Description description;
+    /** Element */
+    struct Element {
 
-        /** Resources */
-        Resources resources;
+        /** Class of an element */
+        enum Class {
+            UndefinedElement = 0, // Unknown
+            CategoryElement,      // Group of other elements
+            CopyElement,          // Human readable text
+            AssetElement,         // Asset of API description
+            ResourceElement,      // Resource
+            DataStructureElement  // Data Structure
+        };
+
+        /** Attributes of an element */
+        struct Attributes {
+
+            /** Human readable name of the element */
+            Name name;
+        };
+
+        /** Content of an element */
+        struct Content {
+
+            /** EITHER Copy */
+            std::string copy;
+
+            /** OR Resource */
+            Resource resource;
+
+            /** OR Data Structure */
+            DataStructure dataStructure;
+
+            /** OR Collection of elements */
+            Elements& elements();
+            const Elements& elements() const;
+
+            /** Constructor */
+            Content();
+
+            /** Copy constructor */
+            Content(const Element::Content& rhs);
+
+            /** Assignment operator */
+            Content& operator=(const Element::Content& rhs);
+
+            /** Destructor */
+            ~Content();
+
+        private:
+            std::auto_ptr<Elements> m_elements;
+        };
+
+        /** Type of Category element (parser internal flag) */
+        enum Category {
+            UndefinedCategory = 0,     // Unknown
+            ResourceGroupCategory,     // Resource Group
+            DataStructureGroupCategory // Data Structure Group
+        };
+
+        /** Type of the element */
+        Element::Class element;
+
+        /** Attributes of the element */
+        Element::Attributes attributes;
+
+        /** Content of the element */
+        Element::Content content;
+
+        /** Type of Category element (to be used internally only) */
+        Element::Category category;
+
+        /** Constructor */
+        Element(const Element::Class& element_ = Element::UndefinedElement);
+
+        /** Copy constructor */
+        Element(const Element& rhs);
+
+        /** Assignment operator */
+        Element& operator=(const Element& rhs);
+
+        /** Destructor */
+        ~Element();
     };
 
-    /** Collection of Resource groups */
-    typedef Collection<ResourceGroup>::type ResourceGroups;
+    /**
+     *  Group of API Resources (Category Element)
+     */
+    struct ResourceGroup : public Element {
+    };
+
+    /**
+     * Group of Data Structures (Category Element)
+     */
+    struct DataStructureGroup : public Element {
+    };
 
     /**
      *  \brief API Blueprint AST
@@ -334,7 +473,7 @@ namespace snowcrash {
      *  This is top-level (or root if you prefer) of API Blueprint abstract syntax tree.
      *  Start reading a parsed API here.
      */
-    struct Blueprint {
+    struct Blueprint : public Element {
 
         /** Metadata */
         MetadataCollection metadata;
@@ -344,9 +483,6 @@ namespace snowcrash {
 
         /** An API Overview description */
         Description description;
-
-        /** The set of API Resource Groups */
-        ResourceGroups resourceGroups;
     };
 }
 

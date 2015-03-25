@@ -29,7 +29,7 @@ TEST_CASE("Warn about keywords in API name", "[warnings][#31]")
 //    REQUIRE(blueprint.report.warnings[0].code == AmbiguityWarning);
 
 //    REQUIRE(blueprint.name.empty());
-    REQUIRE(blueprint.node.resourceGroups.empty());
+    REQUIRE(blueprint.node.content.elements().empty());
 }
 
 TEST_CASE("Warn about brackets in URI template", "[warnings][#79]")

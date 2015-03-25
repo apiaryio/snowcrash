@@ -570,30 +570,32 @@ TEST_CASE("Parse named resource with lazy referencing", "[resource][model][issue
     REQUIRE(blueprint.node.name == "api name");
     REQUIRE(blueprint.node.description == "");
 
-    REQUIRE(blueprint.node.resourceGroups.size() == 1);
-    REQUIRE(blueprint.node.resourceGroups[0].resources.size() == 2);
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].uriTemplate == "/1");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].name == "Resource 1");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].name == "Resource 1");
+    REQUIRE(blueprint.node.content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 2);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).element == Element::ResourceElement);
 
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions.size() == 1);
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].method == "GET");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].name == "Retrieve");
+    Resource resource = blueprint.node.content.elements().at(0).content.elements().at(0).content.resource;
+    REQUIRE(resource.uriTemplate == "/1");
+    REQUIRE(resource.name == "Resource 1");
 
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples.size() == 1);
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body == "`resource model` 2\n");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers.size() == 1);
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[0].first == "Content-Type");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers[0].second == "text/plain");
+    REQUIRE(resource.actions.size() == 1);
+    REQUIRE(resource.actions[0].method == "GET");
+    REQUIRE(resource.actions[0].name == "Retrieve");
 
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].reference.id == "Resource 2");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].reference.type == Reference::ModelReference);
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].reference.meta.state == Reference::StateResolved);
+    REQUIRE(resource.actions[0].examples.size() == 1);
+    REQUIRE(resource.actions[0].examples[0].responses.size() == 1);
+    REQUIRE(resource.actions[0].examples[0].responses[0].name == "200");
+    REQUIRE(resource.actions[0].examples[0].responses[0].body == "`resource model` 2\n");
+    REQUIRE(resource.actions[0].examples[0].responses[0].headers.size() == 1);
+    REQUIRE(resource.actions[0].examples[0].responses[0].headers[0].first == "Content-Type");
+    REQUIRE(resource.actions[0].examples[0].responses[0].headers[0].second == "text/plain");
 
-    SourceMap<Resources> resourcesSourceMap = blueprint.sourceMap.resourceGroups.collection[0].resources;
-    SourceMap<TransactionExamples> examplesSourceMap = resourcesSourceMap.collection[0].actions.collection[0].examples;
+    REQUIRE(resource.actions[0].examples[0].responses[0].reference.id == "Resource 2");
+    REQUIRE(resource.actions[0].examples[0].responses[0].reference.type == Reference::ModelReference);
+    REQUIRE(resource.actions[0].examples[0].responses[0].reference.meta.state == Reference::StateResolved);
+
+    SourceMap<TransactionExamples> examplesSourceMap = blueprint.sourceMap.content.elements().collection[0].content.elements().collection[0].content.resource.actions.collection[0].examples;
 
     REQUIRE(examplesSourceMap.collection[0].responses.collection[0].headers.collection[0].sourceMap.size() == 1);
     REQUIRE(examplesSourceMap.collection[0].responses.collection[0].headers.collection[0].sourceMap[0].length == 20);
@@ -637,36 +639,40 @@ TEST_CASE("Parse named resource with lazy referencing with both response and req
     REQUIRE(blueprint.node.name == "API");
     REQUIRE(blueprint.node.description == "");
 
-    REQUIRE(blueprint.node.resourceGroups.size() == 1);
-    REQUIRE(blueprint.node.resourceGroups[0].resources.size() == 2);
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].uriTemplate == "/items");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].name == "Collection of Items");
+    REQUIRE(blueprint.node.content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 2);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).element == Element::ResourceElement);
 
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions.size() == 1);
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].method == "POST");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].name == "Create New Item");
+    Resource resource = blueprint.node.content.elements().at(0).content.elements().at(0).content.resource;
+    REQUIRE(resource.uriTemplate == "/items");
+    REQUIRE(resource.name == "Collection of Items");
 
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples.size() == 1);
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].requests.size() == 1);
+    REQUIRE(resource.actions.size() == 1);
+    REQUIRE(resource.actions[0].method == "POST");
+    REQUIRE(resource.actions[0].name == "Create New Item");
 
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].requests[0].name == "");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].requests[0].body == "{ item }\n");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].requests[0].headers.size() == 1);
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].requests[0].headers[0].first == "Content-Type");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].requests[0].headers[0].second == "application/json");
+    REQUIRE(resource.actions[0].examples.size() == 1);
+    REQUIRE(resource.actions[0].examples[0].requests.size() == 1);
 
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].requests[0].reference.id == "Item");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].requests[0].reference.type == Reference::ModelReference);
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].requests[0].reference.meta.state == Reference::StateResolved);
+    REQUIRE(resource.actions[0].examples[0].requests[0].name == "");
+    REQUIRE(resource.actions[0].examples[0].requests[0].body == "{ item }\n");
+    REQUIRE(resource.actions[0].examples[0].requests[0].headers.size() == 1);
+    REQUIRE(resource.actions[0].examples[0].requests[0].headers[0].first == "Content-Type");
+    REQUIRE(resource.actions[0].examples[0].requests[0].headers[0].second == "application/json");
 
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses.size() == 1);
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].name == "200");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].body == "[ { item 1 }, { item 2 } ]\n");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].headers.size() == 1);
+    REQUIRE(resource.actions[0].examples[0].requests[0].reference.id == "Item");
+    REQUIRE(resource.actions[0].examples[0].requests[0].reference.type == Reference::ModelReference);
+    REQUIRE(resource.actions[0].examples[0].requests[0].reference.meta.state == Reference::StateResolved);
 
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].reference.id == "Collection of Items");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].reference.type == Reference::ModelReference);
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].examples[0].responses[0].reference.meta.state == Reference::StateResolved);
+    REQUIRE(resource.actions[0].examples[0].responses.size() == 1);
+    REQUIRE(resource.actions[0].examples[0].responses[0].name == "200");
+    REQUIRE(resource.actions[0].examples[0].responses[0].body == "[ { item 1 }, { item 2 } ]\n");
+    REQUIRE(resource.actions[0].examples[0].responses[0].headers.size() == 1);
+
+    REQUIRE(resource.actions[0].examples[0].responses[0].reference.id == "Collection of Items");
+    REQUIRE(resource.actions[0].examples[0].responses[0].reference.type == Reference::ModelReference);
+    REQUIRE(resource.actions[0].examples[0].responses[0].reference.meta.state == Reference::StateResolved);
 }
 
 TEST_CASE("Expect to have a warning when 100 responce's reference has a body", "[resource][model]")
@@ -944,4 +950,150 @@ TEST_CASE("Body list item in description", "[resource][regression][#190]")
     REQUIRE(resource.sourceMap.actions.collection[0].description.sourceMap.size() == 1);
     REQUIRE(resource.sourceMap.actions.collection[0].description.sourceMap[0].location == 10);
     REQUIRE(resource.sourceMap.actions.collection[0].description.sourceMap[0].length == 34);
+}
+
+TEST_CASE("Parse resource attributes", "[resource]")
+{
+    mdp::ByteBuffer source = \
+    "# Coupons [/coupons]\n\n"\
+    "+ Attributes (array[Coupon])\n\n"\
+    "## List [GET]\n\n"\
+    "+ Response 200 (application/json)\n\n"\
+    "  + Attributes (Coupons)";
+
+    ParseResult<Resource> resource;
+    NamedTypes namedTypes;
+
+    NamedTypeHelper::build("Coupon", mson::ObjectBaseType, namedTypes);
+    NamedTypeHelper::build("Coupons", mson::ValueBaseType, namedTypes);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource, ExportSourcemapOption, Models(), NULL, namedTypes);
+
+    REQUIRE(resource.report.error.code == Error::OK);
+    REQUIRE(resource.report.warnings.empty());
+
+    REQUIRE(resource.node.name == "Coupons");
+    REQUIRE(resource.node.attributes.name.symbol.literal == "Coupons");
+    REQUIRE(resource.node.attributes.typeDefinition.typeSpecification.name.base == mson::ArrayTypeName);
+    REQUIRE(resource.node.attributes.typeDefinition.typeSpecification.nestedTypes.size() == 1);
+    REQUIRE(resource.node.attributes.typeDefinition.typeSpecification.nestedTypes[0].symbol.literal == "Coupon");
+
+    REQUIRE(resource.node.actions.size() == 1);
+    REQUIRE(resource.node.actions[0].examples.size() == 1);
+    REQUIRE(resource.node.actions[0].examples[0].responses.size() == 1);
+}
+
+TEST_CASE("Parse unnamed resource attributes", "[resource]")
+{
+    mdp::ByteBuffer source = \
+    "# /coupons\n\n"\
+    "+ Attributes (array[Coupon])\n\n"\
+    "## List [GET]\n\n"\
+    "+ Response 200 (application/json)\n\n"\
+    "  + Attributes (Coupons)";
+
+    ParseResult<Resource> resource;
+    NamedTypes namedTypes;
+
+    NamedTypeHelper::build("Coupon", mson::ObjectBaseType, namedTypes);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource, ExportSourcemapOption, Models(), NULL, namedTypes);
+
+    REQUIRE(resource.report.error.code == Error::OK);
+    REQUIRE(resource.report.warnings.size() == 1); // Unknown type 'Coupons'
+
+    REQUIRE(resource.node.name.empty());
+    REQUIRE(resource.node.attributes.name.empty());
+    REQUIRE(resource.node.attributes.typeDefinition.typeSpecification.name.base == mson::ArrayTypeName);
+    REQUIRE(resource.node.attributes.typeDefinition.typeSpecification.nestedTypes.size() == 1);
+    REQUIRE(resource.node.attributes.typeDefinition.typeSpecification.nestedTypes[0].symbol.literal == "Coupon");
+
+    REQUIRE(resource.node.actions.size() == 1);
+    REQUIRE(resource.node.actions[0].examples.size() == 1);
+    REQUIRE(resource.node.actions[0].examples[0].responses.size() == 1);
+}
+
+TEST_CASE("Parse inline action", "[resource]")
+{
+    mdp::ByteBuffer source = \
+    "# Task [/task/{id}]\n"\
+    "+ Parameters\n"\
+    "    + id (string)\n"\
+    "\n"\
+    "## Retrieve [GET]\n"\
+    "+ response 200 (application/json)\n"\
+    "\n"\
+    "        {}\n"\
+    "\n"\
+    "## List all tasks [GET /tasks]\n"\
+    "+ response 200 (application/json)\n"\
+    "\n"\
+    "        {}";
+
+    ParseResult<Resource> resource;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource, ExportSourcemapOption);
+
+    REQUIRE(resource.report.error.code == Error::OK);
+    REQUIRE(resource.report.warnings.empty());
+
+    REQUIRE(resource.node.actions.size() == 2);
+    REQUIRE(resource.node.actions[0].name == "Retrieve");
+    REQUIRE(resource.node.actions[0].method == "GET");
+    REQUIRE(resource.node.actions[0].uriTemplate.empty());
+    REQUIRE(resource.node.actions[1].name == "List all tasks");
+    REQUIRE(resource.node.actions[1].method == "GET");
+    REQUIRE(resource.node.actions[1].uriTemplate == "/tasks");
+
+    REQUIRE(resource.sourceMap.actions.collection.size() == 2);
+    SourceMapHelper::check(resource.sourceMap.actions.collection[0].method.sourceMap, 52, 18);
+    REQUIRE(resource.sourceMap.actions.collection[0].uriTemplate.sourceMap.empty());
+    SourceMapHelper::check(resource.sourceMap.actions.collection[1].method.sourceMap, 117, 31);
+    SourceMapHelper::check(resource.sourceMap.actions.collection[1].uriTemplate.sourceMap, 117, 31);
+}
+
+TEST_CASE("Parameters for action should consider action's uri template", "[resource]")
+{
+    mdp::ByteBuffer source = \
+    "## Users [/users]\n"\
+    "\n"\
+    "### Create [POST]\n"\
+    "\n"\
+    "+ Response 204\n"\
+    "\n"\
+    "### Add a friend [POST /users/{username}/friends/{friend}]\n"\
+    "\n"\
+    "+ Parameters\n"\
+    "    + username\n"\
+    "    + friend\n"\
+    "\n"\
+    "+ Response 204";
+
+    ParseResult<Resource> resource;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource, ExportSourcemapOption);
+
+    REQUIRE(resource.report.error.code == Error::OK);
+    REQUIRE(resource.report.warnings.empty());
+}
+
+TEST_CASE("Relation identifiers should be unique for a resource", "[resource]")
+{
+    mdp::ByteBuffer source = \
+    "## Users [/users]\n"\
+    "\n"\
+    "### Create [POST]\n"\
+    "+ Relation: create\n"\
+    "+ Response 204\n"\
+    "\n"\
+    "### Delte [DELETE]\n"\
+    "+ Relation: create\n"\
+    "+ Response 204";
+
+    ParseResult<Resource> resource;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource, ExportSourcemapOption);
+
+    REQUIRE(resource.report.error.code == Error::OK);
+    REQUIRE(resource.report.warnings.size() == 1);
+    REQUIRE(resource.report.warnings[0].code == DuplicateWarning);
+
+    REQUIRE(resource.node.actions.size() == 2);
+    REQUIRE(resource.node.actions[0].relation.str == "create");
+    REQUIRE(resource.node.actions[1].relation.str == "create");
 }

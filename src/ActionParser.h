@@ -13,6 +13,7 @@
 #include "SectionParser.h"
 #include "ParametersParser.h"
 #include "PayloadParser.h"
+#include "RelationParser.h"
 #include "RegexMatch.h"
 
 namespace snowcrash {
@@ -21,7 +22,7 @@ namespace snowcrash {
     const char* const ActionHeaderRegex = "^[[:blank:]]*" HTTP_REQUEST_METHOD "[[:blank:]]*" URI_TEMPLATE "?$";
 
     /** Named action matching regex */
-    const char* const NamedActionHeaderRegex = "^[[:blank:]]*" SYMBOL_IDENTIFIER "\\[" HTTP_REQUEST_METHOD "]$";
+    const char* const NamedActionHeaderRegex = "^[[:blank:]]*" SYMBOL_IDENTIFIER "\\[" HTTP_REQUEST_METHOD "[[:blank:]]*" URI_TEMPLATE "?]$";
 
     /** Internal type alias for Collection iterator of Action */
     typedef Collection<Action>::const_iterator ActionIterator;
@@ -46,7 +47,7 @@ namespace snowcrash {
                                                      SectionLayout& layout,
                                                      const ParseResultRef<Action>& out) {
 
-            actionHTTPMethodAndName(node, out.node.method, out.node.name);
+            actionHTTPMethodAndName(node, out.node.method, out.node.name, out.node.uriTemplate);
             TrimString(out.node.name);
 
             mdp::ByteBuffer remainingContent;
@@ -59,6 +60,10 @@ namespace snowcrash {
 
                 if (!out.node.name.empty()) {
                     out.sourceMap.name.sourceMap = node->sourceMap;
+                }
+
+                if (!out.node.uriTemplate.empty()) {
+                    out.sourceMap.uriTemplate.sourceMap = node->sourceMap;
                 }
             }
 
@@ -85,6 +90,12 @@ namespace snowcrash {
             mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
 
             switch (sectionType) {
+                case RelationSectionType:
+                {
+                    ParseResultRef<Relation> relation(out.report, out.node.relation, out.sourceMap.relation);
+                    return RelationParser::parse(node, siblings, pd, relation);
+                }
+
                 case ParametersSectionType:
                 {
                     ParseResultRef<Parameters> parameters(out.report, out.node.parameters, out.sourceMap.parameters);
@@ -153,6 +164,12 @@ namespace snowcrash {
                 {
                     ParseResultRef<Headers> headers(out.report, out.node.headers, out.sourceMap.headers);
                     return SectionProcessor<Action>::handleDeprecatedHeaders(node, siblings, pd, headers);
+                }
+
+                case AttributesSectionType:
+                {
+                    ParseResultRef<Attributes> attributes(out.report, out.node.attributes, out.sourceMap.attributes);
+                    return AttributesParser::parse(node, siblings, pd, attributes);
                 }
 
                 default:
@@ -253,6 +270,13 @@ namespace snowcrash {
 
             SectionType nestedType = UndefinedSectionType;
 
+            // Check if relation section
+            nestedType = SectionProcessor<Relation>::sectionType(node);
+
+            if (nestedType != UndefinedSectionType) {
+                return nestedType;
+            }
+
             // Check if parameters section
             nestedType = SectionProcessor<Parameters>::sectionType(node);
 
@@ -263,7 +287,14 @@ namespace snowcrash {
             // Check if headers section
             nestedType = SectionProcessor<Headers>::sectionType(node);
 
-            if (nestedType == HeadersSectionType) {
+            if (nestedType != UndefinedSectionType) {
+                return nestedType;
+            }
+
+            // Check if attributes section
+            nestedType = SectionProcessor<Attributes>::sectionType(node);
+
+            if (nestedType != UndefinedSectionType) {
                 return nestedType;
             }
 
@@ -285,6 +316,7 @@ namespace snowcrash {
             nested.push_back(ResponseSectionType);
             nested.push_back(RequestBodySectionType);
             nested.push_back(RequestSectionType);
+            nested.push_back(RelationSectionType);
 
             types = SectionProcessor<Payload>::nestedSectionTypes();
             nested.insert(nested.end(), types.begin(), types.end());
@@ -450,6 +482,7 @@ namespace snowcrash {
             }
 
             CaptureGroups captureGroups;
+
             if (RegexCapture(subject, ActionHeaderRegex, captureGroups, 3)) {
 
                 if (captureGroups[2].empty()) {
@@ -466,7 +499,8 @@ namespace snowcrash {
         /** \return HTTP request method and name of an action */
         static void actionHTTPMethodAndName(const MarkdownNodeIterator& node,
                                             mdp::ByteBuffer& method,
-                                            mdp::ByteBuffer& name) {
+                                            mdp::ByteBuffer& name,
+                                            mdp::ByteBuffer& uriTemplate) {
 
             CaptureGroups captureGroups;
             mdp::ByteBuffer subject, remaining;
@@ -476,9 +510,10 @@ namespace snowcrash {
 
             if (RegexCapture(subject, ActionHeaderRegex, captureGroups, 3)) {
                 method = captureGroups[1];
-            } else if (RegexCapture(subject, NamedActionHeaderRegex, captureGroups, 3)) {
+            } else if (RegexCapture(subject, NamedActionHeaderRegex, captureGroups, 4)) {
                 name = captureGroups[1];
                 method = captureGroups[2];
+                uriTemplate = captureGroups[3];
             }
 
             return;
@@ -490,7 +525,16 @@ namespace snowcrash {
 
             return std::find_if(actions.begin(),
                                 actions.end(),
-                                std::bind2nd(MatchAction<Action>(), action));
+                                std::bind2nd(MatchAction(), action));
+        }
+
+        /** Finds a relation identifier inside an actions collection */
+        static ActionIterator findRelation(const Actions& actions,
+                                           const Relation& relation) {
+
+            return std::find_if(actions.begin(),
+                                actions.end(),
+                                std::bind2nd(MatchRelation(), relation));
         }
     };
 

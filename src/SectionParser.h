@@ -10,7 +10,7 @@
 #define SNOWCRASH_SECTIONPARSER_H
 
 #include <stdexcept>
-#include "SectionProcessor.h"
+#include "SignatureSectionProcessor.h"
 
 #define ADAPTER_MISMATCH_ERR std::logic_error("mismatched adapter and node type")
 
@@ -106,6 +106,8 @@ namespace snowcrash {
             MarkdownNodeIterator lastCur = cur;
 
             SectionType lastSectionType = UndefinedSectionType;
+
+            SectionProcessor<T>::preprocessNestedSections(node, collection, pd, out);
 
             // Nested sections
             while(cur != collection.end()) {

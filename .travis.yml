@@ -3,7 +3,7 @@ compiler:
   - gcc
   - clang
 script:
-  - ./configure --include-integration-tests
+  - ./configure
   - make test
 before_install:
   - git submodule update --init --recursive

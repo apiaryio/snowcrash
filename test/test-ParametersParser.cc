@@ -64,7 +64,7 @@ TEST_CASE("Parse ilegal parameter", "[parameters]")
 {
     mdp::ByteBuffer source = \
     "+ Parameters\n"\
-    "    + i:legal\n\n";
+    "    + i;legal\n\n";
 
     ParseResult<Parameters> parameters;
     SectionParserHelper<Parameters, ParametersParser>::parse(source, ParametersSectionType, parameters);
@@ -83,7 +83,7 @@ TEST_CASE("Parse illegal parameter among legal ones", "[parameters]")
     mdp::ByteBuffer source = \
     "+ Parameters\n"\
     "    + OK_1\n"\
-    "    + i:legal\n"\
+    "    + i;legal\n"\
     "    + OK-2\n";
 
     ParseResult<Parameters> parameters;
@@ -271,6 +271,28 @@ TEST_CASE("Parentheses in parameter example ", "[parameters][issue][#109]")
     REQUIRE(parameters.node[0].description == "test");
 }
 
+TEST_CASE("Parse parameters when it has parameter of both old and new syntax", "[parameter]")
+{
+    mdp::ByteBuffer source = \
+    "+ Parameters\n"\
+    "    + id (optional, string) ... Hello\n"\
+    "    + percent_off: 25 (required, number)";
+
+    ParseResult<Parameters> parameters;
+    SectionParserHelper<Parameters, ParametersParser>::parse(source, ParametersSectionType, parameters);
+
+    REQUIRE(parameters.report.error.code == Error::OK);
+    REQUIRE(parameters.report.warnings.empty());
+
+    REQUIRE(parameters.node.size() == 2);
+    REQUIRE(parameters.node[0].name == "id");
+    REQUIRE(parameters.node[0].type == "string");
+    REQUIRE(parameters.node[0].description == "Hello");
+    REQUIRE(parameters.node[1].name == "percent_off");
+    REQUIRE(parameters.node[1].type == "number");
+    REQUIRE(parameters.node[1].exampleValue == "25");
+}
+
 TEST_CASE("Percentage encoded characters in parameter name ", "[parameters][percentageencoding][issue][#107]")
 {
     // Blueprint in question:
@@ -295,15 +317,19 @@ TEST_CASE("Percentage encoded characters in parameter name ", "[parameters][perc
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
 
-    REQUIRE(blueprint.node.resourceGroups.size() == 1);
-    REQUIRE(blueprint.node.resourceGroups[0].resources.size() == 1);
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions.size() == 1);
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].description.empty());
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].parameters.size() == 1);
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].parameters[0].name == "id%5b%5d");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].parameters[0].type == "oData");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].parameters[0].exampleValue == "substringof('homer', id)");
-    REQUIRE(blueprint.node.resourceGroups[0].resources[0].actions[0].parameters[0].description == "test");
+    REQUIRE(blueprint.node.content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).element == Element::ResourceElement);
+
+    Resource resource = blueprint.node.content.elements().at(0).content.elements().at(0).content.resource;
+    REQUIRE(resource.actions.size() == 1);
+    REQUIRE(resource.actions[0].description.empty());
+    REQUIRE(resource.actions[0].parameters.size() == 1);
+    REQUIRE(resource.actions[0].parameters[0].name == "id%5b%5d");
+    REQUIRE(resource.actions[0].parameters[0].type == "oData");
+    REQUIRE(resource.actions[0].parameters[0].exampleValue == "substringof('homer', id)");
+    REQUIRE(resource.actions[0].parameters[0].description == "test");
 }
 
 TEST_CASE("Invalid percentage encoded characters in parameter name ", "[invalid][parameters][percentageencoding][issue][#107]")

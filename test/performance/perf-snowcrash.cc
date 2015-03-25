@@ -9,7 +9,6 @@
 #include <sstream>
 #include <fstream>
 #include <cmath>
-#include "cmdline.h"
 #include "snowcrash.h"
 
 #if defined (_MSC_VER)
@@ -113,30 +112,35 @@ static int testfunc(const std::string& input, double& total, double& mean, doubl
 	return resultCode;
 }
 
+void help() {
+    std::cout << "usage: perf-snowcrash [options] ... <input file>" << std::endl << std::endl;
+    std::cout << "API Blueprint Parser Performance Test Tool" << std::endl << std::endl;
+    std::cout << "options:" << std::endl << std::endl;
+    std::cout << "  -h, --help    display this help message" << std::endl;
+    exit(0);
+}
+
+bool helpRequest(const std::string &arg) {
+    return arg == "-h" || arg == "--help";
+}
+
 int main(int argc, const char *argv[])
 {
     // FIXME: Intstrumetns helper
     //::sleep(20);
-    
-    // Setup commandline Argument Parser
-    cmdline::parser argumentParser;
-    argumentParser.set_program_name("perf-snowcrash");
-    std::stringstream ss;
-    ss << "<input file>\n\n";
-    ss << "API Blueprint Parser Performance Test Tool\n";
 
-    argumentParser.footer(ss.str());
-    argumentParser.add("help", 'h', "display this help message");
-
-    argumentParser.parse_check(argc, argv);
-    if (argumentParser.rest().size() != 1) {
+    if (argc != 2) {
         std::cerr << "one input file expected\n";
         exit(EXIT_FAILURE);
+    }
+
+    if (helpRequest(argv[1])) {
+        help();
     }
     
     // Read fixture file
     std::ifstream inputFileStream;
-    std::string inputFileName = argumentParser.rest().front();
+    std::string inputFileName = argv[1];
     inputFileStream.open(inputFileName.c_str());
     if (!inputFileStream.is_open()) {
         std::cerr << "fatal: unable to open input file '" << inputFileName << "'\n";

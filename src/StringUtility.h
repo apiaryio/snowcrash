@@ -8,8 +8,8 @@
 //  Credits:
 //  http://stackoverflow.com/questions/216823/whats-the-best-way-to-trim-stdstring
 
-#ifndef SNOWCRAH_TRIMSTRING_H
-#define SNOWCRAH_TRIMSTRING_H
+#ifndef SNOWCRAH_STRINGUTILITY_H
+#define SNOWCRAH_STRINGUTILITY_H
 
 #include <algorithm>
 #include <functional>
@@ -18,6 +18,8 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include "RegexMatch.h"
+#include "MarkdownParser.h"
 
 namespace snowcrash {
 
@@ -125,7 +127,6 @@ namespace snowcrash {
         return elem.front();
     }
 
-
     /**
      *  \brief  compare equality  - allow compare diferent types
      *
@@ -151,9 +152,9 @@ namespace snowcrash {
     };
 
     /**
-     *  \brief  compare containers equality 
+     *  \brief  compare containers equality
      *
-     *  \requirements 
+     *  \requirements
      *    - both containers must support methods ::length(), ::begin(), ::end()
      *    - both containers must be iterable
      *    - both containers must contain comparable types
@@ -171,7 +172,7 @@ namespace snowcrash {
         }
         return std::equal(arg1.begin(), arg1.end(), arg2.begin(), predicate);
     }
-    
+
     template <typename T>
     struct Equal : std::binary_function<T, T, bool> {
         bool operator()(const T& left, const T& right) const {
@@ -186,6 +187,102 @@ namespace snowcrash {
         }
     };
 
+    /**
+     * \brief Retrieve the string enclosed by the given matching escaping characters
+     *
+     *        Please note that the subject will be stripped of the escaped string
+     *        and the characters before it
+     *
+     * \param subject String that needs to be parsed
+     * \param begin Character representing the beginning of the escaped string
+     * \param stripEscapeChars If true, strip the escape characters from the result string
+     *
+     * \return Returns the escaped string
+     *
+     * \example (begin = 1, subject = "a```b```cd") ----> (return = "```b```", subject = "cd")
+     */
+    inline std::string RetrieveEscaped(std::string& subject,
+                                       size_t begin = 0,
+                                       const bool stripEscapeChars = false) {
+
+        size_t levels = 0;
+        const char escapeChar = subject[begin];
+
+        // Get the level of the backticks
+        while (subject[levels + begin] == escapeChar) {
+            levels++;
+        }
+
+        std::string borderChars = subject.substr(begin, levels);
+        size_t end = subject.substr(levels + begin).find(borderChars);
+
+        if (end == std::string::npos) {
+            return "";
+        }
+
+        if (stripEscapeChars) {
+            begin = begin + levels;
+            end = end + begin;
+        } else {
+            end = end + (2 * levels) + begin;
+        }
+
+        std::string escapedString = subject.substr(begin, end - begin);
+        subject = subject.substr(end);
+
+        return escapedString;
+    }
+
+    /**
+     * \brief Strip the enclosing backticks and return the string in the middle.
+     *
+     *        If there are no matching enclosing bacticks, return the whole string.
+     *
+     * \param subject String that needs to be stripped of enclosing backticks
+     *
+     * \return Substring that has been stripped of enclosing backticks
+     */
+    inline std::string StripBackticks(std::string& subject) {
+
+        // Check if first and last chars are backticks
+        if (subject[0] != '`' ||
+            subject[subject.length() - 1] != '`') {
+
+            return subject;
+        }
+
+        std::string escapedString = RetrieveEscaped(subject, 0, true);
+
+        if (escapedString.empty()) {
+            return subject;
+        }
+
+        TrimString(escapedString);
+
+        return escapedString;
+    }
+
+    /**
+     * \brief If the given string is a markdown link, return the string which is being linked
+     *
+     *        If there is no link, return the whole string
+     *
+     * \param subject String which is a markdown link
+     *
+     * \return Substring which is inside the first [] of the markdown link
+     */
+    inline std::string StripMarkdownLink(const std::string& subject) {
+
+        // Check if markdown link
+        if (subject[0] != mdp::MarkdownBeginReference) {
+            return subject;
+        }
+
+        std::string linkedString = RegexCaptureFirst(subject, mdp::MarkdownLinkRegex);
+        TrimString(linkedString);
+
+        return linkedString;
+    }
 }
 
 #endif
