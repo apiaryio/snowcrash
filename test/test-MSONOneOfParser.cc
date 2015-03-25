@@ -46,10 +46,6 @@ TEST_CASE("OneOf be tolerant on parsing input","[mson][one_of]")
 
     sectionType = SectionProcessor<mson::OneOf>::sectionType(markdownAST.children().begin());
     REQUIRE(sectionType == MSONOneOfSectionType);
-
-    markdownAST.children().front().children().front().text = "One of";
-    sectionType = SectionProcessor<mson::OneOf>::sectionType(markdownAST.children().begin());
-    REQUIRE(sectionType == MSONOneOfSectionType);
 }
 
 TEST_CASE("Parse canonical mson one of", "[mson][one_of]")

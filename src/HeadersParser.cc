@@ -55,7 +55,7 @@ bool HeaderNameTokenChecker::operator()() const {
 std::string HeaderNameTokenChecker::getMessage() const {
 
     std::stringstream ss;
-    ss << "HTTP header field name contain illegal character '" 
+    ss << "HTTP header field name contain illegal character '"
         << *findNonValidCharInHeaderName(headerName)
         << "'";
 
@@ -74,7 +74,7 @@ std::string ColonPresentedChecker::getMessage() const {
 
 bool HeadersDuplicateChecker::operator()() const {
 
-    return findHeader(headers, header) == headers.end() || 
+    return findHeader(headers, header) == headers.end() ||
         isAllowedMultipleDefinition(header);
 }
 

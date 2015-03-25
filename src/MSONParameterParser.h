@@ -17,6 +17,12 @@ using namespace scpl;
 
 namespace snowcrash {
 
+    /* We only allow at the maximum 2 attributes for new syntax parameters */
+    const size_t MAX_ATTRIBUTES = 2;
+
+    /* Type wrapped by enum matching regex */
+    const char* const EnumRegex = "^enum\\[([^][]+)]$";
+
     /**
      * MSON Parameter Section Processor
      */
@@ -124,7 +130,7 @@ namespace snowcrash {
 
                     break;
                 }
-                    
+
                 default:
                     break;
             }
@@ -162,7 +168,7 @@ namespace snowcrash {
 
             out.node.use = UndefinedParameterUse;
 
-            if (attributes.size() <= 2) {
+            if (attributes.size() <= MAX_ATTRIBUTES) {
                 size_t i = 0;
                 bool definedUse = false;
 
@@ -177,8 +183,13 @@ namespace snowcrash {
                         definedUse = true;
                     }
                     else {
-                        if (RegexMatch(attributes[i], "^enum\\[[^][]+]$")) {
-                            out.node.type = attributes[i].substr(5, attributes[i].length() - 6);
+
+                        // Retrieve the type which is wrapped by enum[]
+                        std::string typeInsideEnum = RegexCaptureFirst(attributes[i], EnumRegex);
+                        TrimString(typeInsideEnum);
+
+                        if (!typeInsideEnum.empty()) {
+                            out.node.type = typeInsideEnum;
                         }
                         else {
                             out.node.type = attributes[i];

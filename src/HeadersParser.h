@@ -30,8 +30,8 @@ namespace snowcrash {
         /** intended to generate warning mesage */
         virtual std::string getMessage() const = 0;
 
-        /** 
-         * intended to invoke validation 
+        /**
+         * intended to invoke validation
          * \return true if validation is ok
          *
          * data for validation you can inject into functor via c-tor
@@ -69,8 +69,8 @@ namespace snowcrash {
         const Header& header;
         const Headers& headers;
 
-        explicit HeadersDuplicateChecker(const Header& header, 
-                                         const Headers& headers) 
+        explicit HeadersDuplicateChecker(const Header& header,
+                                         const Headers& headers)
             : header(header), headers(headers) {}
 
         virtual bool operator()() const;
@@ -83,7 +83,7 @@ namespace snowcrash {
 
         const Header& header;
 
-        explicit HeaderValuePresentedChecker(const Header& header) 
+        explicit HeaderValuePresentedChecker(const Header& header)
             : header(header) {}
 
         virtual bool operator()() const;
@@ -97,8 +97,8 @@ namespace snowcrash {
         const ParseResultRef<Headers>& out;
         mdp::CharactersRangeSet sourceMap;
 
-        HeaderParserValidator(const ParseResultRef<Headers>& out, 
-                              mdp::CharactersRangeSet sourceMap) 
+        HeaderParserValidator(const ParseResultRef<Headers>& out,
+                              mdp::CharactersRangeSet sourceMap)
             : out(out), sourceMap(sourceMap) {}
 
         bool operator()(const ValidateFunctorBase& rule);
@@ -179,7 +179,7 @@ namespace snowcrash {
             }
         }
 
-        /** 
+        /**
          * Parse individual line of header
          * \return true if valid header definition
          *
@@ -190,8 +190,8 @@ namespace snowcrash {
          * \param out - "report" member can receive warning while checking validity
          * \param sourceMap - just contain source mapping for warning report
          */
-        static bool parseHeaderLine(const mdp::ByteBuffer& line, 
-                                    Header& header, 
+        static bool parseHeaderLine(const mdp::ByteBuffer& line,
+                                    Header& header,
                                     const ParseResultRef<Headers>& out,
                                     const mdp::CharactersRangeSet sourceMap) {
 
@@ -207,7 +207,7 @@ namespace snowcrash {
             TrimString(header.second);
 
             HeaderParserValidator validate(out, sourceMap);
-        
+
             validate(HeaderNameTokenChecker(header.first));
             validate(ColonPresentedChecker(parts));
             validate(HeadersDuplicateChecker(header, out.node));
