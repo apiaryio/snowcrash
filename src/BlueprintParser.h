@@ -357,7 +357,7 @@ namespace snowcrash {
             else if (!typeDefinition.typeSpecification.name.symbol.literal.empty() &&
                      !typeDefinition.typeSpecification.name.symbol.variable) {
 
-                pd.namedTypeInheritanceTable[identifier] = typeDefinition.typeSpecification.name.symbol.literal;
+                pd.namedTypeInheritanceTable[identifier] = std::make_pair(typeDefinition.typeSpecification.name.symbol.literal, node->sourceMap);
             }
             else if (typeDefinition.typeSpecification.name.empty()) {
 
@@ -382,7 +382,7 @@ namespace snowcrash {
                  it != pd.namedTypeInheritanceTable.end();
                  it++) {
 
-                resolveNamedTypeTableEntry(pd, it->first, it->second, report);
+                resolveNamedTypeTableEntry(pd, it->first, it->second.first, it->second.second, report);
             }
         }
 
@@ -397,6 +397,7 @@ namespace snowcrash {
         static void resolveNamedTypeTableEntry(SectionParserData& pd,
                                                const mson::Literal& subType,
                                                const mson::Literal& superType,
+                                               const mdp::BytesRangeSet& nodeSourceMap,
                                                Report& report) {
 
             mson::BaseType baseType;
@@ -423,12 +424,13 @@ namespace snowcrash {
                     std::stringstream ss;
                     ss << "unable to find named type '" << superType << "' in the whole document";
 
-                    report.error = Error(ss.str(), BusinessError, mdp::CharactersRangeSet());
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(nodeSourceMap, pd.sourceData);
+                    report.error = Error(ss.str(), BusinessError, sourceMap);
                     return;
                 }
 
                 // Recursively, try to get a base type for the current super type
-                resolveNamedTypeTableEntry(pd, superType, inhIt->second, report);
+                resolveNamedTypeTableEntry(pd, superType, inhIt->second.first, inhIt->second.second, report);
 
                 if (report.error.code != Error::OK) {
                     return;

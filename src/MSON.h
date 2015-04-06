@@ -54,7 +54,7 @@ namespace mson {
     typedef std::map<Literal, BaseType> NamedTypeBaseTable;
 
     /** Named Types inheritance table */
-    typedef std::map<Literal, Literal> NamedTypeInheritanceTable;
+    typedef std::map<Literal, std::pair<Literal, mdp::BytesRangeSet> > NamedTypeInheritanceTable;
 
     /** A simple or actual value */
     struct Value {
