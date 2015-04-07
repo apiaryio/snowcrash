@@ -584,7 +584,7 @@ TEST_CASE("Parsing blueprint with mson data structures", "[blueprint]")
 
     inheritanceIt = pd.namedTypeInheritanceTable.find("Plan");
     REQUIRE(inheritanceIt != pd.namedTypeInheritanceTable.end());
-    REQUIRE(inheritanceIt->second == "Plan Base");
+    REQUIRE(inheritanceIt->second.first == "Plan Base");
 
     REQUIRE(blueprint.node.content.elements().size() == 3);
     REQUIRE(blueprint.node.content.elements().at(2).element == Element::CategoryElement);
@@ -681,4 +681,5 @@ TEST_CASE("Report error when coming across a super type reference to non existen
     SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
     REQUIRE(blueprint.report.error.code != Error::OK);
+    SourceMapHelper::check(blueprint.report.error.location, 62, 27);
 }
