@@ -683,3 +683,18 @@ TEST_CASE("Report error when coming across a super type reference to non existen
     REQUIRE(blueprint.report.error.code != Error::OK);
     SourceMapHelper::check(blueprint.report.error.location, 62, 27);
 }
+
+TEST_CASE("Report error when a Data Structure inherits from itself", "[blueprint]")
+{
+    mdp::ByteBuffer source = \
+    "# Data Structures\n"\
+    "\n"\
+    "## B (B)\n"\
+    "+ id (string)\n";
+
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
+
+    REQUIRE(blueprint.report.error.code != Error::OK);
+    SourceMapHelper::check(blueprint.report.error.location, 19, 9);
+}

@@ -417,12 +417,13 @@ namespace snowcrash {
                 // Try to get the super type of the current super type
                 mson::NamedTypeInheritanceTable::iterator inhIt = pd.namedTypeInheritanceTable.find(superType);
 
-                if (inhIt == pd.namedTypeInheritanceTable.end()) {
+                // Check for recursive MSON definitions
+                if (inhIt == pd.namedTypeInheritanceTable.end() || superType == inhIt->second.first) {
 
                     // We cannot find the super type in inheritance table at all
                     // and there is not base type table entry for it, so, the blueprint is wrong
                     std::stringstream ss;
-                    ss << "unable to find named type '" << superType << "' in the whole document";
+                    ss << "base type '" << superType << "' is not defined in the document";
 
                     mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(nodeSourceMap, pd.sourceData);
                     report.error = Error(ss.str(), BusinessError, sourceMap);
