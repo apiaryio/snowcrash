@@ -76,11 +76,11 @@ int snowcrash::parse(const mdp::ByteBuffer& source,
 
         std::stringstream ss;
         ss << "parser exception: '" << e.what() << "'";
-        out.report.error = Error(ss.str(), 1);
+        out.report.error = Error(ss.str(), ApplicationError);
     }
     catch (...) {
 
-        out.report.error = Error("parser exception has occured", 1);
+        out.report.error = Error("parser exception has occured", ApplicationError);
     }
 
     return out.report.error.code;

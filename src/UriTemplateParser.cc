@@ -188,7 +188,7 @@ void URITemplateParser::parse(const URITemplate& uri, const mdp::CharactersRange
         }
     }
     else{
-        result.report.error = Error("Failed to parse URI Template", URIWarning);
+        result.report.error = Error("Failed to parse URI Template", ApplicationError);
     }
 
 }

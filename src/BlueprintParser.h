@@ -9,6 +9,7 @@
 #ifndef SNOWCRASH_BLUEPRINTPARSER_H
 #define SNOWCRASH_BLUEPRINTPARSER_H
 
+#include <set>
 #include "ResourceParser.h"
 #include "ResourceGroupParser.h"
 #include "DataStructureGroupParser.h"
@@ -284,16 +285,14 @@ namespace snowcrash {
 
                 // ERR: No API name specified
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                out.report.error = Error(ExpectedAPINameMessage,
-                                         BusinessError,
-                                         sourceMap);
+                out.report.error = Error(ExpectedAPINameMessage, BusinessError, sourceMap);
 
             }
             else if (!out.node.description.empty()) {
+
+                // WARN: No API name specified
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                out.report.warnings.push_back(Warning(ExpectedAPINameMessage,
-                                                      APINameWarning,
-                                                      sourceMap));
+                out.report.warnings.push_back(Warning(ExpectedAPINameMessage, APINameWarning, sourceMap));
             }
         }
 
@@ -343,10 +342,18 @@ namespace snowcrash {
                 identifier = signature.identifier;
             }
 
-            // If named type already exists, do nothing
+            // If named type already exists, return error
             mson::NamedTypeBaseTable::iterator it = pd.namedTypeBaseTable.find(identifier);
+            mson::NamedTypeInheritanceTable::iterator inhIt = pd.namedTypeInheritanceTable.find(identifier);
 
-            if (it != pd.namedTypeBaseTable.end()) {
+            if (it != pd.namedTypeBaseTable.end() || inhIt != pd.namedTypeInheritanceTable.end()) {
+
+                // ERR: Named type is defined more than once
+                std::stringstream ss;
+                ss << "named type '" << identifier << "' is defined more than once";
+
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                report.error = Error(ss.str(), MSONError, sourceMap);
                 return;
             }
 
@@ -382,7 +389,8 @@ namespace snowcrash {
                  it != pd.namedTypeInheritanceTable.end();
                  it++) {
 
-                resolveNamedTypeTableEntry(pd, it->first, it->second.first, it->second.second, report);
+                std::set<mson::Literal> inheritanceNodes;
+                resolveNamedTypeTableEntry(pd, it->first, it->second.first, it->second.second, report, inheritanceNodes);
             }
         }
 
@@ -393,15 +401,19 @@ namespace snowcrash {
          * \param subType The sub named type between the two
          * \param superType The super named type between the two
          * \param report Parse report
+         * \param inheritanceNodes Set containing named types which have been checked for inheritance in current cycle
          */
         static void resolveNamedTypeTableEntry(SectionParserData& pd,
                                                const mson::Literal& subType,
                                                const mson::Literal& superType,
                                                const mdp::BytesRangeSet& nodeSourceMap,
-                                               Report& report) {
+                                               Report& report,
+                                               std::set<mson::Literal> inheritanceNodes) {
 
             mson::BaseType baseType;
             mson::NamedTypeBaseTable::iterator it = pd.namedTypeBaseTable.find(subType);
+
+            inheritanceNodes.insert(superType);
 
             // If the base table entry is already filled, nothing else to do
             if (it != pd.namedTypeBaseTable.end()) {
@@ -417,20 +429,21 @@ namespace snowcrash {
                 // Try to get the super type of the current super type
                 mson::NamedTypeInheritanceTable::iterator inhIt = pd.namedTypeInheritanceTable.find(superType);
 
-                if (inhIt == pd.namedTypeInheritanceTable.end()) {
+                // Check for recursive MSON definitions
+                if (inhIt == pd.namedTypeInheritanceTable.end() || inheritanceNodes.find(inhIt->second.first) != inheritanceNodes.end()) {
 
                     // We cannot find the super type in inheritance table at all
                     // and there is not base type table entry for it, so, the blueprint is wrong
                     std::stringstream ss;
-                    ss << "unable to find named type '" << superType << "' in the whole document";
+                    ss << "base type '" << superType << "' is not defined in the document";
 
                     mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(nodeSourceMap, pd.sourceData);
-                    report.error = Error(ss.str(), BusinessError, sourceMap);
+                    report.error = Error(ss.str(), MSONError, sourceMap);
                     return;
                 }
 
                 // Recursively, try to get a base type for the current super type
-                resolveNamedTypeTableEntry(pd, superType, inhIt->second.first, inhIt->second.second, report);
+                resolveNamedTypeTableEntry(pd, superType, inhIt->second.first, inhIt->second.second, report, inheritanceNodes);
 
                 if (report.error.code != Error::OK) {
                     return;

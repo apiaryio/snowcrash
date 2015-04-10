@@ -608,7 +608,7 @@ TEST_CASE("Parse blueprint with two named types having the same name", "[bluepri
     ParseResult<Blueprint> blueprint;
     SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
-    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.error.code == MSONError);
     REQUIRE(blueprint.report.warnings.size() == 1);
     REQUIRE(blueprint.report.warnings[0].code == DuplicateWarning);
 
@@ -680,6 +680,85 @@ TEST_CASE("Report error when coming across a super type reference to non existen
     ParseResult<Blueprint> blueprint;
     SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
-    REQUIRE(blueprint.report.error.code != Error::OK);
+    REQUIRE(blueprint.report.error.code == MSONError);
     SourceMapHelper::check(blueprint.report.error.location, 62, 27);
+}
+
+TEST_CASE("Report error when a Data Structure inherits from itself", "[blueprint]")
+{
+    mdp::ByteBuffer source = \
+    "# Data Structures\n"\
+    "\n"\
+    "## B (B)\n"\
+    "+ id (string)\n";
+
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
+
+    REQUIRE(blueprint.report.error.code == MSONError);
+    SourceMapHelper::check(blueprint.report.error.location, 19, 9);
+}
+
+TEST_CASE("Report error when data Structure inheritance graph contains a cycle", "[blueprint]")
+{
+    mdp::ByteBuffer source = \
+    "# Data Structures\n"\
+    "\n"\
+    "## A (B)\n"\
+    "## B (C)\n"\
+    "## C (A)\n";
+
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
+
+    REQUIRE(blueprint.report.error.code == MSONError);
+    SourceMapHelper::check(blueprint.report.error.location, 28, 9);
+}
+
+TEST_CASE("Report error when a named type is defined twice with inheritance", "[blueprint]")
+{
+    mdp::ByteBuffer source = \
+    "# Data Structures\n"\
+    "\n"\
+    "## A (B)\n"\
+    "## B (A)\n"\
+    "## B (C)\n"\
+    "## C (object)\n";
+
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
+
+    REQUIRE(blueprint.report.error.code == MSONError);
+    SourceMapHelper::check(blueprint.report.error.location, 19, 9);
+}
+
+TEST_CASE("Report error when a named type is defined twice with base type", "[blueprint]")
+{
+    mdp::ByteBuffer source = \
+    "# Data Structures\n"\
+    "\n"\
+    "## A (string)\n"\
+    "## A (object)\n";
+
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
+
+    REQUIRE(blueprint.report.error.code == MSONError);
+    SourceMapHelper::check(blueprint.report.error.location, 33, 14);
+}
+
+TEST_CASE("Report error when a named type is defined twice, once with base type and other inheritance", "[blueprint]")
+{
+    mdp::ByteBuffer source = \
+    "# Data Structures\n"\
+    "\n"\
+    "## A (B)\n"\
+    "## A (object)\n"\
+    "## B (object)\n";
+
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
+
+    REQUIRE(blueprint.report.error.code == MSONError);
+    SourceMapHelper::check(blueprint.report.error.location, 28, 14);
 }
