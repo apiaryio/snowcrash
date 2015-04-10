@@ -342,10 +342,18 @@ namespace snowcrash {
                 identifier = signature.identifier;
             }
 
-            // If named type already exists, do nothing
+            // If named type already exists, return error
             mson::NamedTypeBaseTable::iterator it = pd.namedTypeBaseTable.find(identifier);
+            mson::NamedTypeInheritanceTable::iterator inhIt = pd.namedTypeInheritanceTable.find(identifier);
 
-            if (it != pd.namedTypeBaseTable.end()) {
+            if (it != pd.namedTypeBaseTable.end() || inhIt != pd.namedTypeInheritanceTable.end()) {
+
+                // ERR: Named type is defined more than once
+                std::stringstream ss;
+                ss << "named type '" << identifier << "' is defined more than once";
+
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                report.error = Error(ss.str(), MSONError, sourceMap);
                 return;
             }
 
