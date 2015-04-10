@@ -255,7 +255,7 @@ namespace snowcrash {
                 // ERR: unable to parse
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
                 out.report.error = Error("unable to parse parameter specification",
-                                         BusinessError,
+                                         ApplicationError,
                                          sourceMap);
             }
         }

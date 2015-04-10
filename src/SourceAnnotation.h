@@ -101,7 +101,8 @@ namespace snowcrash {
         NoError = 0,
         ApplicationError = 1,
         BusinessError = 2,
-        ModelError = 3
+        ModelError = 3,
+        MSONError = 4
     };
 
     /**

@@ -285,16 +285,14 @@ namespace snowcrash {
 
                 // ERR: No API name specified
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                out.report.error = Error(ExpectedAPINameMessage,
-                                         BusinessError,
-                                         sourceMap);
+                out.report.error = Error(ExpectedAPINameMessage, BusinessError, sourceMap);
 
             }
             else if (!out.node.description.empty()) {
+
+                // WARN: No API name specified
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
-                out.report.warnings.push_back(Warning(ExpectedAPINameMessage,
-                                                      APINameWarning,
-                                                      sourceMap));
+                out.report.warnings.push_back(Warning(ExpectedAPINameMessage, APINameWarning, sourceMap));
             }
         }
 
@@ -432,7 +430,7 @@ namespace snowcrash {
                     ss << "base type '" << superType << "' is not defined in the document";
 
                     mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(nodeSourceMap, pd.sourceData);
-                    report.error = Error(ss.str(), BusinessError, sourceMap);
+                    report.error = Error(ss.str(), MSONError, sourceMap);
                     return;
                 }
 

@@ -680,7 +680,7 @@ TEST_CASE("Report error when coming across a super type reference to non existen
     ParseResult<Blueprint> blueprint;
     SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
-    REQUIRE(blueprint.report.error.code != Error::OK);
+    REQUIRE(blueprint.report.error.code == MSONError);
     SourceMapHelper::check(blueprint.report.error.location, 62, 27);
 }
 
@@ -695,7 +695,7 @@ TEST_CASE("Report error when a Data Structure inherits from itself", "[blueprint
     ParseResult<Blueprint> blueprint;
     SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
-    REQUIRE(blueprint.report.error.code != Error::OK);
+    REQUIRE(blueprint.report.error.code == MSONError);
     SourceMapHelper::check(blueprint.report.error.location, 19, 9);
 }
 
@@ -711,6 +711,6 @@ TEST_CASE("Report error when data Structure inheritance graph contains a cycle",
     ParseResult<Blueprint> blueprint;
     SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
-    REQUIRE(blueprint.report.error.code != Error::OK);
+    REQUIRE(blueprint.report.error.code == MSONError);
     SourceMapHelper::check(blueprint.report.error.location, 28, 9);
 }
