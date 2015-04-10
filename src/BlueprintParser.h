@@ -9,6 +9,7 @@
 #ifndef SNOWCRASH_BLUEPRINTPARSER_H
 #define SNOWCRASH_BLUEPRINTPARSER_H
 
+#include <set>
 #include "ResourceParser.h"
 #include "ResourceGroupParser.h"
 #include "DataStructureGroupParser.h"
@@ -382,7 +383,8 @@ namespace snowcrash {
                  it != pd.namedTypeInheritanceTable.end();
                  it++) {
 
-                resolveNamedTypeTableEntry(pd, it->first, it->second.first, it->second.second, report);
+                std::set<mson::Literal> inheritanceNodes;
+                resolveNamedTypeTableEntry(pd, it->first, it->second.first, it->second.second, report, inheritanceNodes);
             }
         }
 
@@ -393,15 +395,19 @@ namespace snowcrash {
          * \param subType The sub named type between the two
          * \param superType The super named type between the two
          * \param report Parse report
+         * \param inheritanceNodes Set containing named types which have been checked for inheritance in current cycle
          */
         static void resolveNamedTypeTableEntry(SectionParserData& pd,
                                                const mson::Literal& subType,
                                                const mson::Literal& superType,
                                                const mdp::BytesRangeSet& nodeSourceMap,
-                                               Report& report) {
+                                               Report& report,
+                                               std::set<mson::Literal> inheritanceNodes) {
 
             mson::BaseType baseType;
             mson::NamedTypeBaseTable::iterator it = pd.namedTypeBaseTable.find(subType);
+
+            inheritanceNodes.insert(superType);
 
             // If the base table entry is already filled, nothing else to do
             if (it != pd.namedTypeBaseTable.end()) {
@@ -418,7 +424,7 @@ namespace snowcrash {
                 mson::NamedTypeInheritanceTable::iterator inhIt = pd.namedTypeInheritanceTable.find(superType);
 
                 // Check for recursive MSON definitions
-                if (inhIt == pd.namedTypeInheritanceTable.end() || superType == inhIt->second.first) {
+                if (inhIt == pd.namedTypeInheritanceTable.end() || inheritanceNodes.find(inhIt->second.first) != inheritanceNodes.end()) {
 
                     // We cannot find the super type in inheritance table at all
                     // and there is not base type table entry for it, so, the blueprint is wrong
@@ -431,7 +437,7 @@ namespace snowcrash {
                 }
 
                 // Recursively, try to get a base type for the current super type
-                resolveNamedTypeTableEntry(pd, superType, inhIt->second.first, inhIt->second.second, report);
+                resolveNamedTypeTableEntry(pd, superType, inhIt->second.first, inhIt->second.second, report, inheritanceNodes);
 
                 if (report.error.code != Error::OK) {
                     return;

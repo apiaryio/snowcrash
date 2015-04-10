@@ -698,3 +698,19 @@ TEST_CASE("Report error when a Data Structure inherits from itself", "[blueprint
     REQUIRE(blueprint.report.error.code != Error::OK);
     SourceMapHelper::check(blueprint.report.error.location, 19, 9);
 }
+
+TEST_CASE("Report error when data Structure inheritance graph contains a cycle", "[blueprint]")
+{
+    mdp::ByteBuffer source = \
+    "# Data Structures\n"\
+    "\n"\
+    "## A (B)\n"\
+    "## B (C)\n"\
+    "## C (A)\n";
+
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
+
+    REQUIRE(blueprint.report.error.code != Error::OK);
+    SourceMapHelper::check(blueprint.report.error.location, 28, 9);
+}
