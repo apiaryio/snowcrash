@@ -762,3 +762,28 @@ TEST_CASE("Report error when a named type is defined twice, once with base type 
     REQUIRE(blueprint.report.error.code == MSONError);
     SourceMapHelper::check(blueprint.report.error.location, 28, 14);
 }
+
+TEST_CASE("Parse mson signature attributes with mismatched square brackets", "[blueprint]")
+{
+    mdp::ByteBuffer source = \
+    "# /\n"\
+    "+ Attributes (array[Note)";
+
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
+
+    REQUIRE(blueprint.report.error.code == Error::OK);
+}
+
+TEST_CASE("Parse named type mson signature attributes with no closing bracket", "[blueprint]")
+{
+    mdp::ByteBuffer source = \
+    "# Data Structures\n"\
+    "## B (A(";
+
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
+
+    REQUIRE(blueprint.report.error.code == MSONError);
+    REQUIRE(blueprint.report.error.message == "base type 'A(' is not defined in the document");
+}
