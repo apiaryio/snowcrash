@@ -371,13 +371,15 @@ namespace scpl {
          * \param begin Character index representing the beginning of the bracket that needs to be matched
          * \param endBracket The type of bracket that needs to be matched
          * \param splitByAttribute If this is true, we need to return when we find a top-level attribute delimiter
+         * \param clearAtEnd If this is true, the string will be cleared at the end of parsing
          *
          * \return String inside the given brackets. If not splitting by comma, append the brackets too
          */
         static mdp::ByteBuffer matchBrackets(mdp::ByteBuffer& subject,
                                              size_t begin,
                                              const char endBracket,
-                                             const bool splitByAttribute = false) {
+                                             const bool splitByAttribute = false,
+                                             const bool clearAtEnd = false) {
 
             size_t i = begin + 1;
             mdp::ByteBuffer returnString;
@@ -403,11 +405,11 @@ namespace scpl {
                     }
                 } else if (subject[i] == '[') {
 
-                    returnString += matchBrackets(subject, i, ']');
+                    returnString += matchBrackets(subject, i, ']', false, true);
                     i = 0;
                 } else if (subject[i] == '(') {
 
-                    returnString += matchBrackets(subject, i, ')');
+                    returnString += matchBrackets(subject, i, ')', false, true);
                     i = 0;
                 } else if (subject[i] == endBracket) {
 
@@ -429,6 +431,10 @@ namespace scpl {
                     returnString += subject[i];
                     i++;
                 }
+            }
+
+            if (i == subject.length() && clearAtEnd) {
+                subject.clear();
             }
 
             return returnString;
