@@ -699,6 +699,21 @@ TEST_CASE("Report error when a Data Structure inherits from itself", "[blueprint
     SourceMapHelper::check(blueprint.report.error.location, 19, 9);
 }
 
+TEST_CASE("Report error when named type inherits a sub type in array", "[blueprint][now]")
+{
+    mdp::ByteBuffer source = \
+    "# Data Structures\n"\
+    "\n"\
+    "## A (array[B])\n"\
+    "## B (A)\n";
+
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
+
+    REQUIRE(blueprint.report.error.code == MSONError);
+    SourceMapHelper::check(blueprint.report.error.location, 28, 9);
+}
+
 TEST_CASE("Report error when data Structure inheritance graph contains a cycle", "[blueprint]")
 {
     mdp::ByteBuffer source = \
@@ -707,6 +722,104 @@ TEST_CASE("Report error when data Structure inheritance graph contains a cycle",
     "## A (B)\n"\
     "## B (C)\n"\
     "## C (A)\n";
+
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
+
+    REQUIRE(blueprint.report.error.code == MSONError);
+    SourceMapHelper::check(blueprint.report.error.location, 19, 9);
+}
+
+TEST_CASE("Report error when data Structure inheritance graph with only a few of them forming a cycle", "[blueprint]")
+{
+    mdp::ByteBuffer source = \
+    "# Data Structures\n"\
+    "\n"\
+    "## A (B)\n"\
+    "## B (C)\n"\
+    "## C (D)\n"\
+    "## D (E)\n"\
+    "## E (C)\n";
+
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
+
+    REQUIRE(blueprint.report.error.code == MSONError);
+    SourceMapHelper::check(blueprint.report.error.location, 37, 9);
+}
+
+TEST_CASE("Report error when named sub type is referenced in nested members", "[blueprint][now]")
+{
+    mdp::ByteBuffer source = \
+    "# Data Structures\n"\
+    "\n"\
+    "## A (B)\n"\
+    "## B\n"\
+    "+ person (A)\n";
+
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
+
+    REQUIRE(blueprint.report.error.code == MSONError);
+    SourceMapHelper::check(blueprint.report.error.location, 28, 9);
+}
+
+TEST_CASE("Report error when named sub type is referenced in nested members when reference happens first", "[blueprint][now]")
+{
+    mdp::ByteBuffer source = \
+    "# Data Structures\n"\
+    "\n"\
+    "## B\n"\
+    "+ person (A)\n"\
+    "## A (B)\n";
+
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
+
+    REQUIRE(blueprint.report.error.code == MSONError);
+    SourceMapHelper::check(blueprint.report.error.location, 28, 9);
+}
+
+TEST_CASE("Report error when named sub type is referenced as mixin", "[blueprint][now]")
+{
+    mdp::ByteBuffer source = \
+    "# Data Structures\n"\
+    "\n"\
+    "## A (B)\n"\
+    "## B\n"\
+    "+ Include A\n";
+
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
+
+    REQUIRE(blueprint.report.error.code == MSONError);
+    SourceMapHelper::check(blueprint.report.error.location, 28, 9);
+}
+
+TEST_CASE("Report error when named sub type is referenced as mixin when reference happens first", "[blueprint][now]")
+{
+    mdp::ByteBuffer source = \
+    "# Data Structures\n"\
+    "\n"\
+    "## B\n"\
+    "+ Include A\n"\
+    "## A (B)\n";
+
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
+
+    REQUIRE(blueprint.report.error.code == MSONError);
+    SourceMapHelper::check(blueprint.report.error.location, 28, 9);
+}
+
+TEST_CASE("Report error when named type references itself in array", "[blueprint][now]")
+{
+    mdp::ByteBuffer source = \
+    "# Data Structures\n"\
+    "\n"\
+    "## Comment\n"\
+    "+ user (string)\n"\
+    "+ children (array[Comment])\n";
 
     ParseResult<Blueprint> blueprint;
     SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);

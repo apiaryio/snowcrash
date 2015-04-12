@@ -11,6 +11,7 @@
 
 #include <vector>
 #include <string>
+#include <set>
 #include <map>
 #include <stdexcept>
 
@@ -55,6 +56,9 @@ namespace mson {
 
     /** Named Types inheritance table */
     typedef std::map<Literal, std::pair<Literal, mdp::BytesRangeSet> > NamedTypeInheritanceTable;
+
+    /** Named Types dependency table */
+    typedef std::map<Literal, std::set<Literal> > NamedTypeDependencyTable;
 
     /** A simple or actual value */
     struct Value {

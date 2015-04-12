@@ -9,7 +9,7 @@
 #ifndef SNOWCRASH_BLUEPRINTPARSER_H
 #define SNOWCRASH_BLUEPRINTPARSER_H
 
-#include <set>
+#include <algorithm>
 #include "ResourceParser.h"
 #include "ResourceGroupParser.h"
 #include "DataStructureGroupParser.h"
@@ -365,6 +365,14 @@ namespace snowcrash {
                      !typeDefinition.typeSpecification.name.symbol.variable) {
 
                 pd.namedTypeInheritanceTable[identifier] = std::make_pair(typeDefinition.typeSpecification.name.symbol.literal, node->sourceMap);
+
+                // Initialize an entry in the dependency table if not found
+                if (pd.namedTypeDependencyTable.find(identifier) != pd.namedTypeDependencyTable.end()) {
+                    pd.namedTypeDependencyTable[identifier] = std::set<mson::Literal>();
+                }
+
+                // Make the sub type dependent on super type
+                pd.namedTypeDependencyTable[identifier].insert(typeDefinition.typeSpecification.name.symbol.literal);
             }
             else if (typeDefinition.typeSpecification.name.empty()) {
 
@@ -383,16 +391,61 @@ namespace snowcrash {
                                            Report& report) {
 
             mson::NamedTypeInheritanceTable::iterator it;
-            mson::NamedTypeBaseTable::iterator baseIt;
+            mson::NamedTypeDependencyTable::iterator depIt;
+
+            // First resolve dependency tables
+            for (depIt = pd.namedTypeDependencyTable.begin();
+                 depIt != pd.namedTypeDependencyTable.end();
+                 depIt++) {
+
+                resolveNamedTypeDependencyTableEntry(pd, depIt->first, report);
+            }
 
             for (it = pd.namedTypeInheritanceTable.begin();
                  it != pd.namedTypeInheritanceTable.end();
                  it++) {
 
-                std::set<mson::Literal> inheritanceNodes;
-                resolveNamedTypeTableEntry(pd, it->first, it->second.first, it->second.second, report, inheritanceNodes);
+                resolveNamedTypeBaseTableEntry(pd, it->first, it->second.first, it->second.second, report);
+
+                if (report.error.code != Error::OK) {
+                    return;
+                }
             }
         }
+
+        /**
+         * \brief Resolve the inheritance dependencies of the current named type
+         *        (Does not include mixin or member dependencies)
+         *
+         * \param pd Section parser data
+         * \param identifier The named type whose dependents need to be resolved
+         * \param report Parse report
+         */
+        static void resolveNamedTypeDependencyTableEntry(SectionParserData& pd,
+                                                         const mson::Literal& identifier,
+                                                         Report& report) {
+
+            std::set<mson::Literal> diffDeps, finalDeps, initialDeps;
+
+            do {
+                initialDeps = pd.namedTypeDependencyTable[identifier];
+                diffDeps.clear();
+
+                for (std::set<mson::Literal>::iterator it = initialDeps.begin();
+                     it != initialDeps.end();
+                     it++) {
+
+                    std::set<mson::Literal> superTypeDeps = pd.namedTypeDependencyTable[*it];
+                    pd.namedTypeDependencyTable[identifier].insert(superTypeDeps.begin(), superTypeDeps.end());
+                }
+
+                // Check if the list of dependents has grown
+                finalDeps = pd.namedTypeDependencyTable[identifier];
+                std::set_difference(finalDeps.begin(), finalDeps.end(), initialDeps.begin(), initialDeps.end(),
+                                    std::inserter(diffDeps, diffDeps.end()));
+
+            } while (!diffDeps.empty());
+        };
 
         /**
          * \brief For each entry in the named type inheritance table, resolve the sub-type's base type recursively
@@ -401,22 +454,32 @@ namespace snowcrash {
          * \param subType The sub named type between the two
          * \param superType The super named type between the two
          * \param report Parse report
-         * \param inheritanceNodes Set containing named types which have been checked for inheritance in current cycle
          */
-        static void resolveNamedTypeTableEntry(SectionParserData& pd,
-                                               const mson::Literal& subType,
-                                               const mson::Literal& superType,
-                                               const mdp::BytesRangeSet& nodeSourceMap,
-                                               Report& report,
-                                               std::set<mson::Literal> inheritanceNodes) {
+        static void resolveNamedTypeBaseTableEntry(SectionParserData& pd,
+                                                   const mson::Literal& subType,
+                                                   const mson::Literal& superType,
+                                                   const mdp::BytesRangeSet& nodeSourceMap,
+                                                   Report& report) {
 
             mson::BaseType baseType;
             mson::NamedTypeBaseTable::iterator it = pd.namedTypeBaseTable.find(subType);
 
-            inheritanceNodes.insert(superType);
-
             // If the base table entry is already filled, nothing else to do
             if (it != pd.namedTypeBaseTable.end()) {
+                return;
+            }
+
+            // Check for circular references
+            std::set<mson::Literal> deps = pd.namedTypeDependencyTable[subType];
+
+            if (deps.find(subType) != deps.end()) {
+
+                // ERR: A named type is circularly referenced
+                std::stringstream ss;
+                ss << "base type '" << subType << "' circularly referencing itself is not allowed";
+
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(nodeSourceMap, pd.sourceData);
+                report.error = Error(ss.str(), MSONError, sourceMap);
                 return;
             }
 
@@ -430,9 +493,9 @@ namespace snowcrash {
                 mson::NamedTypeInheritanceTable::iterator inhIt = pd.namedTypeInheritanceTable.find(superType);
 
                 // Check for recursive MSON definitions
-                if (inhIt == pd.namedTypeInheritanceTable.end() || inheritanceNodes.find(inhIt->second.first) != inheritanceNodes.end()) {
+                if (inhIt == pd.namedTypeInheritanceTable.end()) {
 
-                    // We cannot find the super type in inheritance table at all
+                    // ERR: We cannot find the super type in inheritance table at all
                     // and there is not base type table entry for it, so, the blueprint is wrong
                     std::stringstream ss;
                     ss << "base type '" << superType << "' is not defined in the document";
@@ -443,7 +506,7 @@ namespace snowcrash {
                 }
 
                 // Recursively, try to get a base type for the current super type
-                resolveNamedTypeTableEntry(pd, superType, inhIt->second.first, inhIt->second.second, report, inheritanceNodes);
+                resolveNamedTypeBaseTableEntry(pd, superType, inhIt->second.first, inhIt->second.second, report);
 
                 if (report.error.code != Error::OK) {
                     return;
