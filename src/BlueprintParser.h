@@ -357,19 +357,34 @@ namespace snowcrash {
                 return;
             }
 
-            // Otherwise, add the respective entries to the tables
-            if (typeDefinition.typeSpecification.name.base != mson::UndefinedTypeName) {
+            mson::BaseTypeName baseTypeName = typeDefinition.typeSpecification.name.base;
+
+            // Initialize an entry in the dependency table if not found
+            if (pd.namedTypeDependencyTable.find(identifier) != pd.namedTypeDependencyTable.end()) {
+                pd.namedTypeDependencyTable[identifier] = std::set<mson::Literal>();
+            }
+
+            // Add the respective entries to the tables
+            if (baseTypeName != mson::UndefinedTypeName) {
                 pd.namedTypeBaseTable[identifier] = mson::parseBaseType(typeDefinition.typeSpecification.name.base);
+
+                // Add nested types as dependents
+                if (baseTypeName == mson::ArrayTypeName || baseTypeName == mson::EnumTypeName) {
+
+                    for (mson::TypeNames::iterator it = typeDefinition.typeSpecification.nestedTypes.begin();
+                         it != typeDefinition.typeSpecification.nestedTypes.end();
+                         ++it) {
+
+                        if (!it->symbol.literal.empty() && !it->symbol.variable) {
+                            pd.namedTypeDependencyTable[identifier].insert(it->symbol.literal);
+                        }
+                    }
+                }
             }
             else if (!typeDefinition.typeSpecification.name.symbol.literal.empty() &&
                      !typeDefinition.typeSpecification.name.symbol.variable) {
 
                 pd.namedTypeInheritanceTable[identifier] = std::make_pair(typeDefinition.typeSpecification.name.symbol.literal, node->sourceMap);
-
-                // Initialize an entry in the dependency table if not found
-                if (pd.namedTypeDependencyTable.find(identifier) != pd.namedTypeDependencyTable.end()) {
-                    pd.namedTypeDependencyTable[identifier] = std::set<mson::Literal>();
-                }
 
                 // Make the sub type dependent on super type
                 pd.namedTypeDependencyTable[identifier].insert(typeDefinition.typeSpecification.name.symbol.literal);
