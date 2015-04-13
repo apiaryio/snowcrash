@@ -34,7 +34,7 @@ namespace snowcrash {
                                                       const Signature& signature,
                                                       const ParseResultRef<mson::NamedType>& out) {
 
-            mson::parseTypeName(signature.identifier, out.node.name, true);
+            mson::parseTypeName(signature.identifier, out.node.name, false);
             mson::parseTypeDefinition(node, pd, signature.attributes, out.report, out.node.typeDefinition);
 
             if (pd.exportSourceMap()) {

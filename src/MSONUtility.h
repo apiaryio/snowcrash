@@ -121,28 +121,28 @@ namespace mson {
      *
      * \param subject String which represents the type name
      * \param typeName MSON Type Name
-     * \param notBaseType If true, will be parsed as a symbol
+     * \param isBaseType If false, will be parsed as a symbol
      */
     inline void parseTypeName(const std::string& subject,
                               TypeName& typeName,
-                              bool notBaseType = false) {
+                              bool isBaseType = true) {
 
-        if (!notBaseType && subject == "boolean") {
+        if (isBaseType && subject == "boolean") {
             typeName.base = BooleanTypeName;
         }
-        else if (!notBaseType && subject == "string") {
+        else if (isBaseType && subject == "string") {
             typeName.base = StringTypeName;
         }
-        else if (!notBaseType && subject == "number") {
+        else if (isBaseType && subject == "number") {
             typeName.base = NumberTypeName;
         }
-        else if (!notBaseType && subject == "array") {
+        else if (isBaseType && subject == "array") {
             typeName.base = ArrayTypeName;
         }
-        else if (!notBaseType && subject == "enum") {
+        else if (isBaseType && subject == "enum") {
             typeName.base = EnumTypeName;
         }
-        else if (!notBaseType && subject == "object") {
+        else if (isBaseType && subject == "object") {
             typeName.base = ObjectTypeName;
         }
         else {
@@ -444,7 +444,7 @@ namespace mson {
 
             // ERR: Dependency named type circular references itself
             std::stringstream ss;
-            ss << "base type '" << dependent << "' circularly referencing itself is not allowed";
+            ss << "base type '" << dependent << "' circularly referencing itself";
 
             mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
             report.error = snowcrash::Error(ss.str(), snowcrash::MSONError, sourceMap);

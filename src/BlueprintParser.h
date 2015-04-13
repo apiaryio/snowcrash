@@ -491,7 +491,7 @@ namespace snowcrash {
 
                 // ERR: A named type is circularly referenced
                 std::stringstream ss;
-                ss << "base type '" << subType << "' circularly referencing itself is not allowed";
+                ss << "base type '" << subType << "' circularly referencing itself";
 
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(nodeSourceMap, pd.sourceData);
                 report.error = Error(ss.str(), MSONError, sourceMap);
