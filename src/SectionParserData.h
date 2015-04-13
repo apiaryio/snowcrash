@@ -51,6 +51,12 @@ namespace snowcrash {
         /** Table mapping named type to sub types */
         mson::NamedTypeInheritanceTable namedTypeInheritanceTable;
 
+        /** Table mapping named types to their dependent named types */
+        mson::NamedTypeDependencyTable namedTypeDependencyTable;
+
+        /** Variable to store the current named type */
+        mson::Literal namedTypeContext;
+
         /** Model Table */
         ModelTable modelTable;
 

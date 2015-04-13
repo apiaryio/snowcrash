@@ -34,7 +34,7 @@ namespace snowcrash {
                                                       const Signature& signature,
                                                       const ParseResultRef<mson::NamedType>& out) {
 
-            mson::parseTypeName(signature.identifier, out.node.name);
+            mson::parseTypeName(signature.identifier, out.node.name, false);
             mson::parseTypeDefinition(node, pd, signature.attributes, out.report, out.node.typeDefinition);
 
             if (pd.exportSourceMap()) {
@@ -52,6 +52,9 @@ namespace snowcrash {
             if (out.node.typeDefinition.baseType == mson::UndefinedBaseType) {
                 out.node.typeDefinition.baseType = mson::ImplicitObjectBaseType;
             }
+
+            // Setup named type context
+            pd.namedTypeContext = out.node.name.symbol.literal;
 
             return ++MarkdownNodeIterator(node);
         }

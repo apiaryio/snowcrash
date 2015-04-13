@@ -111,6 +111,29 @@ namespace snowcrash {
             mson::parseTypeDefinition(node, pd, signature.attributes, report, valueMember.valueDefinition.typeDefinition);
             parseRemainingContent(node, pd, signature.remainingContent, valueMember.sections, sourceMap.sections);
 
+            // Check for circular references
+            mson::TypeSpecification typeSpecification = valueMember.valueDefinition.typeDefinition.typeSpecification;
+
+            if (typeSpecification.name.base == mson::ArrayTypeName ||
+                typeSpecification.name.base == mson::EnumTypeName) {
+
+                for (mson::TypeNames::iterator it = typeSpecification.nestedTypes.begin();
+                     it != typeSpecification.nestedTypes.end();
+                     ++it) {
+
+                    if (!it->symbol.literal.empty() && !it->symbol.variable) {
+                        mson::addDependency(node, pd, it->symbol.literal, pd.namedTypeContext, report);
+                    }
+                }
+            }
+            else if (typeSpecification.name.base == mson::UndefinedTypeName &&
+                     !typeSpecification.name.symbol.literal.empty() &&
+                     !typeSpecification.name.symbol.variable) {
+
+                mson::addDependency(node, pd, typeSpecification.name.symbol.literal, pd.namedTypeContext, report);
+            }
+
+            // Properly parse the values in the signature
             if (signature.values.size() > 1) {
 
                 if (valueMember.valueDefinition.typeDefinition.baseType == mson::PrimitiveBaseType) {
