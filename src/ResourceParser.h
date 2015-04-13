@@ -105,6 +105,11 @@ namespace snowcrash {
 
                 case AttributesSectionType:
                 {
+                    // Set up named type context
+                    if (!out.node.name.empty()) {
+                        pd.namedTypeContext = out.node.name;
+                    }
+
                     ParseResultRef<Attributes> attributes(out.report, out.node.attributes, out.sourceMap.attributes);
                     MarkdownNodeIterator cur = AttributesParser::parse(node, siblings, pd, attributes);
 

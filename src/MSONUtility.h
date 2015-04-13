@@ -121,26 +121,28 @@ namespace mson {
      *
      * \param subject String which represents the type name
      * \param typeName MSON Type Name
+     * \param notBaseType If true, will be parsed as a symbol
      */
     inline void parseTypeName(const std::string& subject,
-                              TypeName& typeName) {
+                              TypeName& typeName,
+                              bool notBaseType = false) {
 
-        if (subject == "boolean") {
+        if (!notBaseType && subject == "boolean") {
             typeName.base = BooleanTypeName;
         }
-        else if (subject == "string") {
+        else if (!notBaseType && subject == "string") {
             typeName.base = StringTypeName;
         }
-        else if (subject == "number") {
+        else if (!notBaseType && subject == "number") {
             typeName.base = NumberTypeName;
         }
-        else if (subject == "array") {
+        else if (!notBaseType && subject == "array") {
             typeName.base = ArrayTypeName;
         }
-        else if (subject == "enum") {
+        else if (!notBaseType && subject == "enum") {
             typeName.base = EnumTypeName;
         }
-        else if (subject == "object") {
+        else if (!notBaseType && subject == "object") {
             typeName.base = ObjectTypeName;
         }
         else {
@@ -416,6 +418,54 @@ namespace mson {
         }
         else {
             propertyName.literal = subject;
+        }
+    }
+
+    /**
+     * \brief Add a dependency to the dependency list of the dependents while checking for circular references
+     *
+     * \param node Current markdown node iterator
+     * \param pd Section parser data
+     * \param dependency The named type which should be added to the dependency list
+     * \param dependent The named type to which the dependency should be added
+     * \param report Parse result report
+     */
+    inline void addDependency(const mdp::MarkdownNodeIterator& node,
+                              snowcrash::SectionParserData& pd,
+                              const mson::Literal dependency,
+                              const mson::Literal dependent,
+                              snowcrash::Report& report) {
+
+        std::set<mson::Literal> dependencyDeps = pd.namedTypeDependencyTable[dependency];
+
+        // First, check if it is circular reference between them
+        if (dependent == dependency ||
+            dependencyDeps.find(dependent) != dependencyDeps.end()) {
+
+            // ERR: Dependency named type circular references itself
+            std::stringstream ss;
+            ss << "base type '" << dependent << "' circularly referencing itself is not allowed";
+
+            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+            report.error = snowcrash::Error(ss.str(), snowcrash::MSONError, sourceMap);
+            return;
+        }
+
+        // Second, check if the dependency is already in the list
+        if (pd.namedTypeDependencyTable[dependent].find(dependency) != pd.namedTypeDependencyTable[dependent].end()) {
+            return;
+        }
+
+        for (mson::NamedTypeDependencyTable::iterator it = pd.namedTypeDependencyTable.begin();
+             it != pd.namedTypeDependencyTable.end();
+             ++it) {
+
+            // If the entry is dependent itself or contain dependent in its list
+            if (it->first == dependent || it->second.find(dependent) != it->second.end()) {
+
+                it->second.insert(dependency);
+                it->second.insert(dependencyDeps.begin(), dependencyDeps.end());
+            }
         }
     }
 }

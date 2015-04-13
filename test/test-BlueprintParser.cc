@@ -764,6 +764,25 @@ TEST_CASE("Report error when named sub type is referenced in nested members", "[
     SourceMapHelper::check(blueprint.report.error.location, 28, 9);
 }
 
+TEST_CASE("Report error when there are circular references in nested members", "[blueprint][now]")
+{
+    mdp::ByteBuffer source = \
+    "# Data Structures\n"\
+    "\n"\
+    "## B (C)\n"\
+    "## C\n"\
+    "+ id (A)\n"
+    "\n"\
+    "## A\n"\
+    "+ id (B)\n";
+
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
+
+    REQUIRE(blueprint.report.error.code == MSONError);
+    SourceMapHelper::check(blueprint.report.error.location, 28, 9);
+}
+
 TEST_CASE("Report error when named sub type is referenced in nested members when reference happens first", "[blueprint][now]")
 {
     mdp::ByteBuffer source = \
@@ -771,6 +790,7 @@ TEST_CASE("Report error when named sub type is referenced in nested members when
     "\n"\
     "## B\n"\
     "+ person (A)\n"\
+    "\n"\
     "## A (B)\n";
 
     ParseResult<Blueprint> blueprint;
@@ -780,7 +800,27 @@ TEST_CASE("Report error when named sub type is referenced in nested members when
     SourceMapHelper::check(blueprint.report.error.location, 28, 9);
 }
 
-TEST_CASE("Report error when named sub type is referenced as mixin", "[blueprint][now]")
+TEST_CASE("Report error when a resource attributes type is circularly referenced in nested members", "[blueprint][now]")
+{
+    mdp::ByteBuffer source = \
+    "# Post [/]\n"\
+    "\n"\
+    "+ Attributes (B)\n"\
+    "    + id\n"\
+    "\n"\
+    "# Data Structures\n"\
+    "\n"\
+    "## B\n"\
+    "+ posts (Post)\n";
+
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
+
+    REQUIRE(blueprint.report.error.code == MSONError);
+    SourceMapHelper::check(blueprint.report.error.location, 28, 9);
+}
+
+TEST_CASE("Report error when named sub type is referenced as mixin", "[blueprint]")
 {
     mdp::ByteBuffer source = \
     "# Data Structures\n"\
@@ -793,23 +833,24 @@ TEST_CASE("Report error when named sub type is referenced as mixin", "[blueprint
     SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
     REQUIRE(blueprint.report.error.code == MSONError);
-    SourceMapHelper::check(blueprint.report.error.location, 28, 9);
+    SourceMapHelper::check(blueprint.report.error.location, 35, 10);
 }
 
-TEST_CASE("Report error when named sub type is referenced as mixin when reference happens first", "[blueprint][now]")
+TEST_CASE("Report error when named sub type is referenced as mixin when reference happens first", "[blueprint]")
 {
     mdp::ByteBuffer source = \
     "# Data Structures\n"\
     "\n"\
     "## B\n"\
     "+ Include A\n"\
+    "\n"\
     "## A (B)\n";
 
     ParseResult<Blueprint> blueprint;
     SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
     REQUIRE(blueprint.report.error.code == MSONError);
-    SourceMapHelper::check(blueprint.report.error.location, 28, 9);
+    SourceMapHelper::check(blueprint.report.error.location, 26, 10);
 }
 
 TEST_CASE("Report error when named type references itself in array", "[blueprint][now]")
