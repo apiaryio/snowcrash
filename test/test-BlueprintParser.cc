@@ -748,7 +748,7 @@ TEST_CASE("Report error when data Structure inheritance graph with only a few of
     SourceMapHelper::check(blueprint.report.error.location, 37, 9);
 }
 
-TEST_CASE("Report error when named sub type is referenced in nested members", "[blueprint][now]")
+TEST_CASE("Report error when named sub type is referenced in nested members", "[blueprint]")
 {
     mdp::ByteBuffer source = \
     "# Data Structures\n"\
@@ -761,10 +761,10 @@ TEST_CASE("Report error when named sub type is referenced in nested members", "[
     SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
     REQUIRE(blueprint.report.error.code == MSONError);
-    SourceMapHelper::check(blueprint.report.error.location, 28, 9);
+    SourceMapHelper::check(blueprint.report.error.location, 35, 11);
 }
 
-TEST_CASE("Report error when there are circular references in nested members", "[blueprint][now]")
+TEST_CASE("Report error when there are circular references in nested members", "[blueprint]")
 {
     mdp::ByteBuffer source = \
     "# Data Structures\n"\
@@ -780,10 +780,10 @@ TEST_CASE("Report error when there are circular references in nested members", "
     SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
     REQUIRE(blueprint.report.error.code == MSONError);
-    SourceMapHelper::check(blueprint.report.error.location, 28, 9);
+    SourceMapHelper::check(blueprint.report.error.location, 50, 7);
 }
 
-TEST_CASE("Report error when named sub type is referenced in nested members when reference happens first", "[blueprint][now]")
+TEST_CASE("Report error when named sub type is referenced in nested members when reference happens first", "[blueprint]")
 {
     mdp::ByteBuffer source = \
     "# Data Structures\n"\
@@ -797,10 +797,10 @@ TEST_CASE("Report error when named sub type is referenced in nested members when
     SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
     REQUIRE(blueprint.report.error.code == MSONError);
-    SourceMapHelper::check(blueprint.report.error.location, 28, 9);
+    SourceMapHelper::check(blueprint.report.error.location, 26, 11);
 }
 
-TEST_CASE("Report error when a resource attributes type is circularly referenced in nested members", "[blueprint][now]")
+TEST_CASE("Report error when a resource attributes type is circularly referenced in nested members", "[blueprint]")
 {
     mdp::ByteBuffer source = \
     "# Post [/]\n"\
@@ -817,7 +817,7 @@ TEST_CASE("Report error when a resource attributes type is circularly referenced
     SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
     REQUIRE(blueprint.report.error.code == MSONError);
-    SourceMapHelper::check(blueprint.report.error.location, 28, 9);
+    SourceMapHelper::check(blueprint.report.error.location, 65, 13);
 }
 
 TEST_CASE("Report error when named sub type is referenced as mixin", "[blueprint]")
@@ -853,7 +853,7 @@ TEST_CASE("Report error when named sub type is referenced as mixin when referenc
     SourceMapHelper::check(blueprint.report.error.location, 26, 10);
 }
 
-TEST_CASE("Report error when named type references itself in array", "[blueprint][now]")
+TEST_CASE("Report error when named type references itself in array", "[blueprint]")
 {
     mdp::ByteBuffer source = \
     "# Data Structures\n"\
@@ -866,7 +866,7 @@ TEST_CASE("Report error when named type references itself in array", "[blueprint
     SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
     REQUIRE(blueprint.report.error.code == MSONError);
-    SourceMapHelper::check(blueprint.report.error.location, 28, 9);
+    SourceMapHelper::check(blueprint.report.error.location, 48, 26);
 }
 
 TEST_CASE("Report error when a named type is defined twice with inheritance", "[blueprint]")

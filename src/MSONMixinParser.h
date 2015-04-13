@@ -65,8 +65,13 @@ namespace snowcrash {
                                                       sourceMap));
             }
 
-            // Add mixin type as dependency
-            mson::addDependency(node, pd, out.node.typeSpecification.name.symbol.literal, pd.namedTypeContext, out.report);
+            // Check circular references
+            if (out.node.typeSpecification.name.base == mson::UndefinedTypeName &&
+                !out.node.typeSpecification.name.symbol.literal.empty() &&
+                !out.node.typeSpecification.name.symbol.variable) {
+
+                mson::addDependency(node, pd, out.node.typeSpecification.name.symbol.literal, pd.namedTypeContext, out.report);
+            }
 
             return ++MarkdownNodeIterator(node);
         }
