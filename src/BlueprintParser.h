@@ -9,6 +9,7 @@
 #ifndef SNOWCRASH_BLUEPRINTPARSER_H
 #define SNOWCRASH_BLUEPRINTPARSER_H
 
+#include <iterator>
 #include <algorithm>
 #include "ResourceParser.h"
 #include "ResourceGroupParser.h"
