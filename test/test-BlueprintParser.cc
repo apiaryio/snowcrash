@@ -959,3 +959,45 @@ TEST_CASE("Parse correctly when a resource named type is non-circularly referenc
 
     REQUIRE(blueprint.report.error.code == Error::OK);
 }
+
+TEST_CASE("Report error when not finding a super type of the nested member", "[blueprint]")
+{
+    mdp::ByteBuffer source = \
+    "# Data Structures\n"\
+    "## A\n"\
+    "+ choice (B)\n";
+
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
+
+    REQUIRE(blueprint.report.error.code == MSONError);
+    REQUIRE(blueprint.report.error.message == "base type 'B' is not defined in the document");
+}
+
+TEST_CASE("Report error when not finding a nested super type of the nested member", "[blueprint]")
+{
+    mdp::ByteBuffer source = \
+    "# Data Structures\n"\
+    "## A\n"\
+    "+ choice (array[B])\n";
+
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
+
+    REQUIRE(blueprint.report.error.code == MSONError);
+    REQUIRE(blueprint.report.error.message == "base type 'B' is not defined in the document");
+}
+
+TEST_CASE("Report error when not finding a mixin type", "[blueprint]")
+{
+    mdp::ByteBuffer source = \
+    "# Data Structures\n"\
+    "## A\n"\
+    "+ Include B\n";
+
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
+
+    REQUIRE(blueprint.report.error.code == MSONError);
+    REQUIRE(blueprint.report.error.message == "base type 'B' is not defined in the document");
+}
