@@ -102,6 +102,14 @@ namespace snowcrash {
 
             return SectionProcessor<mson::ValueMember>::nestedSectionType(node);
         }
+
+        static void finalize(const MarkdownNodeIterator& node,
+                             SectionParserData& pd,
+                             const ParseResultRef<mson::NamedType>& out) {
+
+            // Clear named type context
+            pd.namedTypeContext.clear();
+        }
     };
 
     /** MSON Named Type Section Parser */

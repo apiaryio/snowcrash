@@ -24,6 +24,7 @@ namespace snowcrashtest {
     struct NamedTypes {
 
         mson::NamedTypeBaseTable baseTable;
+        mson::NamedTypeDependencyTable dependencyTable;
     };
 
     template <typename T, typename PARSER>
@@ -61,6 +62,7 @@ namespace snowcrashtest {
             pd.modelSourceMapTable.insert(models.modelSourceMapTable.begin(), models.modelSourceMapTable.end());
 
             pd.namedTypeBaseTable.insert(namedTypes.baseTable.begin(), namedTypes.baseTable.end());
+            pd.namedTypeDependencyTable.insert(namedTypes.dependencyTable.begin(), namedTypes.dependencyTable.end());
 
             PARSER::parse(markdownAST.children().begin(),
                           markdownAST.children(),
@@ -110,6 +112,7 @@ namespace snowcrashtest {
                           NamedTypes& namedTypes) {
 
             namedTypes.baseTable[literal] = baseType;
+            namedTypes.dependencyTable[literal] = std::set<mson::Literal>();
         }
     };
 

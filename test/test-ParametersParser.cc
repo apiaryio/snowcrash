@@ -379,3 +379,41 @@ TEST_CASE("Incomplete percentage encoded characters in parameter name ", "[incom
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.size() == 3);
 }
+
+TEST_CASE("Parse old style parameter in parameters with non-complete default value", "[parameter]")
+{
+    mdp::ByteBuffer source = \
+    "+ Parameters\n"\
+    "    + id = `10";
+
+    ParseResult<Parameters> parameters;
+    SectionParserHelper<Parameters, ParametersParser>::parse(source,
+                                                             ParametersSectionType,
+                                                             parameters,
+                                                             ExportSourcemapOption);
+
+    REQUIRE(parameters.report.error.code == Error::OK);
+    REQUIRE(parameters.report.warnings.size() == 1);
+
+    REQUIRE(parameters.node.size() == 1);
+    REQUIRE(parameters.node[0].name == "id");
+    REQUIRE(parameters.node[0].defaultValue == "10");
+}
+
+TEST_CASE("Parse old style parameter in parameters with non-complete example value", "[parameter]")
+{
+    mdp::ByteBuffer source = \
+    "+ Parameters\n"\
+    "    + id (number, `";
+
+    ParseResult<Parameters> parameters;
+    SectionParserHelper<Parameters, ParametersParser>::parse(source,
+                                                             ParametersSectionType,
+                                                             parameters,
+                                                             ExportSourcemapOption);
+
+    REQUIRE(parameters.report.error.code == Error::OK);
+    REQUIRE(parameters.report.warnings.size() == 2);
+
+    REQUIRE(parameters.node.empty());
+}

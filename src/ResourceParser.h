@@ -113,6 +113,9 @@ namespace snowcrash {
                     ParseResultRef<Attributes> attributes(out.report, out.node.attributes, out.sourceMap.attributes);
                     MarkdownNodeIterator cur = AttributesParser::parse(node, siblings, pd, attributes);
 
+                    // Clear named type context
+                    pd.namedTypeContext.clear();
+
                     if (!out.node.name.empty()) {
 
                         if (SectionProcessor<DataStructureGroup>::isNamedTypeDuplicate(pd.blueprint, out.node.name)) {

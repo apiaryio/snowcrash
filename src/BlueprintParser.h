@@ -344,10 +344,7 @@ namespace snowcrash {
             }
 
             // If named type already exists, return error
-            mson::NamedTypeBaseTable::iterator it = pd.namedTypeBaseTable.find(identifier);
-            mson::NamedTypeInheritanceTable::iterator inhIt = pd.namedTypeInheritanceTable.find(identifier);
-
-            if (it != pd.namedTypeBaseTable.end() || inhIt != pd.namedTypeInheritanceTable.end()) {
+            if (pd.namedTypeDependencyTable.find(identifier) != pd.namedTypeDependencyTable.end()) {
 
                 // ERR: Named type is defined more than once
                 std::stringstream ss;
@@ -360,10 +357,8 @@ namespace snowcrash {
 
             mson::BaseTypeName baseTypeName = typeDefinition.typeSpecification.name.base;
 
-            // Initialize an entry in the dependency table if not found
-            if (pd.namedTypeDependencyTable.find(identifier) != pd.namedTypeDependencyTable.end()) {
-                pd.namedTypeDependencyTable[identifier] = std::set<mson::Literal>();
-            }
+            // Initialize an entry in the dependency table
+            pd.namedTypeDependencyTable[identifier] = std::set<mson::Literal>();
 
             // Add the respective entries to the tables
             if (baseTypeName != mson::UndefinedTypeName) {

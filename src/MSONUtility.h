@@ -436,9 +436,21 @@ namespace mson {
                               const mson::Literal dependent,
                               snowcrash::Report& report) {
 
+        // First, check if the type exists
+        if (pd.namedTypeDependencyTable.find(dependency) == pd.namedTypeDependencyTable.end()) {
+
+            // ERR: We cannot find the dependency type
+            std::stringstream ss;
+            ss << "base type '" << dependency << "' is not defined in the document";
+
+            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+            report.error = snowcrash::Error(ss.str(), snowcrash::MSONError, sourceMap);
+            return;
+        }
+
         std::set<mson::Literal> dependencyDeps = pd.namedTypeDependencyTable[dependency];
 
-        // First, check if it is circular reference between them
+        // Second, check if it is circular reference between them
         if (dependent == dependency ||
             dependencyDeps.find(dependent) != dependencyDeps.end()) {
 
@@ -451,7 +463,7 @@ namespace mson {
             return;
         }
 
-        // Second, check if the dependency is already in the list
+        // Third, check if the dependency is already in the list
         if (pd.namedTypeDependencyTable[dependent].find(dependency) != pd.namedTypeDependencyTable[dependent].end()) {
             return;
         }

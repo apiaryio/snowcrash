@@ -941,3 +941,63 @@ TEST_CASE("Parse named type mson signature attributes with no closing bracket", 
     REQUIRE(blueprint.report.error.code == MSONError);
     REQUIRE(blueprint.report.error.message == "base type 'A(' is not defined in the document");
 }
+
+TEST_CASE("Parse correctly when a resource named type is non-circularly referenced in action attributes", "[blueprint]")
+{
+    mdp::ByteBuffer source = \
+    "# Question [/question]\n"\
+    "+ Attributes\n"\
+    "    + question\n"\
+    "\n"\
+    "# Choice [/choice]\n"\
+    "## Vote on choice [POST]\n"\
+    "+ Attributes\n"\
+    "    + bla (Question)\n";
+
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
+
+    REQUIRE(blueprint.report.error.code == Error::OK);
+}
+
+TEST_CASE("Report error when not finding a super type of the nested member", "[blueprint]")
+{
+    mdp::ByteBuffer source = \
+    "# Data Structures\n"\
+    "## A\n"\
+    "+ choice (B)\n";
+
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
+
+    REQUIRE(blueprint.report.error.code == MSONError);
+    REQUIRE(blueprint.report.error.message == "base type 'B' is not defined in the document");
+}
+
+TEST_CASE("Report error when not finding a nested super type of the nested member", "[blueprint]")
+{
+    mdp::ByteBuffer source = \
+    "# Data Structures\n"\
+    "## A\n"\
+    "+ choice (array[B])\n";
+
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
+
+    REQUIRE(blueprint.report.error.code == MSONError);
+    REQUIRE(blueprint.report.error.message == "base type 'B' is not defined in the document");
+}
+
+TEST_CASE("Report error when not finding a mixin type", "[blueprint]")
+{
+    mdp::ByteBuffer source = \
+    "# Data Structures\n"\
+    "## A\n"\
+    "+ Include B\n";
+
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
+
+    REQUIRE(blueprint.report.error.code == MSONError);
+    REQUIRE(blueprint.report.error.message == "base type 'B' is not defined in the document");
+}
