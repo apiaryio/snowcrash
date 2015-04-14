@@ -470,7 +470,13 @@ namespace snowcrash {
                     std::string first = innerSignature.substr(0, 1);
 
                     if (first == "`") {
-                        RetrieveEscaped(innerSignature);
+                        std::string escaped = RetrieveEscaped(innerSignature);
+
+                        // If empty value is returned
+                        if (escaped.empty()) {
+                            innerSignature.clear();
+                        }
+
                         TrimString(innerSignature);
                     }
                     else if (first == "(") {
