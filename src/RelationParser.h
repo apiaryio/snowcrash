@@ -12,10 +12,15 @@
 #include "SectionParser.h"
 #include "RegexMatch.h"
 
+/** Macro for relation regex */
+#define RELATION_REGEX "^[[:blank:]]*[Rr]elation[[:blank:]]*:"
+
 namespace snowcrash {
 
     /** Link Relation matching regex */
-    const char* const RelationRegex = "^[[:blank:]]*[Rr]elation[[:blank:]]*:[[:blank:]]*([a-z][a-z0-9.-]*)?[[:blank:]]*$";
+    const char* const RelationRegex = RELATION_REGEX;
+
+    const char* const RelationIdentifierRegex = RELATION_REGEX "[[:blank:]]*([a-z][a-z0-9.-]*)?[[:blank:]]*$";
 
     /**
      *  Relation Section Processor
@@ -35,9 +40,16 @@ namespace snowcrash {
             signature = GetFirstLine(node->text, remainingContent);
             TrimString(signature);
 
-            if (RegexCapture(signature, RelationRegex, captureGroups, 3)) {
+            if (RegexCapture(signature, RelationIdentifierRegex, captureGroups, 3)) {
                 out.node.str = captureGroups[1];
                 TrimString(out.node.str);
+            }
+            else {
+                // WARN: Relation identifier contains illegal characters
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                out.report.warnings.push_back(Warning("relation identifier contains illegal characters (only lower case letters, numbers, '-' and '.' allowed)",
+                                                      FormattingWarning,
+                                                      sourceMap));
             }
 
             if (pd.exportSourceMap() && !out.node.str.empty()) {
