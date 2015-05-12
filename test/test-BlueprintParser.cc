@@ -1001,3 +1001,95 @@ TEST_CASE("Report error when not finding a mixin type", "[blueprint]")
     REQUIRE(blueprint.report.error.code == MSONError);
     REQUIRE(blueprint.report.error.message == "base type 'B' is not defined in the document");
 }
+
+TEST_CASE("When an object contains a mixin of array type", "[blueprint]")
+{
+    mdp::ByteBuffer source = \
+    "# Data Structures\n"\
+    "## C (object)\n"\
+    "+ Include A\n"\
+    "\n"\
+    "## D (object)\n"\
+    "+ Include B";
+
+    NamedTypes namedTypes;
+    NamedTypeHelper::build("A", mson::ObjectBaseType, namedTypes);
+    NamedTypeHelper::build("B", mson::ValueBaseType, namedTypes);
+
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint, namedTypes);
+
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.size() == 1);
+    REQUIRE(blueprint.report.warnings[0].code == LogicalErrorWarning);
+    SourceMapHelper::check(blueprint.report.warnings[0].location, 59, 11);
+}
+
+TEST_CASE("When an array contains a mixin of object type", "[blueprint]")
+{
+    mdp::ByteBuffer source = \
+    "# Data Structures\n"\
+    "## C (array)\n"\
+    "+ Include A\n"\
+    "\n"\
+    "## D (array)\n"\
+    "+ Include B";
+
+    NamedTypes namedTypes;
+    NamedTypeHelper::build("A", mson::ObjectBaseType, namedTypes);
+    NamedTypeHelper::build("B", mson::ValueBaseType, namedTypes);
+
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint, namedTypes);
+
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.size() == 1);
+    REQUIRE(blueprint.report.warnings[0].code == LogicalErrorWarning);
+    SourceMapHelper::check(blueprint.report.warnings[0].location, 31, 13);
+}
+
+TEST_CASE("When an object member contains a mixin of array type", "[blueprint]")
+{
+    mdp::ByteBuffer source = \
+    "# Data Structures\n"\
+    "## C\n"\
+    "+ d (object)\n"\
+    "    + Include A\n"\
+    "+ e (object)\n"\
+    "    + Include B";
+
+    NamedTypes namedTypes;
+    NamedTypeHelper::build("A", mson::ObjectBaseType, namedTypes);
+    NamedTypeHelper::build("B", mson::ValueBaseType, namedTypes);
+
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint, namedTypes);
+
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.size() == 1);
+    REQUIRE(blueprint.report.warnings[0].code == LogicalErrorWarning);
+    SourceMapHelper::check(blueprint.report.warnings[0].location, 69, 11);
+}
+
+TEST_CASE("When an array member contains a mixin of object type", "[blueprint]")
+{
+    mdp::ByteBuffer source = \
+    "# Data Structures\n"\
+    "## C\n"\
+    "+ d (array)\n"\
+    "    + Include A\n"\
+    "+ e (array)\n"\
+    "    + Include B";
+
+    NamedTypes namedTypes;
+    NamedTypeHelper::build("A", mson::ObjectBaseType, namedTypes);
+    NamedTypeHelper::build("B", mson::ValueBaseType, namedTypes);
+
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint, namedTypes);
+
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.size() == 1);
+    REQUIRE(blueprint.report.warnings[0].code == LogicalErrorWarning);
+    SourceMapHelper::check(blueprint.report.warnings[0].location, 39, 12);
+}
