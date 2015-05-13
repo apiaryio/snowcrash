@@ -88,10 +88,20 @@ namespace snowcrash {
             IntermediateParseResult<mson::Mixin> mixin(sections.report);
             cur = MSONMixinParser::parse(node, siblings, pd, mixin);
 
-            element.build(mixin.node);
+            if (baseType != mixin.node.baseType) {
 
-            if (pd.exportSourceMap()) {
-                elementSM.mixin = mixin.sourceMap;
+                // WARN: Mixin base type should be compatible with the parent base type
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                sections.report.warnings.push_back(Warning("mixin base type should be the same as parent base type. objects should contain object mixins. arrays should contain array mixins",
+                                                           LogicalErrorWarning,
+                                                           sourceMap));
+            }
+            else {
+                element.build(mixin.node);
+
+                if (pd.exportSourceMap()) {
+                    elementSM.mixin = mixin.sourceMap;
+                }
             }
         }
         else if (pd.sectionContext() == MSONOneOfSectionType) {
