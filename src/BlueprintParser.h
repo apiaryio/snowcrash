@@ -644,7 +644,7 @@ namespace snowcrash {
                  ++elementIt) {
 
                 if (elementIt->element == Element::CategoryElement) {
-                    checkResourceLazyReferencing(*elementIt, *elementSourceMapIt, pd, out);
+                    checkResourceLazyReferencing(*elementIt, elementSourceMapIt, pd, out);
                 }
 
                 if (pd.exportSourceMap()) {
@@ -655,14 +655,14 @@ namespace snowcrash {
 
         /** Traverses Resource Collection to resolve references with `Pending` state (Lazy referencing) */
         static void checkResourceLazyReferencing(Element& element,
-                                                 SourceMap<Element>& elementSourceMap,
+                                                 Collection<SourceMap<Element> >::iterator& elementSourceMap,
                                                  SectionParserData& pd,
                                                  const ParseResultRef<Blueprint>& out) {
 
             Collection<SourceMap<Element> >::iterator resourceElementSourceMapIt;
 
             if (pd.exportSourceMap()) {
-                resourceElementSourceMapIt = elementSourceMap.content.elements().collection.begin();
+                resourceElementSourceMapIt = elementSourceMap->content.elements().collection.begin();
             }
 
             for (Elements::iterator resourceElementIt = element.content.elements().begin();
@@ -670,7 +670,12 @@ namespace snowcrash {
                  ++resourceElementIt) {
 
                 if (resourceElementIt->element == Element::ResourceElement) {
-                    checkActionLazyReferencing(resourceElementIt->content.resource, resourceElementSourceMapIt->content.resource, pd, out);
+                    if (pd.exportSourceMap()) {
+                        checkActionLazyReferencing(resourceElementIt->content.resource, resourceElementSourceMapIt->content.resource, pd, out);
+                    } else {
+                        SourceMap<Resource> tempSourceMap;
+                        checkActionLazyReferencing(resourceElementIt->content.resource, tempSourceMap, pd, out);
+                    }
                 }
 
                 if (pd.exportSourceMap()) {
@@ -705,7 +710,7 @@ namespace snowcrash {
 
         /** Traverses Transaction Example Collection AST to resolve references with `Pending` state (Lazy referencing) */
         static void checkExampleLazyReferencing(Action& action,
-                                                Collection<SourceMap<Action> >::iterator actionSourceMapIt,
+                                                Collection<SourceMap<Action> >::iterator& actionSourceMapIt,
                                                 SectionParserData& pd,
                                                 const ParseResultRef<Blueprint>& out) {
 
@@ -730,7 +735,7 @@ namespace snowcrash {
 
         /** Traverses Request Collection to resolve references with `Pending` state (Lazy referencing) */
         static void checkRequestLazyReferencing(TransactionExample& transactionExample,
-                                                Collection<SourceMap<TransactionExample> >::iterator transactionExampleSourceMapIt,
+                                                Collection<SourceMap<TransactionExample> >::iterator& transactionExampleSourceMapIt,
                                                 SectionParserData& pd,
                                                 const ParseResultRef<Blueprint>& out) {
 
@@ -770,7 +775,7 @@ namespace snowcrash {
 
         /** Traverses Response Collection to resolve references with `Pending` state (Lazy referencing) */
         static void checkResponseLazyReferencing(TransactionExample& transactionExample,
-                                                 Collection<SourceMap<TransactionExample> >::iterator transactionExampleSourceMapIt,
+                                                 Collection<SourceMap<TransactionExample> >::iterator& transactionExampleSourceMapIt,
                                                  SectionParserData& pd,
                                                  const ParseResultRef<Blueprint>& out) {
 
