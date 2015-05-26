@@ -725,3 +725,24 @@ TEST_CASE("Don't mess up sourcemaps when there are references", "[parser][#213]"
     REQUIRE(resourceSM.actions.collection[0].method.sourceMap[0].location == 111);
     REQUIRE(resourceSM.actions.collection[0].method.sourceMap[0].length == 8);
 }
+
+TEST_CASE("doesn't crash while parsing response followed by a block quote", "[parser][#322]")
+{
+    mdp::ByteBuffer source = \
+    "# GET /a\n\n"\
+    "+ Response 200\n\n"\
+    "        a\n"\
+    ">       b\n"\
+    "        e\n"\
+    "# B";
+
+    ParseResult<Blueprint> blueprint;
+    parse(source, ExportSourcemapOption, blueprint);
+
+    REQUIRE(blueprint.report.error.code == Error::OK);
+
+    SourceMap<Resource> resourceSM = blueprint.sourceMap.content.elements().collection[0].content.elements().collection[0].content.resource;
+    SourceMap<Action> actionSM = resourceSM.actions.collection[0];
+    SourceMap<Payload> payloadSM = actionSM.examples.collection[0].responses.collection[0];
+    SourceMapHelper::check(payloadSM.body.sourceMap, 30, 22);
+}
