@@ -246,8 +246,7 @@ TEST_CASE("Parse multi-line mson sample list type section with newline", "[mson]
     mdp::ByteBuffer source = \
     "- Sample\n\n"\
     "     red\n"\
-    "       green\n"\
-    "yellow";
+    "       green";
 
     ParseResult<mson::TypeSection> typeSection;
     typeSection.node.baseType = mson::PrimitiveBaseType;
@@ -257,13 +256,13 @@ TEST_CASE("Parse multi-line mson sample list type section with newline", "[mson]
     REQUIRE(typeSection.report.warnings.empty());
 
     REQUIRE(typeSection.node.klass == mson::TypeSection::SampleClass);
-    REQUIRE(typeSection.node.content.value == " red\n   green\nyellow");
+    REQUIRE(typeSection.node.content.value == " red\n   green");
     REQUIRE(typeSection.node.content.description.empty());
     REQUIRE(typeSection.node.content.elements().empty());
 
     REQUIRE(typeSection.sourceMap.value.sourceMap.size() == 2);
     SourceMapHelper::check(typeSection.sourceMap.value.sourceMap, 14, 5, 1);
-    SourceMapHelper::check(typeSection.sourceMap.value.sourceMap, 23, 15, 2);
+    SourceMapHelper::check(typeSection.sourceMap.value.sourceMap, 23, 8, 2);
     REQUIRE(typeSection.sourceMap.description.sourceMap.empty());
     REQUIRE(typeSection.sourceMap.elements().collection.empty());
 }
