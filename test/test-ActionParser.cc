@@ -6,6 +6,7 @@
 //  Copyright (c) 2013 Apiary Inc. All rights reserved.
 //
 
+#include "snowcrash.h"
 #include "snowcrashtest.h"
 #include "ActionParser.h"
 
@@ -520,3 +521,87 @@ TEST_CASE("Warn when request is not followed by a response", "[action]")
 //    REQUIRE(action.node.examples[1].requests[0].attributes.source.typeDefinition.typeSpecification.name.base == mson::StringTypeName);
 //    REQUIRE(action.node.examples[1].responses.size() == 1);
 //}
+
+TEST_CASE("Named Endpoint", "[named_endpoint]")
+{
+    const mdp::ByteBuffer source = \
+    "# Group Test Group\n\n"\
+    "## My Named Endpoint [GET /test/endpoint]\n\n"\
+    "Endpoint Description\n\n"\
+    "+ Response 200 (text/plain)\n\n"\
+    "        OK.";
+
+    ParseResult<Blueprint> blueprint;
+    snowcrash::parse(source, 0, blueprint);
+
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.empty());
+
+    REQUIRE(blueprint.node.content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).element == Element::ResourceElement);
+
+    Resource resource = blueprint.node.content.elements().at(0).content.elements().at(0).content.resource;
+    REQUIRE(resource.name == "My Named Endpoint");
+    REQUIRE(resource.uriTemplate == "/test/endpoint");
+    REQUIRE(resource.actions.size() == 1);
+
+    Action action = resource.actions.at(0);
+    REQUIRE(action.method == "GET");
+}
+
+TEST_CASE("Named Endpoints Edge Cases", "[named_endpoint]")
+{
+    const mdp::ByteBuffer source = \
+    "# Endpoint 1  [GET /e1]\n\n"\
+    "+ Response 204\n\n"\
+    "# Endpoint 2  [GET /e1]\n\n"\
+    "+ Response 204\n\n"\
+    "# Endpoint 3  [POST /e1]\n\n"\
+    "+ Response 204\n";
+
+    ParseResult<Blueprint> blueprint;
+    snowcrash::parse(source, 0, blueprint);
+
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.size() == 2);
+
+    REQUIRE(blueprint.report.warnings.at(0).code == DuplicateWarning);
+    REQUIRE(blueprint.report.warnings.at(1).code == DuplicateWarning);
+
+    REQUIRE(blueprint.node.content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 3);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).element == Element::ResourceElement);
+
+    {
+        Resource resource = blueprint.node.content.elements().at(0).content.elements().at(0).content.resource;
+        REQUIRE(resource.name == "Endpoint 1");
+        REQUIRE(resource.uriTemplate == "/e1");
+        REQUIRE(resource.actions.size() == 1);
+
+        Action action = resource.actions.at(0);
+        REQUIRE(action.method == "GET");
+    }
+
+    {
+        Resource resource = blueprint.node.content.elements().at(0).content.elements().at(1).content.resource;
+        REQUIRE(resource.name == "Endpoint 2");
+        REQUIRE(resource.uriTemplate == "/e1");
+        REQUIRE(resource.actions.size() == 1);
+
+        Action action = resource.actions.at(0);
+        REQUIRE(action.method == "GET");
+    }
+
+    {
+        Resource resource = blueprint.node.content.elements().at(0).content.elements().at(2).content.resource;
+        REQUIRE(resource.name == "Endpoint 3");
+        REQUIRE(resource.uriTemplate == "/e1");
+        REQUIRE(resource.actions.size() == 1);
+
+        Action action = resource.actions.at(0);
+        REQUIRE(action.method == "POST");
+    }
+}

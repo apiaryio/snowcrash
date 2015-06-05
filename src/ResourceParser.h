@@ -25,6 +25,9 @@ namespace snowcrash {
     /** Named resource matching regex */
     const char* const NamedResourceHeaderRegex = "^[[:blank:]]*" SYMBOL_IDENTIFIER "[[:blank:]]+\\[" URI_TEMPLATE "]$";
 
+    /** Named endpoint matching regex */
+    const char* const NamedEndpointHeaderRegex = "^[[:blank:]]*" SYMBOL_IDENTIFIER "[[:blank:]]+\\[" HTTP_REQUEST_METHOD "[[:blank:]]+" URI_TEMPLATE "]$";
+
     /** Internal type alias for Collection iterator of Resource */
     typedef Collection<Resource>::const_iterator ResourceIterator;
 
@@ -49,21 +52,15 @@ namespace snowcrash {
 
                 // Make this section an action
                 if (!captureGroups[2].empty()) {
-
-                    IntermediateParseResult<Action> action(out.report);
-
-                    MarkdownNodeIterator cur = ActionParser::parse(node, node->parent().children(), pd, action);
-
-                    out.node.actions.push_back(action.node);
-                    layout = RedirectSectionLayout;
-
-                    if (pd.exportSourceMap()) {
-                        out.sourceMap.actions.collection.push_back(action.sourceMap);
-                        out.sourceMap.uriTemplate.sourceMap = node->sourceMap;
-                    }
-
-                    return cur;
+                    return processNestedAction(node, node->parent().children(), pd, layout, out);
                 }
+            } else if (RegexCapture(node->text, NamedEndpointHeaderRegex, captureGroups, 5)) {
+
+                out.node.name = captureGroups[1];
+                TrimString(out.node.name);
+                out.node.uriTemplate = captureGroups[3];
+
+                return processNestedAction(node, node->parent().children(), pd, layout, out);
             } else {
                 matchNamedResourceHeader(node, out.node);
             }
@@ -207,6 +204,7 @@ namespace snowcrash {
                 TrimString(subject);
 
                 if (RegexMatch(subject, NamedResourceHeaderRegex) ||
+                    RegexMatch(subject, NamedEndpointHeaderRegex) ||
                     RegexMatch(subject, ResourceHeaderRegex)) {
                     return ResourceSectionType;
                 }
@@ -334,6 +332,29 @@ namespace snowcrash {
                 TrimString(resource.name);
                 resource.uriTemplate = captureGroups[2];
             }
+        }
+
+        /**
+         * \brief Parse the current node as an action
+         */
+        static MarkdownNodeIterator processNestedAction(const MarkdownNodeIterator& node,
+                                                        const MarkdownNodes& siblings,
+                                                        SectionParserData& pd,
+                                                        SectionLayout& layout,
+                                                        const ParseResultRef<Resource>& out) {
+
+            IntermediateParseResult<Action> action(out.report);
+            MarkdownNodeIterator cur = ActionParser::parse(node, siblings, pd, action);
+
+            out.node.actions.push_back(action.node);
+            layout = RedirectSectionLayout;
+
+            if (pd.exportSourceMap()) {
+                out.sourceMap.actions.collection.push_back(action.sourceMap);
+                out.sourceMap.uriTemplate.sourceMap = node->sourceMap;
+            }
+
+            return cur;
         }
 
         /** Process Action section */
