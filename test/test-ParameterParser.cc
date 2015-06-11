@@ -163,6 +163,66 @@ TEST_CASE("Recognize parameter with old syntax default value but have enum in at
     REQUIRE(sectionType == ParameterSectionType);
 }
 
+TEST_CASE("Recognize parameter with ambiguous signature but uses MSON syntax for default value", "[parameter][#336]")
+{
+    mdp::ByteBuffer source = \
+    "+ id (optional)\n"\
+    "    + Default: 1";
+
+    mdp::MarkdownParser markdownParser;
+    mdp::MarkdownNode markdownAST;
+    markdownParser.parse(source, markdownAST);
+
+    REQUIRE(!markdownAST.children().empty());
+    SectionType sectionType = SectionProcessor<Parameter>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == MSONParameterSectionType);
+}
+
+TEST_CASE("Recognize parameter with ambiguous signature but uses MSON syntax for sample value", "[parameter][#336]")
+{
+    mdp::ByteBuffer source = \
+    "+ id (optional)\n"\
+    "    + Sample: 1";
+
+    mdp::MarkdownParser markdownParser;
+    mdp::MarkdownNode markdownAST;
+    markdownParser.parse(source, markdownAST);
+
+    REQUIRE(!markdownAST.children().empty());
+    SectionType sectionType = SectionProcessor<Parameter>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == MSONParameterSectionType);
+}
+
+TEST_CASE("Recognize parameter with ambiguous signature but uses MSON syntax for values", "[parameter][#336]")
+{
+    mdp::ByteBuffer source = \
+    "+ id (optional)\n"\
+    "    + Members";
+
+    mdp::MarkdownParser markdownParser;
+    mdp::MarkdownNode markdownAST;
+    markdownParser.parse(source, markdownAST);
+
+    REQUIRE(!markdownAST.children().empty());
+    SectionType sectionType = SectionProcessor<Parameter>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == MSONParameterSectionType);
+}
+
+TEST_CASE("Recognize parameter with ambiguous signature but uses old syntax for values", "[parameter][#336]")
+{
+    mdp::ByteBuffer source = \
+    "+ id (optional)\n"\
+    "    + Values";
+
+    mdp::MarkdownParser markdownParser;
+    mdp::MarkdownNode markdownAST;
+    markdownParser.parse(source, markdownAST);
+
+    REQUIRE(!markdownAST.children().empty());
+    SectionType sectionType = SectionProcessor<Parameter>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == ParameterSectionType);
+}
+
 TEST_CASE("Parse canonical parameter definition", "[parameter]")
 {
     ParseResult<Parameter> parameter;
