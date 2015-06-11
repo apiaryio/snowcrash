@@ -11,6 +11,7 @@
 
 #include "SectionParser.h"
 #include "ValuesParser.h"
+#include "MSONTypeSectionParser.h"
 #include "RegexMatch.h"
 #include "StringUtility.h"
 
@@ -146,6 +147,27 @@ namespace snowcrash {
                 mdp::ByteBuffer subject, remainingContent;
                 subject = GetFirstLine(node->children().front().text, remainingContent);
                 TrimString(subject);
+
+                // Look ahead into nested list items
+                for (MarkdownNodeIterator it = node->children().begin();
+                     it != node->children().end();
+                     ++it) {
+
+                    if (it->type == mdp::ListItemMarkdownNodeType
+                        && !it->children().empty()) {
+
+                        mdp::ByteBuffer itSubject, itRemainingContent;
+                        itSubject = GetFirstLine(it->children().front().text, itRemainingContent);
+                        TrimString(itSubject);
+
+                        if (RegexMatch(itSubject, MSONDefaultTypeSectionRegex) ||
+                            RegexMatch(itSubject, MSONSampleTypeSectionRegex) ||
+                            RegexMatch(itSubject, MSONValueMembersTypeSectionRegex)) {
+
+                            return MSONParameterSectionType;
+                        }
+                    }
+                }
 
                 ParameterType parameterType = getParameterType(subject);
 
