@@ -121,8 +121,8 @@
 		BBAE529218FEBFAE00D98223 = {
 			isa = PBXGroup;
 			children = (
-				BBAE52A218FEC10400D98223 /* src */,
 				BBAE52A418FEC16B00D98223 /* sundown */,
+				BBAE52A218FEC10400D98223 /* libmarkdownparser */,
 				BB955A4E19011E85006684B8 /* test-libmarkdownparser */,
 				BBAE529C18FEBFAE00D98223 /* Products */,
 			);
@@ -137,7 +137,7 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		BBAE52A218FEC10400D98223 /* src */ = {
+		BBAE52A218FEC10400D98223 /* libmarkdownparser */ = {
 			isa = PBXGroup;
 			children = (
 				BB2672ED19067E6A0053EEFA /* ByteBuffer.cc */,
@@ -147,7 +147,7 @@
 				BB955A4519011A5F006684B8 /* MarkdownParser.cc */,
 				BB955A4719011A71006684B8 /* MarkdownParser.h */,
 			);
-			name = src;
+			name = libmarkdownparser;
 			sourceTree = "<group>";
 		};
 		BBAE52A418FEC16B00D98223 /* sundown */ = {
