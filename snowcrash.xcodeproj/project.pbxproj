@@ -270,9 +270,9 @@
 			children = (
 				BB8C3E701923F09900EF36FA /* libmarkdownparser.a */,
 				BBFF48CB170B3ECB001E5FB2 /* libsnowcrash */,
+				BBFF48B9170B3AF6001E5FB2 /* test-libsnowcrash */,
 				BB05B9CF180448E300243E1B /* perf-libsnowcrash */,
 				BBFF4899170B34E6001E5FB2 /* Products */,
-				BBFF48B9170B3AF6001E5FB2 /* test-libsnowcrash */,
 			);
 			sourceTree = "<group>";
 		};
