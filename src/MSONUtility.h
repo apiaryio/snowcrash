@@ -46,7 +46,8 @@ namespace mson {
 
         if ((type == StringTypeName) ||
             (type == NumberTypeName) ||
-            (type == BooleanTypeName)) {
+            (type == BooleanTypeName) ||
+            (type == NullTypeName)) {
 
             return PrimitiveBaseType;
         }
@@ -141,6 +142,9 @@ namespace mson {
         }
         else if (isBaseType && subject == "enum") {
             typeName.base = EnumTypeName;
+        }
+        else if (isBaseType && subject == "null") {
+            typeName.base = NullTypeName;
         }
         else if (isBaseType && subject == "object") {
             typeName.base = ObjectTypeName;

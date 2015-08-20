@@ -101,6 +101,7 @@ namespace mson {
     enum BaseTypeName {
         UndefinedTypeName = 0, // Not a base type name
         BooleanTypeName,       // `boolean` type name
+        NullTypeName,          // `null` type name
         StringTypeName,        // `string` type name
         NumberTypeName,        // `number` type name
         ArrayTypeName,         // `array` type name
