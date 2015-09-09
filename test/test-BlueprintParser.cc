@@ -1093,3 +1093,82 @@ TEST_CASE("When an array member contains a mixin of object type", "[blueprint]")
     REQUIRE(blueprint.report.warnings[0].code == LogicalErrorWarning);
     SourceMapHelper::check(blueprint.report.warnings[0].location, 39, 12);
 }
+
+TEST_CASE("Any named type data structure should be able to be overridden when referenced", "[blueprint]")
+{
+    mdp::ByteBuffer source = \
+    "# Tesla\n"\
+    "\n"\
+    "# Data Structures\n"\
+    "## User (object)\n"\
+    "+ username: kyle\n"\
+    "\n"\
+    "# GET /sample\n"\
+    "+ Response 200 (application/json)\n"\
+    "    + Attributes\n"\
+    "        + data (object, required)\n"\
+    "            + users (array, required)\n"\
+    "                + (User)\n"\
+    "                    + relation: family\n";
+
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
+
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.empty());
+
+    REQUIRE(blueprint.node.content.elements().size() == 2);
+    REQUIRE(blueprint.node.content.elements().at(1).element == Element::CategoryElement);
+    REQUIRE(blueprint.node.content.elements().at(1).category == Element::ResourceGroupCategory);
+    REQUIRE(blueprint.node.content.elements().at(1).content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(0).element == Element::ResourceElement);
+
+    Resource resource = blueprint.node.content.elements().at(1).content.elements().at(0).content.resource;
+
+    REQUIRE(resource.uriTemplate == "/sample");
+    REQUIRE(resource.actions.size() == 1);
+    REQUIRE(resource.actions.at(0).method == "GET");
+    REQUIRE(resource.actions.at(0).examples.size() == 1);
+    REQUIRE(resource.actions.at(0).examples.at(0).requests.empty());
+    REQUIRE(resource.actions.at(0).examples.at(0).responses.size() == 1);
+
+    Response response = resource.actions.at(0).examples.at(0).responses.at(0);
+
+    REQUIRE(response.name == "200");
+    REQUIRE(response.attributes.sections.size() == 1);
+    REQUIRE(response.attributes.sections.at(0).klass == mson::TypeSection::MemberTypeClass);
+    REQUIRE(response.attributes.sections.at(0).content.elements().size() == 1);
+    REQUIRE(response.attributes.sections.at(0).content.elements().at(0).klass == mson::Element::PropertyClass);
+
+    mson::PropertyMember property1 = response.attributes.sections.at(0).content.elements().at(0).content.property;
+
+    REQUIRE(property1.name.literal == "data");
+    REQUIRE(property1.sections.size() == 1);
+    REQUIRE(property1.sections.at(0).klass == mson::TypeSection::MemberTypeClass);
+    REQUIRE(property1.sections.at(0).content.elements().size() == 1);
+    REQUIRE(property1.sections.at(0).content.elements().at(0).klass == mson::Element::PropertyClass);
+
+    mson::PropertyMember property2 = property1.sections.at(0).content.elements().at(0).content.property;
+
+    REQUIRE(property2.name.literal == "users");
+    REQUIRE(property2.sections.size() == 1);
+    REQUIRE(property2.sections.at(0).klass == mson::TypeSection::MemberTypeClass);
+    REQUIRE(property2.sections.at(0).content.elements().size() == 1);
+    REQUIRE(property2.sections.at(0).content.elements().at(0).klass == mson::Element::ValueClass);
+
+    mson::ValueMember value = property2.sections.at(0).content.elements().at(0).content.value;
+
+    REQUIRE(value.valueDefinition.typeDefinition.typeSpecification.name.symbol.literal == "User");
+    REQUIRE(value.sections.size() == 1);
+    REQUIRE(value.sections.at(0).klass == mson::TypeSection::MemberTypeClass);
+    REQUIRE(value.sections.at(0).content.elements().size() == 1);
+    REQUIRE(value.sections.at(0).content.elements().at(0).klass == mson::Element::PropertyClass);
+
+    mson::PropertyMember property3 = value.sections.at(0).content.elements().at(0).content.property;
+
+    REQUIRE(property3.name.literal == "relation");
+    REQUIRE(property3.sections.empty());
+    REQUIRE(property3.valueDefinition.values.size() == 1);
+    REQUIRE(property3.valueDefinition.values[0].literal == "family");
+    REQUIRE(property3.valueDefinition.typeDefinition.empty());
+}
