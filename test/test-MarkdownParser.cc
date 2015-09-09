@@ -574,6 +574,62 @@ TEST_CASE("Map node without trailing newline", "[parser][sourcemap]")
     REQUIRE(node.sourceMap[0].length == 13);
 }
 
+TEST_CASE("Parse six nested level list items", "[parser]")
+{
+    MarkdownParser parser;
+    MarkdownNode ast;
+
+    ByteBuffer src = \
+    "+ 1\n"\
+    "    + 2\n"\
+    "        + 3\n"\
+    "            + 4\n"\
+    "                + 5\n"\
+    "                    + 6\n";
+
+    parser.parse(src, ast);
+
+    REQUIRE(ast.type == RootMarkdownNodeType);
+    REQUIRE(ast.text.empty());
+    REQUIRE(ast.children().size() == 1);
+
+    MarkdownNode& list = ast.children().back();
+    REQUIRE(list.type == ListItemMarkdownNodeType);
+    REQUIRE(list.children().size() == 2);
+    REQUIRE(list.children().front().type == ParagraphMarkdownNodeType);
+    REQUIRE(list.children().front().text == "1\n");
+
+    list = list.children().back();
+    REQUIRE(list.type == ListItemMarkdownNodeType);
+    REQUIRE(list.children().size() == 2);
+    REQUIRE(list.children().front().type == ParagraphMarkdownNodeType);
+    REQUIRE(list.children().front().text == "2\n");
+
+    list = list.children().back();
+    REQUIRE(list.type == ListItemMarkdownNodeType);
+    REQUIRE(list.children().size() == 2);
+    REQUIRE(list.children().front().type == ParagraphMarkdownNodeType);
+    REQUIRE(list.children().front().text == "3\n");
+
+    list = list.children().back();
+    REQUIRE(list.type == ListItemMarkdownNodeType);
+    REQUIRE(list.children().size() == 2);
+    REQUIRE(list.children().front().type == ParagraphMarkdownNodeType);
+    REQUIRE(list.children().front().text == "4\n");
+
+    list = list.children().back();
+    REQUIRE(list.type == ListItemMarkdownNodeType);
+    REQUIRE(list.children().size() == 2);
+    REQUIRE(list.children().front().type == ParagraphMarkdownNodeType);
+    REQUIRE(list.children().front().text == "5\n");
+
+    list = list.children().back();
+    REQUIRE(list.type == ListItemMarkdownNodeType);
+    REQUIRE(list.children().size() == 1);
+    REQUIRE(list.children().front().type == ParagraphMarkdownNodeType);
+    REQUIRE(list.children().front().text == "6\n");
+}
+
 TEST_CASE("Multi-paragraph list item source map", "[parser][sourcemap]")
 {
     MarkdownParser parser;
