@@ -134,7 +134,8 @@ namespace mson {
         OptionalTypeAttribute = (1 << 1),  // The type is optional
         FixedTypeAttribute    = (1 << 2),  // The type is fixed
         SampleTypeAttribute   = (1 << 3),  // The type is a sample
-        DefaultTypeAttribute  = (1 << 4)   // The type is default
+        DefaultTypeAttribute  = (1 << 4),  // The type is default
+        NullableTypeAttribute = (1 << 5)   // The type is nullable
     };
 
     /** List of type attributes */

@@ -187,6 +187,7 @@ TEST_CASE("Parse required type attribute", "[mson][utility]")
     REQUIRE((typeAttributes & FixedTypeAttribute) == 0);
     REQUIRE((typeAttributes & SampleTypeAttribute) == 0);
     REQUIRE((typeAttributes & DefaultTypeAttribute) == 0);
+    REQUIRE((typeAttributes & NullableTypeAttribute) == 0);
     REQUIRE(isAttributeParsed);
 }
 
@@ -203,6 +204,7 @@ TEST_CASE("Parse optional type attribute", "[mson][utility]")
     REQUIRE((typeAttributes & FixedTypeAttribute) == 0);
     REQUIRE((typeAttributes & SampleTypeAttribute) == 0);
     REQUIRE((typeAttributes & DefaultTypeAttribute) == 0);
+    REQUIRE((typeAttributes & NullableTypeAttribute) == 0);
     REQUIRE(isAttributeParsed);
 }
 
@@ -219,6 +221,7 @@ TEST_CASE("Parse fixed type attribute", "[mson][utility]")
     REQUIRE((typeAttributes & FixedTypeAttribute) == FixedTypeAttribute);
     REQUIRE((typeAttributes & SampleTypeAttribute) == 0);
     REQUIRE((typeAttributes & DefaultTypeAttribute) == 0);
+    REQUIRE((typeAttributes & NullableTypeAttribute) == 0);
     REQUIRE(isAttributeParsed);
 }
 
@@ -235,6 +238,7 @@ TEST_CASE("Parse sample type attribute", "[mson][utility]")
     REQUIRE((typeAttributes & FixedTypeAttribute) == 0);
     REQUIRE((typeAttributes & SampleTypeAttribute) == SampleTypeAttribute);
     REQUIRE((typeAttributes & DefaultTypeAttribute) == 0);
+    REQUIRE((typeAttributes & NullableTypeAttribute) == 0);
     REQUIRE(isAttributeParsed);
 }
 
@@ -251,6 +255,24 @@ TEST_CASE("Parse default type attribute", "[mson][utility]")
     REQUIRE((typeAttributes & FixedTypeAttribute) == 0);
     REQUIRE((typeAttributes & SampleTypeAttribute) == 0);
     REQUIRE((typeAttributes & DefaultTypeAttribute) == DefaultTypeAttribute);
+    REQUIRE((typeAttributes & NullableTypeAttribute) == 0);
+    REQUIRE(isAttributeParsed);
+}
+
+TEST_CASE("Parse nullable type attribute", "[mson][utility]")
+{
+    std::string source = "nullable";
+    TypeAttributes typeAttributes = 0;
+    
+    bool isAttributeParsed;
+    isAttributeParsed = parseTypeAttribute(source, typeAttributes);
+    
+    REQUIRE((typeAttributes & RequiredTypeAttribute) == 0);
+    REQUIRE((typeAttributes & OptionalTypeAttribute) == 0);
+    REQUIRE((typeAttributes & FixedTypeAttribute) == 0);
+    REQUIRE((typeAttributes & SampleTypeAttribute) == 0);
+    REQUIRE((typeAttributes & DefaultTypeAttribute) == 0);
+    REQUIRE((typeAttributes & NullableTypeAttribute) == NullableTypeAttribute);
     REQUIRE(isAttributeParsed);
 }
 
@@ -267,6 +289,7 @@ TEST_CASE("Parse required type attribute enclosed in backticks", "[mson][utility
     REQUIRE((typeAttributes & FixedTypeAttribute) == 0);
     REQUIRE((typeAttributes & SampleTypeAttribute) == 0);
     REQUIRE((typeAttributes & DefaultTypeAttribute) == 0);
+    REQUIRE((typeAttributes & NullableTypeAttribute) == 0);
     REQUIRE(isAttributeParsed == false);
 }
 
