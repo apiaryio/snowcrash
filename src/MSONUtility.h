@@ -178,6 +178,9 @@ namespace mson {
         else if (attribute == "default") {
             typeAttributes |= DefaultTypeAttribute;
         }
+        else if (attribute == "nullable") {
+            typeAttributes |= NullableTypeAttribute;
+        }
         else {
             isAttribute = false;
         }
