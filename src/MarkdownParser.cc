@@ -13,7 +13,7 @@
 using namespace mdp;
 
 const size_t MarkdownParser::OutputUnitSize = 64;
-const size_t MarkdownParser::MaxNesting = 16;
+const size_t MarkdownParser::MaxNesting = 32;
 const int MarkdownParser::ParserExtensions = MKDEXT_FENCED_CODE | MKDEXT_NO_INTRA_EMPHASIS | MKDEXT_LAX_SPACING /*| MKDEXT_TABLES */;
 
 #define NO_WORKING_NODE_ERR std::logic_error("no working node")
