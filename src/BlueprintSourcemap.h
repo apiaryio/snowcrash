@@ -49,6 +49,9 @@ namespace snowcrash {
 
         /** Source Map of Default Value, applicable only when `required == false` */
         SourceMap<Value> defaultValue;
+        
+        /** Source Map of Nullable Value */
+        SourceMap<Value> nullableValue;
 
         /** Source Map of Example Value */
         SourceMap<Value> exampleValue;

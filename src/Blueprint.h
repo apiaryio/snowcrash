@@ -104,7 +104,8 @@ namespace snowcrash {
     enum ParameterUse {
         UndefinedParameterUse,
         OptionalParameterUse,
-        RequiredParameterUse
+        RequiredParameterUse,
+        NullableParameterUse
     };
 
     /** Parameter */
@@ -124,6 +125,9 @@ namespace snowcrash {
 
         /** Default Value, applicable only when `required == false` */
         Value defaultValue;
+        
+        /** Nullable Value */
+        Value nullableValue;
 
         /** Example Value */
         Value exampleValue;
