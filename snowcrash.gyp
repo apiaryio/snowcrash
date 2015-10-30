@@ -47,7 +47,7 @@
         'ext/markdown-parser/src/MarkdownParser.h'
       ],
       'dependencies': [
-          'libsundown'
+        'libsundown'
       ]
     },
     {
@@ -123,7 +123,7 @@
         ]
       ],
       'dependencies': [
-          'libmarkdownparser',
+        'libmarkdownparser',
       ]
     },
     {
@@ -174,7 +174,6 @@
       ],
       'dependencies': [
         'libsnowcrash',
-        'libmarkdownparser'
       ]
     },
     {
@@ -192,7 +191,6 @@
       ],
       'dependencies': [
         'libsnowcrash',
-        'libmarkdownparser',
       ]
     }
   ]
