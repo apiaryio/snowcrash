@@ -114,7 +114,6 @@
         'src/SourceAnnotation.h',
         'src/StringUtility.h',
         'src/ValuesParser.h',
-        'src/Version.h'
       ],
       'conditions': [
         [ 'OS=="win"',
