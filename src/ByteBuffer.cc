@@ -52,12 +52,70 @@ static CharactersRange BytesRangeToCharactersRange(const BytesRange& bytesRange,
     return characterRange;
 }
 
+static CharactersRange BytesRangeToCharactersRange(const BytesRange& bytesRange, const ByteBufferCharacterIndex& index)
+{
+    if (index.empty()) {
+        return CharactersRange();
+    }
+    
+    BytesRange workRange = bytesRange;
+    if (bytesRange.location + bytesRange.length > index.size()) {
+        // Accomodate maximum possible length
+        workRange.length -= bytesRange.location + bytesRange.length - index.size();
+    }
+
+    size_t charLocation = 0;
+    if (bytesRange.location > 0)
+        charLocation = index[bytesRange.location];
+    
+    size_t charLength = 0;
+    if (bytesRange.length > 0)
+        charLength = index[bytesRange.location + bytesRange.length];
+    
+    CharactersRange characterRange = CharactersRange(charLocation, charLength);
+    return characterRange;
+}
+
+void mdp::BuildCharacterIndex(ByteBufferCharacterIndex& index, const ByteBuffer& byteBuffer) {
+
+    const char* s = byteBuffer.c_str();
+    size_t len = byteBuffer.length();
+    size_t pos = 0;
+    size_t charPos = 0;
+
+    index.resize(byteBuffer.length());
+
+	while (s[pos] && pos < len) {
+        int charLen = UTF8_CHAR_LEN(s[pos]);
+        pos += charLen;
+
+        while (charLen) {
+            index[pos-charLen] = charPos;
+            charLen--;
+        }
+
+        charPos++;
+	}
+}
+
 CharactersRangeSet mdp::BytesRangeSetToCharactersRangeSet(const BytesRangeSet& rangeSet, const ByteBuffer& byteBuffer)
 {
     CharactersRangeSet characterMap;
     
     for (BytesRangeSet::const_iterator it = rangeSet.begin(); it != rangeSet.end(); ++it) {
         CharactersRange characterRange = BytesRangeToCharactersRange(*it, byteBuffer);
+        characterMap.push_back(characterRange);
+    }
+    
+    return characterMap;
+}
+
+CharactersRangeSet mdp::BytesRangeSetToCharactersRangeSet(const BytesRangeSet& rangeSet, const ByteBufferCharacterIndex& index)
+{
+    CharactersRangeSet characterMap;
+    
+    for (BytesRangeSet::const_iterator it = rangeSet.begin(); it != rangeSet.end(); ++it) {
+        CharactersRange characterRange = BytesRangeToCharactersRange(*it, index);
         characterMap.push_back(characterRange);
     }
     

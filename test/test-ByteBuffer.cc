@@ -81,3 +81,61 @@ TEST_CASE("Multi-byte characters in blockquote", "[bytebuffer][sourcemap]")
     REQUIRE(charMap[0].location == 2);
     REQUIRE(charMap[0].length == 3);
 }
+
+TEST_CASE("Character index")
+{
+    // $¢€𐍈 (byte length - 1, 2, 3, 4, 1)
+    ByteBuffer src = "\x24\xc2\xa2\xe2\x82\xac\xf0\x90\x8d\x88\n";
+    ByteBufferCharacterIndex index;
+
+    mdp::BuildCharacterIndex(index, src);
+
+    REQUIRE(index.size() == src.length());
+
+    REQUIRE(index.size() == 11);
+
+    // '$' byte length - 1
+    REQUIRE(index[0] == 0);
+
+    // ¢ byte length - 2
+    REQUIRE(index[1] == 1);
+    REQUIRE(index[2] == 1);
+
+    // € byte length - 3
+    REQUIRE(index[3] == 2);
+    REQUIRE(index[4] == 2);
+    REQUIRE(index[5] == 2);
+
+    // 𐍈 byte length - 4
+    REQUIRE(index[6] == 3);
+    REQUIRE(index[7] == 3);
+    REQUIRE(index[8] == 3);
+    REQUIRE(index[9] == 3);
+
+    // \n byte length - 1
+    REQUIRE(index[10] == 4);
+}
+
+TEST_CASE("Byte buffer and Index should provide equal information", "[bytebuffer][sourcemap]")
+{
+    MarkdownParser parser;
+    MarkdownNode ast;
+
+    ByteBuffer src = "\x50\xC5\x99\xC3\xAD\xC5\xA1\x65\x72\x6E\xC4\x9B\x20\xC5\xBE\x6C\x75\xC5\xA5\x6F\x75\xC4\x8D\x6B\xC3\xBD\x20\x6B\xC5\xAF\xC5\x88\x20\xC3\xBA\x70\xC4\x9B\x6C\x20\xC4\x8F\xC3\xA1\x62\x65\x6C\x73\x6B\xC3\xA9\x20\xC3\xB3\x64\x79\n";
+
+    ByteBufferCharacterIndex index;
+    mdp::BuildCharacterIndex(index, src);
+
+    parser.parse(src, ast);
+
+    CharactersRangeSet charMap = BytesRangeSetToCharactersRangeSet(ast.sourceMap, src);
+    CharactersRangeSet indexMap = BytesRangeSetToCharactersRangeSet(ast.sourceMap, index);
+
+    REQUIRE(charMap.size() == 1);
+    REQUIRE(charMap[0].location == 0);
+    REQUIRE(charMap[0].length == 41);
+
+    REQUIRE(indexMap.size() == charMap.size());
+    REQUIRE(indexMap[0].location == charMap[0].location);
+    REQUIRE(charMap[0].length == charMap[0].length);
+}
