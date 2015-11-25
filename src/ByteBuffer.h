@@ -71,12 +71,20 @@ namespace mdp {
     
     /** Set of non-continuous character ranges */
     typedef RangeSet<CharactersRange> CharactersRangeSet;
+
+    /** Map byte index into utf-8 chracter index */
+    typedef std::vector<size_t> ByteBufferCharacterIndex;
+
+    /** Fill character map - cache of characters positions */
+    void BuildCharacterIndex(ByteBufferCharacterIndex& index, const ByteBuffer& byteBuffer);
     
     /** Convert ranges of bytes to ranges of characters */
     CharactersRangeSet BytesRangeSetToCharactersRangeSet(const BytesRangeSet& rangeSet, const ByteBuffer& byteBuffer);
+    CharactersRangeSet BytesRangeSetToCharactersRangeSet(const BytesRangeSet& rangeSet, const ByteBufferCharacterIndex& index);
     
     /** Maps bytes range set to byte buffer */
     ByteBuffer MapBytesRangeSet(const BytesRangeSet& rangeSet, const ByteBuffer& byteBuffer);
+
 }
 
 #endif
