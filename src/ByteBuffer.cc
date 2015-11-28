@@ -57,7 +57,7 @@ static CharactersRange BytesRangeToCharactersRange(const BytesRange& bytesRange,
     if (index.empty()) {
         return CharactersRange();
     }
-    
+
     BytesRange workRange = bytesRange;
     if (bytesRange.location + bytesRange.length > index.size()) {
         // Accomodate maximum possible length
@@ -65,12 +65,22 @@ static CharactersRange BytesRangeToCharactersRange(const BytesRange& bytesRange,
     }
 
     size_t charLocation = 0;
-    if (bytesRange.location > 0)
-        charLocation = index[bytesRange.location];
+    if (workRange.location > 0)
+        charLocation = index[workRange.location];
     
     size_t charLength = 0;
-    if (bytesRange.length > 0)
-        charLength = index[bytesRange.location + bytesRange.length];
+    if (workRange.length > 0) {
+        size_t pos = workRange.location + workRange.length;
+        if (pos >= index.size()) {
+            // this code branch is there to be compatioble with strlen_utf8()
+            charLength = index[index.size()-1];
+            charLength -= charLocation - 1;
+        }
+        else {
+            charLength = index[pos];
+            charLength -= charLocation;
+        }
+    }
     
     CharactersRange characterRange = CharactersRange(charLocation, charLength);
     return characterRange;
