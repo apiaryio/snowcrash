@@ -115,7 +115,7 @@ namespace snowcrash {
                 if (duplicate || globalDuplicate) {
 
                     // WARN: Duplicate resource
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                     out.report.warnings.push_back(Warning("the resource '" + resource.node.uriTemplate + "' is already defined",
                                                           DuplicateWarning,
                                                           sourceMap));
@@ -150,7 +150,7 @@ namespace snowcrash {
                 mdp::ByteBuffer method, name, uriTemplate;
 
                 SectionProcessor<Action>::actionHTTPMethodAndName(node, method, name, uriTemplate);
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
 
                 // WARN: Unexpected action
                 std::stringstream ss;

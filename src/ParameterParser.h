@@ -103,7 +103,7 @@ namespace snowcrash {
                 ss << "overshadowing previous 'values' definition";
                 ss << " for parameter '" << out.node.name << "'";
 
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                 out.report.warnings.push_back(Warning(ss.str(),
                                                       RedefinitionWarning,
                                                       sourceMap));
@@ -124,7 +124,7 @@ namespace snowcrash {
                 std::stringstream ss;
                 ss << "no possible values specified for parameter '" << out.node.name << "'";
 
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                 out.report.warnings.push_back(Warning(ss.str(),
                                                       EmptyDefinitionWarning,
                                                       sourceMap));
@@ -275,7 +275,7 @@ namespace snowcrash {
             }
             else {
                 // ERR: unable to parse
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                 out.report.error = Error("unable to parse parameter specification",
                                          ApplicationError,
                                          sourceMap);
@@ -353,7 +353,7 @@ namespace snowcrash {
                 ss << ", expected '([required | optional], [<type>], [`<example value>`])'";
                 ss << ", e.g. '(optional, string, `Hello World`)'";
 
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                 out.report.warnings.push_back(Warning(ss.str(),
                                                       FormattingWarning,
                                                       sourceMap));
@@ -384,7 +384,7 @@ namespace snowcrash {
                 ss << "specifying parameter '" << out.node.name << "' as required supersedes its default value"\
                 ", declare the parameter as 'optional' to specify its default value";
 
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                 out.report.warnings.push_back(Warning(ss.str(),
                                                       LogicalErrorWarning,
                                                       sourceMap));
@@ -432,7 +432,7 @@ namespace snowcrash {
             }
 
             if (printWarning) {
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                 out.report.warnings.push_back(Warning(ss.str(),
                                                       LogicalErrorWarning,
                                                       sourceMap));

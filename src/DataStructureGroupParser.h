@@ -44,7 +44,7 @@ namespace snowcrash {
                     std::stringstream ss;
                     ss << "named type with name '" << namedType.node.name.symbol.literal << "' already exists";
 
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                     out.report.warnings.push_back(Warning(ss.str(),
                                                           DuplicateWarning,
                                                           sourceMap));

@@ -68,6 +68,7 @@ int snowcrash::parse(const mdp::ByteBuffer& source,
 
         // Build SectionParserData
         SectionParserData pd(options, source, out.node);
+        mdp::BuildCharacterIndex(pd.sourceCharacterIndex, source);
 
         // Parse Blueprint
         BlueprintParser::parse(markdownAST.children().begin(), markdownAST.children(), pd, out);

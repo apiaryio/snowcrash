@@ -118,7 +118,7 @@ namespace snowcrash {
 
                     ss << " is already defined";
 
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                     out.report.warnings.push_back(Warning(ss.str(),
                                                           DuplicateWarning,
                                                           sourceMap));
@@ -285,14 +285,14 @@ namespace snowcrash {
             if (pd.options & RequireBlueprintNameOption) {
 
                 // ERR: No API name specified
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                 out.report.error = Error(ExpectedAPINameMessage, BusinessError, sourceMap);
 
             }
             else if (!out.node.description.empty()) {
 
                 // WARN: No API name specified
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                 out.report.warnings.push_back(Warning(ExpectedAPINameMessage, APINameWarning, sourceMap));
             }
         }
@@ -350,7 +350,7 @@ namespace snowcrash {
                 std::stringstream ss;
                 ss << "named type '" << identifier << "' is defined more than once";
 
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                 report.error = Error(ss.str(), MSONError, sourceMap);
                 return;
             }
@@ -489,7 +489,7 @@ namespace snowcrash {
                 std::stringstream ss;
                 ss << "base type '" << subType << "' circularly referencing itself";
 
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(nodeSourceMap, pd.sourceData);
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(nodeSourceMap, pd.sourceCharacterIndex);
                 report.error = Error(ss.str(), MSONError, sourceMap);
                 return;
             }
@@ -511,7 +511,7 @@ namespace snowcrash {
                     std::stringstream ss;
                     ss << "base type '" << superType << "' is not defined in the document";
 
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(nodeSourceMap, pd.sourceData);
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(nodeSourceMap, pd.sourceCharacterIndex);
                     report.error = Error(ss.str(), MSONError, sourceMap);
                     return;
                 }
@@ -584,7 +584,7 @@ namespace snowcrash {
                         std::stringstream ss;
                         ss << "duplicate definition of '" << it->first << "'";
 
-                        mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                        mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                         out.report.warnings.push_back(Warning(ss.str(),
                                                               DuplicateWarning,
                                                               sourceMap));
@@ -594,7 +594,7 @@ namespace snowcrash {
             else if (!out.node.empty()) {
 
                 // WARN: malformed metadata block
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                 out.report.warnings.push_back(Warning("ignoring possible metadata, expected '<key> : <value>', one one per line",
                                                       FormattingWarning,
                                                       sourceMap));
@@ -827,7 +827,7 @@ namespace snowcrash {
                 std::stringstream ss;
                 ss << "Undefined resource model " << out.node.reference.id;
 
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(out.node.reference.meta.node->sourceMap, pd.sourceData);
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(out.node.reference.meta.node->sourceMap, pd.sourceCharacterIndex);
                 out.report.error = Error(ss.str(), ModelError, sourceMap);
 
                 out.node.reference.meta.state = Reference::StateUnresolved;

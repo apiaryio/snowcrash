@@ -50,7 +50,7 @@ namespace snowcrash {
                 ss << "ignoring additional content after 'parameters' keyword,";
                 ss << " expected a nested list of parameters, one parameter per list item";
 
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                 out.report.warnings.push_back(Warning(ss.str(),
                                                       IgnoringWarning,
                                                       sourceMap));
@@ -94,7 +94,7 @@ namespace snowcrash {
                     std::stringstream ss;
                     ss << "overshadowing previous parameter '" << parameter.node.name << "' definition";
 
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                     out.report.warnings.push_back(Warning(ss.str(),
                                                           RedefinitionWarning,
                                                           sourceMap));
@@ -151,7 +151,7 @@ namespace snowcrash {
             if (out.node.empty()) {
 
                 // WARN: No parameters defined
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                 out.report.warnings.push_back(Warning(NoParametersMessage,
                                                       FormattingWarning,
                                                       sourceMap));

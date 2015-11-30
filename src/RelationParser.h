@@ -46,7 +46,7 @@ namespace snowcrash {
             }
             else {
                 // WARN: Relation identifier contains illegal characters
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                 out.report.warnings.push_back(Warning("relation identifier contains illegal characters (only lower case letters, numbers, '-' and '.' allowed)",
                                                       FormattingWarning,
                                                       sourceMap));

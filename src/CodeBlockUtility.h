@@ -80,7 +80,7 @@ namespace snowcrash {
             ss << " is expected to be a pre-formatted code block, every of its line indented by exactly ";
             ss << level * 4 << " spaces or " << level << " tabs";
 
-            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
             report.warnings.push_back(Warning(ss.str(),
                                               IndentationWarning,
                                               sourceMap));
@@ -115,7 +115,7 @@ namespace snowcrash {
             ss << "indent every of its line by ";
             ss << level * 4 << " spaces or " << level << " tabs";
 
-            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
             report.warnings.push_back(Warning(ss.str(),
                                               IndentationWarning,
                                               sourceMap));
@@ -167,7 +167,7 @@ namespace snowcrash {
                     ss << "section is not expected to be indented";
                 }
 
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                 report.warnings.push_back(Warning(ss.str(),
                                                   IndentationWarning,
                                                   sourceMap));
@@ -232,7 +232,7 @@ namespace snowcrash {
                 ss << "dangling message-body asset, expected a pre-formatted code block, ";
                 ss << "indent every of it's line by " << level*4 << " spaces or " << level << " tabs";
 
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                 report.warnings.push_back(Warning(ss.str(),
                                                   IndentationWarning,
                                                   sourceMap));
@@ -260,7 +260,7 @@ namespace snowcrash {
                 ss << "found a possible '" << symbol << "' model reference, ";
                 ss << "a reference must be directly in the " << SectionName(pd.sectionContext()) << " section, indented by 4 spaces or 1 tab, without any additional sections";
 
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                 report.warnings.push_back(Warning(ss.str(),
                                                   IgnoringWarning,
                                                   sourceMap));

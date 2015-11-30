@@ -66,6 +66,9 @@ namespace snowcrash {
         /** Source Data */
         const mdp::ByteBuffer& sourceData;
 
+        /** Source - map of bytes to character position - performance optimalization */
+        mdp::ByteBufferCharacterIndex sourceCharacterIndex;
+
         /** AST being parsed **/
         const Blueprint& blueprint;
 

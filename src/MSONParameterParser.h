@@ -217,7 +217,7 @@ namespace snowcrash {
                 ss << ", expected '([required | optional], [<type> | enum[<type>])'";
                 ss << ", e.g. '(optional, string)'";
 
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                 out.report.warnings.push_back(Warning(ss.str(),
                                                       FormattingWarning,
                                                       sourceMap));

@@ -340,7 +340,7 @@ namespace mson {
                 if (foundTypeSpecification) {
 
                     // WARN: Ignoring unrecognized type attribute
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                     report.warnings.push_back(snowcrash::Warning("ignoring unrecognized type attribute",
                                                                  snowcrash::IgnoringWarning,
                                                                  sourceMap));
@@ -369,7 +369,7 @@ namespace mson {
             std::stringstream ss;
             ss << "unable to find the symbol `" << typeDefinition.typeSpecification.name.symbol.literal << "` in the list of named types";
 
-            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
             report.warnings.push_back(snowcrash::Warning(ss.str(),
                                                          snowcrash::LogicalErrorWarning,
                                                          sourceMap));
@@ -380,7 +380,7 @@ namespace mson {
             !typeDefinition.typeSpecification.nestedTypes.empty()) {
 
             // WARN: Nested types for non (array or enum) structure base type
-            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
             report.warnings.push_back(snowcrash::Warning("nested types should be present only for types which are sub typed from either array or enum structure type",
                                                          snowcrash::LogicalErrorWarning,
                                                          sourceMap));
@@ -446,7 +446,7 @@ namespace mson {
             std::stringstream ss;
             ss << "base type '" << dependency << "' is not defined in the document";
 
-            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
             report.error = snowcrash::Error(ss.str(), snowcrash::MSONError, sourceMap);
             return;
         }
@@ -461,7 +461,7 @@ namespace mson {
             std::stringstream ss;
             ss << "base type '" << dependent << "' circularly referencing itself";
 
-            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
             report.error = snowcrash::Error(ss.str(), snowcrash::MSONError, sourceMap);
             return;
         }

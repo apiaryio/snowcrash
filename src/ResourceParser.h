@@ -121,7 +121,7 @@ namespace snowcrash {
                             std::stringstream ss;
                             ss << "named type with name '" << out.node.name << "' already exists";
 
-                            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                             out.report.warnings.push_back(Warning(ss.str(),
                                                                   DuplicateWarning,
                                                                   sourceMap));
@@ -285,7 +285,7 @@ namespace snowcrash {
 
                 URITemplateParser uriTemplateParser;
                 ParsedURITemplate parsedResult;
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
 
                 uriTemplateParser.parse(out.node.uriTemplate, sourceMap, parsedResult);
 
@@ -375,7 +375,7 @@ namespace snowcrash {
                 ss << "action with method '" << action.node.method << "' already defined for resource '";
                 ss << out.node.uriTemplate << "'";
 
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                 out.report.warnings.push_back(Warning(ss.str(),
                                                       DuplicateWarning,
                                                       sourceMap));
@@ -389,7 +389,7 @@ namespace snowcrash {
                 std::stringstream ss;
                 ss << "relation identifier '" << action.node.relation.str << "' already defined for resource '" << out.node.uriTemplate << "'";
 
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                 out.report.warnings.push_back(Warning(ss.str(),
                                                       DuplicateWarning,
                                                       sourceMap));
@@ -464,7 +464,7 @@ namespace snowcrash {
 
                 ss << "' resource, a resource can be represented by a single model only";
 
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                 out.report.warnings.push_back(Warning(ss.str(),
                                                       DuplicateWarning,
                                                       sourceMap));
@@ -485,7 +485,7 @@ namespace snowcrash {
                     ss << "resource model can be specified only for a named resource";
                     ss << ", name your resource, e.g. '# <resource name> [" << out.node.uriTemplate << "]'";
 
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                     out.report.error = Error(ss.str(),
                                              ModelError,
                                              sourceMap);
@@ -507,7 +507,7 @@ namespace snowcrash {
                 std::stringstream ss;
                 ss << "symbol '" << model.node.name << "' already defined";
 
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                 out.report.error = Error(ss.str(),
                                          ModelError,
                                          sourceMap);
@@ -550,7 +550,7 @@ namespace snowcrash {
 
                     ss << "its '" << out.node.uriTemplate << "' URI template";
 
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                     out.report.warnings.push_back(Warning(ss.str(),
                                                           LogicalErrorWarning,
                                                           sourceMap));
