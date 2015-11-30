@@ -139,3 +139,38 @@ TEST_CASE("Byte buffer and Index should provide equal information", "[bytebuffer
     REQUIRE(indexMap[0].location == charMap[0].location);
     REQUIRE(charMap[0].length == charMap[0].length);
 }
+
+TEST_CASE("Byte buffer and Index should return equal char ranges", "[bytebuffer][sourcemap]")
+{
+    //          bytes:0123   4   5678901   2   3   4
+    //          chars:0123       4567890           1
+    ByteBuffer src = "19 \xc2\xa2 & 20 \xe2\x82\xac\n";
+
+    ByteBufferCharacterIndex index;
+    mdp::BuildCharacterIndex(index, src);
+
+    BytesRangeSet byteMap;
+    byteMap.push_back(Range(1,4));
+    byteMap.push_back(Range(10,4));
+    byteMap.push_back(Range(3,7));
+    byteMap.push_back(Range(0,14));
+    byteMap.push_back(Range(0,30));
+
+    CharactersRangeSet charMap = BytesRangeSetToCharactersRangeSet(byteMap, src);
+    CharactersRangeSet indexMap = BytesRangeSetToCharactersRangeSet(byteMap, index);
+
+    REQUIRE(charMap[0].location == indexMap[0].location);
+    REQUIRE(charMap[0].length == indexMap[0].length);
+
+    REQUIRE(charMap[1].location == indexMap[1].location);
+    REQUIRE(charMap[1].length == indexMap[1].length);
+
+    REQUIRE(charMap[2].location == indexMap[2].location);
+    REQUIRE(charMap[2].length == indexMap[2].length);
+
+    REQUIRE(charMap[3].location == indexMap[3].location);
+    REQUIRE(charMap[3].length == indexMap[3].length);
+
+    REQUIRE(charMap[4].location == indexMap[4].location);
+    REQUIRE(charMap[4].length == indexMap[4].length);
+}
