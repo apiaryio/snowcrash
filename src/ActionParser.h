@@ -87,7 +87,7 @@ namespace snowcrash {
             MarkdownNodeIterator cur = node;
             std::stringstream ss;
 
-            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
 
             switch (sectionType) {
                 case RelationSectionType:
@@ -233,7 +233,7 @@ namespace snowcrash {
 
                 // WARN: Ignoring section
                 std::stringstream ss;
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
 
                 ss << "Ignoring " << SectionName(assetType) << " list item, ";
                 ss << SectionName(assetType) << " list item is expected to be indented by 4 spaces or 1 tab";
@@ -341,7 +341,7 @@ namespace snowcrash {
             if (out.node.examples.empty()) {
 
                 // WARN: No response for action
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                 out.report.warnings.push_back(Warning("action is missing a response",
                                                       EmptyDefinitionWarning,
                                                       sourceMap));
@@ -359,7 +359,7 @@ namespace snowcrash {
                     ss << "the '" << out.node.examples.back().requests.back().name << "' request";
                 }
 
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                 out.report.warnings.push_back(Warning(ss.str(),
                                                       EmptyDefinitionWarning,
                                                       sourceMap));
@@ -460,7 +460,7 @@ namespace snowcrash {
             std::stringstream ss;
             ss << "the 'headers' section at this level is deprecated and will be removed in a future, use respective payload header section(s) instead";
 
-            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
             out.report.warnings.push_back(Warning(ss.str(),
                                                   DeprecatedWarning,
                                                   sourceMap));

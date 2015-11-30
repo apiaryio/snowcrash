@@ -71,7 +71,7 @@ namespace snowcrash {
                     ss << "type section `" << signature.identifier;
                     ss << "` not allowed for a type sub-typed from a primitive or object type";
 
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                     out.report.warnings.push_back(Warning(ss.str(),
                                                           LogicalErrorWarning,
                                                           sourceMap));
@@ -92,7 +92,7 @@ namespace snowcrash {
                     ss << "type section `" << signature.identifier;
                     ss << "` is only allowed for a type sub-typed from an object type";
 
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                     out.report.warnings.push_back(Warning(ss.str(),
                                                           LogicalErrorWarning,
                                                           sourceMap));
@@ -137,7 +137,7 @@ namespace snowcrash {
                          out.node.baseType == mson::ImplicitObjectBaseType) {
 
                     // WARN: sample/default is for an object but it has values in signature
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                     out.report.warnings.push_back(Warning("a sample and/or default type section for a type which is sub-typed from an object cannot have value(s) beside the keyword",
                                                           LogicalErrorWarning,
                                                           sourceMap));

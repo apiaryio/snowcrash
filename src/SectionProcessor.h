@@ -203,7 +203,7 @@ namespace snowcrash {
 
             // WARN: Ignoring unexpected node
             std::stringstream ss;
-            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
 
             if (node->type == mdp::HeaderMarkdownNodeType) {
                 ss << "unexpected header block, expected a group, resource or an action definition";

@@ -59,7 +59,7 @@ namespace snowcrash {
                 (out.node.baseType == mson::UndefinedBaseType)) {
 
                 // WARN: invalid mixin base type
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                 out.report.warnings.push_back(Warning("mixin type may not include a type of a primitive sub-type",
                                                       FormattingWarning,
                                                       sourceMap));

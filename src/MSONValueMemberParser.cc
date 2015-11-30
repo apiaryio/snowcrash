@@ -91,7 +91,7 @@ namespace snowcrash {
             if (baseType != mixin.node.baseType) {
 
                 // WARN: Mixin base type should be compatible with the parent base type
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                 sections.report.warnings.push_back(Warning("mixin base type should be the same as parent base type. objects should contain object mixins. arrays should contain array mixins",
                                                            LogicalErrorWarning,
                                                            sourceMap));
@@ -110,7 +110,7 @@ namespace snowcrash {
                 baseType != mson::ImplicitObjectBaseType) {
 
                 // WARN: One of can not be a nested member for a non object structure type
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                 sections.report.warnings.push_back(Warning("one of may be a nested member of a object sub-types only",
                                                            LogicalErrorWarning,
                                                            sourceMap));
@@ -159,7 +159,7 @@ namespace snowcrash {
                      baseType == mson::ImplicitPrimitiveBaseType) {
 
                 // WARN: Primitive type members should not have nested members
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                 sections.report.warnings.push_back(Warning("sub-types of primitive types should not have nested members",
                                                            LogicalErrorWarning,
                                                            sourceMap));
@@ -167,7 +167,7 @@ namespace snowcrash {
             else {
 
                 // WARN: Ignoring unrecognized block in mson nested members
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                 sections.report.warnings.push_back(Warning("ignorning unrecognized block",
                                                            IgnoringWarning,
                                                            sourceMap));

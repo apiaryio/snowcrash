@@ -97,7 +97,7 @@ namespace scpl {
                 if (signature.identifier.empty()) {
 
                     // WARN: Empty identifier
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                     report.warnings.push_back(snowcrash::Warning("no identifier specified",
                                                                  snowcrash::EmptyDefinitionWarning,
                                                                  sourceMap));
@@ -121,7 +121,7 @@ namespace scpl {
                     if (signature.values.empty()) {
 
                         // WARN: Empty values
-                        mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                        mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                         report.warnings.push_back(snowcrash::Warning("no value(s) specified",
                                                                      snowcrash::EmptyDefinitionWarning,
                                                                      sourceMap));

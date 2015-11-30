@@ -172,7 +172,7 @@ namespace snowcrash {
             if (out.node.empty()) {
 
                 // WARN: No headers defined
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                 out.report.warnings.push_back(Warning("no headers specified",
                                                       FormattingWarning,
                                                       sourceMap));
@@ -233,7 +233,7 @@ namespace snowcrash {
                 }
 
                 Header header;
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
 
                 if (parseHeaderLine(*line, header, out, sourceMap)) {
                     out.node.push_back(header);
@@ -245,7 +245,7 @@ namespace snowcrash {
                     }
                 } else {
                     // WARN: unable to parse header
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                     out.report.warnings.push_back(Warning("unable to parse HTTP header, expected '<header name> : <header value>', one header per line",
                                                           FormattingWarning,
                                                           sourceMap));

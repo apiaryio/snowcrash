@@ -55,6 +55,7 @@ namespace snowcrashtest {
             }
 
             snowcrash::SectionParserData pd(opts, source, bppointer->node);
+            mdp::BuildCharacterIndex(pd.sourceCharacterIndex, source);
 
             pd.sectionsContext.push_back(type);
 

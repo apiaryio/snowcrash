@@ -55,7 +55,7 @@ namespace snowcrash {
                     ss << "ignoring the '" << content << "' element";
                     ss << ", expected '`" << content << "`'";
 
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                     out.report.warnings.push_back(Warning(ss.str(),
                                                           IgnoringWarning,
                                                           sourceMap));
