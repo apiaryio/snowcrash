@@ -20,11 +20,11 @@ static size_t strnlen_utf8(const char* s, size_t len)
         return 0;
     
     size_t i = 0, j = 0;
-	while (s[i] && i < len) {
+    while (s[i] && i < len) {
         i += UTF8_CHAR_LEN(s[i]);
         j++;
-	}
-	return j;
+    }
+    return j;
 }
 
 /* Convert range of bytes to a range of characters */
@@ -88,15 +88,15 @@ static CharactersRange BytesRangeToCharactersRange(const BytesRange& bytesRange,
 
 void mdp::BuildCharacterIndex(ByteBufferCharacterIndex& index, const ByteBuffer& byteBuffer) {
 
-    const char* s = byteBuffer.c_str();
+    const char* source = byteBuffer.c_str();
     size_t len = byteBuffer.length();
     size_t pos = 0;
     size_t charPos = 0;
 
     index.resize(byteBuffer.length());
 
-	while (s[pos] && pos < len) {
-        int charLen = UTF8_CHAR_LEN(s[pos]);
+    while (source[pos] && pos < len) {
+        int charLen = UTF8_CHAR_LEN(source[pos]);
         pos += charLen;
 
         while (charLen) {
@@ -105,7 +105,7 @@ void mdp::BuildCharacterIndex(ByteBufferCharacterIndex& index, const ByteBuffer&
         }
 
         charPos++;
-	}
+    }
 }
 
 CharactersRangeSet mdp::BytesRangeSetToCharactersRangeSet(const BytesRangeSet& rangeSet, const ByteBuffer& byteBuffer)
