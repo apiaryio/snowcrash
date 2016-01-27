@@ -13,7 +13,7 @@
     'libsnowcrash_type%': 'static_library'
   },
   'target_defaults': {
-    'defines': [ 
+    'defines': [
       'BUILDING_SNOWCRASH=1'
     ],
     'configurations': {
@@ -35,7 +35,7 @@
             'BasicRuntimeChecks': 3, # /RTC1
             'RuntimeTypeInfo':  'true', # /GR, determine object type at runtime
             'DebugInformationFormat': 3, # /Zi, use program database as debugging information
-            'ExceptionHandling': 1            
+            'ExceptionHandling': 1
           },
           'VCLinkerTool': {
             'LinkIncremental': 2, # enable incremental linking
@@ -98,8 +98,7 @@
         ],
       }],
       [ 'OS in "linux freebsd openbsd solaris"', {
-        'cflags': [ '-pthread', '-fPIC' ],
-        'ldflags': [ '-pthread' ],
+        'cflags': [ '-fPIC' ],
       }],
       [ 'OS in "linux freebsd openbsd solaris android"', {
         'cflags': [ '-Wall', '-Wextra', '-Wno-unused-parameter', ],
@@ -122,7 +121,7 @@
         ]
       }],
       ['OS=="mac"', {
-        'defines': ['_DARWIN_USE_64_BIT_INODE=1'],        
+        'defines': ['_DARWIN_USE_64_BIT_INODE=1'],
         'xcode_settings': {
           'ALWAYS_SEARCH_USER_PATHS': 'NO',
           'GCC_CW_ASM_SYNTAX': 'NO',                # No -fasm-blocks
