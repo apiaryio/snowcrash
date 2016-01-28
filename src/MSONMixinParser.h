@@ -70,7 +70,7 @@ namespace snowcrash {
                 !out.node.typeSpecification.name.symbol.literal.empty() &&
                 !out.node.typeSpecification.name.symbol.variable) {
 
-                mson::addDependency(node, pd, out.node.typeSpecification.name.symbol.literal, pd.namedTypeContext, out.report);
+                mson::addDependency(node, pd, out.node.typeSpecification.name.symbol.literal, pd.namedTypeContext, out.report, true);
             }
 
             return ++MarkdownNodeIterator(node);

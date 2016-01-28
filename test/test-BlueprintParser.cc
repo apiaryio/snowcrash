@@ -748,7 +748,7 @@ TEST_CASE("Report error when data Structure inheritance graph with only a few of
     SourceMapHelper::check(blueprint.report.error.location, 37, 9);
 }
 
-TEST_CASE("Report error when named sub type is referenced in nested members", "[blueprint]")
+TEST_CASE("Do not report error when named sub type is referenced in nested members", "[blueprint]")
 {
     mdp::ByteBuffer source = \
     "# Data Structures\n"\
@@ -760,11 +760,35 @@ TEST_CASE("Report error when named sub type is referenced in nested members", "[
     ParseResult<Blueprint> blueprint;
     SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
-    REQUIRE(blueprint.report.error.code == MSONError);
-    SourceMapHelper::check(blueprint.report.error.location, 35, 11);
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.empty());
+    REQUIRE(blueprint.node.content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 2);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).element == Element::DataStructureElement);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(1).element == Element::DataStructureElement);
+
+    DataStructure dsA = blueprint.node.content.elements().at(0).content.elements().at(0).content.dataStructure;
+    REQUIRE(dsA.name.symbol.literal == "A");
+    REQUIRE(dsA.typeDefinition.baseType == mson::ImplicitObjectBaseType);
+    REQUIRE(dsA.typeDefinition.typeSpecification.name.symbol.literal == "B");
+
+    DataStructure dsB = blueprint.node.content.elements().at(0).content.elements().at(1).content.dataStructure;
+    REQUIRE(dsB.name.symbol.literal == "B");
+    REQUIRE(dsB.typeDefinition.baseType == mson::ImplicitObjectBaseType);
+    REQUIRE(dsB.typeDefinition.empty());
+    REQUIRE(dsB.sections.size() == 1);
+    REQUIRE(dsB.sections[0].klass == mson::TypeSection::MemberTypeClass);
+    REQUIRE(dsB.sections[0].content.elements().size() == 1);
+    REQUIRE(dsB.sections[0].content.elements().at(0).klass == mson::Element::PropertyClass);
+
+    mson::PropertyMember person = dsB.sections[0].content.elements().at(0).content.property;
+    REQUIRE(person.name.literal == "person");
+    REQUIRE(person.valueDefinition.typeDefinition.baseType == mson::ImplicitObjectBaseType);
+    REQUIRE(person.valueDefinition.typeDefinition.typeSpecification.name.symbol.literal == "A");
 }
 
-TEST_CASE("Report error when there are circular references in nested members", "[blueprint]")
+TEST_CASE("Do not report error when there are circular references in nested members", "[blueprint]")
 {
     mdp::ByteBuffer source = \
     "# Data Structures\n"\
@@ -779,11 +803,50 @@ TEST_CASE("Report error when there are circular references in nested members", "
     ParseResult<Blueprint> blueprint;
     SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
-    REQUIRE(blueprint.report.error.code == MSONError);
-    SourceMapHelper::check(blueprint.report.error.location, 50, 7);
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.empty());
+    REQUIRE(blueprint.node.content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 3);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).element == Element::DataStructureElement);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(1).element == Element::DataStructureElement);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(2).element == Element::DataStructureElement);
+
+    DataStructure dsB = blueprint.node.content.elements().at(0).content.elements().at(0).content.dataStructure;
+    REQUIRE(dsB.name.symbol.literal == "B");
+    REQUIRE(dsB.typeDefinition.baseType == mson::ImplicitObjectBaseType);
+    REQUIRE(dsB.typeDefinition.typeSpecification.name.symbol.literal == "C");
+
+    DataStructure dsC = blueprint.node.content.elements().at(0).content.elements().at(1).content.dataStructure;
+    REQUIRE(dsC.name.symbol.literal == "C");
+    REQUIRE(dsC.typeDefinition.baseType == mson::ImplicitObjectBaseType);
+    REQUIRE(dsC.typeDefinition.empty());
+    REQUIRE(dsC.sections.size() == 1);
+    REQUIRE(dsC.sections[0].klass == mson::TypeSection::MemberTypeClass);
+    REQUIRE(dsC.sections[0].content.elements().size() == 1);
+    REQUIRE(dsC.sections[0].content.elements().at(0).klass == mson::Element::PropertyClass);
+
+    mson::PropertyMember idC = dsC.sections[0].content.elements().at(0).content.property;
+    REQUIRE(idC.name.literal == "id");
+    REQUIRE(idC.valueDefinition.typeDefinition.baseType == mson::ImplicitObjectBaseType);
+    REQUIRE(idC.valueDefinition.typeDefinition.typeSpecification.name.symbol.literal == "A");
+
+    DataStructure dsA = blueprint.node.content.elements().at(0).content.elements().at(2).content.dataStructure;
+    REQUIRE(dsA.name.symbol.literal == "A");
+    REQUIRE(dsA.typeDefinition.baseType == mson::ImplicitObjectBaseType);
+    REQUIRE(dsA.typeDefinition.empty());
+    REQUIRE(dsA.sections.size() == 1);
+    REQUIRE(dsA.sections[0].klass == mson::TypeSection::MemberTypeClass);
+    REQUIRE(dsA.sections[0].content.elements().size() == 1);
+    REQUIRE(dsA.sections[0].content.elements().at(0).klass == mson::Element::PropertyClass);
+
+    mson::PropertyMember idA = dsA.sections[0].content.elements().at(0).content.property;
+    REQUIRE(idA.name.literal == "id");
+    REQUIRE(idA.valueDefinition.typeDefinition.baseType == mson::ImplicitObjectBaseType);
+    REQUIRE(idA.valueDefinition.typeDefinition.typeSpecification.name.symbol.literal == "B");
 }
 
-TEST_CASE("Report error when named sub type is referenced in nested members when reference happens first", "[blueprint]")
+TEST_CASE("Do not report error when named sub type is referenced in nested members when reference happens first", "[blueprint]")
 {
     mdp::ByteBuffer source = \
     "# Data Structures\n"\
@@ -796,11 +859,35 @@ TEST_CASE("Report error when named sub type is referenced in nested members when
     ParseResult<Blueprint> blueprint;
     SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
-    REQUIRE(blueprint.report.error.code == MSONError);
-    SourceMapHelper::check(blueprint.report.error.location, 26, 11);
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.empty());
+    REQUIRE(blueprint.node.content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 2);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).element == Element::DataStructureElement);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(1).element == Element::DataStructureElement);
+
+    DataStructure dsB = blueprint.node.content.elements().at(0).content.elements().at(0).content.dataStructure;
+    REQUIRE(dsB.name.symbol.literal == "B");
+    REQUIRE(dsB.typeDefinition.baseType == mson::ImplicitObjectBaseType);
+    REQUIRE(dsB.typeDefinition.empty());
+    REQUIRE(dsB.sections.size() == 1);
+    REQUIRE(dsB.sections[0].klass == mson::TypeSection::MemberTypeClass);
+    REQUIRE(dsB.sections[0].content.elements().size() == 1);
+    REQUIRE(dsB.sections[0].content.elements().at(0).klass == mson::Element::PropertyClass);
+
+    mson::PropertyMember person = dsB.sections[0].content.elements().at(0).content.property;
+    REQUIRE(person.name.literal == "person");
+    REQUIRE(person.valueDefinition.typeDefinition.baseType == mson::ImplicitObjectBaseType);
+    REQUIRE(person.valueDefinition.typeDefinition.typeSpecification.name.symbol.literal == "A");
+
+    DataStructure dsA = blueprint.node.content.elements().at(0).content.elements().at(1).content.dataStructure;
+    REQUIRE(dsA.name.symbol.literal == "A");
+    REQUIRE(dsA.typeDefinition.baseType == mson::ImplicitObjectBaseType);
+    REQUIRE(dsA.typeDefinition.typeSpecification.name.symbol.literal == "B");
 }
 
-TEST_CASE("Report error when a resource attributes type is circularly referenced in nested members", "[blueprint]")
+TEST_CASE("Do not report error when a resource attributes type is circularly referenced in nested members", "[blueprint]")
 {
     mdp::ByteBuffer source = \
     "# Post [/]\n"\
@@ -816,8 +903,43 @@ TEST_CASE("Report error when a resource attributes type is circularly referenced
     ParseResult<Blueprint> blueprint;
     SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
-    REQUIRE(blueprint.report.error.code == MSONError);
-    SourceMapHelper::check(blueprint.report.error.location, 65, 13);
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.empty());
+    REQUIRE(blueprint.node.content.elements().size() == 2);
+    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).element == Element::ResourceElement);
+
+    Resource r = blueprint.node.content.elements().at(0).content.elements().at(0).content.resource;
+    REQUIRE(r.name == "Post");
+    REQUIRE(r.attributes.typeDefinition.baseType == mson::ImplicitObjectBaseType);
+    REQUIRE(r.attributes.typeDefinition.typeSpecification.name.symbol.literal == "B");
+    REQUIRE(r.attributes.sections.size() == 1);
+    REQUIRE(r.attributes.sections[0].klass == mson::TypeSection::MemberTypeClass);
+    REQUIRE(r.attributes.sections[0].content.elements().size() == 1);
+    REQUIRE(r.attributes.sections[0].content.elements().at(0).klass == mson::Element::PropertyClass);
+
+    mson::PropertyMember id = r.attributes.sections[0].content.elements().at(0).content.property;
+    REQUIRE(id.name.literal == "id");
+    REQUIRE(id.valueDefinition.typeDefinition.baseType == mson::ImplicitPrimitiveBaseType);
+
+    REQUIRE(blueprint.node.content.elements().at(1).element == Element::CategoryElement);
+    REQUIRE(blueprint.node.content.elements().at(1).content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(0).element == Element::DataStructureElement);
+
+    DataStructure dsB = blueprint.node.content.elements().at(1).content.elements().at(0).content.dataStructure;
+    REQUIRE(dsB.name.symbol.literal == "B");
+    REQUIRE(dsB.typeDefinition.baseType == mson::ImplicitObjectBaseType);
+    REQUIRE(dsB.typeDefinition.empty());
+    REQUIRE(dsB.sections.size() == 1);
+    REQUIRE(dsB.sections[0].klass == mson::TypeSection::MemberTypeClass);
+    REQUIRE(dsB.sections[0].content.elements().size() == 1);
+    REQUIRE(dsB.sections[0].content.elements().at(0).klass == mson::Element::PropertyClass);
+
+    mson::PropertyMember posts = dsB.sections[0].content.elements().at(0).content.property;
+    REQUIRE(posts.name.literal == "posts");
+    REQUIRE(posts.valueDefinition.typeDefinition.baseType == mson::ImplicitObjectBaseType);
+    REQUIRE(posts.valueDefinition.typeDefinition.typeSpecification.name.symbol.literal == "Post");
 }
 
 TEST_CASE("Report error when named sub type is referenced as mixin", "[blueprint]")
@@ -853,7 +975,25 @@ TEST_CASE("Report error when named sub type is referenced as mixin when referenc
     SourceMapHelper::check(blueprint.report.error.location, 26, 10);
 }
 
-TEST_CASE("Report error when named type references itself in array", "[blueprint]")
+TEST_CASE("Report error when circular reference in mixins", "[blueprint]")
+{
+    mdp::ByteBuffer source = \
+    "# Data Structures\n"\
+    "\n"\
+    "## A\n"\
+    "+ Include B\n"\
+    "\n"\
+    "## B \n" \
+    "+ Include A\n";
+
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
+
+    REQUIRE(blueprint.report.error.code == MSONError);
+    SourceMapHelper::check(blueprint.report.error.location, 45, 10);
+}
+
+TEST_CASE("Do not report error when named type references itself in array", "[blueprint]")
 {
     mdp::ByteBuffer source = \
     "# Data Structures\n"\
@@ -865,8 +1005,31 @@ TEST_CASE("Report error when named type references itself in array", "[blueprint
     ParseResult<Blueprint> blueprint;
     SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
-    REQUIRE(blueprint.report.error.code == MSONError);
-    SourceMapHelper::check(blueprint.report.error.location, 48, 26);
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.empty());
+    REQUIRE(blueprint.node.content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).element == Element::DataStructureElement);
+
+    DataStructure dsComment = blueprint.node.content.elements().at(0).content.elements().at(0).content.dataStructure;
+    REQUIRE(dsComment.name.symbol.literal == "Comment");
+    REQUIRE(dsComment.typeDefinition.baseType == mson::ImplicitObjectBaseType);
+    REQUIRE(dsComment.typeDefinition.empty());
+    REQUIRE(dsComment.sections.size() == 1);
+    REQUIRE(dsComment.sections[0].klass == mson::TypeSection::MemberTypeClass);
+    REQUIRE(dsComment.sections[0].content.elements().size() == 2);
+    REQUIRE(dsComment.sections[0].content.elements().at(0).klass == mson::Element::PropertyClass);
+
+    mson::PropertyMember user = dsComment.sections[0].content.elements().at(0).content.property;
+    REQUIRE(user.name.literal == "user");
+    REQUIRE(user.valueDefinition.typeDefinition.baseType == mson::PrimitiveBaseType);
+
+    mson::PropertyMember children  = dsComment.sections[0].content.elements().at(1).content.property;
+    REQUIRE(children.name.literal == "children");
+    REQUIRE(children.valueDefinition.typeDefinition.baseType == mson::ValueBaseType);
+    REQUIRE(children.valueDefinition.typeDefinition.typeSpecification.nestedTypes.size() == 1);
+    REQUIRE(children.valueDefinition.typeDefinition.typeSpecification.nestedTypes.at(0).symbol.literal == "Comment");
 }
 
 TEST_CASE("Report error when a named type is defined twice with inheritance", "[blueprint]")
