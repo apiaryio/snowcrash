@@ -604,7 +604,36 @@ TEST_CASE("Empty body section should shouldn't be parsed as description", "[payl
     REQUIRE(payload.sourceMap.body.sourceMap.empty());
 }
 
-TEST_CASE("Parameters section should be taken as a description node", "[payload]")
+TEST_CASE("Values section should be taken as a description node", "[payload]")
+{
+    mdp::ByteBuffer source = \
+    "+ Response 200\n\n"\
+    "    + Values\n\n"\
+    "        + id\n\n"\
+    "    + Body\n\n"\
+    "            {}\n";
+
+    ParseResult<Payload> payload;
+    SectionParserHelper<Payload, PayloadParser>::parse(source, ResponseSectionType, payload, ExportSourcemapOption);
+
+    REQUIRE(payload.report.error.code == Error::OK);
+    REQUIRE(payload.report.warnings.empty());
+
+    REQUIRE(payload.node.description == "+ Values\n\n    + id\n");
+    REQUIRE(payload.node.body == "{}\n");
+
+    REQUIRE(payload.sourceMap.description.sourceMap.size() == 2);
+    REQUIRE(payload.sourceMap.description.sourceMap[0].location == 20);
+    REQUIRE(payload.sourceMap.description.sourceMap[0].length == 10);
+    REQUIRE(payload.sourceMap.description.sourceMap[1].location == 34);
+    REQUIRE(payload.sourceMap.description.sourceMap[1].length == 9);
+    REQUIRE(payload.sourceMap.parameters.collection.empty());
+    REQUIRE(payload.sourceMap.body.sourceMap.size() == 1);
+    REQUIRE(payload.sourceMap.body.sourceMap[0].location == 64);
+    REQUIRE(payload.sourceMap.body.sourceMap[0].length == 7);
+}
+
+TEST_CASE("Parameters section in response section should give a warning", "[payload]")
 {
     mdp::ByteBuffer source = \
     "+ Response 200\n\n"\
@@ -617,16 +646,13 @@ TEST_CASE("Parameters section should be taken as a description node", "[payload]
     SectionParserHelper<Payload, PayloadParser>::parse(source, ResponseSectionType, payload, ExportSourcemapOption);
 
     REQUIRE(payload.report.error.code == Error::OK);
-    REQUIRE(payload.report.warnings.empty());
+    REQUIRE(payload.report.warnings.size() == 1);
+    REQUIRE(payload.report.warnings[0].code == IgnoringWarning);
 
-    REQUIRE(payload.node.description == "+ Parameters\n\n    + id (string)\n");
+    REQUIRE(payload.node.description.empty());
     REQUIRE(payload.node.body == "{}\n");
 
-    REQUIRE(payload.sourceMap.description.sourceMap.size() == 2);
-    REQUIRE(payload.sourceMap.description.sourceMap[0].location == 20);
-    REQUIRE(payload.sourceMap.description.sourceMap[0].length == 14);
-    REQUIRE(payload.sourceMap.description.sourceMap[1].location == 38);
-    REQUIRE(payload.sourceMap.description.sourceMap[1].length == 18);
+    REQUIRE(payload.sourceMap.description.sourceMap.empty());
     REQUIRE(payload.sourceMap.parameters.collection.empty());
     REQUIRE(payload.sourceMap.body.sourceMap.size() == 1);
     REQUIRE(payload.sourceMap.body.sourceMap[0].location == 77);
