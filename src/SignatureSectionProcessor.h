@@ -18,12 +18,6 @@ namespace scpl {
     using mdp::MarkdownNodeIterator;
 
     const char EscapeCharacter = '`';
-    const char ValuesDelimiter = ':';
-    const char ValueDelimiter = ',';
-    const char AttributesBeginDelimiter = '(';
-    const char AttributesEndDelimiter = ')';
-    const char AttributeDelimiter = ',';
-    const char ContentDelimiter = '-';
 
     /**
      * \brief Signature Section Processor Base
@@ -107,14 +101,15 @@ namespace scpl {
             // Make sure values exist
             if (traits.valuesTrait &&
                 !subject.empty() &&
-                subject[0] != AttributesBeginDelimiter) {
+                subject[0] != Delimiters::AttributesBeginDelimiter) {
+
 
                 // When subject starts with values, add a ':' for easier processing
                 if (!traits.identifierTrait) {
-                    subject = ValuesDelimiter + subject;
+                    subject = traits.delimiters.valuesDelimiter + subject;
                 }
 
-                if (subject[0] == ValuesDelimiter) {
+                if (subject[0] == traits.delimiters.valuesDelimiter) {
 
                     parseSignatureValues(traits, report, subject, signature);
 
@@ -131,14 +126,14 @@ namespace scpl {
 
             if (traits.attributesTrait &&
                 !subject.empty() &&
-                subject[0] != ContentDelimiter) {
+                subject.substr(0, traits.delimiters.contentDelimiter.length()) != traits.delimiters.contentDelimiter) {
 
                 parseSignatureAttributes(report, subject, signature);
             }
 
             if (traits.contentTrait &&
                 !subject.empty() &&
-                subject[0] == ContentDelimiter) {
+                subject.substr(0, traits.delimiters.contentDelimiter.length()) == traits.delimiters.contentDelimiter) {
 
                 subject = subject.substr(1);
                 snowcrash::TrimString(subject);
@@ -204,9 +199,10 @@ namespace scpl {
                         identifier += subject[i];
                         i++;
                     }
-                } else if ((traits.valuesTrait && subject[i] == ValuesDelimiter) ||
-                           (traits.attributesTrait && subject[i] == AttributesBeginDelimiter) ||
-                           (traits.contentTrait && subject[i] == ContentDelimiter)) {
+                } else if ((traits.valuesTrait && subject[i] == traits.delimiters.valuesDelimiter) ||
+                           (traits.attributesTrait && subject[i] == Delimiters::AttributesBeginDelimiter) ||
+                           (traits.contentTrait &&
+                            subject.substr(i, traits.delimiters.contentDelimiter.length()) == traits.delimiters.contentDelimiter)) {
 
                     // If identifier ends, strip it from the subject
                     subject = subject.substr(i);
@@ -272,7 +268,7 @@ namespace scpl {
                         value += subject[i];
                         i++;
                     }
-                } else if (subject[i] == ValueDelimiter) {
+                } else if (subject[i] == Delimiters::ValueDelimiter) {
 
                     // If found value delimiter, add the value and strip it from subject
                     subject = subject.substr(i + 1);
@@ -283,8 +279,9 @@ namespace scpl {
 
                     value = "";
                     i = 0;
-                } else if ((traits.attributesTrait && subject[i] == AttributesBeginDelimiter) ||
-                           (traits.contentTrait && subject[i] == ContentDelimiter)) {
+                } else if ((traits.attributesTrait && subject[i] == Delimiters::AttributesBeginDelimiter) ||
+                           (traits.contentTrait &&
+                            subject.substr(i, traits.delimiters.contentDelimiter.length()) == traits.delimiters.contentDelimiter)) {
 
                     // If values section ends, strip it from subject
                     subject = subject.substr(i);
@@ -330,7 +327,7 @@ namespace scpl {
                                              mdp::ByteBuffer& subject,
                                              Signature& out) {
 
-            if (subject[0] != AttributesBeginDelimiter) {
+            if (subject[0] != Delimiters::AttributesBeginDelimiter) {
                 return;
             }
 
@@ -340,17 +337,17 @@ namespace scpl {
             while (attributesNotFinished) {
 
                 // Retrieve attribute
-                mdp::ByteBuffer attribute = matchBrackets(subject, 0, AttributesEndDelimiter, true);
+                mdp::ByteBuffer attribute = matchBrackets(subject, 0, Delimiters::AttributesEndDelimiter, true);
                 size_t length = attribute.size();
 
                 // If the last char is not an attribute delimiter, attributes are finished
-                if (attribute[length - 1] != AttributeDelimiter) {
+                if (attribute[length - 1] != Delimiters::AttributeDelimiter) {
                     attributesNotFinished = false;
                 } else {
                     attribute = attribute.substr(0, length - 1);
 
                     // For easier processing
-                    subject = AttributesBeginDelimiter + subject;
+                    subject = Delimiters::AttributesBeginDelimiter + subject;
                 }
 
                 snowcrash::TrimString(attribute);
@@ -420,7 +417,7 @@ namespace scpl {
 
                     subject = subject.substr(i + 1);
                     break;
-                } else if (splitByAttribute && subject[i] == AttributeDelimiter) {
+                } else if (splitByAttribute && subject[i] == Delimiters::AttributeDelimiter) {
 
                     // Return when encountering comma
                     returnString += subject[i];

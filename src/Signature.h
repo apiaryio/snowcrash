@@ -47,6 +47,26 @@ namespace scpl {
     };
 
     /**
+     * \brief Customisable Delimiters for the section signature
+     */
+    struct Delimiters {
+        const char valuesDelimiter;
+        const std::string contentDelimiter;
+
+        // These are not customizable for now
+        static const char ValueDelimiter = ',';
+        static const char AttributesBeginDelimiter = '(';
+        static const char AttributesEndDelimiter = ')';
+        static const char AttributeDelimiter = ',';
+
+        Delimiters(char valuesDelimiter_ = ':', std::string contentDelimiter_ = "-")
+        :
+        valuesDelimiter(valuesDelimiter_),
+        contentDelimiter(contentDelimiter_)
+        {}
+    };
+
+    /**
      * \brief Traits characteristics of a section signature
      *
      * Traits describe identifier defined or value/type defined signatures.
@@ -67,12 +87,15 @@ namespace scpl {
         const bool attributesTrait;
         const bool contentTrait;
 
-        SignatureTraits(Traits traits_ = 0)
+        Delimiters delimiters;
+
+        SignatureTraits(Traits traits_ = 0, Delimiters delimiters_ = Delimiters())
         :
         identifierTrait(traits_ & IdentifierTrait),
         valuesTrait(traits_ & ValuesTrait),
         attributesTrait(traits_ & AttributesTrait),
-        contentTrait(traits_ & ContentTrait)
+        contentTrait(traits_ & ContentTrait),
+        delimiters(delimiters_)
         {}
     };
 }
