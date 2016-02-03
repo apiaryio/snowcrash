@@ -100,7 +100,7 @@ namespace snowcrash {
                 out.node.description += "\n" + signature.remainingContent + "\n";
             }
 
-            parseAttributes(node, pd, signature.attributes, out);
+            SectionProcessor<Parameter>::parseAttributes(node, pd, signature.attributes, out);
 
             if (pd.exportSourceMap()) {
                 if (!out.node.name.empty()) {
@@ -263,6 +263,10 @@ namespace snowcrash {
                         out.node.exampleValue = captureGroups[1];
                     }
                     else {
+                        if (!out.node.type.empty()) {
+                            return warnAboutAdditionalTraits(node, pd, out, oldSyntax);
+                        }
+
                         out.node.type = attributes[i];
                     }
                     
@@ -294,31 +298,40 @@ namespace snowcrash {
                 }
             }
             else {
-                // WARN: Additional parameters traits warning
-                std::stringstream ss;
-                ss << "unable to parse additional parameter traits";
-                ss << (oldSyntax ? OldSyntaxAdditionalTraitsWarning : NewSyntaxAdditionalTraitsWarning);
+                warnAboutAdditionalTraits(node, pd, out, oldSyntax);
+            }
+        }
 
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                out.report.warnings.push_back(Warning(ss.str(),
-                                                      FormattingWarning,
-                                                      sourceMap));
+        template<typename T>
+        static void warnAboutAdditionalTraits(const mdp::MarkdownNodeIterator& node,
+                                              SectionParserData& pd,
+                                              const ParseResultRef<T>& out,
+                                              bool oldSyntax) {
 
-                out.node.type.clear();
-                out.node.use = UndefinedParameterUse;
+            // WARN: Additional parameters traits warning
+            std::stringstream ss;
+            ss << "unable to parse additional parameter traits";
+            ss << (oldSyntax ? OldSyntaxAdditionalTraitsWarning : NewSyntaxAdditionalTraitsWarning);
+
+            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+            out.report.warnings.push_back(Warning(ss.str(),
+                                                  FormattingWarning,
+                                                  sourceMap));
+
+            out.node.type.clear();
+            out.node.use = UndefinedParameterUse;
+
+            if (pd.exportSourceMap()) {
+                out.sourceMap.type.sourceMap.clear();
+                out.sourceMap.use.sourceMap.clear();
+            }
+
+            // Clear example value for old syntax
+            if (oldSyntax) {
+                out.node.exampleValue.clear();
 
                 if (pd.exportSourceMap()) {
-                    out.sourceMap.type.sourceMap.clear();
-                    out.sourceMap.use.sourceMap.clear();
-                }
-
-                // Clear example value for old syntax
-                if (oldSyntax) {
-                    out.node.exampleValue.clear();
-
-                    if (pd.exportSourceMap()) {
-                        out.sourceMap.exampleValue.sourceMap.clear();
-                    }
+                    out.sourceMap.exampleValue.sourceMap.clear();
                 }
             }
         }
@@ -349,7 +362,7 @@ namespace snowcrash {
                                                 SectionParserData& pd,
                                                 const ParseResultRef<T>& out) {
 
-            if (!(out.node.exampleValue.empty() && out.node.defaultValue.empty()) ||
+            if ((out.node.exampleValue.empty() && out.node.defaultValue.empty()) ||
                 out.node.values.empty()) {
 
                 return;

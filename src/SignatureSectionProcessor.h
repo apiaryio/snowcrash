@@ -135,7 +135,7 @@ namespace scpl {
                 !subject.empty() &&
                 subject.substr(0, traits.delimiters.contentDelimiter.length()) == traits.delimiters.contentDelimiter) {
 
-                subject = subject.substr(1);
+                subject = subject.substr(traits.delimiters.contentDelimiter.length());
                 snowcrash::TrimString(subject);
 
                 signature.content = subject;

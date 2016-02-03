@@ -397,7 +397,7 @@ TEST_CASE("Parse old style parameter in parameters with non-complete default val
 
     REQUIRE(parameters.node.size() == 1);
     REQUIRE(parameters.node[0].name == "id");
-    REQUIRE(parameters.node[0].defaultValue == "10");
+    REQUIRE(parameters.node[0].defaultValue == "`10");
 }
 
 TEST_CASE("Parse old style parameter in parameters with non-complete example value", "[parameter]")

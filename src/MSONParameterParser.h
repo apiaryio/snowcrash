@@ -46,7 +46,7 @@ namespace snowcrash {
                 out.node.description += "\n" + signature.remainingContent + "\n";
             }
 
-            SectionProcessor<Parameter>::parseAttributes<MSONParameter>(node, pd, signature.attributes, out, false);
+            SectionProcessor<Parameter>::parseAttributes(node, pd, signature.attributes, out, false);
 
             if (pd.exportSourceMap()) {
                 if (!out.node.name.empty()) {
