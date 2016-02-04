@@ -437,7 +437,8 @@ namespace mson {
                               snowcrash::SectionParserData& pd,
                               const mson::Literal dependency,
                               const mson::Literal dependent,
-                              snowcrash::Report& report) {
+                              snowcrash::Report& report,
+                              bool circularCheck = false) {
 
         // First, check if the type exists
         if (pd.namedTypeDependencyTable.find(dependency) == pd.namedTypeDependencyTable.end()) {
@@ -454,8 +455,8 @@ namespace mson {
         std::set<mson::Literal> dependencyDeps = pd.namedTypeDependencyTable[dependency];
 
         // Second, check if it is circular reference between them
-        if (dependent == dependency ||
-            dependencyDeps.find(dependent) != dependencyDeps.end()) {
+        if (circularCheck && (dependent == dependency ||
+                              dependencyDeps.find(dependent) != dependencyDeps.end())) {
 
             // ERR: Dependency named type circular references itself
             std::stringstream ss;
