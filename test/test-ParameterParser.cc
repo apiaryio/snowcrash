@@ -39,7 +39,18 @@ TEST_CASE("Recognize parameter with just parameter name", "[parameter]")
 
     REQUIRE(!markdownAST.children().empty());
     SectionType sectionType = SectionProcessor<Parameter>::sectionType(markdownAST.children().begin());
-    REQUIRE(sectionType == ParameterSectionType);
+    REQUIRE(sectionType == MSONParameterSectionType);
+}
+
+TEST_CASE("Recognize parameter with escaped identifier for new syntax", "[parameter]")
+{
+    mdp::MarkdownParser markdownParser;
+    mdp::MarkdownNode markdownAST;
+    markdownParser.parse("+ `user-name`", markdownAST);
+
+    REQUIRE(!markdownAST.children().empty());
+    SectionType sectionType = SectionProcessor<Parameter>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == MSONParameterSectionType);
 }
 
 TEST_CASE("Recognize parameter with parameter name and without any values or description", "[parameter]")
@@ -50,7 +61,7 @@ TEST_CASE("Recognize parameter with parameter name and without any values or des
 
     REQUIRE(!markdownAST.children().empty());
     SectionType sectionType = SectionProcessor<Parameter>::sectionType(markdownAST.children().begin());
-    REQUIRE(sectionType == ParameterSectionType);
+    REQUIRE(sectionType == MSONParameterSectionType);
 }
 
 TEST_CASE("Recognize parameter with parameter type as first trait", "[parameter]")
@@ -61,7 +72,7 @@ TEST_CASE("Recognize parameter with parameter type as first trait", "[parameter]
 
     REQUIRE(!markdownAST.children().empty());
     SectionType sectionType = SectionProcessor<Parameter>::sectionType(markdownAST.children().begin());
-    REQUIRE(sectionType == ParameterSectionType);
+    REQUIRE(sectionType == MSONParameterSectionType);
 }
 
 TEST_CASE("Recognize parameter with new syntax example value", "[parameter]")

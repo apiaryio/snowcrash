@@ -200,6 +200,10 @@ namespace snowcrash {
 
                             return MSONParameterSectionType;
                         }
+
+                        if (RegexMatch(itSubject, ParameterValuesRegex)) {
+                            return ParameterSectionType;
+                        }
                     }
                 }
 
@@ -425,16 +429,15 @@ namespace snowcrash {
                 return NotParameterType; // Empty string, invalid
             }
 
-            if (RegexCapture(innerSignature, "^" PARAMETER_IDENTIFIER "[[:blank:]]*:?", captureGroups) &&
+            // If first character is backtick, then new parameter syntax
+            if (innerSignature.substr(0, 1) == "`") {
+                return NewParameterType;
+            }
+
+            if (RegexCapture(innerSignature, "^" PARAMETER_IDENTIFIER "[[:blank:]]*", captureGroups) &&
                 !captureGroups[0].empty()) {
 
                 innerSignature = innerSignature.substr(captureGroups[0].size());
-
-                // If last char is ':', don't strip it from signature
-                if (captureGroups[0].substr(captureGroups[0].size() - 1) == ":") {
-                    innerSignature = ":" + innerSignature;
-                }
-
                 TrimString(innerSignature);
             }
             else {
@@ -443,7 +446,7 @@ namespace snowcrash {
 
             // If contains only parameter name
             if (innerSignature.empty()) {
-                return OldParameterType;
+                return NewParameterType;
             }
 
             std::string firstChar = innerSignature.substr(0, 1);
@@ -507,7 +510,7 @@ namespace snowcrash {
                 TrimString(innerSignature);
 
                 if (innerSignature.empty()) {
-                    return OldParameterType;
+                    return NewParameterType;
                 }
             }
 

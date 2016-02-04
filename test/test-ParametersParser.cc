@@ -84,7 +84,7 @@ TEST_CASE("Parse illegal parameter among legal ones", "[parameters]")
     "+ Parameters\n"\
     "    + OK_1\n"\
     "    + i;legal\n"\
-    "    + OK-2\n";
+    "    + OK_2\n";
 
     ParseResult<Parameters> parameters;
     SectionParserHelper<Parameters, ParametersParser>::parse(source,
@@ -99,7 +99,7 @@ TEST_CASE("Parse illegal parameter among legal ones", "[parameters]")
     REQUIRE(parameters.node.size() == 2);
     REQUIRE(parameters.node[0].name == "OK_1");
     REQUIRE(parameters.node[0].description.empty());
-    REQUIRE(parameters.node[1].name == "OK-2");
+    REQUIRE(parameters.node[1].name == "OK_2");
     REQUIRE(parameters.node[1].description.empty());
 
     REQUIRE(parameters.sourceMap.collection.size() == 2);
