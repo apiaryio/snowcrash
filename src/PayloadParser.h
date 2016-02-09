@@ -156,7 +156,7 @@ namespace snowcrash {
 
                 case ParametersSectionType:
                 {
-                    if (pd.sectionContext() != RequestSectionType) {
+                    if (pd.parentSectionContext() != RequestSectionType) {
                         // WARN: Only request section can have parameters section
                         mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                         out.report.warnings.push_back(Warning("ignoring parameters section in a non request payload section",

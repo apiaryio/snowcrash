@@ -604,6 +604,32 @@ TEST_CASE("Empty body section should shouldn't be parsed as description", "[payl
     REQUIRE(payload.sourceMap.body.sourceMap.empty());
 }
 
+TEST_CASE("Parse request parameters", "[payload]")
+{
+    mdp::ByteBuffer source = \
+    "+ Request (application/json)\n\n"\
+    "    + Parameters\n\n"\
+    "        + id: pavan - description\n\n"\
+    "    + Body\n\n"\
+    "            {}\n";
+
+    ParseResult<Payload> payload;
+    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, payload);
+
+    REQUIRE(payload.report.error.code == Error::OK);
+    REQUIRE(payload.report.warnings.empty());
+
+    REQUIRE(payload.node.description.empty());
+    REQUIRE(payload.node.body == "{}\n");
+    REQUIRE(payload.node.parameters.size() == 1);
+    REQUIRE(payload.node.parameters[0].name == "id");
+    REQUIRE(payload.node.parameters[0].description == "description");
+    REQUIRE(payload.node.parameters[0].type.empty());
+    REQUIRE(payload.node.parameters[0].defaultValue.empty());
+    REQUIRE(payload.node.parameters[0].exampleValue == "pavan");
+    REQUIRE(payload.node.parameters[0].values.empty());
+}
+
 TEST_CASE("Values section should be taken as a description node", "[payload]")
 {
     mdp::ByteBuffer source = \
