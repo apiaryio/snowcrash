@@ -555,7 +555,37 @@ TEST_CASE("Give a warning of empty message body for requests with certain header
     REQUIRE(payload.sourceMap.body.sourceMap.empty());
 }
 
-TEST_CASE("Do not report empty message body for requests", "[payload]")
+TEST_CASE("Give a warning of empty message body for requests with certain headers and has parameters", "[payload]")
+{
+    mdp::ByteBuffer source = \
+    "+ Request\n"\
+    "    + Parameters\n"\
+    "        + limit: 1\n"\
+    "\n"\
+    "    + Headers \n"\
+    "\n"\
+    "            Content-Length: 100\n";
+
+    ParseResult<Payload> payload;
+    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, payload, ExportSourcemapOption);
+
+    REQUIRE(payload.report.error.code == Error::OK);
+    REQUIRE(payload.report.warnings.size() == 1);
+    REQUIRE(payload.report.warnings[0].code == EmptyDefinitionWarning);
+
+    REQUIRE(payload.node.headers.size() == 1);
+    REQUIRE(payload.node.headers[0].first == "Content-Length");
+    REQUIRE(payload.node.headers[0].second == "100");
+    REQUIRE(payload.node.parameters.size() == 1);
+    REQUIRE(payload.node.parameters[0].name == "limit");
+    REQUIRE(payload.node.body.empty());
+    REQUIRE(payload.node.schema.empty());
+    REQUIRE(payload.node.attributes.empty());
+
+    REQUIRE(payload.sourceMap.body.sourceMap.empty());
+}
+
+TEST_CASE("Do not report empty message body for requests with only headers", "[payload]")
 {
     mdp::ByteBuffer source = \
     "+ Request\n"\
@@ -573,6 +603,30 @@ TEST_CASE("Do not report empty message body for requests", "[payload]")
     REQUIRE(payload.node.headers[0].first == "Accept");
     REQUIRE(payload.node.headers[0].second == "application/json, application/javascript");
     REQUIRE(payload.node.body.empty());
+    REQUIRE(payload.node.schema.empty());
+    REQUIRE(payload.node.attributes.empty());
+    REQUIRE(payload.node.parameters.empty());
+}
+
+TEST_CASE("Do not report empty message body for requests with only parameters", "[payload]")
+{
+    mdp::ByteBuffer source = \
+    "+ Request\n"\
+    "    + Parameters \n"\
+    "        + limit: 1\n";
+
+    ParseResult<Payload> payload;
+    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, payload);
+
+    REQUIRE(payload.report.error.code == Error::OK);
+    REQUIRE(payload.report.warnings.empty());
+
+    REQUIRE(payload.node.parameters.size() == 1);
+    REQUIRE(payload.node.parameters[0].name == "limit");
+    REQUIRE(payload.node.body.empty());
+    REQUIRE(payload.node.schema.empty());
+    REQUIRE(payload.node.attributes.empty());
+    REQUIRE(payload.node.headers.empty());
 }
 
 TEST_CASE("Give a warning when 100 response has a body", "[payload]")

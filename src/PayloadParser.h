@@ -640,8 +640,8 @@ namespace snowcrash {
             if (out.node.body.empty() && out.node.attributes.empty() &&
                 out.node.reference.meta.state != Reference::StatePending) {
 
-                // Warn when content-length or transfer-encoding is specified or both headers and body are empty
-                if (out.node.headers.empty()) {
+                // Warn when content-length or transfer-encoding is specified or headers, parameters and body are empty
+                if (out.node.headers.empty() && out.node.parameters.empty()) {
                     warnEmptyBody = true;
                 } else {
                     warnEmptyBody = !contentLength.empty() || !transferEncoding.empty();
