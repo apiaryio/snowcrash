@@ -244,65 +244,61 @@ namespace snowcrash {
             out.node.use = UndefinedParameterUse;
             size_t max = oldSyntax ? OLD_SYNTAX_MAX_ATTRIBUTES : NEW_SYNTAX_MAX_ATTRIBUTES;
 
-            if (attributes.size() <= max) {
-                size_t i = 0;
-                bool definedUse = false;
+            if (attributes.size() > max) {
+                return warnAboutAdditionalTraits(node, pd, out, oldSyntax);
+            }
 
-                // Traverse over parameter's traits
-                while (i < attributes.size()) {
-                    CaptureGroups captureGroups;
+            bool definedUse = false;
 
-                    if (RegexMatch(attributes[i], ParameterOptionalRegex) && !definedUse) {
-                        out.node.use = OptionalParameterUse;
-                        definedUse = true;
-                    }
-                    else if (RegexMatch(attributes[i], ParameterRequiredRegex) && !definedUse) {
-                        out.node.use = RequiredParameterUse;
-                        definedUse = true;
-                    }
-                    else if (oldSyntax &&
-                             RegexCapture(attributes[i], AdditionalTraitsExampleRegex, captureGroups) &&
-                             captureGroups.size() > 1) {
+            // Traverse over parameter's traits
+            for (size_t i = 0; i < attributes.size(); i++) {
+                CaptureGroups captureGroups;
 
-                        out.node.exampleValue = captureGroups[1];
-                    }
-                    else {
-                        if (!out.node.type.empty()) {
-                            return warnAboutAdditionalTraits(node, pd, out, oldSyntax);
-                        }
-
-                        out.node.type = attributes[i];
-                    }
-                    
-                    i++;
+                if (RegexMatch(attributes[i], ParameterOptionalRegex) && !definedUse) {
+                    out.node.use = OptionalParameterUse;
+                    definedUse = true;
                 }
-
-                // For new syntax, Retrieve the type which is wrapped by enum[]
-                if (!oldSyntax && !out.node.type.empty()) {
-                    std::string typeInsideEnum = RegexCaptureFirst(out.node.type, EnumRegex);
-                    TrimString(typeInsideEnum);
-
-                    if (!typeInsideEnum.empty()) {
-                        out.node.type = typeInsideEnum;
-                    }
+                else if (RegexMatch(attributes[i], ParameterRequiredRegex) && !definedUse) {
+                    out.node.use = RequiredParameterUse;
+                    definedUse = true;
                 }
+                else if (oldSyntax &&
+                         RegexCapture(attributes[i], AdditionalTraitsExampleRegex, captureGroups) &&
+                         captureGroups.size() > 1) {
 
-                if (pd.exportSourceMap()) {
+                    out.node.exampleValue = captureGroups[1];
+                }
+                else {
                     if (!out.node.type.empty()) {
-                        out.sourceMap.type.sourceMap = node->sourceMap;
+                        return warnAboutAdditionalTraits(node, pd, out, oldSyntax);
                     }
 
-                    if (definedUse) {
-                        out.sourceMap.use.sourceMap = node->sourceMap;
-                    }
-
-                    if (oldSyntax && !out.node.exampleValue.empty()) {
-                        out.sourceMap.exampleValue.sourceMap = node->sourceMap;
-                    }
+                    out.node.type = attributes[i];
                 }
             }
-            else {
-                warnAboutAdditionalTraits(node, pd, out, oldSyntax);
+
+            // For new syntax, Retrieve the type which is wrapped by enum[]
+            if (!oldSyntax && !out.node.type.empty()) {
+                std::string typeInsideEnum = RegexCaptureFirst(out.node.type, EnumRegex);
+                TrimString(typeInsideEnum);
+
+                if (!typeInsideEnum.empty()) {
+                    out.node.type = typeInsideEnum;
+                }
+            }
+
+            if (pd.exportSourceMap()) {
+                if (!out.node.type.empty()) {
+                    out.sourceMap.type.sourceMap = node->sourceMap;
+                }
+
+                if (definedUse) {
+                    out.sourceMap.use.sourceMap = node->sourceMap;
+                }
+
+                if (oldSyntax && !out.node.exampleValue.empty()) {
+                    out.sourceMap.exampleValue.sourceMap = node->sourceMap;
+                }
             }
         }
 
