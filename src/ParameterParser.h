@@ -26,6 +26,15 @@
 
 namespace snowcrash {
 
+    /* We only allow at the maximum 3 attributes for old syntax parameters */
+    const size_t OLD_SYNTAX_MAX_ATTRIBUTES = 3;
+
+    /* We only allow at the maximum 2 attributes for new syntax parameters */
+    const size_t NEW_SYNTAX_MAX_ATTRIBUTES = 2;
+
+    /** Parameter description delimiter */
+    const std::string DescriptionIdentifier = "...";
+
     /** Parameter Required matching regex */
     const char* const ParameterRequiredRegex = "^[[:blank:]]*[Rr]equired[[:blank:]]*$";
 
@@ -33,13 +42,10 @@ namespace snowcrash {
     const char* const ParameterOptionalRegex = "^[[:blank:]]*[Oo]ptional[[:blank:]]*$";
 
     /** Additonal Parameter Traits Example matching regex */
-    const char* const AdditionalTraitsExampleRegex = CSV_LEADINOUT "`([^`]*)`" CSV_LEADINOUT;
+    const char* const AdditionalTraitsExampleRegex = "`([^`]*)`";
 
     /** Additonal Parameter Traits Use matching regex */
-    const char* const AdditionalTraitsUseRegex = CSV_LEADINOUT "([Oo]ptional|[Rr]equired)" CSV_LEADINOUT;
-
-    /** Additonal Parameter Traits Type matching regex */
-    const char* const AdditionalTraitsTypeRegex = CSV_LEADINOUT "([^,]*)" CSV_LEADINOUT;
+    const char* const AdditionalTraitsUseRegex = "([Oo]ptional|[Rr]equired)";
 
     /** Parameter Values matching regex */
     const char* const ParameterValuesRegex = "^[[:blank:]]*[Vv]alues[[:blank:]]*$";
@@ -47,8 +53,14 @@ namespace snowcrash {
     /** Values expected content */
     const char* const ExpectedValuesContent = "nested list of possible parameter values, one element per list item e.g. '`value`'";
 
-    /** Parameter description delimiter */
-    const std::string DescriptionIdentifier = "...";
+    /** Additional Traits warning for old syntax */
+    const char* const OldSyntaxAdditionalTraitsWarning = ", expected '([required | optional], [<type>], [`<example value>`])', e.g. '(optional, string, `Hello World`)'";
+
+    /** Additional Traits warning for new syntax */
+    const char* const NewSyntaxAdditionalTraitsWarning = ", expected '([required | optional], [<type> | enum[<type>])', e.g. '(optional, string)'";
+
+    /* Type wrapped by enum matching regex */
+    const char* const EnumRegex = "^enum\\[([^][]+)]$";
 
     /** Parameter Definition Type */
     enum ParameterType {
@@ -62,30 +74,50 @@ namespace snowcrash {
      * Parameter section processor
      */
     template<>
-    struct SectionProcessor<Parameter> : public SectionProcessorBase<Parameter> {
+    struct SectionProcessor<Parameter> : public SignatureSectionProcessorBase<Parameter> {
 
-        static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
-                                                     const MarkdownNodes& siblings,
-                                                     SectionParserData& pd,
-                                                     SectionLayout& layout,
-                                                     const ParseResultRef<Parameter>& out) {
+        static SignatureTraits signatureTraits() {
 
-            mdp::ByteBuffer signature, remainingContent;
-            signature = GetFirstLine(node->text, remainingContent);
+            SignatureTraits signatureTraits(SignatureTraits::IdentifierTrait |
+                                            SignatureTraits::ValuesTrait |
+                                            SignatureTraits::AttributesTrait |
+                                            SignatureTraits::ContentTrait,
+                                            Delimiters('=', snowcrash::DescriptionIdentifier));
 
-            parseSignature(node, pd, signature, out);
+            return signatureTraits;
+        }
 
-            if (!remainingContent.empty()) {
-                out.node.description += "\n" + remainingContent + "\n";
+        static MarkdownNodeIterator finalizeSignature(const MarkdownNodeIterator& node,
+                                                      SectionParserData& pd,
+                                                      const Signature& signature,
+                                                      const ParseResultRef<Parameter>& out) {
 
-                if (pd.exportSourceMap()) {
-                    out.sourceMap.description.sourceMap.append(node->sourceMap);
+            out.node.name = signature.identifier;
+            out.node.description = signature.content;
+            out.node.defaultValue = signature.value;
+
+            if (!signature.remainingContent.empty()) {
+                out.node.description += "\n" + signature.remainingContent + "\n";
+            }
+
+            SectionProcessor<Parameter>::parseAttributes(node, pd, signature.attributes, out);
+
+            if (pd.exportSourceMap()) {
+                if (!out.node.name.empty()) {
+                    out.sourceMap.name.sourceMap = node->sourceMap;
+                }
+
+                if (!out.node.description.empty()) {
+                    out.sourceMap.description.sourceMap = node->sourceMap;
+                }
+
+                if (!out.node.defaultValue.empty()) {
+                    out.sourceMap.defaultValue.sourceMap = node->sourceMap;
                 }
             }
 
             return ++MarkdownNodeIterator(node);
         }
-
 
         static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
                                                          const MarkdownNodes& siblings,
@@ -130,13 +162,15 @@ namespace snowcrash {
                                                       sourceMap));
             }
 
-            if ((!out.node.exampleValue.empty() || !out.node.defaultValue.empty()) &&
-                 !out.node.values.empty()) {
-
-                checkExampleAndDefaultValue<Parameter>(node, pd, out);
-            }
-
             return ++MarkdownNodeIterator(node);
+        }
+
+        static void finalize(const MarkdownNodeIterator& node,
+                             SectionParserData& pd,
+                             const ParseResultRef<Parameter>& out) {
+
+            checkDefaultAndRequiredClash<Parameter>(node, pd, out);
+            checkExampleAndDefaultValue<Parameter>(node, pd, out);
         }
 
         static SectionType sectionType(const MarkdownNodeIterator& node) {
@@ -165,6 +199,10 @@ namespace snowcrash {
                             RegexMatch(itSubject, MSONValueMembersTypeSectionRegex)) {
 
                             return MSONParameterSectionType;
+                        }
+
+                        if (RegexMatch(itSubject, ParameterValuesRegex)) {
+                            return ParameterSectionType;
                         }
                     }
                 }
@@ -196,176 +234,104 @@ namespace snowcrash {
             return nested;
         }
 
-        static void parseSignature(const mdp::MarkdownNodeIterator& node,
-                                   SectionParserData& pd,
-                                   mdp::ByteBuffer& signature,
-                                   const ParseResultRef<Parameter>& out) {
+        template<typename T>
+        static void parseAttributes(const mdp::MarkdownNodeIterator& node,
+                                    SectionParserData& pd,
+                                    const std::vector<mdp::ByteBuffer>& attributes,
+                                    const ParseResultRef<T>& out,
+                                    const bool oldSyntax = true) {
 
             out.node.use = UndefinedParameterUse;
-            TrimString(signature);
+            size_t max = oldSyntax ? OLD_SYNTAX_MAX_ATTRIBUTES : NEW_SYNTAX_MAX_ATTRIBUTES;
 
-            if (pd.sectionContext() == ParameterSectionType) {
+            if (attributes.size() > max) {
+                return warnAboutAdditionalTraits(node, pd, out, oldSyntax);
+            }
 
-                mdp::ByteBuffer innerSignature = signature;
-                innerSignature = TrimString(innerSignature);
+            bool definedUse = false;
 
-                size_t firstSpace = innerSignature.find(" ");
+            // Traverse over parameter's traits
+            for (size_t i = 0; i < attributes.size(); i++) {
+                CaptureGroups captureGroups;
 
-                if (firstSpace == std::string::npos) {
-                    // Name
-                    out.node.name = signature;
+                if (RegexMatch(attributes[i], ParameterOptionalRegex) && !definedUse) {
+                    out.node.use = OptionalParameterUse;
+                    definedUse = true;
+                }
+                else if (RegexMatch(attributes[i], ParameterRequiredRegex) && !definedUse) {
+                    out.node.use = RequiredParameterUse;
+                    definedUse = true;
+                }
+                else if (oldSyntax &&
+                         RegexCapture(attributes[i], AdditionalTraitsExampleRegex, captureGroups) &&
+                         captureGroups.size() > 1) {
+
+                    out.node.exampleValue = captureGroups[1];
                 }
                 else {
-                    out.node.name = innerSignature.substr(0, firstSpace);
-                    innerSignature = innerSignature.substr(firstSpace + 1);
-
-                    size_t descriptionPos = innerSignature.find(snowcrash::DescriptionIdentifier);
-
-                    if (descriptionPos != std::string::npos) {
-                        // Description
-                        out.node.description = innerSignature.substr(descriptionPos);
-                        out.node.description = TrimString(out.node.description.replace(0, snowcrash::DescriptionIdentifier.length(), ""));
-
-                        innerSignature = innerSignature.substr(0, descriptionPos);
-                        innerSignature = TrimString(innerSignature);
+                    if (!out.node.type.empty()) {
+                        return warnAboutAdditionalTraits(node, pd, out, oldSyntax);
                     }
 
-                    size_t attributesPos = innerSignature.find("(");
-
-                    if (attributesPos != std::string::npos) {
-                        size_t endOfAttributesPos = innerSignature.find_last_of(")");
-
-                        if (endOfAttributesPos - attributesPos > 1) {
-                            std::string attributes = innerSignature.substr(attributesPos, endOfAttributesPos - attributesPos);
-                            attributes = attributes.substr(1);
-
-                            parseAdditionalTraits(node, pd, attributes, out);
-
-                            innerSignature = innerSignature.substr(0, attributesPos);
-                            innerSignature = TrimString(innerSignature);
-                        }
-                    }
-
-                    if (innerSignature.length() > 0) {
-                        // Remove =
-                        out.node.defaultValue = innerSignature;
-
-                        out.node.defaultValue.erase(std::remove(out.node.defaultValue.begin(), out.node.defaultValue.end(), '='), out.node.defaultValue.end());
-                        out.node.defaultValue.erase(std::remove(out.node.defaultValue.begin(), out.node.defaultValue.end(), '`'), out.node.defaultValue.end());
-
-                        out.node.defaultValue = TrimString(out.node.defaultValue);
-                    }
+                    out.node.type = attributes[i];
                 }
-
-                if (pd.exportSourceMap()) {
-                    if (!out.node.name.empty()) {
-                        out.sourceMap.name.sourceMap = node->sourceMap;
-                    }
-
-                    if (!out.node.description.empty()) {
-                        out.sourceMap.description.sourceMap = node->sourceMap;
-                    }
-
-                    if (!out.node.defaultValue.empty()) {
-                        out.sourceMap.defaultValue.sourceMap = node->sourceMap;
-                    }
-                }
-
-                checkDefaultAndRequiredClash<Parameter>(node, pd, out);
             }
-            else {
-                // ERR: unable to parse
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                out.report.error = Error("unable to parse parameter specification",
-                                         ApplicationError,
-                                         sourceMap);
+
+            // For new syntax, Retrieve the type which is wrapped by enum[]
+            if (!oldSyntax && !out.node.type.empty()) {
+                std::string typeInsideEnum = RegexCaptureFirst(out.node.type, EnumRegex);
+                TrimString(typeInsideEnum);
+
+                if (!typeInsideEnum.empty()) {
+                    out.node.type = typeInsideEnum;
+                }
+            }
+
+            if (pd.exportSourceMap()) {
+                if (!out.node.type.empty()) {
+                    out.sourceMap.type.sourceMap = node->sourceMap;
+                }
+
+                if (definedUse) {
+                    out.sourceMap.use.sourceMap = node->sourceMap;
+                }
+
+                if (oldSyntax && !out.node.exampleValue.empty()) {
+                    out.sourceMap.exampleValue.sourceMap = node->sourceMap;
+                }
             }
         }
 
-        static void parseAdditionalTraits(const mdp::MarkdownNodeIterator& node,
-                                          SectionParserData& pd,
-                                          mdp::ByteBuffer& traits,
-                                          const ParseResultRef<Parameter>& out) {
+        template<typename T>
+        static void warnAboutAdditionalTraits(const mdp::MarkdownNodeIterator& node,
+                                              SectionParserData& pd,
+                                              const ParseResultRef<T>& out,
+                                              bool oldSyntax) {
 
-            TrimString(traits);
+            // WARN: Additional parameters traits warning
+            std::stringstream ss;
+            ss << "unable to parse additional parameter traits";
+            ss << (oldSyntax ? OldSyntaxAdditionalTraitsWarning : NewSyntaxAdditionalTraitsWarning);
 
-            CaptureGroups captureGroups;
+            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+            out.report.warnings.push_back(Warning(ss.str(),
+                                                  FormattingWarning,
+                                                  sourceMap));
 
-            // Cherry pick example value, if any
-            if (RegexCapture(traits, AdditionalTraitsExampleRegex, captureGroups) &&
-                captureGroups.size() > 1) {
+            out.node.type.clear();
+            out.node.use = UndefinedParameterUse;
 
-                out.node.exampleValue = captureGroups[1];
-                std::string::size_type pos = traits.find(captureGroups[0]);
-
-                if (pos != std::string::npos) {
-                    traits.replace(pos, captureGroups[0].length(), std::string());
-                }
-
-                if (pd.exportSourceMap()) {
-                    out.sourceMap.exampleValue.sourceMap = node->sourceMap;
-                }
-             }
-
-            captureGroups.clear();
-
-            // Cherry pick use attribute, if any
-            if (RegexCapture(traits, AdditionalTraitsUseRegex, captureGroups) &&
-                captureGroups.size() > 1) {
-
-                out.node.use = RegexMatch(captureGroups[1], ParameterOptionalRegex) ? OptionalParameterUse : RequiredParameterUse;
-                std::string::size_type pos = traits.find(captureGroups[0]);
-
-                if (pos != std::string::npos) {
-                    traits.replace(pos, captureGroups[0].length(), std::string());
-                }
-
-                if (pd.exportSourceMap()) {
-                    out.sourceMap.use.sourceMap = node->sourceMap;
-                }
+            if (pd.exportSourceMap()) {
+                out.sourceMap.type.sourceMap.clear();
+                out.sourceMap.use.sourceMap.clear();
             }
 
-            captureGroups.clear();
-
-            // Finish with type
-            if (RegexCapture(traits, AdditionalTraitsTypeRegex, captureGroups) &&
-                captureGroups.size() > 1) {
-
-                out.node.type = captureGroups[1];
-                std::string::size_type pos = traits.find(captureGroups[0]);
-
-                if (pos != std::string::npos) {
-                    traits.replace(pos, captureGroups[0].length(), std::string());
-                }
-
-                if (pd.exportSourceMap()) {
-                    out.sourceMap.type.sourceMap = node->sourceMap;
-                }
-            }
-
-            // Check what is left
-            TrimString(traits);
-
-            if (!traits.empty()) {
-                // WARN: Additional parameters traits warning
-                std::stringstream ss;
-                ss << "unable to parse additional parameter traits";
-                ss << ", expected '([required | optional], [<type>], [`<example value>`])'";
-                ss << ", e.g. '(optional, string, `Hello World`)'";
-
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                out.report.warnings.push_back(Warning(ss.str(),
-                                                      FormattingWarning,
-                                                      sourceMap));
-
-                out.node.type.clear();
+            // Clear example value for old syntax
+            if (oldSyntax) {
                 out.node.exampleValue.clear();
-                out.node.use = UndefinedParameterUse;
 
                 if (pd.exportSourceMap()) {
-                    out.sourceMap.type.sourceMap.clear();
                     out.sourceMap.exampleValue.sourceMap.clear();
-                    out.sourceMap.use.sourceMap.clear();
                 }
             }
         }
@@ -395,6 +361,12 @@ namespace snowcrash {
         static void checkExampleAndDefaultValue(const mdp::MarkdownNodeIterator& node,
                                                 SectionParserData& pd,
                                                 const ParseResultRef<T>& out) {
+
+            if ((out.node.exampleValue.empty() && out.node.defaultValue.empty()) ||
+                out.node.values.empty()) {
+
+                return;
+            }
 
             bool isExampleFound = false;
             bool isDefaultFound = false;
@@ -453,16 +425,15 @@ namespace snowcrash {
                 return NotParameterType; // Empty string, invalid
             }
 
-            if (RegexCapture(innerSignature, "^" PARAMETER_IDENTIFIER "[[:blank:]]*:?", captureGroups) &&
+            // If first character is backtick, then new parameter syntax
+            if (innerSignature.substr(0, 1) == "`") {
+                return NewParameterType;
+            }
+
+            if (RegexCapture(innerSignature, "^" PARAMETER_IDENTIFIER "[[:blank:]]*", captureGroups) &&
                 !captureGroups[0].empty()) {
 
                 innerSignature = innerSignature.substr(captureGroups[0].size());
-
-                // If last char is ':', don't strip it from signature
-                if (captureGroups[0].substr(captureGroups[0].size() - 1) == ":") {
-                    innerSignature = ":" + innerSignature;
-                }
-
                 TrimString(innerSignature);
             }
             else {
@@ -471,7 +442,7 @@ namespace snowcrash {
 
             // If contains only parameter name
             if (innerSignature.empty()) {
-                return OldParameterType;
+                return NewParameterType;
             }
 
             std::string firstChar = innerSignature.substr(0, 1);
@@ -535,7 +506,7 @@ namespace snowcrash {
                 TrimString(innerSignature);
 
                 if (innerSignature.empty()) {
-                    return OldParameterType;
+                    return NewParameterType;
                 }
             }
 

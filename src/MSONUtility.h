@@ -247,7 +247,7 @@ namespace mson {
                 alreadyParsedLink = true;
                 lookingForEndLink = false;
             }
-            else if (subject[i] == AttributeDelimiter &&
+            else if (subject[i] == scpl::Delimiters::AttributeDelimiter &&
                      lookingAtNested &&
                      !lookingForEndLink) {
 

@@ -17,12 +17,6 @@ using namespace scpl;
 
 namespace snowcrash {
 
-    /* We only allow at the maximum 2 attributes for new syntax parameters */
-    const size_t MAX_ATTRIBUTES = 2;
-
-    /* Type wrapped by enum matching regex */
-    const char* const EnumRegex = "^enum\\[([^][]+)]$";
-
     /**
      * MSON Parameter Section Processor
      */
@@ -52,7 +46,7 @@ namespace snowcrash {
                 out.node.description += "\n" + signature.remainingContent + "\n";
             }
 
-            parseAttributes(node, pd, signature.attributes, out);
+            SectionProcessor<Parameter>::parseAttributes(node, pd, signature.attributes, out, false);
 
             if (pd.exportSourceMap()) {
                 if (!out.node.name.empty()) {
@@ -143,12 +137,7 @@ namespace snowcrash {
                              const ParseResultRef<MSONParameter>& out) {
 
             SectionProcessor<Parameter>::checkDefaultAndRequiredClash<MSONParameter>(node, pd, out);
-
-            if ((!out.node.exampleValue.empty() || !out.node.defaultValue.empty()) &&
-                !out.node.values.empty()) {
-
-                SectionProcessor<Parameter>::checkExampleAndDefaultValue<MSONParameter>(node, pd, out);
-            }
+            SectionProcessor<Parameter>::checkExampleAndDefaultValue<MSONParameter>(node, pd, out);
         }
 
         static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
@@ -159,69 +148,6 @@ namespace snowcrash {
             nestedType = SectionProcessor<mson::TypeSection>::sectionType(node);
 
             return nestedType;
-        }
-
-        static void parseAttributes(const MarkdownNodeIterator& node,
-                                    SectionParserData& pd,
-                                    const std::vector<mdp::ByteBuffer>& attributes,
-                                    const ParseResultRef<MSONParameter>& out) {
-
-            out.node.use = UndefinedParameterUse;
-
-            if (attributes.size() <= MAX_ATTRIBUTES) {
-                size_t i = 0;
-                bool definedUse = false;
-
-                // Traverse over parameter's traits
-                while (i < attributes.size()) {
-                    if (attributes[i] == "optional" && !definedUse) {
-                        out.node.use = OptionalParameterUse;
-                        definedUse = true;
-                    }
-                    else if (attributes[i] == "required" && !definedUse) {
-                        out.node.use = RequiredParameterUse;
-                        definedUse = true;
-                    }
-                    else {
-
-                        // Retrieve the type which is wrapped by enum[]
-                        std::string typeInsideEnum = RegexCaptureFirst(attributes[i], EnumRegex);
-                        TrimString(typeInsideEnum);
-
-                        if (!typeInsideEnum.empty()) {
-                            out.node.type = typeInsideEnum;
-                        }
-                        else {
-                            out.node.type = attributes[i];
-                        }
-                    }
-
-                    i++;
-                }
-
-                if (pd.exportSourceMap()) {
-                    if (!out.node.type.empty()) {
-                        out.sourceMap.type.sourceMap = node->sourceMap;
-                    }
-
-                    if (definedUse) {
-                        out.sourceMap.use.sourceMap = node->sourceMap;
-                    }
-                }
-            }
-            else {
-                // WARN: Additional parameters traits warning
-                std::stringstream ss;
-
-                ss << "unable to parse additional parameter traits";
-                ss << ", expected '([required | optional], [<type> | enum[<type>])'";
-                ss << ", e.g. '(optional, string)'";
-
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                out.report.warnings.push_back(Warning(ss.str(),
-                                                      FormattingWarning,
-                                                      sourceMap));
-            }
         }
     };
 

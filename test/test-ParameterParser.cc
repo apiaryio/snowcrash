@@ -39,7 +39,18 @@ TEST_CASE("Recognize parameter with just parameter name", "[parameter]")
 
     REQUIRE(!markdownAST.children().empty());
     SectionType sectionType = SectionProcessor<Parameter>::sectionType(markdownAST.children().begin());
-    REQUIRE(sectionType == ParameterSectionType);
+    REQUIRE(sectionType == MSONParameterSectionType);
+}
+
+TEST_CASE("Recognize parameter with escaped identifier for new syntax", "[parameter]")
+{
+    mdp::MarkdownParser markdownParser;
+    mdp::MarkdownNode markdownAST;
+    markdownParser.parse("+ `user-name`", markdownAST);
+
+    REQUIRE(!markdownAST.children().empty());
+    SectionType sectionType = SectionProcessor<Parameter>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == MSONParameterSectionType);
 }
 
 TEST_CASE("Recognize parameter with parameter name and without any values or description", "[parameter]")
@@ -50,7 +61,7 @@ TEST_CASE("Recognize parameter with parameter name and without any values or des
 
     REQUIRE(!markdownAST.children().empty());
     SectionType sectionType = SectionProcessor<Parameter>::sectionType(markdownAST.children().begin());
-    REQUIRE(sectionType == ParameterSectionType);
+    REQUIRE(sectionType == MSONParameterSectionType);
 }
 
 TEST_CASE("Recognize parameter with parameter type as first trait", "[parameter]")
@@ -61,7 +72,7 @@ TEST_CASE("Recognize parameter with parameter type as first trait", "[parameter]
 
     REQUIRE(!markdownAST.children().empty());
     SectionType sectionType = SectionProcessor<Parameter>::sectionType(markdownAST.children().begin());
-    REQUIRE(sectionType == ParameterSectionType);
+    REQUIRE(sectionType == MSONParameterSectionType);
 }
 
 TEST_CASE("Recognize parameter with new syntax example value", "[parameter]")
@@ -113,6 +124,28 @@ TEST_CASE("Recognize parameter with only old syntax description", "[parameter]")
     mdp::MarkdownParser markdownParser;
     mdp::MarkdownNode markdownAST;
     markdownParser.parse("+ id ... The user id", markdownAST);
+
+    REQUIRE(!markdownAST.children().empty());
+    SectionType sectionType = SectionProcessor<Parameter>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == ParameterSectionType);
+}
+
+TEST_CASE("Recognize parameter with brackets in old syntax example value", "[parameter]")
+{
+    mdp::MarkdownParser markdownParser;
+    mdp::MarkdownNode markdownAST;
+    markdownParser.parse("+ id (optional, oData, `substringof('homer', id)`) ... test", markdownAST);
+
+    REQUIRE(!markdownAST.children().empty());
+    SectionType sectionType = SectionProcessor<Parameter>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == ParameterSectionType);
+}
+
+TEST_CASE("Recognize parameter with old syntax description after attributes", "[parameter]")
+{
+    mdp::MarkdownParser markdownParser;
+    mdp::MarkdownNode markdownAST;
+    markdownParser.parse("+ id (optional, string) ... test", markdownAST);
 
     REQUIRE(!markdownAST.children().empty());
     SectionType sectionType = SectionProcessor<Parameter>::sectionType(markdownAST.children().begin());
@@ -359,7 +392,7 @@ TEST_CASE("Parse full abbreviated syntax", "[parameter]")
     REQUIRE(parameter.sourceMap.values.collection.empty());
 }
 
-TEST_CASE("Warn on error in  abbreviated syntax attribute bracket", "[parameter]")
+TEST_CASE("Warn on error in abbreviated syntax attribute bracket", "[parameter]")
 {
     mdp::ByteBuffer source = "+ limit (string1, string2, string3) ... This is a limit\n";
 
@@ -482,7 +515,7 @@ TEST_CASE("Unrecognized 'values' keyword", "[parameter]")
     REQUIRE(parameter.sourceMap.values.collection.empty());
 }
 
-TEST_CASE("warn missing example item in values", "[parameter]")
+TEST_CASE("Warn missing example item in values", "[parameter]")
 {
     mdp::ByteBuffer source = \
     "+ id = `Value2` (optional, string, `Value1`)\n"\
@@ -506,7 +539,7 @@ TEST_CASE("warn missing example item in values", "[parameter]")
     REQUIRE(parameter.sourceMap.values.collection[0].sourceMap[0].length == 11);
 }
 
-TEST_CASE("warn missing default value in values", "[parameter]")
+TEST_CASE("Warn missing default value in values", "[parameter]")
 {
     mdp::ByteBuffer source = \
     "+ id = `Value1` (optional, string, `Value2`)\n"\
@@ -642,11 +675,9 @@ TEST_CASE("Parameter with additional description as continuation of signature", 
     REQUIRE(parameter.sourceMap.type.sourceMap[0].length == 57);
     REQUIRE(parameter.sourceMap.defaultValue.sourceMap.empty());
     REQUIRE(parameter.sourceMap.exampleValue.sourceMap.empty());
-    REQUIRE(parameter.sourceMap.description.sourceMap.size() == 2);
+    REQUIRE(parameter.sourceMap.description.sourceMap.size() == 1);
     REQUIRE(parameter.sourceMap.description.sourceMap[0].location == 0);
     REQUIRE(parameter.sourceMap.description.sourceMap[0].length == 57);
-    REQUIRE(parameter.sourceMap.description.sourceMap[1].location == 0);
-    REQUIRE(parameter.sourceMap.description.sourceMap[1].length == 57);
     REQUIRE(parameter.sourceMap.use.sourceMap.empty());
     REQUIRE(parameter.sourceMap.values.collection.empty());
 }
@@ -674,18 +705,14 @@ TEST_CASE("Parameter with list in description", "[parameter]")
     REQUIRE(parameter.sourceMap.name.sourceMap[0].length == 40);
     REQUIRE(parameter.sourceMap.name.sourceMap[1].location == 44);
     REQUIRE(parameter.sourceMap.name.sourceMap[1].length == 15);
-    REQUIRE(parameter.sourceMap.description.sourceMap.size() == 6);
+    REQUIRE(parameter.sourceMap.description.sourceMap.size() == 4);
     REQUIRE(parameter.sourceMap.description.sourceMap[0].location == 2);
     REQUIRE(parameter.sourceMap.description.sourceMap[0].length == 40);
     REQUIRE(parameter.sourceMap.description.sourceMap[1].location == 44);
     REQUIRE(parameter.sourceMap.description.sourceMap[1].length == 15);
-    REQUIRE(parameter.sourceMap.description.sourceMap[2].location == 2);
-    REQUIRE(parameter.sourceMap.description.sourceMap[2].length == 40);
-    REQUIRE(parameter.sourceMap.description.sourceMap[3].location == 44);
-    REQUIRE(parameter.sourceMap.description.sourceMap[3].length == 15);
-    REQUIRE(parameter.sourceMap.description.sourceMap[4].location == 62);
-    REQUIRE(parameter.sourceMap.description.sourceMap[4].length == 14);
-    REQUIRE(parameter.sourceMap.description.sourceMap[5].location == 78);
-    REQUIRE(parameter.sourceMap.description.sourceMap[5].length == 21);
+    REQUIRE(parameter.sourceMap.description.sourceMap[2].location == 62);
+    REQUIRE(parameter.sourceMap.description.sourceMap[2].length == 14);
+    REQUIRE(parameter.sourceMap.description.sourceMap[3].location == 78);
+    REQUIRE(parameter.sourceMap.description.sourceMap[3].length == 21);
     REQUIRE(parameter.sourceMap.values.collection.empty());
 }
