@@ -154,6 +154,22 @@ namespace snowcrash {
                     return AttributesParser::parse(node, siblings, pd, attributes);
                 }
 
+                case ParametersSectionType:
+                {
+                    if (pd.parentSectionContext() != RequestSectionType) {
+                        // WARN: Only request section can have parameters section
+                        mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                        out.report.warnings.push_back(Warning("ignoring parameters section in a non request payload section",
+                                                              IgnoringWarning,
+                                                              sourceMap));
+
+                        return ++MarkdownNodeIterator(node);
+                    }
+
+                    ParseResultRef<Parameters> parameters(out.report, out.node.parameters, out.sourceMap.parameters);
+                    return ParametersParser::parse(node, siblings, pd, parameters);
+                }
+
                 case BodySectionType:
                 {
                     if (!out.node.body.empty()) {
@@ -290,6 +306,13 @@ namespace snowcrash {
                 return nestedType;
             }
 
+            // Check if parameters section
+            nestedType = SectionProcessor<Parameters>::sectionType(node);
+
+            if (nestedType != UndefinedSectionType) {
+                return nestedType;
+            }
+
             return UndefinedSectionType;
         }
 
@@ -300,6 +323,7 @@ namespace snowcrash {
             nested.push_back(BodySectionType);
             nested.push_back(SchemaSectionType);
             nested.push_back(AttributesSectionType);
+            nested.push_back(ParametersSectionType);
 
             // Parameters & descendants
             nested.push_back(ParametersSectionType);
@@ -616,8 +640,8 @@ namespace snowcrash {
             if (out.node.body.empty() && out.node.attributes.empty() &&
                 out.node.reference.meta.state != Reference::StatePending) {
 
-                // Warn when content-length or transfer-encoding is specified or both headers and body are empty
-                if (out.node.headers.empty()) {
+                // Warn when content-length or transfer-encoding is specified or headers, parameters and body are empty
+                if (out.node.headers.empty() && out.node.parameters.empty()) {
                     warnEmptyBody = true;
                 } else {
                     warnEmptyBody = !contentLength.empty() || !transferEncoding.empty();

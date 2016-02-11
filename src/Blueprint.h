@@ -211,13 +211,13 @@ namespace snowcrash {
         /** Payload-specific Headers */
         Headers headers;
 
-        /** Payload-specific Attributes (THIS SHOULD NOT BE HERE - should be under content) */
+        /** Payload-specific Attributes */
         Attributes attributes;
 
-        /** Body (THIS SHOULD NOT BE HERE - should be under content) */
+        /** Body */
         Asset body;
 
-        /** Schema (THIS SHOULD NOT BE HERE - should be under content) */
+        /** Schema */
         Asset schema;
 
         /** Reference */
@@ -291,13 +291,13 @@ namespace snowcrash {
         /** Action-specific Parameters */
         Parameters parameters;
 
-        /** Action-specific Attributes (THIS SHOULD NOT BE HERE - should be under content) */
+        /** Action-specific Attributes */
         Attributes attributes;
 
-        /** URI Template (THIS SHOULD NOT BE HERE - should be under element attributes) */
+        /** URI Template */
         URITemplate uriTemplate;
 
-        /** Link Relation (THIS SHOULD NOT BE HERE - should be under element attributes) */
+        /** Link Relation */
         Relation relation;
 
         /**
@@ -338,7 +338,7 @@ namespace snowcrash {
         /** Model representing this Resource */
         ResourceModel model;
 
-        /** Resource-specific Attributes (THIS SHOULD NOT BE HERE - should be under content) */
+        /** Resource-specific Attributes */
         Attributes attributes;
 
         /** Parameters */

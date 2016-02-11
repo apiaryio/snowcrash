@@ -555,7 +555,37 @@ TEST_CASE("Give a warning of empty message body for requests with certain header
     REQUIRE(payload.sourceMap.body.sourceMap.empty());
 }
 
-TEST_CASE("Do not report empty message body for requests", "[payload]")
+TEST_CASE("Give a warning of empty message body for requests with certain headers and has parameters", "[payload]")
+{
+    mdp::ByteBuffer source = \
+    "+ Request\n"\
+    "    + Parameters\n"\
+    "        + limit: 1\n"\
+    "\n"\
+    "    + Headers \n"\
+    "\n"\
+    "            Content-Length: 100\n";
+
+    ParseResult<Payload> payload;
+    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, payload, ExportSourcemapOption);
+
+    REQUIRE(payload.report.error.code == Error::OK);
+    REQUIRE(payload.report.warnings.size() == 1);
+    REQUIRE(payload.report.warnings[0].code == EmptyDefinitionWarning);
+
+    REQUIRE(payload.node.headers.size() == 1);
+    REQUIRE(payload.node.headers[0].first == "Content-Length");
+    REQUIRE(payload.node.headers[0].second == "100");
+    REQUIRE(payload.node.parameters.size() == 1);
+    REQUIRE(payload.node.parameters[0].name == "limit");
+    REQUIRE(payload.node.body.empty());
+    REQUIRE(payload.node.schema.empty());
+    REQUIRE(payload.node.attributes.empty());
+
+    REQUIRE(payload.sourceMap.body.sourceMap.empty());
+}
+
+TEST_CASE("Do not report empty message body for requests with only headers", "[payload]")
 {
     mdp::ByteBuffer source = \
     "+ Request\n"\
@@ -573,6 +603,30 @@ TEST_CASE("Do not report empty message body for requests", "[payload]")
     REQUIRE(payload.node.headers[0].first == "Accept");
     REQUIRE(payload.node.headers[0].second == "application/json, application/javascript");
     REQUIRE(payload.node.body.empty());
+    REQUIRE(payload.node.schema.empty());
+    REQUIRE(payload.node.attributes.empty());
+    REQUIRE(payload.node.parameters.empty());
+}
+
+TEST_CASE("Do not report empty message body for requests with only parameters", "[payload]")
+{
+    mdp::ByteBuffer source = \
+    "+ Request\n"\
+    "    + Parameters \n"\
+    "        + limit: 1\n";
+
+    ParseResult<Payload> payload;
+    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, payload);
+
+    REQUIRE(payload.report.error.code == Error::OK);
+    REQUIRE(payload.report.warnings.empty());
+
+    REQUIRE(payload.node.parameters.size() == 1);
+    REQUIRE(payload.node.parameters[0].name == "limit");
+    REQUIRE(payload.node.body.empty());
+    REQUIRE(payload.node.schema.empty());
+    REQUIRE(payload.node.attributes.empty());
+    REQUIRE(payload.node.headers.empty());
 }
 
 TEST_CASE("Give a warning when 100 response has a body", "[payload]")
@@ -604,7 +658,62 @@ TEST_CASE("Empty body section should shouldn't be parsed as description", "[payl
     REQUIRE(payload.sourceMap.body.sourceMap.empty());
 }
 
-TEST_CASE("Parameters section should be taken as a description node", "[payload]")
+TEST_CASE("Parse request parameters", "[payload]")
+{
+    mdp::ByteBuffer source = \
+    "+ Request (application/json)\n\n"\
+    "    + Parameters\n\n"\
+    "        + id: pavan - description\n\n"\
+    "    + Body\n\n"\
+    "            {}\n";
+
+    ParseResult<Payload> payload;
+    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, payload);
+
+    REQUIRE(payload.report.error.code == Error::OK);
+    REQUIRE(payload.report.warnings.empty());
+
+    REQUIRE(payload.node.description.empty());
+    REQUIRE(payload.node.body == "{}\n");
+    REQUIRE(payload.node.parameters.size() == 1);
+    REQUIRE(payload.node.parameters[0].name == "id");
+    REQUIRE(payload.node.parameters[0].description == "description");
+    REQUIRE(payload.node.parameters[0].type.empty());
+    REQUIRE(payload.node.parameters[0].defaultValue.empty());
+    REQUIRE(payload.node.parameters[0].exampleValue == "pavan");
+    REQUIRE(payload.node.parameters[0].values.empty());
+}
+
+TEST_CASE("Values section should be taken as a description node", "[payload]")
+{
+    mdp::ByteBuffer source = \
+    "+ Response 200\n\n"\
+    "    + Values\n\n"\
+    "        + id\n\n"\
+    "    + Body\n\n"\
+    "            {}\n";
+
+    ParseResult<Payload> payload;
+    SectionParserHelper<Payload, PayloadParser>::parse(source, ResponseSectionType, payload, ExportSourcemapOption);
+
+    REQUIRE(payload.report.error.code == Error::OK);
+    REQUIRE(payload.report.warnings.empty());
+
+    REQUIRE(payload.node.description == "+ Values\n\n    + id\n");
+    REQUIRE(payload.node.body == "{}\n");
+
+    REQUIRE(payload.sourceMap.description.sourceMap.size() == 2);
+    REQUIRE(payload.sourceMap.description.sourceMap[0].location == 20);
+    REQUIRE(payload.sourceMap.description.sourceMap[0].length == 10);
+    REQUIRE(payload.sourceMap.description.sourceMap[1].location == 34);
+    REQUIRE(payload.sourceMap.description.sourceMap[1].length == 9);
+    REQUIRE(payload.sourceMap.parameters.collection.empty());
+    REQUIRE(payload.sourceMap.body.sourceMap.size() == 1);
+    REQUIRE(payload.sourceMap.body.sourceMap[0].location == 64);
+    REQUIRE(payload.sourceMap.body.sourceMap[0].length == 7);
+}
+
+TEST_CASE("Parameters section in response section should give a warning", "[payload]")
 {
     mdp::ByteBuffer source = \
     "+ Response 200\n\n"\
@@ -617,16 +726,13 @@ TEST_CASE("Parameters section should be taken as a description node", "[payload]
     SectionParserHelper<Payload, PayloadParser>::parse(source, ResponseSectionType, payload, ExportSourcemapOption);
 
     REQUIRE(payload.report.error.code == Error::OK);
-    REQUIRE(payload.report.warnings.empty());
+    REQUIRE(payload.report.warnings.size() == 1);
+    REQUIRE(payload.report.warnings[0].code == IgnoringWarning);
 
-    REQUIRE(payload.node.description == "+ Parameters\n\n    + id (string)\n");
+    REQUIRE(payload.node.description.empty());
     REQUIRE(payload.node.body == "{}\n");
 
-    REQUIRE(payload.sourceMap.description.sourceMap.size() == 2);
-    REQUIRE(payload.sourceMap.description.sourceMap[0].location == 20);
-    REQUIRE(payload.sourceMap.description.sourceMap[0].length == 14);
-    REQUIRE(payload.sourceMap.description.sourceMap[1].location == 38);
-    REQUIRE(payload.sourceMap.description.sourceMap[1].length == 18);
+    REQUIRE(payload.sourceMap.description.sourceMap.empty());
     REQUIRE(payload.sourceMap.parameters.collection.empty());
     REQUIRE(payload.sourceMap.body.sourceMap.size() == 1);
     REQUIRE(payload.sourceMap.body.sourceMap[0].location == 77);
