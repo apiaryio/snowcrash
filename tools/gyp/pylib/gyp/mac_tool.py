@@ -45,7 +45,7 @@ class MacTool(object):
     """Transforms a tool name like copy-info-plist to CopyInfoPlist"""
     return name_string.title().replace('-', '')
 
-  def ExecCopyBundleResource(self, source, dest):
+  def ExecCopyBundleResource(self, source, dest, convert_to_binary):
     """Copies a resource file to the bundle/Resources directory, performing any
     necessary compilation on each resource."""
     extension = os.path.splitext(source)[1].lower()
@@ -66,6 +66,9 @@ class MacTool(object):
     else:
       shutil.copy(source, dest)
 
+    if extension in ('.plist', '.strings') and convert_to_binary == 'True':
+      self._ConvertToBinary(dest)
+
   def _CopyXIBFile(self, source, dest):
     """Compiles a XIB file with ibtool into a binary plist in the bundle."""
 
@@ -76,8 +79,26 @@ class MacTool(object):
     if os.path.relpath(dest):
       dest = os.path.join(base, dest)
 
-    args = ['xcrun', 'ibtool', '--errors', '--warnings', '--notices',
-        '--output-format', 'human-readable-text', '--compile', dest, source]
+    args = ['xcrun', 'ibtool', '--errors', '--warnings', '--notices']
+
+    if os.environ['XCODE_VERSION_ACTUAL'] > '0700':
+      args.extend(['--auto-activate-custom-fonts'])
+      if 'IPHONEOS_DEPLOYMENT_TARGET' in os.environ:
+        args.extend([
+            '--target-device', 'iphone', '--target-device', 'ipad',
+            '--minimum-deployment-target',
+            os.environ['IPHONEOS_DEPLOYMENT_TARGET'],
+        ])
+      else:
+        args.extend([
+            '--target-device', 'mac',
+            '--minimum-deployment-target',
+            os.environ['MACOSX_DEPLOYMENT_TARGET'],
+        ])
+
+    args.extend(['--output-format', 'human-readable-text', '--compile', dest,
+        source])
+
     ibtool_section_re = re.compile(r'/\*.*\*/')
     ibtool_re = re.compile(r'.*note:.*is clipping its content')
     ibtoolout = subprocess.Popen(args, stdout=subprocess.PIPE)
@@ -91,6 +112,10 @@ class MacTool(object):
           current_section_header = None
         sys.stdout.write(line)
     return ibtoolout.returncode
+
+  def _ConvertToBinary(self, dest):
+    subprocess.check_call([
+        'xcrun', 'plutil', '-convert', 'binary1', '-o', dest, dest])
 
   def _CopyStringsFile(self, source, dest):
     """Copies a .strings file using iconv to reconvert the input into UTF-16."""
@@ -131,7 +156,7 @@ class MacTool(object):
     else:
       return None
 
-  def ExecCopyInfoPlist(self, source, dest, *keys):
+  def ExecCopyInfoPlist(self, source, dest, convert_to_binary, *keys):
     """Copies the |source| Info.plist to the destination directory |dest|."""
     # Read the source Info.plist into memory.
     fd = open(source, 'r')
@@ -146,7 +171,7 @@ class MacTool(object):
 
     # Go through all the environment variables and replace them as variables in
     # the file.
-    IDENT_RE = re.compile('[/\s]')
+    IDENT_RE = re.compile(r'[/\s]')
     for key in os.environ:
       if key.startswith('_'):
         continue
@@ -185,6 +210,9 @@ class MacTool(object):
     # "compiled".
     self._WritePkgInfo(dest)
 
+    if convert_to_binary == 'True':
+      self._ConvertToBinary(dest)
+
   def _WritePkgInfo(self, info_plist):
     """This writes the PkgInfo file from the data stored in Info.plist."""
     plist = plistlib.readPlist(info_plist)
@@ -218,12 +246,30 @@ class MacTool(object):
   def ExecFilterLibtool(self, *cmd_list):
     """Calls libtool and filters out '/path/to/libtool: file: foo.o has no
     symbols'."""
-    libtool_re = re.compile(r'^.*libtool: file: .* has no symbols$')
-    libtoolout = subprocess.Popen(cmd_list, stderr=subprocess.PIPE)
+    libtool_re = re.compile(r'^.*libtool: (?:for architecture: \S* )?'
+                            r'file: .* has no symbols$')
+    libtool_re5 = re.compile(
+        r'^.*libtool: warning for library: ' +
+        r'.* the table of contents is empty ' +
+        r'\(no object file members in the library define global symbols\)$')
+    env = os.environ.copy()
+    # Ref:
+    # http://www.opensource.apple.com/source/cctools/cctools-809/misc/libtool.c
+    # The problem with this flag is that it resets the file mtime on the file to
+    # epoch=0, e.g. 1970-1-1 or 1969-12-31 depending on timezone.
+    env['ZERO_AR_DATE'] = '1'
+    libtoolout = subprocess.Popen(cmd_list, stderr=subprocess.PIPE, env=env)
     _, err = libtoolout.communicate()
     for line in err.splitlines():
-      if not libtool_re.match(line):
+      if not libtool_re.match(line) and not libtool_re5.match(line):
         print >>sys.stderr, line
+    # Unconditionally touch the output .a file on the command line if present
+    # and the command succeeded. A bit hacky.
+    if not libtoolout.returncode:
+      for i in range(len(cmd_list) - 1):
+        if cmd_list[i] == "-o" and cmd_list[i+1].endswith('.a'):
+          os.utime(cmd_list[i+1], None)
+          break
     return libtoolout.returncode
 
   def ExecPackageFramework(self, framework, version):
@@ -262,49 +308,85 @@ class MacTool(object):
       os.remove(link)
     os.symlink(dest, link)
 
-  def ExecCodeSignBundle(self, key, resource_rules, entitlements, provisioning):
+  def ExecCompileXcassets(self, keys, *inputs):
+    """Compiles multiple .xcassets files into a single .car file.
+
+    This invokes 'actool' to compile all the inputs .xcassets files. The
+    |keys| arguments is a json-encoded dictionary of extra arguments to
+    pass to 'actool' when the asset catalogs contains an application icon
+    or a launch image.
+
+    Note that 'actool' does not create the Assets.car file if the asset
+    catalogs does not contains imageset.
+    """
+    command_line = [
+      'xcrun', 'actool', '--output-format', 'human-readable-text',
+      '--compress-pngs', '--notices', '--warnings', '--errors',
+    ]
+    is_iphone_target = 'IPHONEOS_DEPLOYMENT_TARGET' in os.environ
+    if is_iphone_target:
+      platform = os.environ['CONFIGURATION'].split('-')[-1]
+      if platform not in ('iphoneos', 'iphonesimulator'):
+        platform = 'iphonesimulator'
+      command_line.extend([
+          '--platform', platform, '--target-device', 'iphone',
+          '--target-device', 'ipad', '--minimum-deployment-target',
+          os.environ['IPHONEOS_DEPLOYMENT_TARGET'], '--compile',
+          os.path.abspath(os.environ['CONTENTS_FOLDER_PATH']),
+      ])
+    else:
+      command_line.extend([
+          '--platform', 'macosx', '--target-device', 'mac',
+          '--minimum-deployment-target', os.environ['MACOSX_DEPLOYMENT_TARGET'],
+          '--compile',
+          os.path.abspath(os.environ['UNLOCALIZED_RESOURCES_FOLDER_PATH']),
+      ])
+    if keys:
+      keys = json.loads(keys)
+      for key, value in keys.iteritems():
+        arg_name = '--' + key
+        if isinstance(value, bool):
+          if value:
+            command_line.append(arg_name)
+        elif isinstance(value, list):
+          for v in value:
+            command_line.append(arg_name)
+            command_line.append(str(v))
+        else:
+          command_line.append(arg_name)
+          command_line.append(str(value))
+    # Note: actool crashes if inputs path are relative, so use os.path.abspath
+    # to get absolute path name for inputs.
+    command_line.extend(map(os.path.abspath, inputs))
+    subprocess.check_call(command_line)
+
+  def ExecMergeInfoPlist(self, output, *inputs):
+    """Merge multiple .plist files into a single .plist file."""
+    merged_plist = {}
+    for path in inputs:
+      plist = self._LoadPlistMaybeBinary(path)
+      self._MergePlist(merged_plist, plist)
+    plistlib.writePlist(merged_plist, output)
+
+  def ExecCodeSignBundle(self, key, entitlements, provisioning):
     """Code sign a bundle.
 
     This function tries to code sign an iOS bundle, following the same
     algorithm as Xcode:
-      1. copy ResourceRules.plist from the user or the SDK into the bundle,
-      2. pick the provisioning profile that best match the bundle identifier,
+      1. pick the provisioning profile that best match the bundle identifier,
          and copy it into the bundle as embedded.mobileprovision,
-      3. copy Entitlements.plist from user or SDK next to the bundle,
-      4. code sign the bundle.
+      2. copy Entitlements.plist from user or SDK next to the bundle,
+      3. code sign the bundle.
     """
-    resource_rules_path = self._InstallResourceRules(resource_rules)
     substitutions, overrides = self._InstallProvisioningProfile(
         provisioning, self._GetCFBundleIdentifier())
     entitlements_path = self._InstallEntitlements(
         entitlements, substitutions, overrides)
     subprocess.check_call([
-        'codesign', '--force', '--sign', key, '--resource-rules',
-        resource_rules_path, '--entitlements', entitlements_path,
-        os.path.join(
+        'codesign', '--force', '--sign', key, '--entitlements',
+        entitlements_path, '--timestamp=none', os.path.join(
             os.environ['TARGET_BUILD_DIR'],
             os.environ['FULL_PRODUCT_NAME'])])
-
-  def _InstallResourceRules(self, resource_rules):
-    """Installs ResourceRules.plist from user or SDK into the bundle.
-
-    Args:
-      resource_rules: string, optional, path to the ResourceRules.plist file
-        to use, default to "${SDKROOT}/ResourceRules.plist"
-
-    Returns:
-      Path to the copy of ResourceRules.plist into the bundle.
-    """
-    source_path = resource_rules
-    target_path = os.path.join(
-        os.environ['BUILT_PRODUCTS_DIR'],
-        os.environ['CONTENTS_FOLDER_PATH'],
-        'ResourceRules.plist')
-    if not source_path:
-      source_path = os.path.join(
-          os.environ['SDKROOT'], 'ResourceRules.plist')
-    shutil.copy2(source_path, target_path)
-    return target_path
 
   def _InstallProvisioningProfile(self, profile, bundle_identifier):
     """Installs embedded.mobileprovision into the bundle.
@@ -397,6 +479,19 @@ class MacTool(object):
       subprocess.check_call([
           'security', 'cms', '-D', '-i', profile_path, '-o', temp.name])
       return self._LoadPlistMaybeBinary(temp.name)
+
+  def _MergePlist(self, merged_plist, plist):
+    """Merge |plist| into |merged_plist|."""
+    for key, value in plist.iteritems():
+      if isinstance(value, dict):
+        merged_value = merged_plist.get(key, {})
+        if isinstance(merged_value, dict):
+          self._MergePlist(merged_value, value)
+          merged_plist[key] = merged_value
+        else:
+          merged_plist[key] = value
+      else:
+        merged_plist[key] = value
 
   def _LoadPlistMaybeBinary(self, plist_path):
     """Loads into a memory a plist possibly encoded in binary format.
