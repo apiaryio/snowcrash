@@ -172,8 +172,8 @@ namespace snowcrashtest {
                 REQUIRE(sourceMap.size() == 1);
             }
 
-            REQUIRE(sourceMap[nth - 1].location == loc);
-            REQUIRE(sourceMap[nth - 1].length == len);
+            REQUIRE(sourceMap[nth - 1].location == (size_t) loc);
+            REQUIRE(sourceMap[nth - 1].length == (size_t) len);
         }
     };
 }

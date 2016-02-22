@@ -61,7 +61,7 @@ TEST_CASE("Resource block classifier", "[resource]")
 TEST_CASE("Parse resource", "[resource]")
 {
     ParseResult<Resource> resource;
-    SectionParserHelper<Resource, ResourceParser>::parse(ResourceFixture, ResourceSectionType, resource, ExportSourcemapOption);
+    SectionParserHelper<Resource, ResourceParser>::parse(ResourceFixture, ResourceSectionType, resource);
 
     REQUIRE(resource.report.error.code == Error::OK);
     REQUIRE(resource.report.warnings.empty());
@@ -120,7 +120,7 @@ TEST_CASE("Parse partially defined resource", "[resource]")
     "p1\n";
 
     ParseResult<Resource> resource;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource, ExportSourcemapOption);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource);
 
     REQUIRE(resource.report.error.code == Error::OK);
     REQUIRE(resource.report.warnings.size() == 2); // no response & preformatted asset
@@ -162,7 +162,7 @@ TEST_CASE("Parse multiple method descriptions", "[resource]")
     "p2\n";
 
     ParseResult<Resource> resource;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource, ExportSourcemapOption);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource);
 
     REQUIRE(resource.report.error.code == Error::OK);
     REQUIRE(resource.report.warnings.size() == 2); // 2x no response
@@ -211,7 +211,7 @@ TEST_CASE("Parse multiple methods", "[resource]")
     "E\n";
 
     ParseResult<Resource> resource;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource, ExportSourcemapOption);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource);
 
     REQUIRE(resource.report.error.code == Error::OK);
     REQUIRE(resource.report.warnings.size() == 2); // empty reuqest asset & no response
@@ -272,7 +272,7 @@ TEST_CASE("Parse description with list", "[resource]")
     "p1\n";
 
     ParseResult<Resource> resource;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource, ExportSourcemapOption);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource);
 
     REQUIRE(resource.report.error.code == Error::OK);
     REQUIRE(resource.report.warnings.empty());
@@ -302,7 +302,7 @@ TEST_CASE("Parse resource with a HR", "[resource][block]")
     "B\n";
 
     ParseResult<Resource> resource;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource, ExportSourcemapOption);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource);
 
     REQUIRE(resource.report.error.code == Error::OK);
     REQUIRE(resource.report.warnings.empty());
@@ -333,7 +333,7 @@ TEST_CASE("Parse resource method abbreviation", "[resource]")
     "            {}\n";
 
     ParseResult<Resource> resource;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource, ExportSourcemapOption);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource);
 
     REQUIRE(resource.report.error.code == Error::OK);
     REQUIRE(resource.report.warnings.empty());
@@ -364,7 +364,7 @@ TEST_CASE("Parse resource without name", "[resource]")
     mdp::ByteBuffer source = "# /resource\n";
 
     ParseResult<Resource> resource;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource, ExportSourcemapOption);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource);
 
     REQUIRE(resource.report.error.code == Error::OK);
     REQUIRE(resource.report.warnings.empty());
@@ -396,7 +396,7 @@ TEST_CASE("Warn about parameters not in URI template", "[resource][source]")
     "+ Response 204\n\n";
 
     ParseResult<Resource> resource;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource, ExportSourcemapOption);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource);
 
     REQUIRE(resource.report.error.code == Error::OK);
     REQUIRE(resource.report.warnings.size() == 2);
@@ -428,7 +428,7 @@ TEST_CASE("Parse nameless resource with named model", "[resource][model][source]
     "\n";
 
     ParseResult<Resource> resource;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource, ExportSourcemapOption);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource);
 
     REQUIRE(resource.report.error.code == Error::OK);
     REQUIRE(resource.report.warnings.empty());
@@ -459,7 +459,7 @@ TEST_CASE("Parse nameless resource with nameless model", "[resource][model][sour
     "\n";
 
     ParseResult<Resource> resource;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource, ExportSourcemapOption);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource);
 
     REQUIRE(resource.report.error.code == ModelError);
     REQUIRE(resource.report.warnings.empty());
@@ -488,7 +488,7 @@ TEST_CASE("Parse named resource with nameless model", "[resource][model][source]
     "    [Message][]\n\n";
 
     ParseResult<Resource> resource;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource, ExportSourcemapOption);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource);
 
     REQUIRE(resource.report.error.code == Error::OK);
     REQUIRE(resource.report.warnings.empty());
@@ -562,7 +562,7 @@ TEST_CASE("Parse named resource with lazy referencing", "[resource][model][issue
     "        `resource model` 2\n";
 
     ParseResult<Blueprint> blueprint;
-    parse(source, ExportSourcemapOption, blueprint);
+    parse(source, 0, blueprint);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -731,7 +731,7 @@ TEST_CASE("Parse root resource", "[resource]")
     mdp::ByteBuffer source = "# API Root [/]\n";
 
     ParseResult<Resource> resource;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource, ExportSourcemapOption);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource);
 
     REQUIRE(resource.report.error.code == Error::OK);
     REQUIRE(resource.report.warnings.empty());
@@ -756,7 +756,7 @@ TEST_CASE("Parse resource with invalid URI Tempalte", "[resource]")
     mdp::ByteBuffer source = "# Resource [/id{? limit}]\n";
 
     ParseResult<Resource> resource;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource, ExportSourcemapOption);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource);
 
     REQUIRE(resource.report.error.code == Error::OK);
     REQUIRE(resource.report.warnings.size() == 1);
@@ -791,7 +791,7 @@ TEST_CASE("Deprecated resource and action headers", "[resource]")
     "            header3: value3\n\n";
 
     ParseResult<Resource> resource;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource, ExportSourcemapOption);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource);
 
     REQUIRE(resource.report.error.code == Error::OK);
     REQUIRE(resource.report.warnings.size() == 2);
@@ -891,7 +891,7 @@ TEST_CASE("Dangling transaction example assets", "[resource]")
     "```\n";
 
     ParseResult<Resource> resource;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource, ExportSourcemapOption);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource);
 
     REQUIRE(resource.report.error.code == Error::OK);
     REQUIRE(resource.report.warnings.size() == 3);
@@ -938,7 +938,7 @@ TEST_CASE("Body list item in description", "[resource][regression][#190]")
     "+ Response 200\n";
 
     ParseResult<Resource> resource;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource, ExportSourcemapOption);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource);
 
     REQUIRE(resource.report.error.code == Error::OK);
     REQUIRE(resource.report.warnings.empty());
@@ -966,7 +966,7 @@ TEST_CASE("Parse resource attributes", "[resource]")
 
     NamedTypeHelper::build("Coupon", mson::ObjectBaseType, namedTypes);
     NamedTypeHelper::build("Coupons", mson::ValueBaseType, namedTypes);
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource, ExportSourcemapOption, Models(), NULL, namedTypes);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource, 0, Models(), NULL, namedTypes);
 
     REQUIRE(resource.report.error.code == Error::OK);
     REQUIRE(resource.report.warnings.empty());
@@ -995,7 +995,7 @@ TEST_CASE("Parse unnamed resource attributes", "[resource]")
     NamedTypes namedTypes;
 
     NamedTypeHelper::build("Coupon", mson::ObjectBaseType, namedTypes);
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource, ExportSourcemapOption, Models(), NULL, namedTypes);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource, 0, Models(), NULL, namedTypes);
 
     REQUIRE(resource.report.error.code == Error::OK);
     REQUIRE(resource.report.warnings.size() == 1); // Unknown type 'Coupons'
@@ -1029,7 +1029,7 @@ TEST_CASE("Parse inline action", "[resource]")
     "        {}";
 
     ParseResult<Resource> resource;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource, ExportSourcemapOption);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource);
 
     REQUIRE(resource.report.error.code == Error::OK);
     REQUIRE(resource.report.warnings.empty());
@@ -1067,7 +1067,7 @@ TEST_CASE("Parameters for action should consider action's uri template", "[resou
     "+ Response 204";
 
     ParseResult<Resource> resource;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource, ExportSourcemapOption);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource);
 
     REQUIRE(resource.report.error.code == Error::OK);
     REQUIRE(resource.report.warnings.empty());
@@ -1087,7 +1087,7 @@ TEST_CASE("Relation identifiers should be unique for a resource", "[resource]")
     "+ Response 204";
 
     ParseResult<Resource> resource;
-    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource, ExportSourcemapOption);
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource);
 
     REQUIRE(resource.report.error.code == Error::OK);
     REQUIRE(resource.report.warnings.size() == 1);

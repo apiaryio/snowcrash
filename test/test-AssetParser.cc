@@ -62,7 +62,7 @@ TEST_CASE("Recognize schema signature", "[asset]")
 TEST_CASE("Parse body asset", "[asset]")
 {
     ParseResult<Asset> asset;
-    SectionParserHelper<Asset, AssetParser>::parse(BodyAssetFixture, BodySectionType, asset, ExportSourcemapOption);
+    SectionParserHelper<Asset, AssetParser>::parse(BodyAssetFixture, BodySectionType, asset);
 
     REQUIRE(asset.report.error.code == Error::OK);
     REQUIRE(asset.report.warnings.empty());
@@ -76,7 +76,7 @@ TEST_CASE("Parse body asset", "[asset]")
 TEST_CASE("Parse schema asset", "[asset]")
 {
     ParseResult<Asset> asset;
-    SectionParserHelper<Asset, AssetParser>::parse(SchemaAssetFixture, SchemaSectionType, asset, ExportSourcemapOption);
+    SectionParserHelper<Asset, AssetParser>::parse(SchemaAssetFixture, SchemaSectionType, asset);
 
     REQUIRE(asset.report.error.code == Error::OK);
     REQUIRE(asset.report.warnings.empty());
@@ -95,7 +95,7 @@ TEST_CASE("Foreign block inside", "[asset]")
     "    Hello World!\n";
 
     ParseResult<Asset> asset;
-    SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, asset, ExportSourcemapOption);
+    SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, asset);
 
     REQUIRE(asset.report.error.code == Error::OK);
     REQUIRE(asset.report.warnings.size() == 1);
@@ -117,7 +117,7 @@ TEST_CASE("Nested list block inside", "[asset]")
     "    + Hello World!\n";
 
     ParseResult<Asset> asset;
-    SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, asset, ExportSourcemapOption);
+    SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, asset);
 
     REQUIRE(asset.report.error.code == Error::OK);
     REQUIRE(asset.report.warnings.size() == 1);
@@ -140,7 +140,7 @@ TEST_CASE("Multiline signature", "[asset]")
     "        Hello World!\n";
 
     ParseResult<Asset> asset;
-    SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, asset, ExportSourcemapOption);
+    SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, asset);
 
     REQUIRE(asset.report.error.code == Error::OK);
     REQUIRE(asset.report.warnings.size() == 1);
@@ -168,7 +168,7 @@ TEST_CASE("Multiple blocks", "[asset]")
     "    Block 3\n";
 
     ParseResult<Asset> asset;
-    SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, asset, ExportSourcemapOption);
+    SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, asset);
 
     REQUIRE(asset.report.error.code == Error::OK);
     REQUIRE(asset.report.warnings.size() == 2);
@@ -193,7 +193,7 @@ TEST_CASE("Extra spaces before signature", "[asset]")
     "        Lorem Ipsum\n";
 
     ParseResult<Asset> asset;
-    SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, asset, ExportSourcemapOption);
+    SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, asset);
 
     REQUIRE(asset.report.error.code == Error::OK);
     REQUIRE(asset.report.warnings.empty());
@@ -212,7 +212,7 @@ TEST_CASE("Asset parser greediness", "[asset]")
     "+ Another Block\n";
 
     ParseResult<Asset> asset;
-    SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, asset, ExportSourcemapOption);
+    SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, asset);
 
     REQUIRE(asset.report.error.code == Error::OK);
     REQUIRE(asset.report.warnings.empty());

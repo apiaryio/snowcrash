@@ -27,7 +27,7 @@ TEST_CASE("Parse canonical mson named type", "[mson][named_type]")
     "        - name: Medium (string)\n";
 
     ParseResult<mson::NamedType> namedType;
-    SectionParserHelper<mson::NamedType, MSONNamedTypeParser>::parse(source, MSONNamedTypeSectionType, namedType, ExportSourcemapOption);
+    SectionParserHelper<mson::NamedType, MSONNamedTypeParser>::parse(source, MSONNamedTypeSectionType, namedType);
 
     mson::Element element, subelement;
     SourceMap<mson::Element> elementSM, subelementSM;
@@ -158,7 +158,7 @@ TEST_CASE("Parse named type with a type section", "[mson][named_type]")
     "## Sample: pksunkara";
 
     ParseResult<mson::NamedType> namedType;
-    SectionParserHelper<mson::NamedType, MSONNamedTypeParser>::parse(source, MSONNamedTypeSectionType, namedType, ExportSourcemapOption);
+    SectionParserHelper<mson::NamedType, MSONNamedTypeParser>::parse(source, MSONNamedTypeSectionType, namedType);
 
     REQUIRE(namedType.report.error.code == Error::OK);
     REQUIRE(namedType.report.warnings.empty());
@@ -186,7 +186,7 @@ TEST_CASE("Parse named type without type specification", "[mson][named_type]")
     "## Sample: pksunkara";
 
     ParseResult<mson::NamedType> namedType;
-    SectionParserHelper<mson::NamedType, MSONNamedTypeParser>::parse(source, MSONNamedTypeSectionType, namedType, ExportSourcemapOption);
+    SectionParserHelper<mson::NamedType, MSONNamedTypeParser>::parse(source, MSONNamedTypeSectionType, namedType);
 
     REQUIRE(namedType.report.error.code == Error::OK);
     REQUIRE(namedType.report.warnings.size() == 1);

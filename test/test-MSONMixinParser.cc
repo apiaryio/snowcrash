@@ -41,7 +41,7 @@ TEST_CASE("Parse canonical mson mixin", "[mson][mixin]")
     NamedTypeHelper::build("Person", mson::ObjectBaseType, namedTypes);
 
     ParseResult<mson::Mixin> mixin;
-    SectionParserHelper<mson::Mixin, MSONMixinParser>::parseMSON(source, MSONMixinSectionType, mixin, ExportSourcemapOption, namedTypes);
+    SectionParserHelper<mson::Mixin, MSONMixinParser>::parseMSON(source, MSONMixinSectionType, mixin, 0, namedTypes);
 
     REQUIRE(mixin.report.error.code == Error::OK);
     REQUIRE(mixin.report.warnings.empty());
@@ -63,7 +63,7 @@ TEST_CASE("Parse mson mixin with canonical type definition", "[mson][mixin]")
     NamedTypeHelper::build("Person", mson::ObjectBaseType, namedTypes);
 
     ParseResult<mson::Mixin> mixin;
-    SectionParserHelper<mson::Mixin, MSONMixinParser>::parseMSON(source, MSONMixinSectionType, mixin, ExportSourcemapOption, namedTypes);
+    SectionParserHelper<mson::Mixin, MSONMixinParser>::parseMSON(source, MSONMixinSectionType, mixin, 0, namedTypes);
 
     REQUIRE(mixin.report.error.code == Error::OK);
     REQUIRE(mixin.report.warnings.empty());
@@ -82,7 +82,7 @@ TEST_CASE("Parse mson mixin with base type definition", "[mson][mixin]")
     mdp::ByteBuffer source = "- Include (string)";
 
     ParseResult<mson::Mixin> mixin;
-    SectionParserHelper<mson::Mixin, MSONMixinParser>::parse(source, MSONMixinSectionType, mixin, ExportSourcemapOption);
+    SectionParserHelper<mson::Mixin, MSONMixinParser>::parse(source, MSONMixinSectionType, mixin);
 
     REQUIRE(mixin.report.error.code == Error::OK);
     REQUIRE(mixin.report.warnings.size() == 1);
@@ -104,7 +104,7 @@ TEST_CASE("Parse mson mixin with nested type definition", "[mson][mixin]")
     NamedTypeHelper::build("Person", mson::ValueBaseType, namedTypes);
 
     ParseResult<mson::Mixin> mixin;
-    SectionParserHelper<mson::Mixin, MSONMixinParser>::parseMSON(source, MSONMixinSectionType, mixin, ExportSourcemapOption, namedTypes);
+    SectionParserHelper<mson::Mixin, MSONMixinParser>::parseMSON(source, MSONMixinSectionType, mixin, 0, namedTypes);
 
     REQUIRE(mixin.report.error.code == Error::OK);
     REQUIRE(mixin.report.warnings.empty());
