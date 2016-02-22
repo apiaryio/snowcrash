@@ -18,7 +18,7 @@ TEST_CASE("Parse canonical mson property member", "[mson][property_member]")
     "- color: red (string, required) - A color";
 
     ParseResult<mson::PropertyMember> propertyMember;
-    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember);
 
     REQUIRE(propertyMember.report.error.code == Error::OK);
     REQUIRE(propertyMember.report.warnings.empty());
@@ -45,7 +45,7 @@ TEST_CASE("Parse mson property member with description not on new line", "[mson]
     "  Which is also very nice\n\n";
 
     ParseResult<mson::PropertyMember> propertyMember;
-    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember);
 
     REQUIRE(propertyMember.report.error.code == Error::OK);
     REQUIRE(propertyMember.report.warnings.empty());
@@ -77,7 +77,7 @@ TEST_CASE("Parse mson property member with block description", "[mson][property_
     "and really really nice\n\n";
 
     ParseResult<mson::PropertyMember> propertyMember;
-    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember);
 
     REQUIRE(propertyMember.report.error.code == Error::OK);
     REQUIRE(propertyMember.report.warnings.empty());
@@ -112,7 +112,7 @@ TEST_CASE("Parse mson property member with block description, default and sample
     "        green\n";
 
     ParseResult<mson::PropertyMember> propertyMember;
-    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember);
 
     REQUIRE(propertyMember.report.error.code == Error::OK);
     REQUIRE(propertyMember.report.warnings.empty());
@@ -150,7 +150,7 @@ TEST_CASE("Parse mson property member object with nested members", "[mson][prope
     "    - last_name: Sunkara (string)";
 
     ParseResult<mson::PropertyMember> propertyMember;
-    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember);
 
     REQUIRE(propertyMember.report.error.code == Error::OK);
     REQUIRE(propertyMember.report.warnings.empty());
@@ -197,7 +197,7 @@ TEST_CASE("Parse mson array property member with nested properties type section"
     "        - last_name";
 
     ParseResult<mson::PropertyMember> propertyMember;
-    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember);
 
     REQUIRE(propertyMember.report.error.code == Error::OK);
     REQUIRE(propertyMember.report.warnings.size() == 1);
@@ -220,7 +220,7 @@ TEST_CASE("Parse mson property member when it has a member group in nested membe
     "    - first_name (string)";
 
     ParseResult<mson::PropertyMember> propertyMember;
-    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember);
 
     REQUIRE(propertyMember.report.error.code == Error::OK);
     REQUIRE(propertyMember.report.warnings.empty());
@@ -255,7 +255,7 @@ TEST_CASE("Parse mson property member when it has multiple member groups", "[mso
     "        - first_name";
 
     ParseResult<mson::PropertyMember> propertyMember;
-    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember);
 
     REQUIRE(propertyMember.report.error.code == Error::OK);
     REQUIRE(propertyMember.report.warnings.empty());
@@ -292,7 +292,7 @@ TEST_CASE("Parse mson property member when it has the wrong member group", "[mso
     "        - last_name";
 
     ParseResult<mson::PropertyMember> propertyMember;
-    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember);
 
     REQUIRE(propertyMember.report.error.code == Error::OK);
     REQUIRE(propertyMember.report.warnings.size() == 1);
@@ -315,7 +315,7 @@ TEST_CASE("Parse mson property member when it is an object and has no sub-type s
     "        - last_name: sunkara (string)";
 
     ParseResult<mson::PropertyMember> propertyMember;
-    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember);
 
     REQUIRE(propertyMember.report.error.code == Error::OK);
     REQUIRE(propertyMember.report.warnings.empty());
@@ -354,7 +354,7 @@ TEST_CASE("Parse mson property member when it is an object and has no sub-type s
     "    - first_name: pavan (string)";
 
     ParseResult<mson::PropertyMember> propertyMember;
-    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember);
 
     REQUIRE(propertyMember.report.error.code == Error::OK);
     REQUIRE(propertyMember.report.warnings.size() == 1);
@@ -402,7 +402,7 @@ TEST_CASE("Parse mson property member when it is a string and has no sub-type sp
     "    - Sample: Pavan, Sunkara";
 
     ParseResult<mson::PropertyMember> propertyMember;
-    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember);
 
     REQUIRE(propertyMember.report.error.code == Error::OK);
     REQUIRE(propertyMember.report.warnings.empty());
@@ -434,7 +434,7 @@ TEST_CASE("Parse mson property member when no sub-type specified and no nested s
     "    Some block description";
 
     ParseResult<mson::PropertyMember> propertyMember;
-    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember);
 
     REQUIRE(propertyMember.report.error.code == Error::OK);
     REQUIRE(propertyMember.report.warnings.empty());
@@ -466,7 +466,7 @@ TEST_CASE("Parse mson property member when containing a mixin", "[mson][property
     NamedTypeHelper::build("Person", mson::ObjectBaseType, namedTypes);
 
     ParseResult<mson::PropertyMember> propertyMember;
-    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption, Models(), NULL, namedTypes);
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember, 0, Models(), NULL, namedTypes);
 
     REQUIRE(propertyMember.report.error.code == Error::OK);
     REQUIRE(propertyMember.report.warnings.empty());
@@ -500,7 +500,7 @@ TEST_CASE("Parse mson property member when containing an oneOf", "[mson][propert
     "        - given_name: Smith";
 
     ParseResult<mson::PropertyMember> propertyMember;
-    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember);
 
     REQUIRE(propertyMember.report.error.code == Error::OK);
     REQUIRE(propertyMember.report.warnings.empty());
@@ -539,7 +539,7 @@ TEST_CASE("Parse mson property member containing a list of values and no type sp
     "- list: 1, 2, 3";
 
     ParseResult<mson::PropertyMember> propertyMember;
-    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember);
 
     REQUIRE(propertyMember.report.error.code == Error::OK);
     REQUIRE(propertyMember.report.warnings.empty());
@@ -563,7 +563,7 @@ TEST_CASE("Parse mson property containing list of value with string type specifi
     "- list: 1, 2, 3 (string)";
 
     ParseResult<mson::PropertyMember> propertyMember;
-    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember);
 
     REQUIRE(propertyMember.report.error.code == Error::OK);
     REQUIRE(propertyMember.report.warnings.empty());

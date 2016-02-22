@@ -18,7 +18,7 @@ TEST_CASE("Parse canonical mson value member", "[mson][value_member]")
     "- red (string, required) - A color";
 
     ParseResult<mson::ValueMember> valueMember;
-    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(source, MSONValueMemberSectionType, valueMember, ExportSourcemapOption);
+    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(source, MSONValueMemberSectionType, valueMember);
 
     REQUIRE(valueMember.report.error.code == Error::OK);
     REQUIRE(valueMember.report.warnings.empty());
@@ -42,7 +42,7 @@ TEST_CASE("Parse mson value member with description not on new line", "[mson][va
     "  Which is also very nice\n\n";
 
     ParseResult<mson::ValueMember> valueMember;
-    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(source, MSONValueMemberSectionType, valueMember, ExportSourcemapOption);
+    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(source, MSONValueMemberSectionType, valueMember);
 
     REQUIRE(valueMember.report.error.code == Error::OK);
     REQUIRE(valueMember.report.warnings.empty());
@@ -69,7 +69,7 @@ TEST_CASE("Parse mson value member with block description", "[mson][value_member
     "and really really nice\n\n";
 
     ParseResult<mson::ValueMember> valueMember;
-    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(source, MSONValueMemberSectionType, valueMember, ExportSourcemapOption);
+    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(source, MSONValueMemberSectionType, valueMember);
 
     REQUIRE(valueMember.report.error.code == Error::OK);
     REQUIRE(valueMember.report.warnings.empty());
@@ -100,7 +100,7 @@ TEST_CASE("Parse mson value member with block description, default and sample", 
     "        green\n";
 
     ParseResult<mson::ValueMember> valueMember;
-    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(source, MSONValueMemberSectionType, valueMember, ExportSourcemapOption);
+    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(source, MSONValueMemberSectionType, valueMember);
 
     REQUIRE(valueMember.report.error.code == Error::OK);
     REQUIRE(valueMember.report.warnings.empty());
@@ -138,7 +138,7 @@ TEST_CASE("Parse mson value member array with sample", "[mson][value_member]")
     "        - yellow\n";
 
     ParseResult<mson::ValueMember> valueMember;
-    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(source, MSONValueMemberSectionType, valueMember, ExportSourcemapOption);
+    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(source, MSONValueMemberSectionType, valueMember);
 
     REQUIRE(valueMember.report.error.code == Error::OK);
     REQUIRE(valueMember.report.warnings.empty());
@@ -164,7 +164,7 @@ TEST_CASE("Parse mson value member with multiple values", "[mson][value_member]"
     "- 1, yellow, true";
 
     ParseResult<mson::ValueMember> valueMember;
-    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(source, MSONValueMemberSectionType, valueMember, ExportSourcemapOption);
+    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(source, MSONValueMemberSectionType, valueMember);
 
     REQUIRE(valueMember.report.error.code == Error::OK);
     REQUIRE(valueMember.report.warnings.empty());
@@ -189,7 +189,7 @@ TEST_CASE("Parse mson value member array with items", "[mson][value_member]")
     "    - green (string)";
 
     ParseResult<mson::ValueMember> valueMember;
-    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(source, MSONValueMemberSectionType, valueMember, ExportSourcemapOption);
+    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(source, MSONValueMemberSectionType, valueMember);
 
     REQUIRE(valueMember.report.error.code == Error::OK);
     REQUIRE(valueMember.report.warnings.empty());
