@@ -22,7 +22,7 @@ namespace snowcrash {
      */
     enum BlueprintParserOption {
         RenderDescriptionsOption = (1 << 0),    /// < Render Markdown in description.
-        RequireBlueprintNameOption = (1 << 1),  /// < Treat missing blueprint name as error
+        RequireBlueprintNameOption = (1 << 1)   /// < Treat missing blueprint name as error
     };
 
     typedef unsigned int BlueprintParserOptions;
@@ -91,11 +91,6 @@ namespace snowcrash {
                 return sectionsContext.back();
             else
                 return sectionsContext[size-2];
-        }
-
-        /** \returns True if exporting source maps */
-        bool exportSourceMap() const {
-            return true;
         }
 
     private:

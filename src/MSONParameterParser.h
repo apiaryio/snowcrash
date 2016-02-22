@@ -48,18 +48,16 @@ namespace snowcrash {
 
             SectionProcessor<Parameter>::parseAttributes(node, pd, signature.attributes, out, false);
 
-            if (pd.exportSourceMap()) {
-                if (!out.node.name.empty()) {
-                    out.sourceMap.name.sourceMap = node->sourceMap;
-                }
+            if (!out.node.name.empty()) {
+                out.sourceMap.name.sourceMap = node->sourceMap;
+            }
 
-                if (!out.node.description.empty()) {
-                    out.sourceMap.description.sourceMap = node->sourceMap;
-                }
+            if (!out.node.description.empty()) {
+                out.sourceMap.description.sourceMap = node->sourceMap;
+            }
 
-                if (!out.node.exampleValue.empty()) {
-                    out.sourceMap.exampleValue.sourceMap = node->sourceMap;
-                }
+            if (!out.node.exampleValue.empty()) {
+                out.sourceMap.exampleValue.sourceMap = node->sourceMap;
             }
 
             return ++MarkdownNodeIterator(node);
@@ -82,10 +80,7 @@ namespace snowcrash {
 
                     if (!typeSection.node.content.value.empty()) {
                         out.node.defaultValue = typeSection.node.content.value;
-
-                        if (pd.exportSourceMap()) {
-                            out.sourceMap.defaultValue.sourceMap = typeSection.sourceMap.value.sourceMap;
-                        }
+                        out.sourceMap.defaultValue.sourceMap = typeSection.sourceMap.value.sourceMap;
                     }
 
                     break;
@@ -97,28 +92,18 @@ namespace snowcrash {
                     cur = MSONTypeSectionListParser::parse(node, siblings, pd, typeSection);
 
                     out.node.values.clear();
-
-                    if (pd.exportSourceMap()) {
-                        out.sourceMap.values.collection.clear();
-                    }
+                    out.sourceMap.values.collection.clear();
 
                     for (size_t i = 0; i < typeSection.node.content.elements().size(); i++) {
                         mson::ValueMember valueMember = typeSection.node.content.elements().at(i).content.value;
-                        SourceMap<mson::ValueMember> valueMemberSM;
-
-                        if (pd.exportSourceMap()) {
-                            valueMemberSM = typeSection.sourceMap.elements().collection.at(i).value;
-                        }
+                        SourceMap<mson::ValueMember> valueMemberSM = typeSection.sourceMap.elements().collection.at(i).value;
 
                         if (valueMember.valueDefinition.values.size() == 1) {
+                            SourceMap<Value> valueSM;
+                            valueSM.sourceMap = valueMemberSM.valueDefinition.sourceMap;
+
                             out.node.values.push_back(valueMember.valueDefinition.values[0].literal);
-
-                            if (pd.exportSourceMap()) {
-                                SourceMap<Value> valueSM;
-                                valueSM.sourceMap = valueMemberSM.valueDefinition.sourceMap;
-
-                                out.sourceMap.values.collection.push_back(valueSM);
-                            }
+                            out.sourceMap.values.collection.push_back(valueSM);
                         }
                     }
 

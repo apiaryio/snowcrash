@@ -46,11 +46,8 @@ namespace snowcrash {
 
             mson::parseTypeDefinition(node, pd, signature.attributes, out.report, out.node.typeDefinition);
 
-            if (pd.exportSourceMap()) {
-
-                if (!out.node.typeDefinition.empty()) {
-                    out.sourceMap.typeDefinition.sourceMap = node->sourceMap;
-                }
+            if (!out.node.typeDefinition.empty()) {
+                out.sourceMap.typeDefinition.sourceMap = node->sourceMap;
             }
 
             // Default to `object` type specification

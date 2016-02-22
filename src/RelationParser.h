@@ -52,7 +52,7 @@ namespace snowcrash {
                                                       sourceMap));
             }
 
-            if (pd.exportSourceMap() && !out.node.str.empty()) {
+            if (!out.node.str.empty()) {
                 out.sourceMap.sourceMap.append(node->sourceMap);
             }
 
