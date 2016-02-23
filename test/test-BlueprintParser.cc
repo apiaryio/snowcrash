@@ -77,16 +77,10 @@ TEST_CASE("Parse canonical blueprint", "[blueprint]")
     REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(0).element == Element::CopyElement);
     REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(0).content.copy == "p2\n");
 
-    REQUIRE(blueprint.sourceMap.name.sourceMap.size() == 1);
-    REQUIRE(blueprint.sourceMap.name.sourceMap[0].location == 13);
-    REQUIRE(blueprint.sourceMap.name.sourceMap[0].length == 17);
-    REQUIRE(blueprint.sourceMap.description.sourceMap.size() == 1);
-    REQUIRE(blueprint.sourceMap.description.sourceMap[0].location == 30);
-    REQUIRE(blueprint.sourceMap.description.sourceMap[0].length == 25);
+    SourceMapHelper::check(blueprint.sourceMap.name.sourceMap, 13, 17);
+    SourceMapHelper::check(blueprint.sourceMap.description.sourceMap, 30, 25);
     REQUIRE(blueprint.sourceMap.metadata.collection.size() == 1);
-    REQUIRE(blueprint.sourceMap.metadata.collection[0].sourceMap.size() == 1);
-    REQUIRE(blueprint.sourceMap.metadata.collection[0].sourceMap[0].location == 0);
-    REQUIRE(blueprint.sourceMap.metadata.collection[0].sourceMap[0].length == 13);
+    SourceMapHelper::check(blueprint.sourceMap.metadata.collection[0].sourceMap, 0, 13);
     REQUIRE(blueprint.sourceMap.content.elements().collection.size() == 2);
 }
 
@@ -123,19 +117,11 @@ TEST_CASE("Parse blueprint with multiple metadata sections", "[blueprint]")
     REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(0).element == Element::CopyElement);
     REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(0).content.copy == "p2\n");
 
-    REQUIRE(blueprint.sourceMap.name.sourceMap.size() == 1);
-    REQUIRE(blueprint.sourceMap.name.sourceMap[0].location == 25);
-    REQUIRE(blueprint.sourceMap.name.sourceMap[0].length == 17);
-    REQUIRE(blueprint.sourceMap.description.sourceMap.size() == 1);
-    REQUIRE(blueprint.sourceMap.description.sourceMap[0].location == 42);
-    REQUIRE(blueprint.sourceMap.description.sourceMap[0].length == 25);
+    SourceMapHelper::check(blueprint.sourceMap.name.sourceMap, 25, 17);
+    SourceMapHelper::check(blueprint.sourceMap.description.sourceMap, 42, 25);
     REQUIRE(blueprint.sourceMap.metadata.collection.size() == 2);
-    REQUIRE(blueprint.sourceMap.metadata.collection[0].sourceMap.size() == 1);
-    REQUIRE(blueprint.sourceMap.metadata.collection[0].sourceMap[0].location == 0);
-    REQUIRE(blueprint.sourceMap.metadata.collection[0].sourceMap[0].length == 12);
-    REQUIRE(blueprint.sourceMap.metadata.collection[1].sourceMap.size() == 1);
-    REQUIRE(blueprint.sourceMap.metadata.collection[1].sourceMap[0].location == 12);
-    REQUIRE(blueprint.sourceMap.metadata.collection[1].sourceMap[0].length == 13);
+    SourceMapHelper::check(blueprint.sourceMap.metadata.collection[0].sourceMap, 0, 12);
+    SourceMapHelper::check(blueprint.sourceMap.metadata.collection[1].sourceMap, 12, 13);
     REQUIRE(blueprint.sourceMap.content.elements().collection.size() == 2);
 }
 
@@ -171,12 +157,8 @@ TEST_CASE("Parse API with Name and abbreviated resource", "[blueprint]")
     REQUIRE(resource.actions.front().examples.front().responses.size() == 1);
     REQUIRE(resource.actions.front().examples.front().responses.front().body == "{}\n");
 
-    REQUIRE(blueprint.sourceMap.name.sourceMap.size() == 1);
-    REQUIRE(blueprint.sourceMap.name.sourceMap[0].location == 0);
-    REQUIRE(blueprint.sourceMap.name.sourceMap[0].length == 6);
-    REQUIRE(blueprint.sourceMap.description.sourceMap.size() == 1);
-    REQUIRE(blueprint.sourceMap.description.sourceMap[0].location == 6);
-    REQUIRE(blueprint.sourceMap.description.sourceMap[0].length == 2);
+    SourceMapHelper::check(blueprint.sourceMap.name.sourceMap, 0, 6);
+    SourceMapHelper::check(blueprint.sourceMap.description.sourceMap, 6, 2);
     REQUIRE(blueprint.sourceMap.metadata.collection.size() == 0);
     REQUIRE(blueprint.sourceMap.content.elements().collection.size() == 1);
 }
@@ -199,9 +181,7 @@ TEST_CASE("Parse nameless blueprint description", "[blueprint]")
     REQUIRE(blueprint.node.content.elements().size() == 0);
 
     REQUIRE(blueprint.sourceMap.name.sourceMap.empty());
-    REQUIRE(blueprint.sourceMap.description.sourceMap.size() == 1);
-    REQUIRE(blueprint.sourceMap.description.sourceMap[0].location == 0);
-    REQUIRE(blueprint.sourceMap.description.sourceMap[0].length == 6);
+    SourceMapHelper::check(blueprint.sourceMap.description.sourceMap, 0, 6);
     REQUIRE(blueprint.sourceMap.metadata.collection.size() == 0);
     REQUIRE(blueprint.sourceMap.content.elements().collection.size() == 0);
 }
@@ -222,9 +202,7 @@ TEST_CASE("Parse nameless blueprint with a list description", "[blueprint]")
     REQUIRE(blueprint.node.content.elements().size() == 0);
 
     REQUIRE(blueprint.sourceMap.name.sourceMap.empty());
-    REQUIRE(blueprint.sourceMap.description.sourceMap.size() == 1);
-    REQUIRE(blueprint.sourceMap.description.sourceMap[0].location == 0);
-    REQUIRE(blueprint.sourceMap.description.sourceMap[0].length == 7);
+    SourceMapHelper::check(blueprint.sourceMap.description.sourceMap, 0, 7);
     REQUIRE(blueprint.sourceMap.metadata.collection.size() == 0);
     REQUIRE(blueprint.sourceMap.content.elements().collection.size() == 0);
 }
@@ -255,9 +233,7 @@ TEST_CASE("Parse two groups with the same name", "[blueprint]")
     REQUIRE(blueprint.node.content.elements().at(1).attributes.name == "Name");
     REQUIRE(blueprint.node.content.elements().at(1).content.elements().empty());
 
-    REQUIRE(blueprint.sourceMap.name.sourceMap.size() == 1);
-    REQUIRE(blueprint.sourceMap.name.sourceMap[0].location == 0);
-    REQUIRE(blueprint.sourceMap.name.sourceMap[0].length == 6);
+    SourceMapHelper::check(blueprint.sourceMap.name.sourceMap, 0, 6);
     REQUIRE(blueprint.sourceMap.description.sourceMap.empty());
     REQUIRE(blueprint.sourceMap.metadata.collection.size() == 0);
     REQUIRE(blueprint.sourceMap.content.elements().collection.size() == 2);
@@ -308,12 +284,8 @@ TEST_CASE("Should parse nested lists in description", "[blueprint]")
     REQUIRE(blueprint.node.description == "+ List\n   + Nested Item\n");
     REQUIRE(blueprint.node.content.elements().empty());
 
-    REQUIRE(blueprint.sourceMap.name.sourceMap.size() == 1);
-    REQUIRE(blueprint.sourceMap.name.sourceMap[0].location == 0);
-    REQUIRE(blueprint.sourceMap.name.sourceMap[0].length == 6);
-    REQUIRE(blueprint.sourceMap.description.sourceMap.size() == 1);
-    REQUIRE(blueprint.sourceMap.description.sourceMap[0].location == 6);
-    REQUIRE(blueprint.sourceMap.description.sourceMap[0].length == 24);
+    SourceMapHelper::check(blueprint.sourceMap.name.sourceMap, 0, 6);
+    SourceMapHelper::check(blueprint.sourceMap.description.sourceMap, 6, 24);
     REQUIRE(blueprint.sourceMap.metadata.collection.size() == 0);
     REQUIRE(blueprint.sourceMap.content.elements().collection.size() == 0);
 }
@@ -464,16 +436,10 @@ TEST_CASE("Parsing unexpected blocks", "[blueprint]")
     REQUIRE(resource.actions.size() == 1);
     REQUIRE(resource.actions[0].method == "GET");
 
-    REQUIRE(blueprint.sourceMap.name.sourceMap.size() == 1);
-    REQUIRE(blueprint.sourceMap.name.sourceMap[0].location == 12);
-    REQUIRE(blueprint.sourceMap.name.sourceMap[0].length == 5);
-    REQUIRE(blueprint.sourceMap.description.sourceMap.size() == 1);
-    REQUIRE(blueprint.sourceMap.description.sourceMap[0].location == 17);
-    REQUIRE(blueprint.sourceMap.description.sourceMap[0].length == 30);
+    SourceMapHelper::check(blueprint.sourceMap.name.sourceMap, 12, 5);
+    SourceMapHelper::check(blueprint.sourceMap.description.sourceMap, 17, 30);
     REQUIRE(blueprint.sourceMap.metadata.collection.size() == 1);
-    REQUIRE(blueprint.sourceMap.metadata.collection[0].sourceMap.size() == 1);
-    REQUIRE(blueprint.sourceMap.metadata.collection[0].sourceMap[0].location == 0);
-    REQUIRE(blueprint.sourceMap.metadata.collection[0].sourceMap[0].length == 12);
+    SourceMapHelper::check(blueprint.sourceMap.metadata.collection[0].sourceMap, 0, 12);
     REQUIRE(blueprint.sourceMap.content.elements().collection.size() == 1);
 }
 

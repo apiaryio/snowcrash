@@ -77,17 +77,13 @@ TEST_CASE("Parse blueprint with unsupported characters", "[parser]")
     parse("hello\t", 0, blueprint1);
 
     REQUIRE(blueprint1.report.error.code != Error::OK);
-    REQUIRE(blueprint1.report.error.location.size() == 1);
-    REQUIRE(blueprint1.report.error.location[0].location == 5);
-    REQUIRE(blueprint1.report.error.location[0].length == 1);
+    SourceMapHelper::check(blueprint1.report.error.location, 5, 1);
 
     ParseResult<Blueprint> blueprint2;
     parse("sun\n\rsalt\n\r", 0, blueprint2);
 
     REQUIRE(blueprint2.report.error.code != Error::OK);
-    REQUIRE(blueprint2.report.error.location.size() == 1);
-    REQUIRE(blueprint2.report.error.location[0].location == 4);
-    REQUIRE(blueprint2.report.error.location[0].length == 1);
+    SourceMapHelper::check(blueprint2.report.error.location, 4, 1);
 }
 
 TEST_CASE("Do not report duplicate response when media type differs", "[method][#14]")
@@ -308,9 +304,7 @@ TEST_CASE("Invalid source map without closing newline", "[regression][parser]")
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.size() == 1);
     REQUIRE(blueprint.report.warnings[0].code == EmptyDefinitionWarning);
-    REQUIRE(blueprint.report.warnings[0].location.size() == 1);
-    REQUIRE(blueprint.report.warnings[0].location[0].location == 0);
-    REQUIRE(blueprint.report.warnings[0].location[0].length == 13);
+    SourceMapHelper::check(blueprint.report.warnings[0].location, 0, 13);
 }
 
 TEST_CASE("Warn about missing API name if there is an API description", "[parser][regression]")
@@ -522,9 +516,7 @@ TEST_CASE("Ignoring local media type", "[parser][regression][#195]")
     REQUIRE(resourceSM.actions.collection[0].examples.collection.size() == 1);
     REQUIRE(resourceSM.actions.collection[0].examples.collection[0].responses.collection.size() == 1);
     REQUIRE(resourceSM.actions.collection[0].examples.collection[0].responses.collection[0].headers.collection.size() == 1);
-    REQUIRE(resourceSM.actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[0].sourceMap.size() == 1);
-    REQUIRE(resourceSM.actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[0].sourceMap[0].location == 11);
-    REQUIRE(resourceSM.actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[0].sourceMap[0].length == 11);
+    SourceMapHelper::check(resourceSM.actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[0].sourceMap, 11, 11);
 }
 
 TEST_CASE("Using local media type", "[parser][regression][#195]")
@@ -568,9 +560,7 @@ TEST_CASE("Using local media type", "[parser][regression][#195]")
     REQUIRE(resourceSM.actions.collection[0].examples.collection.size() == 1);
     REQUIRE(resourceSM.actions.collection[0].examples.collection[0].responses.collection.size() == 1);
     REQUIRE(resourceSM.actions.collection[0].examples.collection[0].responses.collection[0].headers.collection.size() == 1);
-    REQUIRE(resourceSM.actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[0].sourceMap.size() == 1);
-    REQUIRE(resourceSM.actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[0].sourceMap[0].location == 53);
-    REQUIRE(resourceSM.actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[0].sourceMap[0].length == 18);
+    SourceMapHelper::check(resourceSM.actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[0].sourceMap, 53, 18);
 }
 
 TEST_CASE("Parse ill-formated header", "[parser][#198][regression]")
@@ -721,9 +711,7 @@ TEST_CASE("Don't mess up sourcemaps when there are references", "[parser][#213]"
 
     SourceMap<Resource> resourceSM = blueprint.sourceMap.content.elements().collection[0].content.elements().collection[0].content.resource;
     REQUIRE(resourceSM.actions.collection.size() == 1);
-    REQUIRE(resourceSM.actions.collection[0].method.sourceMap.size() == 1);
-    REQUIRE(resourceSM.actions.collection[0].method.sourceMap[0].location == 111);
-    REQUIRE(resourceSM.actions.collection[0].method.sourceMap[0].length == 8);
+    SourceMapHelper::check(resourceSM.actions.collection[0].method.sourceMap, 111, 8);
 }
 
 TEST_CASE("doesn't crash while parsing response followed by a block quote and heading", "[parser][#322]")

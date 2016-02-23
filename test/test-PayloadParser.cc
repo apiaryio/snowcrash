@@ -101,26 +101,14 @@ TEST_CASE("Parse request payload", "[payload]")
     REQUIRE(payload.node.body == "Code\n");
     REQUIRE(payload.node.schema == "Code 2\n");
 
-    REQUIRE(payload.sourceMap.name.sourceMap.size() == 1);
-    REQUIRE(payload.sourceMap.name.sourceMap[0].location == 2);
-    REQUIRE(payload.sourceMap.name.sourceMap[0].length == 34);
-    REQUIRE(payload.sourceMap.description.sourceMap.size() == 1);
-    REQUIRE(payload.sourceMap.description.sourceMap[0].location == 38);
-    REQUIRE(payload.sourceMap.description.sourceMap[0].length == 12);
+    SourceMapHelper::check(payload.sourceMap.name.sourceMap, 2, 34);
+    SourceMapHelper::check(payload.sourceMap.description.sourceMap, 38, 12);
     REQUIRE(payload.sourceMap.parameters.collection.empty());
     REQUIRE(payload.sourceMap.headers.collection.size() == 2);
-    REQUIRE(payload.sourceMap.headers.collection[0].sourceMap.size() == 1);
-    REQUIRE(payload.sourceMap.headers.collection[0].sourceMap[0].location == 2);
-    REQUIRE(payload.sourceMap.headers.collection[0].sourceMap[0].length == 34);
-    REQUIRE(payload.sourceMap.headers.collection[1].sourceMap.size() == 1);
-    REQUIRE(payload.sourceMap.headers.collection[1].sourceMap[0].location == 74);
-    REQUIRE(payload.sourceMap.headers.collection[1].sourceMap[0].length == 17);
-    REQUIRE(payload.sourceMap.body.sourceMap.size() == 1);
-    REQUIRE(payload.sourceMap.body.sourceMap[0].location == 112);
-    REQUIRE(payload.sourceMap.body.sourceMap[0].length == 9);
-    REQUIRE(payload.sourceMap.schema.sourceMap.size() == 1);
-    REQUIRE(payload.sourceMap.schema.sourceMap[0].location == 144);
-    REQUIRE(payload.sourceMap.schema.sourceMap[0].length == 11);
+    SourceMapHelper::check(payload.sourceMap.headers.collection[0].sourceMap, 2, 34);
+    SourceMapHelper::check(payload.sourceMap.headers.collection[1].sourceMap, 74, 17);
+    SourceMapHelper::check(payload.sourceMap.body.sourceMap, 112, 9);
+    SourceMapHelper::check(payload.sourceMap.schema.sourceMap, 144, 11);
 }
 
 TEST_CASE("Parse abbreviated payload body", "[payload]")
@@ -138,18 +126,12 @@ TEST_CASE("Parse abbreviated payload body", "[payload]")
     REQUIRE(payload.node.body == "Hello World!\n");
     REQUIRE(payload.node.schema.empty());
 
-    REQUIRE(payload.sourceMap.name.sourceMap.size() == 1);
-    REQUIRE(payload.sourceMap.name.sourceMap[0].location == 2);
-    REQUIRE(payload.sourceMap.name.sourceMap[0].length == 27);
+    SourceMapHelper::check(payload.sourceMap.name.sourceMap, 2, 27);
     REQUIRE(payload.sourceMap.description.sourceMap.empty());
     REQUIRE(payload.sourceMap.parameters.collection.empty());
     REQUIRE(payload.sourceMap.headers.collection.size() == 1);
-    REQUIRE(payload.sourceMap.headers.collection[0].sourceMap.size() == 1);
-    REQUIRE(payload.sourceMap.headers.collection[0].sourceMap[0].location == 2);
-    REQUIRE(payload.sourceMap.headers.collection[0].sourceMap[0].length == 27);
-    REQUIRE(payload.sourceMap.body.sourceMap.size() == 1);
-    REQUIRE(payload.sourceMap.body.sourceMap[0].location == 33);
-    REQUIRE(payload.sourceMap.body.sourceMap[0].length == 17);
+    SourceMapHelper::check(payload.sourceMap.headers.collection[0].sourceMap, 2, 27);
+    SourceMapHelper::check(payload.sourceMap.body.sourceMap, 33, 17);
 }
 
 TEST_CASE("Parse abbreviated inline payload body", "[payload]")
@@ -170,17 +152,11 @@ TEST_CASE("Parse abbreviated inline payload body", "[payload]")
     REQUIRE(payload.node.body == "Hello World!\nB\n");
     REQUIRE(payload.node.schema.empty());
 
-    REQUIRE(payload.sourceMap.name.sourceMap.size() == 1);
-    REQUIRE(payload.sourceMap.name.sourceMap[0].location == 2);
-    REQUIRE(payload.sourceMap.name.sourceMap[0].length == 11);
+    SourceMapHelper::check(payload.sourceMap.name.sourceMap, 2, 11);
     REQUIRE(payload.sourceMap.description.sourceMap.empty());
     REQUIRE(payload.sourceMap.parameters.collection.empty());
     REQUIRE(payload.sourceMap.headers.collection.empty());
-    REQUIRE(payload.sourceMap.body.sourceMap.size() == 2);
-    REQUIRE(payload.sourceMap.body.sourceMap[0].location == 17);
-    REQUIRE(payload.sourceMap.body.sourceMap[0].length == 17);
-    REQUIRE(payload.sourceMap.body.sourceMap[1].location == 36);
-    REQUIRE(payload.sourceMap.body.sourceMap[1].length == 2);
+    SourceMapHelper::check(payload.sourceMap.body.sourceMap, 17, 17, 36, 2);
 }
 
 TEST_CASE("Parse payload description with list", "[payload]")
@@ -216,14 +192,10 @@ TEST_CASE("Parse payload description with list", "[payload]")
     REQUIRE(payload.node.schema.empty());
 
     REQUIRE(payload.sourceMap.name.sourceMap.empty());
-    REQUIRE(payload.sourceMap.description.sourceMap.size() == 1);
-    REQUIRE(payload.sourceMap.description.sourceMap[0].location == 15);
-    REQUIRE(payload.sourceMap.description.sourceMap[0].length == 4);
+    SourceMapHelper::check(payload.sourceMap.description.sourceMap, 15, 4);
     REQUIRE(payload.sourceMap.parameters.collection.empty());
     REQUIRE(payload.sourceMap.headers.collection.empty());
-    REQUIRE(payload.sourceMap.body.sourceMap.size() == 1);
-    REQUIRE(payload.sourceMap.body.sourceMap[0].location == 40);
-    REQUIRE(payload.sourceMap.body.sourceMap[0].length == 7);
+    SourceMapHelper::check(payload.sourceMap.body.sourceMap, 40, 7);
 }
 
 TEST_CASE("Parse payload with foreign list item", "[payload]")
@@ -262,9 +234,7 @@ TEST_CASE("Parse payload with foreign list item", "[payload]")
     REQUIRE(payload.sourceMap.description.sourceMap.empty());
     REQUIRE(payload.sourceMap.parameters.collection.empty());
     REQUIRE(payload.sourceMap.headers.collection.empty());
-    REQUIRE(payload.sourceMap.body.sourceMap.size() == 1);
-    REQUIRE(payload.sourceMap.body.sourceMap[0].location == 31);
-    REQUIRE(payload.sourceMap.body.sourceMap[0].length == 7);
+    SourceMapHelper::check(payload.sourceMap.body.sourceMap, 31, 7);
 }
 
 TEST_CASE("Parse payload with dangling body", "[payload]")
@@ -302,11 +272,7 @@ TEST_CASE("Parse payload with dangling body", "[payload]")
     REQUIRE(payload.sourceMap.description.sourceMap.empty());
     REQUIRE(payload.sourceMap.parameters.collection.empty());
     REQUIRE(payload.sourceMap.headers.collection.empty());
-    REQUIRE(payload.sourceMap.body.sourceMap.size() == 2);
-    REQUIRE(payload.sourceMap.body.sourceMap[0].location == 30);
-    REQUIRE(payload.sourceMap.body.sourceMap[0].length == 8);
-    REQUIRE(payload.sourceMap.body.sourceMap[1].location == 43);
-    REQUIRE(payload.sourceMap.body.sourceMap[1].length == 4);
+    SourceMapHelper::check(payload.sourceMap.body.sourceMap, 30, 8, 43, 4);
 }
 
 TEST_CASE("Parse inline payload with symbol reference", "[payload]")
@@ -328,14 +294,10 @@ TEST_CASE("Parse inline payload with symbol reference", "[payload]")
     REQUIRE(payload.node.schema.empty());
 
     REQUIRE(payload.sourceMap.name.sourceMap.empty());
-    REQUIRE(payload.sourceMap.description.sourceMap.size() == 1);
-    REQUIRE(payload.sourceMap.description.sourceMap[0].location == 0);
-    REQUIRE(payload.sourceMap.description.sourceMap[0].length == 1);
+    SourceMapHelper::check(payload.sourceMap.description.sourceMap, 0, 1);
     REQUIRE(payload.sourceMap.parameters.collection.empty());
     REQUIRE(payload.sourceMap.headers.collection.empty());
-    REQUIRE(payload.sourceMap.body.sourceMap.size() == 1);
-    REQUIRE(payload.sourceMap.body.sourceMap[0].location == 0);
-    REQUIRE(payload.sourceMap.body.sourceMap[0].length == 1);
+    SourceMapHelper::check(payload.sourceMap.body.sourceMap, 0, 1);
 }
 
 TEST_CASE("Parse inline payload with symbol reference with extra indentation", "[payload]")
@@ -365,9 +327,7 @@ TEST_CASE("Parse inline payload with symbol reference with extra indentation", "
     REQUIRE(payload.sourceMap.description.sourceMap.empty());
     REQUIRE(payload.sourceMap.parameters.collection.empty());
     REQUIRE(payload.sourceMap.headers.collection.empty());
-    REQUIRE(payload.sourceMap.body.sourceMap.size() == 1);
-    REQUIRE(payload.sourceMap.body.sourceMap[0].location == 15);
-    REQUIRE(payload.sourceMap.body.sourceMap[0].length == 15);
+    SourceMapHelper::check(payload.sourceMap.body.sourceMap, 15, 15);
 }
 
 TEST_CASE("Parse inline payload with symbol reference with foreign content", "[payload]")
@@ -392,14 +352,10 @@ TEST_CASE("Parse inline payload with symbol reference with foreign content", "[p
     REQUIRE(payload.node.schema.empty());
 
     REQUIRE(payload.sourceMap.name.sourceMap.empty());
-    REQUIRE(payload.sourceMap.description.sourceMap.size() == 1);
-    REQUIRE(payload.sourceMap.description.sourceMap[0].location == 0);
-    REQUIRE(payload.sourceMap.description.sourceMap[0].length == 1);
+    SourceMapHelper::check(payload.sourceMap.description.sourceMap, 0, 1);
     REQUIRE(payload.sourceMap.parameters.collection.empty());
     REQUIRE(payload.sourceMap.headers.collection.empty());
-    REQUIRE(payload.sourceMap.body.sourceMap.size() == 1);
-    REQUIRE(payload.sourceMap.body.sourceMap[0].location == 0);
-    REQUIRE(payload.sourceMap.body.sourceMap[0].length == 1);
+    SourceMapHelper::check(payload.sourceMap.body.sourceMap, 0, 1);
 }
 
 TEST_CASE("Parse named model", "[payload]")
@@ -429,18 +385,12 @@ TEST_CASE("Parse named model", "[payload]")
     REQUIRE(payload.node.body == "Hello World!\n");
     REQUIRE(payload.node.schema.empty());
 
-    REQUIRE(payload.sourceMap.name.sourceMap.size() == 1);
-    REQUIRE(payload.sourceMap.name.sourceMap[0].location == 2);
-    REQUIRE(payload.sourceMap.name.sourceMap[0].length == 26);
+    SourceMapHelper::check(payload.sourceMap.name.sourceMap, 2, 26);
     REQUIRE(payload.sourceMap.description.sourceMap.empty());
     REQUIRE(payload.sourceMap.parameters.collection.empty());
     REQUIRE(payload.sourceMap.headers.collection.size() == 1);
-    REQUIRE(payload.sourceMap.headers.collection[0].sourceMap.size() == 1);
-    REQUIRE(payload.sourceMap.headers.collection[0].sourceMap[0].location == 2);
-    REQUIRE(payload.sourceMap.headers.collection[0].sourceMap[0].length == 26);
-    REQUIRE(payload.sourceMap.body.sourceMap.size() == 1);
-    REQUIRE(payload.sourceMap.body.sourceMap[0].location == 32);
-    REQUIRE(payload.sourceMap.body.sourceMap[0].length == 17);
+    SourceMapHelper::check(payload.sourceMap.headers.collection[0].sourceMap, 2, 26);
+    SourceMapHelper::check(payload.sourceMap.body.sourceMap, 32, 17);
 }
 
 TEST_CASE("Parse nameless model", "[payload]")
@@ -474,12 +424,8 @@ TEST_CASE("Parse nameless model", "[payload]")
     REQUIRE(payload.sourceMap.description.sourceMap.empty());
     REQUIRE(payload.sourceMap.parameters.collection.empty());
     REQUIRE(payload.sourceMap.headers.collection.size() == 1);
-    REQUIRE(payload.sourceMap.headers.collection[0].sourceMap.size() == 1);
-    REQUIRE(payload.sourceMap.headers.collection[0].sourceMap[0].location == 2);
-    REQUIRE(payload.sourceMap.headers.collection[0].sourceMap[0].length == 20);
-    REQUIRE(payload.sourceMap.body.sourceMap.size() == 1);
-    REQUIRE(payload.sourceMap.body.sourceMap[0].location == 26);
-    REQUIRE(payload.sourceMap.body.sourceMap[0].length == 17);
+    SourceMapHelper::check(payload.sourceMap.headers.collection[0].sourceMap, 2, 20);
+    SourceMapHelper::check(payload.sourceMap.body.sourceMap, 26, 17);
     REQUIRE(payload.sourceMap.schema.sourceMap.empty());
 }
 
@@ -519,17 +465,12 @@ TEST_CASE("Warn on malformed payload signature", "[payload]")
 
     REQUIRE(payload.sourceMap.name.sourceMap.empty());
     REQUIRE(payload.sourceMap.description.sourceMap.size() == 3);
-    REQUIRE(payload.sourceMap.description.sourceMap[0].location == 2);
-    REQUIRE(payload.sourceMap.description.sourceMap[0].length == 34);
-    REQUIRE(payload.sourceMap.description.sourceMap[1].location == 38);
-    REQUIRE(payload.sourceMap.description.sourceMap[1].length == 13);
-    REQUIRE(payload.sourceMap.description.sourceMap[2].location == 54);
-    REQUIRE(payload.sourceMap.description.sourceMap[2].length == 7);
+    SourceMapHelper::check(payload.sourceMap.description.sourceMap, 2, 34, 1);
+    SourceMapHelper::check(payload.sourceMap.description.sourceMap, 38, 13, 2);
+    SourceMapHelper::check(payload.sourceMap.description.sourceMap, 54, 7, 3);
     REQUIRE(payload.sourceMap.parameters.collection.empty());
     REQUIRE(payload.sourceMap.headers.collection.empty());
-    REQUIRE(payload.sourceMap.body.sourceMap.size() == 1);
-    REQUIRE(payload.sourceMap.body.sourceMap[0].location == 82);
-    REQUIRE(payload.sourceMap.body.sourceMap[0].length == 17);
+    SourceMapHelper::check(payload.sourceMap.body.sourceMap, 82, 17);
 }
 
 TEST_CASE("Give a warning of empty message body for requests with certain headers", "[payload]")
@@ -702,15 +643,9 @@ TEST_CASE("Values section should be taken as a description node", "[payload]")
     REQUIRE(payload.node.description == "+ Values\n\n    + id\n");
     REQUIRE(payload.node.body == "{}\n");
 
-    REQUIRE(payload.sourceMap.description.sourceMap.size() == 2);
-    REQUIRE(payload.sourceMap.description.sourceMap[0].location == 20);
-    REQUIRE(payload.sourceMap.description.sourceMap[0].length == 10);
-    REQUIRE(payload.sourceMap.description.sourceMap[1].location == 34);
-    REQUIRE(payload.sourceMap.description.sourceMap[1].length == 9);
+    SourceMapHelper::check(payload.sourceMap.description.sourceMap, 20, 10, 34, 9);
     REQUIRE(payload.sourceMap.parameters.collection.empty());
-    REQUIRE(payload.sourceMap.body.sourceMap.size() == 1);
-    REQUIRE(payload.sourceMap.body.sourceMap[0].location == 64);
-    REQUIRE(payload.sourceMap.body.sourceMap[0].length == 7);
+    SourceMapHelper::check(payload.sourceMap.body.sourceMap, 64, 7);
 }
 
 TEST_CASE("Parameters section in response section should give a warning", "[payload]")
@@ -734,9 +669,7 @@ TEST_CASE("Parameters section in response section should give a warning", "[payl
 
     REQUIRE(payload.sourceMap.description.sourceMap.empty());
     REQUIRE(payload.sourceMap.parameters.collection.empty());
-    REQUIRE(payload.sourceMap.body.sourceMap.size() == 1);
-    REQUIRE(payload.sourceMap.body.sourceMap[0].location == 77);
-    REQUIRE(payload.sourceMap.body.sourceMap[0].length == 7);
+    SourceMapHelper::check(payload.sourceMap.body.sourceMap, 77, 7);
 }
 
 TEST_CASE("Report ignoring nested request objects", "[payload][#163][#189]")
