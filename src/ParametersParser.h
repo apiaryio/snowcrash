@@ -102,10 +102,7 @@ namespace snowcrash {
             }
 
             out.node.push_back(parameter.node);
-
-            if (pd.exportSourceMap()) {
-                out.sourceMap.collection.push_back(parameter.sourceMap);
-            }
+            out.sourceMap.collection.push_back(parameter.sourceMap);
 
             return ++MarkdownNodeIterator(node);
         }

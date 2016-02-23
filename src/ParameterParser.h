@@ -102,18 +102,16 @@ namespace snowcrash {
 
             SectionProcessor<Parameter>::parseAttributes(node, pd, signature.attributes, out);
 
-            if (pd.exportSourceMap()) {
-                if (!out.node.name.empty()) {
-                    out.sourceMap.name.sourceMap = node->sourceMap;
-                }
+            if (!out.node.name.empty()) {
+                out.sourceMap.name.sourceMap = node->sourceMap;
+            }
 
-                if (!out.node.description.empty()) {
-                    out.sourceMap.description.sourceMap = node->sourceMap;
-                }
+            if (!out.node.description.empty()) {
+                out.sourceMap.description.sourceMap = node->sourceMap;
+            }
 
-                if (!out.node.defaultValue.empty()) {
-                    out.sourceMap.defaultValue.sourceMap = node->sourceMap;
-                }
+            if (!out.node.defaultValue.empty()) {
+                out.sourceMap.defaultValue.sourceMap = node->sourceMap;
             }
 
             return ++MarkdownNodeIterator(node);
@@ -143,10 +141,7 @@ namespace snowcrash {
 
             // Clear any previous values
             out.node.values.clear();
-
-            if (pd.exportSourceMap()) {
-                out.sourceMap.values.collection.clear();
-            }
+            out.sourceMap.values.collection.clear();
 
             ParseResultRef<Values> values(out.report, out.node.values, out.sourceMap.values);
             ValuesParser::parse(node, siblings, pd, values);
@@ -287,18 +282,16 @@ namespace snowcrash {
                 }
             }
 
-            if (pd.exportSourceMap()) {
-                if (!out.node.type.empty()) {
-                    out.sourceMap.type.sourceMap = node->sourceMap;
-                }
+            if (!out.node.type.empty()) {
+                out.sourceMap.type.sourceMap = node->sourceMap;
+            }
 
-                if (definedUse) {
-                    out.sourceMap.use.sourceMap = node->sourceMap;
-                }
+            if (definedUse) {
+                out.sourceMap.use.sourceMap = node->sourceMap;
+            }
 
-                if (oldSyntax && !out.node.exampleValue.empty()) {
-                    out.sourceMap.exampleValue.sourceMap = node->sourceMap;
-                }
+            if (oldSyntax && !out.node.exampleValue.empty()) {
+                out.sourceMap.exampleValue.sourceMap = node->sourceMap;
             }
         }
 
@@ -321,18 +314,13 @@ namespace snowcrash {
             out.node.type.clear();
             out.node.use = UndefinedParameterUse;
 
-            if (pd.exportSourceMap()) {
-                out.sourceMap.type.sourceMap.clear();
-                out.sourceMap.use.sourceMap.clear();
-            }
+            out.sourceMap.type.sourceMap.clear();
+            out.sourceMap.use.sourceMap.clear();
 
             // Clear example value for old syntax
             if (oldSyntax) {
                 out.node.exampleValue.clear();
-
-                if (pd.exportSourceMap()) {
-                    out.sourceMap.exampleValue.sourceMap.clear();
-                }
+                out.sourceMap.exampleValue.sourceMap.clear();
             }
         }
 
@@ -387,16 +375,16 @@ namespace snowcrash {
                 }
             }
 
-            if(!out.node.exampleValue.empty() &&
-               !isExampleFound) {
+            if (!out.node.exampleValue.empty() &&
+                !isExampleFound) {
 
                 // WARN: missing example in values.
                 ss << "the example value '" << out.node.exampleValue << "' of parameter '"<< out.node.name <<"' is not in its list of expected values";
                 printWarning = true;
             }
 
-            if(!out.node.defaultValue.empty() &&
-               !isDefaultFound) {
+            if (!out.node.defaultValue.empty() &&
+                !isDefaultFound) {
 
                 // WARN: missing default in values.
                 ss << "the default value '" << out.node.defaultValue << "' of parameter '"<< out.node.name <<"' is not in its list of expected values";

@@ -54,18 +54,14 @@ namespace snowcrash {
                     Element element(Element::DataStructureElement);
                     element.content.dataStructure = namedType.node;
 
+                    SourceMap<Element> elementSM(Element::DataStructureElement);
+
+                    elementSM.content.dataStructure.name = namedType.sourceMap.name;
+                    elementSM.content.dataStructure.typeDefinition = namedType.sourceMap.typeDefinition;
+                    elementSM.content.dataStructure.sections = namedType.sourceMap.sections;
+
                     out.node.content.elements().push_back(element);
-
-                    if (pd.exportSourceMap()) {
-
-                        SourceMap<Element> elementSM(Element::DataStructureElement);
-
-                        elementSM.content.dataStructure.name = namedType.sourceMap.name;
-                        elementSM.content.dataStructure.typeDefinition = namedType.sourceMap.typeDefinition;
-                        elementSM.content.dataStructure.sections = namedType.sourceMap.sections;
-
-                        out.sourceMap.content.elements().collection.push_back(elementSM);
-                    }
+                    out.sourceMap.content.elements().collection.push_back(elementSM);
                 }
             }
 
@@ -79,11 +75,8 @@ namespace snowcrash {
             out.node.element = Element::CategoryElement;
             out.node.category = Element::DataStructureGroupCategory;
 
-            if (pd.exportSourceMap()) {
-
-                out.sourceMap.element = out.node.element;
-                out.sourceMap.category = out.node.category;
-            }
+            out.sourceMap.element = out.node.element;
+            out.sourceMap.category = out.node.category;
         }
 
         static SectionType sectionType(const MarkdownNodeIterator& node) {

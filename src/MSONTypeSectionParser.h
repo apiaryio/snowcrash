@@ -110,10 +110,7 @@ namespace snowcrash {
                     out.node.baseType == mson::ImplicitPrimitiveBaseType) {
 
                     out.node.content.value = signature.value;
-
-                    if (pd.exportSourceMap()) {
-                        out.sourceMap.value.sourceMap = node->sourceMap;
-                    }
+                    out.sourceMap.value.sourceMap = node->sourceMap;
                 }
                 else if (out.node.baseType == mson::ValueBaseType ||
                          out.node.baseType == mson::ImplicitValueBaseType) {
@@ -121,16 +118,13 @@ namespace snowcrash {
                     for (size_t i = 0; i < signature.values.size(); i++) {
 
                         mson::Element element;
-                        SourceMap<mson::Element> elementSM;
-
                         element.build(mson::parseValue(signature.values[i]));
+
+                        SourceMap<mson::Element> elementSM;
+                        elementSM.value.valueDefinition.sourceMap = node->sourceMap;
+
                         out.node.content.elements().push_back(element);
-
-                        if (pd.exportSourceMap()) {
-
-                            elementSM.value.valueDefinition.sourceMap = node->sourceMap;
-                            out.sourceMap.elements().collection.push_back(elementSM);
-                        }
+                        out.sourceMap.elements().collection.push_back(elementSM);
                     }
                 }
                 else if (out.node.baseType == mson::ObjectBaseType ||
@@ -149,10 +143,7 @@ namespace snowcrash {
                  out.node.baseType == mson::ImplicitPrimitiveBaseType)) {
 
                 out.node.content.value += signature.remainingContent;
-
-                if (pd.exportSourceMap()) {
-                    out.sourceMap.value.sourceMap.append(node->sourceMap);
-                }
+                out.sourceMap.value.sourceMap.append(node->sourceMap);
             }
 
             return ++MarkdownNodeIterator(node);

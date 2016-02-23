@@ -29,10 +29,7 @@ namespace snowcrash {
                 cur = MSONMixinParser::parse(node, siblings, pd, mixin);
 
                 element.build(mixin.node);
-
-                if (pd.exportSourceMap()) {
-                    elementSM.mixin = mixin.sourceMap;
-                }
+                elementSM.mixin = mixin.sourceMap;
 
                 break;
             }
@@ -43,10 +40,7 @@ namespace snowcrash {
                 cur = MSONOneOfParser::parse(node, siblings, pd, oneOf);
 
                 element.build(oneOf.node);
-
-                if (pd.exportSourceMap()) {
-                    elementSM = oneOf.sourceMap;
-                }
+                elementSM = oneOf.sourceMap;
 
                 break;
             }
@@ -59,10 +53,7 @@ namespace snowcrash {
                 cur = MSONTypeSectionListParser::parse(node, siblings, pd, typeSection);
 
                 element.buildFromElements(typeSection.node.content.elements());
-
-                if (pd.exportSourceMap()) {
-                    elementSM = typeSection.sourceMap.elements();
-                }
+                elementSM = typeSection.sourceMap.elements();
 
                 break;
             }
@@ -73,10 +64,7 @@ namespace snowcrash {
                 cur = MSONPropertyMemberParser::parse(node, siblings, pd, propertyMember);
 
                 element.build(propertyMember.node);
-
-                if (pd.exportSourceMap()) {
-                    elementSM.property = propertyMember.sourceMap;
-                }
+                elementSM.property = propertyMember.sourceMap;
 
                 break;
             }
@@ -87,10 +75,7 @@ namespace snowcrash {
 
         if (element.klass != mson::Element::UndefinedClass) {
             out.node.push_back(element);
-
-            if (pd.exportSourceMap()) {
-                out.sourceMap.collection.push_back(elementSM);
-            }
+            out.sourceMap.collection.push_back(elementSM);
         }
 
         return cur;
