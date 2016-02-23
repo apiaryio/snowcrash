@@ -78,9 +78,17 @@ namespace snowcrash {
                     typeSection.node.baseType = mson::ImplicitPrimitiveBaseType;
                     cur = MSONTypeSectionListParser::parse(node, siblings, pd, typeSection);
 
-                    if (!typeSection.node.content.value.empty()) {
+                    if (typeSection.node.content.value.empty()) {
+                        break;
+                    }
+
+                    if (typeSection.node.klass == mson::TypeSection::DefaultClass) {
                         out.node.defaultValue = typeSection.node.content.value;
                         out.sourceMap.defaultValue.sourceMap = typeSection.sourceMap.value.sourceMap;
+                    }
+                    else if (typeSection.node.klass == mson::TypeSection::SampleClass) {
+                        out.node.exampleValue = typeSection.node.content.value;
+                        out.sourceMap.exampleValue.sourceMap = typeSection.sourceMap.value.sourceMap;
                     }
 
                     break;

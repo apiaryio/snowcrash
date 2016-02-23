@@ -92,6 +92,23 @@ TEST_CASE("Parse parameter when it has more than 2 traits", "[mson_parameter]")
     REQUIRE(parameter.sourceMap.use.sourceMap.empty());
 }
 
+TEST_CASE("Parse parameter when it has a sample type section", "[mson_parameter]")
+{
+    mdp::ByteBuffer source = \
+    "+ id\n"\
+    "    + Sample: 42";
+
+    ParseResult<MSONParameter> parameter;
+    SectionParserHelper<MSONParameter, MSONParameterParser>::parse(source, MSONParameterSectionType, parameter);
+
+    REQUIRE(parameter.report.error.code == Error::OK);
+    REQUIRE(parameter.report.warnings.empty());
+
+    REQUIRE(parameter.node.name == "id");
+    REQUIRE(parameter.node.use == UndefinedParameterUse);
+    REQUIRE(parameter.node.exampleValue == "42");
+}
+
 TEST_CASE("Warn about implicit required vs default clash in new parameter", "[mson_parameter]")
 {
     mdp::ByteBuffer source = \
