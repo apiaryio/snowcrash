@@ -59,29 +59,17 @@ TEST_CASE("Parsing action", "[action]")
     REQUIRE(action.node.examples.front().responses[0].headers[0].first == "Content-Type");
     REQUIRE(action.node.examples.front().responses[0].headers[0].second == "text/plain");
 
-    REQUIRE(action.sourceMap.name.sourceMap.size() == 1);
-    REQUIRE(action.sourceMap.name.sourceMap[0].location == 0);
-    REQUIRE(action.sourceMap.name.sourceMap[0].length == 19);
-    REQUIRE(action.sourceMap.method.sourceMap.size() == 1);
-    REQUIRE(action.sourceMap.method.sourceMap[0].location == 0);
-    REQUIRE(action.sourceMap.method.sourceMap[0].length == 19);
-    REQUIRE(action.sourceMap.description.sourceMap.size() == 1);
-    REQUIRE(action.sourceMap.description.sourceMap[0].location == 19);
-    REQUIRE(action.sourceMap.description.sourceMap[0].length == 20);
+    SourceMapHelper::check(action.sourceMap.name.sourceMap, 0, 19);
+    SourceMapHelper::check(action.sourceMap.method.sourceMap, 0, 19);
+    SourceMapHelper::check(action.sourceMap.description.sourceMap, 19, 20);
     REQUIRE(action.sourceMap.examples.collection.size() == 1);
     REQUIRE(action.sourceMap.examples.collection[0].requests.collection.size() == 0);
     REQUIRE(action.sourceMap.examples.collection[0].responses.collection.size() == 1);
 
-    REQUIRE(action.sourceMap.examples.collection[0].responses.collection[0].body.sourceMap.size() == 1);
-    REQUIRE(action.sourceMap.examples.collection[0].responses.collection[0].body.sourceMap[0].location == 72);
-    REQUIRE(action.sourceMap.examples.collection[0].responses.collection[0].body.sourceMap[0].length == 7);
-    REQUIRE(action.sourceMap.examples.collection[0].responses.collection[0].name.sourceMap.size() == 1);
-    REQUIRE(action.sourceMap.examples.collection[0].responses.collection[0].name.sourceMap[0].location == 41);
-    REQUIRE(action.sourceMap.examples.collection[0].responses.collection[0].name.sourceMap[0].length == 27);
+    SourceMapHelper::check(action.sourceMap.examples.collection[0].responses.collection[0].body.sourceMap, 72, 7);
+    SourceMapHelper::check(action.sourceMap.examples.collection[0].responses.collection[0].name.sourceMap, 41, 27);
     REQUIRE(action.sourceMap.examples.collection[0].responses.collection[0].headers.collection.size() == 1);
-    REQUIRE(action.sourceMap.examples.collection[0].responses.collection[0].headers.collection[0].sourceMap.size() == 1);
-    REQUIRE(action.sourceMap.examples.collection[0].responses.collection[0].headers.collection[0].sourceMap[0].location == 41);
-    REQUIRE(action.sourceMap.examples.collection[0].responses.collection[0].headers.collection[0].sourceMap[0].length == 27);
+    SourceMapHelper::check(action.sourceMap.examples.collection[0].responses.collection[0].headers.collection[0].sourceMap, 41, 27);
 }
 
 TEST_CASE("Parse Action description with list", "[action]")
@@ -107,12 +95,8 @@ TEST_CASE("Parse Action description with list", "[action]")
     REQUIRE(action.node.examples.front().requests.empty());
 
     REQUIRE(action.sourceMap.name.sourceMap.empty());
-    REQUIRE(action.sourceMap.method.sourceMap.size() == 1);
-    REQUIRE(action.sourceMap.method.sourceMap[0].location == 0);
-    REQUIRE(action.sourceMap.method.sourceMap[0].length == 6);
-    REQUIRE(action.sourceMap.description.sourceMap.size() == 1);
-    REQUIRE(action.sourceMap.description.sourceMap[0].location == 6);
-    REQUIRE(action.sourceMap.description.sourceMap[0].length == 26);
+    SourceMapHelper::check(action.sourceMap.method.sourceMap, 0, 6);
+    SourceMapHelper::check(action.sourceMap.description.sourceMap, 6, 26);
     REQUIRE(action.sourceMap.examples.collection.size() == 1);
     REQUIRE(action.sourceMap.examples.collection[0].requests.collection.size() == 0);
     REQUIRE(action.sourceMap.examples.collection[0].responses.collection.size() == 1);
@@ -184,9 +168,7 @@ TEST_CASE("Parse method with multiple requests and responses", "[action]")
     REQUIRE(action.node.examples.front().responses[1].headers.empty());
 
     REQUIRE(action.sourceMap.name.sourceMap.empty());
-    REQUIRE(action.sourceMap.method.sourceMap.size() == 1);
-    REQUIRE(action.sourceMap.method.sourceMap[0].location == 0);
-    REQUIRE(action.sourceMap.method.sourceMap[0].length == 6);
+    SourceMapHelper::check(action.sourceMap.method.sourceMap, 0, 6);
     REQUIRE(action.sourceMap.description.sourceMap.empty());
     REQUIRE(action.sourceMap.examples.collection.size() == 1);
     REQUIRE(action.sourceMap.examples.collection[0].requests.collection.size() == 2);
@@ -232,9 +214,7 @@ TEST_CASE("Parse method with multiple incomplete requests", "[action][blocks]")
     REQUIRE(action.node.examples.front().responses.size() == 1);
 
     REQUIRE(action.sourceMap.name.sourceMap.empty());
-    REQUIRE(action.sourceMap.method.sourceMap.size() == 1);
-    REQUIRE(action.sourceMap.method.sourceMap[0].location == 0);
-    REQUIRE(action.sourceMap.method.sourceMap[0].length == 9);
+    SourceMapHelper::check(action.sourceMap.method.sourceMap, 0, 9);
     REQUIRE(action.sourceMap.description.sourceMap.empty());
     REQUIRE(action.sourceMap.examples.collection.size() == 1);
     REQUIRE(action.sourceMap.examples.collection[0].requests.collection.size() == 2);
@@ -273,9 +253,7 @@ TEST_CASE("Parse method with foreign item", "[action]")
     REQUIRE(action.node.examples.front().responses.size() == 1);
 
     REQUIRE(action.sourceMap.name.sourceMap.empty());
-    REQUIRE(action.sourceMap.method.sourceMap.size() == 1);
-    REQUIRE(action.sourceMap.method.sourceMap[0].location == 0);
-    REQUIRE(action.sourceMap.method.sourceMap[0].length == 8);
+    SourceMapHelper::check(action.sourceMap.method.sourceMap, 0, 8);
     REQUIRE(action.sourceMap.description.sourceMap.empty());
     REQUIRE(action.sourceMap.examples.collection.size() == 1);
     REQUIRE(action.sourceMap.examples.collection[0].requests.collection.size() == 1);
@@ -302,12 +280,8 @@ TEST_CASE("Parse method with a HR", "[action]")
     REQUIRE(action.node.examples.empty());
 
     REQUIRE(action.sourceMap.name.sourceMap.empty());
-    REQUIRE(action.sourceMap.method.sourceMap.size() == 1);
-    REQUIRE(action.sourceMap.method.sourceMap[0].location == 0);
-    REQUIRE(action.sourceMap.method.sourceMap[0].length == 12);
-    REQUIRE(action.sourceMap.description.sourceMap.size() == 1);
-    REQUIRE(action.sourceMap.description.sourceMap[0].location == 12);
-    REQUIRE(action.sourceMap.description.sourceMap[0].length == 8);
+    SourceMapHelper::check(action.sourceMap.method.sourceMap, 0, 12);
+    SourceMapHelper::check(action.sourceMap.description.sourceMap, 12, 8);
     REQUIRE(action.sourceMap.examples.collection.size() == 0);
 }
 
@@ -326,9 +300,7 @@ TEST_CASE("Parse method without name", "[action]")
     REQUIRE(action.node.description.empty());
 
     REQUIRE(action.sourceMap.name.sourceMap.empty());
-    REQUIRE(action.sourceMap.method.sourceMap.size() == 1);
-    REQUIRE(action.sourceMap.method.sourceMap[0].location == 0);
-    REQUIRE(action.sourceMap.method.sourceMap[0].length == 5);
+    SourceMapHelper::check(action.sourceMap.method.sourceMap, 0, 5);
     REQUIRE(action.sourceMap.description.sourceMap.empty());
     REQUIRE(action.sourceMap.examples.collection.size() == 0);
 }
@@ -358,14 +330,10 @@ TEST_CASE("Parse action with parameters", "[action]")
     REQUIRE(action.node.parameters[0].values.empty());
 
     REQUIRE(action.sourceMap.name.sourceMap.empty());
-    REQUIRE(action.sourceMap.method.sourceMap.size() == 1);
-    REQUIRE(action.sourceMap.method.sourceMap[0].location == 0);
-    REQUIRE(action.sourceMap.method.sourceMap[0].length == 21);
+    SourceMapHelper::check(action.sourceMap.method.sourceMap, 0, 21);
     REQUIRE(action.sourceMap.description.sourceMap.empty());
     REQUIRE(action.sourceMap.parameters.collection.size() == 1);
-    REQUIRE(action.sourceMap.parameters.collection[0].name.sourceMap.size() == 1);
-    REQUIRE(action.sourceMap.parameters.collection[0].name.sourceMap[0].location == 40);
-    REQUIRE(action.sourceMap.parameters.collection[0].name.sourceMap[0].length == 44);
+    SourceMapHelper::check(action.sourceMap.parameters.collection[0].name.sourceMap, 40, 44);
     REQUIRE(action.sourceMap.examples.collection.size() == 1);
     REQUIRE(action.sourceMap.examples.collection[0].requests.collection.size() == 0);
     REQUIRE(action.sourceMap.examples.collection[0].responses.collection.size() == 1);
@@ -390,9 +358,7 @@ TEST_CASE("Give a warning when 2xx CONNECT has a body", "[action]")
     REQUIRE(action.node.examples[0].responses[0].body == "{}\n");
 
     REQUIRE(action.sourceMap.name.sourceMap.empty());
-    REQUIRE(action.sourceMap.method.sourceMap.size() == 1);
-    REQUIRE(action.sourceMap.method.sourceMap[0].location == 0);
-    REQUIRE(action.sourceMap.method.sourceMap[0].length == 13);
+    SourceMapHelper::check(action.sourceMap.method.sourceMap, 0, 13);
     REQUIRE(action.sourceMap.description.sourceMap.empty());
     REQUIRE(action.sourceMap.examples.collection.size() == 1);
     REQUIRE(action.sourceMap.examples.collection[0].requests.collection.size() == 0);
@@ -419,9 +385,7 @@ TEST_CASE("Give a warning when response to HEAD has a body", "[action]")
     REQUIRE(action.node.examples[0].responses[0].body == "{}\n");
 
     REQUIRE(action.sourceMap.name.sourceMap.empty());
-    REQUIRE(action.sourceMap.method.sourceMap.size() == 1);
-    REQUIRE(action.sourceMap.method.sourceMap[0].location == 0);
-    REQUIRE(action.sourceMap.method.sourceMap[0].length == 10);
+    SourceMapHelper::check(action.sourceMap.method.sourceMap, 0, 10);
     REQUIRE(action.sourceMap.description.sourceMap.empty());
     REQUIRE(action.sourceMap.examples.collection.size() == 1);
     REQUIRE(action.sourceMap.examples.collection[0].requests.collection.size() == 0);
@@ -445,9 +409,7 @@ TEST_CASE("Missing 'LINK' HTTP request method", "[action]")
     REQUIRE(action.node.examples[0].responses.size() == 1);
 
     REQUIRE(action.sourceMap.name.sourceMap.empty());
-    REQUIRE(action.sourceMap.method.sourceMap.size() == 1);
-    REQUIRE(action.sourceMap.method.sourceMap[0].location == 0);
-    REQUIRE(action.sourceMap.method.sourceMap[0].length == 10);
+    SourceMapHelper::check(action.sourceMap.method.sourceMap, 0, 10);
     REQUIRE(action.sourceMap.description.sourceMap.empty());
     REQUIRE(action.sourceMap.examples.collection.size() == 1);
     REQUIRE(action.sourceMap.examples.collection[0].requests.collection.size() == 0);
@@ -480,9 +442,7 @@ TEST_CASE("Warn when request is not followed by a response", "[action]")
     REQUIRE(action.node.examples[1].responses.size() == 0);
 
     REQUIRE(action.sourceMap.name.sourceMap.empty());
-    REQUIRE(action.sourceMap.method.sourceMap.size() == 1);
-    REQUIRE(action.sourceMap.method.sourceMap[0].location == 0);
-    REQUIRE(action.sourceMap.method.sourceMap[0].length == 9);
+    SourceMapHelper::check(action.sourceMap.method.sourceMap, 0, 9);
     REQUIRE(action.sourceMap.description.sourceMap.empty());
     REQUIRE(action.sourceMap.examples.collection.size() == 2);
     REQUIRE(action.sourceMap.examples.collection[0].requests.collection.size() == 0);

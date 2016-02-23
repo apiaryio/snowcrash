@@ -96,9 +96,7 @@ TEST_CASE("Parse mson property member with block description", "[mson][property_
     SourceMapHelper::check(propertyMember.sourceMap.valueDefinition.sourceMap, 2, 41);
 
     REQUIRE(propertyMember.sourceMap.sections.collection.size() == 1);
-    REQUIRE(propertyMember.sourceMap.sections.collection[0].description.sourceMap.size() == 2);
-    SourceMapHelper::check(propertyMember.sourceMap.sections.collection[0].description.sourceMap, 47, 24, 1);
-    SourceMapHelper::check(propertyMember.sourceMap.sections.collection[0].description.sourceMap, 76, 14, 2);
+    SourceMapHelper::check(propertyMember.sourceMap.sections.collection[0].description.sourceMap, 47, 24, 76, 14);
 }
 
 TEST_CASE("Parse mson property member with block description, default and sample", "[mson][property_member]")
@@ -135,9 +133,7 @@ TEST_CASE("Parse mson property member with block description, default and sample
     SourceMapHelper::check(propertyMember.sourceMap.valueDefinition.sourceMap, 2, 31);
 
     REQUIRE(propertyMember.sourceMap.sections.collection.size() == 3);
-    REQUIRE(propertyMember.sourceMap.sections.collection[0].description.sourceMap.size() == 2);
-    SourceMapHelper::check(propertyMember.sourceMap.sections.collection[0].description.sourceMap, 37, 24, 1);
-    SourceMapHelper::check(propertyMember.sourceMap.sections.collection[0].description.sourceMap, 66, 14, 2);
+    SourceMapHelper::check(propertyMember.sourceMap.sections.collection[0].description.sourceMap, 37, 24, 66, 14);
     SourceMapHelper::check(propertyMember.sourceMap.sections.collection[1].value.sourceMap, 87, 16);
     SourceMapHelper::check(propertyMember.sourceMap.sections.collection[2].value.sourceMap, 125, 6);
 }

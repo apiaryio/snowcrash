@@ -175,6 +175,16 @@ namespace snowcrashtest {
             REQUIRE(sourceMap[nth - 1].location == (size_t) loc);
             REQUIRE(sourceMap[nth - 1].length == (size_t) len);
         }
+
+        /**
+         * Test a sourcemap which is of size 2
+         */
+        static void check(mdp::BytesRangeSet& sourceMap, int loc1, int len1, int loc2, int len2) {
+
+            REQUIRE(sourceMap.size() ==  2);
+            check(sourceMap, loc1, len1, 1);
+            check(sourceMap, loc2, len2, 2);
+        }
     };
 }
 

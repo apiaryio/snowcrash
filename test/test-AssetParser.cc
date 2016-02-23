@@ -68,9 +68,7 @@ TEST_CASE("Parse body asset", "[asset]")
     REQUIRE(asset.report.warnings.empty());
     REQUIRE(asset.node == "Lorem Ipsum\n");
 
-    REQUIRE(asset.sourceMap.sourceMap.size() == 1);
-    REQUIRE(asset.sourceMap.sourceMap[0].location == 12);
-    REQUIRE(asset.sourceMap.sourceMap[0].length == 16);
+    SourceMapHelper::check(asset.sourceMap.sourceMap, 12, 16);
 }
 
 TEST_CASE("Parse schema asset", "[asset]")
@@ -82,9 +80,7 @@ TEST_CASE("Parse schema asset", "[asset]")
     REQUIRE(asset.report.warnings.empty());
     REQUIRE(asset.node == "Dolor Sit Amet\n");
 
-    REQUIRE(asset.sourceMap.sourceMap.size() == 1);
-    REQUIRE(asset.sourceMap.sourceMap[0].location == 14);
-    REQUIRE(asset.sourceMap.sourceMap[0].length == 19);
+    SourceMapHelper::check(asset.sourceMap.sourceMap, 14, 19);
 }
 
 TEST_CASE("Foreign block inside", "[asset]")
@@ -102,11 +98,7 @@ TEST_CASE("Foreign block inside", "[asset]")
     REQUIRE(asset.report.warnings[0].code == IndentationWarning);
     REQUIRE(asset.node == "Lorem Ipsum\nHello World!\n");
 
-    REQUIRE(asset.sourceMap.sourceMap.size() == 2);
-    REQUIRE(asset.sourceMap.sourceMap[0].location == 12);
-    REQUIRE(asset.sourceMap.sourceMap[0].length == 17);
-    REQUIRE(asset.sourceMap.sourceMap[1].location == 33);
-    REQUIRE(asset.sourceMap.sourceMap[1].length == 13);
+    SourceMapHelper::check(asset.sourceMap.sourceMap, 12, 17, 33, 13);
 }
 
 TEST_CASE("Nested list block inside", "[asset]")
@@ -124,11 +116,7 @@ TEST_CASE("Nested list block inside", "[asset]")
     REQUIRE(asset.report.warnings[0].code == IndentationWarning);
     REQUIRE(asset.node == "Lorem Ipsum\n+ Hello World!\n");
 
-    REQUIRE(asset.sourceMap.sourceMap.size() == 2);
-    REQUIRE(asset.sourceMap.sourceMap[0].location == 12);
-    REQUIRE(asset.sourceMap.sourceMap[0].length == 16);
-    REQUIRE(asset.sourceMap.sourceMap[1].location == 33);
-    REQUIRE(asset.sourceMap.sourceMap[1].length == 15);
+    SourceMapHelper::check(asset.sourceMap.sourceMap, 12, 16, 33, 15);
 }
 
 TEST_CASE("Multiline signature", "[asset]")
@@ -148,12 +136,9 @@ TEST_CASE("Multiline signature", "[asset]")
     REQUIRE(asset.node == "Multiline Signature Content\nHello World!\n");
 
     REQUIRE(asset.sourceMap.sourceMap.size() == 3);
-    REQUIRE(asset.sourceMap.sourceMap[0].location == 2);
-    REQUIRE(asset.sourceMap.sourceMap[0].length == 5);
-    REQUIRE(asset.sourceMap.sourceMap[1].location == 9);
-    REQUIRE(asset.sourceMap.sourceMap[1].length == 29);
-    REQUIRE(asset.sourceMap.sourceMap[2].location == 42);
-    REQUIRE(asset.sourceMap.sourceMap[2].length == 17);
+    SourceMapHelper::check(asset.sourceMap.sourceMap, 2, 5, 1);
+    SourceMapHelper::check(asset.sourceMap.sourceMap, 9, 29, 2);
+    SourceMapHelper::check(asset.sourceMap.sourceMap, 42, 17, 3);
 }
 
 TEST_CASE("Multiple blocks", "[asset]")
@@ -177,12 +162,9 @@ TEST_CASE("Multiple blocks", "[asset]")
     REQUIRE(asset.node == "Block 1\n\nBlock 2\nBlock 3\n");
 
     REQUIRE(asset.sourceMap.sourceMap.size() == 3);
-    REQUIRE(asset.sourceMap.sourceMap[0].location == 12);
-    REQUIRE(asset.sourceMap.sourceMap[0].length == 9);
-    REQUIRE(asset.sourceMap.sourceMap[1].location == 25);
-    REQUIRE(asset.sourceMap.sourceMap[1].length == 13);
-    REQUIRE(asset.sourceMap.sourceMap[2].location == 42);
-    REQUIRE(asset.sourceMap.sourceMap[2].length == 8);
+    SourceMapHelper::check(asset.sourceMap.sourceMap, 12, 9, 1);
+    SourceMapHelper::check(asset.sourceMap.sourceMap, 25, 13, 2);
+    SourceMapHelper::check(asset.sourceMap.sourceMap, 42, 8, 3);
 }
 
 TEST_CASE("Extra spaces before signature", "[asset]")
@@ -199,9 +181,7 @@ TEST_CASE("Extra spaces before signature", "[asset]")
     REQUIRE(asset.report.warnings.empty());
     REQUIRE(asset.node == "Lorem Ipsum\n");
 
-    REQUIRE(asset.sourceMap.sourceMap.size() == 1);
-    REQUIRE(asset.sourceMap.sourceMap[0].location == 14);
-    REQUIRE(asset.sourceMap.sourceMap[0].length == 16);
+    SourceMapHelper::check(asset.sourceMap.sourceMap, 14, 16);
 }
 
 TEST_CASE("Asset parser greediness", "[asset]")
@@ -218,7 +198,5 @@ TEST_CASE("Asset parser greediness", "[asset]")
     REQUIRE(asset.report.warnings.empty());
     REQUIRE(asset.node == "Lorem Ipsum\n");
 
-    REQUIRE(asset.sourceMap.sourceMap.size() == 1);
-    REQUIRE(asset.sourceMap.sourceMap[0].location == 12);
-    REQUIRE(asset.sourceMap.sourceMap[0].length == 16);
+    SourceMapHelper::check(asset.sourceMap.sourceMap, 12, 16);
 }

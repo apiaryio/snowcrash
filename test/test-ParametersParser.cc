@@ -51,12 +51,8 @@ TEST_CASE("Parse canonical parameters", "[parameters]")
     REQUIRE(parameters.node[1].description.empty());
 
     REQUIRE(parameters.sourceMap.collection.size() == 2);
-    REQUIRE(parameters.sourceMap.collection[0].name.sourceMap.size() == 1);
-    REQUIRE(parameters.sourceMap.collection[0].name.sourceMap[0].location == 19);
-    REQUIRE(parameters.sourceMap.collection[0].name.sourceMap[0].length == 40);
-    REQUIRE(parameters.sourceMap.collection[1].name.sourceMap.size() == 1);
-    REQUIRE(parameters.sourceMap.collection[1].name.sourceMap[0].location == 165);
-    REQUIRE(parameters.sourceMap.collection[1].name.sourceMap[0].length == 5);
+    SourceMapHelper::check(parameters.sourceMap.collection[0].name.sourceMap, 19, 40);
+    SourceMapHelper::check(parameters.sourceMap.collection[1].name.sourceMap, 165, 5);
 }
 
 TEST_CASE("Parse ilegal parameter", "[parameters]")
@@ -101,13 +97,9 @@ TEST_CASE("Parse illegal parameter among legal ones", "[parameters]")
     REQUIRE(parameters.node[1].description.empty());
 
     REQUIRE(parameters.sourceMap.collection.size() == 2);
-    REQUIRE(parameters.sourceMap.collection[0].name.sourceMap.size() == 1);
-    REQUIRE(parameters.sourceMap.collection[0].name.sourceMap[0].location == 19);
-    REQUIRE(parameters.sourceMap.collection[0].name.sourceMap[0].length == 5);
+    SourceMapHelper::check(parameters.sourceMap.collection[0].name.sourceMap, 19, 5);
     REQUIRE(parameters.sourceMap.collection[0].description.sourceMap.empty());
-    REQUIRE(parameters.sourceMap.collection[1].name.sourceMap.size() == 1);
-    REQUIRE(parameters.sourceMap.collection[1].name.sourceMap[0].location == 44);
-    REQUIRE(parameters.sourceMap.collection[1].name.sourceMap[0].length == 5);
+    SourceMapHelper::check(parameters.sourceMap.collection[1].name.sourceMap, 44, 5);
     REQUIRE(parameters.sourceMap.collection[1].description.sourceMap.empty());
 }
 
@@ -132,9 +124,7 @@ TEST_CASE("Warn about additional content in parameters section", "[parameters]")
     REQUIRE(parameters.node[0].description.empty());
 
     REQUIRE(parameters.sourceMap.collection.size() == 1);
-    REQUIRE(parameters.sourceMap.collection[0].name.sourceMap.size() == 1);
-    REQUIRE(parameters.sourceMap.collection[0].name.sourceMap[0].location == 30);
-    REQUIRE(parameters.sourceMap.collection[0].name.sourceMap[0].length == 3);
+    SourceMapHelper::check(parameters.sourceMap.collection[0].name.sourceMap, 30, 3);
     REQUIRE(parameters.sourceMap.collection[0].description.sourceMap.empty());
 }
 
@@ -159,9 +149,7 @@ TEST_CASE("Warn about additional content block in parameters section", "[paramet
     REQUIRE(parameters.node[0].description.empty());
 
     REQUIRE(parameters.sourceMap.collection.size() == 1);
-    REQUIRE(parameters.sourceMap.collection[0].name.sourceMap.size() == 1);
-    REQUIRE(parameters.sourceMap.collection[0].name.sourceMap[0].location == 31);
-    REQUIRE(parameters.sourceMap.collection[0].name.sourceMap[0].length == 3);
+    SourceMapHelper::check(parameters.sourceMap.collection[0].name.sourceMap, 31, 3);
     REQUIRE(parameters.sourceMap.collection[0].description.sourceMap.empty());
 }
 
@@ -190,12 +178,8 @@ TEST_CASE("Warn about multiple parameters with the same name", "[parameters]")
     REQUIRE(parameters.node[1].exampleValue == "43");
 
     REQUIRE(parameters.sourceMap.collection.size() == 2);
-    REQUIRE(parameters.sourceMap.collection[0].name.sourceMap.size() == 1);
-    REQUIRE(parameters.sourceMap.collection[0].name.sourceMap[0].location == 19);
-    REQUIRE(parameters.sourceMap.collection[0].name.sourceMap[0].length == 10);
-    REQUIRE(parameters.sourceMap.collection[1].name.sourceMap.size() == 1);
-    REQUIRE(parameters.sourceMap.collection[1].name.sourceMap[0].location == 35);
-    REQUIRE(parameters.sourceMap.collection[1].name.sourceMap[0].length == 10);
+    SourceMapHelper::check(parameters.sourceMap.collection[0].name.sourceMap, 19, 10);
+    SourceMapHelper::check(parameters.sourceMap.collection[1].name.sourceMap, 35, 10);
 }
 
 TEST_CASE("Recognize parameter when there is no description on its signature and remaining description is not a new node", "[parameters]")

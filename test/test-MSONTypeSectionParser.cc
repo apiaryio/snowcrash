@@ -261,9 +261,7 @@ TEST_CASE("Parse multi-line mson sample list type section with newline", "[mson]
     REQUIRE(typeSection.node.content.description.empty());
     REQUIRE(typeSection.node.content.elements().empty());
 
-    REQUIRE(typeSection.sourceMap.value.sourceMap.size() == 2);
-    SourceMapHelper::check(typeSection.sourceMap.value.sourceMap, 14, 5, 1);
-    SourceMapHelper::check(typeSection.sourceMap.value.sourceMap, 23, 15, 2);
+    SourceMapHelper::check(typeSection.sourceMap.value.sourceMap, 14, 5, 23, 15);
     REQUIRE(typeSection.sourceMap.description.sourceMap.empty());
     REQUIRE(typeSection.sourceMap.elements().collection.empty());
 }
@@ -311,9 +309,7 @@ TEST_CASE("Parse markdown multi-line mson sample list type section", "[mson][typ
     REQUIRE(typeSection.node.content.description.empty());
     REQUIRE(typeSection.node.content.elements().empty());
 
-    REQUIRE(typeSection.sourceMap.value.sourceMap.size() == 2);
-    SourceMapHelper::check(typeSection.sourceMap.value.sourceMap, 11, 6, 1);
-    SourceMapHelper::check(typeSection.sourceMap.value.sourceMap, 20, 7, 2);
+    SourceMapHelper::check(typeSection.sourceMap.value.sourceMap, 11, 6, 20, 7);
     REQUIRE(typeSection.sourceMap.description.sourceMap.empty());
     REQUIRE(typeSection.sourceMap.elements().collection.empty());
 }

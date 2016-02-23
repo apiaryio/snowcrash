@@ -416,9 +416,7 @@ TEST_CASE("Resource followed by a complete action", "[resource_group][regression
     REQUIRE(resourceSM.name.sourceMap.empty());
     SourceMapHelper::check(resourceSM.uriTemplate.sourceMap, 16, 10);
     REQUIRE(resourceSM.actions.collection.size() == 1);
-    REQUIRE(resourceSM.actions.collection[0].method.sourceMap.size() == 1);
-    REQUIRE(resourceSM.actions.collection[0].method.sourceMap[0].location == 16);
-    REQUIRE(resourceSM.actions.collection[0].method.sourceMap[0].length == 10);
+    SourceMapHelper::check(resourceSM.actions.collection[0].method.sourceMap, 16, 10);
 }
 
 TEST_CASE("Too eager complete action processing", "[resource_group][regression][#187]")

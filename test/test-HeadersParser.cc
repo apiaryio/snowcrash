@@ -49,16 +49,8 @@ TEST_CASE("parse headers fixture", "[headers]")
     REQUIRE(headers.node[1].second == "Hello World!");
 
     REQUIRE(headers.sourceMap.collection.size() == 2);
-    REQUIRE(headers.sourceMap.collection[0].sourceMap.size() == 2);
-    REQUIRE(headers.sourceMap.collection[0].sourceMap[0].location == 15);
-    REQUIRE(headers.sourceMap.collection[0].sourceMap[0].length == 35);
-    REQUIRE(headers.sourceMap.collection[0].sourceMap[1].location == 54);
-    REQUIRE(headers.sourceMap.collection[0].sourceMap[1].length == 30);
-    REQUIRE(headers.sourceMap.collection[1].sourceMap.size() == 2);
-    REQUIRE(headers.sourceMap.collection[1].sourceMap[0].location == 15);
-    REQUIRE(headers.sourceMap.collection[1].sourceMap[0].length == 35);
-    REQUIRE(headers.sourceMap.collection[1].sourceMap[1].location == 54);
-    REQUIRE(headers.sourceMap.collection[1].sourceMap[1].length == 30);
+    SourceMapHelper::check(headers.sourceMap.collection[0].sourceMap, 15, 35, 54, 30);
+    SourceMapHelper::check(headers.sourceMap.collection[1].sourceMap, 15, 35, 54, 30);
 }
 
 TEST_CASE("parse headers fixture with no empty line between signature and content", "[headers]")
@@ -76,12 +68,8 @@ TEST_CASE("parse headers fixture with no empty line between signature and conten
     REQUIRE(headers.node[1].second == "Hello World!");
 
     REQUIRE(headers.sourceMap.collection.size() == 2);
-    REQUIRE(headers.sourceMap.collection[0].sourceMap.size() == 1);
-    REQUIRE(headers.sourceMap.collection[0].sourceMap[0].location == 0);
-    REQUIRE(headers.sourceMap.collection[0].sourceMap[0].length == 83);
-    REQUIRE(headers.sourceMap.collection[1].sourceMap.size() == 1);
-    REQUIRE(headers.sourceMap.collection[1].sourceMap[0].location == 0);
-    REQUIRE(headers.sourceMap.collection[1].sourceMap[0].length == 83);
+    SourceMapHelper::check(headers.sourceMap.collection[0].sourceMap, 0, 83);
+    SourceMapHelper::check(headers.sourceMap.collection[1].sourceMap, 0, 83);
 }
 
 TEST_CASE("parse malformed headers fixture", "[headers]")
@@ -106,28 +94,19 @@ TEST_CASE("parse malformed headers fixture", "[headers]")
     REQUIRE(headers.sourceMap.collection.size() == 3);
 
     REQUIRE(headers.sourceMap.collection[0].sourceMap.size() == 3);
-    REQUIRE(headers.sourceMap.collection[0].sourceMap[0].location == 15);
-    REQUIRE(headers.sourceMap.collection[0].sourceMap[0].length == 35);
-    REQUIRE(headers.sourceMap.collection[0].sourceMap[1].location == 54);
-    REQUIRE(headers.sourceMap.collection[0].sourceMap[1].length == 30);
-    REQUIRE(headers.sourceMap.collection[0].sourceMap[2].location == 88);
-    REQUIRE(headers.sourceMap.collection[0].sourceMap[2].length == 21);
+    SourceMapHelper::check(headers.sourceMap.collection[0].sourceMap, 15, 35, 1);
+    SourceMapHelper::check(headers.sourceMap.collection[0].sourceMap, 54, 30, 2);
+    SourceMapHelper::check(headers.sourceMap.collection[0].sourceMap, 88, 21, 3);
 
     REQUIRE(headers.sourceMap.collection[1].sourceMap.size() == 3);
-    REQUIRE(headers.sourceMap.collection[1].sourceMap[0].location == 15);
-    REQUIRE(headers.sourceMap.collection[1].sourceMap[0].length == 35);
-    REQUIRE(headers.sourceMap.collection[1].sourceMap[1].location == 54);
-    REQUIRE(headers.sourceMap.collection[1].sourceMap[1].length == 30);
-    REQUIRE(headers.sourceMap.collection[1].sourceMap[2].location == 88);
-    REQUIRE(headers.sourceMap.collection[1].sourceMap[2].length == 21);
+    SourceMapHelper::check(headers.sourceMap.collection[0].sourceMap, 15, 35, 1);
+    SourceMapHelper::check(headers.sourceMap.collection[0].sourceMap, 54, 30, 2);
+    SourceMapHelper::check(headers.sourceMap.collection[0].sourceMap, 88, 21, 3);
 
     REQUIRE(headers.sourceMap.collection[2].sourceMap.size() == 3);
-    REQUIRE(headers.sourceMap.collection[2].sourceMap[0].location == 15);
-    REQUIRE(headers.sourceMap.collection[2].sourceMap[0].length == 35);
-    REQUIRE(headers.sourceMap.collection[2].sourceMap[1].location == 54);
-    REQUIRE(headers.sourceMap.collection[2].sourceMap[1].length == 30);
-    REQUIRE(headers.sourceMap.collection[2].sourceMap[2].location == 88);
-    REQUIRE(headers.sourceMap.collection[2].sourceMap[2].length == 21);
+    SourceMapHelper::check(headers.sourceMap.collection[0].sourceMap, 15, 35, 1);
+    SourceMapHelper::check(headers.sourceMap.collection[0].sourceMap, 54, 30, 2);
+    SourceMapHelper::check(headers.sourceMap.collection[0].sourceMap, 88, 21, 3);
 }
 
 TEST_CASE("Parse header section composed of multiple blocks", "[headers]")
@@ -162,15 +141,9 @@ TEST_CASE("Parse header section composed of multiple blocks", "[headers]")
     REQUIRE(headers.node[2].second == "42");
 
     REQUIRE(headers.sourceMap.collection.size() == 3);
-    REQUIRE(headers.sourceMap.collection[0].sourceMap.size() == 1);
-    REQUIRE(headers.sourceMap.collection[0].sourceMap[0].location == 15);
-    REQUIRE(headers.sourceMap.collection[0].sourceMap[0].length == 33);
-    REQUIRE(headers.sourceMap.collection[1].sourceMap.size() == 1);
-    REQUIRE(headers.sourceMap.collection[1].sourceMap[0].location == 52);
-    REQUIRE(headers.sourceMap.collection[1].sourceMap[0].length == 9);
-    REQUIRE(headers.sourceMap.collection[2].sourceMap.size() == 1);
-    REQUIRE(headers.sourceMap.collection[2].sourceMap[0].location == 65);
-    REQUIRE(headers.sourceMap.collection[2].sourceMap[0].length == 20);
+    SourceMapHelper::check(headers.sourceMap.collection[0].sourceMap, 15, 33);
+    SourceMapHelper::check(headers.sourceMap.collection[1].sourceMap, 52, 9);
+    SourceMapHelper::check(headers.sourceMap.collection[2].sourceMap, 65, 20);
 }
 
 TEST_CASE("Parse header section with missing headers", "[headers]")
