@@ -158,6 +158,8 @@ namespace snowcrash {
                 sourceMap.valueDefinition.sourceMap = node->sourceMap;
             }
 
+            sourceMap.sourceMap = node->sourceMap;
+
             return ++MarkdownNodeIterator(node);
         }
 

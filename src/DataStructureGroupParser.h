@@ -48,21 +48,21 @@ namespace snowcrash {
                     out.report.warnings.push_back(Warning(ss.str(),
                                                           DuplicateWarning,
                                                           sourceMap));
+                    return cur;
                 }
-                else {
 
-                    Element element(Element::DataStructureElement);
-                    element.content.dataStructure = namedType.node;
+                Element element(Element::DataStructureElement);
+                element.content.dataStructure = namedType.node;
 
-                    SourceMap<Element> elementSM(Element::DataStructureElement);
+                out.node.content.elements().push_back(element);
 
-                    elementSM.content.dataStructure.name = namedType.sourceMap.name;
-                    elementSM.content.dataStructure.typeDefinition = namedType.sourceMap.typeDefinition;
-                    elementSM.content.dataStructure.sections = namedType.sourceMap.sections;
+                SourceMap<Element> elementSM(Element::DataStructureElement);
 
-                    out.node.content.elements().push_back(element);
-                    out.sourceMap.content.elements().collection.push_back(elementSM);
-                }
+                elementSM.content.dataStructure.name = namedType.sourceMap.name;
+                elementSM.content.dataStructure.typeDefinition = namedType.sourceMap.typeDefinition;
+                elementSM.content.dataStructure.sections = namedType.sourceMap.sections;
+
+                out.sourceMap.content.elements().collection.push_back(elementSM);
             }
 
             return cur;

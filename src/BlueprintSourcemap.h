@@ -188,7 +188,7 @@ namespace snowcrash {
      *  Source Map Structure for API Resource
      */
     template<>
-    struct SourceMap<Resource> {
+    struct SourceMap<Resource> : public SourceMapBase {
 
         /** Source Map of URI template */
         SourceMap<URITemplate> uriTemplate;
