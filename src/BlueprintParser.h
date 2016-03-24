@@ -732,7 +732,7 @@ namespace snowcrash {
          *  \param  out      Processed output
          */
         static void resolvePendingModels(SectionParserData& pd,
-                                          const ParseResultRef<Payload>& out) {
+                                         const ParseResultRef<Payload>& out) {
 
             if (pd.modelTable.find(out.node.reference.id) == pd.modelTable.end()) {
 

@@ -502,6 +502,8 @@ namespace snowcrash {
                     out.node.headers.push_back(header);
                     out.sourceMap.headers.collection.push_back(headerSM);
                 }
+
+                out.sourceMap.sourceMap = node->sourceMap;
             }
 
             return true;
