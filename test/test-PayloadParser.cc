@@ -749,3 +749,16 @@ TEST_CASE("Parse a request with attributes and no body", "[payload]")
     REQUIRE(payload.node.attributes.typeDefinition.typeSpecification.nestedTypes[0].symbol.literal == "Coupon");
     REQUIRE(payload.node.attributes.sections.empty());
 }
+
+TEST_CASE("Parsed payload includes source map", "[payload]")
+{
+    ParseResult<Payload> payload;
+    SectionParserHelper<Payload, PayloadParser>::parse(RequestFixture, RequestSectionType, payload);
+
+    REQUIRE(payload.report.error.code == Error::OK);
+    CHECK(payload.report.warnings.empty());
+
+    REQUIRE(payload.sourceMap.sourceMap.size() == 1);
+    REQUIRE(payload.sourceMap.sourceMap[0].location == 2);
+    REQUIRE(payload.sourceMap.sourceMap[0].length == 34);
+}

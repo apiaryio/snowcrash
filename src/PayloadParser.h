@@ -92,6 +92,8 @@ namespace snowcrash {
                 }
             }
 
+            out.sourceMap.sourceMap = node->sourceMap;
+
             return ++MarkdownNodeIterator(node);
         }
 
