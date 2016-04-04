@@ -37,7 +37,7 @@ TEST_CASE("recognize headers signature", "[headers]")
 TEST_CASE("parse headers fixture", "[headers]")
 {
     ParseResult<Headers> headers;
-    SectionParserHelper<Headers, HeadersParser>::parse(HeadersFixture, HeadersSectionType, headers);
+    SectionParserHelper<Headers, HeadersParser>::parse(HeadersFixture, HeadersSectionType, headers, ExportSourcemapOption);
 
     REQUIRE(headers.report.error.code == Error::OK);
     REQUIRE(headers.report.warnings.empty());
@@ -56,7 +56,7 @@ TEST_CASE("parse headers fixture", "[headers]")
 TEST_CASE("parse headers fixture with no empty line between signature and content", "[headers]")
 {
     ParseResult<Headers> headers;
-    SectionParserHelper<Headers, HeadersParser>::parse(HeadersSignatureContentFixture, HeadersSectionType, headers);
+    SectionParserHelper<Headers, HeadersParser>::parse(HeadersSignatureContentFixture, HeadersSectionType, headers, ExportSourcemapOption);
 
     REQUIRE(headers.report.error.code == Error::OK);
     REQUIRE(headers.report.warnings.size() == 1); // content in signature
@@ -78,7 +78,7 @@ TEST_CASE("parse malformed headers fixture", "[headers]")
     source += "        X-Custom-Header:\n";
 
     ParseResult<Headers> headers;
-    SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
+    SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers, ExportSourcemapOption);
 
     REQUIRE(headers.report.error.code == Error::OK);
     REQUIRE(headers.report.warnings.size() == 1); // malformed header
@@ -127,7 +127,7 @@ TEST_CASE("Parse header section composed of multiple blocks", "[headers]")
     source += "        X-My-Header: 42\n";
 
     ParseResult<Headers> headers;
-    SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
+    SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers, ExportSourcemapOption);
 
     REQUIRE(headers.report.error.code == Error::OK);
     REQUIRE(headers.report.warnings.size() == 1); // not a code block
@@ -151,7 +151,7 @@ TEST_CASE("Parse header section with missing headers", "[headers]")
     mdp::ByteBuffer source = "+ Headers\n\n";
 
     ParseResult<Headers> headers;
-    SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
+    SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers, ExportSourcemapOption);
 
     REQUIRE(headers.report.error.code == Error::OK);
     REQUIRE(headers.report.warnings.size() == 1); // no headers

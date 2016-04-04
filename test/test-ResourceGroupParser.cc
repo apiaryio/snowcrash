@@ -49,7 +49,8 @@ TEST_CASE("Parse canonical resource group", "[resource_group]")
     ParseResult<ResourceGroup> resourceGroup;
     SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(ResourceGroupFixture,
                                                                    ResourceGroupSectionType,
-                                                                   resourceGroup);
+                                                                   resourceGroup,
+                                                                   ExportSourcemapOption);
 
     REQUIRE(resourceGroup.report.error.code == Error::OK);
     REQUIRE(resourceGroup.report.warnings.empty());
@@ -80,7 +81,8 @@ TEST_CASE("Parse resource group with empty resource", "[resource_group]")
     ParseResult<ResourceGroup> resourceGroup;
     SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source,
                                                                    ResourceGroupSectionType,
-                                                                   resourceGroup);
+                                                                   resourceGroup,
+                                                                   ExportSourcemapOption);
 
     REQUIRE(resourceGroup.report.error.code == Error::OK);
     REQUIRE(resourceGroup.report.warnings.empty());
@@ -112,7 +114,8 @@ TEST_CASE("Parse multiple resource in anonymous group", "[resource_group]")
     ParseResult<ResourceGroup> resourceGroup;
     SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source,
                                                                    ResourceGroupSectionType,
-                                                                   resourceGroup);
+                                                                   resourceGroup,
+                                                                   ExportSourcemapOption);
 
     REQUIRE(resourceGroup.report.error.code == Error::OK);
     REQUIRE(resourceGroup.report.warnings.empty());
@@ -147,7 +150,8 @@ TEST_CASE("Parse multiple resources with payloads", "[resource_group]")
     ParseResult<ResourceGroup> resourceGroup;
     SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source,
                                                                    ResourceGroupSectionType,
-                                                                   resourceGroup);
+                                                                   resourceGroup,
+                                                                   ExportSourcemapOption);
 
     REQUIRE(resourceGroup.report.error.code == Error::OK);
     REQUIRE(resourceGroup.report.warnings.size() == 4);
@@ -197,7 +201,8 @@ TEST_CASE("Parse multiple resources with the same name", "[resource_group]")
     ParseResult<ResourceGroup> resourceGroup;
     SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source,
                                                                    ResourceGroupSectionType,
-                                                                   resourceGroup);
+                                                                   resourceGroup,
+                                                                   ExportSourcemapOption);
 
     REQUIRE(resourceGroup.report.error.code == Error::OK);
     REQUIRE(resourceGroup.report.warnings.size() == 1);
@@ -224,7 +229,8 @@ TEST_CASE("Parse resource with list in its description", "[resource_group]")
     ParseResult<ResourceGroup> resourceGroup;
     SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source,
                                                                    ResourceGroupSectionType,
-                                                                   resourceGroup);
+                                                                   resourceGroup,
+                                                                   ExportSourcemapOption);
 
     REQUIRE(resourceGroup.report.error.code == Error::OK);
     REQUIRE(resourceGroup.report.warnings.size() == 3);   // preformatted asset & ignoring unrecognized node & no response
@@ -256,7 +262,8 @@ TEST_CASE("Parse resource groups with hr in description", "[resource_group]")
     ParseResult<ResourceGroup> resourceGroup;
     SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source,
                                                                    ResourceGroupSectionType,
-                                                                   resourceGroup);
+                                                                   resourceGroup,
+                                                                   ExportSourcemapOption);
 
     REQUIRE(resourceGroup.report.error.code == Error::OK);
     REQUIRE(resourceGroup.report.warnings.empty());
@@ -282,7 +289,8 @@ TEST_CASE("Make sure method followed by a group does not eat the group", "[resou
     ParseResult<ResourceGroup> resourceGroup;
     SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source,
                                                                    ResourceGroupSectionType,
-                                                                   resourceGroup);
+                                                                   resourceGroup,
+                                                                   ExportSourcemapOption);
 
     REQUIRE(resourceGroup.report.error.code == Error::OK);
     REQUIRE(resourceGroup.report.warnings.size() == 1); // no response
@@ -311,7 +319,8 @@ TEST_CASE("Parse resource method abbreviation followed by a foreign method", "[r
     ParseResult<ResourceGroup> resourceGroup;
     SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source,
                                                                    ResourceGroupSectionType,
-                                                                   resourceGroup);
+                                                                   resourceGroup,
+                                                                   ExportSourcemapOption);
 
     REQUIRE(resourceGroup.report.error.code == Error::OK);
     REQUIRE(resourceGroup.report.warnings.size() == 2); // no response && unexpected action POST
@@ -344,7 +353,8 @@ TEST_CASE("Parse resource method abbreviation followed by another", "[resource_g
     ParseResult<ResourceGroup> resourceGroup;
     SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source,
                                                                    ResourceGroupSectionType,
-                                                                   resourceGroup);
+                                                                   resourceGroup,
+                                                                   ExportSourcemapOption);
 
     REQUIRE(resourceGroup.report.error.code == Error::OK);
     REQUIRE(resourceGroup.report.warnings.size() == 2); // 2x no response
@@ -387,7 +397,8 @@ TEST_CASE("Resource followed by a complete action", "[resource_group][regression
     ParseResult<ResourceGroup> resourceGroup;
     SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source,
                                                                    ResourceGroupSectionType,
-                                                                   resourceGroup);
+                                                                   resourceGroup,
+                                                                   ExportSourcemapOption);
 
     REQUIRE(resourceGroup.report.error.code == Error::OK);
     REQUIRE(resourceGroup.report.warnings.empty());
@@ -433,7 +444,8 @@ TEST_CASE("Too eager complete action processing", "[resource_group][regression][
     ParseResult<ResourceGroup> resourceGroup;
     SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(source,
                                                                    ResourceGroupSectionType,
-                                                                   resourceGroup);
+                                                                   resourceGroup,
+                                                                   ExportSourcemapOption);
 
     REQUIRE(resourceGroup.report.error.code == Error::OK);
     REQUIRE(resourceGroup.report.warnings.empty());

@@ -102,8 +102,9 @@ namespace snowcrash {
                                                      mson::ValueMember& valueMember,
                                                      SourceMap<mson::ValueMember>& sourceMap) {
 
-            if (!signature.content.empty()) {
-                valueMember.description = signature.content;
+            valueMember.description = signature.content;
+
+            if (pd.exportSourceMap() && !signature.content.empty()) {
                 sourceMap.description.sourceMap = node->sourceMap;
             }
 
@@ -138,7 +139,10 @@ namespace snowcrash {
                 if (valueMember.valueDefinition.typeDefinition.baseType == mson::PrimitiveBaseType) {
 
                     valueMember.valueDefinition.values.push_back(mson::parseValue(signature.value));
-                    sourceMap.valueDefinition.sourceMap = node->sourceMap;
+
+                    if (pd.exportSourceMap()) {
+                        sourceMap.valueDefinition.sourceMap = node->sourceMap;
+                    }
 
                     return ++MarkdownNodeIterator(node);
                 }
@@ -154,11 +158,13 @@ namespace snowcrash {
                 valueMember.valueDefinition.values.push_back(mson::parseValue(*it));
             }
 
-            if (!valueMember.valueDefinition.empty()) {
+            if (pd.exportSourceMap() && !valueMember.valueDefinition.empty()) {
                 sourceMap.valueDefinition.sourceMap = node->sourceMap;
             }
 
-            sourceMap.sourceMap = node->sourceMap;
+            if (pd.exportSourceMap()) {
+                sourceMap.sourceMap = node->sourceMap;
+            }
 
             return ++MarkdownNodeIterator(node);
         }
@@ -183,13 +189,17 @@ namespace snowcrash {
             }
 
             mson::TypeSection typeSection(mson::TypeSection::BlockDescriptionClass);
+
             typeSection.content.description = remainingContent;
-
-            SourceMap<mson::TypeSection> typeSectionSM;
-            typeSectionSM.description.sourceMap = node->sourceMap;
-
             sections.push_back(typeSection);
-            sourceMap.collection.push_back(typeSectionSM);
+
+            if (pd.exportSourceMap()) {
+
+                SourceMap<mson::TypeSection> typeSectionSM;
+
+                typeSectionSM.description.sourceMap = node->sourceMap;
+                sourceMap.collection.push_back(typeSectionSM);
+            }
         }
 
         /**
@@ -212,10 +222,13 @@ namespace snowcrash {
                 if (sections.empty()) {
 
                     mson::TypeSection typeSection(mson::TypeSection::BlockDescriptionClass);
-                    SourceMap<mson::TypeSection> typeSectionSM;
-
                     sections.push_back(typeSection);
-                    sourceMap.collection.push_back(typeSectionSM);
+
+                    if (pd.exportSourceMap()) {
+
+                        SourceMap<mson::TypeSection> typeSectionSM;
+                        sourceMap.collection.push_back(typeSectionSM);
+                    }
                 }
 
                 if (!sections[0].content.description.empty()) {
@@ -223,9 +236,9 @@ namespace snowcrash {
                 }
 
                 mdp::ByteBuffer content = mdp::MapBytesRangeSet(node->sourceMap, pd.sourceData);
+                sections[0].content.description += content;
 
-                if (!content.empty()) {
-                    sections[0].content.description += content;
+                if (pd.exportSourceMap() && !content.empty()) {
                     sourceMap.collection[0].description.sourceMap.append(node->sourceMap);
                 }
 
@@ -271,7 +284,10 @@ namespace snowcrash {
 
                 if (typeSection.node.klass != mson::TypeSection::UndefinedClass) {
                     sections.node.push_back(typeSection.node);
-                    sections.sourceMap.collection.push_back(typeSection.sourceMap);
+
+                    if (pd.exportSourceMap()) {
+                        sections.sourceMap.collection.push_back(typeSection.sourceMap);
+                    }
                 }
             }
 

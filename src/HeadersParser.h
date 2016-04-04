@@ -233,15 +233,16 @@ namespace snowcrash {
                 }
 
                 Header header;
-                SourceMap<Header> headerSM;
-
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
 
                 if (parseHeaderLine(*line, header, out, sourceMap)) {
                     out.node.push_back(header);
 
-                    headerSM.sourceMap = node->sourceMap;
-                    out.sourceMap.collection.push_back(headerSM);
+                    if (pd.exportSourceMap()) {
+                        SourceMap<Header> headerSM;
+                        headerSM.sourceMap = node->sourceMap;
+                        out.sourceMap.collection.push_back(headerSM);
+                    }
                 } else {
                     // WARN: unable to parse header
                     mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
@@ -260,27 +261,41 @@ namespace snowcrash {
                                             SourceMap<TransactionExamples>& examplesSM) {
 
             Collection<TransactionExample>::iterator exampleIt = examples.begin();
-            Collection<SourceMap<TransactionExample> >::iterator exampleSourceMapIt = examplesSM.collection.begin();
+            Collection<SourceMap<TransactionExample> >::iterator exampleSourceMapIt;
+
+            if (pd.exportSourceMap()) {
+                exampleSourceMapIt = examplesSM.collection.begin();
+            }
 
             while (exampleIt != examples.end()) {
 
                 Collection<Request>::iterator requestIt = exampleIt->requests.begin();
-                Collection<SourceMap<Request> >::iterator requestSourceMapIt = exampleSourceMapIt->requests.collection.begin();
+                Collection<SourceMap<Request> >::iterator requestSourceMapIt;
+
+                if (pd.exportSourceMap()) {
+                    requestSourceMapIt = exampleSourceMapIt->requests.collection.begin();
+                }
 
                 // Requests
                 while (requestIt != exampleIt->requests.end()) {
 
-                    requestIt->headers.insert(requestIt->headers.begin(), headers.begin(), headers.end());
-                    ++requestIt;
+                     requestIt->headers.insert(requestIt->headers.begin(), headers.begin(), headers.end());
+                     ++requestIt;
 
-                    requestSourceMapIt->headers.collection.insert(requestSourceMapIt->headers.collection.begin(),
-                                                                  headersSM.collection.begin(),
-                                                                  headersSM.collection.end());
-                    ++requestSourceMapIt;
+                     if (pd.exportSourceMap()) {
+                         requestSourceMapIt->headers.collection.insert(requestSourceMapIt->headers.collection.begin(),
+                                                                       headersSM.collection.begin(),
+                                                                       headersSM.collection.end());
+                         ++requestSourceMapIt;
+                     }
                 }
 
                 Collection<Response>::iterator responseIt = exampleIt->responses.begin();
-                Collection<SourceMap<Response> >::iterator responseSourceMapIt = exampleSourceMapIt->responses.collection.begin();
+                Collection<SourceMap<Response> >::iterator responseSourceMapIt;
+
+                if (pd.exportSourceMap()) {
+                    responseSourceMapIt = exampleSourceMapIt->responses.collection.begin();
+                }
 
                 // Responses
                 while(responseIt != exampleIt->responses.end()) {
@@ -288,14 +303,19 @@ namespace snowcrash {
                     responseIt->headers.insert(responseIt->headers.begin(), headers.begin(), headers.end());
                     ++responseIt;
 
-                    responseSourceMapIt->headers.collection.insert(responseSourceMapIt->headers.collection.begin(),
-                                                                   headersSM.collection.begin(),
-                                                                   headersSM.collection.end());
-                    ++responseSourceMapIt;
+                    if (pd.exportSourceMap()) {
+                        responseSourceMapIt->headers.collection.insert(responseSourceMapIt->headers.collection.begin(),
+                                                                       headersSM.collection.begin(),
+                                                                       headersSM.collection.end());
+                        ++responseSourceMapIt;
+                    }
                 }
 
                 ++exampleIt;
-                ++exampleSourceMapIt;
+
+                if (pd.exportSourceMap()) {
+                    ++exampleSourceMapIt;
+                }
             }
         }
 

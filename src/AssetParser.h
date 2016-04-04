@@ -42,10 +42,10 @@ namespace snowcrash {
                                                      SectionLayout& layout,
                                                      const ParseResultRef<Asset>& out) {
 
-            out.node.clear();
+            out.node = "";
             CodeBlockUtility::signatureContentAsCodeBlock(node, pd, out.report, out.node);
 
-            if (!out.node.empty()) {
+            if (pd.exportSourceMap() && !out.node.empty()) {
                 out.sourceMap.sourceMap.append(node->sourceMap);
             }
 
@@ -62,8 +62,9 @@ namespace snowcrash {
             mdp::ByteBuffer content;
             CodeBlockUtility::contentAsCodeBlock(node, pd, out.report, content);
 
-            if (!content.empty()) {
-                out.node += content;
+            out.node += content;
+
+            if (pd.exportSourceMap() && !content.empty()) {
                 out.sourceMap.sourceMap.append(node->sourceMap);
             }
 

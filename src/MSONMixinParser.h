@@ -51,7 +51,9 @@ namespace snowcrash {
 
             mson::parseTypeDefinition(node, pd, attributes, out.report, out.node);
 
-            out.sourceMap.sourceMap = node->sourceMap;
+            if (pd.exportSourceMap()) {
+                out.sourceMap.sourceMap = node->sourceMap;
+            }
 
             if ((out.node.baseType == mson::PrimitiveBaseType) ||
                 (out.node.baseType == mson::UndefinedBaseType)) {

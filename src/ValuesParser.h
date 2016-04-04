@@ -40,13 +40,14 @@ namespace snowcrash {
                 RegexCapture(content, PARAMETER_VALUE, captureGroups);
 
                 if (captureGroups.size() > 1) {
-                    SourceMap<Value> valueSM;
-                    valueSM.sourceMap = node->sourceMap;
-
                     out.node.push_back(captureGroups[1]);
-                    out.sourceMap.collection.push_back(valueSM);
-                }
-                else {
+
+                    if (pd.exportSourceMap()) {
+                        SourceMap<Value> valueSM;
+                        valueSM.sourceMap = node->sourceMap;
+                        out.sourceMap.collection.push_back(valueSM);
+                    }
+                } else {
                     TrimString(content);
 
                     // WARN: Ignoring the unexpected param value

@@ -53,21 +53,26 @@ namespace snowcrash {
             mdp::ByteBuffer remainingContent;
             GetFirstLine(node->text, remainingContent);
 
-            if (!out.node.method.empty()) {
-                out.sourceMap.method.sourceMap = node->sourceMap;
-            }
+            if (pd.exportSourceMap()) {
+                if (!out.node.method.empty()) {
+                    out.sourceMap.method.sourceMap = node->sourceMap;
+                }
 
-            if (!out.node.name.empty()) {
-                out.sourceMap.name.sourceMap = node->sourceMap;
-            }
+                if (!out.node.name.empty()) {
+                    out.sourceMap.name.sourceMap = node->sourceMap;
+                }
 
-            if (!out.node.uriTemplate.empty()) {
-                out.sourceMap.uriTemplate.sourceMap = node->sourceMap;
+                if (!out.node.uriTemplate.empty()) {
+                    out.sourceMap.uriTemplate.sourceMap = node->sourceMap;
+                }
             }
 
             if (!remainingContent.empty()) {
                 out.node.description += remainingContent;
-                out.sourceMap.description.sourceMap.append(node->sourceMap);
+
+                if (pd.exportSourceMap()) {
+                    out.sourceMap.description.sourceMap.append(node->sourceMap);
+                }
             }
 
             return ++MarkdownNodeIterator(node);
@@ -109,13 +114,19 @@ namespace snowcrash {
                         SourceMap<TransactionExample> transactionSM;
 
                         out.node.examples.push_back(transaction);
-                        out.sourceMap.examples.collection.push_back(transactionSM);
+
+                        if (pd.exportSourceMap()) {
+                            out.sourceMap.examples.collection.push_back(transactionSM);
+                        }
                     }
 
                     checkPayload(sectionType, sourceMap, payload.node, out);
 
                     out.node.examples.back().requests.push_back(payload.node);
-                    out.sourceMap.examples.collection.back().requests.collection.push_back(payload.sourceMap);
+
+                    if (pd.exportSourceMap()) {
+                        out.sourceMap.examples.collection.back().requests.collection.push_back(payload.sourceMap);
+                    }
 
                     break;
                 }
@@ -132,13 +143,19 @@ namespace snowcrash {
                         SourceMap<TransactionExample> transactionSM;
 
                         out.node.examples.push_back(transaction);
-                        out.sourceMap.examples.collection.push_back(transactionSM);
+
+                        if (pd.exportSourceMap()) {
+                            out.sourceMap.examples.collection.push_back(transactionSM);
+                        }
                     }
 
                     checkPayload(sectionType, sourceMap, payload.node, out);
 
                     out.node.examples.back().responses.push_back(payload.node);
-                    out.sourceMap.examples.collection.back().responses.collection.push_back(payload.sourceMap);
+
+                    if (pd.exportSourceMap()) {
+                        out.sourceMap.examples.collection.back().responses.collection.push_back(payload.sourceMap);
+                    }
 
                     break;
                 }
@@ -187,7 +204,7 @@ namespace snowcrash {
 
                 mdp::ByteBuffer content = CodeBlockUtility::addDanglingAsset(node, pd, sectionType, out.report, out.node.examples.back().responses.back().body);
 
-                if (!content.empty()) {
+                if (pd.exportSourceMap() && !content.empty()) {
                     out.sourceMap.examples.collection.back().responses.collection.back().body.sourceMap.append(node->sourceMap);
                 }
 
@@ -203,7 +220,7 @@ namespace snowcrash {
 
                 mdp::ByteBuffer content = CodeBlockUtility::addDanglingAsset(node, pd, sectionType, out.report, out.node.examples.back().requests.back().body);
 
-                if (!content.empty()) {
+                if (pd.exportSourceMap() && !content.empty()) {
                     out.sourceMap.examples.collection.back().requests.collection.back().body.sourceMap.append(node->sourceMap);
                 }
 
@@ -314,9 +331,11 @@ namespace snowcrash {
             if (!out.node.headers.empty()) {
 
                 SectionProcessor<Headers>::injectDeprecatedHeaders(pd, out.node.headers, out.sourceMap.headers, out.node.examples, out.sourceMap.examples);
-
                 out.node.headers.clear();
-                out.sourceMap.headers.collection.clear();
+
+                if (pd.exportSourceMap()) {
+                    out.sourceMap.headers.collection.clear();
+                }
             }
 
             if (out.node.examples.empty()) {
@@ -326,10 +345,9 @@ namespace snowcrash {
                 out.report.warnings.push_back(Warning("action is missing a response",
                                                       EmptyDefinitionWarning,
                                                       sourceMap));
-            }
-            else if (!out.node.examples.empty() &&
-                     !out.node.examples.back().requests.empty() &&
-                     out.node.examples.back().responses.empty()) {
+            } else if (!out.node.examples.empty() &&
+                !out.node.examples.back().requests.empty() &&
+                out.node.examples.back().responses.empty()) {
 
                 // WARN: No response for request
                 std::stringstream ss;
@@ -421,8 +439,7 @@ namespace snowcrash {
 
                 RequestIterator duplicate = SectionProcessor<Payload>::findRequest(example, payload);
                 return duplicate != example.requests.end();
-            }
-            else if (sectionType == ResponseSectionType) {
+            } else if (sectionType == ResponseSectionType) {
 
                 ResponseIterator duplicate = SectionProcessor<Payload>::findResponse(example, payload);
                 return duplicate != example.responses.end();
@@ -493,8 +510,7 @@ namespace snowcrash {
 
             if (RegexCapture(subject, ActionHeaderRegex, captureGroups, 3)) {
                 method = captureGroups[1];
-            }
-            else if (RegexCapture(subject, NamedActionHeaderRegex, captureGroups, 4)) {
+            } else if (RegexCapture(subject, NamedActionHeaderRegex, captureGroups, 4)) {
                 name = captureGroups[1];
                 method = captureGroups[2];
                 uriTemplate = captureGroups[3];

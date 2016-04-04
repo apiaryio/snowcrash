@@ -36,7 +36,7 @@ TEST_CASE("Parse canonical data structures", "[data_structure_group]")
     "## Email (array[string])";
 
     ParseResult<DataStructureGroup> dataStructureGroup;
-    SectionParserHelper<DataStructureGroup, DataStructureGroupParser>::parse(source, DataStructureGroupSectionType, dataStructureGroup);
+    SectionParserHelper<DataStructureGroup, DataStructureGroupParser>::parse(source, DataStructureGroupSectionType, dataStructureGroup, ExportSourcemapOption);
 
     REQUIRE(dataStructureGroup.report.error.code == Error::OK);
     REQUIRE(dataStructureGroup.report.warnings.empty());
@@ -86,7 +86,7 @@ TEST_CASE("Parse multiple data structures with type sections", "[data_structure_
     "## Email (array[string])";
 
     ParseResult<DataStructureGroup> dataStructureGroup;
-    SectionParserHelper<DataStructureGroup, DataStructureGroupParser>::parse(source, DataStructureGroupSectionType, dataStructureGroup);
+    SectionParserHelper<DataStructureGroup, DataStructureGroupParser>::parse(source, DataStructureGroupSectionType, dataStructureGroup, ExportSourcemapOption);
 
     REQUIRE(dataStructureGroup.report.error.code == Error::OK);
     REQUIRE(dataStructureGroup.report.warnings.empty());

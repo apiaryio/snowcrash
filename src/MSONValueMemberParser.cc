@@ -69,12 +69,15 @@ namespace snowcrash {
             (!sections.node.empty() && sections.node.back().klass != mson::TypeSection::MemberTypeClass)) {
 
             mson::TypeSection typeSection(mson::TypeSection::MemberTypeClass);
+
             typeSection.baseType = baseType;
-
-            SourceMap<mson::TypeSection> typeSectionSM;
-
             sections.node.push_back(typeSection);
-            sections.sourceMap.collection.push_back(typeSectionSM);
+
+            if (pd.exportSourceMap()) {
+
+                SourceMap<mson::TypeSection> typeSectionSM;
+                sections.sourceMap.collection.push_back(typeSectionSM);
+            }
         }
 
         mson::Element element;
@@ -95,7 +98,10 @@ namespace snowcrash {
             }
             else {
                 element.build(mixin.node);
-                elementSM.mixin = mixin.sourceMap;
+
+                if (pd.exportSourceMap()) {
+                    elementSM.mixin = mixin.sourceMap;
+                }
             }
         }
         else if (pd.sectionContext() == MSONOneOfSectionType) {
@@ -116,7 +122,10 @@ namespace snowcrash {
             cur = MSONOneOfParser::parse(node, siblings, pd, oneOf);
 
             element.build(oneOf.node);
-            elementSM = oneOf.sourceMap;
+
+            if (pd.exportSourceMap()) {
+                elementSM = oneOf.sourceMap;
+            }
         }
         else {
 
@@ -128,7 +137,10 @@ namespace snowcrash {
                 cur = MSONValueMemberParser::parse(node, siblings, pd, valueMember);
 
                 element.build(valueMember.node);
-                elementSM.value = valueMember.sourceMap;
+
+                if (pd.exportSourceMap()) {
+                    elementSM.value = valueMember.sourceMap;
+                }
             }
             else if ((baseType == mson::ObjectBaseType ||
                       baseType == mson::ImplicitObjectBaseType) &&
@@ -138,7 +150,10 @@ namespace snowcrash {
                 cur = MSONPropertyMemberParser::parse(node, siblings, pd, propertyMember);
 
                 element.build(propertyMember.node);
-                elementSM.property = propertyMember.sourceMap;
+
+                if (pd.exportSourceMap()) {
+                    elementSM.property = propertyMember.sourceMap;
+                }
             }
             else if (baseType == mson::PrimitiveBaseType ||
                      baseType == mson::ImplicitPrimitiveBaseType) {
@@ -163,7 +178,10 @@ namespace snowcrash {
 
         if (element.klass != mson::Element::UndefinedClass) {
             sections.node.back().content.elements().push_back(element);
-            sections.sourceMap.collection.back().elements().collection.push_back(elementSM);
+
+            if (pd.exportSourceMap()) {
+                sections.sourceMap.collection.back().elements().collection.push_back(elementSM);
+            }
         }
 
         return cur;

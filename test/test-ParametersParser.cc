@@ -39,7 +39,8 @@ TEST_CASE("Parse canonical parameters", "[parameters]")
     ParseResult<Parameters> parameters;
     SectionParserHelper<Parameters, ParametersParser>::parse(ParametersFixture,
                                                              ParametersSectionType,
-                                                             parameters);
+                                                             parameters,
+                                                             ExportSourcemapOption);
 
     REQUIRE(parameters.report.error.code == Error::OK);
     REQUIRE(parameters.report.warnings.empty());
@@ -84,7 +85,8 @@ TEST_CASE("Parse illegal parameter among legal ones", "[parameters]")
     ParseResult<Parameters> parameters;
     SectionParserHelper<Parameters, ParametersParser>::parse(source,
                                                              ParametersSectionType,
-                                                             parameters);
+                                                             parameters,
+                                                             ExportSourcemapOption);
 
     REQUIRE(parameters.report.error.code == Error::OK);
     REQUIRE(parameters.report.warnings.size() == 1);
@@ -113,7 +115,8 @@ TEST_CASE("Warn about additional content in parameters section", "[parameters]")
     ParseResult<Parameters> parameters;
     SectionParserHelper<Parameters, ParametersParser>::parse(source,
                                                              ParametersSectionType,
-                                                             parameters);
+                                                             parameters,
+                                                             ExportSourcemapOption);
 
     REQUIRE(parameters.report.error.code == Error::OK);
     REQUIRE(parameters.report.warnings.size() == 1);
@@ -138,7 +141,8 @@ TEST_CASE("Warn about additional content block in parameters section", "[paramet
     ParseResult<Parameters> parameters;
     SectionParserHelper<Parameters, ParametersParser>::parse(source,
                                                              ParametersSectionType,
-                                                             parameters);
+                                                             parameters,
+                                                             ExportSourcemapOption);
 
     REQUIRE(parameters.report.error.code == Error::OK);
     REQUIRE(parameters.report.warnings.size() == 1);
@@ -163,7 +167,8 @@ TEST_CASE("Warn about multiple parameters with the same name", "[parameters]")
     ParseResult<Parameters> parameters;
     SectionParserHelper<Parameters, ParametersParser>::parse(source,
                                                              ParametersSectionType,
-                                                             parameters);
+                                                             parameters,
+                                                             ExportSourcemapOption);
 
     REQUIRE(parameters.report.error.code == Error::OK);
     REQUIRE(parameters.report.warnings.size() == 1);
@@ -198,7 +203,8 @@ TEST_CASE("Recognize parameter when there is no description on its signature and
     ParseResult<Parameters> parameters;
     SectionParserHelper<Parameters, ParametersParser>::parse(source,
                                                              ParametersSectionType,
-                                                             parameters);
+                                                             parameters,
+                                                             ExportSourcemapOption);
 
     REQUIRE(parameters.report.error.code == Error::OK);
     REQUIRE(parameters.report.warnings.empty());
@@ -367,7 +373,8 @@ TEST_CASE("Parse old style parameter in parameters with non-complete default val
     ParseResult<Parameters> parameters;
     SectionParserHelper<Parameters, ParametersParser>::parse(source,
                                                              ParametersSectionType,
-                                                             parameters);
+                                                             parameters,
+                                                             ExportSourcemapOption);
 
     REQUIRE(parameters.report.error.code == Error::OK);
     REQUIRE(parameters.report.warnings.size() == 1);
@@ -386,7 +393,8 @@ TEST_CASE("Parse old style parameter in parameters with non-complete example val
     ParseResult<Parameters> parameters;
     SectionParserHelper<Parameters, ParametersParser>::parse(source,
                                                              ParametersSectionType,
-                                                             parameters);
+                                                             parameters,
+                                                             ExportSourcemapOption);
 
     REQUIRE(parameters.report.error.code == Error::OK);
     REQUIRE(parameters.report.warnings.size() == 2);

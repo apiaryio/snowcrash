@@ -65,12 +65,14 @@ namespace snowcrash {
                 matchNamedResourceHeader(node, out.node);
             }
 
-            if (!out.node.uriTemplate.empty()) {
-                out.sourceMap.uriTemplate.sourceMap = node->sourceMap;
-            }
+            if (pd.exportSourceMap()) {
+                if (!out.node.uriTemplate.empty()) {
+                    out.sourceMap.uriTemplate.sourceMap = node->sourceMap;
+                }
 
-            if (!out.node.name.empty()) {
-                out.sourceMap.name.sourceMap = node->sourceMap;
+                if (!out.node.name.empty()) {
+                    out.sourceMap.name.sourceMap = node->sourceMap;
+                }
             }
 
             return ++MarkdownNodeIterator(node);
@@ -131,7 +133,10 @@ namespace snowcrash {
                         }
 
                         attributes.node.name.symbol.literal = out.node.name;
-                        attributes.sourceMap.name.sourceMap = out.sourceMap.name.sourceMap;
+
+                        if (pd.exportSourceMap()) {
+                            attributes.sourceMap.name.sourceMap = out.sourceMap.name.sourceMap;
+                        }
                     }
 
                     return cur;
@@ -157,7 +162,7 @@ namespace snowcrash {
 
                 mdp::ByteBuffer content = CodeBlockUtility::addDanglingAsset(node, pd, sectionType, out.report, out.node.model.body);
 
-                if (!content.empty()) {
+                if (pd.exportSourceMap() && !content.empty()) {
                     out.sourceMap.model.body.sourceMap.append(node->sourceMap);
                 }
 
@@ -167,7 +172,9 @@ namespace snowcrash {
                 if (it != pd.modelTable.end()) {
                     it->second.body = out.node.model.body;
 
-                    pd.modelSourceMapTable[out.node.model.name].body = out.sourceMap.model.body;
+                    if (pd.exportSourceMap()) {
+                        pd.modelSourceMapTable[out.node.model.name].body = out.sourceMap.model.body;
+                    }
                 }
 
                 return ++MarkdownNodeIterator(node);
@@ -301,7 +308,10 @@ namespace snowcrash {
                 }
 
                 out.node.headers.clear();
-                out.sourceMap.headers.collection.clear();
+
+                if (pd.exportSourceMap()) {
+                    out.sourceMap.headers.collection.clear();
+                }
             }
         }
 
@@ -339,8 +349,10 @@ namespace snowcrash {
             out.node.actions.push_back(action.node);
             layout = RedirectSectionLayout;
 
-            out.sourceMap.actions.collection.push_back(action.sourceMap);
-            out.sourceMap.uriTemplate.sourceMap = node->sourceMap;
+            if (pd.exportSourceMap()) {
+                out.sourceMap.actions.collection.push_back(action.sourceMap);
+                out.sourceMap.uriTemplate.sourceMap = node->sourceMap;
+            }
 
             return cur;
         }
@@ -394,7 +406,10 @@ namespace snowcrash {
             }
 
             out.node.actions.push_back(action.node);
-            out.sourceMap.actions.collection.push_back(action.sourceMap);
+
+            if (pd.exportSourceMap()) {
+                out.sourceMap.actions.collection.push_back(action.sourceMap);
+            }
 
             return cur;
         }
@@ -414,9 +429,11 @@ namespace snowcrash {
                 checkParametersEligibility<Resource>(node, pd, parameters.node, out);
                 out.node.parameters.insert(out.node.parameters.end(), parameters.node.begin(), parameters.node.end());
 
-                out.sourceMap.parameters.collection.insert(out.sourceMap.parameters.collection.end(),
-                                                           parameters.sourceMap.collection.begin(),
-                                                           parameters.sourceMap.collection.end());
+                if (pd.exportSourceMap()) {
+                    out.sourceMap.parameters.collection.insert(out.sourceMap.parameters.collection.end(),
+                                                               parameters.sourceMap.collection.begin(),
+                                                               parameters.sourceMap.collection.end());
+                }
             }
 
             return cur;
@@ -457,7 +474,10 @@ namespace snowcrash {
 
                 if (!out.node.name.empty()) {
                     model.node.name = out.node.name;
-                    model.sourceMap.name = out.sourceMap.name;
+
+                    if (pd.exportSourceMap()) {
+                        model.sourceMap.name = out.sourceMap.name;
+                    }
                 } else {
 
                     // ERR: No name specified for resource model
@@ -477,7 +497,10 @@ namespace snowcrash {
             if (it == pd.modelTable.end()) {
 
                 pd.modelTable[model.node.name] = model.node;
-                pd.modelSourceMapTable[model.node.name] = model.sourceMap;
+
+                if (pd.exportSourceMap()) {
+                    pd.modelSourceMapTable[model.node.name] = model.sourceMap;
+                }
             } else {
 
                 // ERR: Model already defined
@@ -491,7 +514,10 @@ namespace snowcrash {
             }
 
             out.node.model = model.node;
-            out.sourceMap.model = model.sourceMap;
+
+            if (pd.exportSourceMap()) {
+                out.sourceMap.model = model.sourceMap;
+            }
 
             return cur;
         }

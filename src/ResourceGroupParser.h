@@ -51,7 +51,7 @@ namespace snowcrash {
                 TrimString(out.node.attributes.name);
             }
 
-            if (!out.node.attributes.name.empty()) {
+            if (pd.exportSourceMap() && !out.node.attributes.name.empty()) {
                 out.sourceMap.attributes.name.sourceMap = node->sourceMap;
             }
 
@@ -69,10 +69,13 @@ namespace snowcrash {
                  out.node.content.elements().back().element != Element::CopyElement)) {
 
                 Element description(Element::CopyElement);
-                SourceMap<Element> descriptionSM(Element::CopyElement);
-
                 out.node.content.elements().push_back(description);
-                out.sourceMap.content.elements().collection.push_back(descriptionSM);
+
+                if (pd.exportSourceMap()) {
+
+                    SourceMap<Element> descriptionSM(Element::CopyElement);
+                    out.sourceMap.content.elements().collection.push_back(descriptionSM);
+                }
             }
 
             if (!out.node.content.elements().back().content.copy.empty()) {
@@ -81,10 +84,11 @@ namespace snowcrash {
 
             mdp::ByteBuffer content = mdp::MapBytesRangeSet(node->sourceMap, pd.sourceData);
 
-            if (!content.empty()) {
-                out.node.content.elements().back().content.copy += content;
+            if (pd.exportSourceMap() && !content.empty()) {
                 out.sourceMap.content.elements().collection.back().content.copy.sourceMap.append(node->sourceMap);
             }
+
+            out.node.content.elements().back().content.copy += content;
 
             return ++MarkdownNodeIterator(node);
         }
@@ -120,11 +124,15 @@ namespace snowcrash {
                 Element resourceElement(Element::ResourceElement);
                 resourceElement.content.resource = resource.node;
 
-                SourceMap<Element> resourceElementSM(Element::ResourceElement);
-                resourceElementSM.content.resource = resource.sourceMap;
-
                 out.node.content.elements().push_back(resourceElement);
-                out.sourceMap.content.elements().collection.push_back(resourceElementSM);
+
+                if (pd.exportSourceMap()) {
+
+                    SourceMap<Element> resourceElementSM(Element::ResourceElement);
+                    resourceElementSM.content.resource = resource.sourceMap;
+
+                    out.sourceMap.content.elements().collection.push_back(resourceElementSM);
+                }
             }
 
             return cur;
@@ -166,8 +174,11 @@ namespace snowcrash {
             out.node.element = Element::CategoryElement;
             out.node.category = Element::ResourceGroupCategory;
 
-            out.sourceMap.element = out.node.element;
-            out.sourceMap.category = out.node.category;
+            if (pd.exportSourceMap()) {
+
+                out.sourceMap.element = out.node.element;
+                out.sourceMap.category = out.node.category;
+            }
         }
 
         static SectionType sectionType(const MarkdownNodeIterator& node) {
