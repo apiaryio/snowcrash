@@ -38,7 +38,7 @@ namespace snowcrash {
 
             mson::parsePropertyName(node, pd, signature.identifier, out.report, out.node.name);
 
-            if (!out.node.name.empty()) {
+            if (pd.exportSourceMap() && !out.node.name.empty()) {
                 out.sourceMap.name.sourceMap = node->sourceMap;
             }
 

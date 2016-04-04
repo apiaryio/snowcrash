@@ -488,7 +488,7 @@ TEST_CASE("Ignoring local media type", "[parser][regression][#195]")
     "    [A][]\n";
 
     ParseResult<Blueprint> blueprint;
-    parse(source, 0, blueprint);
+    parse(source, ExportSourcemapOption, blueprint);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.size() == 1);
@@ -533,7 +533,7 @@ TEST_CASE("Using local media type", "[parser][regression][#195]")
     "    [A][]\n";
 
     ParseResult<Blueprint> blueprint;
-    parse(source, 0, blueprint);
+    parse(source, ExportSourcemapOption, blueprint);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -700,7 +700,7 @@ TEST_CASE("Don't mess up sourcemaps when there are references", "[parser][#213]"
     "# GET /1";
 
     ParseResult<Blueprint> blueprint;
-    parse(source, 0, blueprint);
+    parse(source, ExportSourcemapOption, blueprint);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.size() == 1);
@@ -725,7 +725,7 @@ TEST_CASE("doesn't crash while parsing response followed by a block quote and he
     "# B";
 
     ParseResult<Blueprint> blueprint;
-    parse(source, 0, blueprint);
+    parse(source, ExportSourcemapOption, blueprint);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
 
@@ -747,7 +747,7 @@ TEST_CASE("doesn't crash while parsing response followed by a block quote settex
     "-------\n";
 
     ParseResult<Blueprint> blueprint;
-    parse(source, 0, blueprint);
+    parse(source, ExportSourcemapOption, blueprint);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
 

@@ -23,7 +23,7 @@ const mdp::ByteBuffer ParameterFixture = \
 TEST_CASE("Parse canonical parameter definition with new syntax", "[mson_parameter]")
 {
     ParseResult<MSONParameter> parameter;
-    SectionParserHelper<MSONParameter, MSONParameterParser>::parse(ParameterFixture, MSONParameterSectionType, parameter);
+    SectionParserHelper<MSONParameter, MSONParameterParser>::parse(ParameterFixture, MSONParameterSectionType, parameter, ExportSourcemapOption);
 
     REQUIRE(parameter.report.error.code == Error::OK);
     REQUIRE(parameter.report.warnings.empty());
@@ -59,7 +59,7 @@ TEST_CASE("Parse parameter description when it occurs in different cases", "[mso
     "    Double newline\n";
 
     ParseResult<MSONParameter> parameter;
-    SectionParserHelper<MSONParameter, MSONParameterParser>::parse(source, MSONParameterSectionType, parameter);
+    SectionParserHelper<MSONParameter, MSONParameterParser>::parse(source, MSONParameterSectionType, parameter, ExportSourcemapOption);
 
     REQUIRE(parameter.report.error.code == Error::OK);
     REQUIRE(parameter.report.warnings.empty());
@@ -78,7 +78,7 @@ TEST_CASE("Parse parameter when it has more than 2 traits", "[mson_parameter]")
     mdp::ByteBuffer source = "+ id: 100 (optional, number, tagging)";
 
     ParseResult<MSONParameter> parameter;
-    SectionParserHelper<MSONParameter, MSONParameterParser>::parse(source, MSONParameterSectionType, parameter);
+    SectionParserHelper<MSONParameter, MSONParameterParser>::parse(source, MSONParameterSectionType, parameter, ExportSourcemapOption);
 
     REQUIRE(parameter.report.error.code == Error::OK);
     REQUIRE(parameter.report.warnings.size() == 1);

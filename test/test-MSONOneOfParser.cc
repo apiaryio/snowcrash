@@ -56,7 +56,7 @@ TEST_CASE("Parse canonical mson one of", "[mson][one_of]")
     "  - province: Madras";
 
     ParseResult<mson::OneOf> oneOf;
-    SectionParserHelper<mson::OneOf, MSONOneOfParser>::parseMSON(source, MSONOneOfSectionType, oneOf);
+    SectionParserHelper<mson::OneOf, MSONOneOfParser>::parseMSON(source, MSONOneOfSectionType, oneOf, ExportSourcemapOption);
 
     REQUIRE(oneOf.report.error.code == Error::OK);
     REQUIRE(oneOf.report.warnings.empty());
@@ -96,7 +96,7 @@ TEST_CASE("Parse mson one of without any nested members", "[mson][one_of]")
     mdp::ByteBuffer source = "- One of\n";
 
     ParseResult<mson::OneOf> oneOf;
-    SectionParserHelper<mson::OneOf, MSONOneOfParser>::parseMSON(source, MSONOneOfSectionType, oneOf);
+    SectionParserHelper<mson::OneOf, MSONOneOfParser>::parseMSON(source, MSONOneOfSectionType, oneOf, ExportSourcemapOption);
 
     REQUIRE(oneOf.report.error.code == Error::OK);
     REQUIRE(oneOf.report.warnings.size() == 1);
@@ -116,7 +116,7 @@ TEST_CASE("Parse mson one of with one of", "[mson][one_of]")
     "        - suffixed_name";
 
     ParseResult<mson::OneOf> oneOf;
-    SectionParserHelper<mson::OneOf, MSONOneOfParser>::parseMSON(source, MSONOneOfSectionType, oneOf);
+    SectionParserHelper<mson::OneOf, MSONOneOfParser>::parseMSON(source, MSONOneOfSectionType, oneOf, ExportSourcemapOption);
 
     REQUIRE(oneOf.report.error.code == Error::OK);
     REQUIRE(oneOf.report.warnings.empty());
@@ -158,7 +158,7 @@ TEST_CASE("Parse mson one of with member group", "[mson][one_of]")
     "        - last_name";
 
     ParseResult<mson::OneOf> oneOf;
-    SectionParserHelper<mson::OneOf, MSONOneOfParser>::parseMSON(source, MSONOneOfSectionType, oneOf);
+    SectionParserHelper<mson::OneOf, MSONOneOfParser>::parseMSON(source, MSONOneOfSectionType, oneOf, ExportSourcemapOption);
 
     REQUIRE(oneOf.report.error.code == Error::OK);
     REQUIRE(oneOf.report.warnings.empty());

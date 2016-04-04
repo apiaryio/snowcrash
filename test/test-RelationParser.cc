@@ -43,7 +43,7 @@ TEST_CASE("Relation signature without colon", "[relation]")
 TEST_CASE("Parse canonical link relation", "[relation]")
 {
     ParseResult<Relation> relation;
-    SectionParserHelper<Relation, RelationParser>::parse(RelationFixture, RelationSectionType, relation);
+    SectionParserHelper<Relation, RelationParser>::parse(RelationFixture, RelationSectionType, relation, ExportSourcemapOption);
 
     REQUIRE(relation.report.error.code == Error::OK);
     REQUIRE(relation.report.warnings.empty());
@@ -66,7 +66,7 @@ TEST_CASE("Relation identifier starting with non lower alphabet", "[relation]")
     REQUIRE(sectionType == RelationSectionType);
 
     ParseResult<Relation> relation;
-    SectionParserHelper<Relation, RelationParser>::parse(source, RelationSectionType, relation);
+    SectionParserHelper<Relation, RelationParser>::parse(source, RelationSectionType, relation, ExportSourcemapOption);
 
     REQUIRE(relation.report.error.code == Error::OK);
     REQUIRE(relation.report.warnings.size() == 1);
@@ -88,7 +88,7 @@ TEST_CASE("Relation identifier containing capital letters", "[relation]")
     REQUIRE(sectionType == RelationSectionType);
 
     ParseResult<Relation> relation;
-    SectionParserHelper<Relation, RelationParser>::parse(source, RelationSectionType, relation);
+    SectionParserHelper<Relation, RelationParser>::parse(source, RelationSectionType, relation, ExportSourcemapOption);
 
     REQUIRE(relation.report.error.code == Error::OK);
     REQUIRE(relation.report.warnings.size() == 1);
@@ -110,7 +110,7 @@ TEST_CASE("Relation identifier containing special characters", "[relation]")
     REQUIRE(sectionType == RelationSectionType);
 
     ParseResult<Relation> relation;
-    SectionParserHelper<Relation, RelationParser>::parse(source, RelationSectionType, relation);
+    SectionParserHelper<Relation, RelationParser>::parse(source, RelationSectionType, relation, ExportSourcemapOption);
 
     REQUIRE(relation.report.error.code == Error::OK);
     REQUIRE(relation.report.warnings.size() == 1);
@@ -132,7 +132,7 @@ TEST_CASE("Relation identifier consisting of dots and dashes", "[relation]")
     REQUIRE(sectionType == RelationSectionType);
 
     ParseResult<Relation> relation;
-    SectionParserHelper<Relation, RelationParser>::parse(source, RelationSectionType, relation);
+    SectionParserHelper<Relation, RelationParser>::parse(source, RelationSectionType, relation, ExportSourcemapOption);
 
     REQUIRE(relation.report.error.code == Error::OK);
     REQUIRE(relation.report.warnings.empty());

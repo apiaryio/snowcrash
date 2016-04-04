@@ -52,7 +52,7 @@ TEST_CASE("Blueprint block classifier", "[blueprint]")
 TEST_CASE("Parse canonical blueprint", "[blueprint]")
 {
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(BlueprintFixture, BlueprintSectionType, blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(BlueprintFixture, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -90,7 +90,7 @@ TEST_CASE("Parse blueprint with multiple metadata sections", "[blueprint]")
     source += BlueprintFixture;
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -136,7 +136,7 @@ TEST_CASE("Parse API with Name and abbreviated resource", "[blueprint]")
     "        {}";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -170,7 +170,7 @@ TEST_CASE("Parse nameless blueprint description", "[blueprint]")
     "# B\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.size() == 1);
@@ -191,7 +191,7 @@ TEST_CASE("Parse nameless blueprint with a list description", "[blueprint]")
     mdp::ByteBuffer source = "+ List\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.size() == 1);
@@ -219,7 +219,7 @@ TEST_CASE("Parse two groups with the same name", "[blueprint]")
     "# Group Name\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.size() == 2); // groups with same name & no response
@@ -275,7 +275,7 @@ TEST_CASE("Should parse nested lists in description", "[blueprint]")
     "   + Nested Item\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -314,7 +314,7 @@ TEST_CASE("Blueprint starting with Resource Group should be parsed", "[blueprint
     "## /posts";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -338,7 +338,7 @@ TEST_CASE("Blueprint starting with Resource should be parsed", "[blueprint]")
     mdp::ByteBuffer source = "# /posts";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -367,7 +367,7 @@ TEST_CASE("Checking a resource with global resources for duplicates", "[blueprin
     "### List posts [GET]\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, 0, Models(), &blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.size() == 3); // 2x no response & duplicate resource
@@ -413,7 +413,7 @@ TEST_CASE("Parsing unexpected blocks", "[blueprint]")
     "# GET /\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, 0, Models(), &blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.size() == 1); // no response
@@ -524,7 +524,7 @@ TEST_CASE("Parsing blueprint with mson data structures", "[blueprint]")
     markdownParser.parse(source, markdownAST);
     REQUIRE(!markdownAST.children().empty());
 
-    snowcrash::SectionParserData pd(0, source, blueprint.node);
+    snowcrash::SectionParserData pd(ExportSourcemapOption, source, blueprint.node);
     pd.sectionsContext.push_back(BlueprintSectionType);
 
     BlueprintParser::parse(markdownAST.children().begin(), markdownAST.children(), pd, blueprint);
@@ -572,7 +572,7 @@ TEST_CASE("Parse blueprint with two named types having the same name", "[bluepri
     "    - name - Coupon name";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, 0, Models(), &blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
     REQUIRE(blueprint.report.error.code == MSONError);
     REQUIRE(blueprint.report.warnings.size() == 1);
@@ -607,7 +607,7 @@ TEST_CASE("Parser blueprint correctly when having a big chain of inheritance in 
     "Clone\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, 0, Models(), &blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -644,7 +644,7 @@ TEST_CASE("Report error when coming across a super type reference to non existen
     "+ id: 25OFF (string)\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, 0, Models(), &blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
     REQUIRE(blueprint.report.error.code == MSONError);
     SourceMapHelper::check(blueprint.report.error.location, 62, 27);
@@ -659,7 +659,7 @@ TEST_CASE("Report error when a Data Structure inherits from itself", "[blueprint
     "+ id (string)\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, 0, Models(), &blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
     REQUIRE(blueprint.report.error.code == MSONError);
     SourceMapHelper::check(blueprint.report.error.location, 19, 9);
@@ -674,7 +674,7 @@ TEST_CASE("Report error when named type inherits a sub type in array", "[bluepri
     "## B (A)\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, 0, Models(), &blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
     REQUIRE(blueprint.report.error.code == MSONError);
     SourceMapHelper::check(blueprint.report.error.location, 35, 9);
@@ -690,7 +690,7 @@ TEST_CASE("Report error when data Structure inheritance graph contains a cycle",
     "## C (A)\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, 0, Models(), &blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
     REQUIRE(blueprint.report.error.code == MSONError);
     SourceMapHelper::check(blueprint.report.error.location, 19, 9);
@@ -708,7 +708,7 @@ TEST_CASE("Report error when data Structure inheritance graph with only a few of
     "## E (C)\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, 0, Models(), &blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
     REQUIRE(blueprint.report.error.code == MSONError);
     SourceMapHelper::check(blueprint.report.error.location, 37, 9);
@@ -724,7 +724,7 @@ TEST_CASE("Do not report error when named sub type is referenced in nested membe
     "+ person (A)\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, 0, Models(), &blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -767,7 +767,7 @@ TEST_CASE("Do not report error when there are circular references in nested memb
     "+ id (B)\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, 0, Models(), &blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -823,7 +823,7 @@ TEST_CASE("Do not report error when named sub type is referenced in nested membe
     "## A (B)\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, 0, Models(), &blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -867,7 +867,7 @@ TEST_CASE("Do not report error when a resource attributes type is circularly ref
     "+ posts (Post)\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, 0, Models(), &blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -918,7 +918,7 @@ TEST_CASE("Report error when named sub type is referenced as mixin", "[blueprint
     "+ Include A\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, 0, Models(), &blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
     REQUIRE(blueprint.report.error.code == MSONError);
     SourceMapHelper::check(blueprint.report.error.location, 35, 10);
@@ -935,7 +935,7 @@ TEST_CASE("Report error when named sub type is referenced as mixin when referenc
     "## A (B)\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, 0, Models(), &blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
     REQUIRE(blueprint.report.error.code == MSONError);
     SourceMapHelper::check(blueprint.report.error.location, 26, 10);
@@ -953,7 +953,7 @@ TEST_CASE("Report error when circular reference in mixins", "[blueprint]")
     "+ Include A\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, 0, Models(), &blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
     REQUIRE(blueprint.report.error.code == MSONError);
     SourceMapHelper::check(blueprint.report.error.location, 45, 10);
@@ -969,7 +969,7 @@ TEST_CASE("Do not report error when named type references itself in array", "[bl
     "+ children (array[Comment])\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, 0, Models(), &blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -1009,7 +1009,7 @@ TEST_CASE("Report error when a named type is defined twice with inheritance", "[
     "## C (object)\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, 0, Models(), &blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
     REQUIRE(blueprint.report.error.code == MSONError);
     SourceMapHelper::check(blueprint.report.error.location, 19, 9);
@@ -1024,7 +1024,7 @@ TEST_CASE("Report error when a named type is defined twice with base type", "[bl
     "## A (object)\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, 0, Models(), &blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
     REQUIRE(blueprint.report.error.code == MSONError);
     SourceMapHelper::check(blueprint.report.error.location, 33, 14);
@@ -1040,7 +1040,7 @@ TEST_CASE("Report error when a named type is defined twice, once with base type 
     "## B (object)\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, 0, Models(), &blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
     REQUIRE(blueprint.report.error.code == MSONError);
     SourceMapHelper::check(blueprint.report.error.location, 28, 14);
@@ -1053,7 +1053,7 @@ TEST_CASE("Parse mson signature attributes with mismatched square brackets", "[b
     "+ Attributes (array[Note)";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, 0, Models(), &blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
 }
@@ -1065,7 +1065,7 @@ TEST_CASE("Parse named type mson signature attributes with no closing bracket", 
     "## B (A(";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, 0, Models(), &blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
     REQUIRE(blueprint.report.error.code == MSONError);
     REQUIRE(blueprint.report.error.message == "base type 'A(' is not defined in the document");
@@ -1084,7 +1084,7 @@ TEST_CASE("Parse correctly when a resource named type is non-circularly referenc
     "    + bla (Question)\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, 0, Models(), &blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
 }
@@ -1097,7 +1097,7 @@ TEST_CASE("Report error when not finding a super type of the nested member", "[b
     "+ choice (B)\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, 0, Models(), &blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
     REQUIRE(blueprint.report.error.code == MSONError);
     REQUIRE(blueprint.report.error.message == "base type 'B' is not defined in the document");
@@ -1111,7 +1111,7 @@ TEST_CASE("Report error when not finding a nested super type of the nested membe
     "+ choice (array[B])\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, 0, Models(), &blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
     REQUIRE(blueprint.report.error.code == MSONError);
     REQUIRE(blueprint.report.error.message == "base type 'B' is not defined in the document");
@@ -1125,7 +1125,7 @@ TEST_CASE("Report error when not finding a mixin type", "[blueprint]")
     "+ Include B\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, 0, Models(), &blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
     REQUIRE(blueprint.report.error.code == MSONError);
     REQUIRE(blueprint.report.error.message == "base type 'B' is not defined in the document");
@@ -1146,7 +1146,7 @@ TEST_CASE("When an object contains a mixin of array type", "[blueprint]")
     NamedTypeHelper::build("B", mson::ValueBaseType, namedTypes);
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, 0, Models(), &blueprint, namedTypes);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint, namedTypes);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.size() == 1);
@@ -1169,7 +1169,7 @@ TEST_CASE("When an array contains a mixin of object type", "[blueprint]")
     NamedTypeHelper::build("B", mson::ValueBaseType, namedTypes);
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, 0, Models(), &blueprint, namedTypes);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint, namedTypes);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.size() == 1);
@@ -1192,7 +1192,7 @@ TEST_CASE("When an object member contains a mixin of array type", "[blueprint]")
     NamedTypeHelper::build("B", mson::ValueBaseType, namedTypes);
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, 0, Models(), &blueprint, namedTypes);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint, namedTypes);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.size() == 1);
@@ -1215,7 +1215,7 @@ TEST_CASE("When an array member contains a mixin of object type", "[blueprint]")
     NamedTypeHelper::build("B", mson::ValueBaseType, namedTypes);
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, 0, Models(), &blueprint, namedTypes);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint, namedTypes);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.size() == 1);
@@ -1241,7 +1241,7 @@ TEST_CASE("Any named type data structure should be able to be overridden when re
     "                    + relation: family\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, 0, Models(), &blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());

@@ -150,10 +150,11 @@ namespace snowcrash {
 
             mdp::ByteBuffer content = mdp::MapBytesRangeSet(node->sourceMap, pd.sourceData);
 
-            if (!content.empty()) {
-                out.node.description += content;
+            if (pd.exportSourceMap() && !content.empty()) {
                 out.sourceMap.description.sourceMap.append(node->sourceMap);
             }
+
+            out.node.description += content;
 
             return ++MarkdownNodeIterator(node);
         }

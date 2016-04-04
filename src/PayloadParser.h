@@ -75,7 +75,7 @@ namespace snowcrash {
                 if (!isAbbreviated(pd.sectionContext())) {
                     out.node.description = remainingContent;
 
-                    if (!out.node.description.empty()) {
+                    if (pd.exportSourceMap() && !out.node.description.empty()) {
                         out.sourceMap.description.sourceMap.append(node->sourceMap);
                     }
                 } else if (!parseModelReference(node, pd, remainingContent, out)) {
@@ -86,13 +86,15 @@ namespace snowcrash {
                     CodeBlockUtility::signatureContentAsCodeBlock(node, pd, out.report, out.node.body);
                     pd.sectionsContext.pop_back();
 
-                    if (!out.node.body.empty()) {
+                    if (pd.exportSourceMap() && !out.node.body.empty()) {
                         out.sourceMap.body.sourceMap.append(node->sourceMap);
                     }
                 }
             }
 
-            out.sourceMap.sourceMap = node->sourceMap;
+            if (pd.exportSourceMap()) {
+                out.sourceMap.sourceMap = node->sourceMap;
+            }
 
             return ++MarkdownNodeIterator(node);
         }
@@ -127,8 +129,9 @@ namespace snowcrash {
                     CodeBlockUtility::contentAsCodeBlock(node, pd, out.report, content);
                     pd.sectionsContext.pop_back();
 
-                    if (!content.empty()) {
-                        out.node.body += content;
+                    out.node.body += content;
+
+                    if (pd.exportSourceMap() && !content.empty()) {
                         out.sourceMap.body.sourceMap.append(node->sourceMap);
                     }
                 }
@@ -218,7 +221,7 @@ namespace snowcrash {
 
                 mdp::ByteBuffer content = CodeBlockUtility::addDanglingAsset(node, pd, sectionType, out.report, out.node.body);
 
-                if (!content.empty()) {
+                if (pd.exportSourceMap() && !content.empty()) {
                     out.sourceMap.body.sourceMap.append(node->sourceMap);
                 }
 
@@ -489,21 +492,24 @@ namespace snowcrash {
                 TrimString(out.node.name);
                 TrimString(mediaType);
 
-                if (!out.node.name.empty()) {
+                if (pd.exportSourceMap() && !out.node.name.empty()) {
                     out.sourceMap.name.sourceMap = node->sourceMap;
                 }
 
                 if (!mediaType.empty()) {
                     Header header = std::make_pair(HTTPHeaderName::ContentType, mediaType);
-
-                    SourceMap<Header> headerSM;
-                    headerSM.sourceMap = node->sourceMap;
-
                     out.node.headers.push_back(header);
-                    out.sourceMap.headers.collection.push_back(headerSM);
+
+                    if (pd.exportSourceMap()) {
+                        SourceMap<Header> headerSM;
+                        headerSM.sourceMap = node->sourceMap;
+                        out.sourceMap.headers.collection.push_back(headerSM);
+                    }
                 }
 
-                out.sourceMap.sourceMap = node->sourceMap;
+                if (pd.exportSourceMap()) {
+                    out.sourceMap.sourceMap = node->sourceMap;
+                }
             }
 
             return true;
@@ -525,7 +531,7 @@ namespace snowcrash {
                 out.node.reference.meta.node = node;
                 out.node.reference.type = Reference::ModelReference;
 
-                if (!symbol.empty()) {
+                if (pd.exportSourceMap() && !symbol.empty()) {
                     out.sourceMap.reference.sourceMap = node->sourceMap;
                 }
 
@@ -593,17 +599,20 @@ namespace snowcrash {
             out.node.body = model.body;
             out.node.schema = model.schema;
 
-            modelSM = pd.modelSourceMapTable.at(out.node.reference.id);
+            if (pd.exportSourceMap()) {
 
-            out.sourceMap.description = modelSM.description;
-            out.sourceMap.parameters = modelSM.parameters;
-            out.sourceMap.body = modelSM.body;
-            out.sourceMap.schema = modelSM.schema;
+                modelSM = pd.modelSourceMapTable.at(out.node.reference.id);
 
-            if (isPayloadContentType && !isModelContentType) {
-                out.sourceMap.headers.collection.insert(out.sourceMap.headers.collection.end(), modelSM.headers.collection.begin(), modelSM.headers.collection.end());
-            } else {
-                out.sourceMap.headers = modelSM.headers;
+                out.sourceMap.description = modelSM.description;
+                out.sourceMap.parameters = modelSM.parameters;
+                out.sourceMap.body = modelSM.body;
+                out.sourceMap.schema = modelSM.schema;
+
+                if (isPayloadContentType && !isModelContentType) {
+                    out.sourceMap.headers.collection.insert(out.sourceMap.headers.collection.end(), modelSM.headers.collection.begin(), modelSM.headers.collection.end());
+                } else {
+                    out.sourceMap.headers = modelSM.headers;
+                }
             }
         }
 

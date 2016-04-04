@@ -90,7 +90,7 @@ TEST_CASE("Parse canonical mson sample list type section", "[mson][type_section]
 
     ParseResult<mson::TypeSection> typeSection;
     typeSection.node.baseType = mson::PrimitiveBaseType;
-    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection);
+    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection, ExportSourcemapOption);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());
@@ -112,7 +112,7 @@ TEST_CASE("Parse array mson sample list type section", "[mson][type_section]")
 
     ParseResult<mson::TypeSection> typeSection;
     typeSection.node.baseType = mson::ValueBaseType;
-    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection);
+    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection, ExportSourcemapOption);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());
@@ -142,7 +142,7 @@ TEST_CASE("Parse mson sample list type section for a string but having values", 
 
     ParseResult<mson::TypeSection> typeSection;
     typeSection.node.baseType = mson::PrimitiveBaseType;
-    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection);
+    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection, ExportSourcemapOption);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());
@@ -164,7 +164,7 @@ TEST_CASE("Parse mson sample list type section for an object with a value", "[ms
 
     ParseResult<mson::TypeSection> typeSection;
     typeSection.node.baseType = mson::ObjectBaseType;
-    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection);
+    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection, ExportSourcemapOption);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.size() == 1);
@@ -189,7 +189,7 @@ TEST_CASE("Parse mson sample list type section with values as list items", "[mso
 
     ParseResult<mson::TypeSection> typeSection;
     typeSection.node.baseType = mson::ValueBaseType;
-    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection);
+    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection, ExportSourcemapOption);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());
@@ -222,7 +222,7 @@ TEST_CASE("Parse multi-line mson sample list type section without newline", "[ms
 
     ParseResult<mson::TypeSection> typeSection;
     typeSection.node.baseType = mson::PrimitiveBaseType;
-    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection);
+    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection, ExportSourcemapOption);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());
@@ -251,7 +251,7 @@ TEST_CASE("Parse multi-line mson sample list type section with newline", "[mson]
 
     ParseResult<mson::TypeSection> typeSection;
     typeSection.node.baseType = mson::PrimitiveBaseType;
-    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection);
+    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection, ExportSourcemapOption);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());
@@ -275,7 +275,7 @@ TEST_CASE("Parse mson sample list type section with values as para for values ba
 
     ParseResult<mson::TypeSection> typeSection;
     typeSection.node.baseType = mson::ValueBaseType;
-    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection);
+    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection, ExportSourcemapOption);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());
@@ -299,7 +299,7 @@ TEST_CASE("Parse markdown multi-line mson sample list type section", "[mson][typ
 
     ParseResult<mson::TypeSection> typeSection;
     typeSection.node.baseType = mson::PrimitiveBaseType;
-    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection);
+    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection, ExportSourcemapOption);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());
@@ -323,7 +323,7 @@ TEST_CASE("Parse mson sample header type section with values as list items", "[m
 
     ParseResult<mson::TypeSection> typeSection;
     typeSection.node.baseType = mson::ValueBaseType;
-    SectionParserHelper<mson::TypeSection, MSONTypeSectionHeaderParser>::parse(source, MSONSampleDefaultSectionType, typeSection);
+    SectionParserHelper<mson::TypeSection, MSONTypeSectionHeaderParser>::parse(source, MSONSampleDefaultSectionType, typeSection, ExportSourcemapOption);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());
@@ -356,7 +356,7 @@ TEST_CASE("Parse multi-line mson sample header type section", "[mson][type_secti
 
     ParseResult<mson::TypeSection> typeSection;
     typeSection.node.baseType = mson::PrimitiveBaseType;
-    SectionParserHelper<mson::TypeSection, MSONTypeSectionHeaderParser>::parse(source, MSONSampleDefaultSectionType, typeSection);
+    SectionParserHelper<mson::TypeSection, MSONTypeSectionHeaderParser>::parse(source, MSONSampleDefaultSectionType, typeSection, ExportSourcemapOption);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());
@@ -381,7 +381,7 @@ TEST_CASE("Parse multi-line mson sample header type section with multiple nested
 
     ParseResult<mson::TypeSection> typeSection;
     typeSection.node.baseType = mson::PrimitiveBaseType;
-    SectionParserHelper<mson::TypeSection, MSONTypeSectionHeaderParser>::parse(source, MSONSampleDefaultSectionType, typeSection);
+    SectionParserHelper<mson::TypeSection, MSONTypeSectionHeaderParser>::parse(source, MSONSampleDefaultSectionType, typeSection, ExportSourcemapOption);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());
@@ -405,7 +405,7 @@ TEST_CASE("Parse markdown multi-line mson sample header type section", "[mson][t
 
     ParseResult<mson::TypeSection> typeSection;
     typeSection.node.baseType = mson::PrimitiveBaseType;
-    SectionParserHelper<mson::TypeSection, MSONTypeSectionHeaderParser>::parse(source, MSONSampleDefaultSectionType, typeSection);
+    SectionParserHelper<mson::TypeSection, MSONTypeSectionHeaderParser>::parse(source, MSONSampleDefaultSectionType, typeSection, ExportSourcemapOption);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());
@@ -430,7 +430,7 @@ TEST_CASE("Parse mson items list type section for values base type containing on
 
     ParseResult<mson::TypeSection> typeSection;
     typeSection.node.baseType = mson::ValueBaseType;
-    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection);
+    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection, ExportSourcemapOption);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.size() == 1);
@@ -452,7 +452,7 @@ TEST_CASE("Parse mson properties list type section for values base type", "[mson
 
     ParseResult<mson::TypeSection> typeSection;
     typeSection.node.baseType = mson::ValueBaseType;
-    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection);
+    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection, ExportSourcemapOption);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.size() == 1);
@@ -477,7 +477,7 @@ TEST_CASE("Parse mson sample type section for a simple object", "[mson][type_sec
 
     ParseResult<mson::TypeSection> typeSection;
     typeSection.node.baseType = mson::ObjectBaseType;
-    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection);
+    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection, ExportSourcemapOption);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());
@@ -537,7 +537,7 @@ TEST_CASE("Parse mson sample type section for a complex object", "[mson][type_se
 
     ParseResult<mson::TypeSection> typeSection;
     typeSection.node.baseType = mson::ObjectBaseType;
-    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection);
+    SectionParserHelper<mson::TypeSection, MSONTypeSectionListParser>::parse(source, MSONSampleDefaultSectionType, typeSection, ExportSourcemapOption);
 
     REQUIRE(typeSection.report.error.code == Error::OK);
     REQUIRE(typeSection.report.warnings.empty());

@@ -30,7 +30,7 @@ TEST_CASE("Recognize explicit attributes signature", "[attributes]")
 TEST_CASE("Parse canonical attributes", "[attributes]")
 {
     ParseResult<Attributes> attributes;
-    SectionParserHelper<Attributes, AttributesParser>::parse(AttributesFixture, AttributesSectionType, attributes);
+    SectionParserHelper<Attributes, AttributesParser>::parse(AttributesFixture, AttributesSectionType, attributes, ExportSourcemapOption);
 
     REQUIRE(attributes.report.error.code == Error::OK);
     REQUIRE(attributes.report.warnings.empty());
@@ -56,7 +56,7 @@ TEST_CASE("Parse attributes with nested members", "[attributes]")
     "    + author: john@appleseed.com (string) - Author of the blog post";
 
     ParseResult<Attributes> attributes;
-    SectionParserHelper<Attributes, AttributesParser>::parse(source, AttributesSectionType, attributes);
+    SectionParserHelper<Attributes, AttributesParser>::parse(source, AttributesSectionType, attributes, ExportSourcemapOption);
 
     REQUIRE(attributes.report.error.code == Error::OK);
     REQUIRE(attributes.report.warnings.empty());
@@ -109,7 +109,7 @@ TEST_CASE("Parse attributes with block description", "[attributes]")
     "        + message (string)";
 
     ParseResult<Attributes> attributes;
-    SectionParserHelper<Attributes, AttributesParser>::parse(source, AttributesSectionType, attributes);
+    SectionParserHelper<Attributes, AttributesParser>::parse(source, AttributesSectionType, attributes, ExportSourcemapOption);
 
     REQUIRE(attributes.report.error.code == Error::OK);
     REQUIRE(attributes.report.warnings.empty());
