@@ -88,7 +88,7 @@ namespace snowcrash {
             IntermediateParseResult<mson::Mixin> mixin(sections.report);
             cur = MSONMixinParser::parse(node, siblings, pd, mixin);
 
-            if (baseType != mixin.node.baseType) {
+            if (!isSameBaseType(baseType, mixin.node.baseType)) {
 
                 // WARN: Mixin base type should be compatible with the parent base type
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);

@@ -425,6 +425,26 @@ namespace mson {
     }
 
     /**
+     * \brief Check is the given base types are the same after taking the implicitness into account
+     */
+    inline bool isSameBaseType(const mson::BaseType lhs,
+                               const mson::BaseType rhs) {
+
+        if (lhs == rhs ||
+            (lhs == mson::ImplicitObjectBaseType && rhs == mson::ObjectBaseType) ||
+            (lhs == mson::ObjectBaseType && rhs == mson::ImplicitObjectBaseType) ||
+            (lhs == mson::ImplicitValueBaseType && rhs == mson::ValueBaseType) ||
+            (lhs == mson::ValueBaseType && rhs == mson::ImplicitValueBaseType) ||
+            (lhs == mson::ImplicitPrimitiveBaseType && rhs == mson::PrimitiveBaseType) ||
+            (lhs == mson::PrimitiveBaseType && rhs == mson::ImplicitPrimitiveBaseType)) {
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * \brief Add a dependency to the dependency list of the dependents while checking for circular references
      *
      * \param node Current markdown node iterator
