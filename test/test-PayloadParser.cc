@@ -758,7 +758,5 @@ TEST_CASE("Parsed payload includes source map", "[payload]")
     REQUIRE(payload.report.error.code == Error::OK);
     CHECK(payload.report.warnings.empty());
 
-    REQUIRE(payload.sourceMap.sourceMap.size() == 1);
-    REQUIRE(payload.sourceMap.sourceMap[0].location == 2);
-    REQUIRE(payload.sourceMap.sourceMap[0].length == 34);
+    SourceMapHelper::check(payload.sourceMap.sourceMap, 2, 34);
 }
