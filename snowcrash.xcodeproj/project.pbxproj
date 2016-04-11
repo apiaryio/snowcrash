@@ -691,6 +691,7 @@
 					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/snowcrash-etyympsdikhephgzkvczxkaprkpp/Build/Products/Debug",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = "./ext/markdown-parser/src/** ./ext/markdown-parser/ext/sundown/src/**";
 			};
 			name = Debug;
 		};
@@ -704,6 +705,7 @@
 					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/snowcrash-etyympsdikhephgzkvczxkaprkpp/Build/Products/Debug",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = "./ext/markdown-parser/src/** ./ext/markdown-parser/ext/sundown/src/**";
 			};
 			name = Release;
 		};
@@ -711,7 +713,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				USER_HEADER_SEARCH_PATHS = "./ext/markdown-parser/src/** ./ext/markdown-parser/ext/sundown/** ./test/**";
+				USER_HEADER_SEARCH_PATHS = "./ext/markdown-parser/src/** ./ext/markdown-parser/ext/sundown/src/** ./test/**";
 			};
 			name = Debug;
 		};
@@ -719,7 +721,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				USER_HEADER_SEARCH_PATHS = "./ext/markdown-parser/src/** ./ext/markdown-parser/ext/sundown/** ./test/**";
+				USER_HEADER_SEARCH_PATHS = "./ext/markdown-parser/src/** ./ext/markdown-parser/ext/sundown/src/** ./test/**";
 			};
 			name = Release;
 		};
