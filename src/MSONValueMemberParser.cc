@@ -138,6 +138,19 @@ namespace snowcrash {
 
                 element.build(valueMember.node);
 
+                if ((valueMember.node.valueDefinition.typeDefinition.baseType ==  mson::ImplicitObjectBaseType ||
+                     valueMember.node.valueDefinition.typeDefinition.baseType ==  mson::ObjectBaseType) &&
+                    !valueMember.node.valueDefinition.values.empty()) {
+                    // WARN: object definition contain value 
+                    // e.g
+                    // - a (array)
+                    //   - key (object)
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                    sections.report.warnings.push_back(Warning("array member definition of type 'object' contains value. You should use type definition without value eg. '- (object)'",
+                                                               LogicalErrorWarning,
+                                                               sourceMap));
+                }
+
                 if (pd.exportSourceMap()) {
                     elementSM.value = valueMember.sourceMap;
                 }

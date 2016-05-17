@@ -217,3 +217,19 @@ TEST_CASE("Parse mson value member array with items", "[mson][value_member]")
     valueMemberSM = valueMember.sourceMap.sections.collection[0].elements().collection[1].value;
     SourceMapHelper::check(valueMemberSM.valueDefinition.sourceMap, 50, 17);
 }
+
+TEST_CASE("Check warnings for object in array with defined value", "[mson][value_member]")
+{
+    mdp::ByteBuffer source = \
+    "- (array)\n"\
+    "    - explicit (object)\n"\
+    "    - implicit\n"\
+    "        - k: v\n";
+
+    ParseResult<mson::ValueMember> valueMember;
+    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(source, MSONValueMemberSectionType, valueMember, ExportSourcemapOption);
+
+    REQUIRE(valueMember.report.error.code == Error::OK);
+    REQUIRE(valueMember.report.warnings.size() == 2);
+
+}
