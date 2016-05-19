@@ -164,6 +164,18 @@ namespace snowcrash {
 
                 element.build(propertyMember.node);
 
+                if ((propertyMember.node.valueDefinition.typeDefinition.baseType ==  mson::ImplicitObjectBaseType ||
+                     propertyMember.node.valueDefinition.typeDefinition.baseType ==  mson::ObjectBaseType) &&
+                    !propertyMember.node.valueDefinition.values.empty()) {
+                    // WARN: object definition contain value 
+                    // e.g
+                    // - key: value (object)
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                    sections.report.warnings.push_back(Warning("'object' with value definition. You should use type definition without value eg. '- key (object)'",
+                                                               LogicalErrorWarning,
+                                                               sourceMap));
+                }
+
                 if (pd.exportSourceMap()) {
                     elementSM.property = propertyMember.sourceMap;
                 }
