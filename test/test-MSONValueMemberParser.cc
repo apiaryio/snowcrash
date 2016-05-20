@@ -233,3 +233,17 @@ TEST_CASE("Check warnings for object in array with defined value", "[mson][value
     REQUIRE(valueMember.report.warnings.size() == 2);
 
 }
+
+TEST_CASE("Check warnings for object with defined value", "[mson][value_member]")
+{
+    mdp::ByteBuffer source = \
+    "- (object)\n"\
+    "    - k: v (object)\n";
+
+    ParseResult<mson::ValueMember> valueMember;
+    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(source, MSONValueMemberSectionType, valueMember, ExportSourcemapOption);
+
+    REQUIRE(valueMember.report.error.code == Error::OK);
+    REQUIRE(valueMember.report.warnings.size() == 1);
+
+}
