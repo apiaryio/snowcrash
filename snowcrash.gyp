@@ -10,6 +10,11 @@
         'ext/markdown-parser/ext/sundown/src',
         'ext/markdown-parser/ext/sundown/html'
       ],
+      'direct_dependent_settings' : {
+          'include_dirs': [
+            'ext/markdown-parser/ext/sundown/src',
+          ],
+      },
       'sources': [
         'ext/markdown-parser/ext/sundown/src/autolink.c',
         'ext/markdown-parser/ext/sundown/src/autolink.h',
@@ -30,13 +35,17 @@
         'ext/markdown-parser/ext/sundown/html/html_smartypants.c'
       ]
     },
+
     {
       'target_name': 'libmarkdownparser',
       'type': 'static_library',
-      'include_dirs': [
-        'ext/markdown-parser/ext/sundown/src',
-        'ext/markdown-parser/ext/sundown/html'
-        'ext/markdown-parser/src',
+      'direct_dependent_settings' : {
+          'include_dirs': [
+            'ext/markdown-parser/src',
+          ],
+      },
+      'export_dependent_settings': [
+          'libsundown'
       ],
       'sources': [
         'ext/markdown-parser/src/ByteBuffer.cc',
@@ -50,14 +59,17 @@
         'libsundown'
       ]
     },
+
     {
       'target_name': 'libsnowcrash',
       'type': '<(libsnowcrash_type)',
-      'include_dirs': [
-        'src',
-        'ext/markdown-parser/src',
-        'ext/markdown-parser/ext/sundown/src',
-        'ext/markdown-parser/ext/sundown/html',
+      'direct_dependent_settings' : {
+          'include_dirs': [
+            'src',
+          ],
+      },
+      'export_dependent_settings': [
+          'libmarkdownparser'
       ],
       'sources': [
         'src/HTTP.cc',
@@ -129,12 +141,7 @@
       'target_name': 'test-libsnowcrash',
       'type': 'executable',
       'include_dirs': [
-        'src',
-        'test',
         'test/vendor/Catch/include',
-        'ext/markdown-parser/src',
-        'ext/markdown-parser/ext/sundown/src',
-        'ext/markdown-parser/ext/sundown/html'
       ],
       'sources': [
         'test/test-ActionParser.cc',
@@ -178,13 +185,6 @@
     {
       'target_name': 'perf-libsnowcrash',
       'type': 'executable',
-      'include_dirs': [
-        'src',
-        'ext/markdown-parser/src',
-        'ext/markdown-parser/ext/sundown/src',
-        'test',
-        'test/performance',
-      ],
       'sources': [
         'test/performance/perf-snowcrash.cc'
       ],
