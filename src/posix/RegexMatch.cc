@@ -8,7 +8,7 @@
 
 #include <regex.h>
 #include <cstring>
-#include "RegexMatch.h"
+#include "../RegexMatch.h"
 
 // FIXME: Migrate to C++11.
 // Naive implementation of regex matching using POSIX regex

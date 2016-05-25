@@ -10,11 +10,11 @@ DESTDIR ?= /usr/local/bin
 V ?= 1
 
 # Targets
-all: libsnowcrash test-libsnowcrash 
+all: libsnowcrash 
 
 .PHONY: libsnowcrash test-libsnowcrash 
 
-libsnowcrash: config.gypi $(BUILD_DIR)/Makefile
+libsnowcrash: config.gypi $(BUILD_DIR)/Makefile 
 	$(MAKE) -C $(BUILD_DIR) V=$(V) libsnowcrash
 
 test-libsnowcrash: config.gypi $(BUILD_DIR)/Makefile
@@ -32,6 +32,8 @@ config.gypi: configure
 
 $(BUILD_DIR)/Makefile:
 	$(GYP) -f make --generator-output $(BUILD_DIR) --depth=.
+
+$(BUILD_DIR)/out/$(BUILDTYPE)/libsnowcrash.a: libsnowcrash
 
 clean:
 	rm -rf $(BUILD_DIR)/out
