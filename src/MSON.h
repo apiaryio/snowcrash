@@ -236,7 +236,7 @@ namespace mson {
             ~Content();
 
         private:
-            std::auto_ptr<Elements> m_elements;
+            std::unique_ptr<Elements> m_elements;
         };
 
         /** Constructor */
@@ -369,7 +369,7 @@ namespace mson {
             ~Content();
 
         private:
-            std::auto_ptr<Elements> m_elements;
+            std::unique_ptr<Elements> m_elements;
         };
 
         /** Class of the element */

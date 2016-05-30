@@ -420,7 +420,7 @@ namespace snowcrash {
             ~Content();
 
         private:
-            std::auto_ptr<Elements> m_elements;
+            std::unique_ptr<Elements> m_elements;
         };
 
         /** Type of Category element (parser internal flag) */

@@ -672,7 +672,7 @@ TEST_CASE("Parameters section in response section should give a warning", "[payl
     SourceMapHelper::check(payload.sourceMap.body.sourceMap, 77, 7);
 }
 
-TEST_CASE("Report ignoring nested request objects", "[payload][#163][#189]")
+TEST_CASE("Report ignoring nested request objects", "[payload][163][189]")
 {
     mdp::ByteBuffer source = \
     "+ Request\n"\

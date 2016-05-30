@@ -278,7 +278,7 @@ namespace snowcrash {
             ~Content();
 
         private:
-            std::auto_ptr<SourceMap<Elements> > m_elements;
+            std::unique_ptr<SourceMap<Elements> > m_elements;
         };
 
         /** Class of the Element (to be used internally only) */

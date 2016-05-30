@@ -1302,7 +1302,7 @@ TEST_CASE("Any named type data structure should be able to be overridden when re
     REQUIRE(property3.valueDefinition.typeDefinition.empty());
 }
 
-TEST_CASE("Parse attributes with mixin and no base type mentioned for attributes", "[blueprint][#362]")
+TEST_CASE("Parse attributes with mixin and no base type mentioned for attributes", "[blueprint][362]")
 {
     mdp::ByteBuffer source = \
     "# GET /\n"\

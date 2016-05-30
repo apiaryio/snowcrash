@@ -487,7 +487,7 @@ TEST_CASE("Parse model with unrecognised resource", "[resource][model]")
     REQUIRE(resource.node.actions[0].examples[0].responses[0].description == "");
 }
 
-TEST_CASE("Parse named resource with lazy referencing", "[resource][model][issue][#84]")
+TEST_CASE("Parse named resource with lazy referencing", "[resource][model][issue][84]")
 {
     mdp::ByteBuffer source = \
     "#api name\n\n"\
@@ -839,7 +839,7 @@ TEST_CASE("Dangling transaction example assets", "[resource]")
     SourceMapHelper::check(resource.sourceMap.actions.collection[0].examples.collection[0].responses.collection[0].body.sourceMap, 78, 31);
 }
 
-TEST_CASE("Body list item in description", "[resource][regression][#190]")
+TEST_CASE("Body list item in description", "[resource][regression][190]")
 {
     mdp::ByteBuffer source = \
     "## GET /A\n"\

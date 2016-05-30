@@ -227,7 +227,7 @@ TEST_CASE("Recognize parameter when there is no description on its signature and
     REQUIRE(parameters.sourceMap.collection.size() == 2);
 }
 
-TEST_CASE("Parentheses in parameter example ", "[parameters][issue][#109]")
+TEST_CASE("Parentheses in parameter example ", "[parameters][issue][109]")
 {
     // Blueprint in question:
     //R"(
@@ -277,7 +277,7 @@ TEST_CASE("Parse parameters when it has parameter of both old and new syntax", "
     REQUIRE(parameters.node[1].exampleValue == "25");
 }
 
-TEST_CASE("Percentage encoded characters in parameter name ", "[parameters][percentageencoding][issue][#107]")
+TEST_CASE("Percentage encoded characters in parameter name ", "[parameters][percentageencoding][issue][107]")
 {
     // Blueprint in question:
     //R"(
@@ -316,7 +316,7 @@ TEST_CASE("Percentage encoded characters in parameter name ", "[parameters][perc
     REQUIRE(resource.actions[0].parameters[0].description == "test");
 }
 
-TEST_CASE("Invalid percentage encoded characters in parameter name ", "[invalid][parameters][percentageencoding][issue][#107]")
+TEST_CASE("Invalid percentage encoded characters in parameter name ", "[invalid][parameters][percentageencoding][issue][107]")
 {
     // Blueprint in question:
     //R"(
@@ -340,7 +340,7 @@ TEST_CASE("Invalid percentage encoded characters in parameter name ", "[invalid]
     REQUIRE(blueprint.report.warnings.size() == 3);
 }
 
-TEST_CASE("Incomplete percentage encoded characters in parameter name ", "[incomplete][parameters][percentageencoding][issue][#107]")
+TEST_CASE("Incomplete percentage encoded characters in parameter name ", "[incomplete][parameters][percentageencoding][issue][107]")
 {
     // Blueprint in question:
     //R"(
