@@ -1,14 +1,10 @@
+sudo: required
+dist: trusty
 language: cpp
 compiler:
   - gcc
   - clang
-script: 
+script:
   - make test
 before_install:
   - git submodule update --init --recursive
-notifications:
-  email:
-    recipients:
-      - z@apiary.io  
-    on_success: change
-    on_failure: always

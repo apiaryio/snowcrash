@@ -1,6 +1,9 @@
 # Default Shell
 SHELL = /bin/bash
 
+# Flags
+CXXFLAGS = -std=c++11
+
 # Default build path
 BUILD_PATH = build
 
@@ -49,9 +52,9 @@ TEST_OBJ = $(TEST_SRC:$(TEST_SRC_PATH)/%.$(CXX_SRC_EXT)=$(BUILD_PATH)/%.o)
 TEST_DEPS = $(TEST_OBJ:.o=.d)
 
 .PHONY: all
-all: libmarkdownparser.a test-libmarkdownparser libsundown.a	
+all: libmarkdownparser.a test-libmarkdownparser libsundown.a
 
-libsundown.a: $(SUNDOWN_OBJ) 
+libsundown.a: $(SUNDOWN_OBJ)
 	$(AR) rcs $(BUILD_PATH)/libsundown.a $^
 
 libmarkdownparser.a: $(LIB_OBJ)
@@ -73,10 +76,10 @@ $(BUILD_PATH)/%.o: $(SRC_PATH)/%.$(CXX_SRC_EXT)
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -MP -MMD -c $< -o $@
 
 $(BUILD_PATH)/%.o: $(TEST_SRC_PATH)/%.$(CXX_SRC_EXT)
-	$(CXX) $(CXXFLAGS) $(TEST_INCLUDES) -MP -MMD -c $< -o $@	
+	$(CXX) $(CXXFLAGS) $(TEST_INCLUDES) -MP -MMD -c $< -o $@
 
 $(BUILD_PATH)/%.o: %.$(C_SRC_EXT)
-	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@	
+	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
 $(LIB_OBJ): | $(BUILD_PATH)
 $(SUNDOWN_OBJ): | $(BUILD_PATH)
