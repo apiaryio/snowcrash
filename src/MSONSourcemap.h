@@ -82,7 +82,7 @@ namespace snowcrash {
         ~SourceMap();
 
     private:
-        std::auto_ptr<SourceMap<mson::Elements> > m_elements;
+        std::unique_ptr<SourceMap<mson::Elements> > m_elements;
 
     };
 
@@ -174,7 +174,7 @@ namespace snowcrash {
         ~SourceMap();
 
     private:
-        std::auto_ptr<SourceMap<mson::Elements> > m_elements;
+        std::unique_ptr<SourceMap<mson::Elements> > m_elements;
     };
 }
 

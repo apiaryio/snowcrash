@@ -387,7 +387,7 @@ TEST_CASE("Parse resource method abbreviation followed by another", "[resource_g
     REQUIRE(resourceGroup.sourceMap.content.elements().collection.size() == 2);
 }
 
-TEST_CASE("Resource followed by a complete action", "[resource_group][regression][#185]")
+TEST_CASE("Resource followed by a complete action", "[resource_group][regression][185]")
 {
     mdp::ByteBuffer source = \
     "# Resource [/A]\n"\
@@ -430,7 +430,7 @@ TEST_CASE("Resource followed by a complete action", "[resource_group][regression
     SourceMapHelper::check(resourceSM.actions.collection[0].method.sourceMap, 16, 10);
 }
 
-TEST_CASE("Too eager complete action processing", "[resource_group][regression][#187]")
+TEST_CASE("Too eager complete action processing", "[resource_group][regression][187]")
 {
     mdp::ByteBuffer source = \
     "# Group A\n"\

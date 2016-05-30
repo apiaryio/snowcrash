@@ -196,7 +196,7 @@ TEST_CASE("Recognize parameter with old syntax default value but have enum in at
     REQUIRE(sectionType == ParameterSectionType);
 }
 
-TEST_CASE("Recognize parameter with ambiguous signature but uses MSON syntax for default value", "[parameter][#336]")
+TEST_CASE("Recognize parameter with ambiguous signature but uses MSON syntax for default value", "[parameter][336]")
 {
     mdp::ByteBuffer source = \
     "+ id (optional)\n"\
@@ -211,7 +211,7 @@ TEST_CASE("Recognize parameter with ambiguous signature but uses MSON syntax for
     REQUIRE(sectionType == MSONParameterSectionType);
 }
 
-TEST_CASE("Recognize parameter with ambiguous signature but uses MSON syntax for sample value", "[parameter][#336]")
+TEST_CASE("Recognize parameter with ambiguous signature but uses MSON syntax for sample value", "[parameter][336]")
 {
     mdp::ByteBuffer source = \
     "+ id (optional)\n"\
@@ -226,7 +226,7 @@ TEST_CASE("Recognize parameter with ambiguous signature but uses MSON syntax for
     REQUIRE(sectionType == MSONParameterSectionType);
 }
 
-TEST_CASE("Recognize parameter with ambiguous signature but uses MSON syntax for values", "[parameter][#336]")
+TEST_CASE("Recognize parameter with ambiguous signature but uses MSON syntax for values", "[parameter][336]")
 {
     mdp::ByteBuffer source = \
     "+ id (optional)\n"\
@@ -241,7 +241,7 @@ TEST_CASE("Recognize parameter with ambiguous signature but uses MSON syntax for
     REQUIRE(sectionType == MSONParameterSectionType);
 }
 
-TEST_CASE("Recognize parameter with ambiguous signature but uses old syntax for values", "[parameter][#336]")
+TEST_CASE("Recognize parameter with ambiguous signature but uses old syntax for values", "[parameter][336]")
 {
     mdp::ByteBuffer source = \
     "+ id (optional)\n"\

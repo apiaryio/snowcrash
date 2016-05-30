@@ -160,7 +160,7 @@ TEST_CASE("Parse header section with missing headers", "[headers]")
     REQUIRE(headers.sourceMap.collection.size() == 0);
 }
 
-TEST_CASE("Headers parses should return warning on multiple definition of same headers", "[headers][issue][#75]")
+TEST_CASE("Headers parses should return warning on multiple definition of same headers", "[headers][issue][75]")
 {
     const mdp::ByteBuffer source = \
     "+ Headers\n"\
@@ -177,7 +177,7 @@ TEST_CASE("Headers parses should return warning on multiple definition of same h
     REQUIRE(headers.node.size() == 2);
 }
 
-TEST_CASE("Parse header section with more same headers Set-Cookie and Link - there should not be warning", "[headers][issue][#75]")
+TEST_CASE("Parse header section with more same headers Set-Cookie and Link - there should not be warning", "[headers][issue][75]")
 {
     const mdp::ByteBuffer source = \
     "+ Headers\n"\
@@ -198,7 +198,7 @@ TEST_CASE("Parse header section with more same headers Set-Cookie and Link - the
     REQUIRE(headers.node[1].second == "kockaprede");
 }
 
-TEST_CASE("Headers Filed Name should be case insensitive", "[headers][issue][#230]")
+TEST_CASE("Headers Filed Name should be case insensitive", "[headers][issue][230]")
 {
     const mdp::ByteBuffer source = \
     "+ Headers\n"\
@@ -219,7 +219,7 @@ TEST_CASE("Headers Filed Name should be case insensitive", "[headers][issue][#23
     REQUIRE(headers.node[1].second == "application/json");
 }
 
-TEST_CASE("Aditional test for Header name insenstivity combined with allowed multiple headers", "[headers][issue][#230]")
+TEST_CASE("Aditional test for Header name insenstivity combined with allowed multiple headers", "[headers][issue][230]")
 {
     const mdp::ByteBuffer source = \
     "+ Headers\n"\
@@ -240,7 +240,7 @@ TEST_CASE("Aditional test for Header name insenstivity combined with allowed mul
     REQUIRE(headers.node[1].second == "kockaprede");
 }
 
-TEST_CASE("Missing or wrong placed colon in header definition", "[headers][issue][#158]")
+TEST_CASE("Missing or wrong placed colon in header definition", "[headers][issue][158]")
 {
 
 
@@ -294,7 +294,7 @@ TEST_CASE("Missing or wrong placed colon in header definition", "[headers][issue
     }
 }
 
-TEST_CASE("Allow parse nonvalid headers, provide apropriate warning", "[headers][issue][#158]") {
+TEST_CASE("Allow parse nonvalid headers, provide apropriate warning", "[headers][issue][158]") {
 
     SECTION("Strange but valid token") {
         const mdp::ByteBuffer source = \

@@ -1,3 +1,5 @@
+sudo: required
+dist: trusty
 language: cpp
 compiler:
   - gcc
@@ -10,11 +12,5 @@ before_install:
   - rvm use $RVM --install --binary --fuzzy
   - gem update --system
   - gem --version
-notifications:
-  email:
-    recipients:
-      - z@apiary.io
-    on_success: change
-    on_failure: always
 env:
   - RVM=2.0.0

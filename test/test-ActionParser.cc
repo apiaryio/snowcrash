@@ -452,8 +452,8 @@ TEST_CASE("Warn when request is not followed by a response", "[action]")
 }
 
 // TODO: This test is failing because of a bug in action attributes. Need to fix the bug.
-//TEST_CASE("Parse action attributes", "[action]")
-//{
+// TEST_CASE("Parse action attributes", "[action]")
+// {
 //    mdp::ByteBuffer source = \
 //    "# GET /1\n\n"\
 //    "+ attributes (Coupon)\n"\
@@ -462,16 +462,16 @@ TEST_CASE("Warn when request is not followed by a response", "[action]")
 //    "+ request B\n\n"\
 //    "  + attributes (string)\n\n"\
 //    "+ response 204";
-//
+
 //    ParseResult<Action> action;
 //    NamedTypes namedTypes;
-//
+
 //    NamedTypeHelper::build("Coupon", mson::ObjectBaseType, namedTypes);
 //    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action, ExportSourcemapOption, Models(), NULL, namedTypes);
-//
+
 //    REQUIRE(action.report.error.code == Error::OK);
 //    REQUIRE(action.report.warnings.empty());
-//
+
 //    REQUIRE(action.node.attributes.source.typeDefinition.typeSpecification.name.symbol.literal == "Coupon");
 //    REQUIRE(action.node.examples.size() == 2);
 //    REQUIRE(action.node.examples[0].requests.size() == 1);
@@ -480,7 +480,8 @@ TEST_CASE("Warn when request is not followed by a response", "[action]")
 //    REQUIRE(action.node.examples[1].requests.size() == 1);
 //    REQUIRE(action.node.examples[1].requests[0].attributes.source.typeDefinition.typeSpecification.name.base == mson::StringTypeName);
 //    REQUIRE(action.node.examples[1].responses.size() == 1);
-//}
+// }
+
 
 TEST_CASE("Named Endpoint", "[named_endpoint]")
 {
