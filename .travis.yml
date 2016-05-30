@@ -9,8 +9,3 @@ script:
   - make test
 before_install:
   - git submodule update --init --recursive
-  - rvm use $RVM --install --binary --fuzzy
-  - gem update --system
-  - gem --version
-env:
-  - RVM=2.0.0
