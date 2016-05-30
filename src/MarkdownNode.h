@@ -15,9 +15,9 @@
 #include "ByteBuffer.h"
 
 namespace mdp {
-    
-    /** 
-     *  AST block node types 
+
+    /**
+     *  AST block node types
      */
     enum MarkdownNodeType {
         RootMarkdownNodeType = 0,
@@ -39,33 +39,33 @@ namespace mdp {
 
     /** Markdown AST nodes collection */
     typedef std::deque<MarkdownNode> MarkdownNodes;
-    
+
     /**
      *  AST node
      */
     class MarkdownNode {
     public:
         typedef int Data;
-        
+
         /** Node type */
         MarkdownNodeType type;
-        
+
         /** Textual content, where applicable */
         ByteBuffer text;
-        
+
         /** Additinonal data, if applicable */
         Data data;
-        
+
         /** Source map of the node including any and all children */
         BytesRangeSet sourceMap;
-        
+
         /** Parent node, throws exception if no parent is defined */
         MarkdownNode& parent();
         const MarkdownNode& parent() const;
-        
+
         /** Sets parent node */
         void setParent(MarkdownNode *parent);
-        
+
         /** True if section's parent is specified, false otherwise */
         bool hasParent() const;
 
@@ -81,21 +81,21 @@ namespace mdp {
 
         /** Copy constructor */
         MarkdownNode(const MarkdownNode& rhs);
-        
+
         /** Assignment operator */
         MarkdownNode& operator=(const MarkdownNode& rhs);
-        
+
         /** Destructor */
         ~MarkdownNode();
-        
+
         /** Prints the node to the stdout */
         void printNode(size_t level = 0) const;
-        
+
     private:
         MarkdownNode* m_parent;
-        std::auto_ptr<MarkdownNodes> m_children;
+        std::unique_ptr<MarkdownNodes> m_children;
     };
-    
+
     /** Markdown AST nodes collection iterator */
     typedef MarkdownNodes::iterator MarkdownNodeIterator;
 }
