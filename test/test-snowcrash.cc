@@ -756,3 +756,20 @@ TEST_CASE("doesn't crash while parsing response followed by a block quote settex
     SourceMap<Payload> payloadSM = actionSM.examples.collection[0].responses.collection[0];
     SourceMapHelper::check(payloadSM.body.sourceMap, 30, 22, 1);
 }
+
+TEST_CASE("Parse blueprint with mismatched adapter blocks", "[blueprint]")
+{
+    mdp::ByteBuffer source = \
+    "# Data Structures\n"\
+    "# User\n"\
+    "Some description\n"\
+    "+ Properties\n"\
+    "    + a: b\n";
+
+    ParseResult<Blueprint> blueprint;
+    parse(source, ExportSourcemapOption, blueprint);
+
+    REQUIRE(blueprint.report.error.code != Error::OK);
+    REQUIRE(blueprint.report.warnings.empty());
+    SourceMapHelper::check(blueprint.report.error.location, 42, 24);
+}

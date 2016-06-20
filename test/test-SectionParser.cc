@@ -28,10 +28,12 @@ TEST_CASE("Header adapter with header section", "[adapter]")
     mdp::MarkdownNode markdownAST;
     markdownParser.parse(HeaderSectionFixture, markdownAST);
 
+    SectionParserData pd(0, HeaderSectionFixture, Blueprint());
+
     REQUIRE(!markdownAST.children().empty());
 
-    REQUIRE_NOTHROW(HeaderSectionAdapter::startingNode(markdownAST.children().begin()));
-    MarkdownNodeIterator it = HeaderSectionAdapter::startingNode(markdownAST.children().begin());
+    REQUIRE_NOTHROW(HeaderSectionAdapter::startingNode(markdownAST.children().begin(), pd));
+    MarkdownNodeIterator it = HeaderSectionAdapter::startingNode(markdownAST.children().begin(), pd);
     REQUIRE(it->text == "Signature");
 
     const MarkdownNodes& collection = HeaderSectionAdapter::startingNodeSiblings(it, markdownAST.children());
@@ -46,9 +48,11 @@ TEST_CASE("Header adapter with list section", "[adapter]")
     mdp::MarkdownNode markdownAST;
     markdownParser.parse(ListSectionFixture, markdownAST);
 
+    SectionParserData pd(0, ListSectionFixture, Blueprint());
+
     REQUIRE(!markdownAST.children().empty());
 
-    REQUIRE_THROWS_AS(HeaderSectionAdapter::startingNode(markdownAST.children().begin()), std::logic_error);
+    REQUIRE_THROWS_AS(HeaderSectionAdapter::startingNode(markdownAST.children().begin(), pd), Error);
 }
 
 TEST_CASE("List adapter with List section", "[adapter]")
@@ -57,10 +61,12 @@ TEST_CASE("List adapter with List section", "[adapter]")
     mdp::MarkdownNode markdownAST;
     markdownParser.parse(ListSectionFixture, markdownAST);
 
+    SectionParserData pd(0, ListSectionFixture, Blueprint());
+
     REQUIRE(!markdownAST.children().empty());
 
-    REQUIRE_NOTHROW(ListSectionAdapter::startingNode(markdownAST.children().begin()));
-    MarkdownNodeIterator it = ListSectionAdapter::startingNode(markdownAST.children().begin());
+    REQUIRE_NOTHROW(ListSectionAdapter::startingNode(markdownAST.children().begin(), pd));
+    MarkdownNodeIterator it = ListSectionAdapter::startingNode(markdownAST.children().begin(), pd);
     REQUIRE(it->text == "Signature");
 
     MarkdownNodes collection = ListSectionAdapter::startingNodeSiblings(markdownAST.children().begin(), markdownAST.children());
@@ -75,7 +81,9 @@ TEST_CASE("List adapter with Header section", "[adapter]")
     mdp::MarkdownNode markdownAST;
     markdownParser.parse(HeaderSectionFixture, markdownAST);
 
+    SectionParserData pd(0, HeaderSectionFixture, Blueprint());
+
     REQUIRE(!markdownAST.children().empty());
 
-    REQUIRE_THROWS_AS(ListSectionAdapter::startingNode(markdownAST.children().begin()), std::logic_error);
+    REQUIRE_THROWS_AS(ListSectionAdapter::startingNode(markdownAST.children().begin(), pd), Error);
 }

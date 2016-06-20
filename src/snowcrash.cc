@@ -73,6 +73,9 @@ int snowcrash::parse(const mdp::ByteBuffer& source,
         // Parse Blueprint
         BlueprintParser::parse(markdownAST.children().begin(), markdownAST.children(), pd, out);
     }
+    catch (const Error& e) {
+        out.report.error = e;
+    }
     catch (const std::exception& e) {
 
         std::stringstream ss;
@@ -80,7 +83,6 @@ int snowcrash::parse(const mdp::ByteBuffer& source,
         out.report.error = Error(ss.str(), ApplicationError);
     }
     catch (...) {
-
         out.report.error = Error("parser exception has occured", ApplicationError);
     }
 
