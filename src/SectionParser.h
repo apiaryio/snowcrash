@@ -12,8 +12,6 @@
 #include <stdexcept>
 #include "SignatureSectionProcessor.h"
 
-#define ADAPTER_MISMATCH_ERR std::logic_error("mismatched adapter and node type")
-
 namespace snowcrash {
 
     /**
@@ -37,7 +35,7 @@ namespace snowcrash {
                                           const ParseResultRef<T>& out) {
 
             SectionLayout layout = DefaultSectionLayout;
-            MarkdownNodeIterator cur = Adapter::startingNode(node);
+            MarkdownNodeIterator cur = Adapter::startingNode(node, pd);
             const MarkdownNodes& collection = Adapter::startingNodeSiblings(node, siblings);
 
             // Signature node
@@ -148,9 +146,13 @@ namespace snowcrash {
     struct HeaderSectionAdapter {
 
         /** \return Node to start parsing with */
-        static const MarkdownNodeIterator startingNode(const MarkdownNodeIterator& seed) {
-            if (seed->type != mdp::HeaderMarkdownNodeType)
-                throw ADAPTER_MISMATCH_ERR;
+        static const MarkdownNodeIterator startingNode(const MarkdownNodeIterator& seed,
+                                                       const SectionParserData& pd) {
+            if (seed->type != mdp::HeaderMarkdownNodeType) {
+                // ERR: Expected header
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(seed->sourceMap, pd.sourceCharacterIndex);
+                throw Error("expected header block, e.g. '# <text>'", BusinessError, sourceMap);
+            }
 
             return seed;
         }
@@ -180,9 +182,13 @@ namespace snowcrash {
     /** Parser Adapter for parsing list-defined sections */
     struct ListSectionAdapter {
 
-        static const MarkdownNodeIterator startingNode(const MarkdownNodeIterator& seed) {
-            if (seed->type != mdp::ListItemMarkdownNodeType)
-                throw ADAPTER_MISMATCH_ERR;
+        static const MarkdownNodeIterator startingNode(const MarkdownNodeIterator& seed,
+                                                       const SectionParserData& pd) {
+            if (seed->type != mdp::ListItemMarkdownNodeType) {
+                // ERR: Expected list item
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(seed->sourceMap, pd.sourceCharacterIndex);
+                throw Error("expected list item block, e.g. '+ <text>'", BusinessError, sourceMap);
+            }
 
             return seed->children().begin();
         }
@@ -208,7 +214,8 @@ namespace snowcrash {
     struct BlueprintSectionAdapter {
 
         /** \return Node to start parsing with */
-        static const MarkdownNodeIterator startingNode(const MarkdownNodeIterator& seed) {
+        static const MarkdownNodeIterator startingNode(const MarkdownNodeIterator& seed,
+                                                       const SectionParserData& pd) {
             return seed;
         }
 
