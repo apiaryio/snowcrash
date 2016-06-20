@@ -131,3 +131,23 @@ TEST_CASE("Parse attributes with block description", "[attributes]")
     SourceMapHelper::check(attributes.sourceMap.sections.collection[0].description.sourceMap, 42, 12, 3);
     REQUIRE(attributes.sourceMap.sections.collection[1].elements().collection.size() == 1);
 }
+
+TEST_CASE("Parse type attributes on attributes section", "[attributes]")
+{
+    mdp::ByteBuffer source = \
+    "+ Attributes (fixed)\n"\
+    "    + a: b";
+
+    ParseResult<Attributes> attributes;
+    SectionParserHelper<Attributes, AttributesParser>::parse(source, AttributesSectionType, attributes, ExportSourcemapOption);
+
+    REQUIRE(attributes.report.error.code == Error::OK);
+    REQUIRE(attributes.report.warnings.empty());
+
+    REQUIRE(attributes.node.name.empty());
+    REQUIRE(attributes.node.typeDefinition.attributes == 4);
+    REQUIRE(attributes.node.typeDefinition.typeSpecification.name.empty());
+    REQUIRE(attributes.node.typeDefinition.baseType == mson::ImplicitObjectBaseType);
+    REQUIRE(attributes.node.sections.size() == 1);
+    REQUIRE(attributes.node.sections[0].klass == mson::TypeSection::MemberTypeClass);
+}
