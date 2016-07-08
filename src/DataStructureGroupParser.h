@@ -108,6 +108,10 @@ namespace snowcrash {
             return SectionProcessor<mson::NamedType>::sectionType(node);
         }
 
+        static SectionTypes upperSectionTypes() {
+            return {DataStructureGroupSectionType, ResourceGroupSectionType, ResourceSectionType};
+        }
+
         /**
          * \brief Check if a named type already exists with the given name
          *

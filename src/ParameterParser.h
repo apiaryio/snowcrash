@@ -226,14 +226,6 @@ namespace snowcrash {
             return SectionProcessor<Values>::sectionType(node);
         }
 
-        static SectionTypes nestedSectionTypes() {
-            SectionTypes nested;
-
-            nested.push_back(ValuesSectionType);
-
-            return nested;
-        }
-
         template<typename T>
         static void parseAttributes(const mdp::MarkdownNodeIterator& node,
                                     SectionParserData& pd,

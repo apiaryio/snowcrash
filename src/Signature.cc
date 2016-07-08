@@ -20,34 +20,26 @@
 
 using namespace snowcrash;
 
+#define TYPECHECK(T)\
+if ((type = SectionProcessor<T>::sectionType(node)) != UndefinedSectionType) {\
+    return type;\
+}
+
 SectionType snowcrash::SectionKeywordSignature(const mdp::MarkdownNodeIterator& node)
 {
     // Note: Every-keyword defined section should be listed here...
     SectionType type = UndefinedSectionType;
 
-    if ((type = SectionProcessor<mson::TypeSection>::sectionType(node)) != UndefinedSectionType)
-        return type;
-
-    if ((type = SectionProcessor<Headers>::sectionType(node)) != UndefinedSectionType)
-        return type;
-
-    if ((type = SectionProcessor<Asset>::sectionType(node)) != UndefinedSectionType)
-        return type;
-
-    if ((type = SectionProcessor<Attributes>::sectionType(node)) != UndefinedSectionType)
-        return type;
-
-    if ((type = SectionProcessor<Payload>::sectionType(node)) != UndefinedSectionType)
-        return type;
-
-    if ((type = SectionProcessor<Values>::sectionType(node)) != UndefinedSectionType)
-        return type;
-
-    if ((type = SectionProcessor<Parameters>::sectionType(node)) != UndefinedSectionType)
-        return type;
-
-    if ((type = SectionProcessor<Relation>::sectionType(node)) != UndefinedSectionType)
-        return type;
+    TYPECHECK(mson::TypeSection)
+    TYPECHECK(mson::Mixin)
+    TYPECHECK(mson::OneOf)
+    TYPECHECK(Headers)
+    TYPECHECK(Asset)
+    TYPECHECK(Attributes)
+    TYPECHECK(Payload)
+    TYPECHECK(Values)
+    TYPECHECK(Parameters)
+    TYPECHECK(Relation)
 
     /*
      *  NOTE: Order is important. Resource MUST preceed the Action.
@@ -55,17 +47,10 @@ SectionType snowcrash::SectionKeywordSignature(const mdp::MarkdownNodeIterator& 
      *  This is because an HTTP Request Method + URI is recognized as both %ActionSectionType and %ResourceSectionType.
      *  This is not optimal and should be addressed in the future.
      */
-    if ((type = SectionProcessor<Resource>::sectionType(node)) != UndefinedSectionType)
-        return type;
-
-    if ((type = SectionProcessor<Action>::sectionType(node)) != UndefinedSectionType)
-        return type;
-
-    if ((type = SectionProcessor<ResourceGroup>::sectionType(node)) != UndefinedSectionType)
-        return type;
-
-    if ((type = SectionProcessor<DataStructureGroup>::sectionType(node)) != UndefinedSectionType)
-        return type;
+    TYPECHECK(Resource)
+    TYPECHECK(Action)
+    TYPECHECK(ResourceGroup)
+    TYPECHECK(DataStructureGroup)
 
     return type;
 }
@@ -86,3 +71,5 @@ SectionType snowcrash::RecognizeCodeBlockFirstLine(const mdp::ByteBuffer& subjec
 
     return type;
 }
+
+#undef TYPECHECK

@@ -203,15 +203,8 @@ namespace snowcrash {
             return SectionProcessor<Resource>::sectionType(node);
         }
 
-        static SectionTypes nestedSectionTypes() {
-            SectionTypes nested;
-
-            // Resource & descendants
-            nested.push_back(ResourceSectionType);
-            SectionTypes types = SectionProcessor<Resource>::nestedSectionTypes();
-            nested.insert(nested.end(), types.begin(), types.end());
-
-            return nested;
+        static SectionTypes upperSectionTypes() {
+            return {ResourceGroupSectionType, DataStructureGroupSectionType};
         }
 
         static bool isDescriptionNode(const MarkdownNodeIterator& node,
