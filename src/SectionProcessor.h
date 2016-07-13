@@ -1,5 +1,5 @@
 //
-//  Processor.h
+//  SectionProcessor.h
 //  snowcrash
 //
 //  Created by Zdenek Nemec on 5/14/14.
@@ -231,7 +231,6 @@ namespace snowcrash {
 
             if (SectionProcessor<T>::isContentNode(node, sectionType) ||
                 SectionProcessor<T>::nestedSectionType(node) != UndefinedSectionType) {
-
                 return false;
             }
 
@@ -241,15 +240,14 @@ namespace snowcrash {
                 return true;
             }
 
-            SectionTypes nestedTypes = SectionProcessor<T>::nestedSectionTypes();
+            SectionTypes upperTypes = SectionProcessor<T>::upperSectionTypes();
 
-            if (std::find(nestedTypes.begin(), nestedTypes.end(), keywordSectionType) != nestedTypes.end()) {
-                // Node is a keyword defined section defined in one of the nested sections
-                // Treat it as a description
-                return true;
+            if (std::find(upperTypes.begin(), upperTypes.end(), keywordSectionType) != upperTypes.end()) {
+                // Node is a keyword defined section defined in an upper level section
+                return false;
             }
 
-            return false;
+            return true;
         }
 
         /** \return True if the node is a section-specific content node */
@@ -263,17 +261,18 @@ namespace snowcrash {
                                      SectionType sectionType) {
 
             SectionType keywordSectionType = SectionKeywordSignature(node);
-            SectionTypes nestedTypes = SectionProcessor<T>::nestedSectionTypes();
+            SectionTypes upperTypes = SectionProcessor<T>::upperSectionTypes();
 
-            if (std::find(nestedTypes.begin(), nestedTypes.end(), keywordSectionType) != nestedTypes.end()) {
+            if (std::find(upperTypes.begin(), upperTypes.end(), keywordSectionType) == upperTypes.end()) {
+                // Node is not a section that is upper level
                 return true;
             }
 
             return (keywordSectionType == UndefinedSectionType);
         }
 
-        /** \return Nested sections of the section */
-        static SectionTypes nestedSectionTypes() {
+        /** \return All upper level sections of the section */
+        static SectionTypes upperSectionTypes() {
             return SectionTypes();
         }
 

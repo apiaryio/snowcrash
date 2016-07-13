@@ -308,20 +308,8 @@ namespace snowcrash {
             return UndefinedSectionType;
         }
 
-        static SectionTypes nestedSectionTypes() {
-            SectionTypes nested, types;
-
-            // Payload & descendants
-            nested.push_back(ResponseBodySectionType);
-            nested.push_back(ResponseSectionType);
-            nested.push_back(RequestBodySectionType);
-            nested.push_back(RequestSectionType);
-            nested.push_back(RelationSectionType);
-
-            types = SectionProcessor<Payload>::nestedSectionTypes();
-            nested.insert(nested.end(), types.begin(), types.end());
-
-            return nested;
+        static SectionTypes upperSectionTypes() {
+            return {ActionSectionType, ResourceSectionType, ResourceGroupSectionType, DataStructureGroupSectionType};
         }
 
         static void finalize(const MarkdownNodeIterator& node,

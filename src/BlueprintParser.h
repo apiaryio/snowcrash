@@ -256,18 +256,6 @@ namespace snowcrash {
             return UndefinedSectionType;
         }
 
-        static SectionTypes nestedSectionTypes() {
-            SectionTypes nested;
-
-            // Resource Group & descendants
-            nested.push_back(ResourceGroupSectionType);
-            nested.push_back(DataStructureGroupSectionType);
-            SectionTypes types = SectionProcessor<ResourceGroup>::nestedSectionTypes();
-            nested.insert(nested.end(), types.begin(), types.end());
-
-            return nested;
-        }
-
         static void finalize(const MarkdownNodeIterator& node,
                              SectionParserData& pd,
                              const ParseResultRef<Blueprint>& out) {

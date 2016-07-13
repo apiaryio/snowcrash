@@ -108,7 +108,7 @@ namespace snowcrash {
             SectionProcessor<T>::preprocessNestedSections(node, collection, pd, out);
 
             // Nested sections
-            while(cur != collection.end()) {
+            while (cur != collection.end()) {
 
                 lastCur = cur;
                 SectionType nestedType = SectionProcessor<T>::nestedSectionType(cur);

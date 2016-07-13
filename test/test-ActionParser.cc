@@ -566,3 +566,21 @@ TEST_CASE("Named Endpoints Edge Cases", "[named_endpoint]")
         REQUIRE(action.method == "POST");
     }
 }
+
+TEST_CASE("Action section containing properties keyword under it", "[action][127]")
+{
+    const mdp::ByteBuffer source = \
+    "# A [GET /]\n"\
+    "+ Properties\n"\
+    "+ Response 204";
+
+    ParseResult<Action> action;
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action, ExportSourcemapOption);
+
+    REQUIRE(action.report.error.code == Error::OK);
+    REQUIRE(action.report.warnings.empty());
+
+    REQUIRE(action.node.examples.size() == 1);
+    REQUIRE(action.node.examples[0].requests.empty());
+    REQUIRE(action.node.examples[0].responses.size() == 1);
+}
