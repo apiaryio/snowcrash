@@ -15,6 +15,9 @@ using namespace scpl;
 
 namespace snowcrash {
 
+    /** MSON reserved characters matching regex */
+    const char* const MSONReservedCharsRegex = "[]:\()<>\{}[_*+`-]+";
+
     /**
      * MSON Named Type Section Processor
      */
@@ -22,6 +25,7 @@ namespace snowcrash {
     struct SectionProcessor<mson::NamedType> : public SignatureSectionProcessorBase<mson::NamedType> {
 
         static SignatureTraits signatureTraits() {
+
 
             SignatureTraits signatureTraits(SignatureTraits::IdentifierTrait |
                                             SignatureTraits::AttributesTrait);
@@ -36,6 +40,18 @@ namespace snowcrash {
 
             mson::parseTypeName(signature.identifier, out.node.name, false);
             mson::parseTypeDefinition(node, pd, signature.attributes, out.report, out.node.typeDefinition);
+
+            mdp::ByteBuffer subject = node->text;
+            TrimString(subject);
+
+            if (subject[0] != '`' && RegexMatch(out.node.name.symbol.literal, MSONReservedCharsRegex)) {
+
+                // WARN: named type name should not contain reserved characters
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                out.report.warnings.push_back(Warning("please escape the name of the data structure using backticks since it contains MSON reserved characters",
+                                                      FormattingWarning,
+                                                      sourceMap));
+            }
 
             if (pd.exportSourceMap()) {
 
