@@ -473,6 +473,20 @@ TEST_CASE("Warn on malformed payload signature", "[payload]")
     SourceMapHelper::check(payload.sourceMap.body.sourceMap, 82, 17);
 }
 
+TEST_CASE("Warn on malformed request payload signature", "[payload]")
+{
+  mdp::ByteBuffer source = "+ Requestz\n";
+  source += "    + Body\n\n";
+  source += "            Hello World!\n";
+
+  ParseResult<Payload> payload;
+  SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, payload, ExportSourcemapOption);
+
+  REQUIRE(payload.report.error.code == Error::OK);
+  REQUIRE(payload.report.warnings.size() == 1);
+  REQUIRE(payload.report.warnings[0].code == FormattingWarning);
+}
+
 TEST_CASE("Give a warning of empty message body for requests with certain headers", "[payload]")
 {
     mdp::ByteBuffer source = \

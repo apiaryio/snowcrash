@@ -35,7 +35,7 @@ namespace snowcrash {
     };
 
     /** Request matching regex */
-    const char* const RequestRegex = "^[[:blank:]]*[Rr]equest" SYMBOL_IDENTIFIER "?" MEDIA_TYPE "?[[:blank:]]*";
+    const char* const RequestRegex = "^[[:blank:]]*[Rr]equest([[:blank:]]" SYMBOL_IDENTIFIER ")?" MEDIA_TYPE "?[[:blank:]]*";
 
     /** Response matching regex */
     const char* const ResponseRegex = "^[[:blank:]]*[Rr]esponse([[:blank:][:digit:]]+)?" MEDIA_TYPE "?[[:blank:]]*";
@@ -466,6 +466,9 @@ namespace snowcrash {
                     pd.sectionContext() == ModelBodySectionType) {
 
                     out.node.name = captureGroups[2];
+                    mediaType = captureGroups[4];
+                } else if (pd.sectionContext() == RequestSectionType) {
+                    out.node.name = captureGroups[1];
                     mediaType = captureGroups[4];
                 } else {
                     out.node.name = captureGroups[1];
