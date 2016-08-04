@@ -130,12 +130,13 @@ namespace mson {
 
     /** Attribute of a type */
     enum TypeAttribute {
-        RequiredTypeAttribute = (1 << 0),  // The type is required
-        OptionalTypeAttribute = (1 << 1),  // The type is optional
-        FixedTypeAttribute    = (1 << 2),  // The type is fixed
-        SampleTypeAttribute   = (1 << 3),  // The type is a sample
-        DefaultTypeAttribute  = (1 << 4),  // The type is default
-        NullableTypeAttribute = (1 << 5)   // The type is nullable
+        RequiredTypeAttribute  = (1 << 0),  // The type is required
+        OptionalTypeAttribute  = (1 << 1),  // The type is optional
+        FixedTypeAttribute     = (1 << 2),  // The type is fixed
+        SampleTypeAttribute    = (1 << 3),  // The type is a sample
+        DefaultTypeAttribute   = (1 << 4),  // The type is default
+        NullableTypeAttribute  = (1 << 5),  // The type is nullable
+        FixedTypeTypeAttribute = (1 << 6)   // This type works like fixed, but it is unheritable
     };
 
     /** List of type attributes */

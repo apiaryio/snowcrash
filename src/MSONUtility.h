@@ -181,6 +181,9 @@ namespace mson {
         else if (attribute == "nullable") {
             typeAttributes |= NullableTypeAttribute;
         }
+        else if (attribute == "fixed-type") {
+            typeAttributes |= FixedTypeTypeAttribute;
+        }
         else {
             isAttribute = false;
         }
