@@ -226,3 +226,45 @@ TEST_CASE("Parse type attributes on named type", "[mson][named_type]")
     REQUIRE(namedType.node.sections.size() == 1);
     REQUIRE(namedType.node.sections[0].klass == mson::TypeSection::MemberTypeClass);
 }
+
+TEST_CASE("Parse variable named type", "[mson][named_type]")
+{
+    mdp::ByteBuffer source = "# *User* (string)";
+
+    ParseResult<mson::NamedType> namedType;
+    SectionParserHelper<mson::NamedType, MSONNamedTypeParser>::parse(source, MSONNamedTypeSectionType, namedType, ExportSourcemapOption);
+
+    REQUIRE(namedType.report.error.code == Error::OK);
+    REQUIRE(namedType.report.warnings.empty());
+
+    REQUIRE(namedType.node.name.symbol.literal == "User");
+    REQUIRE(namedType.node.name.symbol.variable == true);
+}
+
+TEST_CASE("Parse variable named type with reserved characters", "[mson][named_type][335]")
+{
+    mdp::ByteBuffer source = "# *User (string)*";
+
+    ParseResult<mson::NamedType> namedType;
+    SectionParserHelper<mson::NamedType, MSONNamedTypeParser>::parse(source, MSONNamedTypeSectionType, namedType, ExportSourcemapOption);
+
+    REQUIRE(namedType.report.error.code == Error::OK);
+    REQUIRE(namedType.report.warnings.size() == 1);
+
+    REQUIRE(namedType.node.name.symbol.literal == "User (string)");
+    REQUIRE(namedType.node.name.symbol.variable == true);
+}
+
+TEST_CASE("Parse variable named type with escaped reserved characters", "[mson][named_type]")
+{
+    mdp::ByteBuffer source = "# `User-A` (string)";
+
+    ParseResult<mson::NamedType> namedType;
+    SectionParserHelper<mson::NamedType, MSONNamedTypeParser>::parse(source, MSONNamedTypeSectionType, namedType, ExportSourcemapOption);
+
+    REQUIRE(namedType.report.error.code == Error::OK);
+    REQUIRE(namedType.report.warnings.empty());
+
+    REQUIRE(namedType.node.name.symbol.literal == "User-A");
+    REQUIRE(namedType.node.name.symbol.variable == false);
+}
