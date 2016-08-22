@@ -628,6 +628,10 @@ TEST_CASE("Parse request parameters", "[payload]")
     REQUIRE(payload.report.error.code == Error::OK);
     REQUIRE(payload.report.warnings.empty());
 
+    REQUIRE(payload.node.name.empty());
+    REQUIRE(payload.node.headers.size() == 1);
+    REQUIRE(payload.node.headers[0].first == "Content-Type");
+    REQUIRE(payload.node.headers[0].second == "application/json");
     REQUIRE(payload.node.description.empty());
     REQUIRE(payload.node.body == "{}\n");
     REQUIRE(payload.node.parameters.size() == 1);
