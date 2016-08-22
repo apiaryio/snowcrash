@@ -909,8 +909,8 @@ TEST_CASE("Parse unnamed resource attributes", "[resource]")
     NamedTypeHelper::build("Coupon", mson::ObjectBaseType, namedTypes);
     SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource, ExportSourcemapOption, Models(), NULL, namedTypes);
 
-    REQUIRE(resource.report.error.code == Error::OK);
-    REQUIRE(resource.report.warnings.size() == 1); // Unknown type 'Coupons'
+    REQUIRE(resource.report.error.code == snowcrash::MSONError); // Unknown type 'Coupons'
+    REQUIRE(resource.report.warnings.empty());
 
     REQUIRE(resource.node.name.empty());
     REQUIRE(resource.node.attributes.name.empty());

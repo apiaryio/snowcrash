@@ -316,6 +316,67 @@ namespace mson {
     }
 
     /**
+     * \brief Add a dependency to the dependency list of the dependents while checking for circular references
+     *
+     * \param node Current markdown node iterator
+     * \param pd Section parser data
+     * \param dependency The named type which should be added to the dependency list
+     * \param dependent The named type to which the dependency should be added
+     * \param report Parse result report
+     */
+    inline void addDependency(const mdp::MarkdownNodeIterator& node,
+                              snowcrash::SectionParserData& pd,
+                              const mson::Literal dependency,
+                              const mson::Literal dependent,
+                              snowcrash::Report& report,
+                              bool circularCheck = false) {
+
+        // First, check if the type exists
+        if (pd.namedTypeDependencyTable.find(dependency) == pd.namedTypeDependencyTable.end()) {
+
+            // ERR: We cannot find the dependency type
+            std::stringstream ss;
+            ss << "base type '" << dependency << "' is not defined in the document";
+
+            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+            report.error = snowcrash::Error(ss.str(), snowcrash::MSONError, sourceMap);
+            return;
+        }
+
+        std::set<mson::Literal> dependencyDeps = pd.namedTypeDependencyTable[dependency];
+
+        // Second, check if it is circular reference between them
+        if (circularCheck && (dependent == dependency ||
+                              dependencyDeps.find(dependent) != dependencyDeps.end())) {
+
+            // ERR: Dependency named type circular references itself
+            std::stringstream ss;
+            ss << "base type '" << dependent << "' circularly referencing itself";
+
+            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+            report.error = snowcrash::Error(ss.str(), snowcrash::MSONError, sourceMap);
+            return;
+        }
+
+        // Third, check if the dependency is already in the list
+        if (pd.namedTypeDependencyTable[dependent].find(dependency) != pd.namedTypeDependencyTable[dependent].end()) {
+            return;
+        }
+
+        for (mson::NamedTypeDependencyTable::iterator it = pd.namedTypeDependencyTable.begin();
+             it != pd.namedTypeDependencyTable.end();
+             ++it) {
+
+            // If the entry is dependent itself or contain dependent in its list
+            if (it->first == dependent || it->second.find(dependent) != it->second.end()) {
+
+                it->second.insert(dependency);
+                it->second.insert(dependencyDeps.begin(), dependencyDeps.end());
+            }
+        }
+    }
+
+    /**
      * \brief Parse Type Definition from a list of signature attributes
      *
      * \param node Markdown node of the signature
@@ -366,16 +427,10 @@ namespace mson {
         }
 
         if (typeDefinition.baseType == UndefinedBaseType &&
-            !typeDefinition.typeSpecification.name.symbol.literal.empty()) {
+            !typeDefinition.typeSpecification.name.symbol.literal.empty() &&
+            !typeDefinition.typeSpecification.name.symbol.variable) {
 
-            // WARN: Unable to find the named type in the named type base type table
-            std::stringstream ss;
-            ss << "unable to find the symbol `" << typeDefinition.typeSpecification.name.symbol.literal << "` in the list of named types";
-
-            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-            report.warnings.push_back(snowcrash::Warning(ss.str(),
-                                                         snowcrash::LogicalErrorWarning,
-                                                         sourceMap));
+            addDependency(node, pd, typeDefinition.typeSpecification.name.symbol.literal, pd.namedTypeContext, report);
         }
 
         if (typeDefinition.baseType != ValueBaseType &&
@@ -445,67 +500,6 @@ namespace mson {
         }
 
         return false;
-    }
-
-    /**
-     * \brief Add a dependency to the dependency list of the dependents while checking for circular references
-     *
-     * \param node Current markdown node iterator
-     * \param pd Section parser data
-     * \param dependency The named type which should be added to the dependency list
-     * \param dependent The named type to which the dependency should be added
-     * \param report Parse result report
-     */
-    inline void addDependency(const mdp::MarkdownNodeIterator& node,
-                              snowcrash::SectionParserData& pd,
-                              const mson::Literal dependency,
-                              const mson::Literal dependent,
-                              snowcrash::Report& report,
-                              bool circularCheck = false) {
-
-        // First, check if the type exists
-        if (pd.namedTypeDependencyTable.find(dependency) == pd.namedTypeDependencyTable.end()) {
-
-            // ERR: We cannot find the dependency type
-            std::stringstream ss;
-            ss << "base type '" << dependency << "' is not defined in the document";
-
-            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-            report.error = snowcrash::Error(ss.str(), snowcrash::MSONError, sourceMap);
-            return;
-        }
-
-        std::set<mson::Literal> dependencyDeps = pd.namedTypeDependencyTable[dependency];
-
-        // Second, check if it is circular reference between them
-        if (circularCheck && (dependent == dependency ||
-                              dependencyDeps.find(dependent) != dependencyDeps.end())) {
-
-            // ERR: Dependency named type circular references itself
-            std::stringstream ss;
-            ss << "base type '" << dependent << "' circularly referencing itself";
-
-            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-            report.error = snowcrash::Error(ss.str(), snowcrash::MSONError, sourceMap);
-            return;
-        }
-
-        // Third, check if the dependency is already in the list
-        if (pd.namedTypeDependencyTable[dependent].find(dependency) != pd.namedTypeDependencyTable[dependent].end()) {
-            return;
-        }
-
-        for (mson::NamedTypeDependencyTable::iterator it = pd.namedTypeDependencyTable.begin();
-             it != pd.namedTypeDependencyTable.end();
-             ++it) {
-
-            // If the entry is dependent itself or contain dependent in its list
-            if (it->first == dependent || it->second.find(dependent) != it->second.end()) {
-
-                it->second.insert(dependency);
-                it->second.insert(dependencyDeps.begin(), dependencyDeps.end());
-            }
-        }
     }
 }
 

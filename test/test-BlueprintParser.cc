@@ -1343,3 +1343,34 @@ TEST_CASE("Parse attributes with mixin and no base type mentioned for mixin", "[
     REQUIRE(blueprint.report.warnings.empty());
     REQUIRE(blueprint.node.content.elements().size() == 2);
 }
+
+TEST_CASE("Report error when not finding a super type of the nested member from attributes", "[blueprint][354]")
+{
+    mdp::ByteBuffer source = \
+    "# GET /\n"\
+    "+ Response 200\n"\
+    "    + Attributes\n"\
+    "        + data (A)\n";
+
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
+
+    REQUIRE(blueprint.report.error.code == MSONError);
+    REQUIRE(blueprint.report.error.message == "base type 'A' is not defined in the document");
+    REQUIRE(blueprint.report.warnings.empty());
+}
+
+TEST_CASE("Report error when not finding a super type of the attributes", "[blueprint][354]")
+{
+    mdp::ByteBuffer source = \
+    "# GET /\n"\
+    "+ Response 200\n"\
+    "    + Attributes (A)\n";
+
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
+
+    REQUIRE(blueprint.report.error.code == MSONError);
+    REQUIRE(blueprint.report.error.message == "base type 'A' is not defined in the document");
+    REQUIRE(blueprint.report.warnings.empty());
+}

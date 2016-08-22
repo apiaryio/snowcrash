@@ -600,9 +600,8 @@ TEST_CASE("Parse variable property name", "[mson][utility]")
 
     parsePropertyName(markdownAST.children().begin(), pd, id, propertyName.report, propertyName.node);
 
-    REQUIRE(propertyName.report.error.code == snowcrash::Error::OK);
-    REQUIRE(propertyName.report.warnings.size() == 1); // Unknown named type
-    REQUIRE(propertyName.report.warnings[0].code == snowcrash::LogicalErrorWarning);
+    REQUIRE(propertyName.report.error.code == snowcrash::MSONError); // Unknown named type
+    REQUIRE(propertyName.report.warnings.empty());
 
     REQUIRE(propertyName.node.literal.empty());
     REQUIRE(propertyName.node.variable.values.size() == 1);
