@@ -85,7 +85,7 @@ namespace mson {
         }
 
         if (value.literal.empty()) {
-            value.literal = buffer;
+            value.literal = snowcrash::StripBackticks(buffer);
         }
 
         // When the value is a wildcard

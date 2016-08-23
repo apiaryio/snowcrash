@@ -42,6 +42,16 @@ TEST_CASE("Parse canonical variable value with '_'", "[mson][utility]")
     REQUIRE(value.variable == true);
 }
 
+TEST_CASE("Parse escaped value", "[mson][utility]")
+{
+  std::string source = "`_rel_`";
+
+  Value value = parseValue(source);
+
+  REQUIRE(value.literal == "_rel_");
+  REQUIRE(value.variable == false);
+}
+
 TEST_CASE("Parse variable value with more than 1 level '*'", "[mson][utility]")
 {
     std::string source = "**r*e*l**";

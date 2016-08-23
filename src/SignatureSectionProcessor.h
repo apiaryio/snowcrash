@@ -298,7 +298,7 @@ namespace scpl {
             snowcrash::TrimString(value);
 
             if (!value.empty()) {
-                out.values.push_back(snowcrash::StripBackticks(value));
+                out.values.push_back(value);
             }
 
             // If the subject ended with the values, strip the last value from the subject
