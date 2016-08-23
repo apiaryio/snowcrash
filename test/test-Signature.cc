@@ -56,7 +56,7 @@ TEST_CASE("Escaped property signature parsing", "[signature]")
     REQUIRE(signature.identifier == "*id*(data):3");
     REQUIRE(signature.value == "42");
     REQUIRE(signature.values.size() == 1);
-    REQUIRE(signature.values[0] == "42");
+    REQUIRE(signature.values[0] == "`42`");
     REQUIRE(signature.attributes.size() == 2);
     REQUIRE(signature.attributes[0] == "yes");
     REQUIRE(signature.attributes[1] == "no");
@@ -277,7 +277,7 @@ TEST_CASE("Escaped element signature parsing", "[signature]")
     REQUIRE(signature.identifier.empty());
     REQUIRE(signature.value == "*42*(data):3");
     REQUIRE(signature.values.size() == 1);
-    REQUIRE(signature.values[0] == "*42*(data):3");
+    REQUIRE(signature.values[0] == "`*42*(data):3`");
     REQUIRE(signature.attributes.size() == 1);
     REQUIRE(signature.attributes[0] == "number");
     REQUIRE(signature.content == "a good number");
