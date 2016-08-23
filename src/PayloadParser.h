@@ -467,7 +467,9 @@ namespace snowcrash {
 
                     out.node.name = captureGroups[2];
                     mediaType = captureGroups[4];
-                } else if (pd.sectionContext() == RequestSectionType) {
+                } else if (pd.sectionContext() == RequestSectionType ||
+                           pd.sectionContext() == RequestBodySectionType) {
+
                     out.node.name = captureGroups[1];
                     mediaType = captureGroups[4];
                 } else {
