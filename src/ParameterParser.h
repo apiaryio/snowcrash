@@ -477,14 +477,13 @@ namespace snowcrash {
 
             if (innerSignature.substr(0, 1) == "(") {
 
-                // We should use `matchBrackets` if the parameters are supported to be more complex
-                size_t endOfAttributesPos = innerSignature.find_last_of(")");
+                mdp::ByteBuffer inner = matchBrackets(innerSignature, 0, ')');
 
-                if (endOfAttributesPos == std::string::npos) {
+                if (inner.length() == 2 || inner == innerSignature) {
                     return NotParameterType; // Expecting close of attributes
                 }
 
-                std::string attributes = innerSignature.substr(1, endOfAttributesPos);
+                std::string attributes = inner.substr(1, inner.length()-1);
 
                 if (RegexMatch(attributes, "enum\\[[^][]+]")) {
                     return NewParameterType;
@@ -494,7 +493,6 @@ namespace snowcrash {
                     return OldParameterType;
                 }
 
-                innerSignature = innerSignature.substr(endOfAttributesPos + 1);
                 TrimString(innerSignature);
 
                 if (innerSignature.empty()) {
