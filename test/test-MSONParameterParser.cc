@@ -166,3 +166,18 @@ TEST_CASE("Warn missing default value in values in new parameter syntax", "[mson
     REQUIRE(parameter.node.exampleValue == "Value2");
     REQUIRE(parameter.node.defaultValue == "Value1");
 }
+
+TEST_CASE("Parentheses in parameter description with new syntax", "[parameter]")
+{
+    mdp::ByteBuffer source = "+ id (string) - lorem (ipsum) dolor\n";
+
+    ParseResult<MSONParameter> parameter;
+    SectionParserHelper<MSONParameter, MSONParameterParser>::parse(source, MSONParameterSectionType, parameter);
+
+    REQUIRE(parameter.report.error.code == Error::OK);
+    REQUIRE(parameter.report.warnings.empty());
+
+    REQUIRE(parameter.node.name == "id");
+    REQUIRE(parameter.node.type == "string");
+    REQUIRE(parameter.node.description == "lorem (ipsum) dolor");
+}
