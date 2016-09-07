@@ -682,3 +682,30 @@ TEST_CASE("Multi-paragraph list item source map", "[parser][sourcemap]")
     REQUIRE(p2.sourceMap[0].length == 28);
 }
 
+TEST_CASE("Sublist should have more indentation than the list item", "[parser]")
+{
+    MarkdownParser parser;
+    MarkdownNode ast;
+
+    ByteBuffer src = \
+    " + 1\n"\
+    "+ 2\n";
+
+    parser.parse(src, ast);
+
+    REQUIRE(ast.type == RootMarkdownNodeType);
+    REQUIRE(ast.text.empty());
+    REQUIRE(ast.children().size() == 2);
+
+    MarkdownNode& list = ast.children().front();
+    REQUIRE(list.type == ListItemMarkdownNodeType);
+    REQUIRE(list.children().size() == 1);
+    REQUIRE(list.children().front().type == ParagraphMarkdownNodeType);
+    REQUIRE(list.children().front().text == "1\n");
+
+    list = ast.children().back();
+    REQUIRE(list.type == ListItemMarkdownNodeType);
+    REQUIRE(list.children().size() == 1);
+    REQUIRE(list.children().front().type == ParagraphMarkdownNodeType);
+    REQUIRE(list.children().front().text == "2\n");
+}
