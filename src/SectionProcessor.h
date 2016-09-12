@@ -144,10 +144,6 @@ namespace snowcrash {
                                                        SectionParserData& pd,
                                                        const ParseResultRef<T>& out) {
 
-            if (!out.node.description.empty()) {
-                TwoNewLines(out.node.description);
-            }
-
             mdp::ByteBuffer content = mdp::MapBytesRangeSet(node->sourceMap, pd.sourceData);
 
             if (pd.exportSourceMap() && !content.empty()) {

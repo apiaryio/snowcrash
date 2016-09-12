@@ -78,10 +78,6 @@ namespace snowcrash {
                 }
             }
 
-            if (!out.node.content.elements().back().content.copy.empty()) {
-                TwoNewLines(out.node.content.elements().back().content.copy);
-            }
-
             mdp::ByteBuffer content = mdp::MapBytesRangeSet(node->sourceMap, pd.sourceData);
 
             if (pd.exportSourceMap() && !content.empty()) {
