@@ -532,13 +532,11 @@ namespace snowcrash {
 
                     // WARN: parameter name not present
                     std::stringstream ss;
-                    ss << "parameter '" << it->name << "' not specified in ";
+                    ss << "parameter '" << it->name << "' is not found within the URI template '" << out.node.uriTemplate << "'";
 
                     if (!out.node.name.empty()) {
-                        ss << "'" << out.node.name << "' ";
+                        ss << " for '" << out.node.name << "' ";
                     }
-
-                    ss << "its '" << out.node.uriTemplate << "' URI template";
 
                     mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                     out.report.warnings.push_back(Warning(ss.str(),
