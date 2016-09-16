@@ -216,11 +216,21 @@ namespace snowcrash {
                     }
                 }
 
+                if (sectionType == UndefinedSectionType) {
+                    checkForPossibleSectionMistakes(cur, pd, out.report);
+                }
+                
                 cur++;
+                
             }
 
             // Resolve all named type base table entries
             resolveNamedTypeTables(pd, out.report);
+        }
+
+        static void checkForPossibleSectionMistakes(const MarkdownNodeIterator& node, SectionParserData& pd, Report& report) {
+            
+            SectionProcessor<Action>::checkForTypoMistake(node, pd, report);
         }
 
         static SectionType sectionType(const MarkdownNodeIterator& node) {
