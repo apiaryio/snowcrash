@@ -584,3 +584,22 @@ TEST_CASE("Action section containing properties keyword under it", "[action][127
     REQUIRE(action.node.examples[0].requests.empty());
     REQUIRE(action.node.examples[0].responses.size() == 1);
 }
+
+TEST_CASE("Miss leading slash in URI", "[action][350]")
+{
+    const mdp::ByteBuffer source = "A [GET {param}]";
+
+    snowcrash::ParseResult<snowcrash::Blueprint> blueprint;
+    snowcrash::SectionParserData pd(0, source, blueprint.node);
+    MarkdownNodes nodes;
+    nodes.push_back(mdp::MarkdownNode(mdp::HeaderMarkdownNodeType, NULL, mdp::ByteBuffer(source)));
+    Report report;
+    SectionProcessor<Action>::checkForTypoMistake(nodes.begin(), pd, report);
+    
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 1);
+    REQUIRE(report.warnings.begin()->code == snowcrash::URIWarning);
+    REQUIRE(report.warnings.begin()->message == "URI path in 'A [GET {param}]' is not absolute, it should have a leading forward slash" );
+
+
+}

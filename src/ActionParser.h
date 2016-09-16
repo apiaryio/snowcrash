@@ -24,6 +24,9 @@ namespace snowcrash {
     /** Named action matching regex */
     const char* const NamedActionHeaderRegex = "^[[:blank:]]*" SYMBOL_IDENTIFIER "\\[" HTTP_REQUEST_METHOD "[[:blank:]]*" URI_TEMPLATE "?]$";
 
+    /** Miss leading slash in URI */
+    const char* const NamedActionNonAbsoluteURIRegex = "^[[:blank:]]*" SYMBOL_IDENTIFIER "\\[" HTTP_REQUEST_METHOD "[[:blank:]]+[^/]+]$";
+
     /** Internal type alias for Collection iterator of Action */
     typedef Collection<Action>::const_iterator ActionIterator;
 
@@ -523,6 +526,26 @@ namespace snowcrash {
             return std::find_if(actions.begin(),
                                 actions.end(),
                                 std::bind2nd(MatchRelation(), relation));
+        }
+
+
+        static void checkForTypoMistake(const MarkdownNodeIterator& node, SectionParserData& pd, Report& report) {
+
+            if (node->type != mdp::HeaderMarkdownNodeType) {
+                return;
+            }
+
+            if (RegexMatch(node->text, NamedActionNonAbsoluteURIRegex)) {
+                std::stringstream ss;
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+
+                ss << "URI path in '" << node->text << "' is not absolute, it should have a leading forward slash";
+
+                report.warnings.push_back(Warning(ss.str(),
+                                          URIWarning,
+                                          sourceMap));
+
+            } 
         }
     };
 
