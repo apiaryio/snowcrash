@@ -51,6 +51,8 @@ namespace snowcrash {
                 if (!out.node.typeDefinition.empty()) {
                     out.sourceMap.typeDefinition.sourceMap = node->sourceMap;
                 }
+                
+                out.sourceMap.sourceMap = node->sourceMap;
             }
 
             // Default to `object` type specification
