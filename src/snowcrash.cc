@@ -13,6 +13,17 @@ const int snowcrash::SourceAnnotation::OK = 0;
 
 using namespace snowcrash;
 
+// http://stackoverflow.com/questions/3418231/replace-part-of-a-string-with-another-string
+void replaceAll(std::string& str, const std::string& from, const std::string& to) {
+    if(from.empty())
+        return;
+    size_t start_pos = 0;
+    while((start_pos = str.find(from, start_pos)) != std::string::npos) {
+        str.replace(start_pos, from.length(), to);
+        start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
+    }
+}
+
 /**
  *  \brief  Check source for unsupported character \t & \r
  *  \return True if passed (not found), false otherwise
@@ -35,13 +46,7 @@ static bool CheckSource(const mdp::ByteBuffer& source, Report& report)
     pos = source.find("\r");
 
     if (pos != std::string::npos) {
-
-        mdp::BytesRangeSet rangeSet;
-        rangeSet.push_back(mdp::BytesRange(pos, 1));
-        report.error = Error("the use of carriage return(s) '\\r' in source data isn't currently supported, please contact makers",
-                             BusinessError,
-                             mdp::BytesRangeSetToCharactersRangeSet(rangeSet, source));
-        return false;
+        replaceAll(source, "\r", "\n");
     }
 
     return true;
