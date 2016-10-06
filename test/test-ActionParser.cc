@@ -595,7 +595,7 @@ TEST_CASE("Miss leading slash in URI", "[action][350]")
     nodes.push_back(mdp::MarkdownNode(mdp::HeaderMarkdownNodeType, NULL, mdp::ByteBuffer(source)));
     Report report;
     SectionProcessor<Action>::checkForTypoMistake(nodes.begin(), pd, report);
-    
+
     REQUIRE(report.error.code == Error::OK);
     REQUIRE(report.warnings.size() == 1);
     REQUIRE(report.warnings.begin()->code == snowcrash::URIWarning);
@@ -603,3 +603,31 @@ TEST_CASE("Miss leading slash in URI", "[action][350]")
 
 
 }
+
+TEST_CASE("Detect invalid reference to URI Template parameters in Action", "[action]")
+{
+    mdp::ByteBuffer source = \
+    "## List [GET /orders{?abc}]\n\n"\
+    "+ Parameters\n"     \
+    "    + ab (string)\n"\
+    "    + bc (string)\n"\
+    "    + ac (string)\n\n"\
+    "+ Response 200";
+
+    ParseResult<Action> action;
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action, ExportSourcemapOption);
+
+    REQUIRE(action.report.error.code == Error::OK);
+    REQUIRE(action.report.warnings.size() == 3);
+    REQUIRE(action.report.warnings[0].code == LogicalErrorWarning);
+    REQUIRE(action.report.warnings[1].code == LogicalErrorWarning);
+    REQUIRE(action.report.warnings[2].code == LogicalErrorWarning);
+
+    REQUIRE(action.node.name == "List");
+    REQUIRE(action.node.uriTemplate == "/orders{?abc}");
+
+    SourceMapHelper::check(action.report.warnings[0].location, 0, 29);
+    SourceMapHelper::check(action.report.warnings[1].location, 0, 29);
+    SourceMapHelper::check(action.report.warnings[2].location, 0, 29);
+}
+
