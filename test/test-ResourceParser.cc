@@ -1009,3 +1009,32 @@ TEST_CASE("Relation identifiers should be unique for a resource", "[resource]")
     REQUIRE(resource.node.actions[0].relation.str == "create");
     REQUIRE(resource.node.actions[1].relation.str == "create");
 }
+
+TEST_CASE("Detect invalid reference to URI Tempalte parameters", "[resource]")
+{
+    mdp::ByteBuffer source = \
+    "## Orders [/orders]\n\n"\
+    "### List [GET /orders{?abc}]\n\n"\
+    "+ Parameters\n"\
+    "    + ab (string)\n"\
+    "    + bc (string)\n"\
+    "    + ac (string)\n\n"\
+    "+ Response 200";
+
+    ParseResult<Resource> resource;
+    SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource, ExportSourcemapOption);
+
+    REQUIRE(resource.report.error.code == Error::OK);
+    REQUIRE(resource.report.warnings.size() == 3);
+    REQUIRE(resource.report.warnings[0].code == LogicalErrorWarning);
+    REQUIRE(resource.report.warnings[1].code == LogicalErrorWarning);
+    REQUIRE(resource.report.warnings[2].code == LogicalErrorWarning);
+
+    REQUIRE(resource.node.name == "Orders");
+    REQUIRE(resource.node.actions.size() == 1);
+    REQUIRE(resource.node.actions[0].uriTemplate == "/orders{?abc}");
+
+    SourceMapHelper::check(resource.report.warnings[0].location, 21, 30);
+    SourceMapHelper::check(resource.report.warnings[1].location, 21, 30);
+    SourceMapHelper::check(resource.report.warnings[2].location, 21, 30);
+}
