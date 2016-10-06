@@ -513,6 +513,30 @@ namespace snowcrash {
         }
 
         /**
+        * \brief Check Parameter validity in URI template
+        */
+        // It must either be in path "{param" or at the begining
+        // "?param" or in the list ",param". And any of the params
+        // must end either with "}" or ",".
+
+        //FIXME: The implementation is very naive and can be sped up.
+        static bool isValidUriTemplateParam(const std::string &uriTemplate, const std::string &param) {
+
+            if (uriTemplate.find("{"+param) == std::string::npos &&
+                uriTemplate.find("?"+param) == std::string::npos &&
+                uriTemplate.find(","+param) == std::string::npos) {
+                return false;
+            }
+
+            if (uriTemplate.find(param+"}") == std::string::npos &&
+                uriTemplate.find(param+",") == std::string::npos) {
+                return false;
+            }
+
+            return true;
+        }
+
+        /**
          * \brief Check Parameters eligibility in URI template
          *
          * \warning Do not specialise this.
@@ -527,8 +551,7 @@ namespace snowcrash {
                  it != parameters.end();
                  ++it) {
 
-                // Naive check whether parameter is present in URI Template
-                if (out.node.uriTemplate.find(it->name) == std::string::npos) {
+                if (!isValidUriTemplateParam(out.node.uriTemplate, it->name)) {
 
                     // WARN: parameter name not present
                     std::stringstream ss;
