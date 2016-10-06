@@ -157,6 +157,64 @@ namespace snowcrash {
         }
     };
 
+    /**
+     * \brief Check Parameter validity in URI template
+     */
+
+    // It must either be in path "{param" or at the begining
+    // "?param" or in the list ",param". And any of the params
+    // must end either with "}" or ",".
+
+    //FIXME: The implementation is very naive and can be sped up.
+    static bool isValidUriTemplateParam(const std::string &uriTemplate, const std::string &param) {
+
+        if (uriTemplate.find("{"+param) == std::string::npos &&
+            uriTemplate.find("?"+param) == std::string::npos &&
+            uriTemplate.find(","+param) == std::string::npos) {
+            return false;
+        }
+
+        if (uriTemplate.find(param+"}") == std::string::npos &&
+            uriTemplate.find(param+",") == std::string::npos) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * \brief Check Parameters eligibility in URI template
+     *
+     * \warning Do not specialise this.
+     */
+    template<typename T>
+    static void checkParametersEligibility(const MarkdownNodeIterator& node,
+                                           const SectionParserData& pd,
+                                           Parameters& parameters,
+                                           const ParseResultRef<T>& out) {
+
+        for (ParameterIterator it = parameters.begin();
+             it != parameters.end();
+             ++it) {
+
+            if (!isValidUriTemplateParam(out.node.uriTemplate, it->name)) {
+
+                // WARN: parameter name not present
+                std::stringstream ss;
+                ss << "parameter '" << it->name << "' is not found within the URI template '" << out.node.uriTemplate << "'";
+
+                if (!out.node.name.empty()) {
+                    ss << " for '" << out.node.name << "' ";
+                }
+
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                out.report.warnings.push_back(Warning(ss.str(),
+                                                      LogicalErrorWarning,
+                                                      sourceMap));
+            }
+        }
+    }
+
     /** Parameters Section parser */
     typedef SectionParser<Parameters, ListSectionAdapter> ParametersParser;
 }

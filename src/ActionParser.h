@@ -319,6 +319,10 @@ namespace snowcrash {
                              SectionParserData& pd,
                              const ParseResultRef<Action>& out) {
 
+            if (!out.node.uriTemplate.empty()) {
+                checkParametersEligibility<Action>(node, pd, out.node.parameters, out);
+            }
+
             if (!out.node.headers.empty()) {
 
                 SectionProcessor<Headers>::injectDeprecatedHeaders(pd, out.node.headers, out.sourceMap.headers, out.node.examples, out.sourceMap.examples);
@@ -545,7 +549,7 @@ namespace snowcrash {
                                           URIWarning,
                                           sourceMap));
 
-            } 
+            }
         }
     };
 
