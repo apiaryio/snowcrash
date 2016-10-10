@@ -171,9 +171,9 @@ namespace snowcrash {
 
             if (out.node.empty()) {
 
-                // WARN: No headers defined
+                // WARN: No valid headers defined
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                out.report.warnings.push_back(Warning("no headers specified",
+                out.report.warnings.push_back(Warning("no valid headers specified",
                                                       FormattingWarning,
                                                       sourceMap));
             }
@@ -195,20 +195,26 @@ namespace snowcrash {
                                     const ParseResultRef<Headers>& out,
                                     const mdp::CharactersRangeSet sourceMap) {
 
-            std::string re = " *([^:[:blank:]]+)(( *:? *)(.*)?)$";
+            std::string re = "^ *([^:[:blank:]]+)(( *:? *)(.*)?)$";
 
             CaptureGroups parts;
             bool matched = RegexCapture(line, re, parts, 5);
 
-            if (!matched)
-                return false;
+            if (!matched) {
+		// WARN: unable to parse header
+		out.report.warnings.push_back(
+		    Warning("unable to parse HTTP header, expected '<header name> : <header value>', one header per line", FormattingWarning, sourceMap));
+		return false;
+	    }
 
             header = std::make_pair(parts[1], parts[4]);
             TrimString(header.second);
 
             HeaderParserValidator validate(out, sourceMap);
 
-            validate(HeaderNameTokenChecker(header.first));
+            if (!validate(HeaderNameTokenChecker(header.first))) {
+                return false;
+            }
             validate(ColonPresentedChecker(parts));
             validate(HeadersDuplicateChecker(header, out.node));
             validate(HeaderValuePresentedChecker(header));
@@ -243,12 +249,6 @@ namespace snowcrash {
                         headerSM.sourceMap = node->sourceMap;
                         out.sourceMap.collection.push_back(headerSM);
                     }
-                } else {
-                    // WARN: unable to parse header
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                    out.report.warnings.push_back(Warning("unable to parse HTTP header, expected '<header name> : <header value>', one header per line",
-                                                          FormattingWarning,
-                                                          sourceMap));
                 }
             }
         }
