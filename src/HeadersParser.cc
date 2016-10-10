@@ -54,10 +54,11 @@ bool HeaderNameTokenChecker::operator()() const {
 
 std::string HeaderNameTokenChecker::getMessage() const {
 
+    const char invalidChar = *findNonValidCharInHeaderName(headerName);
     std::stringstream ss;
-    ss << "HTTP header field name contain illegal character '"
-        << *findNonValidCharInHeaderName(headerName)
-        << "'";
+    ss << "HTTP header name '" << headerName << "' contains illegal character '"
+       << invalidChar << "' (0x" << std::hex << static_cast<int16_t>(invalidChar)
+       << ") skipping the header";
 
     return ss.str();
 }
@@ -69,7 +70,10 @@ bool ColonPresentedChecker::operator()() const {
 
 std::string ColonPresentedChecker::getMessage() const {
 
-    return "missing colon after header name";
+    std::stringstream ss;
+    ss << "missing colon after header name '" << captures[1] << "'";
+
+    return ss.str();
 }
 
 bool HeadersDuplicateChecker::operator()() const {
@@ -93,7 +97,10 @@ bool HeaderValuePresentedChecker::operator()() const {
 
 std::string HeaderValuePresentedChecker::getMessage() const {
 
-    return "HTTP header has no value";
+    std::stringstream ss;
+    ss << "HTTP header '"<< header.first << "' has no value";
+
+    return ss.str();
 }
 
 bool HeaderParserValidator::operator()(const ValidateFunctorBase& rule) {
