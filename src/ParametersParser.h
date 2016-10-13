@@ -67,12 +67,12 @@ namespace snowcrash {
                                                          const ParseResultRef<Parameters>& out) {
 
             IntermediateParseResult<Parameter> parameter(out.report);
-            IntermediateParseResult<MSONParameter> msonParameter(out.report);
 
             if (pd.sectionContext() == ParameterSectionType) {
                 ParameterParser::parse(node, siblings, pd, parameter);
             }
             else if (pd.sectionContext() == MSONParameterSectionType) {
+                IntermediateParseResult<MSONParameter> msonParameter(out.report);
                 MSONParameterParser::parse(node, siblings, pd, msonParameter);
 
                 // Copy values from MSON Parameter to normal parameter

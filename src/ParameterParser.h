@@ -19,7 +19,7 @@
 #define PARAMETER_VALUE "`([^`]+)`"
 
 /** Parameter Identifier */
-#define PARAMETER_IDENTIFIER "(([[:alnum:]_.-])*|(%[A-Fa-f0-9]{2})*)+"
+#define PARAMETER_IDENTIFIER "`?(([[:alnum:]_.-])*|(%[A-Fa-f0-9]{2})*)+`?"
 
 /** Lead in and out for comma separated values regex */
 #define CSV_LEADINOUT "[[:blank:]]*,?[[:blank:]]*"
@@ -415,11 +415,6 @@ namespace snowcrash {
 
             if (innerSignature.empty()) {
                 return NotParameterType; // Empty string, invalid
-            }
-
-            // If first character is backtick, then new parameter syntax
-            if (innerSignature.substr(0, 1) == "`") {
-                return NewParameterType;
             }
 
             if (RegexCapture(innerSignature, "^" PARAMETER_IDENTIFIER "[[:blank:]]*", captureGroups) &&

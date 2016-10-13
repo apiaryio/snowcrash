@@ -141,6 +141,17 @@ TEST_CASE("Recognize parameter with brackets in old syntax example value", "[par
     REQUIRE(sectionType == ParameterSectionType);
 }
 
+TEST_CASE("Recognize escaped parameter with brackets in old syntax example value", "[parameter]")
+{
+    mdp::MarkdownParser markdownParser;
+    mdp::MarkdownNode markdownAST;
+    markdownParser.parse("+ `id` (optional, oData, `example`)", markdownAST);
+
+    REQUIRE(!markdownAST.children().empty());
+    SectionType sectionType = SectionProcessor<Parameter>::sectionType(markdownAST.children().begin());
+    REQUIRE(sectionType == ParameterSectionType);
+}
+
 TEST_CASE("Recognize parameter with old syntax description after attributes", "[parameter]")
 {
     mdp::MarkdownParser markdownParser;
