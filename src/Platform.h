@@ -30,22 +30,4 @@
 #   endif
 #endif
 
-#ifndef SC_API
-#  ifdef _WIN32
-#     if defined(CSNOWCRASH_BUILD_SHARED) /* build dll */
-#         define SC_API __declspec(dllimport)
-#     elif !defined(CSNOWCRASH_BUILD_STATIC) /* use dll */
-#         define SC_API __declspec(dllexport)
-#     else /* static library */
-#         define SC_API
-#     endif
-#  else
-#     if __GNUC__ >= 4
-#         define SC_API /*__attribute__((visibility("default")))*/
-#     else
-#         define SC_API
-#     endif
-#  endif
-#endif
-
 #endif
