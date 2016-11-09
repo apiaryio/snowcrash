@@ -49,9 +49,14 @@ TEST_CASE("parse headers fixture", "[headers]")
     REQUIRE(headers.node[1].second == "Hello World!");
 
     REQUIRE(headers.sourceMap.collection.size() == 2);
-    SourceMapHelper::check(headers.sourceMap.collection[0].sourceMap, 15, 35, 54, 30);
-    SourceMapHelper::check(headers.sourceMap.collection[1].sourceMap, 15, 35, 54, 30);
+    SourceMapHelper::check(headers.sourceMap.collection[0].sourceMap, 19, 30);
+    SourceMapHelper::check(headers.sourceMap.collection[1].sourceMap, 58, 25);
 }
+
+
+// This test is commented out because, in real parsing it is never parsed is "one block sourcemap"
+// Just in context of HeaderParser testing.
+// This test is not completly removed, instead it is placed in context of ResourceParser (as in real world)
 
 TEST_CASE("parse headers fixture with no empty line between signature and content", "[headers]")
 {
@@ -93,20 +98,14 @@ TEST_CASE("parse malformed headers fixture", "[headers]")
 
     REQUIRE(headers.sourceMap.collection.size() == 3);
 
-    REQUIRE(headers.sourceMap.collection[0].sourceMap.size() == 3);
-    SourceMapHelper::check(headers.sourceMap.collection[0].sourceMap, 15, 35, 1);
-    SourceMapHelper::check(headers.sourceMap.collection[0].sourceMap, 54, 30, 2);
-    SourceMapHelper::check(headers.sourceMap.collection[0].sourceMap, 88, 21, 3);
+    REQUIRE(headers.sourceMap.collection[0].sourceMap.size() == 1);
+    SourceMapHelper::check(headers.sourceMap.collection[0].sourceMap, 19, 30);
 
-    REQUIRE(headers.sourceMap.collection[1].sourceMap.size() == 3);
-    SourceMapHelper::check(headers.sourceMap.collection[0].sourceMap, 15, 35, 1);
-    SourceMapHelper::check(headers.sourceMap.collection[0].sourceMap, 54, 30, 2);
-    SourceMapHelper::check(headers.sourceMap.collection[0].sourceMap, 88, 21, 3);
+    REQUIRE(headers.sourceMap.collection[1].sourceMap.size() == 1);
+    SourceMapHelper::check(headers.sourceMap.collection[1].sourceMap, 58, 25);
 
-    REQUIRE(headers.sourceMap.collection[2].sourceMap.size() == 3);
-    SourceMapHelper::check(headers.sourceMap.collection[0].sourceMap, 15, 35, 1);
-    SourceMapHelper::check(headers.sourceMap.collection[0].sourceMap, 54, 30, 2);
-    SourceMapHelper::check(headers.sourceMap.collection[0].sourceMap, 88, 21, 3);
+    REQUIRE(headers.sourceMap.collection[2].sourceMap.size() == 1);
+    SourceMapHelper::check(headers.sourceMap.collection[2].sourceMap, 92, 16);
 }
 
 TEST_CASE("Parse header section composed of multiple blocks", "[headers]")
@@ -141,9 +140,9 @@ TEST_CASE("Parse header section composed of multiple blocks", "[headers]")
     REQUIRE(headers.node[2].second == "42");
 
     REQUIRE(headers.sourceMap.collection.size() == 3);
-    SourceMapHelper::check(headers.sourceMap.collection[0].sourceMap, 15, 33);
-    SourceMapHelper::check(headers.sourceMap.collection[1].sourceMap, 52, 9);
-    SourceMapHelper::check(headers.sourceMap.collection[2].sourceMap, 65, 20);
+    SourceMapHelper::check(headers.sourceMap.collection[0].sourceMap, 19, 27);
+    SourceMapHelper::check(headers.sourceMap.collection[1].sourceMap, 52, 7);
+    SourceMapHelper::check(headers.sourceMap.collection[2].sourceMap, 69, 15);
 }
 
 TEST_CASE("Parse header section with missing headers", "[headers]")

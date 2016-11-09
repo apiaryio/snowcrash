@@ -106,7 +106,7 @@ TEST_CASE("Parse request payload", "[payload]")
     REQUIRE(payload.sourceMap.parameters.collection.empty());
     REQUIRE(payload.sourceMap.headers.collection.size() == 2);
     SourceMapHelper::check(payload.sourceMap.headers.collection[0].sourceMap, 2, 34);
-    SourceMapHelper::check(payload.sourceMap.headers.collection[1].sourceMap, 74, 17);
+    SourceMapHelper::check(payload.sourceMap.headers.collection[1].sourceMap, 78, 12);
     SourceMapHelper::check(payload.sourceMap.body.sourceMap, 112, 9);
     SourceMapHelper::check(payload.sourceMap.schema.sourceMap, 144, 11);
 }

@@ -47,6 +47,22 @@ namespace snowcrash {
         return TrimStringStart(TrimStringEnd(s));
     }
 
+
+    // <position form begin, lenght of string>
+    typedef std::tuple<std::string::const_iterator::difference_type, std::string::const_iterator::difference_type> TrimRange;
+
+    // Get Trim Info
+    inline TrimRange GetTrimInfo(std::string::const_iterator begin, std::string::const_iterator end) {
+        std::string::const_reverse_iterator rbegin(end);
+        std::string::const_reverse_iterator rend(begin);
+
+        std::string::const_iterator trim = std::find_if(begin, end, std::not1(std::ptr_fun(isSpace)));
+        std::string::const_reverse_iterator rtrim = std::find_if(rbegin, rend, std::not1(std::ptr_fun(isSpace)));
+
+        return std::make_tuple(std::distance(begin, trim),
+                std::distance(rtrim, std::string::const_reverse_iterator(trim)));
+    }
+
     // Split string by delim
     inline std::vector<std::string>& Split(const std::string& s, char delim, std::vector<std::string>& elems) {
         std::stringstream ss(s);
