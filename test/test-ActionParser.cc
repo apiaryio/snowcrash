@@ -47,7 +47,7 @@ TEST_CASE("Parsing action", "[action]")
 
     REQUIRE(action.node.name == "My Method");
     REQUIRE(action.node.method == "GET");
-    REQUIRE(action.node.description == "Method Description\n\n");
+    REQUIRE(action.node.description == "Method Description");
 
     REQUIRE(action.node.examples.size() == 1);
     REQUIRE(action.node.examples.front().requests.size() == 0);
@@ -88,7 +88,7 @@ TEST_CASE("Parse Action description with list", "[action]")
     CHECK(action.report.warnings.empty());
 
     REQUIRE(action.node.method == "GET");
-    REQUIRE(action.node.description == "Small Description\n\n+ A\n\n+ B\n");
+    REQUIRE(action.node.description == "Small Description\n\n+ A\n\n+ B");
 
     REQUIRE(action.node.examples.size() == 1);
     REQUIRE(action.node.examples.front().responses.size() == 1);
@@ -276,7 +276,7 @@ TEST_CASE("Parse method with a HR", "[action]")
 
     REQUIRE(action.node.name.empty());
     REQUIRE(action.node.method == "PATCH");
-    REQUIRE(action.node.description == "A\n---\n\nB\n");
+    REQUIRE(action.node.description == "A\n---\n\nB");
     REQUIRE(action.node.examples.empty());
 
     REQUIRE(action.sourceMap.name.sourceMap.empty());

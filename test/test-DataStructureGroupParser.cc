@@ -102,7 +102,7 @@ TEST_CASE("Parse multiple data structures with type sections", "[data_structure_
     REQUIRE(dataStructure.typeDefinition.empty());
     REQUIRE(dataStructure.sections.size() == 2);
     REQUIRE(dataStructure.sections[0].klass == mson::TypeSection::BlockDescriptionClass);
-    REQUIRE(dataStructure.sections[0].content.description == "Some description\n\n");
+    REQUIRE(dataStructure.sections[0].content.description == "Some description");
     REQUIRE(dataStructure.sections[1].klass == mson::TypeSection::MemberTypeClass);
     REQUIRE(dataStructure.sections[1].content.elements().size() == 2);
 

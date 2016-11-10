@@ -61,7 +61,7 @@ TEST_CASE("Parse simple blueprint", "[parser]")
 
     Action& action = resource.actions[0];
     REQUIRE(action.method == "GET");
-    REQUIRE(action.description == "Resource **description**\n\n");
+    REQUIRE(action.description == "Resource **description**");
     REQUIRE(action.examples.size() == 1);
     REQUIRE(action.examples.front().requests.empty());
     REQUIRE(action.examples.front().responses.size() == 1);
@@ -124,7 +124,7 @@ TEST_CASE("Support description ending with an list item", "[parser][8]")
 
     Resource resource = blueprint.node.content.elements().at(0).content.elements().at(0).content.resource;
     REQUIRE(resource.actions.size() == 1);
-    REQUIRE(resource.actions[0].description == "+ a description item\n");
+    REQUIRE(resource.actions[0].description == "+ a description item");
     REQUIRE(resource.actions[0].examples.size() == 1);
     REQUIRE(resource.actions[0].examples[0].responses.size() == 1);
     REQUIRE(resource.actions[0].examples[0].responses[0].name == "200");
@@ -320,7 +320,7 @@ TEST_CASE("Warn about missing API name if there is an API description", "[parser
     REQUIRE(blueprint1.report.warnings[0].code == APINameWarning);
 
     REQUIRE(blueprint1.node.name.empty());
-    REQUIRE(blueprint1.node.description == "Hello World\n");
+    REQUIRE(blueprint1.node.description == "Hello World");
     REQUIRE(blueprint1.node.content.elements().empty());
 
     mdp::ByteBuffer source2 = \
@@ -334,7 +334,7 @@ TEST_CASE("Warn about missing API name if there is an API description", "[parser
     REQUIRE(blueprint2.report.warnings.empty());
 
     REQUIRE(blueprint2.node.name == "API");
-    REQUIRE(blueprint2.node.description == "Hello World\n");
+    REQUIRE(blueprint2.node.description == "Hello World");
     REQUIRE(blueprint2.node.content.elements().empty());
 
     mdp::ByteBuffer source3 = \
@@ -371,7 +371,7 @@ TEST_CASE("Resource with incorrect URI segfault", "[parser][regression]")
     REQUIRE(blueprint.node.content.elements().at(0).attributes.name == "A");
     REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 1);
     REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).element == Element::CopyElement);
-    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).content.copy == "## Resource [wronguri]\n\n### Retrieve [GET]\n\n+ Response 200\n\n");
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).content.copy == "## Resource [wronguri]\n\n### Retrieve [GET]\n\n+ Response 200");
 }
 
 TEST_CASE("Dangling block not recognized", "[parser][regression][186]")
@@ -675,18 +675,18 @@ TEST_CASE("Don't remove link references", "[parser][213]")
     REQUIRE(blueprint.report.warnings.empty());
 
     REQUIRE(blueprint.node.name == "API");
-    REQUIRE(blueprint.node.description == "This is [first example][id]\n\n[id]: http://a.com\n\n");
+    REQUIRE(blueprint.node.description == "This is [first example][id]\n\n[id]: http://a.com");
     REQUIRE(blueprint.node.content.elements().size() == 1);
     REQUIRE(blueprint.node.content.elements().at(0).attributes.name == "A");
     REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
     REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 2);
     REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).element == Element::CopyElement);
-    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).content.copy == "This is [second example][id]\n\n[id]: http://b.com\n\n");
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).content.copy == "This is [second example][id]\n\n[id]: http://b.com");
     REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(1).element == Element::ResourceElement);
 
     Resource resource = blueprint.node.content.elements().at(0).content.elements().at(1).content.resource;
     REQUIRE(resource.uriTemplate == "/a");
-    REQUIRE(resource.description == "This is [third example][id]\n\n[id]: http://c.com\n\n");
+    REQUIRE(resource.description == "This is [third example][id]\n\n[id]: http://c.com");
 }
 
 TEST_CASE("Don't mess up sourcemaps when there are references", "[parser][213]")

@@ -97,8 +97,10 @@ namespace snowcrash {
             out.node.defaultValue = signature.value;
 
             if (!signature.remainingContent.empty()) {
-                out.node.description += "\n" + signature.remainingContent + "\n";
+                out.node.description += "\n" + signature.remainingContent;
             }
+
+            TrimString(out.node.description);
 
             SectionProcessor<Parameter>::parseAttributes(node, pd, signature.attributes, out);
 

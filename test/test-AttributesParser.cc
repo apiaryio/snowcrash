@@ -119,7 +119,7 @@ TEST_CASE("Parse attributes with block description", "[attributes]")
     REQUIRE(attributes.node.typeDefinition.baseType == mson::ImplicitObjectBaseType);
     REQUIRE(attributes.node.sections.size() == 2);
     REQUIRE(attributes.node.sections[0].klass == mson::TypeSection::BlockDescriptionClass);
-    REQUIRE(attributes.node.sections[0].content.description == "Awesome description\n\n+ With list\n");
+    REQUIRE(attributes.node.sections[0].content.description == "Awesome description\n\n+ With list");
     REQUIRE(attributes.node.sections[1].klass == mson::TypeSection::MemberTypeClass);
     REQUIRE(attributes.node.sections[1].content.elements().size() == 1);
 

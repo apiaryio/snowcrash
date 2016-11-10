@@ -90,7 +90,7 @@ TEST_CASE("Parse canonical mson named type", "[mson][named_type]")
     REQUIRE(element.content.property.valueDefinition.typeDefinition.typeSpecification.name.base == mson::ObjectTypeName);
     REQUIRE(element.content.property.sections.size() == 2);
     REQUIRE(element.content.property.sections[0].klass == mson::TypeSection::BlockDescriptionClass);
-    REQUIRE(element.content.property.sections[0].content.description == "The subscription plan of the user\n");
+    REQUIRE(element.content.property.sections[0].content.description == "The subscription plan of the user");
     REQUIRE(element.content.property.sections[1].klass == mson::TypeSection::MemberTypeClass);
     REQUIRE(element.content.property.sections[1].content.elements().size() == 2);
 
@@ -134,10 +134,10 @@ TEST_CASE("Parse canonical mson named type", "[mson][named_type]")
     REQUIRE(elementSM.property.sections.collection.empty());
 
     elementSM = namedType.sourceMap.sections.collection[0].elements().collection[4];
-    SourceMapHelper::check(elementSM.property.name.sourceMap, 155, 135);
-    SourceMapHelper::check(elementSM.property.valueDefinition.sourceMap, 155, 135);
+    SourceMapHelper::check(elementSM.property.name.sourceMap, 157, 14, 175, 34);
+    SourceMapHelper::check(elementSM.property.valueDefinition.sourceMap, 157, 14, 175, 34);
     REQUIRE(elementSM.property.sections.collection.size() == 2);
-    SourceMapHelper::check(elementSM.property.sections.collection[0].description.sourceMap, 155, 135);
+    SourceMapHelper::check(elementSM.property.sections.collection[0].description.sourceMap, 157, 14, 175, 34);
     REQUIRE(elementSM.property.sections.collection[1].elements().collection.size() == 2);
 
     subelementSM = elementSM.property.sections.collection[1].elements().collection[0];

@@ -276,7 +276,7 @@ TEST_CASE("Parse canonical parameter definition", "[parameter]")
     CHECK(parameter.report.warnings.empty());
 
     REQUIRE(parameter.node.name == "id");
-    REQUIRE(parameter.node.description == "Lorem ipsum\n");
+    REQUIRE(parameter.node.description == "Lorem ipsum");
     REQUIRE(parameter.node.type == "number");
     REQUIRE(parameter.node.use == OptionalParameterUse);
     REQUIRE(parameter.node.defaultValue == "1234");
@@ -459,7 +459,7 @@ TEST_CASE("Unrecognized 'values' keyword", "[parameter]")
     REQUIRE(parameter.report.warnings.empty());
 
     REQUIRE(parameter.node.name == "param");
-    REQUIRE(parameter.node.description == "+ Values:\n    + `lorem`\n");
+    REQUIRE(parameter.node.description == "+ Values:\n    + `lorem`");
     REQUIRE(parameter.node.use == UndefinedParameterUse);
     REQUIRE(parameter.node.values.empty());
 
@@ -600,13 +600,13 @@ TEST_CASE("Parameter with additional description as continuation of signature", 
 
     REQUIRE(parameter.node.name == "id");
     REQUIRE(parameter.node.type == "string");
-    REQUIRE(parameter.node.description == "lorem (ipsum)\nAdditional description\n\n");
+    REQUIRE(parameter.node.description == "lorem (ipsum)\nAdditional description");
 
-    SourceMapHelper::check(parameter.sourceMap.name.sourceMap, 0, 57);
-    SourceMapHelper::check(parameter.sourceMap.type.sourceMap, 0, 57);
+    SourceMapHelper::check(parameter.sourceMap.name.sourceMap, 2, 30, 34, 23);
+    SourceMapHelper::check(parameter.sourceMap.type.sourceMap, 2, 30, 34, 23);
     REQUIRE(parameter.sourceMap.defaultValue.sourceMap.empty());
     REQUIRE(parameter.sourceMap.exampleValue.sourceMap.empty());
-    SourceMapHelper::check(parameter.sourceMap.description.sourceMap, 0, 57);
+    SourceMapHelper::check(parameter.sourceMap.description.sourceMap, 2, 30, 34, 23);
     REQUIRE(parameter.sourceMap.use.sourceMap.empty());
     REQUIRE(parameter.sourceMap.values.collection.empty());
 }
@@ -627,7 +627,7 @@ TEST_CASE("Parameter with list in description", "[parameter]")
 
     REQUIRE(parameter.node.name == "id");
     REQUIRE(parameter.node.type == "string");
-    REQUIRE(parameter.node.description == "lorem (ipsum)\ndolor sit amet\n\n+ Ut pulvinar\n\n+ Mauris condimentum\n");;
+    REQUIRE(parameter.node.description == "lorem (ipsum)\ndolor sit amet\n\n+ Ut pulvinar\n\n+ Mauris condimentum");;
 
     SourceMapHelper::check(parameter.sourceMap.name.sourceMap, 2, 40, 44, 15);
     REQUIRE(parameter.sourceMap.description.sourceMap.size() == 4);

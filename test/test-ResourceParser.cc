@@ -68,7 +68,7 @@ TEST_CASE("Parse resource", "[resource]")
 
     REQUIRE(resource.node.name == "My Resource");
     REQUIRE(resource.node.uriTemplate == "/resource/{id}{?limit}");
-    REQUIRE(resource.node.description == "Awesome description\n\n");
+    REQUIRE(resource.node.description == "Awesome description");
     REQUIRE(resource.node.headers.empty());
 
     REQUIRE(resource.node.model.name == "Resource");
@@ -76,7 +76,7 @@ TEST_CASE("Parse resource", "[resource]")
 
     REQUIRE(resource.node.parameters.size() == 2);
     REQUIRE(resource.node.parameters[0].name == "id");
-    REQUIRE(resource.node.parameters[0].description == "Lorem ipsum\n");
+    REQUIRE(resource.node.parameters[0].description == "Lorem ipsum");
     REQUIRE(resource.node.parameters[1].name == "limit");
 
     REQUIRE(resource.node.actions.size() == 1);
@@ -153,9 +153,9 @@ TEST_CASE("Parse multiple method descriptions", "[resource]")
     REQUIRE(resource.node.model.body.empty());
     REQUIRE(resource.node.actions.size() == 2);
     REQUIRE(resource.node.actions[0].method == "GET");
-    REQUIRE(resource.node.actions[0].description == "p1\n");
+    REQUIRE(resource.node.actions[0].description == "p1");
     REQUIRE(resource.node.actions[1].method == "POST");
-    REQUIRE(resource.node.actions[1].description == "p2\n");
+    REQUIRE(resource.node.actions[1].description == "p2");
 
     REQUIRE(resource.sourceMap.name.sourceMap.empty());
     REQUIRE(resource.sourceMap.description.sourceMap.empty());
@@ -191,13 +191,13 @@ TEST_CASE("Parse multiple methods", "[resource]")
     REQUIRE(resource.report.warnings.size() == 2); // empty reuqest asset & no response
 
     REQUIRE(resource.node.uriTemplate == "/1");
-    REQUIRE(resource.node.description == "A\n");
+    REQUIRE(resource.node.description == "A");
     REQUIRE(resource.node.model.name.empty());
     REQUIRE(resource.node.model.body.empty());
     REQUIRE(resource.node.actions.size() == 3);
 
     REQUIRE(resource.node.actions[0].method == "GET");
-    REQUIRE(resource.node.actions[0].description == "B\n");
+    REQUIRE(resource.node.actions[0].description == "B");
     REQUIRE(resource.node.actions[0].examples.size() == 1);
     REQUIRE(resource.node.actions[0].examples[0].requests.empty());
     REQUIRE(resource.node.actions[0].examples[0].responses.size() == 1);
@@ -206,7 +206,7 @@ TEST_CASE("Parse multiple methods", "[resource]")
     REQUIRE(resource.node.actions[0].examples[0].responses[0].body == "Code 1\n");
 
     REQUIRE(resource.node.actions[1].method == "POST");
-    REQUIRE(resource.node.actions[1].description == "C\n");
+    REQUIRE(resource.node.actions[1].description == "C");
     REQUIRE(resource.node.actions[1].examples.size() == 1);
     REQUIRE(resource.node.actions[1].examples[0].requests.size() == 1);
     REQUIRE(resource.node.actions[1].examples[0].requests[0].name == "D");
@@ -218,7 +218,7 @@ TEST_CASE("Parse multiple methods", "[resource]")
     REQUIRE(resource.node.actions[1].examples[0].responses[0].body == "{}\n");
 
     REQUIRE(resource.node.actions[2].method == "PUT");
-    REQUIRE(resource.node.actions[2].description == "E\n");
+    REQUIRE(resource.node.actions[2].description == "E");
     REQUIRE(resource.node.actions[2].examples.empty());
 
     REQUIRE(resource.sourceMap.name.sourceMap.empty());
@@ -244,7 +244,7 @@ TEST_CASE("Parse description with list", "[resource]")
     REQUIRE(resource.report.warnings.empty());
 
     REQUIRE(resource.node.uriTemplate == "/1");
-    REQUIRE(resource.node.description == "+ A\n\n+ B\n\np1\n");
+    REQUIRE(resource.node.description == "+ A\n\n+ B\n\np1");
     REQUIRE(resource.node.model.name.empty());
     REQUIRE(resource.node.model.body.empty());
     REQUIRE(resource.node.actions.empty());
@@ -270,7 +270,7 @@ TEST_CASE("Parse resource with a HR", "[resource][block]")
     REQUIRE(resource.report.warnings.empty());
 
     REQUIRE(resource.node.uriTemplate == "/1");
-    REQUIRE(resource.node.description == "A\n---\n\nB\n");
+    REQUIRE(resource.node.description == "A\n---\n\nB");
     REQUIRE(resource.node.model.name.empty());
     REQUIRE(resource.node.model.body.empty());
     REQUIRE(resource.node.actions.empty());
@@ -300,7 +300,7 @@ TEST_CASE("Parse resource method abbreviation", "[resource]")
     REQUIRE(resource.node.uriTemplate == "/resource");
     REQUIRE(resource.node.actions.size() == 1);
     REQUIRE(resource.node.actions[0].method == "GET");
-    REQUIRE(resource.node.actions[0].description == "Description\n");
+    REQUIRE(resource.node.actions[0].description == "Description");
 
     REQUIRE(resource.node.actions[0].examples[0].responses.size() == 1);
     REQUIRE(resource.node.actions[0].examples[0].responses[0].description.empty());
@@ -769,7 +769,7 @@ TEST_CASE("Bug fix for recognition of model as a part of other word or as a quot
     REQUIRE(resource.report.warnings.size() == 0);
 
     REQUIRE(resource.node.name == "Resource");
-    REQUIRE(resource.node.description == "### Attributes\n\n- A\n\n- Cmodel\n\n- Single data model for all exchange data\n\n- `model`\n");
+    REQUIRE(resource.node.description == "### Attributes\n\n- A\n\n- Cmodel\n\n- Single data model for all exchange data\n\n- `model`");
 }
 
 TEST_CASE("Parse resource with multi-word named model", "[resource][model]")
@@ -858,7 +858,7 @@ TEST_CASE("Body list item in description", "[resource][regression][190]")
     REQUIRE(resource.report.warnings.empty());
 
     REQUIRE(resource.node.actions.size() == 1);
-    REQUIRE(resource.node.actions[0].description == "Lorem Ipsum\n\n+ Body\n\n    { ... }\n\n");
+    REQUIRE(resource.node.actions[0].description == "Lorem Ipsum\n\n+ Body\n\n    { ... }");
 
     REQUIRE(resource.sourceMap.actions.collection.size() == 1);
     SourceMapHelper::check(resource.sourceMap.actions.collection[0].description.sourceMap, 10, 34);

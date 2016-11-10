@@ -236,6 +236,8 @@ namespace snowcrash {
                 }
 
                 mdp::ByteBuffer content = mdp::MapBytesRangeSet(node->sourceMap, pd.sourceData);
+                TrimString(content);
+
                 sections[0].content.description += content;
 
                 if (pd.exportSourceMap() && !content.empty()) {

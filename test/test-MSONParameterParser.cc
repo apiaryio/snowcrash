@@ -65,7 +65,7 @@ TEST_CASE("Parse parameter description when it occurs in different cases", "[mso
     REQUIRE(parameter.report.warnings.empty());
 
     REQUIRE(parameter.node.name == "id");
-    REQUIRE(parameter.node.description == "Same line\nSingle newline\n\nDouble newline\n");
+    REQUIRE(parameter.node.description == "Same line\nSingle newline\n\nDouble newline");
     REQUIRE(parameter.node.exampleValue == "100");
 
     SourceMapHelper::check(parameter.sourceMap.description.sourceMap, 2, 20, 1);
