@@ -49,7 +49,7 @@ TEST_CASE("Parse canonical link relation", "[relation]")
     REQUIRE(relation.report.warnings.empty());
 
     REQUIRE(relation.node.str == "create");
-    SourceMapHelper::check(relation.sourceMap.sourceMap, 0, 19);
+    SourceMapHelper::check(relation.sourceMap.sourceMap, 2, 16);
 }
 
 TEST_CASE("Relation identifier starting with non lower alphabet", "[relation]")

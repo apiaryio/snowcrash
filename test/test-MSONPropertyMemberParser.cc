@@ -33,9 +33,9 @@ TEST_CASE("Parse canonical mson property member", "[mson][property_member]")
     REQUIRE(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.nestedTypes.empty());
     REQUIRE(propertyMember.node.valueDefinition.typeDefinition.attributes == mson::RequiredTypeAttribute);
 
-    SourceMapHelper::check(propertyMember.sourceMap.name.sourceMap, 0, 42);
-    SourceMapHelper::check(propertyMember.sourceMap.description.sourceMap, 0, 42);
-    SourceMapHelper::check(propertyMember.sourceMap.valueDefinition.sourceMap, 0, 42);
+    SourceMapHelper::check(propertyMember.sourceMap.name.sourceMap, 2, 39);
+    SourceMapHelper::check(propertyMember.sourceMap.description.sourceMap, 2, 39);
+    SourceMapHelper::check(propertyMember.sourceMap.valueDefinition.sourceMap, 2, 39);
 }
 
 TEST_CASE("Parse mson property member with description not on new line", "[mson][property_member]")
@@ -180,7 +180,7 @@ TEST_CASE("Parse mson property member object with nested members", "[mson][prope
     REQUIRE(propertyMember.sourceMap.sections.collection.size() == 1);
     REQUIRE(propertyMember.sourceMap.sections.collection[0].elements().collection.size() == 2);
     SourceMapHelper::check(propertyMember.sourceMap.sections.collection[0].elements().collection[0].property.name.sourceMap, 22, 44);
-    SourceMapHelper::check(propertyMember.sourceMap.sections.collection[0].elements().collection[1].property.name.sourceMap, 70, 30);
+    SourceMapHelper::check(propertyMember.sourceMap.sections.collection[0].elements().collection[1].property.name.sourceMap, 72, 27);
 }
 
 TEST_CASE("Parse mson array property member with nested properties type section", "[mson][property_member]")
@@ -235,7 +235,7 @@ TEST_CASE("Parse mson property member when it has a member group in nested membe
     SourceMapHelper::check(propertyMember.sourceMap.sections.collection[0].elements().collection[0].property.name.sourceMap, 22, 18);
     REQUIRE(propertyMember.sourceMap.sections.collection[1].elements().collection.size() == 2);
     SourceMapHelper::check(propertyMember.sourceMap.sections.collection[1].elements().collection[0].property.name.sourceMap, 67, 10);
-    SourceMapHelper::check(propertyMember.sourceMap.sections.collection[1].elements().collection[1].property.name.sourceMap, 81, 22);
+    SourceMapHelper::check(propertyMember.sourceMap.sections.collection[1].elements().collection[1].property.name.sourceMap, 83, 19);
 }
 
 TEST_CASE("Parse mson property member when it has multiple member groups", "[mson][property_member]")
@@ -276,7 +276,7 @@ TEST_CASE("Parse mson property member when it has multiple member groups", "[mso
     SourceMapHelper::check(propertyMember.sourceMap.sections.collection[1].elements().collection[0].property.name.sourceMap, 92, 10);
 
     REQUIRE(propertyMember.sourceMap.sections.collection[2].elements().collection.size() == 1);
-    SourceMapHelper::check(propertyMember.sourceMap.sections.collection[2].elements().collection[0].property.name.sourceMap, 128, 13);
+    SourceMapHelper::check(propertyMember.sourceMap.sections.collection[2].elements().collection[0].property.name.sourceMap, 130, 10);
 }
 
 TEST_CASE("Parse mson property member when it has the wrong member group", "[mson][property_member]")
@@ -337,8 +337,8 @@ TEST_CASE("Parse mson property member when it is an object and has no sub-type s
     SourceMapHelper::check(propertyMember.sourceMap.sections.collection[0].description.sourceMap, 12, 13);
 
     REQUIRE(propertyMember.sourceMap.sections.collection[1].elements().collection.size() == 1);
-    SourceMapHelper::check(propertyMember.sourceMap.sections.collection[1].elements().collection[0].property.name.sourceMap, 50, 30);
-    SourceMapHelper::check(propertyMember.sourceMap.sections.collection[1].elements().collection[0].property.valueDefinition.sourceMap, 50, 30);
+    SourceMapHelper::check(propertyMember.sourceMap.sections.collection[1].elements().collection[0].property.name.sourceMap, 52, 27);
+    SourceMapHelper::check(propertyMember.sourceMap.sections.collection[1].elements().collection[0].property.valueDefinition.sourceMap, 52, 27);
 }
 
 TEST_CASE("Parse mson property member when it is an object and has no sub-type specified", "[mson][property_member]")
@@ -386,8 +386,8 @@ TEST_CASE("Parse mson property member when it is an object and has no sub-type s
 
     SourceMapHelper::check(propertyMember.sourceMap.sections.collection[0].elements().collection[0].property.name.sourceMap, 14, 28);
     SourceMapHelper::check(propertyMember.sourceMap.sections.collection[0].elements().collection[0].property.valueDefinition.sourceMap, 14, 28);
-    SourceMapHelper::check(propertyMember.sourceMap.sections.collection[0].elements().collection[1].property.name.sourceMap, 73, 29);
-    SourceMapHelper::check(propertyMember.sourceMap.sections.collection[0].elements().collection[1].property.valueDefinition.sourceMap, 73, 29);
+    SourceMapHelper::check(propertyMember.sourceMap.sections.collection[0].elements().collection[1].property.name.sourceMap, 75, 26);
+    SourceMapHelper::check(propertyMember.sourceMap.sections.collection[0].elements().collection[1].property.valueDefinition.sourceMap, 75, 26);
 }
 
 TEST_CASE("Parse mson property member when it is a string and has no sub-type specified", "[mson][property_member]")
@@ -420,7 +420,7 @@ TEST_CASE("Parse mson property member when it is a string and has no sub-type sp
 
     REQUIRE(propertyMember.sourceMap.sections.collection.size() == 2);
     SourceMapHelper::check(propertyMember.sourceMap.sections.collection[0].description.sourceMap, 16, 23);
-    SourceMapHelper::check(propertyMember.sourceMap.sections.collection[1].value.sourceMap, 44, 25);
+    SourceMapHelper::check(propertyMember.sourceMap.sections.collection[1].value.sourceMap, 46, 22);
 }
 
 TEST_CASE("Parse mson property member when no sub-type specified and no nested sections", "[mson][property_member]")
@@ -483,7 +483,7 @@ TEST_CASE("Parse mson property member when containing a mixin", "[mson][property
     REQUIRE(propertyMember.sourceMap.sections.collection[0].elements().collection.size() == 2);
 
     SourceMapHelper::check(propertyMember.sourceMap.sections.collection[0].elements().collection[0].property.name.sourceMap, 29, 11);
-    SourceMapHelper::check(propertyMember.sourceMap.sections.collection[0].elements().collection[1].mixin.sourceMap, 42, 17);
+    SourceMapHelper::check(propertyMember.sourceMap.sections.collection[0].elements().collection[1].mixin.sourceMap, 44, 14);
 }
 
 TEST_CASE("Parse mson property member when containing an oneOf", "[mson][property_member]")
@@ -526,7 +526,7 @@ TEST_CASE("Parse mson property member when containing an oneOf", "[mson][propert
     SourceMap<mson::OneOf> oneOfSM = propertyMember.sourceMap.sections.collection[0].elements().collection[1].oneOf();
     REQUIRE(oneOfSM.collection.size() == 2);
     SourceMapHelper::check(oneOfSM.collection[0].property.name.sourceMap, 65, 10);
-    SourceMapHelper::check(oneOfSM.collection[1].property.name.sourceMap, 83, 20);
+    SourceMapHelper::check(oneOfSM.collection[1].property.name.sourceMap, 85, 17);
 }
 
 TEST_CASE("Parse mson property member containing a list of values and no type specification", "[mson][property_member]")
@@ -549,8 +549,8 @@ TEST_CASE("Parse mson property member containing a list of values and no type sp
     REQUIRE(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.empty());
     REQUIRE(propertyMember.node.sections.empty());
 
-    SourceMapHelper::check(propertyMember.sourceMap.name.sourceMap, 0, 16);
-    SourceMapHelper::check(propertyMember.sourceMap.valueDefinition.sourceMap, 0, 16);
+    SourceMapHelper::check(propertyMember.sourceMap.name.sourceMap, 2, 13);
+    SourceMapHelper::check(propertyMember.sourceMap.valueDefinition.sourceMap, 2, 13);
 }
 
 TEST_CASE("Parse mson property containing list of value with string type specification", "[mson][property_member]")
@@ -571,6 +571,6 @@ TEST_CASE("Parse mson property containing list of value with string type specifi
     REQUIRE(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.name.base == mson::StringTypeName);
     REQUIRE(propertyMember.node.sections.empty());
 
-    SourceMapHelper::check(propertyMember.sourceMap.name.sourceMap, 0, 25);
-    SourceMapHelper::check(propertyMember.sourceMap.valueDefinition.sourceMap, 0, 25);
+    SourceMapHelper::check(propertyMember.sourceMap.name.sourceMap, 2, 22);
+    SourceMapHelper::check(propertyMember.sourceMap.valueDefinition.sourceMap, 2, 22);
 }

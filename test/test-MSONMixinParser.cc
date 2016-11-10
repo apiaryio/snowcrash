@@ -52,7 +52,7 @@ TEST_CASE("Parse canonical mson mixin", "[mson][mixin]")
     REQUIRE(mixin.node.typeSpecification.name.symbol.variable == false);
     REQUIRE(mixin.node.typeSpecification.nestedTypes.empty());
 
-    SourceMapHelper::check(mixin.sourceMap.sourceMap, 0, 17);
+    SourceMapHelper::check(mixin.sourceMap.sourceMap, 2, 14);
 }
 
 TEST_CASE("Parse mson mixin with canonical type definition", "[mson][mixin]")
@@ -74,7 +74,7 @@ TEST_CASE("Parse mson mixin with canonical type definition", "[mson][mixin]")
     REQUIRE(mixin.node.typeSpecification.name.symbol.variable == false);
     REQUIRE(mixin.node.typeSpecification.nestedTypes.empty());
 
-    SourceMapHelper::check(mixin.sourceMap.sourceMap, 0, 27);
+    SourceMapHelper::check(mixin.sourceMap.sourceMap, 2, 24);
 }
 
 TEST_CASE("Parse mson mixin with base type definition", "[mson][mixin]")
@@ -93,7 +93,7 @@ TEST_CASE("Parse mson mixin with base type definition", "[mson][mixin]")
     REQUIRE(mixin.node.typeSpecification.name.symbol.empty());
     REQUIRE(mixin.node.typeSpecification.nestedTypes.empty());
 
-    SourceMapHelper::check(mixin.sourceMap.sourceMap, 0, 19);
+    SourceMapHelper::check(mixin.sourceMap.sourceMap, 2, 16);
 }
 
 TEST_CASE("Parse mson mixin with nested type definition", "[mson][mixin]")
@@ -119,5 +119,5 @@ TEST_CASE("Parse mson mixin with nested type definition", "[mson][mixin]")
     REQUIRE(mixin.node.typeSpecification.nestedTypes[1].base == mson::StringTypeName);
     REQUIRE(mixin.node.typeSpecification.nestedTypes[1].symbol.empty());
 
-    SourceMapHelper::check(mixin.sourceMap.sourceMap, 0, 45);
+    SourceMapHelper::check(mixin.sourceMap.sourceMap, 2, 42);
 }

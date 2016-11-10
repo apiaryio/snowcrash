@@ -73,8 +73,8 @@ TEST_CASE("parse headers fixture with no empty line between signature and conten
     REQUIRE(headers.node[1].second == "Hello World!");
 
     REQUIRE(headers.sourceMap.collection.size() == 2);
-    SourceMapHelper::check(headers.sourceMap.collection[0].sourceMap, 0, 83);
-    SourceMapHelper::check(headers.sourceMap.collection[1].sourceMap, 0, 83);
+    SourceMapHelper::check(headers.sourceMap.collection[0].sourceMap, 18, 30);
+    SourceMapHelper::check(headers.sourceMap.collection[1].sourceMap, 57, 25);
 }
 
 TEST_CASE("parse malformed headers fixture", "[headers]")

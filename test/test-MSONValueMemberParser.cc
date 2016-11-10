@@ -31,8 +31,8 @@ TEST_CASE("Parse canonical mson value member", "[mson][value_member]")
     REQUIRE(valueMember.node.valueDefinition.typeDefinition.typeSpecification.nestedTypes.empty());
     REQUIRE(valueMember.node.valueDefinition.typeDefinition.attributes == mson::RequiredTypeAttribute);
 
-    SourceMapHelper::check(valueMember.sourceMap.valueDefinition.sourceMap, 0, 35);
-    SourceMapHelper::check(valueMember.sourceMap.description.sourceMap, 0, 35);
+    SourceMapHelper::check(valueMember.sourceMap.valueDefinition.sourceMap, 2, 32);
+    SourceMapHelper::check(valueMember.sourceMap.description.sourceMap, 2, 32);
 }
 
 TEST_CASE("Parse mson value member with description not on new line", "[mson][value_member]")
@@ -172,7 +172,7 @@ TEST_CASE("Parse mson value member with multiple values", "[mson][value_member]"
     REQUIRE(valueMember.node.valueDefinition.values[1].literal == "yellow");
     REQUIRE(valueMember.node.valueDefinition.values[2].literal == "true");
 
-    SourceMapHelper::check(valueMember.sourceMap.valueDefinition.sourceMap, 0, 18);
+    SourceMapHelper::check(valueMember.sourceMap.valueDefinition.sourceMap, 2, 15);
     REQUIRE(valueMember.sourceMap.description.sourceMap.empty());
     REQUIRE(valueMember.sourceMap.sections.collection.empty());
 }
@@ -215,7 +215,7 @@ TEST_CASE("Parse mson value member array with items", "[mson][value_member]")
     SourceMapHelper::check(valueMemberSM.description.sourceMap, 16, 30);
 
     valueMemberSM = valueMember.sourceMap.sections.collection[0].elements().collection[1].value;
-    SourceMapHelper::check(valueMemberSM.valueDefinition.sourceMap, 50, 17);
+    SourceMapHelper::check(valueMemberSM.valueDefinition.sourceMap, 52, 14);
 }
 
 TEST_CASE("Check warnings for object in array with defined value", "[mson][value_member]")

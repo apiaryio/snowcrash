@@ -87,8 +87,8 @@ TEST_CASE("Parse canonical mson one of", "[mson][one_of]")
 
     SourceMapHelper::check(oneOf.sourceMap.collection[0].property.name.sourceMap, 13, 22);
     SourceMapHelper::check(oneOf.sourceMap.collection[0].property.valueDefinition.sourceMap, 13, 22);
-    SourceMapHelper::check(oneOf.sourceMap.collection[1].property.name.sourceMap, 37, 19);
-    SourceMapHelper::check(oneOf.sourceMap.collection[1].property.valueDefinition.sourceMap, 37, 19);
+    SourceMapHelper::check(oneOf.sourceMap.collection[1].property.name.sourceMap, 39, 16);
+    SourceMapHelper::check(oneOf.sourceMap.collection[1].property.valueDefinition.sourceMap, 39, 16);
 }
 
 TEST_CASE("Parse mson one of without any nested members", "[mson][one_of]")
@@ -145,7 +145,7 @@ TEST_CASE("Parse mson one of with one of", "[mson][one_of]")
 
     REQUIRE(oneOf.sourceMap.collection[1].oneOf().collection.size() == 2);
     SourceMapHelper::check(oneOf.sourceMap.collection[1].oneOf().collection[0].property.name.sourceMap, 48, 11);
-    SourceMapHelper::check(oneOf.sourceMap.collection[1].oneOf().collection[1].property.name.sourceMap, 67, 16);
+    SourceMapHelper::check(oneOf.sourceMap.collection[1].oneOf().collection[1].property.name.sourceMap, 69, 13);
 }
 
 TEST_CASE("Parse mson one of with member group", "[mson][one_of]")
@@ -186,5 +186,5 @@ TEST_CASE("Parse mson one of with member group", "[mson][one_of]")
 
     REQUIRE(oneOf.sourceMap.collection[1].elements().collection.size() == 2);
     SourceMapHelper::check(oneOf.sourceMap.collection[1].elements().collection[0].property.name.sourceMap, 52, 11);
-    SourceMapHelper::check(oneOf.sourceMap.collection[1].elements().collection[1].property.name.sourceMap, 71, 12);
+    SourceMapHelper::check(oneOf.sourceMap.collection[1].elements().collection[1].property.name.sourceMap, 73, 9);
 }
