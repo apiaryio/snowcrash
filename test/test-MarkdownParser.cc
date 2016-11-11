@@ -283,7 +283,7 @@ TEST_CASE("Parse single list item", "[parser][list]")
     MarkdownNode node = ast.children()[0];
     REQUIRE(node.type == ListItemMarkdownNodeType);
     REQUIRE(node.text.empty());
-    REQUIRE(node.data == 0);
+    REQUIRE(node.data == 2);
     REQUIRE(node.children().size() == 1);
     REQUIRE(node.sourceMap.size() == 1);
     REQUIRE(node.sourceMap[0].location == 0);
@@ -291,7 +291,7 @@ TEST_CASE("Parse single list item", "[parser][list]")
     
     node = node.children()[0];
     REQUIRE(node.type == ParagraphMarkdownNodeType);
-    REQUIRE(node.text == "list item\n");
+    REQUIRE(node.text == "list item");
     REQUIRE(node.data == 0);
     REQUIRE(node.children().empty());
     REQUIRE(node.sourceMap.size() == 1);
@@ -340,14 +340,14 @@ TEST_CASE("Parse nested list items", "[parser][list]")
     MarkdownNode& itemA = ast.children()[0];
     REQUIRE(itemA.type == ListItemMarkdownNodeType);
     REQUIRE(itemA.text.empty());
-    REQUIRE(itemA.data == 0);
+    REQUIRE(itemA.data == 2);
     REQUIRE(itemA.children().size() == 3);
     REQUIRE(itemA.sourceMap.size() == 1);
     REQUIRE(itemA.sourceMap[0].location == 0);
     REQUIRE(itemA.sourceMap[0].length == 32);
     
     REQUIRE(itemA.children()[0].type == ParagraphMarkdownNodeType);
-    REQUIRE(itemA.children()[0].text == "A\n");
+    REQUIRE(itemA.children()[0].text == "A");
     REQUIRE(itemA.children()[0].data == 0);
     REQUIRE(itemA.children()[0].children().empty());
     REQUIRE(itemA.children()[0].sourceMap.size() == 1);
@@ -358,7 +358,7 @@ TEST_CASE("Parse nested list items", "[parser][list]")
     MarkdownNode itemB = itemA.children()[1];
     REQUIRE(itemB.type == ListItemMarkdownNodeType);
     REQUIRE(itemB.text.empty());
-    REQUIRE(itemB.data == 0);
+    REQUIRE(itemB.data == 2);
     REQUIRE(itemB.children().size() == 2);
     REQUIRE(itemB.sourceMap.size() == 2);
     REQUIRE(itemB.sourceMap[0].location == 8);
@@ -367,7 +367,7 @@ TEST_CASE("Parse nested list items", "[parser][list]")
     REQUIRE(itemB.sourceMap[1].length == 8);
     
     REQUIRE(itemB.children()[0].type == ParagraphMarkdownNodeType);
-    REQUIRE(itemB.children()[0].text == "B\n");
+    REQUIRE(itemB.children()[0].text == "B");
     REQUIRE(itemB.children()[0].data == 0);
     REQUIRE(itemB.children()[0].children().empty());
     MarkdownNode paraBX = itemB.children()[0];
@@ -379,14 +379,14 @@ TEST_CASE("Parse nested list items", "[parser][list]")
     MarkdownNode itemC = itemB.children()[1];
     REQUIRE(itemC.type == ListItemMarkdownNodeType);
     REQUIRE(itemC.text.empty());
-    REQUIRE(itemC.data == 0);
+    REQUIRE(itemC.data == 2);
     REQUIRE(itemC.children().size() == 1);
     REQUIRE(itemC.sourceMap.size() == 1);
     REQUIRE(itemC.sourceMap[0].location == 20);
     REQUIRE(itemC.sourceMap[0].length == 4);
     
     REQUIRE(itemC.children()[0].type == ParagraphMarkdownNodeType);
-    REQUIRE(itemC.children()[0].text == "C\n");
+    REQUIRE(itemC.children()[0].text == "C");
     REQUIRE(itemC.children()[0].data == 0);
     REQUIRE(itemC.children()[0].children().empty());
     REQUIRE(itemC.children()[0].sourceMap.size() == 1);
@@ -397,14 +397,14 @@ TEST_CASE("Parse nested list items", "[parser][list]")
     MarkdownNode itemD = itemA.children()[2];
     REQUIRE(itemD.type == ListItemMarkdownNodeType);
     REQUIRE(itemD.text.empty());
-    REQUIRE(itemD.data == 0);
+    REQUIRE(itemD.data == 2);
     REQUIRE(itemD.children().size() == 1);
     REQUIRE(itemD.sourceMap.size() == 1);
     REQUIRE(itemD.sourceMap[0].location == 28);
     REQUIRE(itemD.sourceMap[0].length == 4);
 
     REQUIRE(itemD.children()[0].type == ParagraphMarkdownNodeType);
-    REQUIRE(itemD.children()[0].text == "D\n");
+    REQUIRE(itemD.children()[0].text == "D");
     REQUIRE(itemD.children()[0].data == 0);
     REQUIRE(itemD.children()[0].children().empty());
     REQUIRE(itemD.children()[0].sourceMap.size() == 1);
@@ -415,14 +415,14 @@ TEST_CASE("Parse nested list items", "[parser][list]")
     MarkdownNode itemE = ast.children()[1];
     REQUIRE(itemE.type == ListItemMarkdownNodeType);
     REQUIRE(itemE.text.empty());
-    REQUIRE(itemE.data == 0);
+    REQUIRE(itemE.data == 2);
     REQUIRE(itemE.children().size() == 1);
     REQUIRE(itemE.sourceMap.size() == 1);
     REQUIRE(itemE.sourceMap[0].location == 32);
     REQUIRE(itemE.sourceMap[0].length == 4);
     
     REQUIRE(itemE.children()[0].type == ParagraphMarkdownNodeType);
-    REQUIRE(itemE.children()[0].text == "E\n");
+    REQUIRE(itemE.children()[0].text == "E");
     REQUIRE(itemE.children()[0].data == 0);
     REQUIRE(itemE.children()[0].children().empty());
     REQUIRE(itemE.children()[0].sourceMap.size() == 1);
@@ -597,37 +597,37 @@ TEST_CASE("Parse six nested level list items", "[parser]")
     REQUIRE(list.type == ListItemMarkdownNodeType);
     REQUIRE(list.children().size() == 2);
     REQUIRE(list.children().front().type == ParagraphMarkdownNodeType);
-    REQUIRE(list.children().front().text == "1\n");
+    REQUIRE(list.children().front().text == "1");
 
     list = list.children().back();
     REQUIRE(list.type == ListItemMarkdownNodeType);
     REQUIRE(list.children().size() == 2);
     REQUIRE(list.children().front().type == ParagraphMarkdownNodeType);
-    REQUIRE(list.children().front().text == "2\n");
+    REQUIRE(list.children().front().text == "2");
 
     list = list.children().back();
     REQUIRE(list.type == ListItemMarkdownNodeType);
     REQUIRE(list.children().size() == 2);
     REQUIRE(list.children().front().type == ParagraphMarkdownNodeType);
-    REQUIRE(list.children().front().text == "3\n");
+    REQUIRE(list.children().front().text == "3");
 
     list = list.children().back();
     REQUIRE(list.type == ListItemMarkdownNodeType);
     REQUIRE(list.children().size() == 2);
     REQUIRE(list.children().front().type == ParagraphMarkdownNodeType);
-    REQUIRE(list.children().front().text == "4\n");
+    REQUIRE(list.children().front().text == "4");
 
     list = list.children().back();
     REQUIRE(list.type == ListItemMarkdownNodeType);
     REQUIRE(list.children().size() == 2);
     REQUIRE(list.children().front().type == ParagraphMarkdownNodeType);
-    REQUIRE(list.children().front().text == "5\n");
+    REQUIRE(list.children().front().text == "5");
 
     list = list.children().back();
     REQUIRE(list.type == ListItemMarkdownNodeType);
     REQUIRE(list.children().size() == 1);
     REQUIRE(list.children().front().type == ParagraphMarkdownNodeType);
-    REQUIRE(list.children().front().text == "6\n");
+    REQUIRE(list.children().front().text == "6");
 }
 
 TEST_CASE("Multi-paragraph list item source map", "[parser][sourcemap]")
@@ -701,11 +701,11 @@ TEST_CASE("Sublist should have more indentation than the list item", "[parser]")
     REQUIRE(list.type == ListItemMarkdownNodeType);
     REQUIRE(list.children().size() == 1);
     REQUIRE(list.children().front().type == ParagraphMarkdownNodeType);
-    REQUIRE(list.children().front().text == "1\n");
+    REQUIRE(list.children().front().text == "1");
 
     list = ast.children().back();
     REQUIRE(list.type == ListItemMarkdownNodeType);
     REQUIRE(list.children().size() == 1);
     REQUIRE(list.children().front().type == ParagraphMarkdownNodeType);
-    REQUIRE(list.children().front().text == "2\n");
+    REQUIRE(list.children().front().text == "2");
 }
