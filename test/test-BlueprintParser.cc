@@ -62,20 +62,20 @@ TEST_CASE("Parse canonical blueprint", "[blueprint]")
     REQUIRE(blueprint.node.metadata[0].second == "verse");
 
     REQUIRE(blueprint.node.name == "Snowcrash API");
-    REQUIRE(blueprint.node.description == "## Character\n\nUncle Enzo\n\n");
+    REQUIRE(blueprint.node.description == "## Character\n\nUncle Enzo");
     REQUIRE(blueprint.node.content.elements().size() == 2);
 
     REQUIRE(blueprint.node.content.elements().at(0).attributes.name == "First");
     REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
     REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 2);
     REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).element == Element::CopyElement);
-    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).content.copy == "p1\n");
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).content.copy == "p1");
 
     REQUIRE(blueprint.node.content.elements().at(1).attributes.name == "Second");
     REQUIRE(blueprint.node.content.elements().at(1).element == Element::CategoryElement);
     REQUIRE(blueprint.node.content.elements().at(1).content.elements().size() == 1);
     REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(0).element == Element::CopyElement);
-    REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(0).content.copy == "p2\n");
+    REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(0).content.copy == "p2");
 
     SourceMapHelper::check(blueprint.sourceMap.name.sourceMap, 13, 17);
     SourceMapHelper::check(blueprint.sourceMap.description.sourceMap, 30, 25);
@@ -102,20 +102,20 @@ TEST_CASE("Parse blueprint with multiple metadata sections", "[blueprint]")
     REQUIRE(blueprint.node.metadata[1].second == "verse");
 
     REQUIRE(blueprint.node.name == "Snowcrash API");
-    REQUIRE(blueprint.node.description == "## Character\n\nUncle Enzo\n\n");
+    REQUIRE(blueprint.node.description == "## Character\n\nUncle Enzo");
     REQUIRE(blueprint.node.content.elements().size() == 2);
 
     REQUIRE(blueprint.node.content.elements().at(0).attributes.name == "First");
     REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
     REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 2);
     REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).element == Element::CopyElement);
-    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).content.copy == "p1\n");
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).content.copy == "p1");
 
     REQUIRE(blueprint.node.content.elements().at(1).attributes.name == "Second");
     REQUIRE(blueprint.node.content.elements().at(1).element == Element::CategoryElement);
     REQUIRE(blueprint.node.content.elements().at(1).content.elements().size() == 1);
     REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(0).element == Element::CopyElement);
-    REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(0).content.copy == "p2\n");
+    REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(0).content.copy == "p2");
 
     SourceMapHelper::check(blueprint.sourceMap.name.sourceMap, 25, 17);
     SourceMapHelper::check(blueprint.sourceMap.description.sourceMap, 42, 25);
@@ -142,7 +142,7 @@ TEST_CASE("Parse API with Name and abbreviated resource", "[blueprint]")
     REQUIRE(blueprint.report.warnings.empty());
 
     REQUIRE(blueprint.node.name == "API");
-    REQUIRE(blueprint.node.description == "A\n");
+    REQUIRE(blueprint.node.description == "A");
     REQUIRE(blueprint.node.content.elements().size() == 1);
 
     REQUIRE(blueprint.node.content.elements().at(0).attributes.name.empty());
@@ -177,7 +177,7 @@ TEST_CASE("Parse nameless blueprint description", "[blueprint]")
     REQUIRE(blueprint.report.warnings[0].code == APINameWarning);
 
     REQUIRE(blueprint.node.name.empty());
-    REQUIRE(blueprint.node.description == "A\n\n# B\n");
+    REQUIRE(blueprint.node.description == "A\n\n# B");
     REQUIRE(blueprint.node.content.elements().size() == 0);
 
     REQUIRE(blueprint.sourceMap.name.sourceMap.empty());
@@ -198,7 +198,7 @@ TEST_CASE("Parse nameless blueprint with a list description", "[blueprint]")
     REQUIRE(blueprint.report.warnings[0].code == APINameWarning);
 
     REQUIRE(blueprint.node.name.empty());
-    REQUIRE(blueprint.node.description == "+ List\n");
+    REQUIRE(blueprint.node.description == "+ List");
     REQUIRE(blueprint.node.content.elements().size() == 0);
 
     REQUIRE(blueprint.sourceMap.name.sourceMap.empty());
@@ -281,7 +281,7 @@ TEST_CASE("Should parse nested lists in description", "[blueprint]")
     REQUIRE(blueprint.report.warnings.empty());
 
     REQUIRE(blueprint.node.name == "API");
-    REQUIRE(blueprint.node.description == "+ List\n   + Nested Item\n");
+    REQUIRE(blueprint.node.description == "+ List\n   + Nested Item");
     REQUIRE(blueprint.node.content.elements().empty());
 
     SourceMapHelper::check(blueprint.sourceMap.name.sourceMap, 0, 6);
@@ -420,7 +420,7 @@ TEST_CASE("Parsing unexpected blocks", "[blueprint]")
     REQUIRE(blueprint.report.warnings[0].code == EmptyDefinitionWarning);
 
     REQUIRE(blueprint.node.name == "S");
-    REQUIRE(blueprint.node.description == "Hello\n\n+ Response\n\nMoar text\n\n");
+    REQUIRE(blueprint.node.description == "Hello\n\n+ Response\n\nMoar text");
 
     REQUIRE(blueprint.node.metadata.size() == 1);
     REQUIRE(blueprint.node.metadata[0].first == "FORMAT");

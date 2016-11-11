@@ -332,5 +332,5 @@ TEST_CASE("No Indentation & No Newline multi-line", "[indentation]")
     REQUIRE(action.node.examples.size() == 1);
     REQUIRE(action.node.examples[0].responses.size() == 1);
     REQUIRE(action.node.examples[0].responses[0].name == "200");
-    REQUIRE(action.node.examples[0].responses[0].body == "{\nHello\n}\n");
+    REQUIRE(action.node.examples[0].responses[0].body == "{\n\nHello\n}\n");
 }

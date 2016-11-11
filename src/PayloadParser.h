@@ -84,6 +84,7 @@ namespace snowcrash {
                     // https://github.com/apiaryio/snowcrash/commit/a7c5868e62df0048a85e2f9aeeb42c3b3e0a2f07#commitcomment-7322085
                     pd.sectionsContext.push_back(BodySectionType);
                     CodeBlockUtility::signatureContentAsCodeBlock(node, pd, out.report, out.node.body);
+                    TwoNewLines(out.node.body);
                     pd.sectionsContext.pop_back();
 
                     if (pd.exportSourceMap() && !out.node.body.empty()) {

@@ -86,3 +86,29 @@ TEST_CASE("Retrieve escaped string")
     REQUIRE(RetrieveEscaped(subject, 4) == "");
     REQUIRE(subject == "site_admin");
 }
+
+TEST_CASE("Add two new lines", "[utility]")
+{
+    std::string s1 = "abc";
+    std::string s2 = "abc\n";
+    std::string s3 = "abc\n\n";
+    REQUIRE(TwoNewLines(s1) == "abc\n\n");
+    REQUIRE(TwoNewLines(s2) == "abc\n\n");
+    REQUIRE(TwoNewLines(s3) == "abc\n\n");
+}
+
+TEST_CASE("Get trim info", "[utility]")
+{
+    TrimRange range; 
+    std::string s;
+
+    s = "abc";
+    range = GetTrimInfo(s.begin(), s.end());
+    REQUIRE(std::get<0>(range) == 0);
+    REQUIRE(std::get<1>(range) == 3);
+
+    s = "   abc ";
+    range = GetTrimInfo(s.begin(), s.end());
+    REQUIRE(std::get<0>(range) == 3);
+    REQUIRE(std::get<1>(range) == 3);
+}

@@ -60,7 +60,7 @@ TEST_CASE("Parse canonical resource group", "[resource_group]")
     REQUIRE(resourceGroup.node.content.elements().size() == 2);
 
     REQUIRE(resourceGroup.node.content.elements().at(0).element == Element::CopyElement);
-    REQUIRE(resourceGroup.node.content.elements().at(0).content.copy == "Fiber Optics\n\n");
+    REQUIRE(resourceGroup.node.content.elements().at(0).content.copy == "Fiber Optics");
 
     REQUIRE(resourceGroup.node.content.elements().at(1).element == Element::ResourceElement);
     REQUIRE(resourceGroup.node.content.elements().at(1).content.resource.uriTemplate == "/resource/{id}");
@@ -92,7 +92,7 @@ TEST_CASE("Parse resource group with empty resource", "[resource_group]")
     REQUIRE(resourceGroup.node.content.elements().size() == 2);
 
     REQUIRE(resourceGroup.node.content.elements().at(0).element == Element::CopyElement);
-    REQUIRE(resourceGroup.node.content.elements().at(0).content.copy == "p1\n");
+    REQUIRE(resourceGroup.node.content.elements().at(0).content.copy == "p1");
 
     REQUIRE(resourceGroup.node.content.elements().at(1).element == Element::ResourceElement);
     REQUIRE(resourceGroup.node.content.elements().at(1).content.resource.uriTemplate == "/resource");
@@ -126,11 +126,11 @@ TEST_CASE("Parse multiple resource in anonymous group", "[resource_group]")
 
     REQUIRE(resourceGroup.node.content.elements().at(0).element == Element::ResourceElement);
     REQUIRE(resourceGroup.node.content.elements().at(0).content.resource.uriTemplate == "/r1");
-    REQUIRE(resourceGroup.node.content.elements().at(0).content.resource.description == "p1\n");
+    REQUIRE(resourceGroup.node.content.elements().at(0).content.resource.description == "p1");
 
     REQUIRE(resourceGroup.node.content.elements().at(1).element == Element::ResourceElement);
     REQUIRE(resourceGroup.node.content.elements().at(1).content.resource.uriTemplate == "/r2");
-    REQUIRE(resourceGroup.node.content.elements().at(1).content.resource.description == "p2\n");
+    REQUIRE(resourceGroup.node.content.elements().at(1).content.resource.description == "p2");
 
     REQUIRE(resourceGroup.sourceMap.attributes.name.sourceMap.empty());
     REQUIRE(resourceGroup.sourceMap.content.elements().collection.size() == 2);
@@ -272,7 +272,7 @@ TEST_CASE("Parse resource groups with hr in description", "[resource_group]")
     REQUIRE(resourceGroup.node.element == Element::CategoryElement);
     REQUIRE(resourceGroup.node.content.elements().size() == 1);
     REQUIRE(resourceGroup.node.content.elements().at(0).element == Element::CopyElement);
-    REQUIRE(resourceGroup.node.content.elements().at(0).content.copy == "---\n\nA\n");
+    REQUIRE(resourceGroup.node.content.elements().at(0).content.copy == "---\n\nA");
 
     SourceMapHelper::check(resourceGroup.sourceMap.attributes.name.sourceMap, 0, 10);
     SourceMapHelper::check(resourceGroup.sourceMap.content.elements().collection[0].content.copy.sourceMap, 10, 6);
@@ -454,7 +454,7 @@ TEST_CASE("Too eager complete action processing", "[resource_group][regression][
     REQUIRE(resourceGroup.node.element == Element::CategoryElement);
     REQUIRE(resourceGroup.node.content.elements().size() == 1);
     REQUIRE(resourceGroup.node.content.elements().at(0).element == Element::CopyElement);
-    REQUIRE(resourceGroup.node.content.elements().at(0).content.copy == "```\nGET /A\n```\n\nLorem Ipsum\n");
+    REQUIRE(resourceGroup.node.content.elements().at(0).content.copy == "```\nGET /A\n```\n\nLorem Ipsum");
 
     SourceMapHelper::check(resourceGroup.sourceMap.content.elements().collection[0].content.copy.sourceMap, 11, 28);
 }

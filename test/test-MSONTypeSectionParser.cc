@@ -100,7 +100,7 @@ TEST_CASE("Parse canonical mson sample list type section", "[mson][type_section]
     REQUIRE(typeSection.node.content.description.empty());
     REQUIRE(typeSection.node.content.elements().empty());
 
-    SourceMapHelper::check(typeSection.sourceMap.value.sourceMap, 0, 13);
+    SourceMapHelper::check(typeSection.sourceMap.value.sourceMap, 2, 10);
     REQUIRE(typeSection.sourceMap.description.sourceMap.empty());
     REQUIRE(typeSection.sourceMap.elements().collection.empty());
 }
@@ -131,8 +131,8 @@ TEST_CASE("Parse array mson sample list type section", "[mson][type_section]")
     REQUIRE(typeSection.sourceMap.value.sourceMap.empty());
     REQUIRE(typeSection.sourceMap.description.sourceMap.empty());
     REQUIRE(typeSection.sourceMap.elements().collection.size() == 2);
-    SourceMapHelper::check(typeSection.sourceMap.elements().collection[0].value.valueDefinition.sourceMap, 0, 18);
-    SourceMapHelper::check(typeSection.sourceMap.elements().collection[1].value.valueDefinition.sourceMap, 0, 18);
+    SourceMapHelper::check(typeSection.sourceMap.elements().collection[0].value.valueDefinition.sourceMap, 2, 15);
+    SourceMapHelper::check(typeSection.sourceMap.elements().collection[1].value.valueDefinition.sourceMap, 2, 15);
 }
 
 TEST_CASE("Parse mson sample list type section for a string but having values", "[mson][type_section]")
@@ -152,7 +152,7 @@ TEST_CASE("Parse mson sample list type section for a string but having values", 
     REQUIRE(typeSection.node.content.description.empty());
     REQUIRE(typeSection.node.content.elements().empty());
 
-    SourceMapHelper::check(typeSection.sourceMap.value.sourceMap, 0, 18);
+    SourceMapHelper::check(typeSection.sourceMap.value.sourceMap, 2, 15);
     REQUIRE(typeSection.sourceMap.description.sourceMap.empty());
     REQUIRE(typeSection.sourceMap.elements().collection.empty());
 }
@@ -517,8 +517,8 @@ TEST_CASE("Parse mson sample type section for a simple object", "[mson][type_sec
     SourceMapHelper::check(memberSM.property.valueDefinition.sourceMap, 39, 20);
 
     memberSM = typeSection.sourceMap.elements().collection[0].property.sections.collection[0].elements().collection[1];
-    SourceMapHelper::check(memberSM.property.name.sourceMap, 67, 15);
-    SourceMapHelper::check(memberSM.property.valueDefinition.sourceMap, 67, 15);
+    SourceMapHelper::check(memberSM.property.name.sourceMap, 69, 12);
+    SourceMapHelper::check(memberSM.property.valueDefinition.sourceMap, 69, 12);
 }
 
 TEST_CASE("Parse mson sample type section for a complex object", "[mson][type_section]")
@@ -616,7 +616,7 @@ TEST_CASE("Parse mson sample type section for a complex object", "[mson][type_se
     REQUIRE(submemberSM.value.sections.collection[0].elements().collection.size() == 1);
 
     memberSM = submemberSM.value.sections.collection[0].elements().collection[0];
-    SourceMapHelper::check(memberSM.property.name.sourceMap, 134, 15);
-    SourceMapHelper::check(memberSM.property.valueDefinition.sourceMap, 134, 15);
+    SourceMapHelper::check(memberSM.property.name.sourceMap, 136, 12);
+    SourceMapHelper::check(memberSM.property.valueDefinition.sourceMap, 136, 12);
     REQUIRE(memberSM.property.sections.collection.empty());
 }

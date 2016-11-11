@@ -47,7 +47,7 @@ TEST_CASE("Parse canonical parameters", "[parameters]")
 
     REQUIRE(parameters.node.size() == 2);
     REQUIRE(parameters.node[0].name == "id");
-    REQUIRE(parameters.node[0].description == "Lorem ipsum\n");
+    REQUIRE(parameters.node[0].description == "Lorem ipsum");
     REQUIRE(parameters.node[1].name == "name");
     REQUIRE(parameters.node[1].description.empty());
 
@@ -217,7 +217,7 @@ TEST_CASE("Recognize parameter when there is no description on its signature and
     Parameter parameter = parameters.node[1];
     REQUIRE(parameter.name == "state");
     REQUIRE(parameter.type == "string");
-    REQUIRE(parameter.description == "\nThe desired state of the panoramic roof. The approximate percent open values for each state are `open` = 100%, `close` = 0%, `comfort` = 80%, and `vent` = ~15%\n\n");
+    REQUIRE(parameter.description == "The desired state of the panoramic roof. The approximate percent open values for each state are `open` = 100%, `close` = 0%, `comfort` = 80%, and `vent` = ~15%");
     REQUIRE(parameter.values.size() == 4);
     REQUIRE(parameter.values[0] == "open");
     REQUIRE(parameter.values[1] == "close");

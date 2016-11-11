@@ -154,6 +154,7 @@ namespace snowcrash {
                 out.sourceMap.description.sourceMap.append(node->sourceMap);
             }
 
+            TrimString(content);
             out.node.description += content;
 
             return ++MarkdownNodeIterator(node);

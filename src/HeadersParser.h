@@ -120,7 +120,12 @@ namespace snowcrash {
             mdp::ByteBuffer content;
             CodeBlockUtility::signatureContentAsCodeBlock(node, pd, out.report, content);
 
-            headersFromContent(node, content, pd, out);
+            // drop first line (it contain " + Headers")
+            // we need just "content"
+            mdp::BytesRangeSet::const_iterator begin = node->sourceMap.begin();
+            begin++;
+
+            headersFromContent(node, begin, node->sourceMap.end(), pd, out);
 
             return ++MarkdownNodeIterator(node);
         }
@@ -135,7 +140,7 @@ namespace snowcrash {
             mdp::ByteBuffer content;
             CodeBlockUtility::contentAsCodeBlock(node, pd, out.report, content);
 
-            headersFromContent(node, content, pd, out);
+            headersFromContent(node, node->sourceMap.begin(), node->sourceMap.end(), pd, out);
 
             return ++MarkdownNodeIterator(node);
         }
@@ -201,11 +206,11 @@ namespace snowcrash {
             bool matched = RegexCapture(line, re, parts, 5);
 
             if (!matched) {
-		// WARN: unable to parse header
-		out.report.warnings.push_back(
-		    Warning("unable to parse HTTP header, expected '<header name> : <header value>', one header per line", FormattingWarning, sourceMap));
-		return false;
-	    }
+                // WARN: unable to parse header
+                out.report.warnings.push_back(
+                    Warning("unable to parse HTTP header, expected '<header name> : <header value>', one header per line", FormattingWarning, sourceMap));
+                return false;
+            }
 
             header = std::make_pair(parts[1], parts[4]);
             TrimString(header.second);
@@ -215,6 +220,7 @@ namespace snowcrash {
             if (!validate(HeaderNameTokenChecker(header.first))) {
                 return false;
             }
+            
             validate(ColonPresentedChecker(parts));
             validate(HeadersDuplicateChecker(header, out.node));
             validate(HeaderValuePresentedChecker(header));
@@ -224,33 +230,46 @@ namespace snowcrash {
 
         /** Retrieve headers from content */
         static void headersFromContent(const MarkdownNodeIterator& node,
-                                       const mdp::ByteBuffer& content,
+                                       mdp::BytesRangeSet::const_iterator from,
+                                       mdp::BytesRangeSet::const_iterator to,
                                        const SectionParserData& pd,
                                        const ParseResultRef<Headers>& out) {
 
-            std::vector<std::string> lines = Split(content, '\n');
 
-            for (std::vector<std::string>::iterator line = lines.begin();
-                 line != lines.end();
-                 ++line) {
+            for (mdp::BytesRangeSet::const_iterator it = from ; it != to ; ++it) {
 
-                if (TrimString(*line).empty()) {
+                mdp::BytesRange map(*it);
+
+                TrimRange trim = GetTrimInfo(pd.sourceData.begin() + map.location, pd.sourceData.begin() + map.location + map.length);
+
+                int length = std::get<1>(trim);
+
+                if (length <= 0) {
                     continue;
                 }
 
-                Header header;
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                map.location += std::get<0>(trim);
+                map.length = length;
 
-                if (parseHeaderLine(*line, header, out, sourceMap)) {
+                std::string line = pd.sourceData.substr(map.location, map.length);
+
+                Header header;
+
+                mdp::BytesRangeSet byteMap;
+                byteMap.push_back(map);
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(byteMap, pd.sourceCharacterIndex);
+
+                if (parseHeaderLine(line, header, out, sourceMap)) {
                     out.node.push_back(header);
 
                     if (pd.exportSourceMap()) {
                         SourceMap<Header> headerSM;
-                        headerSM.sourceMap = node->sourceMap;
+                        headerSM.sourceMap = sourceMap;
                         out.sourceMap.collection.push_back(headerSM);
                     }
                 }
             }
+
         }
 
         /** Inject headers into transaction examples requests and responses */

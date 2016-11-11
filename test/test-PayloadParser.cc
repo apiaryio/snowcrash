@@ -91,7 +91,7 @@ TEST_CASE("Parse request payload", "[payload]")
     CHECK(payload.report.warnings.empty());
 
     REQUIRE(payload.node.name == "Hello World");
-    REQUIRE(payload.node.description == "Description\n");
+    REQUIRE(payload.node.description == "Description");
     REQUIRE(payload.node.parameters.empty());
     REQUIRE(payload.node.headers.size() == 2);
     REQUIRE(payload.node.headers[0].first == "Content-Type");
@@ -106,7 +106,7 @@ TEST_CASE("Parse request payload", "[payload]")
     REQUIRE(payload.sourceMap.parameters.collection.empty());
     REQUIRE(payload.sourceMap.headers.collection.size() == 2);
     SourceMapHelper::check(payload.sourceMap.headers.collection[0].sourceMap, 2, 34);
-    SourceMapHelper::check(payload.sourceMap.headers.collection[1].sourceMap, 74, 17);
+    SourceMapHelper::check(payload.sourceMap.headers.collection[1].sourceMap, 78, 12);
     SourceMapHelper::check(payload.sourceMap.body.sourceMap, 112, 9);
     SourceMapHelper::check(payload.sourceMap.schema.sourceMap, 144, 11);
 }
@@ -185,7 +185,7 @@ TEST_CASE("Parse payload description with list", "[payload]")
     CHECK(payload.report.warnings.empty());
 
     REQUIRE(payload.node.name.empty());
-    REQUIRE(payload.node.description == "+ B\n");
+    REQUIRE(payload.node.description == "+ B");
     REQUIRE(payload.node.parameters.empty());
     REQUIRE(payload.node.headers.empty());
     REQUIRE(payload.node.body == "{}\n");
@@ -457,7 +457,7 @@ TEST_CASE("Warn on malformed payload signature", "[payload]")
     REQUIRE(payload.report.warnings[0].code == FormattingWarning);
 
     REQUIRE(payload.node.name.empty());
-    REQUIRE(payload.node.description == "Description\n\nLine 2\n");
+    REQUIRE(payload.node.description == "Description\n\nLine 2");
     REQUIRE(payload.node.parameters.empty());
     REQUIRE(payload.node.headers.empty());
     REQUIRE(payload.node.body == "Hello World!\n");
@@ -658,7 +658,7 @@ TEST_CASE("Values section should be taken as a description node", "[payload]")
     REQUIRE(payload.report.error.code == Error::OK);
     REQUIRE(payload.report.warnings.empty());
 
-    REQUIRE(payload.node.description == "+ Values\n\n    + id\n");
+    REQUIRE(payload.node.description == "+ Values\n\n    + id");
     REQUIRE(payload.node.body == "{}\n");
 
     SourceMapHelper::check(payload.sourceMap.description.sourceMap, 20, 10, 34, 9);
