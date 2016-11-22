@@ -21,6 +21,21 @@ namespace snowcrash {
     template<>
     struct SectionProcessor<mson::PropertyMember> : public SignatureSectionProcessorBase<mson::PropertyMember> {
 
+        static Signature parseSignature(const MarkdownNodeIterator& node,
+                                        snowcrash::SectionParserData& pd,
+                                        const SignatureTraits& traits,
+                                        snowcrash::Report& report,
+                                        const mdp::ByteBuffer& subjectOrig = "") {
+
+            std::string subject = subjectOrig;
+
+            if (node->type == mdp::HeaderMarkdownNodeType) {
+                subject = ReconstructMarkdownHeader(*node);
+            }
+
+            return SignatureSectionProcessorBase<mson::PropertyMember>::parseSignature(node, pd, traits, report, subject);
+        }
+
         static SignatureTraits signatureTraits() {
 
             SignatureTraits signatureTraits(SignatureTraits::IdentifierTrait |

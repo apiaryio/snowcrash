@@ -190,7 +190,13 @@ namespace snowcrash {
                 throw Error("expected list item block, e.g. '+ <text>'", BusinessError, sourceMap);
             }
 
-            return seed->children().begin();
+            for (auto it = seed->children().begin() ; it != seed->children().end() ; ++it) {
+                if (it->sourceMap.begin()->length != 0) {
+                    return it;
+                }
+            }
+
+            return seed->children().end();
         }
 
         static const MarkdownNodes& startingNodeSiblings(const MarkdownNodeIterator& seed,

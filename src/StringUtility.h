@@ -299,6 +299,25 @@ namespace snowcrash {
 
         return linkedString;
     }
+
+    inline std::string ReconstructMarkdownHeader(const mdp::MarkdownNode& node) {
+        std::string subject;
+
+        // we are not able to reconstruct correctly headers
+        // there is missing info about spacing on both sides
+        // node.sourceMap - contain length, but we dont now count of space on both sides
+        // it we are not able to distinguis between "a  ", " a " and "  a".
+        //
+        // Solution - we strictly strip whitespace
+
+        if (node.type == mdp::HeaderMarkdownNodeType) {
+            subject.reserve(node.text.length() + node.data -1);
+            subject.append(node.data, '#');
+            subject.append(node.text);
+        }
+
+        return subject;
+    }
 }
 
 #endif
