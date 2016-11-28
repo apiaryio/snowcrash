@@ -1,6 +1,6 @@
 [submodule "test/vendor/Catch"]
 	path = test/vendor/Catch
-	url = git://github.com/philsquared/Catch.git
+	url = https://github.com/philsquared/Catch.git
 [submodule "ext/markdown-parser"]
 	path = ext/markdown-parser
-	url = git://github.com/apiaryio/markdown-parser.git
+	url = https://github.com/apiaryio/markdown-parser.git
