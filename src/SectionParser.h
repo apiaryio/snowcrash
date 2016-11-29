@@ -196,7 +196,8 @@ namespace snowcrash {
                 }
             }
 
-            return seed->children().end();
+            // there are no parseable items, let it pass in old manner
+            return seed->children().begin(); 
         }
 
         static const MarkdownNodes& startingNodeSiblings(const MarkdownNodeIterator& seed,
