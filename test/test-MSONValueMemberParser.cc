@@ -247,3 +247,13 @@ TEST_CASE("Check warnings for object with defined value", "[mson][value_member]"
     REQUIRE(valueMember.report.warnings.size() == 1);
 
 }
+
+TEST_CASE("Parse undisclosed item list", "[mson][value_member]")
+{
+    mdp::ByteBuffer source = \
+    "- item\n"\
+    "    -\n";
+
+    ParseResult<mson::ValueMember> valueMember;
+    REQUIRE_NOTHROW( (SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(source, MSONValueMemberSectionType, valueMember, ExportSourcemapOption)) );
+}
