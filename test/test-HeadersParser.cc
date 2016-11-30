@@ -444,3 +444,22 @@ TEST_CASE("Parse headers with in the middle codefences", "[headers][codefence]")
     REQUIRE(headers.node[1].first == "```");
     REQUIRE(headers.node[1].second.empty());
 }
+
+TEST_CASE("Parse headers in codefences with hint", "[headers][codefence]")
+{
+    const mdp::ByteBuffer source = \
+    "+ Headers\n"\
+    "    ```html\n"\
+    "    Set-Cookie: abcd\n"\
+    "    ```\n";
+
+    ParseResult<Headers> headers;
+    SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
+
+    REQUIRE(headers.report.error.code == Error::OK);
+    REQUIRE(headers.report.warnings.empty()); 
+
+    REQUIRE(headers.node.size() == 1);
+    REQUIRE(headers.node[0].first == "Set-Cookie");
+    REQUIRE(headers.node[0].second == "abcd");
+}
