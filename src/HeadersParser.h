@@ -16,6 +16,8 @@
 #include "BlueprintUtility.h"
 #include "RegexMatch.h"
 
+#include <string.h>
+
 namespace snowcrash {
 
     /** Headers matching regex */
@@ -228,6 +230,33 @@ namespace snowcrash {
             return !header.first.empty();
         }
 
+        static bool fetchLine(const std::string& input,
+                              mdp::BytesRange& map,
+                              std::string& line) {
+
+            if (input.length() < (map.location + map.length)) {
+                return false;
+            }
+
+            TrimRange trim = GetTrimInfo(input.begin() + map.location, input.begin() + map.location + map.length);
+
+            map.length = std::get<1>(trim);
+
+            if (map.length <= 0) {
+                return false;
+            }
+
+            map.location += std::get<0>(trim);
+
+            line = input.substr(map.location, map.length);
+
+            return true;
+        }
+
+        static bool isCodeFence(const std::string& line) {
+            return (!memcmp(line.c_str(), "```", 3) || !memcmp(line.c_str(), "~~~", 3));
+        }
+
         /** Retrieve headers from content */
         static void headersFromContent(const MarkdownNodeIterator& node,
                                        mdp::BytesRangeSet::const_iterator from,
@@ -235,23 +264,30 @@ namespace snowcrash {
                                        const SectionParserData& pd,
                                        const ParseResultRef<Headers>& out) {
 
+            mdp::BytesRange map(*from);
+            std::string line;
 
-            for (mdp::BytesRangeSet::const_iterator it = from ; it != to ; ++it) {
+            fetchLine(pd.sourceData, map, line);
+
+            bool inCodeFence = isCodeFence(line);
+
+            if (inCodeFence) {
+                from++;
+            }
+
+
+            for (mdp::BytesRangeSet::const_iterator it = from ; it != to ; it++) {
 
                 mdp::BytesRange map(*it);
+                std::string line;
 
-                TrimRange trim = GetTrimInfo(pd.sourceData.begin() + map.location, pd.sourceData.begin() + map.location + map.length);
-
-                int length = std::get<1>(trim);
-
-                if (length <= 0) {
+                if (!fetchLine(pd.sourceData, map, line)) {
                     continue;
                 }
 
-                map.location += std::get<0>(trim);
-                map.length = length;
-
-                std::string line = pd.sourceData.substr(map.location, map.length);
+                if (inCodeFence && isCodeFence(line)) {
+                    continue;
+                }
 
                 Header header;
 
