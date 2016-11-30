@@ -402,3 +402,45 @@ TEST_CASE("Skip completely invalid headers", "[headers][drafter-issue][382]") {
     }
 }
 
+TEST_CASE("Parse headers in codefences", "[headers][codefence]")
+{
+    const mdp::ByteBuffer source = \
+    "+ Headers\n"\
+    "    ```\n"\
+    "    Set-Cookie: abcd\n"\
+    "    ```\n";
+
+    ParseResult<Headers> headers;
+    SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
+
+    REQUIRE(headers.report.error.code == Error::OK);
+    REQUIRE(headers.report.warnings.empty()); 
+
+    REQUIRE(headers.node.size() == 1);
+    REQUIRE(headers.node[0].first == "Set-Cookie");
+    REQUIRE(headers.node[0].second == "abcd");
+}
+
+TEST_CASE("Parse headers with in the middle codefences", "[headers][codefence]")
+{
+    const mdp::ByteBuffer source = \
+    "+ Headers\n"\
+    "        \n"\
+    "        a: b\n"\
+    "        ```\n"\
+    "        \n";
+
+    ParseResult<Headers> headers;
+    SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
+
+    REQUIRE(headers.report.error.code == Error::OK);
+    REQUIRE(headers.report.warnings.size() == 2); 
+
+    REQUIRE(headers.node.size() == 2);
+
+    REQUIRE(headers.node[0].first == "a");
+    REQUIRE(headers.node[0].second == "b");
+
+    REQUIRE(headers.node[1].first == "```");
+    REQUIRE(headers.node[1].second.empty());
+}
