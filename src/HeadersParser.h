@@ -264,17 +264,7 @@ namespace snowcrash {
                                        const SectionParserData& pd,
                                        const ParseResultRef<Headers>& out) {
 
-            mdp::BytesRange map(*from);
-            std::string line;
-
-            fetchLine(pd.sourceData, map, line);
-
-            bool inCodeFence = isCodeFence(line);
-
-            if (inCodeFence) {
-                from++;
-            }
-
+            bool inCodeFence = false;
 
             for (mdp::BytesRangeSet::const_iterator it = from ; it != to ; it++) {
 
@@ -284,6 +274,10 @@ namespace snowcrash {
                 if (!fetchLine(pd.sourceData, map, line)) {
                     continue;
                 }
+
+                if (it == from) {
+                    inCodeFence = isCodeFence(line);
+                };
 
                 if (inCodeFence && isCodeFence(line)) {
                     continue;
