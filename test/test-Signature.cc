@@ -53,7 +53,7 @@ TEST_CASE("Escaped property signature parsing", "[signature]")
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
 
-    REQUIRE(signature.identifier == "*id*(data):3");
+    REQUIRE(signature.identifier == "`*id*(data):3`");
     REQUIRE(signature.value == "42");
     REQUIRE(signature.values.size() == 1);
     REQUIRE(signature.values[0] == "`42`");
@@ -138,7 +138,7 @@ TEST_CASE("Identifier enclosed by backticks", "[signature]")
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
 
-    REQUIRE(signature.identifier == "username `is` g``ood");
+    REQUIRE(signature.identifier == "```username `is` g``ood```");
     REQUIRE(signature.value.empty());
     REQUIRE(signature.values.empty());
     REQUIRE(signature.attributes.size() == 1);
@@ -172,7 +172,7 @@ TEST_CASE("Extra space content after identifier enclosure", "[signature]")
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
 
-    REQUIRE(signature.identifier == "a");
+    REQUIRE(signature.identifier == "`a`");
     REQUIRE(signature.value == "42");
     REQUIRE(signature.values.size() == 1);
     REQUIRE(signature.values[0] == "42");
