@@ -219,7 +219,7 @@ namespace scpl {
             snowcrash::TrimString(identifier);
 
             if (!identifier.empty()) {
-                out.identifier = snowcrash::StripBackticks(identifier);
+                out.identifier = identifier;
             }
 
             // If the subject ended with the identifier, strip it from the subject

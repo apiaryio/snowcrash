@@ -478,7 +478,7 @@ namespace mson {
             parseTypeDefinition(node, pd, signature.attributes, report, propertyName.variable.typeDefinition);
         }
         else {
-            propertyName.literal = subject;
+            propertyName.literal = snowcrash::StripBackticks(buffer);
         }
     }
 
