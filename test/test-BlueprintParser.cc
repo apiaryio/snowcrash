@@ -1374,3 +1374,58 @@ TEST_CASE("Report error when not finding a super type of the attributes", "[blue
     REQUIRE(blueprint.report.error.message == "base type 'A' is not defined in the document");
     REQUIRE(blueprint.report.warnings.empty());
 }
+
+TEST_CASE("Parse blueprint with escaped datastructure", "[blueprint]")
+{
+    mdp::ByteBuffer source = \
+    "# Data Structures\n"\
+    "## `Test`\n"\
+    "- name - test name\n"\
+    "\n"\
+    "# GET /\n"\
+     "+ Response 200 (application/json)\n"\
+     "    + Attributes(Test)\n";
+
+
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
+
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.size() == 0);
+
+    REQUIRE(blueprint.node.content.elements().size() == 2);
+    REQUIRE(blueprint.node.content.elements().at(1).element == Element::CategoryElement);
+    REQUIRE(blueprint.node.content.elements().at(1).content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(0).element == Element::ResourceElement);
+    REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(0).content.resource.attributes.empty());
+    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 1);
+}
+
+
+TEST_CASE("Parse blueprint with escaped datastructure reference", "[blueprint]")
+{
+    mdp::ByteBuffer source = \
+    "# Data Structures\n"\
+    "## Test\n"\
+    "- name - test name\n"\
+    "\n"\
+    "# GET /\n"\
+     "+ Response 200 (application/json)\n"\
+     "    + Attributes(`Test`)\n";
+
+
+    ParseResult<Blueprint> blueprint;
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
+
+    REQUIRE(blueprint.report.error.code == Error::OK);
+    REQUIRE(blueprint.report.warnings.size() == 0);
+
+    REQUIRE(blueprint.node.content.elements().size() == 2);
+    REQUIRE(blueprint.node.content.elements().at(1).element == Element::CategoryElement);
+    REQUIRE(blueprint.node.content.elements().at(1).content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(0).element == Element::ResourceElement);
+    REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(0).content.resource.attributes.empty());
+    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
+    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 1);
+}
