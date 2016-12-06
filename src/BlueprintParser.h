@@ -219,9 +219,9 @@ namespace snowcrash {
                 if (sectionType == UndefinedSectionType) {
                     checkForPossibleSectionMistakes(cur, pd, out.report);
                 }
-                
+
                 cur++;
-                
+
             }
 
             // Resolve all named type base table entries
@@ -229,7 +229,7 @@ namespace snowcrash {
         }
 
         static void checkForPossibleSectionMistakes(const MarkdownNodeIterator& node, SectionParserData& pd, Report& report) {
-            
+
             SectionProcessor<Action>::checkForTypoMistake(node, pd, report);
         }
 
@@ -338,7 +338,7 @@ namespace snowcrash {
                 identifier = name;
             }
             else {
-                identifier = signature.identifier;
+                identifier = StripBackticks(signature.identifier);
             }
 
             // If named type already exists, return error
