@@ -623,19 +623,16 @@ TEST_CASE("Overshadow parameters", "[parser][201][regression][parameters]")
 
     Resource resource = blueprint.node.content.elements().at(0).content.elements().at(0).content.resource;
     REQUIRE(resource.actions.size() == 1);
-    REQUIRE(resource.actions[0].parameters.size() == 4);
+    REQUIRE(resource.actions[0].parameters.size() == 3);
 
-    REQUIRE(resource.actions[0].parameters[0].name == "a");
-    REQUIRE(resource.actions[0].parameters[0].description == "1");
+    REQUIRE(resource.actions[0].parameters[0].name == "b");
+    REQUIRE(resource.actions[0].parameters[0].description == "2");
 
-    REQUIRE(resource.actions[0].parameters[1].name == "b");
-    REQUIRE(resource.actions[0].parameters[1].description == "2");
+    REQUIRE(resource.actions[0].parameters[1].name == "c");
+    REQUIRE(resource.actions[0].parameters[1].description == "3");
 
-    REQUIRE(resource.actions[0].parameters[2].name == "c");
-    REQUIRE(resource.actions[0].parameters[2].description == "3");
-
-    REQUIRE(resource.actions[0].parameters[3].name == "a");
-    REQUIRE(resource.actions[0].parameters[3].description == "4");
+    REQUIRE(resource.actions[0].parameters[2].name == "a");
+    REQUIRE(resource.actions[0].parameters[2].description == "4");
 }
 
 TEST_CASE("Segfault parsing metadata only", "[parser][205][regression]")
