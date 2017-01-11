@@ -181,3 +181,23 @@ TEST_CASE("Parentheses in parameter description with new syntax", "[parameter]")
     REQUIRE(parameter.node.type == "string");
     REQUIRE(parameter.node.description == "lorem (ipsum) dolor");
 }
+
+TEST_CASE("Parse parameter including backtics for escaping, issue drafter#445", "[mson_parameter]")
+{
+    mdp::ByteBuffer source = \
+    "+ `start_time`: `recorded_at` (enum[string], optional)\n"\
+    "\n"\
+    "    + Members\n"\
+    "        + `recorded_at`\n"\
+    "        + `created_at`";
+
+
+    ParseResult<MSONParameter> parameter;
+    SectionParserHelper<MSONParameter, MSONParameterParser>::parse(source, MSONParameterSectionType, parameter);
+
+    REQUIRE(parameter.report.error.code == Error::OK);
+    REQUIRE(parameter.report.warnings.empty());
+
+    REQUIRE(parameter.node.name == "start_time");
+    REQUIRE(parameter.node.exampleValue == "recorded_at");
+}
