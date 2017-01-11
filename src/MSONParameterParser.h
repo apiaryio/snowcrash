@@ -38,7 +38,7 @@ namespace snowcrash {
                                                       const Signature& signature,
                                                       const ParseResultRef<MSONParameter>& out) {
 
-            out.node.name = signature.identifier;
+            out.node.name = StripBackticks(const_cast<std::string&>(signature.identifier));
             out.node.description = signature.content;
             out.node.exampleValue = signature.value;
 
