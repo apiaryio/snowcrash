@@ -174,17 +174,13 @@ TEST_CASE("Warn about multiple parameters with the same name", "[parameters]")
     REQUIRE(parameters.report.warnings.size() == 1);
     REQUIRE(parameters.report.warnings[0].code == RedefinitionWarning);
 
-    REQUIRE(parameters.node.size() == 2);
+    REQUIRE(parameters.node.size() == 1);
 
     REQUIRE(parameters.node[0].name == "id");
-    REQUIRE(parameters.node[0].exampleValue == "42");
+    REQUIRE(parameters.node[0].exampleValue == "43");
 
-    REQUIRE(parameters.node[1].name == "id");
-    REQUIRE(parameters.node[1].exampleValue == "43");
-
-    REQUIRE(parameters.sourceMap.collection.size() == 2);
-    SourceMapHelper::check(parameters.sourceMap.collection[0].name.sourceMap, 19, 10);
-    SourceMapHelper::check(parameters.sourceMap.collection[1].name.sourceMap, 35, 10);
+    REQUIRE(parameters.sourceMap.collection.size() == 1);
+    SourceMapHelper::check(parameters.sourceMap.collection[0].name.sourceMap, 35, 10);
 }
 
 TEST_CASE("Recognize parameter when there is no description on its signature and remaining description is not a new node", "[parameters]")

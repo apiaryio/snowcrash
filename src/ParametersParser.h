@@ -89,6 +89,7 @@ namespace snowcrash {
                 ParameterIterator duplicate = findParameter(out.node, parameter.node);
 
                 if (duplicate != out.node.end()) {
+                    removeParameter(duplicate, pd, out);
 
                     // WARN: Parameter already defined
                     std::stringstream ss;
@@ -154,6 +155,18 @@ namespace snowcrash {
             return std::find_if(parameters.begin(),
                                 parameters.end(),
                                 std::bind2nd(MatchName<Parameter>(), parameter));
+        }
+
+        static void removeParameter(ParameterIterator &parameter,
+                                    SectionParserData &pd,
+                                    const ParseResultRef<Parameters>& out) {
+
+            out.node.erase(parameter);
+
+            if (pd.exportSourceMap()) {
+                size_t parameterIndex = parameter - out.node.begin();
+                out.sourceMap.collection.erase(out.sourceMap.collection.begin() + parameterIndex);
+            }
         }
     };
 
