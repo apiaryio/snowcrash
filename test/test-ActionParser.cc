@@ -105,6 +105,22 @@ TEST_CASE("Parse named action with path including () in title", "[action]")
     REQUIRE(action.node.uriTemplate == "/test");
 }
 
+TEST_CASE("Parse named action with [] in title", "[action]")
+{
+    mdp::ByteBuffer source = \
+    "# My Action [DEPRECATED] [GET]\n"\
+    "+ Response 204\n";
+
+    ParseResult<Action> action;
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action, ExportSourcemapOption);
+
+    REQUIRE(action.report.error.code == Error::OK);
+    CHECK(action.report.warnings.empty());
+
+    REQUIRE(action.node.name == "My Action [DEPRECATED]");
+    REQUIRE(action.node.method == "GET");
+}
+
 TEST_CASE("Parse Action description with list", "[action]")
 {
     mdp::ByteBuffer source = \

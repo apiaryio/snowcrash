@@ -16,8 +16,7 @@
 #include "RelationParser.h"
 #include "RegexMatch.h"
 
-// Similiar to SYMBOL_IDENTIFIER, except `(` and `)` are allowed
-#define ACTION_SYMBOL_IDENTIFIER "([^][]+)"
+#define ACTION_SYMBOL_IDENTIFIER "(.+)"
 
 namespace snowcrash {
 
