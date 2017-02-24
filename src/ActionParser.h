@@ -16,16 +16,19 @@
 #include "RelationParser.h"
 #include "RegexMatch.h"
 
+// Similiar to SYMBOL_IDENTIFIER, except `(` and `)` are allowed
+#define ACTION_SYMBOL_IDENTIFIER "([^][]+)"
+
 namespace snowcrash {
 
     /** Nameless action matching regex */
     const char* const ActionHeaderRegex = "^[[:blank:]]*" HTTP_REQUEST_METHOD "[[:blank:]]*" URI_TEMPLATE "?$";
 
     /** Named action matching regex */
-    const char* const NamedActionHeaderRegex = "^[[:blank:]]*" SYMBOL_IDENTIFIER "\\[" HTTP_REQUEST_METHOD "[[:blank:]]*" URI_TEMPLATE "?]$";
+    const char* const NamedActionHeaderRegex = "^[[:blank:]]*" ACTION_SYMBOL_IDENTIFIER "\\[" HTTP_REQUEST_METHOD "[[:blank:]]*" URI_TEMPLATE "?]$";
 
     /** Miss leading slash in URI */
-    const char* const NamedActionNonAbsoluteURIRegex = "^[[:blank:]]*" SYMBOL_IDENTIFIER "\\[" HTTP_REQUEST_METHOD "[[:blank:]]+[^/]+]$";
+    const char* const NamedActionNonAbsoluteURIRegex = "^[[:blank:]]*" ACTION_SYMBOL_IDENTIFIER "\\[" HTTP_REQUEST_METHOD "[[:blank:]]+[^/]+]$";
 
     /** Internal type alias for Collection iterator of Action */
     typedef Collection<Action>::const_iterator ActionIterator;
