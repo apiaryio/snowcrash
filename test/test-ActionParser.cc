@@ -72,6 +72,55 @@ TEST_CASE("Parsing action", "[action]")
     SourceMapHelper::check(action.sourceMap.examples.collection[0].responses.collection[0].headers.collection[0].sourceMap, 41, 27);
 }
 
+TEST_CASE("Parse named action with () in title", "[action]")
+{
+    mdp::ByteBuffer source = \
+    "# My Action (Deprecated) [GET]\n"\
+    "+ Response 204\n";
+
+    ParseResult<Action> action;
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action, ExportSourcemapOption);
+
+    REQUIRE(action.report.error.code == Error::OK);
+    CHECK(action.report.warnings.empty());
+
+    REQUIRE(action.node.name == "My Action (Deprecated)");
+    REQUIRE(action.node.method == "GET");
+}
+
+TEST_CASE("Parse named action with path including () in title", "[action]")
+{
+    mdp::ByteBuffer source = \
+    "# My Action (Deprecated) [GET /test]\n"\
+    "+ Response 204\n";
+
+    ParseResult<Action> action;
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action, ExportSourcemapOption);
+
+    REQUIRE(action.report.error.code == Error::OK);
+    CHECK(action.report.warnings.empty());
+
+    REQUIRE(action.node.name == "My Action (Deprecated)");
+    REQUIRE(action.node.method == "GET");
+    REQUIRE(action.node.uriTemplate == "/test");
+}
+
+TEST_CASE("Parse named action with [] in title", "[action]")
+{
+    mdp::ByteBuffer source = \
+    "# My Action [DEPRECATED] [GET]\n"\
+    "+ Response 204\n";
+
+    ParseResult<Action> action;
+    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action, ExportSourcemapOption);
+
+    REQUIRE(action.report.error.code == Error::OK);
+    CHECK(action.report.warnings.empty());
+
+    REQUIRE(action.node.name == "My Action [DEPRECATED]");
+    REQUIRE(action.node.method == "GET");
+}
+
 TEST_CASE("Parse Action description with list", "[action]")
 {
     mdp::ByteBuffer source = \
