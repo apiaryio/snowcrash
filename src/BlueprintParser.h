@@ -90,6 +90,8 @@ namespace snowcrash {
                 return processDescription(cur, siblings, pd, out);
             }
 
+            pd.commonResponses.push_back(new Responses());
+
             return ++MarkdownNodeIterator(cur);
         }
 
@@ -147,6 +149,10 @@ namespace snowcrash {
                 cur = CommonDataParser::parse(node, siblings, pd, commonData);
 
                 out.node.content.elements().push_back(commonData.node);
+
+                for (auto i = commonData.node.content.responses.begin(); i != commonData.node.content.responses.end(); ++i) {
+                    pd.commonResponses.back()->push_back(*i);
+                }
 
                 if (pd.exportSourceMap()) {
                     out.sourceMap.content.elements().collection.push_back(commonData.sourceMap);
@@ -311,6 +317,9 @@ namespace snowcrash {
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                 out.report.warnings.push_back(Warning(ExpectedAPINameMessage, APINameWarning, sourceMap));
             }
+
+            delete pd.commonResponses.back();
+            pd.commonResponses.pop_back();
         }
 
         static bool isUnexpectedNode(const MarkdownNodeIterator& node,
