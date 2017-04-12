@@ -11,6 +11,7 @@
 
 #include "SectionParser.h"
 #include "ResourceParser.h"
+#include "CommonDataParser.h"
 #include "RegexMatch.h"
 
 namespace snowcrash {
@@ -199,6 +200,16 @@ namespace snowcrash {
         }
 
         static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
+
+            SectionType nestedType = UndefinedSectionType;
+
+            // Check if CommonData section
+            nestedType = SectionProcessor<CommonData>::sectionType(node);
+
+            if (nestedType != UndefinedSectionType) {
+                std::cout << "CommonData found!\n";
+                return nestedType;
+            }
 
             // Return ResourceSectionType or UndefinedSectionType
             return SectionProcessor<Resource>::sectionType(node);

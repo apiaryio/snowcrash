@@ -15,6 +15,7 @@
 #include "ResourceGroupParser.h"
 #include "DataStructureGroupParser.h"
 #include "SectionParser.h"
+#include "CommonDataParser.h"
 #include "RegexMatch.h"
 #include "CodeBlockUtility.h"
 
@@ -141,6 +142,16 @@ namespace snowcrash {
                     out.sourceMap.content.elements().collection.push_back(dataStructureGroup.sourceMap);
                 }
             }
+            else if (pd.sectionContext() == CommonDataSectionType) {
+                IntermediateParseResult<CommonData> commonData(out.report);
+                cur = CommonDataParser::parse(node, siblings, pd, commonData);
+
+                out.node.content.elements().push_back(commonData.node);
+
+                if (pd.exportSourceMap()) {
+                    out.sourceMap.content.elements().collection.push_back(commonData.sourceMap);
+                }
+            }
 
             return cur;
         }
@@ -258,6 +269,13 @@ namespace snowcrash {
 
             // Check if DataStructures section
             nestedType = SectionProcessor<DataStructureGroup>::sectionType(node);
+
+            if (nestedType != UndefinedSectionType) {
+                return nestedType;
+            }
+
+            // Check if CommonData section
+            nestedType = SectionProcessor<CommonData>::sectionType(node);
 
             if (nestedType != UndefinedSectionType) {
                 return nestedType;

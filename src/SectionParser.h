@@ -33,7 +33,6 @@ namespace snowcrash {
                                           const MarkdownNodes& siblings,
                                           SectionParserData& pd,
                                           const ParseResultRef<T>& out) {
-
             SectionLayout layout = DefaultSectionLayout;
             MarkdownNodeIterator cur = Adapter::startingNode(node, pd);
             const MarkdownNodes& collection = Adapter::startingNodeSiblings(node, siblings);
@@ -48,20 +47,19 @@ namespace snowcrash {
                 cur = parseNestedSections(cur, collection, pd, out);
 
                 SectionProcessor<T>::finalize(node, pd, out);
-
                 return Adapter::nextStartingNode(node, siblings, cur);
             }
 
             // Parser redirect layout
             if (layout == RedirectSectionLayout) {
                 SectionProcessor<T>::finalize(node, pd, out);
-
                 return Adapter::nextStartingNode(node, siblings, cur);
             }
 
             // Default layout
-            if (lastCur == cur)
+            if (lastCur == cur) {
                 return Adapter::nextStartingNode(node, siblings, cur);
+            }
 
             // Description nodes
             while(cur != collection.end() &&
@@ -70,8 +68,9 @@ namespace snowcrash {
                 lastCur = cur;
                 cur = SectionProcessor<T>::processDescription(cur, collection, pd, out);
 
-                if (lastCur == cur)
+                if (lastCur == cur) {
                     return Adapter::nextStartingNode(node, siblings, cur);
+                }
             }
 
             // Content nodes
@@ -81,8 +80,9 @@ namespace snowcrash {
                 lastCur = cur;
                 cur = SectionProcessor<T>::processContent(cur, collection, pd, out);
 
-                if (lastCur == cur)
+                if (lastCur == cur) {
                     return Adapter::nextStartingNode(node, siblings, cur);
+                }
             }
 
             // Nested Sections
@@ -118,10 +118,12 @@ namespace snowcrash {
                 if (nestedType != UndefinedSectionType) {
                     cur = SectionProcessor<T>::processNestedSection(cur, collection, pd, out);
                 }
-                else if (Adapter::nextSkipsUnexpected ||
-                         SectionProcessor<T>::isUnexpectedNode(cur, pd.sectionContext())) {
+                else {
+                    if (Adapter::nextSkipsUnexpected ||
+                             SectionProcessor<T>::isUnexpectedNode(cur, pd.sectionContext())) {
 
-                    cur = SectionProcessor<T>::processUnexpectedNode(cur, collection, pd, lastSectionType, out);
+                        cur = SectionProcessor<T>::processUnexpectedNode(cur, collection, pd, lastSectionType, out);
+                    }
                 }
 
                 if (cur != collection.end() &&
@@ -134,8 +136,9 @@ namespace snowcrash {
 
                 pd.sectionsContext.pop_back();
 
-                if (lastCur == cur)
+                if (lastCur == cur) {
                     break;
+                }
             }
 
             return cur;

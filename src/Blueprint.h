@@ -381,7 +381,8 @@ namespace snowcrash {
             CopyElement,          // Human readable text
             AssetElement,         // Asset of API description
             ResourceElement,      // Resource
-            DataStructureElement  // Data Structure
+            DataStructureElement, // Data Structure
+            CommonDataElement     // Common Data
         };
 
         /** Attributes of an element */
@@ -406,6 +407,9 @@ namespace snowcrash {
             /** OR Collection of elements */
             Elements& elements();
             const Elements& elements() const;
+
+            /** OR Common responses */
+            Responses responses;
 
             /** Constructor */
             Content();
@@ -465,6 +469,12 @@ namespace snowcrash {
      * Group of Data Structures (Category Element)
      */
     struct DataStructureGroup : public Element {
+    };
+
+    /**
+     * Common Data
+     */
+    struct CommonData : public Element {
     };
 
     /**

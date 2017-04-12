@@ -45,6 +45,7 @@ Element::Content::Content(const Element::Content& rhs)
     this->copy = rhs.copy;
     this->resource = rhs.resource;
     this->dataStructure = rhs.dataStructure;
+    this->responses = rhs.responses;
     m_elements.reset(::new Elements(*rhs.m_elements.get()));
 }
 
@@ -53,6 +54,7 @@ Element::Content& Element::Content::operator=(const Element::Content& rhs)
     this->copy = rhs.copy;
     this->resource = rhs.resource;
     this->dataStructure = rhs.dataStructure;
+    this->responses = rhs.responses;
     m_elements.reset(::new Elements(*rhs.m_elements.get()));
 
     return *this;
