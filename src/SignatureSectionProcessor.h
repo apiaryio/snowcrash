@@ -416,12 +416,14 @@ namespace scpl {
                     }
 
                     subject = subject.substr(i + 1);
+                    i = 0;
                     break;
                 } else if (splitByAttribute && subject[i] == Delimiters::AttributeDelimiter) {
 
                     // Return when encountering comma
                     returnString += subject[i];
                     subject = subject.substr(i + 1);
+                    i = 0;
                     break;
                 } else {
 

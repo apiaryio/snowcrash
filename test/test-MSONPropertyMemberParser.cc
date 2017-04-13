@@ -574,3 +574,23 @@ TEST_CASE("Parse mson property containing list of value with string type specifi
     SourceMapHelper::check(propertyMember.sourceMap.name.sourceMap, 2, 22);
     SourceMapHelper::check(propertyMember.sourceMap.valueDefinition.sourceMap, 2, 22);
 }
+
+TEST_CASE("Parse fixed type attribute on array with primitive nested type", "[mson][property_member][now]")
+{
+    mdp::ByteBuffer source = \
+    "+ s (array[string], fixed-type)";
+
+    ParseResult<mson::PropertyMember> propertyMember;
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
+
+    REQUIRE(propertyMember.report.error.code == Error::OK);
+    REQUIRE(propertyMember.report.warnings.empty());
+
+    REQUIRE(propertyMember.node.name.literal == "s");
+    REQUIRE(propertyMember.node.valueDefinition.typeDefinition.attributes == mson::FixedTypeTypeAttribute);
+    REQUIRE(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.name.base == mson::ArrayTypeName);
+    REQUIRE(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.nestedTypes.size() == 1);
+    REQUIRE(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.nestedTypes[0].base == mson::StringTypeName);
+    REQUIRE(propertyMember.node.valueDefinition.typeDefinition.baseType == mson::ValueBaseType);
+    REQUIRE(propertyMember.node.sections.empty());
+}
