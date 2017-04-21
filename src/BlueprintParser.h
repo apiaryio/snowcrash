@@ -40,6 +40,8 @@ namespace snowcrash {
 
             MarkdownNodeIterator cur = node;
 
+            pd.commonResponses.push_back(new Responses());
+
             while (cur != siblings.end() &&
                    cur->type == mdp::ParagraphMarkdownNodeType) {
 
@@ -89,8 +91,6 @@ namespace snowcrash {
                 // Any other type of block, add to description
                 return processDescription(cur, siblings, pd, out);
             }
-
-            pd.commonResponses.push_back(new Responses());
 
             return ++MarkdownNodeIterator(cur);
         }

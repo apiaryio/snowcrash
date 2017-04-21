@@ -56,6 +56,8 @@ namespace snowcrash {
                 out.sourceMap.attributes.name.sourceMap = node->sourceMap;
             }
 
+            pd.commonResponses.push_back(new Responses());
+
             return ++MarkdownNodeIterator(node);
         }
 
@@ -136,6 +138,20 @@ namespace snowcrash {
                     out.sourceMap.content.elements().collection.push_back(resourceElementSM);
                 }
             }
+            else if (pd.sectionContext() == CommonDataSectionType) {
+                IntermediateParseResult<CommonData> commonData(out.report);
+                cur = CommonDataParser::parse(node, siblings, pd, commonData);
+
+                out.node.content.elements().push_back(commonData.node);
+
+                for (auto i = commonData.node.content.responses.begin(); i != commonData.node.content.responses.end(); ++i) {
+                    pd.commonResponses.back()->push_back(*i);
+                }
+
+                if (pd.exportSourceMap()) {
+                    out.sourceMap.content.elements().collection.push_back(commonData.sourceMap);
+                }
+            }
 
             return cur;
         }
@@ -181,6 +197,9 @@ namespace snowcrash {
                 out.sourceMap.element = out.node.element;
                 out.sourceMap.category = out.node.category;
             }
+
+            delete pd.commonResponses.back();
+            pd.commonResponses.pop_back();
         }
 
         static SectionType sectionType(const MarkdownNodeIterator& node) {
@@ -207,12 +226,17 @@ namespace snowcrash {
             nestedType = SectionProcessor<CommonData>::sectionType(node);
 
             if (nestedType != UndefinedSectionType) {
-                std::cout << "CommonData found!\n";
                 return nestedType;
             }
 
-            // Return ResourceSectionType or UndefinedSectionType
-            return SectionProcessor<Resource>::sectionType(node);
+            // Check if Resource section
+            nestedType = SectionProcessor<Resource>::sectionType(node);
+
+            if (nestedType != UndefinedSectionType) {
+                return nestedType;
+            }
+
+            return UndefinedSectionType;
         }
 
         static SectionTypes upperSectionTypes() {
