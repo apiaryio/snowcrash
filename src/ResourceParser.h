@@ -264,7 +264,7 @@ namespace snowcrash {
         }
 
         static SectionTypes upperSectionTypes() {
-            return {ResourceGroupSectionType, ResourceSectionType, DataStructureGroupSectionType};
+            return {ResourceGroupSectionType, ResourceSectionType, DataStructureGroupSectionType, CommonDataSectionType};
         }
 
         static void finalize(const MarkdownNodeIterator& node,

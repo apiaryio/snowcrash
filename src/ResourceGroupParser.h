@@ -240,7 +240,7 @@ namespace snowcrash {
         }
 
         static SectionTypes upperSectionTypes() {
-            return {ResourceGroupSectionType, DataStructureGroupSectionType};
+            return {ResourceGroupSectionType, DataStructureGroupSectionType, CommonDataSectionType};
         }
 
         static bool isDescriptionNode(const MarkdownNodeIterator& node,
