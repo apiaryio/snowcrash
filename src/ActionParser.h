@@ -100,12 +100,9 @@ namespace snowcrash {
 
                     out.node.examples.back().responses.push_back(*j);
 
-                    /*
                     if (pd.exportSourceMap()) {
                         out.sourceMap.examples.collection.back().responses.collection.push_back(payload.sourceMap);
                     }
-                     */
-
                 }
             }
 
