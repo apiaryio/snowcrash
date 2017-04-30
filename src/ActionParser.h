@@ -96,6 +96,7 @@ namespace snowcrash {
                         }
                     }
 
+                    // TODO: find out if this string is required
                     // checkPayload(sectionType, sourceMap, j->node, out);
 
                     out.node.examples.back().responses.push_back(*j);
