@@ -81,7 +81,7 @@ namespace snowcrash {
             }
 
             for (auto i = pd.commonResponses.begin(); i != pd.commonResponses.end(); ++i) {
-                for (auto j = (*i)->begin(); j != (*i)->end(); j++) {
+                for (auto j = i->begin(); j != i->end(); j++) {
 
                     IntermediateParseResult<Payload> payload(out.report);
 

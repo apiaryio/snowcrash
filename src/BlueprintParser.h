@@ -40,7 +40,7 @@ namespace snowcrash {
 
             MarkdownNodeIterator cur = node;
 
-            pd.commonResponses.push_back(new Responses());
+            pd.commonResponses.push_back(Responses());
 
             while (cur != siblings.end() &&
                    cur->type == mdp::ParagraphMarkdownNodeType) {
@@ -151,7 +151,7 @@ namespace snowcrash {
                 out.node.content.elements().push_back(commonData.node);
 
                 for (auto i = commonData.node.content.responses.begin(); i != commonData.node.content.responses.end(); ++i) {
-                    pd.commonResponses.back()->push_back(*i);
+                    pd.commonResponses.back().push_back(*i);
                 }
 
                 if (pd.exportSourceMap()) {
@@ -318,7 +318,6 @@ namespace snowcrash {
                 out.report.warnings.push_back(Warning(ExpectedAPINameMessage, APINameWarning, sourceMap));
             }
 
-            delete pd.commonResponses.back();
             pd.commonResponses.pop_back();
         }
 

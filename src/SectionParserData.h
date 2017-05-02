@@ -77,7 +77,7 @@ namespace snowcrash {
         SectionsStack sectionsContext;
 
         /** Common Responses */
-        Collection<Responses *>::type commonResponses;
+        Collection<Responses>::type commonResponses;
 
         /** \returns Actual Section Context */
         SectionType sectionContext() const {

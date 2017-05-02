@@ -36,7 +36,7 @@ namespace snowcrash {
                                                      SectionLayout& layout,
                                                      const ParseResultRef<ResourceGroup>& out) {
 
-            pd.commonResponses.push_back(new Responses());
+            pd.commonResponses.push_back(Responses());
 
             MarkdownNodeIterator cur = node;
             SectionType nestedType = nestedSectionType(cur);
@@ -145,7 +145,7 @@ namespace snowcrash {
                 out.node.content.elements().push_back(commonData.node);
 
                 for (auto i = commonData.node.content.responses.begin(); i != commonData.node.content.responses.end(); ++i) {
-                    pd.commonResponses.back()->push_back(*i);
+                    pd.commonResponses.back().push_back(*i);
                 }
 
                 if (pd.exportSourceMap()) {
@@ -198,7 +198,6 @@ namespace snowcrash {
                 out.sourceMap.category = out.node.category;
             }
 
-            delete pd.commonResponses.back();
             pd.commonResponses.pop_back();
         }
 
