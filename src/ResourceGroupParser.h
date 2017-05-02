@@ -36,8 +36,6 @@ namespace snowcrash {
                                                      SectionLayout& layout,
                                                      const ParseResultRef<ResourceGroup>& out) {
 
-            pd.commonResponses.push_back(Responses());
-
             MarkdownNodeIterator cur = node;
             SectionType nestedType = nestedSectionType(cur);
 
@@ -197,8 +195,6 @@ namespace snowcrash {
                 out.sourceMap.element = out.node.element;
                 out.sourceMap.category = out.node.category;
             }
-
-            pd.commonResponses.pop_back();
         }
 
         static SectionType sectionType(const MarkdownNodeIterator& node) {

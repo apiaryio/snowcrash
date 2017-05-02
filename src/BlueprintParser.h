@@ -40,8 +40,6 @@ namespace snowcrash {
 
             MarkdownNodeIterator cur = node;
 
-            pd.commonResponses.push_back(Responses());
-
             while (cur != siblings.end() &&
                    cur->type == mdp::ParagraphMarkdownNodeType) {
 
@@ -317,8 +315,6 @@ namespace snowcrash {
                 mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                 out.report.warnings.push_back(Warning(ExpectedAPINameMessage, APINameWarning, sourceMap));
             }
-
-            pd.commonResponses.pop_back();
         }
 
         static bool isUnexpectedNode(const MarkdownNodeIterator& node,
