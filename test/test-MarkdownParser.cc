@@ -709,3 +709,47 @@ TEST_CASE("Sublist should have more indentation than the list item", "[parser]")
     REQUIRE(list.children().front().type == ParagraphMarkdownNodeType);
     REQUIRE(list.children().front().text == "2");
 }
+
+TEST_CASE("Empty quota in listitem", "[parser]")
+{
+    MarkdownParser parser;
+    MarkdownNode ast;
+
+    ByteBuffer src = \
+"+ a\n"\
+"              \"a\"\n"\
+">> 0\n"\
+"              \"t\"\n"\
+"            }";
+
+    parser.parse(src, ast);
+
+    REQUIRE(ast.type == RootMarkdownNodeType);
+    REQUIRE(ast.text.empty());
+    REQUIRE(ast.children().size() == 1);
+
+    MarkdownNode& list = ast.children().front();
+    REQUIRE(list.type == ListItemMarkdownNodeType);
+
+    REQUIRE(list.children().size() == 2);
+    REQUIRE(list.children()[0].type == ParagraphMarkdownNodeType);
+    REQUIRE(list.children()[1].type == QuoteMarkdownNodeType);
+
+    REQUIRE(list.children()[1].sourceMap.size() == 2);
+
+    REQUIRE(list.children()[1].sourceMap[0].location == 22);
+    REQUIRE(list.children()[1].sourceMap[0].length == 19);
+
+    REQUIRE(list.children()[1].sourceMap[1].location == 31);
+    REQUIRE(list.children()[1].sourceMap[1].length == 10);
+
+    REQUIRE(list.children()[1].children().size() == 1);
+    REQUIRE(list.children()[1].children()[0].type == QuoteMarkdownNodeType);
+
+    REQUIRE(list.children()[1].children()[0].children().size() == 1);
+    REQUIRE(list.children()[1].children()[0].children()[0].type == ParagraphMarkdownNodeType);
+
+    REQUIRE(list.children()[1].children()[0].children()[0].sourceMap.size() == 1);
+    REQUIRE(list.children()[1].children()[0].children()[0].sourceMap[0].location == 25);
+    REQUIRE(list.children()[1].children()[0].children()[0].sourceMap[0].length == 3);
+}
