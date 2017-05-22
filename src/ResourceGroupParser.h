@@ -11,6 +11,7 @@
 
 #include "SectionParser.h"
 #include "ResourceParser.h"
+#include "CommonDataParser.h"
 #include "RegexMatch.h"
 
 namespace snowcrash {
@@ -135,6 +136,20 @@ namespace snowcrash {
                     out.sourceMap.content.elements().collection.push_back(resourceElementSM);
                 }
             }
+            else if (pd.sectionContext() == CommonDataSectionType) {
+                IntermediateParseResult<CommonData> commonData(out.report);
+                cur = CommonDataParser::parse(node, siblings, pd, commonData);
+
+                out.node.content.elements().push_back(commonData.node);
+
+                for (auto i = commonData.node.content.responses.begin(); i != commonData.node.content.responses.end(); ++i) {
+                    pd.commonResponses.back().push_back(*i);
+                }
+
+                if (pd.exportSourceMap()) {
+                    out.sourceMap.content.elements().collection.push_back(commonData.sourceMap);
+                }
+            }
 
             return cur;
         }
@@ -200,12 +215,27 @@ namespace snowcrash {
 
         static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
 
-            // Return ResourceSectionType or UndefinedSectionType
-            return SectionProcessor<Resource>::sectionType(node);
+            SectionType nestedType = UndefinedSectionType;
+
+            // Check if CommonData section
+            nestedType = SectionProcessor<CommonData>::sectionType(node);
+
+            if (nestedType != UndefinedSectionType) {
+                return nestedType;
+            }
+
+            // Check if Resource section
+            nestedType = SectionProcessor<Resource>::sectionType(node);
+
+            if (nestedType != UndefinedSectionType) {
+                return nestedType;
+            }
+
+            return UndefinedSectionType;
         }
 
         static SectionTypes upperSectionTypes() {
-            return {ResourceGroupSectionType, DataStructureGroupSectionType};
+            return {ResourceGroupSectionType, DataStructureGroupSectionType, CommonDataSectionType};
         }
 
         static bool isDescriptionNode(const MarkdownNodeIterator& node,

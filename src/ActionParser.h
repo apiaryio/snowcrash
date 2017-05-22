@@ -80,6 +80,34 @@ namespace snowcrash {
                 }
             }
 
+            for (auto i = pd.commonResponses.begin(); i != pd.commonResponses.end(); ++i) {
+                for (auto j = i->begin(); j != i->end(); j++) {
+
+                    IntermediateParseResult<Payload> payload(out.report);
+
+                    if (out.node.examples.empty()) {
+                        TransactionExample transaction;
+                        SourceMap<TransactionExample> transactionSM;
+
+                        out.node.examples.push_back(transaction);
+
+                        if (pd.exportSourceMap()) {
+                            out.sourceMap.examples.collection.push_back(transactionSM);
+                        }
+                    }
+
+                    // TODO: find out if this string is required
+                    // checkPayload(sectionType, sourceMap, j->node, out);
+
+                    out.node.examples.back().responses.push_back(*j);
+
+                    if (pd.exportSourceMap()) {
+                        out.sourceMap.examples.collection.back().responses.collection.push_back(payload.sourceMap);
+                    }
+                }
+            }
+
+
             return ++MarkdownNodeIterator(node);
         }
 
@@ -314,7 +342,7 @@ namespace snowcrash {
         }
 
         static SectionTypes upperSectionTypes() {
-            return {ActionSectionType, ResourceSectionType, ResourceGroupSectionType, DataStructureGroupSectionType};
+            return {ActionSectionType, ResourceSectionType, ResourceGroupSectionType, DataStructureGroupSectionType, CommonDataSectionType};
         }
 
         static void finalize(const MarkdownNodeIterator& node,

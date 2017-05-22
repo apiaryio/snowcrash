@@ -265,6 +265,9 @@ namespace snowcrash {
             SourceMap<Elements>& elements();
             const SourceMap<Elements>& elements() const;
 
+            /** OR Common responses */
+            SourceMap<Responses> responses;
+
             /** Constructor */
             Content();
 
@@ -318,6 +321,13 @@ namespace snowcrash {
      */
     template<>
     struct SourceMap<DataStructureGroup> : public SourceMap<Element> {
+    };
+
+    /**
+     * Source Map Structure for Common Data (Category Element)
+     */
+    template<>
+    struct SourceMap<CommonData> : public SourceMap<Element> {
     };
 
     /**

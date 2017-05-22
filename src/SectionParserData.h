@@ -76,6 +76,9 @@ namespace snowcrash {
         typedef std::vector<SectionType> SectionsStack;
         SectionsStack sectionsContext;
 
+        /** Common Responses */
+        Collection<Responses>::type commonResponses;
+
         /** \returns Actual Section Context */
         SectionType sectionContext() const {
             return (sectionsContext.empty()) ? UndefinedSectionType : sectionsContext.back();

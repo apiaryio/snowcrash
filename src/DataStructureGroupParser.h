@@ -109,7 +109,7 @@ namespace snowcrash {
         }
 
         static SectionTypes upperSectionTypes() {
-            return {DataStructureGroupSectionType, ResourceGroupSectionType, ResourceSectionType};
+            return {CommonDataSectionType, DataStructureGroupSectionType, ResourceGroupSectionType, ResourceSectionType};
         }
 
         /**

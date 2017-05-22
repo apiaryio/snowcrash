@@ -99,6 +99,7 @@
         'src/BlueprintSourcemap.h',
         'src/BlueprintUtility.h',
         'src/CodeBlockUtility.h',
+        'src/CommonDataParser.h',
         'src/DataStructureGroupParser.h',
         'src/HeadersParser.h',
         'src/HeadersParser.cc',
