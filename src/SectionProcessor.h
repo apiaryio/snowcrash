@@ -125,7 +125,7 @@ namespace snowcrash
     /**
      *  \brief  Section Processor Base
      *
-     *  Defines section processor interface alongised with its default
+     *  Defines section processor interface alongside with its default
      *  behavior.
      */
     template <typename T>

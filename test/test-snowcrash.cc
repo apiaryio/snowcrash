@@ -572,7 +572,7 @@ TEST_CASE("Using local media type", "[parser][regression][195]")
         18);
 }
 
-TEST_CASE("Parse ill-formated header", "[parser][198][regression]")
+TEST_CASE("Parse ill-formatted header", "[parser][198][regression]")
 {
     mdp::ByteBuffer source
         = "# GET /A\n"

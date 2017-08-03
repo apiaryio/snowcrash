@@ -11,7 +11,7 @@
 
 using namespace snowcrash;
 
-TEST_CASE("Parse a valid uri into seperate parts", "[validuriparser][issue][79]")
+TEST_CASE("Parse a valid uri into separate parts", "[validuriparser][issue][79]")
 {
 
     const snowcrash::URI uri = "http://www.test.com/other/{id}";
@@ -27,7 +27,7 @@ TEST_CASE("Parse a valid uri into seperate parts", "[validuriparser][issue][79]"
     REQUIRE(result.report.warnings.size() == 0);
 }
 
-TEST_CASE("Parse an invalid uri into seperate parts", "[invaliduriparser][issue][79]")
+TEST_CASE("Parse an invalid uri into separate parts", "[invaliduriparser][issue][79]")
 {
 
     const snowcrash::URI uri = "http://www.test.com/other/{id}[2]";

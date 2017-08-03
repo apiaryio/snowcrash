@@ -440,9 +440,9 @@ TEST_CASE("Parse type definition with non recognized type attribute", "[mson][ut
     snowcrash::Blueprint blueprint;
 
     attributes.push_back("[Person][]");
-    attributes.push_back("optinal");
+    attributes.push_back("optional");
 
-    mdp::ByteBuffer source = "+ ([Person][], optinal)";
+    mdp::ByteBuffer source = "+ ([Person][], optional)";
     mdp::MarkdownParser markdownParser;
     mdp::MarkdownNode markdownAST;
 
@@ -523,7 +523,7 @@ TEST_CASE("Build member type from value member", "[mson][utility]")
     REQUIRE(element.klass == Element::ValueClass);
 }
 
-TEST_CASE("Build member type from property memeber", "[mson][utility]")
+TEST_CASE("Build member type from property member", "[mson][utility]")
 {
     PropertyMember propertyMember;
     Element element;
@@ -533,7 +533,7 @@ TEST_CASE("Build member type from property memeber", "[mson][utility]")
     REQUIRE(element.klass == Element::PropertyClass);
 }
 
-TEST_CASE("Build memebr type from members collection", "[mson][utility]")
+TEST_CASE("Build member type from members collection", "[mson][utility]")
 {
     Element element;
     TypeSection typeSection;

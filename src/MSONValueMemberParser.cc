@@ -59,7 +59,7 @@ namespace snowcrash
         }
 
         // If the nodes follow after some block description without member
-        // seperator, then they are treated as description
+        // separator, then they are treated as description
         if (!sections.node.empty() && sections.node.back().klass == mson::TypeSection::BlockDescriptionClass) {
             return SectionProcessor<mson::ValueMember>::blockDescription(node, pd, sections.node, sections.sourceMap);
         }

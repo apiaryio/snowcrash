@@ -54,7 +54,7 @@ TEST_CASE("Parse canonical parameters", "[parameters]")
     SourceMapHelper::check(parameters.sourceMap.collection[1].name.sourceMap, 165, 5);
 }
 
-TEST_CASE("Parse ilegal parameter", "[parameters]")
+TEST_CASE("Parse illegal parameter", "[parameters]")
 {
     mdp::ByteBuffer source
         = "+ Parameters\n"

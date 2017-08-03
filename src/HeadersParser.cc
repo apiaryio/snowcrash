@@ -12,7 +12,7 @@ static HeaderIterator findHeader(const Headers& headers, const Header& header)
 
 typedef std::vector<std::string> HeadersKeyCollection;
 
-/** Get collection of allowed keywords - workarround due to C++98 restriction - static initialization of vector */
+/** Get collection of allowed keywords - workaround due to C++98 restriction - static initialization of vector */
 static const HeadersKeyCollection& getAllowedMultipleDefinitions()
 {
 

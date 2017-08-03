@@ -11,7 +11,7 @@
 
 using namespace snowcrash;
 
-TEST_CASE("blueprint/blueprint-init", "Blueprint initializaton")
+TEST_CASE("blueprint/blueprint-init", "Blueprint initialization")
 {
     Blueprint blueprint;
     REQUIRE(blueprint.name.length() == 0);
@@ -20,7 +20,7 @@ TEST_CASE("blueprint/blueprint-init", "Blueprint initializaton")
     REQUIRE(blueprint.content.elements().size() == 0);
 }
 
-TEST_CASE("blueprint/init", "Blueprint initializaton")
+TEST_CASE("blueprint/init", "Blueprint initialization")
 {
     Blueprint blueprint;
     REQUIRE(blueprint.name.length() == 0);

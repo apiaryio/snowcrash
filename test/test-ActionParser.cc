@@ -358,7 +358,7 @@ TEST_CASE("Parse method without name", "[action]")
 TEST_CASE("Parse action with parameters", "[action]")
 {
     mdp::ByteBuffer source
-        = "# GET /resrouce/{id}\n"
+        = "# GET /resource/{id}\n"
           "+ Parameters\n"
           "    + id (required, number, `42`) ... Resource Id\n"
           "\n"

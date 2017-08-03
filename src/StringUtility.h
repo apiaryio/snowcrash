@@ -52,7 +52,7 @@ namespace snowcrash
         return TrimStringStart(TrimStringEnd(s));
     }
 
-    // <position form begin, lenght of string>
+    // <position form begin, length of string>
     typedef std::tuple<std::string::const_iterator::difference_type, std::string::const_iterator::difference_type>
         TrimRange;
 
@@ -153,7 +153,7 @@ namespace snowcrash
     }
 
     /**
-     *  \brief  compare equality  - allow compare diferent types
+     *  \brief  compare equality  - allow compare different types
      *
      *  \return true if args era equal
      */
@@ -265,7 +265,7 @@ namespace snowcrash
     /**
      * \brief Strip the enclosing backticks and return the string in the middle.
      *
-     *        If there are no matching enclosing bacticks, return the whole string.
+     *        If there are no matching enclosing backticks, return the whole string.
      *
      * \param subject String that needs to be stripped of enclosing backticks
      *

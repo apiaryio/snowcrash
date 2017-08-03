@@ -30,7 +30,7 @@ namespace snowcrash
     /** Base class for functor to check validity of parsed header */
     struct ValidateFunctorBase {
 
-        /** intended to generate warning mesage */
+        /** intended to generate warning message */
         virtual std::string getMessage() const = 0;
 
         /**
@@ -97,7 +97,7 @@ namespace snowcrash
         virtual std::string getMessage() const;
     };
 
-    /** Functor receive and invoke individual Validators and conditionaly push reports  */
+    /** Functor receive and invoke individual Validators and conditionally push reports  */
     struct HeaderParserValidator {
 
         const ParseResultRef<Headers>& out;

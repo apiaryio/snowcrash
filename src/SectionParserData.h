@@ -68,7 +68,7 @@ namespace snowcrash
         /** Source Data */
         const mdp::ByteBuffer& sourceData;
 
-        /** Source - map of bytes to character position - performance optimalization */
+        /** Source - map of bytes to character position - performance optimization */
         mdp::ByteBufferCharacterIndex sourceCharacterIndex;
 
         /** AST being parsed **/
