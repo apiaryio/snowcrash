@@ -616,7 +616,7 @@ TEST_CASE("Parse named resource with lazy referencing with both response and req
     REQUIRE(resource.actions[0].examples[0].responses[0].reference.meta.state == Reference::StateResolved);
 }
 
-TEST_CASE("Expect to have a warning when 100 response's reference has a body", "[resource][model]")
+TEST_CASE("Expect to have a warning when 100 responses reference has a body", "[resource][model]")
 {
     mdp::ByteBuffer source
         = "# API\n"

@@ -42,7 +42,7 @@ SectionType snowcrash::SectionKeywordSignature(const mdp::MarkdownNodeIterator& 
     TYPECHECK(Relation)
 
     /*
-     *  NOTE: Order is important. Resource MUST preced the Action.
+     *  NOTE: Order is important. Resource MUST preceed the Action.
      *
      *  This is because an HTTP Request Method + URI is recognized as both %ActionSectionType and %ResourceSectionType.
      *  This is not optimal and should be addressed in the future.
