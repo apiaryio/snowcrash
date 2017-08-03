@@ -77,7 +77,7 @@ TEST_CASE("Relation identifier starting with non lower alphabet", "[relation]")
 
 TEST_CASE("Relation identifier containing capital letters", "[relation]")
 {
-    mdp::ByteBuffer source = "+ Relation: delete";
+    mdp::ByteBuffer source = "+ Relation: deLete";
 
     mdp::MarkdownParser markdownParser;
     mdp::MarkdownNode markdownAST;

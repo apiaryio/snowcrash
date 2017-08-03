@@ -440,9 +440,9 @@ TEST_CASE("Parse type definition with non recognized type attribute", "[mson][ut
     snowcrash::Blueprint blueprint;
 
     attributes.push_back("[Person][]");
-    attributes.push_back("optional");
+    attributes.push_back("optinal");
 
-    mdp::ByteBuffer source = "+ ([Person][], optional)";
+    mdp::ByteBuffer source = "+ ([Person][], optinal)";
     mdp::MarkdownParser markdownParser;
     mdp::MarkdownNode markdownAST;
 
