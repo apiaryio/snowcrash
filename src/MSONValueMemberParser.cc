@@ -196,7 +196,7 @@ namespace snowcrash
                 // WARN: Ignoring unrecognized block in mson nested members
                 mdp::CharactersRangeSet sourceMap
                     = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                sections.report.warnings.push_back(Warning("ignorning unrecognized block", IgnoringWarning, sourceMap));
+                sections.report.warnings.push_back(Warning("ignoring unrecognized block", IgnoringWarning, sourceMap));
 
                 cur = ++MarkdownNodeIterator(node);
             }
