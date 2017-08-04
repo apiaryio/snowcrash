@@ -15,143 +15,158 @@ using namespace scpl;
 
 namespace snowcrash {
 
-    /** Data structure group matching regex */
-    const char* const DataStructureGroupRegex = "^[[:blank:]]*[Dd]ata[[:blank:]]+[Ss]tructures?[[:blank:]]*$";
+/** Data structure group matching regex */
+const char *const DataStructureGroupRegex =
+    "^[[:blank:]]*[Dd]ata[[:blank:]]+[Ss]tructures?[[:blank:]]*$";
 
-    /**
-     * Data structure group section processor
-     */
-    template<>
-    struct SectionProcessor<DataStructureGroup> : public SectionProcessorBase<DataStructureGroup> {
+/**
+ * Data structure group section processor
+ */
+template <>
+struct SectionProcessor<DataStructureGroup>
+    : public SectionProcessorBase<DataStructureGroup>
+{
 
-        NO_SECTION_DESCRIPTION(DataStructureGroup)
+    NO_SECTION_DESCRIPTION(DataStructureGroup)
 
-        static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
-                                                         const MarkdownNodes& siblings,
-                                                         SectionParserData& pd,
-                                                         const ParseResultRef<DataStructureGroup>& out) {
+    static MarkdownNodeIterator processNestedSection(
+        const MarkdownNodeIterator &node,
+        const MarkdownNodes &siblings,
+        SectionParserData &pd,
+        const ParseResultRef<DataStructureGroup> &out) {
 
-            MarkdownNodeIterator cur = node;
+        MarkdownNodeIterator cur = node;
 
-            if (pd.sectionContext() == MSONNamedTypeSectionType) {
+        if (pd.sectionContext() == MSONNamedTypeSectionType) {
 
-                IntermediateParseResult<mson::NamedType> namedType(out.report);
-                cur = MSONNamedTypeParser::parse(node, siblings, pd, namedType);
+            IntermediateParseResult<mson::NamedType> namedType(out.report);
+            cur = MSONNamedTypeParser::parse(node, siblings, pd, namedType);
 
-                if (isNamedTypeDuplicate(pd.blueprint, namedType.node.name.symbol.literal)) {
+            if (isNamedTypeDuplicate(
+                    pd.blueprint, namedType.node.name.symbol.literal)) {
 
-                    // WARN: duplicate named type
-                    std::stringstream ss;
-                    ss << "named type with name '" << namedType.node.name.symbol.literal << "' already exists";
+                // WARN: duplicate named type
+                std::stringstream ss;
+                ss << "named type with name '"
+                   << namedType.node.name.symbol.literal << "' already exists";
 
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                    out.report.warnings.push_back(Warning(ss.str(),
-                                                          DuplicateWarning,
-                                                          sourceMap));
-                    return cur;
-                }
-
-                Element element(Element::DataStructureElement);
-                element.content.dataStructure = namedType.node;
-
-                out.node.content.elements().push_back(element);
-
-                if (pd.exportSourceMap()) {
-
-                    SourceMap<Element> elementSM(Element::DataStructureElement);
-
-                    elementSM.content.dataStructure.name = namedType.sourceMap.name;
-                    elementSM.content.dataStructure.typeDefinition = namedType.sourceMap.typeDefinition;
-                    elementSM.content.dataStructure.sections = namedType.sourceMap.sections;
-
-                    out.sourceMap.content.elements().collection.push_back(elementSM);
-                }
+                mdp::CharactersRangeSet sourceMap =
+                    mdp::BytesRangeSetToCharactersRangeSet(
+                        node->sourceMap, pd.sourceCharacterIndex);
+                out.report.warnings.push_back(
+                    Warning(ss.str(), DuplicateWarning, sourceMap));
+                return cur;
             }
 
-            return cur;
-        }
+            Element element(Element::DataStructureElement);
+            element.content.dataStructure = namedType.node;
 
-        static void finalize(const MarkdownNodeIterator& node,
-                             SectionParserData& pd,
-                             const ParseResultRef<DataStructureGroup>& out) {
-
-            out.node.element = Element::CategoryElement;
-            out.node.category = Element::DataStructureGroupCategory;
+            out.node.content.elements().push_back(element);
 
             if (pd.exportSourceMap()) {
 
-                out.sourceMap.element = out.node.element;
-                out.sourceMap.category = out.node.category;
+                SourceMap<Element> elementSM(Element::DataStructureElement);
+
+                elementSM.content.dataStructure.name = namedType.sourceMap.name;
+                elementSM.content.dataStructure.typeDefinition =
+                    namedType.sourceMap.typeDefinition;
+                elementSM.content.dataStructure.sections =
+                    namedType.sourceMap.sections;
+
+                out.sourceMap.content.elements().collection.push_back(
+                    elementSM);
             }
         }
 
-        static SectionType sectionType(const MarkdownNodeIterator& node) {
+        return cur;
+    }
 
-            if (node->type == mdp::HeaderMarkdownNodeType &&
-                !node->text.empty()) {
+    static void finalize(const MarkdownNodeIterator &node,
+        SectionParserData &pd,
+        const ParseResultRef<DataStructureGroup> &out) {
 
-                mdp::ByteBuffer remaining, subject = node->text;
+        out.node.element = Element::CategoryElement;
+        out.node.category = Element::DataStructureGroupCategory;
 
-                subject = GetFirstLine(subject, remaining);
-                TrimString(subject);
+        if (pd.exportSourceMap()) {
 
-                if (RegexMatch(subject, DataStructureGroupRegex)) {
-                    return DataStructureGroupSectionType;
-                }
+            out.sourceMap.element = out.node.element;
+            out.sourceMap.category = out.node.category;
+        }
+    }
+
+    static SectionType sectionType(const MarkdownNodeIterator &node) {
+
+        if (node->type == mdp::HeaderMarkdownNodeType && !node->text.empty()) {
+
+            mdp::ByteBuffer remaining, subject = node->text;
+
+            subject = GetFirstLine(subject, remaining);
+            TrimString(subject);
+
+            if (RegexMatch(subject, DataStructureGroupRegex)) {
+                return DataStructureGroupSectionType;
             }
-
-            return UndefinedSectionType;
         }
 
-        static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
+        return UndefinedSectionType;
+    }
 
-            return SectionProcessor<mson::NamedType>::sectionType(node);
-        }
+    static SectionType nestedSectionType(const MarkdownNodeIterator &node) {
 
-        static SectionTypes upperSectionTypes() {
-            return {DataStructureGroupSectionType, ResourceGroupSectionType, ResourceSectionType};
-        }
+        return SectionProcessor<mson::NamedType>::sectionType(node);
+    }
 
-        /**
-         * \brief Check if a named type already exists with the given name
-         *
-         * \param blueprint The blueprint which is formed until now
-         * \param name The named type name to be checked
-         */
-        static bool isNamedTypeDuplicate(const Blueprint& blueprint,
-                                         mdp::ByteBuffer& name) {
+    static SectionTypes upperSectionTypes() {
+        return {DataStructureGroupSectionType,
+            ResourceGroupSectionType,
+            ResourceSectionType};
+    }
 
-            for (Elements::const_iterator it = blueprint.content.elements().begin();
-                 it != blueprint.content.elements().end();
-                 ++it) {
+    /**
+     * \brief Check if a named type already exists with the given name
+     *
+     * \param blueprint The blueprint which is formed until now
+     * \param name The named type name to be checked
+     */
+    static bool isNamedTypeDuplicate(
+        const Blueprint &blueprint, mdp::ByteBuffer &name) {
 
-                if (it->element == Element::CategoryElement) {
+        for (Elements::const_iterator it = blueprint.content.elements().begin();
+             it != blueprint.content.elements().end();
+             ++it) {
 
-                    for (Elements::const_iterator subIt = it->content.elements().begin();
-                         subIt != it->content.elements().end();
-                         ++subIt) {
+            if (it->element == Element::CategoryElement) {
 
-                        if (subIt->element == Element::ResourceElement &&
-                            subIt->content.resource.attributes.name.symbol.literal == name) {
+                for (Elements::const_iterator subIt =
+                         it->content.elements().begin();
+                     subIt != it->content.elements().end();
+                     ++subIt) {
 
-                            return true;
-                        }
+                    if (subIt->element == Element::ResourceElement &&
+                        subIt->content.resource.attributes.name.symbol
+                                .literal == name) {
 
-                        if (subIt->element == Element::DataStructureElement &&
-                            subIt->content.dataStructure.name.symbol.literal == name) {
+                        return true;
+                    }
 
-                            return true;
-                        }
+                    if (subIt->element == Element::DataStructureElement &&
+                        subIt->content.dataStructure.name.symbol.literal ==
+                            name) {
+
+                        return true;
                     }
                 }
             }
-
-            return false;
         }
-    };
 
-    /** Data Structures Parser */
-    typedef SectionParser<DataStructureGroup, HeaderSectionAdapter> DataStructureGroupParser;
+        return false;
+    }
+};
+
+/** Data Structures Parser */
+typedef SectionParser<DataStructureGroup, HeaderSectionAdapter>
+    DataStructureGroupParser;
 }
 
 #endif

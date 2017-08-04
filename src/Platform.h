@@ -13,21 +13,21 @@
 #define AS_CTYPE(Type, Obj) reinterpret_cast<const Type *>(Obj)
 
 #if defined(BUILDING_SNOWCRASH)
-#   define DEPRECATED
+#define DEPRECATED
 #endif
 
 #if defined(_MSC_VER)
-#   if !defined(DEPRECATED)
-#       define DEPRECATED __declspec(deprecated)
-#   endif
+#if !defined(DEPRECATED)
+#define DEPRECATED __declspec(deprecated)
+#endif
 #elif defined(__clang__) || defined(__GNUC__)
-#   if !defined(DEPRECATED)
-#       define DEPRECATED __attribute__((deprecated))
-#   endif
+#if !defined(DEPRECATED)
+#define DEPRECATED __attribute__((deprecated))
+#endif
 #else
-#   if !defined(DEPRECATED)
-#       define DEPRECATED
-#   endif
+#if !defined(DEPRECATED)
+#define DEPRECATED
+#endif
 #endif
 
 #endif

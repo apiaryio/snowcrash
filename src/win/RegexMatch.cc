@@ -19,35 +19,33 @@ using namespace std::tr1;
 // A C++09 implementation
 //
 
-bool snowcrash::RegexMatch(const string& target, const string& expression)
-{
+bool snowcrash::RegexMatch(const string &target, const string &expression) {
     if (target.empty() || expression.empty())
         return false;
 
     try {
         regex pattern(expression, regex_constants::extended);
         return regex_search(target, pattern);
-    }
-    catch (const regex_error&) {
-    }
-    catch (...) {
+    } catch (const regex_error &) {
+    } catch (...) {
     }
 
     return false;
 }
 
-string snowcrash::RegexCaptureFirst(const string& target, const string& expression)
-{
+string snowcrash::RegexCaptureFirst(
+    const string &target, const string &expression) {
     CaptureGroups groups;
-    if (!RegexCapture(target, expression, groups) ||
-        groups.size() < 2)
+    if (!RegexCapture(target, expression, groups) || groups.size() < 2)
         return string();
 
     return groups[1];
 }
 
-bool snowcrash::RegexCapture(const string& target, const string& expression, CaptureGroups& captureGroups, size_t groupSize)
-{
+bool snowcrash::RegexCapture(const string &target,
+    const string &expression,
+    CaptureGroups &captureGroups,
+    size_t groupSize) {
     if (target.empty() || expression.empty())
         return false;
 
@@ -60,7 +58,8 @@ bool snowcrash::RegexCapture(const string& target, const string& expression, Cap
         if (!regex_search(target, result, pattern))
             return false;
 
-        for (match_results<string::const_iterator>::const_iterator it = result.begin();
+        for (match_results<string::const_iterator>::const_iterator it =
+                 result.begin();
              it != result.end();
              ++it) {
 
@@ -68,10 +67,8 @@ bool snowcrash::RegexCapture(const string& target, const string& expression, Cap
         }
 
         return true;
-    }
-    catch (const regex_error&) {
-    }
-    catch (...) {
+    } catch (const regex_error &) {
+    } catch (...) {
     }
 
     return false;

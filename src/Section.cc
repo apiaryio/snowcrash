@@ -10,39 +10,39 @@
 
 using namespace snowcrash;
 
-std::string snowcrash::SectionName(const SectionType& section) {
+std::string snowcrash::SectionName(const SectionType &section) {
 
     switch (section) {
-        case ModelSectionType:
-        case ModelBodySectionType:
-            return "model";
+    case ModelSectionType:
+    case ModelBodySectionType:
+        return "model";
 
-        case RequestSectionType:
-        case RequestBodySectionType:
-            return "request";
+    case RequestSectionType:
+    case RequestBodySectionType:
+        return "request";
 
-        case ResponseSectionType:
-        case ResponseBodySectionType:
-            return "response";
+    case ResponseSectionType:
+    case ResponseBodySectionType:
+        return "response";
 
-        case BodySectionType:
-        case DanglingBodySectionType:
-            return "message-body";
+    case BodySectionType:
+    case DanglingBodySectionType:
+        return "message-body";
 
-        case SchemaSectionType:
-        case DanglingSchemaSectionType:
-            return "message-schema";
+    case SchemaSectionType:
+    case DanglingSchemaSectionType:
+        return "message-schema";
 
-        case HeadersSectionType:
-            return "headers";
+    case HeadersSectionType:
+        return "headers";
 
-        case MSONMixinSectionType:
-            return "mixin";
+    case MSONMixinSectionType:
+        return "mixin";
 
-        case MSONOneOfSectionType:
-            return "one of";
+    case MSONOneOfSectionType:
+        return "one of";
 
-        default:
-            return "section";
+    default:
+        return "section";
     }
 }

@@ -12,28 +12,27 @@
 using namespace snowcrash;
 using namespace snowcrashtest;
 
-const mdp::ByteBuffer ValuesFixture = \
-"+ Values\n"\
-"    + `1234`\n"\
-"    + `0000`\n"\
-"    + `beef`\n"\
-"";
+const mdp::ByteBuffer ValuesFixture = "+ Values\n"
+                                      "    + `1234`\n"
+                                      "    + `0000`\n"
+                                      "    + `beef`\n"
+                                      "";
 
-TEST_CASE("Recognize values signature", "[values]")
-{
+TEST_CASE("Recognize values signature", "[values]") {
     mdp::MarkdownParser markdownParser;
     mdp::MarkdownNode markdownAST;
     markdownParser.parse(ValuesFixture, markdownAST);
 
     REQUIRE(!markdownAST.children().empty());
-    SectionType sectionType = SectionProcessor<Values>::sectionType(markdownAST.children().begin());
+    SectionType sectionType =
+        SectionProcessor<Values>::sectionType(markdownAST.children().begin());
     REQUIRE(sectionType == ValuesSectionType);
 }
 
-TEST_CASE("Parse canonical values", "[values]")
-{
+TEST_CASE("Parse canonical values", "[values]") {
     ParseResult<Values> values;
-    SectionParserHelper<Values, ValuesParser>::parse(ValuesFixture, ValuesSectionType, values, ExportSourcemapOption);
+    SectionParserHelper<Values, ValuesParser>::parse(
+        ValuesFixture, ValuesSectionType, values, ExportSourcemapOption);
 
     REQUIRE(values.report.error.code == Error::OK);
     CHECK(values.report.warnings.empty());
@@ -49,15 +48,14 @@ TEST_CASE("Parse canonical values", "[values]")
     SourceMapHelper::check(values.sourceMap.collection[2].sourceMap, 39, 9);
 }
 
-TEST_CASE("Warn superfluous content in values attribute", "[values]")
-{
-    mdp::ByteBuffer source = \
-    "+ Values\n\n"\
-    " extra\n\n"\
-    "    + `Hello`\n";
+TEST_CASE("Warn superfluous content in values attribute", "[values]") {
+    mdp::ByteBuffer source = "+ Values\n\n"
+                             " extra\n\n"
+                             "    + `Hello`\n";
 
     ParseResult<Values> values;
-    SectionParserHelper<Values, ValuesParser>::parse(source, ValuesSectionType, values, ExportSourcemapOption);
+    SectionParserHelper<Values, ValuesParser>::parse(
+        source, ValuesSectionType, values, ExportSourcemapOption);
 
     REQUIRE(values.report.error.code == Error::OK);
     REQUIRE(values.report.warnings.size() == 1);
@@ -70,16 +68,15 @@ TEST_CASE("Warn superfluous content in values attribute", "[values]")
     SourceMapHelper::check(values.sourceMap.collection[0].sourceMap, 22, 10);
 }
 
-TEST_CASE("Warn about illegal entities in values attribute", "[values]")
-{
-    const std::string source = \
-    "+ Values\n"\
-    "    + `Hello`\n"\
-    "    + illegal\n"\
-    "    + `Hi`\n";
+TEST_CASE("Warn about illegal entities in values attribute", "[values]") {
+    const std::string source = "+ Values\n"
+                               "    + `Hello`\n"
+                               "    + illegal\n"
+                               "    + `Hi`\n";
 
     ParseResult<Values> values;
-    SectionParserHelper<Values, ValuesParser>::parse(source, ValuesSectionType, values, ExportSourcemapOption);
+    SectionParserHelper<Values, ValuesParser>::parse(
+        source, ValuesSectionType, values, ExportSourcemapOption);
 
     REQUIRE(values.report.error.code == Error::OK);
     REQUIRE(values.report.warnings.size() == 1);

@@ -13,24 +13,22 @@
 using namespace snowcrash;
 using namespace snowcrashtest;
 
-void ReportDebugMessage(const std::string& msg)
-{
+void ReportDebugMessage(const std::string &msg) {
 #ifdef DEBUG
     std::cout << "MESSAGE: ";
     std::cout << msg << std::endl << std::endl;
 #endif
 }
 
-TEST_CASE("Correct indentation", "[indentation]")
-{
-    mdp::ByteBuffer source = \
-    "# GET /1\n"\
-    "+ Response 200\n"\
-    "\n"\
-    "        { ... }\n";
+TEST_CASE("Correct indentation", "[indentation]") {
+    mdp::ByteBuffer source = "# GET /1\n"
+                             "+ Response 200\n"
+                             "\n"
+                             "        { ... }\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
+    SectionParserHelper<Action, ActionParser>::parse(
+        source, ActionSectionType, action);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.empty());
@@ -41,15 +39,14 @@ TEST_CASE("Correct indentation", "[indentation]")
     REQUIRE(action.node.examples[0].responses[0].body == "{ ... }\n");
 }
 
-TEST_CASE("No Indentation & No Newline", "[indentation]")
-{
-    mdp::ByteBuffer source = \
-    "# GET /1\n"\
-    "+ Response 200\n"\
-    "{ ... }\n";
+TEST_CASE("No Indentation & No Newline", "[indentation]") {
+    mdp::ByteBuffer source = "# GET /1\n"
+                             "+ Response 200\n"
+                             "{ ... }\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
+    SectionParserHelper<Action, ActionParser>::parse(
+        source, ActionSectionType, action);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.size() == 1);
@@ -62,16 +59,15 @@ TEST_CASE("No Indentation & No Newline", "[indentation]")
     REQUIRE(action.node.examples[0].responses[0].body == "{ ... }\n\n");
 }
 
-TEST_CASE("No Indentation", "[indentation]")
-{
-    mdp::ByteBuffer source = \
-    "# GET /1\n"\
-    "+ Response 200\n"\
-    "\n"\
-    "{ ... }\n";
+TEST_CASE("No Indentation", "[indentation]") {
+    mdp::ByteBuffer source = "# GET /1\n"
+                             "+ Response 200\n"
+                             "\n"
+                             "{ ... }\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
+    SectionParserHelper<Action, ActionParser>::parse(
+        source, ActionSectionType, action);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.size() == 1);
@@ -84,15 +80,14 @@ TEST_CASE("No Indentation", "[indentation]")
     REQUIRE(action.node.examples[0].responses[0].body == "{ ... }\n\n");
 }
 
-TEST_CASE("Poor Indentation & No Newline", "[indentation]")
-{
-    mdp::ByteBuffer source = \
-    "# GET /1\n"\
-    "+ Response 200\n"\
-    "    { ... }\n";
+TEST_CASE("Poor Indentation & No Newline", "[indentation]") {
+    mdp::ByteBuffer source = "# GET /1\n"
+                             "+ Response 200\n"
+                             "    { ... }\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
+    SectionParserHelper<Action, ActionParser>::parse(
+        source, ActionSectionType, action);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.size() == 1);
@@ -105,16 +100,15 @@ TEST_CASE("Poor Indentation & No Newline", "[indentation]")
     REQUIRE(action.node.examples[0].responses[0].body == "{ ... }\n\n");
 }
 
-TEST_CASE("Poor Indentation", "[indentation]")
-{
-    mdp::ByteBuffer source = \
-    "# GET /1\n"\
-    "+ Response 200\n"\
-    "\n"\
-    "    { ... }\n";
+TEST_CASE("Poor Indentation", "[indentation]") {
+    mdp::ByteBuffer source = "# GET /1\n"
+                             "+ Response 200\n"
+                             "\n"
+                             "    { ... }\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
+    SectionParserHelper<Action, ActionParser>::parse(
+        source, ActionSectionType, action);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.size() == 1);
@@ -127,15 +121,14 @@ TEST_CASE("Poor Indentation", "[indentation]")
     REQUIRE(action.node.examples[0].responses[0].body == "{ ... }\n");
 }
 
-TEST_CASE("OK Indentation & No Newline", "[indentation]")
-{
-    mdp::ByteBuffer source = \
-    "# GET /1\n"\
-    "+ Response 200\n"\
-    "        { ... }\n";
+TEST_CASE("OK Indentation & No Newline", "[indentation]") {
+    mdp::ByteBuffer source = "# GET /1\n"
+                             "+ Response 200\n"
+                             "        { ... }\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
+    SectionParserHelper<Action, ActionParser>::parse(
+        source, ActionSectionType, action);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.size() == 1);
@@ -148,17 +141,16 @@ TEST_CASE("OK Indentation & No Newline", "[indentation]")
     REQUIRE(action.node.examples[0].responses[0].body == "    { ... }\n\n");
 }
 
-TEST_CASE("Full syntax - correct", "[indentation]")
-{
-    mdp::ByteBuffer source = \
-    "## GET /1\n"\
-    "+ Response 200\n"\
-    "    + Body\n"\
-    "\n"\
-    "            { ... }\n";
+TEST_CASE("Full syntax - correct", "[indentation]") {
+    mdp::ByteBuffer source = "## GET /1\n"
+                             "+ Response 200\n"
+                             "    + Body\n"
+                             "\n"
+                             "            { ... }\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
+    SectionParserHelper<Action, ActionParser>::parse(
+        source, ActionSectionType, action);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.empty());
@@ -169,17 +161,16 @@ TEST_CASE("Full syntax - correct", "[indentation]")
     REQUIRE(action.node.examples[0].responses[0].body == "{ ... }\n");
 }
 
-TEST_CASE("Full syntax - Poor Body Indentation", "[indentation]")
-{
-    mdp::ByteBuffer source = \
-    "## GET /1\n"\
-    "+ Response 200\n"\
-    "+ Body\n"\
-    "\n"\
-    "        { ... }\n";
+TEST_CASE("Full syntax - Poor Body Indentation", "[indentation]") {
+    mdp::ByteBuffer source = "## GET /1\n"
+                             "+ Response 200\n"
+                             "+ Body\n"
+                             "\n"
+                             "        { ... }\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
+    SectionParserHelper<Action, ActionParser>::parse(
+        source, ActionSectionType, action);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.size() == 1);
@@ -192,17 +183,16 @@ TEST_CASE("Full syntax - Poor Body Indentation", "[indentation]")
     REQUIRE(action.node.examples[0].responses[0].body.empty());
 }
 
-TEST_CASE("Full syntax - Poor Body & Body Asset Indentation", "[indentation]")
-{
-    mdp::ByteBuffer source = \
-    "## GET /1\n"\
-    "+ Response 200\n"\
-    "+ Body\n"\
-    "\n"\
-    "    { ... }\n";
+TEST_CASE("Full syntax - Poor Body & Body Asset Indentation", "[indentation]") {
+    mdp::ByteBuffer source = "## GET /1\n"
+                             "+ Response 200\n"
+                             "+ Body\n"
+                             "\n"
+                             "    { ... }\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
+    SectionParserHelper<Action, ActionParser>::parse(
+        source, ActionSectionType, action);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.size() == 1);
@@ -215,16 +205,16 @@ TEST_CASE("Full syntax - Poor Body & Body Asset Indentation", "[indentation]")
     REQUIRE(action.node.examples[0].responses[0].body.empty());
 }
 
-TEST_CASE("Full syntax - Poor Body & Body Asset Indentation & No Newline", "[indentation]")
-{
-    mdp::ByteBuffer source = \
-    "## GET /1\n"\
-    "+ Response 200\n"\
-    "+ Body\n"\
-    "    { ... }\n";
+TEST_CASE("Full syntax - Poor Body & Body Asset Indentation & No Newline",
+    "[indentation]") {
+    mdp::ByteBuffer source = "## GET /1\n"
+                             "+ Response 200\n"
+                             "+ Body\n"
+                             "    { ... }\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
+    SectionParserHelper<Action, ActionParser>::parse(
+        source, ActionSectionType, action);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.size() == 1);
@@ -237,17 +227,16 @@ TEST_CASE("Full syntax - Poor Body & Body Asset Indentation & No Newline", "[ind
     REQUIRE(action.node.examples[0].responses[0].body.empty());
 }
 
-TEST_CASE("Full syntax - No Indentation", "[indentation]")
-{
-    mdp::ByteBuffer source = \
-    "## GET /1\n"\
-    "+ Response 200\n"\
-    "+ Body\n"\
-    "\n"\
-    "{ ... }\n";
+TEST_CASE("Full syntax - No Indentation", "[indentation]") {
+    mdp::ByteBuffer source = "## GET /1\n"
+                             "+ Response 200\n"
+                             "+ Body\n"
+                             "\n"
+                             "{ ... }\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
+    SectionParserHelper<Action, ActionParser>::parse(
+        source, ActionSectionType, action);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.size() == 2);
@@ -262,16 +251,15 @@ TEST_CASE("Full syntax - No Indentation", "[indentation]")
     REQUIRE(action.node.examples[0].responses[0].body == "{ ... }\n\n");
 }
 
-TEST_CASE("Full syntax - No Indentation & No Newline", "[indentation]")
-{
-    mdp::ByteBuffer source = \
-    "## GET /1\n"\
-    "+ Response 200\n"\
-    "+ Body\n"\
-    "{ ... }\n";
+TEST_CASE("Full syntax - No Indentation & No Newline", "[indentation]") {
+    mdp::ByteBuffer source = "## GET /1\n"
+                             "+ Response 200\n"
+                             "+ Body\n"
+                             "{ ... }\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
+    SectionParserHelper<Action, ActionParser>::parse(
+        source, ActionSectionType, action);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.size() == 1);
@@ -284,18 +272,17 @@ TEST_CASE("Full syntax - No Indentation & No Newline", "[indentation]")
     REQUIRE(action.node.examples[0].responses[0].body.empty());
 }
 
-TEST_CASE("Full syntax - Extra indentation", "[indentation]")
-{
-    mdp::ByteBuffer source = \
-    "## GET /1\n"\
-    "+ Response 200\n"\
-    "\n"\
-    "        + Body\n"\
-    "\n"\
-    "                { ... }\n";
+TEST_CASE("Full syntax - Extra indentation", "[indentation]") {
+    mdp::ByteBuffer source = "## GET /1\n"
+                             "+ Response 200\n"
+                             "\n"
+                             "        + Body\n"
+                             "\n"
+                             "                { ... }\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
+    SectionParserHelper<Action, ActionParser>::parse(
+        source, ActionSectionType, action);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.size() == 1);
@@ -305,21 +292,21 @@ TEST_CASE("Full syntax - Extra indentation", "[indentation]")
     REQUIRE(action.node.examples.size() == 1);
     REQUIRE(action.node.examples[0].responses.size() == 1);
     REQUIRE(action.node.examples[0].responses[0].name == "200");
-    REQUIRE(action.node.examples[0].responses[0].body == "+ Body\n\n        { ... }\n");
+    REQUIRE(action.node.examples[0].responses[0].body ==
+            "+ Body\n\n        { ... }\n");
 }
 
-TEST_CASE("No Indentation & No Newline multi-line", "[indentation]")
-{
-    mdp::ByteBuffer source = \
-    "## GET /1\n"\
-    "+ Response 200\n"\
-    "{\n"\
-    "\n"\
-    "    Hello\n"\
-    "}\n";
+TEST_CASE("No Indentation & No Newline multi-line", "[indentation]") {
+    mdp::ByteBuffer source = "## GET /1\n"
+                             "+ Response 200\n"
+                             "{\n"
+                             "\n"
+                             "    Hello\n"
+                             "}\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
+    SectionParserHelper<Action, ActionParser>::parse(
+        source, ActionSectionType, action);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.size() == 2);

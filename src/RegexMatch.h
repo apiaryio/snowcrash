@@ -14,19 +14,24 @@
 
 namespace snowcrash {
 
-    // Perform snowcrash-specific regex evaluation
-    // returns true if target string matches given expression, false otherwise
-    bool RegexMatch(const std::string& target, const std::string& expression);
+// Perform snowcrash-specific regex evaluation
+// returns true if target string matches given expression, false otherwise
+bool RegexMatch(const std::string &target, const std::string &expression);
 
-    // Performs posix-regex and returns first captured group (excluding whole target)
-    std::string RegexCaptureFirst(const std::string& target, const std::string& expression);
+// Performs posix-regex and returns first captured group (excluding whole
+// target)
+std::string RegexCaptureFirst(
+    const std::string &target, const std::string &expression);
 
-    // Array of capture groups
-    typedef std::vector<std::string> CaptureGroups;
+// Array of capture groups
+typedef std::vector<std::string> CaptureGroups;
 
-    // Performs posix-regex
-    // returns true if target string matches given expression, false otherwise
-    bool RegexCapture(const std::string& target, const std::string& expression, CaptureGroups& captureGroups, size_t groupSize = 8);
+// Performs posix-regex
+// returns true if target string matches given expression, false otherwise
+bool RegexCapture(const std::string &target,
+    const std::string &expression,
+    CaptureGroups &captureGroups,
+    size_t groupSize = 8);
 }
 
 #endif

@@ -13,8 +13,7 @@
 using namespace snowcrash;
 using namespace snowcrashtest;
 
-TEST_CASE("Parse empty blueprint", "[parser]")
-{
+TEST_CASE("Parse empty blueprint", "[parser]") {
     mdp::ByteBuffer source = "";
 
     ParseResult<Blueprint> blueprint;
@@ -29,16 +28,14 @@ TEST_CASE("Parse empty blueprint", "[parser]")
     REQUIRE(blueprint.node.content.elements().empty());
 }
 
-TEST_CASE("Parse simple blueprint", "[parser]")
-{
-    mdp::ByteBuffer source = \
-    "# Snowcrash API \n\n"\
-    "# GET /resource\n"\
-    "Resource **description**\n\n"\
-    "+ Response 200\n"\
-    "    + Body\n\n"\
-    "            Text\n\n"\
-    "            { ... }\n";
+TEST_CASE("Parse simple blueprint", "[parser]") {
+    mdp::ByteBuffer source = "# Snowcrash API \n\n"
+                             "# GET /resource\n"
+                             "Resource **description**\n\n"
+                             "+ Response 200\n"
+                             "    + Body\n\n"
+                             "            Text\n\n"
+                             "            { ... }\n";
 
     ParseResult<Blueprint> blueprint;
     parse(source, 0, blueprint);
@@ -51,28 +48,37 @@ TEST_CASE("Parse simple blueprint", "[parser]")
 
     REQUIRE(blueprint.node.content.elements().size() == 1);
     REQUIRE(blueprint.node.content.elements().at(0).attributes.name.empty());
-    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
-    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 1);
-    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).element == Element::ResourceElement);
+    REQUIRE(blueprint.node.content.elements().at(0).element ==
+            Element::CategoryElement);
+    REQUIRE(
+        blueprint.node.content.elements().at(0).content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements()
+                .at(0)
+                .content.elements()
+                .at(0)
+                .element == Element::ResourceElement);
 
-    Resource resource = blueprint.node.content.elements().at(0).content.elements().at(0).content.resource;
+    Resource resource = blueprint.node.content.elements()
+                            .at(0)
+                            .content.elements()
+                            .at(0)
+                            .content.resource;
     REQUIRE(resource.uriTemplate == "/resource");
     REQUIRE(resource.actions.size() == 1);
 
-    Action& action = resource.actions[0];
+    Action &action = resource.actions[0];
     REQUIRE(action.method == "GET");
     REQUIRE(action.description == "Resource **description**");
     REQUIRE(action.examples.size() == 1);
     REQUIRE(action.examples.front().requests.empty());
     REQUIRE(action.examples.front().responses.size() == 1);
 
-    Response& response = action.examples.front().responses[0];
+    Response &response = action.examples.front().responses[0];
     REQUIRE(response.name == "200");
     REQUIRE(response.body == "Text\n\n{ ... }\n");
 }
 
-TEST_CASE("Parse blueprint with unsupported characters", "[parser]")
-{
+TEST_CASE("Parse blueprint with unsupported characters", "[parser]") {
     ParseResult<Blueprint> blueprint1;
     parse("hello\t", 0, blueprint1);
 
@@ -86,14 +92,13 @@ TEST_CASE("Parse blueprint with unsupported characters", "[parser]")
     SourceMapHelper::check(blueprint2.report.error.location, 4, 1);
 }
 
-TEST_CASE("Do not report duplicate response when media type differs", "[method][14]")
-{
-    mdp::ByteBuffer source = \
-    "# GET /message\n"\
-    "+ Response 200 (application/json)\n\n"\
-    "        { \"msg\": \"Hello.\" }\n\n"\
-    "+ Response 200 (text/plain)\n\n"\
-    "        Hello.\n";
+TEST_CASE("Do not report duplicate response when media type differs",
+    "[method][14]") {
+    mdp::ByteBuffer source = "# GET /message\n"
+                             "+ Response 200 (application/json)\n\n"
+                             "        { \"msg\": \"Hello.\" }\n\n"
+                             "+ Response 200 (text/plain)\n\n"
+                             "        Hello.\n";
 
     ParseResult<Blueprint> blueprint;
 
@@ -103,13 +108,11 @@ TEST_CASE("Do not report duplicate response when media type differs", "[method][
     REQUIRE(blueprint.report.warnings.empty());
 }
 
-TEST_CASE("Support description ending with an list item", "[parser][8]")
-{
-    mdp::ByteBuffer source = \
-    "# GET /1\n"\
-    "+ a description item\n"\
-    "+ Response 200\n\n"\
-    "        ...\n";
+TEST_CASE("Support description ending with an list item", "[parser][8]") {
+    mdp::ByteBuffer source = "# GET /1\n"
+                             "+ a description item\n"
+                             "+ Response 200\n\n"
+                             "        ...\n";
 
     ParseResult<Blueprint> blueprint;
     parse(source, 0, blueprint);
@@ -118,11 +121,21 @@ TEST_CASE("Support description ending with an list item", "[parser][8]")
     REQUIRE(blueprint.report.warnings.empty());
 
     REQUIRE(blueprint.node.content.elements().size() == 1);
-    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
-    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 1);
-    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).element == Element::ResourceElement);
+    REQUIRE(blueprint.node.content.elements().at(0).element ==
+            Element::CategoryElement);
+    REQUIRE(
+        blueprint.node.content.elements().at(0).content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements()
+                .at(0)
+                .content.elements()
+                .at(0)
+                .element == Element::ResourceElement);
 
-    Resource resource = blueprint.node.content.elements().at(0).content.elements().at(0).content.resource;
+    Resource resource = blueprint.node.content.elements()
+                            .at(0)
+                            .content.elements()
+                            .at(0)
+                            .content.resource;
     REQUIRE(resource.actions.size() == 1);
     REQUIRE(resource.actions[0].description == "+ a description item");
     REQUIRE(resource.actions[0].examples.size() == 1);
@@ -131,11 +144,10 @@ TEST_CASE("Support description ending with an list item", "[parser][8]")
     REQUIRE(resource.actions[0].examples[0].responses[0].body == "...\n");
 }
 
-TEST_CASE("Invalid ‘warning: empty body asset’ for certain status codes", "[parser][13]")
-{
-    mdp::ByteBuffer source = \
-    "# GET /1\n"\
-    "+ Response 304\n";
+TEST_CASE("Invalid ‘warning: empty body asset’ for certain status codes",
+    "[parser][13]") {
+    mdp::ByteBuffer source = "# GET /1\n"
+                             "+ Response 304\n";
 
     ParseResult<Blueprint> blueprint;
     parse(source, 0, blueprint);
@@ -144,11 +156,21 @@ TEST_CASE("Invalid ‘warning: empty body asset’ for certain status codes", "[
     REQUIRE(blueprint.report.warnings.empty());
 
     REQUIRE(blueprint.node.content.elements().size() == 1);
-    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
-    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 1);
-    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).element == Element::ResourceElement);
+    REQUIRE(blueprint.node.content.elements().at(0).element ==
+            Element::CategoryElement);
+    REQUIRE(
+        blueprint.node.content.elements().at(0).content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements()
+                .at(0)
+                .content.elements()
+                .at(0)
+                .element == Element::ResourceElement);
 
-    Resource resource = blueprint.node.content.elements().at(0).content.elements().at(0).content.resource;
+    Resource resource = blueprint.node.content.elements()
+                            .at(0)
+                            .content.elements()
+                            .at(0)
+                            .content.resource;
     REQUIRE(resource.actions.size() == 1);
     REQUIRE(resource.actions[0].description.empty());
     REQUIRE(resource.actions[0].examples.size() == 1);
@@ -157,25 +179,23 @@ TEST_CASE("Invalid ‘warning: empty body asset’ for certain status codes", "[
     REQUIRE(resource.actions[0].examples[0].responses[0].body.empty());
 }
 
-TEST_CASE("SIGTERM parsing blueprint", "[parser][45]")
-{
-    mdp::ByteBuffer source = \
-    "# A\n"\
-    "# B\n"\
-    "C\n\n"\
-    "D\n\n"\
-    "E\n\n"\
-    "F\n\n"\
-    "G\n\n"\
-    "# /1\n"\
-    "# GET\n"\
-    "+ Request\n"\
-    "+ Response 200\n"\
-    "    + Body\n\n"\
-    "            H\n\n"\
-    "I\n"\
-    "# J\n"\
-    "> K";
+TEST_CASE("SIGTERM parsing blueprint", "[parser][45]") {
+    mdp::ByteBuffer source = "# A\n"
+                             "# B\n"
+                             "C\n\n"
+                             "D\n\n"
+                             "E\n\n"
+                             "F\n\n"
+                             "G\n\n"
+                             "# /1\n"
+                             "# GET\n"
+                             "+ Request\n"
+                             "+ Response 200\n"
+                             "    + Body\n\n"
+                             "            H\n\n"
+                             "I\n"
+                             "# J\n"
+                             "> K";
 
     ParseResult<Blueprint> blueprint;
     parse(source, 0, blueprint);
@@ -184,18 +204,16 @@ TEST_CASE("SIGTERM parsing blueprint", "[parser][45]")
     REQUIRE(blueprint.report.warnings.size() == 4);
 }
 
-TEST_CASE("Parse adjacent asset blocks", "[parser][9]")
-{
-    mdp::ByteBuffer source = \
-    "# GET /1\n"\
-    "+ response 200\n"\
-    "\n"\
-    "asset\n"\
-    "\n"\
-    "    pre\n"\
-    "+ response 404\n"\
-    "\n"\
-    "        Not found\n";
+TEST_CASE("Parse adjacent asset blocks", "[parser][9]") {
+    mdp::ByteBuffer source = "# GET /1\n"
+                             "+ response 200\n"
+                             "\n"
+                             "asset\n"
+                             "\n"
+                             "    pre\n"
+                             "+ response 404\n"
+                             "\n"
+                             "        Not found\n";
 
     ParseResult<Blueprint> blueprint;
     parse(source, 0, blueprint);
@@ -204,27 +222,36 @@ TEST_CASE("Parse adjacent asset blocks", "[parser][9]")
     REQUIRE(blueprint.report.warnings.size() == 2);
 
     REQUIRE(blueprint.node.content.elements().size() == 1);
-    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
-    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 1);
-    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).element == Element::ResourceElement);
+    REQUIRE(blueprint.node.content.elements().at(0).element ==
+            Element::CategoryElement);
+    REQUIRE(
+        blueprint.node.content.elements().at(0).content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements()
+                .at(0)
+                .content.elements()
+                .at(0)
+                .element == Element::ResourceElement);
 
-    Resource resource = blueprint.node.content.elements().at(0).content.elements().at(0).content.resource;
+    Resource resource = blueprint.node.content.elements()
+                            .at(0)
+                            .content.elements()
+                            .at(0)
+                            .content.resource;
     REQUIRE(resource.actions.size() == 1);
     REQUIRE(resource.actions[0].description.empty());
     REQUIRE(resource.actions[0].examples.size() == 1);
     REQUIRE(resource.actions[0].examples[0].responses.size() == 2);
     REQUIRE(resource.actions[0].examples[0].responses[0].name == "200");
-    REQUIRE(resource.actions[0].examples[0].responses[0].body == "asset\n\npre\n\n");
+    REQUIRE(resource.actions[0].examples[0].responses[0].body ==
+            "asset\n\npre\n\n");
     REQUIRE(resource.actions[0].examples[0].responses[1].name == "404");
     REQUIRE(resource.actions[0].examples[0].responses[1].body == "Not found\n");
 }
 
-TEST_CASE("Parse adjacent asset list blocks", "[parser][9]")
-{
-    mdp::ByteBuffer source = \
-    "# GET /1\n"\
-    "+ response 200\n"\
-    "+ list\n";
+TEST_CASE("Parse adjacent asset list blocks", "[parser][9]") {
+    mdp::ByteBuffer source = "# GET /1\n"
+                             "+ response 200\n"
+                             "+ list\n";
 
     ParseResult<Blueprint> blueprint;
     parse(source, 0, blueprint);
@@ -234,11 +261,21 @@ TEST_CASE("Parse adjacent asset list blocks", "[parser][9]")
     REQUIRE(blueprint.report.warnings[0].code == IgnoringWarning);
 
     REQUIRE(blueprint.node.content.elements().size() == 1);
-    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
-    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 1);
-    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).element == Element::ResourceElement);
+    REQUIRE(blueprint.node.content.elements().at(0).element ==
+            Element::CategoryElement);
+    REQUIRE(
+        blueprint.node.content.elements().at(0).content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements()
+                .at(0)
+                .content.elements()
+                .at(0)
+                .element == Element::ResourceElement);
 
-    Resource resource = blueprint.node.content.elements().at(0).content.elements().at(0).content.resource;
+    Resource resource = blueprint.node.content.elements()
+                            .at(0)
+                            .content.elements()
+                            .at(0)
+                            .content.resource;
     REQUIRE(resource.actions.size() == 1);
     REQUIRE(resource.actions[0].description.empty());
     REQUIRE(resource.actions[0].examples[0].responses.size() == 1);
@@ -246,17 +283,15 @@ TEST_CASE("Parse adjacent asset list blocks", "[parser][9]")
     REQUIRE(resource.actions[0].examples[0].responses[0].body.empty());
 }
 
-TEST_CASE("Parse adjacent nested asset blocks", "[parser][9]")
-{
-    mdp::ByteBuffer source = \
-    "# GET /1\n"\
-    "+ response 200\n"\
-    "    + body\n"\
-    "\n"\
-    "        A\n"\
-    "\n"\
-    "    B\n"\
-    "C\n";
+TEST_CASE("Parse adjacent nested asset blocks", "[parser][9]") {
+    mdp::ByteBuffer source = "# GET /1\n"
+                             "+ response 200\n"
+                             "    + body\n"
+                             "\n"
+                             "        A\n"
+                             "\n"
+                             "    B\n"
+                             "C\n";
 
     ParseResult<Blueprint> blueprint;
     parse(source, 0, blueprint);
@@ -267,11 +302,21 @@ TEST_CASE("Parse adjacent nested asset blocks", "[parser][9]")
     REQUIRE(blueprint.report.warnings[1].code == IndentationWarning);
 
     REQUIRE(blueprint.node.content.elements().size() == 1);
-    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
-    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 1);
-    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).element == Element::ResourceElement);
+    REQUIRE(blueprint.node.content.elements().at(0).element ==
+            Element::CategoryElement);
+    REQUIRE(
+        blueprint.node.content.elements().at(0).content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements()
+                .at(0)
+                .content.elements()
+                .at(0)
+                .element == Element::ResourceElement);
 
-    Resource resource = blueprint.node.content.elements().at(0).content.elements().at(0).content.resource;
+    Resource resource = blueprint.node.content.elements()
+                            .at(0)
+                            .content.elements()
+                            .at(0)
+                            .content.resource;
     REQUIRE(resource.actions.size() == 1);
     REQUIRE(resource.actions[0].description.empty());
     REQUIRE(resource.actions[0].examples[0].responses.size() == 1);
@@ -279,11 +324,10 @@ TEST_CASE("Parse adjacent nested asset blocks", "[parser][9]")
     REQUIRE(resource.actions[0].examples[0].responses[0].body == "A\nB\nC\n\n");
 }
 
-TEST_CASE("Exception while parsing a blueprint with leading empty space", "[regression][parser]")
-{
-    mdp::ByteBuffer source = \
-    "\n"\
-    "# PUT /branch\n";
+TEST_CASE("Exception while parsing a blueprint with leading empty space",
+    "[regression][parser]") {
+    mdp::ByteBuffer source = "\n"
+                             "# PUT /branch\n";
 
     ParseResult<Blueprint> blueprint;
 
@@ -293,10 +337,9 @@ TEST_CASE("Exception while parsing a blueprint with leading empty space", "[regr
     REQUIRE(blueprint.report.warnings[0].code == EmptyDefinitionWarning);
 }
 
-TEST_CASE("Invalid source map without closing newline", "[regression][parser]")
-{
-    mdp::ByteBuffer source = \
-    "# PUT /branch";
+TEST_CASE(
+    "Invalid source map without closing newline", "[regression][parser]") {
+    mdp::ByteBuffer source = "# PUT /branch";
 
     ParseResult<Blueprint> blueprint;
 
@@ -307,10 +350,9 @@ TEST_CASE("Invalid source map without closing newline", "[regression][parser]")
     SourceMapHelper::check(blueprint.report.warnings[0].location, 0, 13);
 }
 
-TEST_CASE("Warn about missing API name if there is an API description", "[parser][regression]")
-{
-    mdp::ByteBuffer source1 = \
-    "Hello World\n";
+TEST_CASE("Warn about missing API name if there is an API description",
+    "[parser][regression]") {
+    mdp::ByteBuffer source1 = "Hello World\n";
 
     ParseResult<Blueprint> blueprint1;
     parse(source1, 0, blueprint1);
@@ -323,9 +365,8 @@ TEST_CASE("Warn about missing API name if there is an API description", "[parser
     REQUIRE(blueprint1.node.description == "Hello World");
     REQUIRE(blueprint1.node.content.elements().empty());
 
-    mdp::ByteBuffer source2 = \
-    "# API\n"\
-    "Hello World\n";
+    mdp::ByteBuffer source2 = "# API\n"
+                              "Hello World\n";
 
     ParseResult<Blueprint> blueprint2;
     parse(source2, 0, blueprint2);
@@ -337,9 +378,8 @@ TEST_CASE("Warn about missing API name if there is an API description", "[parser
     REQUIRE(blueprint2.node.description == "Hello World");
     REQUIRE(blueprint2.node.content.elements().empty());
 
-    mdp::ByteBuffer source3 = \
-    "# POST /1\n"\
-    "+ Response 201";
+    mdp::ByteBuffer source3 = "# POST /1\n"
+                              "+ Response 201";
 
     ParseResult<Blueprint> blueprint3;
     parse(source3, 0, blueprint3);
@@ -348,14 +388,12 @@ TEST_CASE("Warn about missing API name if there is an API description", "[parser
     REQUIRE(blueprint3.report.warnings.empty());
 }
 
-TEST_CASE("Resource with incorrect URI segfault", "[parser][regression]")
-{
-    mdp::ByteBuffer source = \
-    "# Group A\n"\
-    "## Resource [wronguri]\n"\
-    "### Retrieve [GET]\n"\
-    "+ Response 200\n"\
-    "\n";
+TEST_CASE("Resource with incorrect URI segfault", "[parser][regression]") {
+    mdp::ByteBuffer source = "# Group A\n"
+                             "## Resource [wronguri]\n"
+                             "### Retrieve [GET]\n"
+                             "+ Response 200\n"
+                             "\n";
 
     ParseResult<Blueprint> blueprint;
     parse(source, 0, blueprint);
@@ -367,22 +405,31 @@ TEST_CASE("Resource with incorrect URI segfault", "[parser][regression]")
     REQUIRE(blueprint.node.description.empty());
 
     REQUIRE(blueprint.node.content.elements().size() == 1);
-    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
+    REQUIRE(blueprint.node.content.elements().at(0).element ==
+            Element::CategoryElement);
     REQUIRE(blueprint.node.content.elements().at(0).attributes.name == "A");
-    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 1);
-    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).element == Element::CopyElement);
-    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).content.copy == "## Resource [wronguri]\n\n### Retrieve [GET]\n\n+ Response 200");
+    REQUIRE(
+        blueprint.node.content.elements().at(0).content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements()
+                .at(0)
+                .content.elements()
+                .at(0)
+                .element == Element::CopyElement);
+    REQUIRE(blueprint.node.content.elements()
+                .at(0)
+                .content.elements()
+                .at(0)
+                .content.copy ==
+            "## Resource [wronguri]\n\n### Retrieve [GET]\n\n+ Response 200");
 }
 
-TEST_CASE("Dangling block not recognized", "[parser][regression][186]")
-{
-    mdp::ByteBuffer source = \
-    "# A [/a]\n"\
-    "+ Model\n"\
-    "\n"\
-    "```js\n"\
-    "    { ... }\n"\
-    "```\n";
+TEST_CASE("Dangling block not recognized", "[parser][regression][186]") {
+    mdp::ByteBuffer source = "# A [/a]\n"
+                             "+ Model\n"
+                             "\n"
+                             "```js\n"
+                             "    { ... }\n"
+                             "```\n";
 
     ParseResult<Blueprint> blueprint;
     parse(source, 0, blueprint);
@@ -395,27 +442,35 @@ TEST_CASE("Dangling block not recognized", "[parser][regression][186]")
     REQUIRE(blueprint.node.description.empty());
 
     REQUIRE(blueprint.node.content.elements().size() == 1);
-    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
-    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 1);
-    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).element == Element::ResourceElement);
+    REQUIRE(blueprint.node.content.elements().at(0).element ==
+            Element::CategoryElement);
+    REQUIRE(
+        blueprint.node.content.elements().at(0).content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements()
+                .at(0)
+                .content.elements()
+                .at(0)
+                .element == Element::ResourceElement);
 
-    Resource resource = blueprint.node.content.elements().at(0).content.elements().at(0).content.resource;
+    Resource resource = blueprint.node.content.elements()
+                            .at(0)
+                            .content.elements()
+                            .at(0)
+                            .content.resource;
     REQUIRE(resource.name == "A");
     REQUIRE(resource.uriTemplate == "/a");
     REQUIRE(resource.model.body == "    { ... }\n\n");
 }
 
-TEST_CASE("Ignoring block recovery", "[parser][regression][188]")
-{
-    mdp::ByteBuffer source = \
-    "## Note [/notes/{id}]\n"\
-    "\n"\
-    "+ Parameters\n"\
-    "    + id\n"\
-    "\n"\
-    "+ Response 200\n"\
-    "\n"\
-    "### Remove a Note [DELETE]\n";
+TEST_CASE("Ignoring block recovery", "[parser][regression][188]") {
+    mdp::ByteBuffer source = "## Note [/notes/{id}]\n"
+                             "\n"
+                             "+ Parameters\n"
+                             "    + id\n"
+                             "\n"
+                             "+ Response 200\n"
+                             "\n"
+                             "### Remove a Note [DELETE]\n";
 
     ParseResult<Blueprint> blueprint;
     parse(source, 0, blueprint);
@@ -426,29 +481,37 @@ TEST_CASE("Ignoring block recovery", "[parser][regression][188]")
     REQUIRE(blueprint.report.warnings[1].code == EmptyDefinitionWarning);
 
     REQUIRE(blueprint.node.content.elements().size() == 1);
-    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
-    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 1);
-    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).element == Element::ResourceElement);
+    REQUIRE(blueprint.node.content.elements().at(0).element ==
+            Element::CategoryElement);
+    REQUIRE(
+        blueprint.node.content.elements().at(0).content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements()
+                .at(0)
+                .content.elements()
+                .at(0)
+                .element == Element::ResourceElement);
 
-    Resource resource = blueprint.node.content.elements().at(0).content.elements().at(0).content.resource;
+    Resource resource = blueprint.node.content.elements()
+                            .at(0)
+                            .content.elements()
+                            .at(0)
+                            .content.resource;
     REQUIRE(resource.name == "Note");
     REQUIRE(resource.actions.size() == 1);
     REQUIRE(resource.actions[0].name == "Remove a Note");
     REQUIRE(resource.actions[0].method == "DELETE");
 }
 
-TEST_CASE("Ignoring dangling model assets", "[parser][regression][196]")
-{
-    mdp::ByteBuffer source = \
-    "# A [/A]\n"\
-    "+ model (Y)\n"\
-    "\n"\
-    "{ A }\n"\
-    "\n"\
-    "## POST /B\n"\
-    "+ Response 200\n"\
-    "\n"\
-    "    [A][]\n";
+TEST_CASE("Ignoring dangling model assets", "[parser][regression][196]") {
+    mdp::ByteBuffer source = "# A [/A]\n"
+                             "+ model (Y)\n"
+                             "\n"
+                             "{ A }\n"
+                             "\n"
+                             "## POST /B\n"
+                             "+ Response 200\n"
+                             "\n"
+                             "    [A][]\n";
 
     ParseResult<Blueprint> blueprint;
     parse(source, 0, blueprint);
@@ -458,12 +521,26 @@ TEST_CASE("Ignoring dangling model assets", "[parser][regression][196]")
     REQUIRE(blueprint.report.warnings[0].code == IndentationWarning);
 
     REQUIRE(blueprint.node.content.elements().size() == 1);
-    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
-    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 2);
-    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).element == Element::ResourceElement);
-    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(1).element == Element::ResourceElement);
+    REQUIRE(blueprint.node.content.elements().at(0).element ==
+            Element::CategoryElement);
+    REQUIRE(
+        blueprint.node.content.elements().at(0).content.elements().size() == 2);
+    REQUIRE(blueprint.node.content.elements()
+                .at(0)
+                .content.elements()
+                .at(0)
+                .element == Element::ResourceElement);
+    REQUIRE(blueprint.node.content.elements()
+                .at(0)
+                .content.elements()
+                .at(1)
+                .element == Element::ResourceElement);
 
-    Resource resource = blueprint.node.content.elements().at(0).content.elements().at(1).content.resource;
+    Resource resource = blueprint.node.content.elements()
+                            .at(0)
+                            .content.elements()
+                            .at(1)
+                            .content.resource;
     REQUIRE(resource.name.empty());
     REQUIRE(resource.uriTemplate == "/B");
     REQUIRE(resource.actions.size() == 1);
@@ -474,18 +551,16 @@ TEST_CASE("Ignoring dangling model assets", "[parser][regression][196]")
     REQUIRE(resource.actions[0].examples[0].responses[0].body == "{ A }\n\n");
 }
 
-TEST_CASE("Ignoring local media type", "[parser][regression][195]")
-{
-    mdp::ByteBuffer source = \
-    "# A [/A]\n"\
-    "+ model (Y)\n"\
-    "\n"\
-    "        { A }\n"\
-    "\n"\
-    "## Retrieve [GET]\n"\
-    "+ Response 200 (X)\n"\
-    "\n"\
-    "    [A][]\n";
+TEST_CASE("Ignoring local media type", "[parser][regression][195]") {
+    mdp::ByteBuffer source = "# A [/A]\n"
+                             "+ model (Y)\n"
+                             "\n"
+                             "        { A }\n"
+                             "\n"
+                             "## Retrieve [GET]\n"
+                             "+ Response 200 (X)\n"
+                             "\n"
+                             "    [A][]\n";
 
     ParseResult<Blueprint> blueprint;
     parse(source, ExportSourcemapOption, blueprint);
@@ -495,42 +570,70 @@ TEST_CASE("Ignoring local media type", "[parser][regression][195]")
     REQUIRE(blueprint.report.warnings[0].code == IgnoringWarning);
 
     REQUIRE(blueprint.node.content.elements().size() == 1);
-    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
-    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 1);
-    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).element == Element::ResourceElement);
+    REQUIRE(blueprint.node.content.elements().at(0).element ==
+            Element::CategoryElement);
+    REQUIRE(
+        blueprint.node.content.elements().at(0).content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements()
+                .at(0)
+                .content.elements()
+                .at(0)
+                .element == Element::ResourceElement);
 
-    Resource resource = blueprint.node.content.elements().at(0).content.elements().at(0).content.resource;
+    Resource resource = blueprint.node.content.elements()
+                            .at(0)
+                            .content.elements()
+                            .at(0)
+                            .content.resource;
     REQUIRE(resource.actions.size() == 1);
     REQUIRE(resource.actions[0].examples.size() == 1);
     REQUIRE(resource.actions[0].examples[0].responses.size() == 1);
     REQUIRE(resource.actions[0].examples[0].responses[0].name == "200");
     REQUIRE(resource.actions[0].examples[0].responses[0].headers.size() == 1);
-    REQUIRE(resource.actions[0].examples[0].responses[0].headers[0].first == "Content-Type");
-    REQUIRE(resource.actions[0].examples[0].responses[0].headers[0].second == "Y");
+    REQUIRE(resource.actions[0].examples[0].responses[0].headers[0].first ==
+            "Content-Type");
+    REQUIRE(
+        resource.actions[0].examples[0].responses[0].headers[0].second == "Y");
 
     REQUIRE(blueprint.sourceMap.content.elements().collection.size() == 1);
-    REQUIRE(blueprint.sourceMap.content.elements().collection[0].content.elements().collection.size() == 1);
+    REQUIRE(blueprint.sourceMap.content.elements()
+                .collection[0]
+                .content.elements()
+                .collection.size() == 1);
 
-    SourceMap<Resource> resourceSM = blueprint.sourceMap.content.elements().collection[0].content.elements().collection[0].content.resource;
+    SourceMap<Resource> resourceSM = blueprint.sourceMap.content.elements()
+                                         .collection[0]
+                                         .content.elements()
+                                         .collection[0]
+                                         .content.resource;
     REQUIRE(resourceSM.actions.collection.size() == 1);
     REQUIRE(resourceSM.actions.collection[0].examples.collection.size() == 1);
-    REQUIRE(resourceSM.actions.collection[0].examples.collection[0].responses.collection.size() == 1);
-    REQUIRE(resourceSM.actions.collection[0].examples.collection[0].responses.collection[0].headers.collection.size() == 1);
-    SourceMapHelper::check(resourceSM.actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[0].sourceMap, 11, 11);
+    REQUIRE(resourceSM.actions.collection[0]
+                .examples.collection[0]
+                .responses.collection.size() == 1);
+    REQUIRE(resourceSM.actions.collection[0]
+                .examples.collection[0]
+                .responses.collection[0]
+                .headers.collection.size() == 1);
+    SourceMapHelper::check(resourceSM.actions.collection[0]
+                               .examples.collection[0]
+                               .responses.collection[0]
+                               .headers.collection[0]
+                               .sourceMap,
+        11,
+        11);
 }
 
-TEST_CASE("Using local media type", "[parser][regression][195]")
-{
-    mdp::ByteBuffer source = \
-    "# A [/A]\n"\
-    "+ model\n"\
-    "\n"\
-    "        { A }\n"\
-    "\n"\
-    "## Retrieve [GET]\n"\
-    "+ Response 200 (X)\n"\
-    "\n"\
-    "    [A][]\n";
+TEST_CASE("Using local media type", "[parser][regression][195]") {
+    mdp::ByteBuffer source = "# A [/A]\n"
+                             "+ model\n"
+                             "\n"
+                             "        { A }\n"
+                             "\n"
+                             "## Retrieve [GET]\n"
+                             "+ Response 200 (X)\n"
+                             "\n"
+                             "    [A][]\n";
 
     ParseResult<Blueprint> blueprint;
     parse(source, ExportSourcemapOption, blueprint);
@@ -539,37 +642,65 @@ TEST_CASE("Using local media type", "[parser][regression][195]")
     REQUIRE(blueprint.report.warnings.empty());
 
     REQUIRE(blueprint.node.content.elements().size() == 1);
-    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
-    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 1);
-    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).element == Element::ResourceElement);
+    REQUIRE(blueprint.node.content.elements().at(0).element ==
+            Element::CategoryElement);
+    REQUIRE(
+        blueprint.node.content.elements().at(0).content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements()
+                .at(0)
+                .content.elements()
+                .at(0)
+                .element == Element::ResourceElement);
 
-    Resource resource = blueprint.node.content.elements().at(0).content.elements().at(0).content.resource;
+    Resource resource = blueprint.node.content.elements()
+                            .at(0)
+                            .content.elements()
+                            .at(0)
+                            .content.resource;
     REQUIRE(resource.actions.size() == 1);
     REQUIRE(resource.actions[0].examples.size() == 1);
     REQUIRE(resource.actions[0].examples[0].responses.size() == 1);
     REQUIRE(resource.actions[0].examples[0].responses[0].name == "200");
     REQUIRE(resource.actions[0].examples[0].responses[0].headers.size() == 1);
-    REQUIRE(resource.actions[0].examples[0].responses[0].headers[0].first == "Content-Type");
-    REQUIRE(resource.actions[0].examples[0].responses[0].headers[0].second == "X");
+    REQUIRE(resource.actions[0].examples[0].responses[0].headers[0].first ==
+            "Content-Type");
+    REQUIRE(
+        resource.actions[0].examples[0].responses[0].headers[0].second == "X");
 
     REQUIRE(blueprint.sourceMap.content.elements().collection.size() == 1);
-    REQUIRE(blueprint.sourceMap.content.elements().collection[0].content.elements().collection.size() == 1);
+    REQUIRE(blueprint.sourceMap.content.elements()
+                .collection[0]
+                .content.elements()
+                .collection.size() == 1);
 
-    SourceMap<Resource> resourceSM = blueprint.sourceMap.content.elements().collection[0].content.elements().collection[0].content.resource;
+    SourceMap<Resource> resourceSM = blueprint.sourceMap.content.elements()
+                                         .collection[0]
+                                         .content.elements()
+                                         .collection[0]
+                                         .content.resource;
     REQUIRE(resourceSM.actions.collection.size() == 1);
     REQUIRE(resourceSM.actions.collection[0].examples.collection.size() == 1);
-    REQUIRE(resourceSM.actions.collection[0].examples.collection[0].responses.collection.size() == 1);
-    REQUIRE(resourceSM.actions.collection[0].examples.collection[0].responses.collection[0].headers.collection.size() == 1);
-    SourceMapHelper::check(resourceSM.actions.collection[0].examples.collection[0].responses.collection[0].headers.collection[0].sourceMap, 53, 18);
+    REQUIRE(resourceSM.actions.collection[0]
+                .examples.collection[0]
+                .responses.collection.size() == 1);
+    REQUIRE(resourceSM.actions.collection[0]
+                .examples.collection[0]
+                .responses.collection[0]
+                .headers.collection.size() == 1);
+    SourceMapHelper::check(resourceSM.actions.collection[0]
+                               .examples.collection[0]
+                               .responses.collection[0]
+                               .headers.collection[0]
+                               .sourceMap,
+        53,
+        18);
 }
 
-TEST_CASE("Parse ill-formated header", "[parser][198][regression]")
-{
-    mdp::ByteBuffer source = \
-    "# GET /A\n"\
-    "+ Response 200\n"\
-    "    + Header\n"\
-    "        Location: new_url\n";
+TEST_CASE("Parse ill-formated header", "[parser][198][regression]") {
+    mdp::ByteBuffer source = "# GET /A\n"
+                             "+ Response 200\n"
+                             "    + Header\n"
+                             "        Location: new_url\n";
 
     ParseResult<Blueprint> blueprint;
     parse(source, 0, blueprint);
@@ -579,35 +710,45 @@ TEST_CASE("Parse ill-formated header", "[parser][198][regression]")
     REQUIRE(blueprint.report.warnings[0].code == IndentationWarning);
 
     REQUIRE(blueprint.node.content.elements().size() == 1);
-    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
-    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 1);
-    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).element == Element::ResourceElement);
+    REQUIRE(blueprint.node.content.elements().at(0).element ==
+            Element::CategoryElement);
+    REQUIRE(
+        blueprint.node.content.elements().at(0).content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements()
+                .at(0)
+                .content.elements()
+                .at(0)
+                .element == Element::ResourceElement);
 
-    Resource resource = blueprint.node.content.elements().at(0).content.elements().at(0).content.resource;
+    Resource resource = blueprint.node.content.elements()
+                            .at(0)
+                            .content.elements()
+                            .at(0)
+                            .content.resource;
     REQUIRE(resource.actions.size() == 1);
     REQUIRE(resource.actions[0].examples.size() == 1);
     REQUIRE(resource.actions[0].examples[0].responses.size() == 1);
     REQUIRE(resource.actions[0].examples[0].responses[0].name == "200");
     REQUIRE(resource.actions[0].examples[0].responses[0].headers.size() == 1);
-    REQUIRE(resource.actions[0].examples[0].responses[0].headers[0].first == "Location");
-    REQUIRE(resource.actions[0].examples[0].responses[0].headers[0].second == "new_url");
+    REQUIRE(resource.actions[0].examples[0].responses[0].headers[0].first ==
+            "Location");
+    REQUIRE(resource.actions[0].examples[0].responses[0].headers[0].second ==
+            "new_url");
 }
 
-TEST_CASE("Overshadow parameters", "[parser][201][regression][parameters]")
-{
-    mdp::ByteBuffer source = \
-    "# /{a,b,c}\n"\
-    "\n"\
-    "## GET\n"\
-    "+ parameters\n"\
-    "    + a ... 1\n"\
-    "    + b ... 2\n"\
-    "    + c ... 3\n"\
-    "\n"\
-    "+ parameters\n"\
-    "    + a ... 4\n"\
-    "\n"\
-    "+ response 200\n";
+TEST_CASE("Overshadow parameters", "[parser][201][regression][parameters]") {
+    mdp::ByteBuffer source = "# /{a,b,c}\n"
+                             "\n"
+                             "## GET\n"
+                             "+ parameters\n"
+                             "    + a ... 1\n"
+                             "    + b ... 2\n"
+                             "    + c ... 3\n"
+                             "\n"
+                             "+ parameters\n"
+                             "    + a ... 4\n"
+                             "\n"
+                             "+ response 200\n";
 
     ParseResult<Blueprint> blueprint;
     parse(source, 0, blueprint);
@@ -617,11 +758,21 @@ TEST_CASE("Overshadow parameters", "[parser][201][regression][parameters]")
     REQUIRE(blueprint.report.warnings[0].code == RedefinitionWarning);
 
     REQUIRE(blueprint.node.content.elements().size() == 1);
-    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
-    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 1);
-    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).element == Element::ResourceElement);
+    REQUIRE(blueprint.node.content.elements().at(0).element ==
+            Element::CategoryElement);
+    REQUIRE(
+        blueprint.node.content.elements().at(0).content.elements().size() == 1);
+    REQUIRE(blueprint.node.content.elements()
+                .at(0)
+                .content.elements()
+                .at(0)
+                .element == Element::ResourceElement);
 
-    Resource resource = blueprint.node.content.elements().at(0).content.elements().at(0).content.resource;
+    Resource resource = blueprint.node.content.elements()
+                            .at(0)
+                            .content.elements()
+                            .at(0)
+                            .content.resource;
     REQUIRE(resource.actions.size() == 1);
     REQUIRE(resource.actions[0].parameters.size() == 3);
 
@@ -635,10 +786,8 @@ TEST_CASE("Overshadow parameters", "[parser][201][regression][parameters]")
     REQUIRE(resource.actions[0].parameters[2].description == "4");
 }
 
-TEST_CASE("Segfault parsing metadata only", "[parser][205][regression]")
-{
-    mdp::ByteBuffer source = \
-    "FORMAT: 1A : SOJ\n";
+TEST_CASE("Segfault parsing metadata only", "[parser][205][regression]") {
+    mdp::ByteBuffer source = "FORMAT: 1A : SOJ\n";
 
     ParseResult<Blueprint> blueprint;
     parse(source, 0, blueprint);
@@ -652,18 +801,16 @@ TEST_CASE("Segfault parsing metadata only", "[parser][205][regression]")
     REQUIRE(blueprint.node.content.elements().empty());
 }
 
-TEST_CASE("Don't remove link references", "[parser][213]")
-{
-    mdp::ByteBuffer source = \
-    "# API\n\n"\
-    "This is [first example][id]\n\n"\
-    "[id]: http://a.com\n\n"\
-    "# Group A\n\n"\
-    "This is [second example][id]\n\n"\
-    "[id]: http://b.com\n\n"\
-    "## /a\n\n"\
-    "This is [third example][id]\n\n"\
-    "[id]: http://c.com\n\n";
+TEST_CASE("Don't remove link references", "[parser][213]") {
+    mdp::ByteBuffer source = "# API\n\n"
+                             "This is [first example][id]\n\n"
+                             "[id]: http://a.com\n\n"
+                             "# Group A\n\n"
+                             "This is [second example][id]\n\n"
+                             "[id]: http://b.com\n\n"
+                             "## /a\n\n"
+                             "This is [third example][id]\n\n"
+                             "[id]: http://c.com\n\n";
 
     ParseResult<Blueprint> blueprint;
     parse(source, 0, blueprint);
@@ -672,29 +819,49 @@ TEST_CASE("Don't remove link references", "[parser][213]")
     REQUIRE(blueprint.report.warnings.empty());
 
     REQUIRE(blueprint.node.name == "API");
-    REQUIRE(blueprint.node.description == "This is [first example][id]\n\n[id]: http://a.com");
+    REQUIRE(blueprint.node.description ==
+            "This is [first example][id]\n\n[id]: http://a.com");
     REQUIRE(blueprint.node.content.elements().size() == 1);
     REQUIRE(blueprint.node.content.elements().at(0).attributes.name == "A");
-    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
-    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 2);
-    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).element == Element::CopyElement);
-    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).content.copy == "This is [second example][id]\n\n[id]: http://b.com");
-    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(1).element == Element::ResourceElement);
+    REQUIRE(blueprint.node.content.elements().at(0).element ==
+            Element::CategoryElement);
+    REQUIRE(
+        blueprint.node.content.elements().at(0).content.elements().size() == 2);
+    REQUIRE(blueprint.node.content.elements()
+                .at(0)
+                .content.elements()
+                .at(0)
+                .element == Element::CopyElement);
+    REQUIRE(blueprint.node.content.elements()
+                .at(0)
+                .content.elements()
+                .at(0)
+                .content.copy ==
+            "This is [second example][id]\n\n[id]: http://b.com");
+    REQUIRE(blueprint.node.content.elements()
+                .at(0)
+                .content.elements()
+                .at(1)
+                .element == Element::ResourceElement);
 
-    Resource resource = blueprint.node.content.elements().at(0).content.elements().at(1).content.resource;
+    Resource resource = blueprint.node.content.elements()
+                            .at(0)
+                            .content.elements()
+                            .at(1)
+                            .content.resource;
     REQUIRE(resource.uriTemplate == "/a");
-    REQUIRE(resource.description == "This is [third example][id]\n\n[id]: http://c.com");
+    REQUIRE(resource.description ==
+            "This is [third example][id]\n\n[id]: http://c.com");
 }
 
-TEST_CASE("Don't mess up sourcemaps when there are references", "[parser][213]")
-{
-    mdp::ByteBuffer source = \
-    "# API\n\n"\
-    "[very][] [much][] [reference][]\n\n"\
-    "[very]: http://a.com\n\n"\
-    "[much]: http://b.com\n\n"\
-    "[reference]: http://c.com\n\n"\
-    "# GET /1";
+TEST_CASE(
+    "Don't mess up sourcemaps when there are references", "[parser][213]") {
+    mdp::ByteBuffer source = "# API\n\n"
+                             "[very][] [much][] [reference][]\n\n"
+                             "[very]: http://a.com\n\n"
+                             "[much]: http://b.com\n\n"
+                             "[reference]: http://c.com\n\n"
+                             "# GET /1";
 
     ParseResult<Blueprint> blueprint;
     parse(source, ExportSourcemapOption, blueprint);
@@ -704,64 +871,80 @@ TEST_CASE("Don't mess up sourcemaps when there are references", "[parser][213]")
     REQUIRE(blueprint.report.warnings[0].code == EmptyDefinitionWarning);
 
     REQUIRE(blueprint.sourceMap.content.elements().collection.size() == 1);
-    REQUIRE(blueprint.sourceMap.content.elements().collection[0].content.elements().collection.size() == 1);
+    REQUIRE(blueprint.sourceMap.content.elements()
+                .collection[0]
+                .content.elements()
+                .collection.size() == 1);
 
-    SourceMap<Resource> resourceSM = blueprint.sourceMap.content.elements().collection[0].content.elements().collection[0].content.resource;
+    SourceMap<Resource> resourceSM = blueprint.sourceMap.content.elements()
+                                         .collection[0]
+                                         .content.elements()
+                                         .collection[0]
+                                         .content.resource;
     REQUIRE(resourceSM.actions.collection.size() == 1);
-    SourceMapHelper::check(resourceSM.actions.collection[0].method.sourceMap, 111, 8);
+    SourceMapHelper::check(
+        resourceSM.actions.collection[0].method.sourceMap, 111, 8);
 }
 
-TEST_CASE("doesn't crash while parsing response followed by a block quote and heading", "[parser][322]")
-{
-    mdp::ByteBuffer source = \
-    "# GET /a\n\n"\
-    "+ Response 200\n\n"\
-    "        a\n"\
-    ">       b\n"\
-    "        e\n"\
-    "# B";
+TEST_CASE("doesn't crash while parsing response followed by a block quote and "
+          "heading",
+    "[parser][322]") {
+    mdp::ByteBuffer source = "# GET /a\n\n"
+                             "+ Response 200\n\n"
+                             "        a\n"
+                             ">       b\n"
+                             "        e\n"
+                             "# B";
 
     ParseResult<Blueprint> blueprint;
     parse(source, ExportSourcemapOption, blueprint);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
 
-    SourceMap<Resource> resourceSM = blueprint.sourceMap.content.elements().collection[0].content.elements().collection[0].content.resource;
+    SourceMap<Resource> resourceSM = blueprint.sourceMap.content.elements()
+                                         .collection[0]
+                                         .content.elements()
+                                         .collection[0]
+                                         .content.resource;
     SourceMap<Action> actionSM = resourceSM.actions.collection[0];
-    SourceMap<Payload> payloadSM = actionSM.examples.collection[0].responses.collection[0];
+    SourceMap<Payload> payloadSM =
+        actionSM.examples.collection[0].responses.collection[0];
     SourceMapHelper::check(payloadSM.body.sourceMap, 30, 22);
 }
 
-TEST_CASE("doesn't crash while parsing response followed by a block quote settext heading", "[parser][322]")
-{
-    mdp::ByteBuffer source = \
-    "# GET /a\n\n"\
-    "+ Response 200\n\n"\
-    "        a\n"\
-    ">       b\n"\
-    "        e\n"\
-    "Heading\n"\
-    "-------\n";
+TEST_CASE("doesn't crash while parsing response followed by a block quote "
+          "settext heading",
+    "[parser][322]") {
+    mdp::ByteBuffer source = "# GET /a\n\n"
+                             "+ Response 200\n\n"
+                             "        a\n"
+                             ">       b\n"
+                             "        e\n"
+                             "Heading\n"
+                             "-------\n";
 
     ParseResult<Blueprint> blueprint;
     parse(source, ExportSourcemapOption, blueprint);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
 
-    SourceMap<Resource> resourceSM = blueprint.sourceMap.content.elements().collection[0].content.elements().collection[0].content.resource;
+    SourceMap<Resource> resourceSM = blueprint.sourceMap.content.elements()
+                                         .collection[0]
+                                         .content.elements()
+                                         .collection[0]
+                                         .content.resource;
     SourceMap<Action> actionSM = resourceSM.actions.collection[0];
-    SourceMap<Payload> payloadSM = actionSM.examples.collection[0].responses.collection[0];
+    SourceMap<Payload> payloadSM =
+        actionSM.examples.collection[0].responses.collection[0];
     SourceMapHelper::check(payloadSM.body.sourceMap, 30, 22, 1);
 }
 
-TEST_CASE("Parse blueprint with mismatched adapter blocks", "[blueprint]")
-{
-    mdp::ByteBuffer source = \
-    "# Data Structures\n"\
-    "# User\n"\
-    "Some description\n"\
-    "+ Properties\n"\
-    "    + a: b\n";
+TEST_CASE("Parse blueprint with mismatched adapter blocks", "[blueprint]") {
+    mdp::ByteBuffer source = "# Data Structures\n"
+                             "# User\n"
+                             "Some description\n"
+                             "+ Properties\n"
+                             "    + a: b\n";
 
     ParseResult<Blueprint> blueprint;
     parse(source, ExportSourcemapOption, blueprint);

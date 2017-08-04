@@ -14,20 +14,19 @@ using namespace snowcrashtest;
 
 mdp::ByteBuffer RelationFixture = "+ Relation: create";
 
-TEST_CASE("Recognize relation signature", "[relation]")
-{
+TEST_CASE("Recognize relation signature", "[relation]") {
     mdp::MarkdownParser markdownParser;
     mdp::MarkdownNode markdownAST;
     SectionType sectionType;
     markdownParser.parse(RelationFixture, markdownAST);
 
     REQUIRE(!markdownAST.children().empty());
-    sectionType = SectionProcessor<Relation>::sectionType(markdownAST.children().begin());
+    sectionType =
+        SectionProcessor<Relation>::sectionType(markdownAST.children().begin());
     REQUIRE(sectionType == RelationSectionType);
 }
 
-TEST_CASE("Relation signature without colon", "[relation]")
-{
+TEST_CASE("Relation signature without colon", "[relation]") {
     mdp::ByteBuffer source = "+ Relation delete";
 
     mdp::MarkdownParser markdownParser;
@@ -36,14 +35,15 @@ TEST_CASE("Relation signature without colon", "[relation]")
     markdownParser.parse(source, markdownAST);
 
     REQUIRE(!markdownAST.children().empty());
-    sectionType = SectionProcessor<Relation>::sectionType(markdownAST.children().begin());
+    sectionType =
+        SectionProcessor<Relation>::sectionType(markdownAST.children().begin());
     REQUIRE(sectionType != RelationSectionType);
 }
 
-TEST_CASE("Parse canonical link relation", "[relation]")
-{
+TEST_CASE("Parse canonical link relation", "[relation]") {
     ParseResult<Relation> relation;
-    SectionParserHelper<Relation, RelationParser>::parse(RelationFixture, RelationSectionType, relation, ExportSourcemapOption);
+    SectionParserHelper<Relation, RelationParser>::parse(
+        RelationFixture, RelationSectionType, relation, ExportSourcemapOption);
 
     REQUIRE(relation.report.error.code == Error::OK);
     REQUIRE(relation.report.warnings.empty());
@@ -52,8 +52,8 @@ TEST_CASE("Parse canonical link relation", "[relation]")
     SourceMapHelper::check(relation.sourceMap.sourceMap, 2, 16);
 }
 
-TEST_CASE("Relation identifier starting with non lower alphabet", "[relation]")
-{
+TEST_CASE(
+    "Relation identifier starting with non lower alphabet", "[relation]") {
     mdp::ByteBuffer source = "+ Relation: 9delete";
 
     mdp::MarkdownParser markdownParser;
@@ -62,11 +62,13 @@ TEST_CASE("Relation identifier starting with non lower alphabet", "[relation]")
     markdownParser.parse(source, markdownAST);
 
     REQUIRE(!markdownAST.children().empty());
-    sectionType = SectionProcessor<Relation>::sectionType(markdownAST.children().begin());
+    sectionType =
+        SectionProcessor<Relation>::sectionType(markdownAST.children().begin());
     REQUIRE(sectionType == RelationSectionType);
 
     ParseResult<Relation> relation;
-    SectionParserHelper<Relation, RelationParser>::parse(source, RelationSectionType, relation, ExportSourcemapOption);
+    SectionParserHelper<Relation, RelationParser>::parse(
+        source, RelationSectionType, relation, ExportSourcemapOption);
 
     REQUIRE(relation.report.error.code == Error::OK);
     REQUIRE(relation.report.warnings.size() == 1);
@@ -74,8 +76,7 @@ TEST_CASE("Relation identifier starting with non lower alphabet", "[relation]")
     REQUIRE(relation.node.str.empty());
 }
 
-TEST_CASE("Relation identifier containing capital letters", "[relation]")
-{
+TEST_CASE("Relation identifier containing capital letters", "[relation]") {
     mdp::ByteBuffer source = "+ Relation: deLete";
 
     mdp::MarkdownParser markdownParser;
@@ -84,11 +85,13 @@ TEST_CASE("Relation identifier containing capital letters", "[relation]")
     markdownParser.parse(source, markdownAST);
 
     REQUIRE(!markdownAST.children().empty());
-    sectionType = SectionProcessor<Relation>::sectionType(markdownAST.children().begin());
+    sectionType =
+        SectionProcessor<Relation>::sectionType(markdownAST.children().begin());
     REQUIRE(sectionType == RelationSectionType);
 
     ParseResult<Relation> relation;
-    SectionParserHelper<Relation, RelationParser>::parse(source, RelationSectionType, relation, ExportSourcemapOption);
+    SectionParserHelper<Relation, RelationParser>::parse(
+        source, RelationSectionType, relation, ExportSourcemapOption);
 
     REQUIRE(relation.report.error.code == Error::OK);
     REQUIRE(relation.report.warnings.size() == 1);
@@ -96,8 +99,7 @@ TEST_CASE("Relation identifier containing capital letters", "[relation]")
     REQUIRE(relation.node.str.empty());
 }
 
-TEST_CASE("Relation identifier containing special characters", "[relation]")
-{
+TEST_CASE("Relation identifier containing special characters", "[relation]") {
     mdp::ByteBuffer source = "+ Relation: del*et_e";
 
     mdp::MarkdownParser markdownParser;
@@ -106,11 +108,13 @@ TEST_CASE("Relation identifier containing special characters", "[relation]")
     markdownParser.parse(source, markdownAST);
 
     REQUIRE(!markdownAST.children().empty());
-    sectionType = SectionProcessor<Relation>::sectionType(markdownAST.children().begin());
+    sectionType =
+        SectionProcessor<Relation>::sectionType(markdownAST.children().begin());
     REQUIRE(sectionType == RelationSectionType);
 
     ParseResult<Relation> relation;
-    SectionParserHelper<Relation, RelationParser>::parse(source, RelationSectionType, relation, ExportSourcemapOption);
+    SectionParserHelper<Relation, RelationParser>::parse(
+        source, RelationSectionType, relation, ExportSourcemapOption);
 
     REQUIRE(relation.report.error.code == Error::OK);
     REQUIRE(relation.report.warnings.size() == 1);
@@ -118,8 +122,7 @@ TEST_CASE("Relation identifier containing special characters", "[relation]")
     REQUIRE(relation.node.str.empty());
 }
 
-TEST_CASE("Relation identifier consisting of dots and dashes", "[relation]")
-{
+TEST_CASE("Relation identifier consisting of dots and dashes", "[relation]") {
     mdp::ByteBuffer source = "+ Relation: delete-task.2";
 
     mdp::MarkdownParser markdownParser;
@@ -128,11 +131,13 @@ TEST_CASE("Relation identifier consisting of dots and dashes", "[relation]")
     markdownParser.parse(source, markdownAST);
 
     REQUIRE(!markdownAST.children().empty());
-    sectionType = SectionProcessor<Relation>::sectionType(markdownAST.children().begin());
+    sectionType =
+        SectionProcessor<Relation>::sectionType(markdownAST.children().begin());
     REQUIRE(sectionType == RelationSectionType);
 
     ParseResult<Relation> relation;
-    SectionParserHelper<Relation, RelationParser>::parse(source, RelationSectionType, relation, ExportSourcemapOption);
+    SectionParserHelper<Relation, RelationParser>::parse(
+        source, RelationSectionType, relation, ExportSourcemapOption);
 
     REQUIRE(relation.report.error.code == Error::OK);
     REQUIRE(relation.report.warnings.empty());
