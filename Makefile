@@ -2,7 +2,7 @@
 SHELL = /bin/bash
 
 # Flags
-CXXFLAGS = -std=c++11
+CXXFLAGS = -std=c++14
 
 # Default build path
 BUILD_PATH = build

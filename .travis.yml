@@ -1,10 +1,21 @@
 sudo: required
 dist: trusty
 language: cpp
+addons:
+  apt:
+    sources:
+      - llvm-toolchain-trusty-4.0
+      - ubuntu-toolchain-r-test
+    packages:
+      - clang-4.0
+      - g++-5
+      - gcc-5
 compiler:
   - gcc
   - clang
 script:
   - make test
 before_install:
+  - if [ "$CXX" = "g++" ]; then export CXX="g++-5" CC="gcc-5"; fi
+  - if [ "$CXX" = "clang++" ]; then export CXX="clang++-4.0" CC="clang-4.0"; fi
   - git submodule update --init --recursive
