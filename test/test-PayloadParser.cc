@@ -12,80 +12,76 @@
 using namespace snowcrash;
 using namespace snowcrashtest;
 
-const mdp::ByteBuffer RequestFixture = \
-"+ Request Hello World (text/plain)\n\n"\
-"  Description\n\n"\
-"    + Headers\n\n"\
-"            X-Header: 42\n\n"\
-"    + Body\n\n"\
-"            Code\n\n"\
-"    + Schema\n\n"\
-"            Code 2\n\n";
+const mdp::ByteBuffer RequestFixture = "+ Request Hello World (text/plain)\n\n"
+                                       "  Description\n\n"
+                                       "    + Headers\n\n"
+                                       "            X-Header: 42\n\n"
+                                       "    + Body\n\n"
+                                       "            Code\n\n"
+                                       "    + Schema\n\n"
+                                       "            Code 2\n\n";
 
-const mdp::ByteBuffer RequestBodyFixture = \
-"+ Request A\n\n"\
-"        Hello World!\n";
+const mdp::ByteBuffer RequestBodyFixture = "+ Request A\n\n"
+                                           "        Hello World!\n";
 
-const mdp::ByteBuffer ResponseBodyFixture = \
-"+ Response 200 (text/plain)\n\n"\
-"        Hello World!\n";
+const mdp::ByteBuffer ResponseBodyFixture = "+ Response 200 (text/plain)\n\n"
+                                            "        Hello World!\n";
 
-const mdp::ByteBuffer ModelFixture = \
-"+ Request\n\n"\
-"    [Symbol][]\n";
+const mdp::ByteBuffer ModelFixture = "+ Request\n\n"
+                                     "    [Symbol][]\n";
 
-const mdp::ByteBuffer EmptyBodyFixture = \
-"+ Response 200\n\n"\
-"    + Body\n\n\n\n";
+const mdp::ByteBuffer EmptyBodyFixture = "+ Response 200\n\n"
+                                         "    + Body\n\n\n\n";
 
-TEST_CASE("recognize request signature", "[payload]")
-{
+TEST_CASE("recognize request signature", "[payload]") {
     mdp::MarkdownParser markdownParser;
     mdp::MarkdownNode markdownAST;
     markdownParser.parse(RequestFixture, markdownAST);
 
     REQUIRE(!markdownAST.children().empty());
-    SectionType sectionType = SectionProcessor<Payload>::sectionType(markdownAST.children().begin());
+    SectionType sectionType =
+        SectionProcessor<Payload>::sectionType(markdownAST.children().begin());
     REQUIRE(sectionType == RequestSectionType);
 }
 
-TEST_CASE("recognize abbreviated request signature", "[payload]")
-{
+TEST_CASE("recognize abbreviated request signature", "[payload]") {
     mdp::MarkdownParser markdownParser;
     mdp::MarkdownNode markdownAST;
     markdownParser.parse(RequestBodyFixture, markdownAST);
 
     REQUIRE(!markdownAST.children().empty());
-    SectionType sectionType = SectionProcessor<Payload>::sectionType(markdownAST.children().begin());
+    SectionType sectionType =
+        SectionProcessor<Payload>::sectionType(markdownAST.children().begin());
     REQUIRE(sectionType == RequestBodySectionType);
 }
 
-TEST_CASE("recognize abbreviated response signature", "[payload]")
-{
+TEST_CASE("recognize abbreviated response signature", "[payload]") {
     mdp::MarkdownParser markdownParser;
     mdp::MarkdownNode markdownAST;
     markdownParser.parse(ResponseBodyFixture, markdownAST);
 
     REQUIRE(!markdownAST.children().empty());
-    SectionType sectionType = SectionProcessor<Payload>::sectionType(markdownAST.children().begin());
+    SectionType sectionType =
+        SectionProcessor<Payload>::sectionType(markdownAST.children().begin());
     REQUIRE(sectionType == ResponseBodySectionType);
 }
 
-TEST_CASE("recognize empty body response signature as non-abbreviated", "[payload]")
-{
+TEST_CASE(
+    "recognize empty body response signature as non-abbreviated", "[payload]") {
     mdp::MarkdownParser markdownParser;
     mdp::MarkdownNode markdownAST;
     markdownParser.parse(EmptyBodyFixture, markdownAST);
 
     REQUIRE(!markdownAST.children().empty());
-    SectionType sectionType = SectionProcessor<Payload>::sectionType(markdownAST.children().begin());
+    SectionType sectionType =
+        SectionProcessor<Payload>::sectionType(markdownAST.children().begin());
     REQUIRE(sectionType == ResponseSectionType);
 }
 
-TEST_CASE("Parse request payload", "[payload]")
-{
+TEST_CASE("Parse request payload", "[payload]") {
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(RequestFixture, RequestSectionType, payload, ExportSourcemapOption);
+    SectionParserHelper<Payload, PayloadParser>::parse(
+        RequestFixture, RequestSectionType, payload, ExportSourcemapOption);
 
     REQUIRE(payload.report.error.code == Error::OK);
     CHECK(payload.report.warnings.empty());
@@ -105,16 +101,20 @@ TEST_CASE("Parse request payload", "[payload]")
     SourceMapHelper::check(payload.sourceMap.description.sourceMap, 38, 12);
     REQUIRE(payload.sourceMap.parameters.collection.empty());
     REQUIRE(payload.sourceMap.headers.collection.size() == 2);
-    SourceMapHelper::check(payload.sourceMap.headers.collection[0].sourceMap, 2, 34);
-    SourceMapHelper::check(payload.sourceMap.headers.collection[1].sourceMap, 78, 12);
+    SourceMapHelper::check(
+        payload.sourceMap.headers.collection[0].sourceMap, 2, 34);
+    SourceMapHelper::check(
+        payload.sourceMap.headers.collection[1].sourceMap, 78, 12);
     SourceMapHelper::check(payload.sourceMap.body.sourceMap, 112, 9);
     SourceMapHelper::check(payload.sourceMap.schema.sourceMap, 144, 11);
 }
 
-TEST_CASE("Parse abbreviated payload body", "[payload]")
-{
+TEST_CASE("Parse abbreviated payload body", "[payload]") {
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(ResponseBodyFixture, ResponseBodySectionType, payload, ExportSourcemapOption);
+    SectionParserHelper<Payload, PayloadParser>::parse(ResponseBodyFixture,
+        ResponseBodySectionType,
+        payload,
+        ExportSourcemapOption);
 
     REQUIRE(payload.report.error.code == Error::OK);
     CHECK(payload.report.warnings.empty());
@@ -130,17 +130,18 @@ TEST_CASE("Parse abbreviated payload body", "[payload]")
     REQUIRE(payload.sourceMap.description.sourceMap.empty());
     REQUIRE(payload.sourceMap.parameters.collection.empty());
     REQUIRE(payload.sourceMap.headers.collection.size() == 1);
-    SourceMapHelper::check(payload.sourceMap.headers.collection[0].sourceMap, 2, 27);
+    SourceMapHelper::check(
+        payload.sourceMap.headers.collection[0].sourceMap, 2, 27);
     SourceMapHelper::check(payload.sourceMap.body.sourceMap, 33, 17);
 }
 
-TEST_CASE("Parse abbreviated inline payload body", "[payload]")
-{
+TEST_CASE("Parse abbreviated inline payload body", "[payload]") {
     mdp::ByteBuffer source = RequestBodyFixture;
     source += "  B\n";
 
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestBodySectionType, payload, ExportSourcemapOption);
+    SectionParserHelper<Payload, PayloadParser>::parse(
+        source, RequestBodySectionType, payload, ExportSourcemapOption);
 
     REQUIRE(payload.report.error.code == Error::OK);
     CHECK(payload.report.warnings.size() == 1); // preformatted code block
@@ -159,10 +160,9 @@ TEST_CASE("Parse abbreviated inline payload body", "[payload]")
     SourceMapHelper::check(payload.sourceMap.body.sourceMap, 17, 17, 36, 2);
 }
 
-TEST_CASE("Parse payload description with list", "[payload]")
-{
+TEST_CASE("Parse payload description with list", "[payload]") {
     // Blueprint in question:
-    //R"(
+    // R"(
     //+ Request
     //
     //    + B
@@ -172,14 +172,14 @@ TEST_CASE("Parse payload description with list", "[payload]")
     //            {}
     //");
 
-    mdp::ByteBuffer source = \
-    "+ Request\n\n"\
-    "    + B\n\n"\
-    "    + Body\n\n"\
-    "            {}\n";
+    mdp::ByteBuffer source = "+ Request\n\n"
+                             "    + B\n\n"
+                             "    + Body\n\n"
+                             "            {}\n";
 
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, payload, ExportSourcemapOption);
+    SectionParserHelper<Payload, PayloadParser>::parse(
+        source, RequestSectionType, payload, ExportSourcemapOption);
 
     REQUIRE(payload.report.error.code == Error::OK);
     CHECK(payload.report.warnings.empty());
@@ -198,10 +198,9 @@ TEST_CASE("Parse payload description with list", "[payload]")
     SourceMapHelper::check(payload.sourceMap.body.sourceMap, 40, 7);
 }
 
-TEST_CASE("Parse payload with foreign list item", "[payload]")
-{
+TEST_CASE("Parse payload with foreign list item", "[payload]") {
     // Blueprint in question:
-    //R"(
+    // R"(
     //+ Request
     //
     //    + Body
@@ -211,14 +210,14 @@ TEST_CASE("Parse payload with foreign list item", "[payload]")
     //    + Bar
     //");
 
-    mdp::ByteBuffer source = \
-    "+ Request\n\n"\
-    "    + Body\n\n"\
-    "            {}\n\n"\
-    "    + Bar\n";
+    mdp::ByteBuffer source = "+ Request\n\n"
+                             "    + Body\n\n"
+                             "            {}\n\n"
+                             "    + Bar\n";
 
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, payload, ExportSourcemapOption);
+    SectionParserHelper<Payload, PayloadParser>::parse(
+        source, RequestSectionType, payload, ExportSourcemapOption);
 
     REQUIRE(payload.report.error.code == Error::OK);
     CHECK(payload.report.warnings.size() == 1); // dangling block
@@ -237,10 +236,9 @@ TEST_CASE("Parse payload with foreign list item", "[payload]")
     SourceMapHelper::check(payload.sourceMap.body.sourceMap, 31, 7);
 }
 
-TEST_CASE("Parse payload with dangling body", "[payload]")
-{
+TEST_CASE("Parse payload with dangling body", "[payload]") {
     // Blueprint in question:
-    //R"(
+    // R"(
     //+ Request
     //    + Body
     //
@@ -255,7 +253,8 @@ TEST_CASE("Parse payload with dangling body", "[payload]")
     source += "    Bar\n";
 
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, payload, ExportSourcemapOption);
+    SectionParserHelper<Payload, PayloadParser>::parse(
+        source, RequestSectionType, payload, ExportSourcemapOption);
 
     REQUIRE(payload.report.error.code == Error::OK);
     REQUIRE(payload.report.warnings.size() == 1); // dangling block
@@ -275,13 +274,16 @@ TEST_CASE("Parse payload with dangling body", "[payload]")
     SourceMapHelper::check(payload.sourceMap.body.sourceMap, 30, 8, 43, 4);
 }
 
-TEST_CASE("Parse inline payload with symbol reference", "[payload]")
-{
+TEST_CASE("Parse inline payload with symbol reference", "[payload]") {
     Models models;
     ModelHelper::build("Symbol", models);
 
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(ModelFixture, RequestBodySectionType, payload, ExportSourcemapOption, models);
+    SectionParserHelper<Payload, PayloadParser>::parse(ModelFixture,
+        RequestBodySectionType,
+        payload,
+        ExportSourcemapOption,
+        models);
 
     REQUIRE(payload.report.error.code == Error::OK);
     REQUIRE(payload.report.warnings.size() == 0);
@@ -300,17 +302,17 @@ TEST_CASE("Parse inline payload with symbol reference", "[payload]")
     SourceMapHelper::check(payload.sourceMap.body.sourceMap, 0, 1);
 }
 
-TEST_CASE("Parse inline payload with symbol reference with extra indentation", "[payload]")
-{
-    mdp::ByteBuffer source = \
-    "+ Request\n\n"\
-    "        [Symbol][]\n";
+TEST_CASE("Parse inline payload with symbol reference with extra indentation",
+    "[payload]") {
+    mdp::ByteBuffer source = "+ Request\n\n"
+                             "        [Symbol][]\n";
 
     Models models;
     ModelHelper::build("Symbol", models);
 
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestBodySectionType, payload, ExportSourcemapOption, models);
+    SectionParserHelper<Payload, PayloadParser>::parse(
+        source, RequestBodySectionType, payload, ExportSourcemapOption, models);
 
     REQUIRE(payload.report.error.code == Error::OK);
     REQUIRE(payload.report.warnings.size() == 1);
@@ -330,8 +332,8 @@ TEST_CASE("Parse inline payload with symbol reference with extra indentation", "
     SourceMapHelper::check(payload.sourceMap.body.sourceMap, 15, 15);
 }
 
-TEST_CASE("Parse inline payload with symbol reference with foreign content", "[payload]")
-{
+TEST_CASE("Parse inline payload with symbol reference with foreign content",
+    "[payload]") {
     mdp::ByteBuffer source = ModelFixture;
     source += "\n    Foreign\n";
 
@@ -339,7 +341,8 @@ TEST_CASE("Parse inline payload with symbol reference with foreign content", "[p
     ModelHelper::build("Symbol", models);
 
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestBodySectionType, payload, ExportSourcemapOption, models);
+    SectionParserHelper<Payload, PayloadParser>::parse(
+        source, RequestBodySectionType, payload, ExportSourcemapOption, models);
 
     REQUIRE(payload.report.error.code == Error::OK);
     REQUIRE(payload.report.warnings.size() == 1); // ignoring foreign entry
@@ -358,10 +361,9 @@ TEST_CASE("Parse inline payload with symbol reference with foreign content", "[p
     SourceMapHelper::check(payload.sourceMap.body.sourceMap, 0, 1);
 }
 
-TEST_CASE("Parse named model", "[payload]")
-{
+TEST_CASE("Parse named model", "[payload]") {
     // Blueprint in question:
-    //R"(
+    // R"(
     //+ Super Model (text/plain)
     //
     //        Hello World!
@@ -371,7 +373,8 @@ TEST_CASE("Parse named model", "[payload]")
     source += "        Hello World!\n";
 
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, ModelBodySectionType, payload, ExportSourcemapOption);
+    SectionParserHelper<Payload, PayloadParser>::parse(
+        source, ModelBodySectionType, payload, ExportSourcemapOption);
 
     REQUIRE(payload.report.error.code == Error::OK);
     REQUIRE(payload.report.warnings.empty());
@@ -389,14 +392,14 @@ TEST_CASE("Parse named model", "[payload]")
     REQUIRE(payload.sourceMap.description.sourceMap.empty());
     REQUIRE(payload.sourceMap.parameters.collection.empty());
     REQUIRE(payload.sourceMap.headers.collection.size() == 1);
-    SourceMapHelper::check(payload.sourceMap.headers.collection[0].sourceMap, 2, 26);
+    SourceMapHelper::check(
+        payload.sourceMap.headers.collection[0].sourceMap, 2, 26);
     SourceMapHelper::check(payload.sourceMap.body.sourceMap, 32, 17);
 }
 
-TEST_CASE("Parse nameless model", "[payload]")
-{
+TEST_CASE("Parse nameless model", "[payload]") {
     // Blueprint in question:
-    //R"(
+    // R"(
     //+ Model (text/plain)
     //
     //        Hello World!
@@ -406,7 +409,8 @@ TEST_CASE("Parse nameless model", "[payload]")
     source += "        Hello World!\n";
 
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, ModelBodySectionType, payload, ExportSourcemapOption);
+    SectionParserHelper<Payload, PayloadParser>::parse(
+        source, ModelBodySectionType, payload, ExportSourcemapOption);
 
     REQUIRE(payload.report.error.code == Error::OK);
     REQUIRE(payload.report.warnings.empty());
@@ -424,15 +428,15 @@ TEST_CASE("Parse nameless model", "[payload]")
     REQUIRE(payload.sourceMap.description.sourceMap.empty());
     REQUIRE(payload.sourceMap.parameters.collection.empty());
     REQUIRE(payload.sourceMap.headers.collection.size() == 1);
-    SourceMapHelper::check(payload.sourceMap.headers.collection[0].sourceMap, 2, 20);
+    SourceMapHelper::check(
+        payload.sourceMap.headers.collection[0].sourceMap, 2, 20);
     SourceMapHelper::check(payload.sourceMap.body.sourceMap, 26, 17);
     REQUIRE(payload.sourceMap.schema.sourceMap.empty());
 }
 
-TEST_CASE("Warn on malformed payload signature", "[payload]")
-{
+TEST_CASE("Warn on malformed payload signature", "[payload]") {
     // Blueprint in question:
-    //R"(
+    // R"(
     //+ Request This is FUN[ (text/plain)
     //  Description
     //
@@ -450,7 +454,8 @@ TEST_CASE("Warn on malformed payload signature", "[payload]")
     source += "            Hello World!\n";
 
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, payload, ExportSourcemapOption);
+    SectionParserHelper<Payload, PayloadParser>::parse(
+        source, RequestSectionType, payload, ExportSourcemapOption);
 
     REQUIRE(payload.report.error.code == Error::OK);
     REQUIRE(payload.report.warnings.size() == 1);
@@ -473,30 +478,31 @@ TEST_CASE("Warn on malformed payload signature", "[payload]")
     SourceMapHelper::check(payload.sourceMap.body.sourceMap, 82, 17);
 }
 
-TEST_CASE("Warn on malformed request payload signature", "[payload]")
-{
-  mdp::ByteBuffer source = "+ Requestz\n";
-  source += "    + Body\n\n";
-  source += "            Hello World!\n";
-
-  ParseResult<Payload> payload;
-  SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, payload, ExportSourcemapOption);
-
-  REQUIRE(payload.report.error.code == Error::OK);
-  REQUIRE(payload.report.warnings.size() == 1);
-  REQUIRE(payload.report.warnings[0].code == FormattingWarning);
-}
-
-TEST_CASE("Give a warning of empty message body for requests with certain headers", "[payload]")
-{
-    mdp::ByteBuffer source = \
-    "+ Request\n"\
-    "    + Headers \n"\
-    "\n"\
-    "            Content-Length: 100\n";
+TEST_CASE("Warn on malformed request payload signature", "[payload]") {
+    mdp::ByteBuffer source = "+ Requestz\n";
+    source += "    + Body\n\n";
+    source += "            Hello World!\n";
 
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, payload, ExportSourcemapOption);
+    SectionParserHelper<Payload, PayloadParser>::parse(
+        source, RequestSectionType, payload, ExportSourcemapOption);
+
+    REQUIRE(payload.report.error.code == Error::OK);
+    REQUIRE(payload.report.warnings.size() == 1);
+    REQUIRE(payload.report.warnings[0].code == FormattingWarning);
+}
+
+TEST_CASE(
+    "Give a warning of empty message body for requests with certain headers",
+    "[payload]") {
+    mdp::ByteBuffer source = "+ Request\n"
+                             "    + Headers \n"
+                             "\n"
+                             "            Content-Length: 100\n";
+
+    ParseResult<Payload> payload;
+    SectionParserHelper<Payload, PayloadParser>::parse(
+        source, RequestSectionType, payload, ExportSourcemapOption);
 
     REQUIRE(payload.report.error.code == Error::OK);
     REQUIRE(payload.report.warnings.size() == 1);
@@ -510,19 +516,20 @@ TEST_CASE("Give a warning of empty message body for requests with certain header
     REQUIRE(payload.sourceMap.body.sourceMap.empty());
 }
 
-TEST_CASE("Give a warning of empty message body for requests with certain headers and has parameters", "[payload]")
-{
-    mdp::ByteBuffer source = \
-    "+ Request\n"\
-    "    + Parameters\n"\
-    "        + limit: 1\n"\
-    "\n"\
-    "    + Headers \n"\
-    "\n"\
-    "            Content-Length: 100\n";
+TEST_CASE("Give a warning of empty message body for requests with certain "
+          "headers and has parameters",
+    "[payload]") {
+    mdp::ByteBuffer source = "+ Request\n"
+                             "    + Parameters\n"
+                             "        + limit: 1\n"
+                             "\n"
+                             "    + Headers \n"
+                             "\n"
+                             "            Content-Length: 100\n";
 
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, payload, ExportSourcemapOption);
+    SectionParserHelper<Payload, PayloadParser>::parse(
+        source, RequestSectionType, payload, ExportSourcemapOption);
 
     REQUIRE(payload.report.error.code == Error::OK);
     REQUIRE(payload.report.warnings.size() == 1);
@@ -540,38 +547,40 @@ TEST_CASE("Give a warning of empty message body for requests with certain header
     REQUIRE(payload.sourceMap.body.sourceMap.empty());
 }
 
-TEST_CASE("Do not report empty message body for requests with only headers", "[payload]")
-{
-    mdp::ByteBuffer source = \
-    "+ Request\n"\
-    "    + Headers \n"\
-    "\n"\
-    "            Accept: application/json, application/javascript\n";
+TEST_CASE("Do not report empty message body for requests with only headers",
+    "[payload]") {
+    mdp::ByteBuffer source =
+        "+ Request\n"
+        "    + Headers \n"
+        "\n"
+        "            Accept: application/json, application/javascript\n";
 
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, payload);
+    SectionParserHelper<Payload, PayloadParser>::parse(
+        source, RequestSectionType, payload);
 
     REQUIRE(payload.report.error.code == Error::OK);
     REQUIRE(payload.report.warnings.empty());
 
     REQUIRE(payload.node.headers.size() == 1);
     REQUIRE(payload.node.headers[0].first == "Accept");
-    REQUIRE(payload.node.headers[0].second == "application/json, application/javascript");
+    REQUIRE(payload.node.headers[0].second ==
+            "application/json, application/javascript");
     REQUIRE(payload.node.body.empty());
     REQUIRE(payload.node.schema.empty());
     REQUIRE(payload.node.attributes.empty());
     REQUIRE(payload.node.parameters.empty());
 }
 
-TEST_CASE("Do not report empty message body for requests with only parameters", "[payload]")
-{
-    mdp::ByteBuffer source = \
-    "+ Request\n"\
-    "    + Parameters \n"\
-    "        + limit: 1\n";
+TEST_CASE("Do not report empty message body for requests with only parameters",
+    "[payload]") {
+    mdp::ByteBuffer source = "+ Request\n"
+                             "    + Parameters \n"
+                             "        + limit: 1\n";
 
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, payload);
+    SectionParserHelper<Payload, PayloadParser>::parse(
+        source, RequestSectionType, payload);
 
     REQUIRE(payload.report.error.code == Error::OK);
     REQUIRE(payload.report.warnings.empty());
@@ -584,14 +593,13 @@ TEST_CASE("Do not report empty message body for requests with only parameters", 
     REQUIRE(payload.node.headers.empty());
 }
 
-TEST_CASE("Give a warning when 100 response has a body", "[payload]")
-{
-    mdp::ByteBuffer source = \
-    "+ Response 100\n\n"\
-    "        {}\n";
+TEST_CASE("Give a warning when 100 response has a body", "[payload]") {
+    mdp::ByteBuffer source = "+ Response 100\n\n"
+                             "        {}\n";
 
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, ResponseBodySectionType, payload);
+    SectionParserHelper<Payload, PayloadParser>::parse(
+        source, ResponseBodySectionType, payload);
 
     REQUIRE(payload.report.error.code == Error::OK);
     REQUIRE(payload.report.warnings.size() == 1);
@@ -600,10 +608,11 @@ TEST_CASE("Give a warning when 100 response has a body", "[payload]")
     REQUIRE(payload.node.body == "{}\n");
 }
 
-TEST_CASE("Empty body section should shouldn't be parsed as description", "[payload]")
-{
+TEST_CASE("Empty body section should shouldn't be parsed as description",
+    "[payload]") {
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(EmptyBodyFixture, ResponseSectionType, payload, ExportSourcemapOption);
+    SectionParserHelper<Payload, PayloadParser>::parse(
+        EmptyBodyFixture, ResponseSectionType, payload, ExportSourcemapOption);
 
     REQUIRE(payload.report.error.code == Error::OK);
     REQUIRE(payload.report.warnings.empty());
@@ -613,17 +622,16 @@ TEST_CASE("Empty body section should shouldn't be parsed as description", "[payl
     REQUIRE(payload.sourceMap.body.sourceMap.empty());
 }
 
-TEST_CASE("Parse request parameters", "[payload]")
-{
-    mdp::ByteBuffer source = \
-    "+ Request (application/json)\n\n"\
-    "    + Parameters\n\n"\
-    "        + id: pavan - description\n\n"\
-    "    + Body\n\n"\
-    "            {}\n";
+TEST_CASE("Parse request parameters", "[payload]") {
+    mdp::ByteBuffer source = "+ Request (application/json)\n\n"
+                             "    + Parameters\n\n"
+                             "        + id: pavan - description\n\n"
+                             "    + Body\n\n"
+                             "            {}\n";
 
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, payload);
+    SectionParserHelper<Payload, PayloadParser>::parse(
+        source, RequestSectionType, payload);
 
     REQUIRE(payload.report.error.code == Error::OK);
     REQUIRE(payload.report.warnings.empty());
@@ -643,17 +651,16 @@ TEST_CASE("Parse request parameters", "[payload]")
     REQUIRE(payload.node.parameters[0].values.empty());
 }
 
-TEST_CASE("Values section should be taken as a description node", "[payload]")
-{
-    mdp::ByteBuffer source = \
-    "+ Response 200\n\n"\
-    "    + Values\n\n"\
-    "        + id\n\n"\
-    "    + Body\n\n"\
-    "            {}\n";
+TEST_CASE("Values section should be taken as a description node", "[payload]") {
+    mdp::ByteBuffer source = "+ Response 200\n\n"
+                             "    + Values\n\n"
+                             "        + id\n\n"
+                             "    + Body\n\n"
+                             "            {}\n";
 
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, ResponseSectionType, payload, ExportSourcemapOption);
+    SectionParserHelper<Payload, PayloadParser>::parse(
+        source, ResponseSectionType, payload, ExportSourcemapOption);
 
     REQUIRE(payload.report.error.code == Error::OK);
     REQUIRE(payload.report.warnings.empty());
@@ -661,22 +668,23 @@ TEST_CASE("Values section should be taken as a description node", "[payload]")
     REQUIRE(payload.node.description == "+ Values\n\n    + id");
     REQUIRE(payload.node.body == "{}\n");
 
-    SourceMapHelper::check(payload.sourceMap.description.sourceMap, 20, 10, 34, 9);
+    SourceMapHelper::check(
+        payload.sourceMap.description.sourceMap, 20, 10, 34, 9);
     REQUIRE(payload.sourceMap.parameters.collection.empty());
     SourceMapHelper::check(payload.sourceMap.body.sourceMap, 64, 7);
 }
 
-TEST_CASE("Parameters section in response section should give a warning", "[payload]")
-{
-    mdp::ByteBuffer source = \
-    "+ Response 200\n\n"\
-    "    + Parameters\n\n"\
-    "        + id (string)\n\n"\
-    "    + Body\n\n"\
-    "            {}\n";
+TEST_CASE("Parameters section in response section should give a warning",
+    "[payload]") {
+    mdp::ByteBuffer source = "+ Response 200\n\n"
+                             "    + Parameters\n\n"
+                             "        + id (string)\n\n"
+                             "    + Body\n\n"
+                             "            {}\n";
 
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, ResponseSectionType, payload, ExportSourcemapOption);
+    SectionParserHelper<Payload, PayloadParser>::parse(
+        source, ResponseSectionType, payload, ExportSourcemapOption);
 
     REQUIRE(payload.report.error.code == Error::OK);
     REQUIRE(payload.report.warnings.size() == 1);
@@ -690,20 +698,20 @@ TEST_CASE("Parameters section in response section should give a warning", "[payl
     SourceMapHelper::check(payload.sourceMap.body.sourceMap, 77, 7);
 }
 
-TEST_CASE("Report ignoring nested request objects", "[payload][163][189]")
-{
-    mdp::ByteBuffer source = \
-    "+ Request\n"\
-    "    + Headers\n"\
-    "\n"\
-    "            Authorization: Basic AAAAA\n"\
-    "\n"\
-    "    + Request (application/x-www-form-urlencoded)\n"\
-    "\n"\
-    "            Hello World\n";
+TEST_CASE("Report ignoring nested request objects", "[payload][163][189]") {
+    mdp::ByteBuffer source =
+        "+ Request\n"
+        "    + Headers\n"
+        "\n"
+        "            Authorization: Basic AAAAA\n"
+        "\n"
+        "    + Request (application/x-www-form-urlencoded)\n"
+        "\n"
+        "            Hello World\n";
 
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, payload);
+    SectionParserHelper<Payload, PayloadParser>::parse(
+        source, RequestSectionType, payload);
 
     REQUIRE(payload.report.error.code == Error::OK);
     REQUIRE(payload.report.warnings.size() == 1);
@@ -713,19 +721,21 @@ TEST_CASE("Report ignoring nested request objects", "[payload][163][189]")
     REQUIRE(payload.node.body.empty());
 }
 
-TEST_CASE("Parse a payload with attributes", "[payload]")
-{
-    mdp::ByteBuffer source = \
-    "+ Response 200 (application/json)\n"\
-    "    + Attributes (object)\n"\
-    "        + id: 250FF (string)\n"\
-    "        + created: 1415203908 (number) - Time stamp\n"\
-    "        + percent_off: 25 (number)\n\n"\
-    "          A positive integer between 1 and 100 that represents the discount the coupon will apply.\n\n"\
-    "        + redeem_by (number) - Date after which the coupon can no longer be redeemed";
+TEST_CASE("Parse a payload with attributes", "[payload]") {
+    mdp::ByteBuffer source =
+        "+ Response 200 (application/json)\n"
+        "    + Attributes (object)\n"
+        "        + id: 250FF (string)\n"
+        "        + created: 1415203908 (number) - Time stamp\n"
+        "        + percent_off: 25 (number)\n\n"
+        "          A positive integer between 1 and 100 that represents the "
+        "discount the coupon will apply.\n\n"
+        "        + redeem_by (number) - Date after which the coupon can no "
+        "longer be redeemed";
 
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, ResponseSectionType, payload);
+    SectionParserHelper<Payload, PayloadParser>::parse(
+        source, ResponseSectionType, payload);
 
     REQUIRE(payload.report.error.code == Error::OK);
     REQUIRE(payload.report.warnings.empty());
@@ -736,22 +746,24 @@ TEST_CASE("Parse a payload with attributes", "[payload]")
     REQUIRE(payload.node.description.empty());
     REQUIRE(payload.node.attributes.name.empty());
     REQUIRE(payload.node.attributes.typeDefinition.attributes == 0);
-    REQUIRE(payload.node.attributes.typeDefinition.typeSpecification.name.base == mson::ObjectTypeName);
+    REQUIRE(
+        payload.node.attributes.typeDefinition.typeSpecification.name.base ==
+        mson::ObjectTypeName);
     REQUIRE(payload.node.attributes.sections.size() == 1);
-    REQUIRE(payload.node.attributes.sections[0].klass == mson::TypeSection::MemberTypeClass);
+    REQUIRE(payload.node.attributes.sections[0].klass ==
+            mson::TypeSection::MemberTypeClass);
     REQUIRE(payload.node.attributes.sections[0].content.elements().size() == 4);
 }
 
-TEST_CASE("Parse a request with attributes and no body", "[payload]")
-{
-    mdp::ByteBuffer source = \
-    "+ Request (application/json)\n"\
-    "    + Headers\n\n"\
-    "            Transfer-Encoding: chunked\n\n"\
-    "    + Attributes (array[Coupon])";
+TEST_CASE("Parse a request with attributes and no body", "[payload]") {
+    mdp::ByteBuffer source = "+ Request (application/json)\n"
+                             "    + Headers\n\n"
+                             "            Transfer-Encoding: chunked\n\n"
+                             "    + Attributes (array[Coupon])";
 
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(source, RequestSectionType, payload);
+    SectionParserHelper<Payload, PayloadParser>::parse(
+        source, RequestSectionType, payload);
 
     REQUIRE(payload.report.error.code == Error::OK);
     REQUIRE(payload.report.warnings.empty());
@@ -762,16 +774,21 @@ TEST_CASE("Parse a request with attributes and no body", "[payload]")
     REQUIRE(payload.node.description.empty());
     REQUIRE(payload.node.attributes.name.empty());
     REQUIRE(payload.node.attributes.typeDefinition.attributes == 0);
-    REQUIRE(payload.node.attributes.typeDefinition.typeSpecification.name.base == mson::ArrayTypeName);
-    REQUIRE(payload.node.attributes.typeDefinition.typeSpecification.nestedTypes.size() == 1);
-    REQUIRE(payload.node.attributes.typeDefinition.typeSpecification.nestedTypes[0].symbol.literal == "Coupon");
+    REQUIRE(
+        payload.node.attributes.typeDefinition.typeSpecification.name.base ==
+        mson::ArrayTypeName);
+    REQUIRE(payload.node.attributes.typeDefinition.typeSpecification.nestedTypes
+                .size() == 1);
+    REQUIRE(
+        payload.node.attributes.typeDefinition.typeSpecification.nestedTypes[0]
+            .symbol.literal == "Coupon");
     REQUIRE(payload.node.attributes.sections.empty());
 }
 
-TEST_CASE("Parsed payload includes source map", "[payload]")
-{
+TEST_CASE("Parsed payload includes source map", "[payload]") {
     ParseResult<Payload> payload;
-    SectionParserHelper<Payload, PayloadParser>::parse(RequestFixture, RequestSectionType, payload, ExportSourcemapOption);
+    SectionParserHelper<Payload, PayloadParser>::parse(
+        RequestFixture, RequestSectionType, payload, ExportSourcemapOption);
 
     REQUIRE(payload.report.error.code == Error::OK);
     CHECK(payload.report.warnings.empty());

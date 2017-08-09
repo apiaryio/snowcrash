@@ -13,65 +13,65 @@
 using namespace snowcrash;
 using namespace snowcrashtest;
 
-TEST_CASE("Templates for compare equality", "[utility]")
-{
-    SECTION("Testing equality on same types")
-    {
-        REQUIRE(IsEqual()(1,1));
-        REQUIRE_FALSE(IsEqual()(1,2));
+TEST_CASE("Templates for compare equality", "[utility]") {
+    SECTION("Testing equality on same types") {
+        REQUIRE(IsEqual()(1, 1));
+        REQUIRE_FALSE(IsEqual()(1, 2));
 
-        REQUIRE(IsEqual()('a','a'));
-        REQUIRE_FALSE(IsEqual()('a','A'));
+        REQUIRE(IsEqual()('a', 'a'));
+        REQUIRE_FALSE(IsEqual()('a', 'A'));
     }
 
-    SECTION("Testing case insensitive equality on same types")
-    {
-        REQUIRE(IsIEqual()('a','a'));
-        REQUIRE(IsIEqual()('a','A'));
-        REQUIRE(IsIEqual()('A','a'));
-        REQUIRE(IsIEqual()('A','A'));
+    SECTION("Testing case insensitive equality on same types") {
+        REQUIRE(IsIEqual()('a', 'a'));
+        REQUIRE(IsIEqual()('a', 'A'));
+        REQUIRE(IsIEqual()('A', 'a'));
+        REQUIRE(IsIEqual()('A', 'A'));
 
-        REQUIRE_FALSE(IsIEqual()('a','b'));
+        REQUIRE_FALSE(IsIEqual()('a', 'b'));
     }
 
-    SECTION("Both version should not throw while testing diferent types")
-    {
-        REQUIRE_NOTHROW(IsEqual()('a',1)); // allow compare diferent types - not throw
-        REQUIRE_NOTHROW(IsIEqual()('a',1)); // allow compare diferent types - not throw
+    SECTION("Both version should not throw while testing diferent types") {
+        REQUIRE_NOTHROW(
+            IsEqual()('a', 1)); // allow compare diferent types - not throw
+        REQUIRE_NOTHROW(
+            IsIEqual()('a', 1)); // allow compare diferent types - not throw
     }
 }
 
-TEST_CASE("Container comparation", "[utility]")
-{
+TEST_CASE("Container comparation", "[utility]") {
     REQUIRE(MatchContainers(std::string("abc"), std::string("abc"), IsEqual()));
 
-    REQUIRE_FALSE(MatchContainers(std::string("ABC"), std::string("abc"), IsEqual()));
+    REQUIRE_FALSE(
+        MatchContainers(std::string("ABC"), std::string("abc"), IsEqual()));
 
-    REQUIRE(MatchContainers(std::string("abc"), std::string("abc"), IsIEqual()));
-    REQUIRE(MatchContainers(std::string("abc"), std::string("ABC"), IsIEqual()));
+    REQUIRE(
+        MatchContainers(std::string("abc"), std::string("abc"), IsIEqual()));
+    REQUIRE(
+        MatchContainers(std::string("abc"), std::string("ABC"), IsIEqual()));
 
-    REQUIRE_FALSE(MatchContainers(std::string("def"), std::string("ABC"), IsIEqual()));
+    REQUIRE_FALSE(
+        MatchContainers(std::string("def"), std::string("ABC"), IsIEqual()));
 }
 
-TEST_CASE("Comapare string", "[utility]")
-{
+TEST_CASE("Comapare string", "[utility]") {
     REQUIRE(Equal<std::string>()(std::string("abc"), std::string("abc")));
-    REQUIRE_FALSE(Equal<std::string>()(std::string("abcd"), std::string("abc")));
+    REQUIRE_FALSE(
+        Equal<std::string>()(std::string("abcd"), std::string("abc")));
 
     REQUIRE(IEqual<std::string>()(std::string("abc"), std::string("ABC")));
     REQUIRE(IEqual<std::string>()(std::string("ABC"), std::string("ABC")));
-    REQUIRE_FALSE(IEqual<std::string>()(std::string("abcd"), std::string("abc")));
+    REQUIRE_FALSE(
+        IEqual<std::string>()(std::string("abcd"), std::string("abc")));
 }
 
-TEST_CASE("Remove markdown link")
-{
+TEST_CASE("Remove markdown link") {
     REQUIRE(StripMarkdownLink("[Google][]") == "Google");
     REQUIRE(StripMarkdownLink("[Google] [google]") == "Google");
     REQUIRE(StripMarkdownLink("[ Google](https://google.com)") == "Google");
 }
 
-TEST_CASE("Retrieve escaped string")
-{
+TEST_CASE("Retrieve escaped string") {
     std::string subject;
 
     subject = "a```b```cd";
@@ -87,8 +87,7 @@ TEST_CASE("Retrieve escaped string")
     REQUIRE(subject == "site_admin");
 }
 
-TEST_CASE("Add two new lines", "[utility]")
-{
+TEST_CASE("Add two new lines", "[utility]") {
     std::string s1 = "abc";
     std::string s2 = "abc\n";
     std::string s3 = "abc\n\n";
@@ -97,9 +96,8 @@ TEST_CASE("Add two new lines", "[utility]")
     REQUIRE(TwoNewLines(s3) == "abc\n\n");
 }
 
-TEST_CASE("Get trim info", "[utility]")
-{
-    TrimRange range; 
+TEST_CASE("Get trim info", "[utility]") {
+    TrimRange range;
     std::string s;
 
     s = "abc";

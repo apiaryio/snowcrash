@@ -12,18 +12,22 @@
 using namespace snowcrash;
 using namespace snowcrashtest;
 
-const mdp::ByteBuffer ParameterFixture = \
-"+ id: `0000` (enum[number], optional) - Description\n\n"\
-"    + Default: `1234`\n"\
-"    + Members\n"\
-"        + `1234` - The default value\n"\
-"        + `0000`\n"\
-"        + `beef` - I like beef\n";
+const mdp::ByteBuffer ParameterFixture =
+    "+ id: `0000` (enum[number], optional) - Description\n\n"
+    "    + Default: `1234`\n"
+    "    + Members\n"
+    "        + `1234` - The default value\n"
+    "        + `0000`\n"
+    "        + `beef` - I like beef\n";
 
-TEST_CASE("Parse canonical parameter definition with new syntax", "[mson_parameter]")
-{
+TEST_CASE("Parse canonical parameter definition with new syntax",
+    "[mson_parameter]") {
     ParseResult<MSONParameter> parameter;
-    SectionParserHelper<MSONParameter, MSONParameterParser>::parse(ParameterFixture, MSONParameterSectionType, parameter, ExportSourcemapOption);
+    SectionParserHelper<MSONParameter, MSONParameterParser>::parse(
+        ParameterFixture,
+        MSONParameterSectionType,
+        parameter,
+        ExportSourcemapOption);
 
     REQUIRE(parameter.report.error.code == Error::OK);
     REQUIRE(parameter.report.warnings.empty());
@@ -46,39 +50,46 @@ TEST_CASE("Parse canonical parameter definition with new syntax", "[mson_paramet
     SourceMapHelper::check(parameter.sourceMap.exampleValue.sourceMap, 2, 50);
     SourceMapHelper::check(parameter.sourceMap.defaultValue.sourceMap, 59, 16);
     REQUIRE(parameter.sourceMap.values.collection.size() == 3);
-    SourceMapHelper::check(parameter.sourceMap.values.collection[0].sourceMap, 99, 27);
-    SourceMapHelper::check(parameter.sourceMap.values.collection[1].sourceMap, 136, 7);
-    SourceMapHelper::check(parameter.sourceMap.values.collection[2].sourceMap, 153, 21);
+    SourceMapHelper::check(
+        parameter.sourceMap.values.collection[0].sourceMap, 99, 27);
+    SourceMapHelper::check(
+        parameter.sourceMap.values.collection[1].sourceMap, 136, 7);
+    SourceMapHelper::check(
+        parameter.sourceMap.values.collection[2].sourceMap, 153, 21);
 }
 
-TEST_CASE("Parse parameter description when it occurs in different cases", "[mson_parameter]")
-{
-    mdp::ByteBuffer source = \
-    "+ id: 100 - Same line\n"\
-    "    Single newline\n\n"\
-    "    Double newline\n";
+TEST_CASE("Parse parameter description when it occurs in different cases",
+    "[mson_parameter]") {
+    mdp::ByteBuffer source = "+ id: 100 - Same line\n"
+                             "    Single newline\n\n"
+                             "    Double newline\n";
 
     ParseResult<MSONParameter> parameter;
-    SectionParserHelper<MSONParameter, MSONParameterParser>::parse(source, MSONParameterSectionType, parameter, ExportSourcemapOption);
+    SectionParserHelper<MSONParameter, MSONParameterParser>::parse(
+        source, MSONParameterSectionType, parameter, ExportSourcemapOption);
 
     REQUIRE(parameter.report.error.code == Error::OK);
     REQUIRE(parameter.report.warnings.empty());
 
     REQUIRE(parameter.node.name == "id");
-    REQUIRE(parameter.node.description == "Same line\nSingle newline\n\nDouble newline");
+    REQUIRE(parameter.node.description ==
+            "Same line\nSingle newline\n\nDouble newline");
     REQUIRE(parameter.node.exampleValue == "100");
 
     SourceMapHelper::check(parameter.sourceMap.description.sourceMap, 2, 20, 1);
-    SourceMapHelper::check(parameter.sourceMap.description.sourceMap, 26, 16, 2);
-    SourceMapHelper::check(parameter.sourceMap.description.sourceMap, 46, 15, 3);
+    SourceMapHelper::check(
+        parameter.sourceMap.description.sourceMap, 26, 16, 2);
+    SourceMapHelper::check(
+        parameter.sourceMap.description.sourceMap, 46, 15, 3);
 }
 
-TEST_CASE("Parse parameter when it has more than 2 traits", "[mson_parameter]")
-{
+TEST_CASE(
+    "Parse parameter when it has more than 2 traits", "[mson_parameter]") {
     mdp::ByteBuffer source = "+ id: 100 (optional, number, tagging)";
 
     ParseResult<MSONParameter> parameter;
-    SectionParserHelper<MSONParameter, MSONParameterParser>::parse(source, MSONParameterSectionType, parameter, ExportSourcemapOption);
+    SectionParserHelper<MSONParameter, MSONParameterParser>::parse(
+        source, MSONParameterSectionType, parameter, ExportSourcemapOption);
 
     REQUIRE(parameter.report.error.code == Error::OK);
     REQUIRE(parameter.report.warnings.size() == 1);
@@ -92,14 +103,14 @@ TEST_CASE("Parse parameter when it has more than 2 traits", "[mson_parameter]")
     REQUIRE(parameter.sourceMap.use.sourceMap.empty());
 }
 
-TEST_CASE("Parse parameter when it has a sample type section", "[mson_parameter]")
-{
-    mdp::ByteBuffer source = \
-    "+ id\n"\
-    "    + Sample: 42";
+TEST_CASE(
+    "Parse parameter when it has a sample type section", "[mson_parameter]") {
+    mdp::ByteBuffer source = "+ id\n"
+                             "    + Sample: 42";
 
     ParseResult<MSONParameter> parameter;
-    SectionParserHelper<MSONParameter, MSONParameterParser>::parse(source, MSONParameterSectionType, parameter);
+    SectionParserHelper<MSONParameter, MSONParameterParser>::parse(
+        source, MSONParameterSectionType, parameter);
 
     REQUIRE(parameter.report.error.code == Error::OK);
     REQUIRE(parameter.report.warnings.empty());
@@ -109,14 +120,14 @@ TEST_CASE("Parse parameter when it has a sample type section", "[mson_parameter]
     REQUIRE(parameter.node.exampleValue == "42");
 }
 
-TEST_CASE("Warn about implicit required vs default clash in new parameter", "[mson_parameter]")
-{
-    mdp::ByteBuffer source = \
-    "+ id\n"\
-    "    + Default: 42";
+TEST_CASE("Warn about implicit required vs default clash in new parameter",
+    "[mson_parameter]") {
+    mdp::ByteBuffer source = "+ id\n"
+                             "    + Default: 42";
 
     ParseResult<MSONParameter> parameter;
-    SectionParserHelper<MSONParameter, MSONParameterParser>::parse(source, MSONParameterSectionType, parameter);
+    SectionParserHelper<MSONParameter, MSONParameterParser>::parse(
+        source, MSONParameterSectionType, parameter);
 
     REQUIRE(parameter.report.error.code == Error::OK);
     REQUIRE(parameter.report.warnings.size() == 1);
@@ -127,16 +138,16 @@ TEST_CASE("Warn about implicit required vs default clash in new parameter", "[ms
     REQUIRE(parameter.node.defaultValue == "42");
 }
 
-TEST_CASE("Warn missing example item in values in new parameter syntax", "[mson_parameter]")
-{
-    mdp::ByteBuffer source = \
-    "+ id: `Value1` (optional, enum[string])\n"\
-    "    + Default: `Value2`\n"\
-    "    + Members\n"\
-    "        + `Value2`\n";
+TEST_CASE("Warn missing example item in values in new parameter syntax",
+    "[mson_parameter]") {
+    mdp::ByteBuffer source = "+ id: `Value1` (optional, enum[string])\n"
+                             "    + Default: `Value2`\n"
+                             "    + Members\n"
+                             "        + `Value2`\n";
 
     ParseResult<MSONParameter> parameter;
-    SectionParserHelper<MSONParameter, MSONParameterParser>::parse(source, MSONParameterSectionType, parameter);
+    SectionParserHelper<MSONParameter, MSONParameterParser>::parse(
+        source, MSONParameterSectionType, parameter);
 
     REQUIRE(parameter.report.error.code == Error::OK);
     REQUIRE(parameter.report.warnings.size() == 1);
@@ -147,16 +158,16 @@ TEST_CASE("Warn missing example item in values in new parameter syntax", "[mson_
     REQUIRE(parameter.node.defaultValue == "Value2");
 }
 
-TEST_CASE("Warn missing default value in values in new parameter syntax", "[mson_parameter]")
-{
-    mdp::ByteBuffer source = \
-    "+ id: `Value2` (optional, enum[string])\n"\
-    "    + Default: `Value1`\n"\
-    "    + Members\n"\
-    "        + `Value2`\n";
+TEST_CASE("Warn missing default value in values in new parameter syntax",
+    "[mson_parameter]") {
+    mdp::ByteBuffer source = "+ id: `Value2` (optional, enum[string])\n"
+                             "    + Default: `Value1`\n"
+                             "    + Members\n"
+                             "        + `Value2`\n";
 
     ParseResult<MSONParameter> parameter;
-    SectionParserHelper<MSONParameter, MSONParameterParser>::parse(source, MSONParameterSectionType, parameter);
+    SectionParserHelper<MSONParameter, MSONParameterParser>::parse(
+        source, MSONParameterSectionType, parameter);
 
     REQUIRE(parameter.report.error.code == Error::OK);
     REQUIRE(parameter.report.warnings.size() == 1);
@@ -167,12 +178,13 @@ TEST_CASE("Warn missing default value in values in new parameter syntax", "[mson
     REQUIRE(parameter.node.defaultValue == "Value1");
 }
 
-TEST_CASE("Parentheses in parameter description with new syntax", "[parameter]")
-{
+TEST_CASE(
+    "Parentheses in parameter description with new syntax", "[parameter]") {
     mdp::ByteBuffer source = "+ id (string) - lorem (ipsum) dolor\n";
 
     ParseResult<MSONParameter> parameter;
-    SectionParserHelper<MSONParameter, MSONParameterParser>::parse(source, MSONParameterSectionType, parameter);
+    SectionParserHelper<MSONParameter, MSONParameterParser>::parse(
+        source, MSONParameterSectionType, parameter);
 
     REQUIRE(parameter.report.error.code == Error::OK);
     REQUIRE(parameter.report.warnings.empty());
@@ -182,18 +194,18 @@ TEST_CASE("Parentheses in parameter description with new syntax", "[parameter]")
     REQUIRE(parameter.node.description == "lorem (ipsum) dolor");
 }
 
-TEST_CASE("Parse parameter including backtics for escaping, issue drafter#445", "[mson_parameter]")
-{
-    mdp::ByteBuffer source = \
-    "+ `start_time`: `recorded_at` (enum[string], optional)\n"\
-    "\n"\
-    "    + Members\n"\
-    "        + `recorded_at`\n"\
-    "        + `created_at`";
-
+TEST_CASE("Parse parameter including backtics for escaping, issue drafter#445",
+    "[mson_parameter]") {
+    mdp::ByteBuffer source =
+        "+ `start_time`: `recorded_at` (enum[string], optional)\n"
+        "\n"
+        "    + Members\n"
+        "        + `recorded_at`\n"
+        "        + `created_at`";
 
     ParseResult<MSONParameter> parameter;
-    SectionParserHelper<MSONParameter, MSONParameterParser>::parse(source, MSONParameterSectionType, parameter);
+    SectionParserHelper<MSONParameter, MSONParameterParser>::parse(
+        source, MSONParameterSectionType, parameter);
 
     REQUIRE(parameter.report.error.code == Error::OK);
     REQUIRE(parameter.report.warnings.empty());

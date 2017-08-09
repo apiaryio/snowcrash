@@ -21,26 +21,25 @@ const std::string HTTPHeaderName::Link = "Link";
 const std::string HTTPMethodName::Head = "HEAD";
 const std::string HTTPMethodName::Connect = "CONNECT";
 
-StatusCodeTraits snowcrash::GetStatusCodeTrait(HTTPStatusCode code)
-{
+StatusCodeTraits snowcrash::GetStatusCodeTrait(HTTPStatusCode code) {
     StatusCodeTraits traits;
     traits.code = code;
 
     // Following status codes MUST NOT contain response body
-    if (code == 204 || code == 304 || code/100 == 1) {
+    if (code == 204 || code == 304 || code / 100 == 1) {
         traits.allowBody = false;
     }
 
     return traits;
 }
 
-HTTPMethodTraits snowcrash::GetMethodTrait(HTTPMethod method)
-{
+HTTPMethodTraits snowcrash::GetMethodTrait(HTTPMethod method) {
     HTTPMethodTraits traits;
     traits.method = method;
 
     // Following HTTP methods MUST NOT contain response body
-    // FIXME: When refactoring traits don't forget that 'CONNECT' has no body only when 1xx-2xx
+    // FIXME: When refactoring traits don't forget that 'CONNECT' has no body
+    // only when 1xx-2xx
     if (method == HTTPMethodName::Head || method == HTTPMethodName::Connect) {
         traits.allowBody = false;
     }

@@ -12,57 +12,54 @@
 using namespace snowcrash;
 using namespace snowcrashtest;
 
-const mdp::ByteBuffer BodyAssetFixture = \
-"+ Body\n"\
-"\n"\
-"        Lorem Ipsum\n";
+const mdp::ByteBuffer BodyAssetFixture = "+ Body\n"
+                                         "\n"
+                                         "        Lorem Ipsum\n";
 
-const mdp::ByteBuffer SchemaAssetFixture = \
-"+ Schema\n"\
-"\n"\
-"        Dolor Sit Amet\n";
+const mdp::ByteBuffer SchemaAssetFixture = "+ Schema\n"
+                                           "\n"
+                                           "        Dolor Sit Amet\n";
 
-TEST_CASE("Recognize explicit body signature", "[asset]")
-{
+TEST_CASE("Recognize explicit body signature", "[asset]") {
     mdp::MarkdownParser markdownParser;
     mdp::MarkdownNode markdownAST;
     markdownParser.parse(BodyAssetFixture, markdownAST);
 
     REQUIRE(!markdownAST.children().empty());
-    SectionType sectionType = SectionProcessor<Asset>::sectionType(markdownAST.children().begin());
+    SectionType sectionType =
+        SectionProcessor<Asset>::sectionType(markdownAST.children().begin());
     REQUIRE(sectionType == BodySectionType);
 }
 
-TEST_CASE("Recognize body with content on signature", "[asset]")
-{
-    mdp::ByteBuffer source = \
-    "+ Body\n"\
-    "        Lorem Ipsum\n";
+TEST_CASE("Recognize body with content on signature", "[asset]") {
+    mdp::ByteBuffer source = "+ Body\n"
+                             "        Lorem Ipsum\n";
 
     mdp::MarkdownParser markdownParser;
     mdp::MarkdownNode markdownAST;
     markdownParser.parse(source, markdownAST);
 
     REQUIRE(!markdownAST.children().empty());
-    SectionType sectionType = SectionProcessor<Asset>::sectionType(markdownAST.children().begin());
+    SectionType sectionType =
+        SectionProcessor<Asset>::sectionType(markdownAST.children().begin());
     REQUIRE(sectionType == BodySectionType);
 }
 
-TEST_CASE("Recognize schema signature", "[asset]")
-{
+TEST_CASE("Recognize schema signature", "[asset]") {
     mdp::MarkdownParser markdownParser;
     mdp::MarkdownNode markdownAST;
     markdownParser.parse(SchemaAssetFixture, markdownAST);
 
     REQUIRE(!markdownAST.children().empty());
-    SectionType sectionType = SectionProcessor<Asset>::sectionType(markdownAST.children().begin());
+    SectionType sectionType =
+        SectionProcessor<Asset>::sectionType(markdownAST.children().begin());
     REQUIRE(sectionType == SchemaSectionType);
 }
 
-TEST_CASE("Parse body asset", "[asset]")
-{
+TEST_CASE("Parse body asset", "[asset]") {
     ParseResult<Asset> asset;
-    SectionParserHelper<Asset, AssetParser>::parse(BodyAssetFixture, BodySectionType, asset, ExportSourcemapOption);
+    SectionParserHelper<Asset, AssetParser>::parse(
+        BodyAssetFixture, BodySectionType, asset, ExportSourcemapOption);
 
     REQUIRE(asset.report.error.code == Error::OK);
     REQUIRE(asset.report.warnings.empty());
@@ -71,10 +68,10 @@ TEST_CASE("Parse body asset", "[asset]")
     SourceMapHelper::check(asset.sourceMap.sourceMap, 12, 16);
 }
 
-TEST_CASE("Parse schema asset", "[asset]")
-{
+TEST_CASE("Parse schema asset", "[asset]") {
     ParseResult<Asset> asset;
-    SectionParserHelper<Asset, AssetParser>::parse(SchemaAssetFixture, SchemaSectionType, asset, ExportSourcemapOption);
+    SectionParserHelper<Asset, AssetParser>::parse(
+        SchemaAssetFixture, SchemaSectionType, asset, ExportSourcemapOption);
 
     REQUIRE(asset.report.error.code == Error::OK);
     REQUIRE(asset.report.warnings.empty());
@@ -83,15 +80,14 @@ TEST_CASE("Parse schema asset", "[asset]")
     SourceMapHelper::check(asset.sourceMap.sourceMap, 14, 19);
 }
 
-TEST_CASE("Foreign block inside", "[asset]")
-{
+TEST_CASE("Foreign block inside", "[asset]") {
     mdp::ByteBuffer source = BodyAssetFixture;
-    source += \
-    "\n"\
-    "    Hello World!\n";
+    source += "\n"
+              "    Hello World!\n";
 
     ParseResult<Asset> asset;
-    SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, asset, ExportSourcemapOption);
+    SectionParserHelper<Asset, AssetParser>::parse(
+        source, BodySectionType, asset, ExportSourcemapOption);
 
     REQUIRE(asset.report.error.code == Error::OK);
     REQUIRE(asset.report.warnings.size() == 1);
@@ -101,15 +97,14 @@ TEST_CASE("Foreign block inside", "[asset]")
     SourceMapHelper::check(asset.sourceMap.sourceMap, 12, 17, 33, 13);
 }
 
-TEST_CASE("Nested list block inside", "[asset]")
-{
+TEST_CASE("Nested list block inside", "[asset]") {
     mdp::ByteBuffer source = BodyAssetFixture;
-    source += \
-    "\n"\
-    "    + Hello World!\n";
+    source += "\n"
+              "    + Hello World!\n";
 
     ParseResult<Asset> asset;
-    SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, asset, ExportSourcemapOption);
+    SectionParserHelper<Asset, AssetParser>::parse(
+        source, BodySectionType, asset, ExportSourcemapOption);
 
     REQUIRE(asset.report.error.code == Error::OK);
     REQUIRE(asset.report.warnings.size() == 1);
@@ -119,16 +114,15 @@ TEST_CASE("Nested list block inside", "[asset]")
     SourceMapHelper::check(asset.sourceMap.sourceMap, 12, 16, 33, 15);
 }
 
-TEST_CASE("Multiline signature", "[asset]")
-{
-    mdp::ByteBuffer source = \
-    "+ Body\n"
-    "  Multiline Signature Content\n"\
-    "\n"\
-    "        Hello World!\n";
+TEST_CASE("Multiline signature", "[asset]") {
+    mdp::ByteBuffer source = "+ Body\n"
+                             "  Multiline Signature Content\n"
+                             "\n"
+                             "        Hello World!\n";
 
     ParseResult<Asset> asset;
-    SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, asset, ExportSourcemapOption);
+    SectionParserHelper<Asset, AssetParser>::parse(
+        source, BodySectionType, asset, ExportSourcemapOption);
 
     REQUIRE(asset.report.error.code == Error::OK);
     REQUIRE(asset.report.warnings.size() == 1);
@@ -141,19 +135,18 @@ TEST_CASE("Multiline signature", "[asset]")
     SourceMapHelper::check(asset.sourceMap.sourceMap, 42, 17, 3);
 }
 
-TEST_CASE("Multiple blocks", "[asset]")
-{
-    mdp::ByteBuffer source = \
-    "+ Body\n"\
-    "\n"\
-    "    Block 1\n"\
-    "\n"\
-    "        Block 2\n"\
-    "\n"\
-    "    Block 3\n";
+TEST_CASE("Multiple blocks", "[asset]") {
+    mdp::ByteBuffer source = "+ Body\n"
+                             "\n"
+                             "    Block 1\n"
+                             "\n"
+                             "        Block 2\n"
+                             "\n"
+                             "    Block 3\n";
 
     ParseResult<Asset> asset;
-    SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, asset, ExportSourcemapOption);
+    SectionParserHelper<Asset, AssetParser>::parse(
+        source, BodySectionType, asset, ExportSourcemapOption);
 
     REQUIRE(asset.report.error.code == Error::OK);
     REQUIRE(asset.report.warnings.size() == 2);
@@ -167,15 +160,14 @@ TEST_CASE("Multiple blocks", "[asset]")
     SourceMapHelper::check(asset.sourceMap.sourceMap, 42, 8, 3);
 }
 
-TEST_CASE("Extra spaces before signature", "[asset]")
-{
-    mdp::ByteBuffer source = \
-    "+   Body\n"\
-    "\n"\
-    "        Lorem Ipsum\n";
+TEST_CASE("Extra spaces before signature", "[asset]") {
+    mdp::ByteBuffer source = "+   Body\n"
+                             "\n"
+                             "        Lorem Ipsum\n";
 
     ParseResult<Asset> asset;
-    SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, asset, ExportSourcemapOption);
+    SectionParserHelper<Asset, AssetParser>::parse(
+        source, BodySectionType, asset, ExportSourcemapOption);
 
     REQUIRE(asset.report.error.code == Error::OK);
     REQUIRE(asset.report.warnings.empty());
@@ -184,15 +176,14 @@ TEST_CASE("Extra spaces before signature", "[asset]")
     SourceMapHelper::check(asset.sourceMap.sourceMap, 14, 16);
 }
 
-TEST_CASE("Asset parser greediness", "[asset]")
-{
+TEST_CASE("Asset parser greediness", "[asset]") {
     mdp::ByteBuffer source = BodyAssetFixture;
-    source +=\
-    "\n"\
-    "+ Another Block\n";
+    source += "\n"
+              "+ Another Block\n";
 
     ParseResult<Asset> asset;
-    SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, asset, ExportSourcemapOption);
+    SectionParserHelper<Asset, AssetParser>::parse(
+        source, BodySectionType, asset, ExportSourcemapOption);
 
     REQUIRE(asset.report.error.code == Error::OK);
     REQUIRE(asset.report.warnings.empty());

@@ -17,150 +17,164 @@ using namespace scpl;
 
 namespace snowcrash {
 
-    /**
-     * MSON Parameter Section Processor
-     */
-    template<>
-    struct SectionProcessor<MSONParameter> : public SignatureSectionProcessorBase<MSONParameter> {
+/**
+ * MSON Parameter Section Processor
+ */
+template <>
+struct SectionProcessor<MSONParameter>
+    : public SignatureSectionProcessorBase<MSONParameter>
+{
 
-        static SignatureTraits signatureTraits() {
+    static SignatureTraits signatureTraits() {
 
-            SignatureTraits signatureTraits(SignatureTraits::IdentifierTrait |
-                                            SignatureTraits::ValuesTrait |
-                                            SignatureTraits::AttributesTrait |
-                                            SignatureTraits::ContentTrait);
+        SignatureTraits signatureTraits(
+            SignatureTraits::IdentifierTrait | SignatureTraits::ValuesTrait |
+            SignatureTraits::AttributesTrait | SignatureTraits::ContentTrait);
 
-            return signatureTraits;
+        return signatureTraits;
+    }
+
+    static MarkdownNodeIterator finalizeSignature(
+        const MarkdownNodeIterator &node,
+        SectionParserData &pd,
+        const Signature &signature,
+        const ParseResultRef<MSONParameter> &out) {
+
+        out.node.name =
+            StripBackticks(const_cast<std::string &>(signature.identifier));
+        out.node.description = signature.content;
+        out.node.exampleValue = signature.value;
+
+        if (!signature.remainingContent.empty()) {
+            out.node.description += "\n" + signature.remainingContent + "\n";
         }
 
-        static MarkdownNodeIterator finalizeSignature(const MarkdownNodeIterator& node,
-                                                      SectionParserData& pd,
-                                                      const Signature& signature,
-                                                      const ParseResultRef<MSONParameter>& out) {
+        SectionProcessor<Parameter>::parseAttributes(
+            node, pd, signature.attributes, out, false);
 
-            out.node.name = StripBackticks(const_cast<std::string&>(signature.identifier));
-            out.node.description = signature.content;
-            out.node.exampleValue = signature.value;
-
-            if (!signature.remainingContent.empty()) {
-                out.node.description += "\n" + signature.remainingContent + "\n";
+        if (pd.exportSourceMap()) {
+            if (!out.node.name.empty()) {
+                out.sourceMap.name.sourceMap = node->sourceMap;
             }
 
-            SectionProcessor<Parameter>::parseAttributes(node, pd, signature.attributes, out, false);
+            if (!out.node.description.empty()) {
+                out.sourceMap.description.sourceMap = node->sourceMap;
+            }
+
+            if (!out.node.exampleValue.empty()) {
+                out.sourceMap.exampleValue.sourceMap = node->sourceMap;
+            }
+        }
+
+        return ++MarkdownNodeIterator(node);
+    }
+
+    static MarkdownNodeIterator processNestedSection(
+        const MarkdownNodeIterator &node,
+        const MarkdownNodes &siblings,
+        SectionParserData &pd,
+        const ParseResultRef<MSONParameter> &out) {
+
+        SectionType sectionType = pd.sectionContext();
+        MarkdownNodeIterator cur = node;
+        IntermediateParseResult<mson::TypeSection> typeSection(out.report);
+
+        switch (sectionType) {
+        case MSONSampleDefaultSectionType: {
+            typeSection.node.baseType = mson::ImplicitPrimitiveBaseType;
+            cur = MSONTypeSectionListParser::parse(
+                node, siblings, pd, typeSection);
+
+            if (typeSection.node.content.value.empty()) {
+                break;
+            }
+
+            if (typeSection.node.klass == mson::TypeSection::DefaultClass) {
+                out.node.defaultValue = typeSection.node.content.value;
+
+                if (pd.exportSourceMap()) {
+                    out.sourceMap.defaultValue.sourceMap =
+                        typeSection.sourceMap.value.sourceMap;
+                }
+            } else if (typeSection.node.klass ==
+                       mson::TypeSection::SampleClass) {
+                out.node.exampleValue = typeSection.node.content.value;
+                out.sourceMap.exampleValue.sourceMap =
+                    typeSection.sourceMap.value.sourceMap;
+            }
+
+            break;
+        }
+
+        case MSONValueMembersSectionType: {
+            typeSection.node.baseType = mson::ImplicitValueBaseType;
+            cur = MSONTypeSectionListParser::parse(
+                node, siblings, pd, typeSection);
+
+            out.node.values.clear();
 
             if (pd.exportSourceMap()) {
-                if (!out.node.name.empty()) {
-                    out.sourceMap.name.sourceMap = node->sourceMap;
-                }
-
-                if (!out.node.description.empty()) {
-                    out.sourceMap.description.sourceMap = node->sourceMap;
-                }
-
-                if (!out.node.exampleValue.empty()) {
-                    out.sourceMap.exampleValue.sourceMap = node->sourceMap;
-                }
+                out.sourceMap.values.collection.clear();
             }
 
-            return ++MarkdownNodeIterator(node);
-        }
+            for (size_t i = 0; i < typeSection.node.content.elements().size();
+                 i++) {
+                mson::ValueMember valueMember =
+                    typeSection.node.content.elements().at(i).content.value;
+                SourceMap<mson::ValueMember> valueMemberSM;
 
-        static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
-                                                         const MarkdownNodes& siblings,
-                                                         SectionParserData& pd,
-                                                         const ParseResultRef<MSONParameter>& out) {
-
-            SectionType sectionType = pd.sectionContext();
-            MarkdownNodeIterator cur = node;
-            IntermediateParseResult<mson::TypeSection> typeSection(out.report);
-
-            switch (sectionType) {
-                case MSONSampleDefaultSectionType:
-                {
-                    typeSection.node.baseType = mson::ImplicitPrimitiveBaseType;
-                    cur = MSONTypeSectionListParser::parse(node, siblings, pd, typeSection);
-
-                    if (typeSection.node.content.value.empty()) {
-                        break;
-                    }
-
-                    if (typeSection.node.klass == mson::TypeSection::DefaultClass) {
-                        out.node.defaultValue = typeSection.node.content.value;
-
-                        if (pd.exportSourceMap()) {
-                            out.sourceMap.defaultValue.sourceMap = typeSection.sourceMap.value.sourceMap;
-                        }
-                    }
-                    else if (typeSection.node.klass == mson::TypeSection::SampleClass) {
-                        out.node.exampleValue = typeSection.node.content.value;
-                        out.sourceMap.exampleValue.sourceMap = typeSection.sourceMap.value.sourceMap;
-                    }
-
-                    break;
+                if (pd.exportSourceMap()) {
+                    valueMemberSM =
+                        typeSection.sourceMap.elements().collection.at(i).value;
                 }
 
-                case MSONValueMembersSectionType:
-                {
-                    typeSection.node.baseType = mson::ImplicitValueBaseType;
-                    cur = MSONTypeSectionListParser::parse(node, siblings, pd, typeSection);
-
-                    out.node.values.clear();
+                if (valueMember.valueDefinition.values.size() == 1) {
+                    out.node.values.push_back(
+                        valueMember.valueDefinition.values[0].literal);
 
                     if (pd.exportSourceMap()) {
-                        out.sourceMap.values.collection.clear();
+                        SourceMap<Value> valueSM;
+                        valueSM.sourceMap =
+                            valueMemberSM.valueDefinition.sourceMap;
+
+                        out.sourceMap.values.collection.push_back(valueSM);
                     }
-
-                    for (size_t i = 0; i < typeSection.node.content.elements().size(); i++) {
-                        mson::ValueMember valueMember = typeSection.node.content.elements().at(i).content.value;
-                        SourceMap<mson::ValueMember> valueMemberSM;
-
-                        if (pd.exportSourceMap()) {
-                            valueMemberSM = typeSection.sourceMap.elements().collection.at(i).value;
-                        }
-
-                        if (valueMember.valueDefinition.values.size() == 1) {
-                            out.node.values.push_back(valueMember.valueDefinition.values[0].literal);
-
-                            if (pd.exportSourceMap()) {
-                                SourceMap<Value> valueSM;
-                                valueSM.sourceMap = valueMemberSM.valueDefinition.sourceMap;
-
-                                out.sourceMap.values.collection.push_back(valueSM);
-                            }
-                        }
-                    }
-
-                    break;
                 }
-
-                default:
-                    break;
             }
 
-            return cur;
+            break;
         }
 
-        static void finalize(const MarkdownNodeIterator& node,
-                             SectionParserData& pd,
-                             const ParseResultRef<MSONParameter>& out) {
-
-            SectionProcessor<Parameter>::checkDefaultAndRequiredClash<MSONParameter>(node, pd, out);
-            SectionProcessor<Parameter>::checkExampleAndDefaultValue<MSONParameter>(node, pd, out);
+        default:
+            break;
         }
 
-        static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
+        return cur;
+    }
 
-            SectionType nestedType = UndefinedSectionType;
+    static void finalize(const MarkdownNodeIterator &node,
+        SectionParserData &pd,
+        const ParseResultRef<MSONParameter> &out) {
 
-            // Recognize `Default` and `Members` sections
-            nestedType = SectionProcessor<mson::TypeSection>::sectionType(node);
+        SectionProcessor<Parameter>::checkDefaultAndRequiredClash<
+            MSONParameter>(node, pd, out);
+        SectionProcessor<Parameter>::checkExampleAndDefaultValue<MSONParameter>(
+            node, pd, out);
+    }
 
-            return nestedType;
-        }
-    };
+    static SectionType nestedSectionType(const MarkdownNodeIterator &node) {
 
-    /** MSON Parameter Section Parser */
-    typedef SectionParser<MSONParameter, ListSectionAdapter> MSONParameterParser;
+        SectionType nestedType = UndefinedSectionType;
+
+        // Recognize `Default` and `Members` sections
+        nestedType = SectionProcessor<mson::TypeSection>::sectionType(node);
+
+        return nestedType;
+    }
+};
+
+/** MSON Parameter Section Parser */
+typedef SectionParser<MSONParameter, ListSectionAdapter> MSONParameterParser;
 }
 
 #endif

@@ -12,8 +12,8 @@
 using namespace snowcrash;
 using namespace snowcrashtest;
 
-TEST_CASE("Match action with same uri template and same http method", "[blueprint_utility]")
-{
+TEST_CASE("Match action with same uri template and same http method",
+    "[blueprint_utility]") {
     Action action1, action2;
 
     action1.method = "GET";
@@ -22,8 +22,8 @@ TEST_CASE("Match action with same uri template and same http method", "[blueprin
     REQUIRE(MatchAction()(action1, action2));
 }
 
-TEST_CASE("Match action with same uri template and different http method", "[blueprint_utility]")
-{
+TEST_CASE("Match action with same uri template and different http method",
+    "[blueprint_utility]") {
     Action action1, action2;
 
     action1.uriTemplate = "/test";
@@ -35,8 +35,8 @@ TEST_CASE("Match action with same uri template and different http method", "[blu
     REQUIRE_FALSE(MatchAction()(action1, action2));
 }
 
-TEST_CASE("Match action with different uri template and same http method", "[blueprint_utility]")
-{
+TEST_CASE("Match action with different uri template and same http method",
+    "[blueprint_utility]") {
     Action action1, action2;
 
     action1.method = "GET";
