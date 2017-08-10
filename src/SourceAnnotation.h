@@ -154,14 +154,16 @@ namespace snowcrash
     struct Report {
 
         /**
-         *  \brief Append a report to this one, replacing the error source annotation.
+         *  \brief Append a report to this one, replacing the error source
+         * annotation.
          *
          *  NOTE: A binding does not need to wrap this action.
          */
         Report& operator+=(const Report& rhs)
         {
             error = rhs.error;
-            warnings.insert(warnings.end(), rhs.warnings.begin(), rhs.warnings.end());
+            warnings.insert(
+                warnings.end(), rhs.warnings.begin(), rhs.warnings.end());
             return *this;
         }
 

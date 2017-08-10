@@ -21,14 +21,18 @@ namespace snowcrash
 {
 
     /** Nameless resource matching regex */
-    const char* const ResourceHeaderRegex = "^[[:blank:]]*(" HTTP_REQUEST_METHOD "[[:blank:]]+)?" URI_TEMPLATE "$";
+    const char* const ResourceHeaderRegex = "^[[:blank:]]*(" HTTP_REQUEST_METHOD
+                                            "[[:blank:]]+)?" URI_TEMPLATE "$";
 
     /** Named resource matching regex */
-    const char* const NamedResourceHeaderRegex = "^[[:blank:]]*" SYMBOL_IDENTIFIER "[[:blank:]]+\\[" URI_TEMPLATE "]$";
+    const char* const NamedResourceHeaderRegex
+        = "^[[:blank:]]*" SYMBOL_IDENTIFIER "[[:blank:]]+\\[" URI_TEMPLATE "]$";
 
     /** Named endpoint matching regex */
     const char* const NamedEndpointHeaderRegex
-        = "^[[:blank:]]*" SYMBOL_IDENTIFIER "[[:blank:]]+\\[" HTTP_REQUEST_METHOD "[[:blank:]]+" URI_TEMPLATE "]$";
+        = "^[[:blank:]]*" SYMBOL_IDENTIFIER
+          "[[:blank:]]+\\[" HTTP_REQUEST_METHOD "[[:blank:]]+" URI_TEMPLATE
+          "]$";
 
     /** Internal type alias for Collection iterator of Resource */
     typedef Collection<Resource>::const_iterator ResourceIterator;
@@ -39,7 +43,8 @@ namespace snowcrash
     template <>
     struct SectionProcessor<Resource> : public SectionProcessorBase<Resource> {
 
-        static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
+        static MarkdownNodeIterator processSignature(
+            const MarkdownNodeIterator& node,
             const MarkdownNodes& siblings,
             SectionParserData& pd,
             SectionLayout& layout,
@@ -49,21 +54,27 @@ namespace snowcrash
             CaptureGroups captureGroups;
 
             // If Abbreviated resource section
-            if (RegexCapture(node->text, ResourceHeaderRegex, captureGroups, 4)) {
+            if (RegexCapture(
+                    node->text, ResourceHeaderRegex, captureGroups, 4)) {
 
                 out.node.uriTemplate = captureGroups[3];
 
                 // Make this section an action
                 if (!captureGroups[2].empty()) {
-                    return processNestedAction(node, node->parent().children(), pd, layout, out);
+                    return processNestedAction(
+                        node, node->parent().children(), pd, layout, out);
                 }
-            } else if (RegexCapture(node->text, NamedEndpointHeaderRegex, captureGroups, 5)) {
+            } else if (RegexCapture(node->text,
+                           NamedEndpointHeaderRegex,
+                           captureGroups,
+                           5)) {
 
                 out.node.name = captureGroups[1];
                 TrimString(out.node.name);
                 out.node.uriTemplate = captureGroups[3];
 
-                return processNestedAction(node, node->parent().children(), pd, layout, out);
+                return processNestedAction(
+                    node, node->parent().children(), pd, layout, out);
             } else {
                 matchNamedResourceHeader(node, out.node);
             }
@@ -81,7 +92,8 @@ namespace snowcrash
             return ++MarkdownNodeIterator(node);
         }
 
-        static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
+        static MarkdownNodeIterator processNestedSection(
+            const MarkdownNodeIterator& node,
             const MarkdownNodes& siblings,
             SectionParserData& pd,
             const ParseResultRef<Resource>& out)
@@ -99,8 +111,10 @@ namespace snowcrash
                     return processModel(node, siblings, pd, out);
 
                 case HeadersSectionType: {
-                    ParseResultRef<Headers> headers(out.report, out.node.headers, out.sourceMap.headers);
-                    return SectionProcessor<Action>::handleDeprecatedHeaders(node, siblings, pd, headers);
+                    ParseResultRef<Headers> headers(
+                        out.report, out.node.headers, out.sourceMap.headers);
+                    return SectionProcessor<Action>::handleDeprecatedHeaders(
+                        node, siblings, pd, headers);
                 }
 
                 case AttributesSectionType: {
@@ -109,25 +123,34 @@ namespace snowcrash
                         pd.namedTypeContext = out.node.name;
                     }
 
-                    ParseResultRef<Attributes> attributes(out.report, out.node.attributes, out.sourceMap.attributes);
-                    MarkdownNodeIterator cur = AttributesParser::parse(node, siblings, pd, attributes);
+                    ParseResultRef<Attributes> attributes(out.report,
+                        out.node.attributes,
+                        out.sourceMap.attributes);
+                    MarkdownNodeIterator cur = AttributesParser::parse(
+                        node, siblings, pd, attributes);
 
                     // Clear named type context
                     pd.namedTypeContext.clear();
 
                     if (!out.node.name.empty()) {
 
-                        if (SectionProcessor<DataStructureGroup>::isNamedTypeDuplicate(pd.blueprint, out.node.name)) {
+                        if (SectionProcessor<DataStructureGroup>::
+                                isNamedTypeDuplicate(
+                                    pd.blueprint, out.node.name)) {
 
                             // WARN: duplicate named type
                             std::stringstream ss;
-                            ss << "named type with name '" << out.node.name << "' already exists";
+                            ss << "named type with name '" << out.node.name
+                               << "' already exists";
 
                             mdp::CharactersRangeSet sourceMap
-                                = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                            out.report.warnings.push_back(Warning(ss.str(), DuplicateWarning, sourceMap));
+                                = mdp::BytesRangeSetToCharactersRangeSet(
+                                    node->sourceMap, pd.sourceCharacterIndex);
+                            out.report.warnings.push_back(
+                                Warning(ss.str(), DuplicateWarning, sourceMap));
 
-                            // Remove the attributes data from the AST since we are ignoring this
+                            // Remove the attributes data from the AST since we
+                            // are ignoring this
                             out.node.attributes = mson::NamedType();
 
                             return cur;
@@ -136,7 +159,8 @@ namespace snowcrash
                         attributes.node.name.symbol.literal = out.node.name;
 
                         if (pd.exportSourceMap()) {
-                            attributes.sourceMap.name.sourceMap = out.sourceMap.name.sourceMap;
+                            attributes.sourceMap.name.sourceMap
+                                = out.sourceMap.name.sourceMap;
                         }
                     }
 
@@ -150,61 +174,72 @@ namespace snowcrash
             return node;
         }
 
-        static MarkdownNodeIterator processUnexpectedNode(const MarkdownNodeIterator& node,
+        static MarkdownNodeIterator processUnexpectedNode(
+            const MarkdownNodeIterator& node,
             const MarkdownNodes& siblings,
             SectionParserData& pd,
             SectionType& sectionType,
             const ParseResultRef<Resource>& out)
         {
 
-            if ((node->type == mdp::ParagraphMarkdownNodeType || node->type == mdp::CodeMarkdownNodeType)
-                && (sectionType == ModelBodySectionType || sectionType == ModelSectionType)) {
+            if ((node->type == mdp::ParagraphMarkdownNodeType
+                    || node->type == mdp::CodeMarkdownNodeType)
+                && (sectionType == ModelBodySectionType
+                       || sectionType == ModelSectionType)) {
 
-                mdp::ByteBuffer content
-                    = CodeBlockUtility::addDanglingAsset(node, pd, sectionType, out.report, out.node.model.body);
+                mdp::ByteBuffer content = CodeBlockUtility::addDanglingAsset(
+                    node, pd, sectionType, out.report, out.node.model.body);
 
                 if (pd.exportSourceMap() && !content.empty()) {
                     out.sourceMap.model.body.sourceMap.append(node->sourceMap);
                 }
 
                 // Update model in the model table as well
-                ModelTable::iterator it = pd.modelTable.find(out.node.model.name);
+                ModelTable::iterator it
+                    = pd.modelTable.find(out.node.model.name);
 
                 if (it != pd.modelTable.end()) {
                     it->second.body = out.node.model.body;
 
                     if (pd.exportSourceMap()) {
-                        pd.modelSourceMapTable[out.node.model.name].body = out.sourceMap.model.body;
+                        pd.modelSourceMapTable[out.node.model.name].body
+                            = out.sourceMap.model.body;
                     }
                 }
 
                 return ++MarkdownNodeIterator(node);
             }
 
-            return SectionProcessorBase<Resource>::processUnexpectedNode(node, siblings, pd, sectionType, out);
+            return SectionProcessorBase<Resource>::processUnexpectedNode(
+                node, siblings, pd, sectionType, out);
         }
 
-        static bool isDescriptionNode(const MarkdownNodeIterator& node, SectionType sectionType)
+        static bool isDescriptionNode(
+            const MarkdownNodeIterator& node, SectionType sectionType)
         {
 
-            if (SectionProcessor<Action>::actionType(node) == CompleteActionType) {
+            if (SectionProcessor<Action>::actionType(node)
+                == CompleteActionType) {
                 return false;
             }
 
-            return SectionProcessorBase<Resource>::isDescriptionNode(node, sectionType);
+            return SectionProcessorBase<Resource>::isDescriptionNode(
+                node, sectionType);
         }
 
         static SectionType sectionType(const MarkdownNodeIterator& node)
         {
 
-            if (node->type == mdp::HeaderMarkdownNodeType && !node->text.empty()) {
+            if (node->type == mdp::HeaderMarkdownNodeType
+                && !node->text.empty()) {
 
                 CaptureGroups captureGroups;
                 mdp::ByteBuffer subject = node->text;
 
                 TrimString(subject);
 
-                if (RegexMatch(subject, NamedResourceHeaderRegex) || RegexMatch(subject, NamedEndpointHeaderRegex)
+                if (RegexMatch(subject, NamedResourceHeaderRegex)
+                    || RegexMatch(subject, NamedEndpointHeaderRegex)
                     || RegexMatch(subject, ResourceHeaderRegex)) {
                     return ResourceSectionType;
                 }
@@ -235,7 +270,8 @@ namespace snowcrash
             // Check if model section
             nestedType = SectionProcessor<Payload>::sectionType(node);
 
-            if (nestedType == ModelSectionType || nestedType == ModelBodySectionType) {
+            if (nestedType == ModelSectionType
+                || nestedType == ModelBodySectionType) {
 
                 return nestedType;
             }
@@ -254,7 +290,8 @@ namespace snowcrash
 
                 // Do not consider complete actions as nested
                 mdp::ByteBuffer method;
-                if (SectionProcessor<Action>::actionType(node) == CompleteActionType)
+                if (SectionProcessor<Action>::actionType(node)
+                    == CompleteActionType)
                     return UndefinedSectionType;
 
                 return nestedType;
@@ -265,11 +302,14 @@ namespace snowcrash
 
         static SectionTypes upperSectionTypes()
         {
-            return { ResourceGroupSectionType, ResourceSectionType, DataStructureGroupSectionType };
+            return { ResourceGroupSectionType,
+                ResourceSectionType,
+                DataStructureGroupSectionType };
         }
 
-        static void finalize(
-            const MarkdownNodeIterator& node, SectionParserData& pd, const ParseResultRef<Resource>& out)
+        static void finalize(const MarkdownNodeIterator& node,
+            SectionParserData& pd,
+            const ParseResultRef<Resource>& out)
         {
 
             if (!out.node.uriTemplate.empty()) {
@@ -277,9 +317,11 @@ namespace snowcrash
                 URITemplateParser uriTemplateParser;
                 ParsedURITemplate parsedResult;
                 mdp::CharactersRangeSet sourceMap
-                    = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                    = mdp::BytesRangeSetToCharactersRangeSet(
+                        node->sourceMap, pd.sourceCharacterIndex);
 
-                uriTemplateParser.parse(out.node.uriTemplate, sourceMap, parsedResult);
+                uriTemplateParser.parse(
+                    out.node.uriTemplate, sourceMap, parsedResult);
 
                 if (!parsedResult.report.warnings.empty()) {
                     out.report += parsedResult.report;
@@ -289,13 +331,19 @@ namespace snowcrash
             // Consolidate deprecated headers into subsequent payloads
             if (!out.node.headers.empty()) {
 
-                Collection<Action>::iterator actionIt = out.node.actions.begin();
-                Collection<SourceMap<Action> >::iterator actionSMIt = out.sourceMap.actions.collection.begin();
+                Collection<Action>::iterator actionIt
+                    = out.node.actions.begin();
+                Collection<SourceMap<Action> >::iterator actionSMIt
+                    = out.sourceMap.actions.collection.begin();
 
-                for (; actionIt != out.node.actions.end(); ++actionIt, ++actionSMIt) {
+                for (; actionIt != out.node.actions.end();
+                     ++actionIt, ++actionSMIt) {
 
-                    SectionProcessor<Headers>::injectDeprecatedHeaders(
-                        pd, out.node.headers, out.sourceMap.headers, actionIt->examples, actionSMIt->examples);
+                    SectionProcessor<Headers>::injectDeprecatedHeaders(pd,
+                        out.node.headers,
+                        out.sourceMap.headers,
+                        actionIt->examples,
+                        actionSMIt->examples);
                 }
 
                 out.node.headers.clear();
@@ -307,17 +355,20 @@ namespace snowcrash
         }
 
         /**
-         * \brief Given a named resource header, retrieve the name and uriTemplate
+         * \brief Given a named resource header, retrieve the name and
+         * uriTemplate
          *
          * \param node Markdown node to process
          * \param resource Resource data structure
          */
-        static void matchNamedResourceHeader(const MarkdownNodeIterator& node, Resource& resource)
+        static void matchNamedResourceHeader(
+            const MarkdownNodeIterator& node, Resource& resource)
         {
 
             CaptureGroups captureGroups;
 
-            if (RegexCapture(node->text, NamedResourceHeaderRegex, captureGroups, 4)) {
+            if (RegexCapture(
+                    node->text, NamedResourceHeaderRegex, captureGroups, 4)) {
 
                 resource.name = captureGroups[1];
                 TrimString(resource.name);
@@ -328,7 +379,8 @@ namespace snowcrash
         /**
          * \brief Parse the current node as an action
          */
-        static MarkdownNodeIterator processNestedAction(const MarkdownNodeIterator& node,
+        static MarkdownNodeIterator processNestedAction(
+            const MarkdownNodeIterator& node,
             const MarkdownNodes& siblings,
             SectionParserData& pd,
             SectionLayout& layout,
@@ -336,7 +388,8 @@ namespace snowcrash
         {
 
             IntermediateParseResult<Action> action(out.report);
-            MarkdownNodeIterator cur = ActionParser::parse(node, siblings, pd, action);
+            MarkdownNodeIterator cur
+                = ActionParser::parse(node, siblings, pd, action);
 
             out.node.actions.push_back(action.node);
             layout = RedirectSectionLayout;
@@ -350,46 +403,58 @@ namespace snowcrash
         }
 
         /** Process Action section */
-        static MarkdownNodeIterator processAction(const MarkdownNodeIterator& node,
+        static MarkdownNodeIterator processAction(
+            const MarkdownNodeIterator& node,
             const MarkdownNodes& siblings,
             SectionParserData& pd,
             const ParseResultRef<Resource>& out)
         {
 
             IntermediateParseResult<Action> action(out.report);
-            MarkdownNodeIterator cur = ActionParser::parse(node, siblings, pd, action);
+            MarkdownNodeIterator cur
+                = ActionParser::parse(node, siblings, pd, action);
 
-            ActionIterator duplicate = SectionProcessor<Action>::findAction(out.node.actions, action.node);
+            ActionIterator duplicate = SectionProcessor<Action>::findAction(
+                out.node.actions, action.node);
 
             if (duplicate != out.node.actions.end()) {
 
                 // WARN: duplicate method
                 std::stringstream ss;
-                ss << "action with method '" << action.node.method << "' already defined for resource '";
+                ss << "action with method '" << action.node.method
+                   << "' already defined for resource '";
                 ss << out.node.uriTemplate << "'";
 
                 mdp::CharactersRangeSet sourceMap
-                    = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                out.report.warnings.push_back(Warning(ss.str(), DuplicateWarning, sourceMap));
+                    = mdp::BytesRangeSetToCharactersRangeSet(
+                        node->sourceMap, pd.sourceCharacterIndex);
+                out.report.warnings.push_back(
+                    Warning(ss.str(), DuplicateWarning, sourceMap));
             }
 
             ActionIterator relationDuplicate
-                = SectionProcessor<Action>::findRelation(out.node.actions, action.node.relation);
+                = SectionProcessor<Action>::findRelation(
+                    out.node.actions, action.node.relation);
 
             if (relationDuplicate != out.node.actions.end()) {
 
                 // WARN: duplicate relation identifier
                 std::stringstream ss;
-                ss << "relation identifier '" << action.node.relation.str << "' already defined for resource '"
-                   << out.node.uriTemplate << "'";
+                ss << "relation identifier '" << action.node.relation.str
+                   << "' already defined for resource '" << out.node.uriTemplate
+                   << "'";
 
                 mdp::CharactersRangeSet sourceMap
-                    = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                out.report.warnings.push_back(Warning(ss.str(), DuplicateWarning, sourceMap));
+                    = mdp::BytesRangeSetToCharactersRangeSet(
+                        node->sourceMap, pd.sourceCharacterIndex);
+                out.report.warnings.push_back(
+                    Warning(ss.str(), DuplicateWarning, sourceMap));
             }
 
-            if (!action.node.parameters.empty() && action.node.uriTemplate.empty()) {
-                checkParametersEligibility<Resource>(node, pd, action.node.parameters, out);
+            if (!action.node.parameters.empty()
+                && action.node.uriTemplate.empty()) {
+                checkParametersEligibility<Resource>(
+                    node, pd, action.node.parameters, out);
             }
 
             out.node.actions.push_back(action.node);
@@ -402,7 +467,8 @@ namespace snowcrash
         }
 
         /** Process Parameters section */
-        static MarkdownNodeIterator processParameters(const MarkdownNodeIterator& node,
+        static MarkdownNodeIterator processParameters(
+            const MarkdownNodeIterator& node,
             const MarkdownNodes& siblings,
             SectionParserData& pd,
             const ParseResultRef<Resource>& out)
@@ -410,15 +476,20 @@ namespace snowcrash
 
             IntermediateParseResult<Parameters> parameters(out.report);
 
-            MarkdownNodeIterator cur = ParametersParser::parse(node, siblings, pd, parameters);
+            MarkdownNodeIterator cur
+                = ParametersParser::parse(node, siblings, pd, parameters);
 
             if (!parameters.node.empty()) {
 
-                checkParametersEligibility<Resource>(node, pd, parameters.node, out);
-                out.node.parameters.insert(out.node.parameters.end(), parameters.node.begin(), parameters.node.end());
+                checkParametersEligibility<Resource>(
+                    node, pd, parameters.node, out);
+                out.node.parameters.insert(out.node.parameters.end(),
+                    parameters.node.begin(),
+                    parameters.node.end());
 
                 if (pd.exportSourceMap()) {
-                    out.sourceMap.parameters.collection.insert(out.sourceMap.parameters.collection.end(),
+                    out.sourceMap.parameters.collection.insert(
+                        out.sourceMap.parameters.collection.end(),
                         parameters.sourceMap.collection.begin(),
                         parameters.sourceMap.collection.end());
                 }
@@ -428,7 +499,8 @@ namespace snowcrash
         }
 
         /** Process Model section */
-        static MarkdownNodeIterator processModel(const MarkdownNodeIterator& node,
+        static MarkdownNodeIterator processModel(
+            const MarkdownNodeIterator& node,
             const MarkdownNodes& siblings,
             SectionParserData& pd,
             const ParseResultRef<Resource>& out)
@@ -436,7 +508,8 @@ namespace snowcrash
 
             IntermediateParseResult<Payload> model(out.report);
 
-            MarkdownNodeIterator cur = PayloadParser::parse(node, siblings, pd, model);
+            MarkdownNodeIterator cur
+                = PayloadParser::parse(node, siblings, pd, model);
 
             // Check whether there isn't a model already
             if (!out.node.model.name.empty()) {
@@ -451,11 +524,14 @@ namespace snowcrash
                     ss << out.node.uriTemplate;
                 }
 
-                ss << "' resource, a resource can be represented by a single model only";
+                ss << "' resource, a resource can be represented by a single "
+                      "model only";
 
                 mdp::CharactersRangeSet sourceMap
-                    = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                out.report.warnings.push_back(Warning(ss.str(), DuplicateWarning, sourceMap));
+                    = mdp::BytesRangeSetToCharactersRangeSet(
+                        node->sourceMap, pd.sourceCharacterIndex);
+                out.report.warnings.push_back(
+                    Warning(ss.str(), DuplicateWarning, sourceMap));
             }
 
             if (model.node.name.empty()) {
@@ -470,11 +546,14 @@ namespace snowcrash
 
                     // ERR: No name specified for resource model
                     std::stringstream ss;
-                    ss << "resource model can be specified only for a named resource";
-                    ss << ", name your resource, e.g. '# <resource name> [" << out.node.uriTemplate << "]'";
+                    ss << "resource model can be specified only for a named "
+                          "resource";
+                    ss << ", name your resource, e.g. '# <resource name> ["
+                       << out.node.uriTemplate << "]'";
 
                     mdp::CharactersRangeSet sourceMap
-                        = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                        = mdp::BytesRangeSetToCharactersRangeSet(
+                            node->sourceMap, pd.sourceCharacterIndex);
                     out.report.error = Error(ss.str(), ModelError, sourceMap);
                 }
             }
@@ -495,7 +574,8 @@ namespace snowcrash
                 ss << "symbol '" << model.node.name << "' already defined";
 
                 mdp::CharactersRangeSet sourceMap
-                    = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                    = mdp::BytesRangeSetToCharactersRangeSet(
+                        node->sourceMap, pd.sourceCharacterIndex);
                 out.report.error = Error(ss.str(), ModelError, sourceMap);
             }
 
@@ -509,17 +589,22 @@ namespace snowcrash
         }
 
         /**
-         * \brief Given a list of elements, Check if a resource already exists with the given uri template
+         * \brief Given a list of elements, Check if a resource already exists
+         * with the given uri template
          *
          * \param elements Collection of elements
          * \param uri The resource uri template to be checked
          */
-        static bool isResourceDuplicate(const Elements& elements, const URITemplate& uri)
+        static bool isResourceDuplicate(
+            const Elements& elements, const URITemplate& uri)
         {
 
-            for (Elements::const_iterator it = elements.begin(); it != elements.end(); ++it) {
+            for (Elements::const_iterator it = elements.begin();
+                 it != elements.end();
+                 ++it) {
 
-                if (it->element == Element::ResourceElement && it->content.resource.uriTemplate == uri) {
+                if (it->element == Element::ResourceElement
+                    && it->content.resource.uriTemplate == uri) {
 
                     return true;
                 }

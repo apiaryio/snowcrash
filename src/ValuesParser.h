@@ -28,7 +28,8 @@ namespace snowcrash
     template <>
     struct SectionProcessor<Values> : public SectionProcessorBase<Values> {
 
-        static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
+        static MarkdownNodeIterator processNestedSection(
+            const MarkdownNodeIterator& node,
             const MarkdownNodes& siblings,
             SectionParserData& pd,
             const ParseResultRef<Values>& out)
@@ -58,8 +59,10 @@ namespace snowcrash
                     ss << ", expected '`" << content << "`'";
 
                     mdp::CharactersRangeSet sourceMap
-                        = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                    out.report.warnings.push_back(Warning(ss.str(), IgnoringWarning, sourceMap));
+                        = mdp::BytesRangeSetToCharactersRangeSet(
+                            node->sourceMap, pd.sourceCharacterIndex);
+                    out.report.warnings.push_back(
+                        Warning(ss.str(), IgnoringWarning, sourceMap));
                 }
 
                 return ++MarkdownNodeIterator(node);
@@ -73,7 +76,8 @@ namespace snowcrash
         static SectionType sectionType(const MarkdownNodeIterator& node)
         {
 
-            if (node->type == mdp::ListItemMarkdownNodeType && !node->children().empty()) {
+            if (node->type == mdp::ListItemMarkdownNodeType
+                && !node->children().empty()) {
 
                 mdp::ByteBuffer subject = node->children().front().text;
                 TrimString(subject);
@@ -89,7 +93,8 @@ namespace snowcrash
         static SectionType nestedSectionType(const MarkdownNodeIterator& node)
         {
 
-            if (node->type == mdp::ListItemMarkdownNodeType && !node->children().empty()) {
+            if (node->type == mdp::ListItemMarkdownNodeType
+                && !node->children().empty()) {
 
                 mdp::ByteBuffer subject = node->children().front().text;
                 TrimString(subject);

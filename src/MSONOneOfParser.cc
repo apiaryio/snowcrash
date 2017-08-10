@@ -14,7 +14,8 @@ namespace snowcrash
 {
 
     /** Implementation of processNestedSection */
-    MarkdownNodeIterator SectionProcessor<mson::OneOf>::processNestedSection(const MarkdownNodeIterator& node,
+    MarkdownNodeIterator SectionProcessor<mson::OneOf>::processNestedSection(
+        const MarkdownNodeIterator& node,
         const MarkdownNodes& siblings,
         SectionParserData& pd,
         const ParseResultRef<mson::OneOf>& out)
@@ -52,10 +53,12 @@ namespace snowcrash
             }
 
             case MSONPropertyMembersSectionType: {
-                IntermediateParseResult<mson::TypeSection> typeSection(out.report);
+                IntermediateParseResult<mson::TypeSection> typeSection(
+                    out.report);
                 typeSection.node.baseType = mson::ObjectBaseType;
 
-                cur = MSONTypeSectionListParser::parse(node, siblings, pd, typeSection);
+                cur = MSONTypeSectionListParser::parse(
+                    node, siblings, pd, typeSection);
 
                 element.buildFromElements(typeSection.node.content.elements());
 
@@ -67,8 +70,10 @@ namespace snowcrash
             }
 
             case MSONPropertyMemberSectionType: {
-                IntermediateParseResult<mson::PropertyMember> propertyMember(out.report);
-                cur = MSONPropertyMemberParser::parse(node, siblings, pd, propertyMember);
+                IntermediateParseResult<mson::PropertyMember> propertyMember(
+                    out.report);
+                cur = MSONPropertyMemberParser::parse(
+                    node, siblings, pd, propertyMember);
 
                 element.build(propertyMember.node);
 
@@ -95,7 +100,8 @@ namespace snowcrash
     }
 
     /** Implementation of nestedSectionType */
-    SectionType SectionProcessor<mson::OneOf>::nestedSectionType(const MarkdownNodeIterator& node)
+    SectionType SectionProcessor<mson::OneOf>::nestedSectionType(
+        const MarkdownNodeIterator& node)
     {
 
         SectionType nestedType = UndefinedSectionType;

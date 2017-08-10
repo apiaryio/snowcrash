@@ -23,35 +23,45 @@ namespace snowcrash
      * MSON Named Type Section Processor
      */
     template <>
-    struct SectionProcessor<mson::NamedType> : public SignatureSectionProcessorBase<mson::NamedType> {
+    struct SectionProcessor<mson::NamedType>
+        : public SignatureSectionProcessorBase<mson::NamedType> {
 
         static SignatureTraits signatureTraits()
         {
 
-            SignatureTraits signatureTraits(SignatureTraits::IdentifierTrait | SignatureTraits::AttributesTrait);
+            SignatureTraits signatureTraits(SignatureTraits::IdentifierTrait
+                | SignatureTraits::AttributesTrait);
 
             return signatureTraits;
         }
 
-        static MarkdownNodeIterator finalizeSignature(const MarkdownNodeIterator& node,
+        static MarkdownNodeIterator finalizeSignature(
+            const MarkdownNodeIterator& node,
             SectionParserData& pd,
             const Signature& signature,
             const ParseResultRef<mson::NamedType>& out)
         {
 
             mson::parseTypeName(signature.identifier, out.node.name, false);
-            mson::parseTypeDefinition(node, pd, signature.attributes, out.report, out.node.typeDefinition);
+            mson::parseTypeDefinition(node,
+                pd,
+                signature.attributes,
+                out.report,
+                out.node.typeDefinition);
 
             mdp::ByteBuffer subject = node->text;
             TrimString(subject);
 
-            if (subject[0] != '`' && RegexMatch(out.node.name.symbol.literal, MSONReservedCharsRegex)) {
+            if (subject[0] != '`' && RegexMatch(out.node.name.symbol.literal,
+                                         MSONReservedCharsRegex)) {
 
                 // WARN: named type name should not contain reserved characters
                 mdp::CharactersRangeSet sourceMap
-                    = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                    = mdp::BytesRangeSetToCharactersRangeSet(
+                        node->sourceMap, pd.sourceCharacterIndex);
                 out.report.warnings.push_back(
-                    Warning("please escape the name of the data structure using backticks since it contains MSON "
+                    Warning("please escape the name of the data structure "
+                            "using backticks since it contains MSON "
                             "reserved characters",
                         FormattingWarning,
                         sourceMap));
@@ -68,7 +78,8 @@ namespace snowcrash
                 }
             }
 
-            // Named types should have type specification when sub-typed from primitive types
+            // Named types should have type specification when sub-typed from
+            // primitive types
             if (out.node.typeDefinition.baseType == mson::UndefinedBaseType) {
                 out.node.typeDefinition.baseType = mson::ImplicitObjectBaseType;
             }
@@ -79,7 +90,8 @@ namespace snowcrash
             return ++MarkdownNodeIterator(node);
         }
 
-        static MarkdownNodeIterator processDescription(const MarkdownNodeIterator& node,
+        static MarkdownNodeIterator processDescription(
+            const MarkdownNodeIterator& node,
             const MarkdownNodes& siblings,
             SectionParserData& pd,
             const ParseResultRef<mson::NamedType>& out)
@@ -89,22 +101,30 @@ namespace snowcrash
                 node, pd, out.node.sections, out.sourceMap.sections);
         }
 
-        static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
+        static MarkdownNodeIterator processNestedSection(
+            const MarkdownNodeIterator& node,
             const MarkdownNodes& siblings,
             SectionParserData& pd,
             const ParseResultRef<mson::NamedType>& out)
         {
 
-            ParseResultRef<mson::TypeSections> typeSections(out.report, out.node.sections, out.sourceMap.sections);
+            ParseResultRef<mson::TypeSections> typeSections(
+                out.report, out.node.sections, out.sourceMap.sections);
 
-            return SectionProcessor<mson::ValueMember>::processNestedMembers<MSONTypeSectionHeaderParser>(
-                node, siblings, pd, typeSections, out.node.typeDefinition.baseType);
+            return SectionProcessor<mson::ValueMember>::
+                processNestedMembers<MSONTypeSectionHeaderParser>(node,
+                    siblings,
+                    pd,
+                    typeSections,
+                    out.node.typeDefinition.baseType);
         }
 
-        static bool isDescriptionNode(const MarkdownNodeIterator& node, SectionType sectionType)
+        static bool isDescriptionNode(
+            const MarkdownNodeIterator& node, SectionType sectionType)
         {
 
-            return SectionProcessor<mson::ValueMember>::isDescriptionNode(node, sectionType);
+            return SectionProcessor<mson::ValueMember>::isDescriptionNode(
+                node, sectionType);
         }
 
         static SectionType sectionType(const MarkdownNodeIterator& node)
@@ -112,7 +132,8 @@ namespace snowcrash
 
             SectionType sectionType = SectionKeywordSignature(node);
 
-            if (node->type == mdp::HeaderMarkdownNodeType && sectionType == UndefinedSectionType) {
+            if (node->type == mdp::HeaderMarkdownNodeType
+                && sectionType == UndefinedSectionType) {
 
                 return MSONNamedTypeSectionType;
             }
@@ -126,8 +147,9 @@ namespace snowcrash
             return SectionProcessor<mson::ValueMember>::nestedSectionType(node);
         }
 
-        static void finalize(
-            const MarkdownNodeIterator& node, SectionParserData& pd, const ParseResultRef<mson::NamedType>& out)
+        static void finalize(const MarkdownNodeIterator& node,
+            SectionParserData& pd,
+            const ParseResultRef<mson::NamedType>& out)
         {
 
             // Clear named type context
@@ -136,7 +158,8 @@ namespace snowcrash
     };
 
     /** MSON Named Type Section Parser */
-    typedef SectionParser<mson::NamedType, HeaderSectionAdapter> MSONNamedTypeParser;
+    typedef SectionParser<mson::NamedType, HeaderSectionAdapter>
+        MSONNamedTypeParser;
 }
 
 #endif

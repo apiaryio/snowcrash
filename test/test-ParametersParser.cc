@@ -30,15 +30,18 @@ TEST_CASE("Recognize Parameters section block", "[parameters]")
     markdownParser.parse(ParametersFixture, markdownAST);
 
     REQUIRE(!markdownAST.children().empty());
-    SectionType sectionType = SectionProcessor<Parameters>::sectionType(markdownAST.children().begin());
+    SectionType sectionType = SectionProcessor<Parameters>::sectionType(
+        markdownAST.children().begin());
     REQUIRE(sectionType == ParametersSectionType);
 }
 
 TEST_CASE("Parse canonical parameters", "[parameters]")
 {
     ParseResult<Parameters> parameters;
-    SectionParserHelper<Parameters, ParametersParser>::parse(
-        ParametersFixture, ParametersSectionType, parameters, ExportSourcemapOption);
+    SectionParserHelper<Parameters, ParametersParser>::parse(ParametersFixture,
+        ParametersSectionType,
+        parameters,
+        ExportSourcemapOption);
 
     REQUIRE(parameters.report.error.code == Error::OK);
     REQUIRE(parameters.report.warnings.empty());
@@ -50,8 +53,10 @@ TEST_CASE("Parse canonical parameters", "[parameters]")
     REQUIRE(parameters.node[1].description.empty());
 
     REQUIRE(parameters.sourceMap.collection.size() == 2);
-    SourceMapHelper::check(parameters.sourceMap.collection[0].name.sourceMap, 19, 40);
-    SourceMapHelper::check(parameters.sourceMap.collection[1].name.sourceMap, 165, 5);
+    SourceMapHelper::check(
+        parameters.sourceMap.collection[0].name.sourceMap, 19, 40);
+    SourceMapHelper::check(
+        parameters.sourceMap.collection[1].name.sourceMap, 165, 5);
 }
 
 TEST_CASE("Parse ilegal parameter", "[parameters]")
@@ -61,7 +66,8 @@ TEST_CASE("Parse ilegal parameter", "[parameters]")
           "    + i;legal\n\n";
 
     ParseResult<Parameters> parameters;
-    SectionParserHelper<Parameters, ParametersParser>::parse(source, ParametersSectionType, parameters);
+    SectionParserHelper<Parameters, ParametersParser>::parse(
+        source, ParametersSectionType, parameters);
 
     REQUIRE(parameters.report.error.code == Error::OK);
     REQUIRE(parameters.report.warnings.size() == 2);
@@ -95,9 +101,11 @@ TEST_CASE("Parse illegal parameter among legal ones", "[parameters]")
     REQUIRE(parameters.node[1].description.empty());
 
     REQUIRE(parameters.sourceMap.collection.size() == 2);
-    SourceMapHelper::check(parameters.sourceMap.collection[0].name.sourceMap, 19, 5);
+    SourceMapHelper::check(
+        parameters.sourceMap.collection[0].name.sourceMap, 19, 5);
     REQUIRE(parameters.sourceMap.collection[0].description.sourceMap.empty());
-    SourceMapHelper::check(parameters.sourceMap.collection[1].name.sourceMap, 44, 5);
+    SourceMapHelper::check(
+        parameters.sourceMap.collection[1].name.sourceMap, 44, 5);
     REQUIRE(parameters.sourceMap.collection[1].description.sourceMap.empty());
 }
 
@@ -121,11 +129,13 @@ TEST_CASE("Warn about additional content in parameters section", "[parameters]")
     REQUIRE(parameters.node[0].description.empty());
 
     REQUIRE(parameters.sourceMap.collection.size() == 1);
-    SourceMapHelper::check(parameters.sourceMap.collection[0].name.sourceMap, 30, 3);
+    SourceMapHelper::check(
+        parameters.sourceMap.collection[0].name.sourceMap, 30, 3);
     REQUIRE(parameters.sourceMap.collection[0].description.sourceMap.empty());
 }
 
-TEST_CASE("Warn about additional content block in parameters section", "[parameters]")
+TEST_CASE(
+    "Warn about additional content block in parameters section", "[parameters]")
 {
     mdp::ByteBuffer source
         = "+ Parameters\n\n"
@@ -145,7 +155,8 @@ TEST_CASE("Warn about additional content block in parameters section", "[paramet
     REQUIRE(parameters.node[0].description.empty());
 
     REQUIRE(parameters.sourceMap.collection.size() == 1);
-    SourceMapHelper::check(parameters.sourceMap.collection[0].name.sourceMap, 31, 3);
+    SourceMapHelper::check(
+        parameters.sourceMap.collection[0].name.sourceMap, 31, 3);
     REQUIRE(parameters.sourceMap.collection[0].description.sourceMap.empty());
 }
 
@@ -170,18 +181,21 @@ TEST_CASE("Warn about multiple parameters with the same name", "[parameters]")
     REQUIRE(parameters.node[0].exampleValue == "43");
 
     REQUIRE(parameters.sourceMap.collection.size() == 1);
-    SourceMapHelper::check(parameters.sourceMap.collection[0].name.sourceMap, 35, 10);
+    SourceMapHelper::check(
+        parameters.sourceMap.collection[0].name.sourceMap, 35, 10);
 }
 
 TEST_CASE(
-    "Recognize parameter when there is no description on its signature and remaining description is not a new node",
+    "Recognize parameter when there is no description on its signature and "
+    "remaining description is not a new node",
     "[parameters]")
 {
     mdp::ByteBuffer source
         = "+ Parameters\n\n"
           "    + id (number) ... The ID number of the car\n"
           "    + state (string)\n"
-          "        The desired state of the panoramic roof. The approximate percent open values for each state are "
+          "        The desired state of the panoramic roof. The approximate "
+          "percent open values for each state are "
           "`open` = 100%, `close` = 0%, `comfort` = 80%, and `vent` = ~15%\n"
           "        + Values\n"
           "            + `open`\n"
@@ -230,7 +244,8 @@ TEST_CASE("Parentheses in parameter example ", "[parameters][issue][109]")
           "\n";
 
     ParseResult<Parameters> parameters;
-    SectionParserHelper<Parameters, ParametersParser>::parse(source, ParametersSectionType, parameters);
+    SectionParserHelper<Parameters, ParametersParser>::parse(
+        source, ParametersSectionType, parameters);
 
     REQUIRE(parameters.report.error.code == Error::OK);
     REQUIRE(parameters.report.warnings.empty());
@@ -242,7 +257,8 @@ TEST_CASE("Parentheses in parameter example ", "[parameters][issue][109]")
     REQUIRE(parameters.node[0].description == "test");
 }
 
-TEST_CASE("Parse parameters when it has parameter of both old and new syntax", "[parameter]")
+TEST_CASE("Parse parameters when it has parameter of both old and new syntax",
+    "[parameter]")
 {
     mdp::ByteBuffer source
         = "+ Parameters\n"
@@ -250,7 +266,8 @@ TEST_CASE("Parse parameters when it has parameter of both old and new syntax", "
           "    + percent_off: 25 (required, number)";
 
     ParseResult<Parameters> parameters;
-    SectionParserHelper<Parameters, ParametersParser>::parse(source, ParametersSectionType, parameters);
+    SectionParserHelper<Parameters, ParametersParser>::parse(
+        source, ParametersSectionType, parameters);
 
     REQUIRE(parameters.report.error.code == Error::OK);
     REQUIRE(parameters.report.warnings.empty());
@@ -264,7 +281,8 @@ TEST_CASE("Parse parameters when it has parameter of both old and new syntax", "
     REQUIRE(parameters.node[1].exampleValue == "25");
 }
 
-TEST_CASE("Percentage encoded characters in parameter name ", "[parameters][percentageencoding][issue][107]")
+TEST_CASE("Percentage encoded characters in parameter name ",
+    "[parameters][percentageencoding][issue][107]")
 {
     // Blueprint in question:
     // R"(
@@ -277,7 +295,8 @@ TEST_CASE("Percentage encoded characters in parameter name ", "[parameters][perc
     mdp::ByteBuffer source
         = "# GET /{id%5b%5d}\n"
           "+ Parameters\n"
-          "  + id%5b%5d (optional, oData, `substringof('homer', id)`) ... test\n"
+          "  + id%5b%5d (optional, oData, `substringof('homer', id)`) ... "
+          "test\n"
           "\n"
           "+ response 204\n";
 
@@ -288,22 +307,31 @@ TEST_CASE("Percentage encoded characters in parameter name ", "[parameters][perc
     REQUIRE(blueprint.report.warnings.empty());
 
     REQUIRE(blueprint.node.content.elements().size() == 1);
-    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
-    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 1);
-    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).element == Element::ResourceElement);
+    REQUIRE(blueprint.node.content.elements().at(0).element
+        == Element::CategoryElement);
+    REQUIRE(
+        blueprint.node.content.elements().at(0).content.elements().size() == 1);
+    REQUIRE(
+        blueprint.node.content.elements().at(0).content.elements().at(0).element
+        == Element::ResourceElement);
 
-    Resource resource = blueprint.node.content.elements().at(0).content.elements().at(0).content.resource;
+    Resource resource = blueprint.node.content.elements()
+                            .at(0)
+                            .content.elements()
+                            .at(0)
+                            .content.resource;
     REQUIRE(resource.actions.size() == 1);
     REQUIRE(resource.actions[0].description.empty());
     REQUIRE(resource.actions[0].parameters.size() == 1);
     REQUIRE(resource.actions[0].parameters[0].name == "id%5b%5d");
     REQUIRE(resource.actions[0].parameters[0].type == "oData");
-    REQUIRE(resource.actions[0].parameters[0].exampleValue == "substringof('homer', id)");
+    REQUIRE(resource.actions[0].parameters[0].exampleValue
+        == "substringof('homer', id)");
     REQUIRE(resource.actions[0].parameters[0].description == "test");
 }
 
-TEST_CASE(
-    "Invalid percentage encoded characters in parameter name ", "[invalid][parameters][percentageencoding][issue][107]")
+TEST_CASE("Invalid percentage encoded characters in parameter name ",
+    "[invalid][parameters][percentageencoding][issue][107]")
 {
     // Blueprint in question:
     // R"(
@@ -352,7 +380,9 @@ TEST_CASE("Incomplete percentage encoded characters in parameter name ",
     REQUIRE(blueprint.report.warnings.size() == 3);
 }
 
-TEST_CASE("Parse old style parameter in parameters with non-complete default value", "[parameter]")
+TEST_CASE(
+    "Parse old style parameter in parameters with non-complete default value",
+    "[parameter]")
 {
     mdp::ByteBuffer source
         = "+ Parameters\n"
@@ -370,7 +400,9 @@ TEST_CASE("Parse old style parameter in parameters with non-complete default val
     REQUIRE(parameters.node[0].defaultValue == "`10");
 }
 
-TEST_CASE("Parse old style parameter in parameters with non-complete example value", "[parameter]")
+TEST_CASE(
+    "Parse old style parameter in parameters with non-complete example value",
+    "[parameter]")
 {
     mdp::ByteBuffer source
         = "+ Parameters\n"

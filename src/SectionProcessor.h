@@ -14,18 +14,20 @@
 #include "Signature.h"
 
 // Use the following macro whenever a section doesn't have description
-#define NO_SECTION_DESCRIPTION(T)                                                                                      \
-    static MarkdownNodeIterator processDescription(const MarkdownNodeIterator& node,                                   \
-        const MarkdownNodes& siblings,                                                                                 \
-        SectionParserData& pd,                                                                                         \
-        const ParseResultRef<T>& out)                                                                                  \
-    {                                                                                                                  \
-        return node;                                                                                                   \
-    }                                                                                                                  \
-                                                                                                                       \
-    static bool isDescriptionNode(const MarkdownNodeIterator& node, SectionType sectionType)                           \
-    {                                                                                                                  \
-        return false;                                                                                                  \
+#define NO_SECTION_DESCRIPTION(T)                                              \
+    static MarkdownNodeIterator processDescription(                            \
+        const MarkdownNodeIterator& node,                                      \
+        const MarkdownNodes& siblings,                                         \
+        SectionParserData& pd,                                                 \
+        const ParseResultRef<T>& out)                                          \
+    {                                                                          \
+        return node;                                                           \
+    }                                                                          \
+                                                                               \
+    static bool isDescriptionNode(                                             \
+        const MarkdownNodeIterator& node, SectionType sectionType)             \
+    {                                                                          \
+        return false;                                                          \
     }
 
 namespace snowcrash
@@ -42,9 +44,12 @@ namespace snowcrash
      */
     enum SectionLayout
     {
-        DefaultSectionLayout,         /// Default Section Layout: Signature > Description > Content > Nested
-        ExclusiveNestedSectionLayout, /// Section is composed of nested sections only
-        RedirectSectionLayout         /// Section should be parsed by another parser as whole
+        DefaultSectionLayout,         /// Default Section Layout: Signature >
+                                      /// Description > Content > Nested
+        ExclusiveNestedSectionLayout, /// Section is composed of nested sections
+                                      /// only
+        RedirectSectionLayout /// Section should be parsed by another parser as
+                              /// whole
     };
 
     /**
@@ -94,12 +99,16 @@ namespace snowcrash
     struct ParseResultRef {
 
         ParseResultRef(ParseResult<T>& parseResult)
-            : report(parseResult.report), node(parseResult.node), sourceMap(parseResult.sourceMap)
+            : report(parseResult.report)
+            , node(parseResult.node)
+            , sourceMap(parseResult.sourceMap)
         {
         }
 
         ParseResultRef(IntermediateParseResult<T>& parseResult)
-            : report(parseResult.report), node(parseResult.node), sourceMap(parseResult.sourceMap)
+            : report(parseResult.report)
+            , node(parseResult.node)
+            , sourceMap(parseResult.sourceMap)
         {
         }
 
@@ -140,7 +149,8 @@ namespace snowcrash
          *  \param out      Processed output
          *  \return Result of the process operation
          */
-        static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
+        static MarkdownNodeIterator processSignature(
+            const MarkdownNodeIterator& node,
             const MarkdownNodes& siblings,
             SectionParserData& pd,
             SectionLayout& layout,
@@ -151,7 +161,8 @@ namespace snowcrash
         }
 
         /** Process section description Markdown node */
-        static MarkdownNodeIterator processDescription(const MarkdownNodeIterator& node,
+        static MarkdownNodeIterator processDescription(
+            const MarkdownNodeIterator& node,
             const MarkdownNodes& siblings,
             SectionParserData& pd,
             const ParseResultRef<T>& out)
@@ -161,7 +172,8 @@ namespace snowcrash
                 TwoNewLines(out.node.description);
             }
 
-            mdp::ByteBuffer content = mdp::MapBytesRangeSet(node->sourceMap, pd.sourceData);
+            mdp::ByteBuffer content
+                = mdp::MapBytesRangeSet(node->sourceMap, pd.sourceData);
 
             if (pd.exportSourceMap() && !content.empty()) {
                 out.sourceMap.description.sourceMap.append(node->sourceMap);
@@ -174,7 +186,8 @@ namespace snowcrash
         }
 
         /** Process section-specific content Markdown node */
-        static MarkdownNodeIterator processContent(const MarkdownNodeIterator& node,
+        static MarkdownNodeIterator processContent(
+            const MarkdownNodeIterator& node,
             const MarkdownNodes& siblings,
             SectionParserData& pd,
             const ParseResultRef<T>& out)
@@ -184,7 +197,8 @@ namespace snowcrash
         }
 
         /**
-         * Pre-process for nested sections, basically a look-ahead before processing nested sections
+         * Pre-process for nested sections, basically a look-ahead before
+         * processing nested sections
          * Only used by BlueprintParser for now
          */
         static void preprocessNestedSections(const MarkdownNodeIterator& node,
@@ -202,7 +216,8 @@ namespace snowcrash
          *  \param report   Process log report
          *  \param out      Processed output
          */
-        static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
+        static MarkdownNodeIterator processNestedSection(
+            const MarkdownNodeIterator& node,
             const MarkdownNodes& siblings,
             SectionParserData& pd,
             const ParseResultRef<T>& out)
@@ -212,7 +227,8 @@ namespace snowcrash
         }
 
         /** Process unexpected Markdown node */
-        static MarkdownNodeIterator processUnexpectedNode(const MarkdownNodeIterator& node,
+        static MarkdownNodeIterator processUnexpectedNode(
+            const MarkdownNodeIterator& node,
             const MarkdownNodes& siblings,
             SectionParserData& pd,
             SectionType& lastSectionType,
@@ -222,31 +238,39 @@ namespace snowcrash
             // WARN: Ignoring unexpected node
             std::stringstream ss;
             mdp::CharactersRangeSet sourceMap
-                = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                = mdp::BytesRangeSetToCharactersRangeSet(
+                    node->sourceMap, pd.sourceCharacterIndex);
 
             if (node->type == mdp::HeaderMarkdownNodeType) {
-                ss << "unexpected header block, expected a group, resource or an action definition";
-                ss << ", e.g. '# Group <name>', '# <resource name> [<URI>]' or '# <HTTP method> <URI>'";
+                ss << "unexpected header block, expected a group, resource or "
+                      "an action definition";
+                ss << ", e.g. '# Group <name>', '# <resource name> [<URI>]' or "
+                      "'# <HTTP method> <URI>'";
             } else {
                 ss << "ignoring unrecognized block";
             }
 
-            out.report.warnings.push_back(Warning(ss.str(), IgnoringWarning, sourceMap));
+            out.report.warnings.push_back(
+                Warning(ss.str(), IgnoringWarning, sourceMap));
 
             return ++MarkdownNodeIterator(node);
         }
 
         /** Final validation after processing */
-        static void finalize(const MarkdownNodeIterator& node, SectionParserData& pd, const ParseResultRef<T>& out)
+        static void finalize(const MarkdownNodeIterator& node,
+            SectionParserData& pd,
+            const ParseResultRef<T>& out)
         {
         }
 
         /** \return True if the node is a section description node */
-        static bool isDescriptionNode(const MarkdownNodeIterator& node, SectionType sectionType)
+        static bool isDescriptionNode(
+            const MarkdownNodeIterator& node, SectionType sectionType)
         {
 
             if (SectionProcessor<T>::isContentNode(node, sectionType)
-                || SectionProcessor<T>::nestedSectionType(node) != UndefinedSectionType) {
+                || SectionProcessor<T>::nestedSectionType(node)
+                    != UndefinedSectionType) {
                 return false;
             }
 
@@ -258,8 +282,11 @@ namespace snowcrash
 
             SectionTypes upperTypes = SectionProcessor<T>::upperSectionTypes();
 
-            if (std::find(upperTypes.begin(), upperTypes.end(), keywordSectionType) != upperTypes.end()) {
-                // Node is a keyword defined section defined in an upper level section
+            if (std::find(
+                    upperTypes.begin(), upperTypes.end(), keywordSectionType)
+                != upperTypes.end()) {
+                // Node is a keyword defined section defined in an upper level
+                // section
                 return false;
             }
 
@@ -267,19 +294,23 @@ namespace snowcrash
         }
 
         /** \return True if the node is a section-specific content node */
-        static bool isContentNode(const MarkdownNodeIterator& node, SectionType sectionType)
+        static bool isContentNode(
+            const MarkdownNodeIterator& node, SectionType sectionType)
         {
             return false;
         }
 
         /** \return True if the node is unexpected in the current context */
-        static bool isUnexpectedNode(const MarkdownNodeIterator& node, SectionType sectionType)
+        static bool isUnexpectedNode(
+            const MarkdownNodeIterator& node, SectionType sectionType)
         {
 
             SectionType keywordSectionType = SectionKeywordSignature(node);
             SectionTypes upperTypes = SectionProcessor<T>::upperSectionTypes();
 
-            if (std::find(upperTypes.begin(), upperTypes.end(), keywordSectionType) == upperTypes.end()) {
+            if (std::find(
+                    upperTypes.begin(), upperTypes.end(), keywordSectionType)
+                == upperTypes.end()) {
                 // Node is not a section that is upper level
                 return true;
             }

@@ -30,7 +30,8 @@ TEST_CASE("Correct indentation", "[indentation]")
           "        { ... }\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
+    SectionParserHelper<Action, ActionParser>::parse(
+        source, ActionSectionType, action);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.empty());
@@ -49,7 +50,8 @@ TEST_CASE("No Indentation & No Newline", "[indentation]")
           "{ ... }\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
+    SectionParserHelper<Action, ActionParser>::parse(
+        source, ActionSectionType, action);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.size() == 1);
@@ -71,7 +73,8 @@ TEST_CASE("No Indentation", "[indentation]")
           "{ ... }\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
+    SectionParserHelper<Action, ActionParser>::parse(
+        source, ActionSectionType, action);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.size() == 1);
@@ -92,7 +95,8 @@ TEST_CASE("Poor Indentation & No Newline", "[indentation]")
           "    { ... }\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
+    SectionParserHelper<Action, ActionParser>::parse(
+        source, ActionSectionType, action);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.size() == 1);
@@ -114,7 +118,8 @@ TEST_CASE("Poor Indentation", "[indentation]")
           "    { ... }\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
+    SectionParserHelper<Action, ActionParser>::parse(
+        source, ActionSectionType, action);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.size() == 1);
@@ -135,7 +140,8 @@ TEST_CASE("OK Indentation & No Newline", "[indentation]")
           "        { ... }\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
+    SectionParserHelper<Action, ActionParser>::parse(
+        source, ActionSectionType, action);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.size() == 1);
@@ -158,7 +164,8 @@ TEST_CASE("Full syntax - correct", "[indentation]")
           "            { ... }\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
+    SectionParserHelper<Action, ActionParser>::parse(
+        source, ActionSectionType, action);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.empty());
@@ -179,7 +186,8 @@ TEST_CASE("Full syntax - Poor Body Indentation", "[indentation]")
           "        { ... }\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
+    SectionParserHelper<Action, ActionParser>::parse(
+        source, ActionSectionType, action);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.size() == 1);
@@ -202,7 +210,8 @@ TEST_CASE("Full syntax - Poor Body & Body Asset Indentation", "[indentation]")
           "    { ... }\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
+    SectionParserHelper<Action, ActionParser>::parse(
+        source, ActionSectionType, action);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.size() == 1);
@@ -215,7 +224,8 @@ TEST_CASE("Full syntax - Poor Body & Body Asset Indentation", "[indentation]")
     REQUIRE(action.node.examples[0].responses[0].body.empty());
 }
 
-TEST_CASE("Full syntax - Poor Body & Body Asset Indentation & No Newline", "[indentation]")
+TEST_CASE("Full syntax - Poor Body & Body Asset Indentation & No Newline",
+    "[indentation]")
 {
     mdp::ByteBuffer source
         = "## GET /1\n"
@@ -224,7 +234,8 @@ TEST_CASE("Full syntax - Poor Body & Body Asset Indentation & No Newline", "[ind
           "    { ... }\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
+    SectionParserHelper<Action, ActionParser>::parse(
+        source, ActionSectionType, action);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.size() == 1);
@@ -247,7 +258,8 @@ TEST_CASE("Full syntax - No Indentation", "[indentation]")
           "{ ... }\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
+    SectionParserHelper<Action, ActionParser>::parse(
+        source, ActionSectionType, action);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.size() == 2);
@@ -271,7 +283,8 @@ TEST_CASE("Full syntax - No Indentation & No Newline", "[indentation]")
           "{ ... }\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
+    SectionParserHelper<Action, ActionParser>::parse(
+        source, ActionSectionType, action);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.size() == 1);
@@ -295,7 +308,8 @@ TEST_CASE("Full syntax - Extra indentation", "[indentation]")
           "                { ... }\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
+    SectionParserHelper<Action, ActionParser>::parse(
+        source, ActionSectionType, action);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.size() == 1);
@@ -305,7 +319,8 @@ TEST_CASE("Full syntax - Extra indentation", "[indentation]")
     REQUIRE(action.node.examples.size() == 1);
     REQUIRE(action.node.examples[0].responses.size() == 1);
     REQUIRE(action.node.examples[0].responses[0].name == "200");
-    REQUIRE(action.node.examples[0].responses[0].body == "+ Body\n\n        { ... }\n");
+    REQUIRE(action.node.examples[0].responses[0].body
+        == "+ Body\n\n        { ... }\n");
 }
 
 TEST_CASE("No Indentation & No Newline multi-line", "[indentation]")
@@ -319,7 +334,8 @@ TEST_CASE("No Indentation & No Newline multi-line", "[indentation]")
           "}\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
+    SectionParserHelper<Action, ActionParser>::parse(
+        source, ActionSectionType, action);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.size() == 2);

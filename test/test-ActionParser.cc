@@ -27,20 +27,23 @@ TEST_CASE("Method block classifier", "[action]")
     markdownParser.parse(ActionFixture, markdownAST);
 
     REQUIRE(!markdownAST.children().empty());
-    sectionType = SectionProcessor<Action>::sectionType(markdownAST.children().begin());
+    sectionType
+        = SectionProcessor<Action>::sectionType(markdownAST.children().begin());
     REQUIRE(sectionType == ActionSectionType);
 
     // Nameless method
     markdownAST.children().front().text = "GET";
     REQUIRE(!markdownAST.children().empty());
-    sectionType = SectionProcessor<Action>::sectionType(markdownAST.children().begin());
+    sectionType
+        = SectionProcessor<Action>::sectionType(markdownAST.children().begin());
     REQUIRE(sectionType == ActionSectionType);
 }
 
 TEST_CASE("Parsing action", "[action]")
 {
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(ActionFixture, ActionSectionType, action, ExportSourcemapOption);
+    SectionParserHelper<Action, ActionParser>::parse(
+        ActionFixture, ActionSectionType, action, ExportSourcemapOption);
 
     REQUIRE(action.report.error.code == Error::OK);
     CHECK(action.report.warnings.empty());
@@ -56,21 +59,40 @@ TEST_CASE("Parsing action", "[action]")
     REQUIRE(action.node.examples.front().responses[0].name == "200");
     REQUIRE(action.node.examples.front().responses[0].body == "OK.\n");
     REQUIRE(action.node.examples.front().responses[0].headers.size() == 1);
-    REQUIRE(action.node.examples.front().responses[0].headers[0].first == "Content-Type");
-    REQUIRE(action.node.examples.front().responses[0].headers[0].second == "text/plain");
+    REQUIRE(action.node.examples.front().responses[0].headers[0].first
+        == "Content-Type");
+    REQUIRE(action.node.examples.front().responses[0].headers[0].second
+        == "text/plain");
 
     SourceMapHelper::check(action.sourceMap.name.sourceMap, 0, 19);
     SourceMapHelper::check(action.sourceMap.method.sourceMap, 0, 19);
     SourceMapHelper::check(action.sourceMap.description.sourceMap, 19, 20);
     REQUIRE(action.sourceMap.examples.collection.size() == 1);
-    REQUIRE(action.sourceMap.examples.collection[0].requests.collection.size() == 0);
-    REQUIRE(action.sourceMap.examples.collection[0].responses.collection.size() == 1);
+    REQUIRE(action.sourceMap.examples.collection[0].requests.collection.size()
+        == 0);
+    REQUIRE(action.sourceMap.examples.collection[0].responses.collection.size()
+        == 1);
 
-    SourceMapHelper::check(action.sourceMap.examples.collection[0].responses.collection[0].body.sourceMap, 72, 7);
-    SourceMapHelper::check(action.sourceMap.examples.collection[0].responses.collection[0].name.sourceMap, 41, 27);
-    REQUIRE(action.sourceMap.examples.collection[0].responses.collection[0].headers.collection.size() == 1);
-    SourceMapHelper::check(
-        action.sourceMap.examples.collection[0].responses.collection[0].headers.collection[0].sourceMap, 41, 27);
+    SourceMapHelper::check(action.sourceMap.examples.collection[0]
+                               .responses.collection[0]
+                               .body.sourceMap,
+        72,
+        7);
+    SourceMapHelper::check(action.sourceMap.examples.collection[0]
+                               .responses.collection[0]
+                               .name.sourceMap,
+        41,
+        27);
+    REQUIRE(action.sourceMap.examples.collection[0]
+                .responses.collection[0]
+                .headers.collection.size()
+        == 1);
+    SourceMapHelper::check(action.sourceMap.examples.collection[0]
+                               .responses.collection[0]
+                               .headers.collection[0]
+                               .sourceMap,
+        41,
+        27);
 }
 
 TEST_CASE("Parse named action with () in title", "[action]")
@@ -80,7 +102,8 @@ TEST_CASE("Parse named action with () in title", "[action]")
           "+ Response 204\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action, ExportSourcemapOption);
+    SectionParserHelper<Action, ActionParser>::parse(
+        source, ActionSectionType, action, ExportSourcemapOption);
 
     REQUIRE(action.report.error.code == Error::OK);
     CHECK(action.report.warnings.empty());
@@ -96,7 +119,8 @@ TEST_CASE("Parse named action with path including () in title", "[action]")
           "+ Response 204\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action, ExportSourcemapOption);
+    SectionParserHelper<Action, ActionParser>::parse(
+        source, ActionSectionType, action, ExportSourcemapOption);
 
     REQUIRE(action.report.error.code == Error::OK);
     CHECK(action.report.warnings.empty());
@@ -113,7 +137,8 @@ TEST_CASE("Parse named action with [] in title", "[action]")
           "+ Response 204\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action, ExportSourcemapOption);
+    SectionParserHelper<Action, ActionParser>::parse(
+        source, ActionSectionType, action, ExportSourcemapOption);
 
     REQUIRE(action.report.error.code == Error::OK);
     CHECK(action.report.warnings.empty());
@@ -132,7 +157,8 @@ TEST_CASE("Parse Action description with list", "[action]")
           "+ Response 204\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action, ExportSourcemapOption);
+    SectionParserHelper<Action, ActionParser>::parse(
+        source, ActionSectionType, action, ExportSourcemapOption);
 
     REQUIRE(action.report.error.code == Error::OK);
     CHECK(action.report.warnings.empty());
@@ -148,8 +174,10 @@ TEST_CASE("Parse Action description with list", "[action]")
     SourceMapHelper::check(action.sourceMap.method.sourceMap, 0, 6);
     SourceMapHelper::check(action.sourceMap.description.sourceMap, 6, 26);
     REQUIRE(action.sourceMap.examples.collection.size() == 1);
-    REQUIRE(action.sourceMap.examples.collection[0].requests.collection.size() == 0);
-    REQUIRE(action.sourceMap.examples.collection[0].responses.collection.size() == 1);
+    REQUIRE(action.sourceMap.examples.collection[0].requests.collection.size()
+        == 0);
+    REQUIRE(action.sourceMap.examples.collection[0].responses.collection.size()
+        == 1);
 }
 
 TEST_CASE("Parse method with multiple requests and responses", "[action]")
@@ -174,10 +202,12 @@ TEST_CASE("Parse method with multiple requests and responses", "[action]")
           "            J\n\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action, ExportSourcemapOption);
+    SectionParserHelper<Action, ActionParser>::parse(
+        source, ActionSectionType, action, ExportSourcemapOption);
 
     REQUIRE(action.report.error.code == Error::OK);
-    REQUIRE(action.report.warnings.size() == 1); // warn responses with the same name
+    REQUIRE(action.report.warnings.size()
+        == 1); // warn responses with the same name
 
     REQUIRE(action.node.name.empty());
     REQUIRE(action.node.method == "PUT");
@@ -221,8 +251,10 @@ TEST_CASE("Parse method with multiple requests and responses", "[action]")
     SourceMapHelper::check(action.sourceMap.method.sourceMap, 0, 6);
     REQUIRE(action.sourceMap.description.sourceMap.empty());
     REQUIRE(action.sourceMap.examples.collection.size() == 1);
-    REQUIRE(action.sourceMap.examples.collection[0].requests.collection.size() == 2);
-    REQUIRE(action.sourceMap.examples.collection[0].responses.collection.size() == 2);
+    REQUIRE(action.sourceMap.examples.collection[0].requests.collection.size()
+        == 2);
+    REQUIRE(action.sourceMap.examples.collection[0].responses.collection.size()
+        == 2);
 }
 
 TEST_CASE("Parse method with multiple incomplete requests", "[action][blocks]")
@@ -235,10 +267,12 @@ TEST_CASE("Parse method with multiple incomplete requests", "[action][blocks]")
           "+ Response 200\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action, ExportSourcemapOption);
+    SectionParserHelper<Action, ActionParser>::parse(
+        source, ActionSectionType, action, ExportSourcemapOption);
 
     REQUIRE(action.report.error.code == Error::OK);
-    REQUIRE(action.report.warnings.size() == 2); // empty asset & preformatted asset
+    REQUIRE(
+        action.report.warnings.size() == 2); // empty asset & preformatted asset
     REQUIRE(action.report.warnings[0].code == EmptyDefinitionWarning);
     REQUIRE(action.report.warnings[1].code == IndentationWarning);
 
@@ -267,8 +301,10 @@ TEST_CASE("Parse method with multiple incomplete requests", "[action][blocks]")
     SourceMapHelper::check(action.sourceMap.method.sourceMap, 0, 9);
     REQUIRE(action.sourceMap.description.sourceMap.empty());
     REQUIRE(action.sourceMap.examples.collection.size() == 1);
-    REQUIRE(action.sourceMap.examples.collection[0].requests.collection.size() == 2);
-    REQUIRE(action.sourceMap.examples.collection[0].responses.collection.size() == 1);
+    REQUIRE(action.sourceMap.examples.collection[0].requests.collection.size()
+        == 2);
+    REQUIRE(action.sourceMap.examples.collection[0].responses.collection.size()
+        == 1);
 }
 
 TEST_CASE("Parse method with foreign item", "[action]")
@@ -282,7 +318,8 @@ TEST_CASE("Parse method with foreign item", "[action]")
           "+ Response 200\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action, ExportSourcemapOption);
+    SectionParserHelper<Action, ActionParser>::parse(
+        source, ActionSectionType, action, ExportSourcemapOption);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.size() == 1);
@@ -306,8 +343,10 @@ TEST_CASE("Parse method with foreign item", "[action]")
     SourceMapHelper::check(action.sourceMap.method.sourceMap, 0, 8);
     REQUIRE(action.sourceMap.description.sourceMap.empty());
     REQUIRE(action.sourceMap.examples.collection.size() == 1);
-    REQUIRE(action.sourceMap.examples.collection[0].requests.collection.size() == 1);
-    REQUIRE(action.sourceMap.examples.collection[0].responses.collection.size() == 1);
+    REQUIRE(action.sourceMap.examples.collection[0].requests.collection.size()
+        == 1);
+    REQUIRE(action.sourceMap.examples.collection[0].responses.collection.size()
+        == 1);
 }
 
 TEST_CASE("Parse method with a HR", "[action]")
@@ -319,7 +358,8 @@ TEST_CASE("Parse method with a HR", "[action]")
           "B\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action, ExportSourcemapOption);
+    SectionParserHelper<Action, ActionParser>::parse(
+        source, ActionSectionType, action, ExportSourcemapOption);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.size() == 1); // no response
@@ -340,7 +380,8 @@ TEST_CASE("Parse method without name", "[action]")
     mdp::ByteBuffer source = "# GET";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action, ExportSourcemapOption);
+    SectionParserHelper<Action, ActionParser>::parse(
+        source, ActionSectionType, action, ExportSourcemapOption);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.size() == 1); // no response
@@ -366,7 +407,8 @@ TEST_CASE("Parse action with parameters", "[action]")
           "\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action, ExportSourcemapOption);
+    SectionParserHelper<Action, ActionParser>::parse(
+        source, ActionSectionType, action, ExportSourcemapOption);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.empty());
@@ -383,10 +425,13 @@ TEST_CASE("Parse action with parameters", "[action]")
     SourceMapHelper::check(action.sourceMap.method.sourceMap, 0, 21);
     REQUIRE(action.sourceMap.description.sourceMap.empty());
     REQUIRE(action.sourceMap.parameters.collection.size() == 1);
-    SourceMapHelper::check(action.sourceMap.parameters.collection[0].name.sourceMap, 40, 44);
+    SourceMapHelper::check(
+        action.sourceMap.parameters.collection[0].name.sourceMap, 40, 44);
     REQUIRE(action.sourceMap.examples.collection.size() == 1);
-    REQUIRE(action.sourceMap.examples.collection[0].requests.collection.size() == 0);
-    REQUIRE(action.sourceMap.examples.collection[0].responses.collection.size() == 1);
+    REQUIRE(action.sourceMap.examples.collection[0].requests.collection.size()
+        == 0);
+    REQUIRE(action.sourceMap.examples.collection[0].responses.collection.size()
+        == 1);
 }
 
 TEST_CASE("Give a warning when 2xx CONNECT has a body", "[action]")
@@ -397,7 +442,8 @@ TEST_CASE("Give a warning when 2xx CONNECT has a body", "[action]")
           "        {}\n\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action, ExportSourcemapOption);
+    SectionParserHelper<Action, ActionParser>::parse(
+        source, ActionSectionType, action, ExportSourcemapOption);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.size() == 1);
@@ -411,8 +457,10 @@ TEST_CASE("Give a warning when 2xx CONNECT has a body", "[action]")
     SourceMapHelper::check(action.sourceMap.method.sourceMap, 0, 13);
     REQUIRE(action.sourceMap.description.sourceMap.empty());
     REQUIRE(action.sourceMap.examples.collection.size() == 1);
-    REQUIRE(action.sourceMap.examples.collection[0].requests.collection.size() == 0);
-    REQUIRE(action.sourceMap.examples.collection[0].responses.collection.size() == 1);
+    REQUIRE(action.sourceMap.examples.collection[0].requests.collection.size()
+        == 0);
+    REQUIRE(action.sourceMap.examples.collection[0].responses.collection.size()
+        == 1);
 }
 
 TEST_CASE("Give a warning when response to HEAD has a body", "[action]")
@@ -423,7 +471,8 @@ TEST_CASE("Give a warning when response to HEAD has a body", "[action]")
           "        {}\n\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action, ExportSourcemapOption);
+    SectionParserHelper<Action, ActionParser>::parse(
+        source, ActionSectionType, action, ExportSourcemapOption);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.size() == 1);
@@ -438,8 +487,10 @@ TEST_CASE("Give a warning when response to HEAD has a body", "[action]")
     SourceMapHelper::check(action.sourceMap.method.sourceMap, 0, 10);
     REQUIRE(action.sourceMap.description.sourceMap.empty());
     REQUIRE(action.sourceMap.examples.collection.size() == 1);
-    REQUIRE(action.sourceMap.examples.collection[0].requests.collection.size() == 0);
-    REQUIRE(action.sourceMap.examples.collection[0].responses.collection.size() == 1);
+    REQUIRE(action.sourceMap.examples.collection[0].requests.collection.size()
+        == 0);
+    REQUIRE(action.sourceMap.examples.collection[0].responses.collection.size()
+        == 1);
 }
 
 TEST_CASE("Missing 'LINK' HTTP request method", "[action]")
@@ -449,7 +500,8 @@ TEST_CASE("Missing 'LINK' HTTP request method", "[action]")
           "+ Response 204\n\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action, ExportSourcemapOption);
+    SectionParserHelper<Action, ActionParser>::parse(
+        source, ActionSectionType, action, ExportSourcemapOption);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.empty());
@@ -462,8 +514,10 @@ TEST_CASE("Missing 'LINK' HTTP request method", "[action]")
     SourceMapHelper::check(action.sourceMap.method.sourceMap, 0, 10);
     REQUIRE(action.sourceMap.description.sourceMap.empty());
     REQUIRE(action.sourceMap.examples.collection.size() == 1);
-    REQUIRE(action.sourceMap.examples.collection[0].requests.collection.size() == 0);
-    REQUIRE(action.sourceMap.examples.collection[0].responses.collection.size() == 1);
+    REQUIRE(action.sourceMap.examples.collection[0].requests.collection.size()
+        == 0);
+    REQUIRE(action.sourceMap.examples.collection[0].responses.collection.size()
+        == 1);
 }
 
 TEST_CASE("Warn when request is not followed by a response", "[action]")
@@ -479,7 +533,8 @@ TEST_CASE("Warn when request is not followed by a response", "[action]")
           "        A\n";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action, ExportSourcemapOption);
+    SectionParserHelper<Action, ActionParser>::parse(
+        source, ActionSectionType, action, ExportSourcemapOption);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.size() == 1);
@@ -495,13 +550,18 @@ TEST_CASE("Warn when request is not followed by a response", "[action]")
     SourceMapHelper::check(action.sourceMap.method.sourceMap, 0, 9);
     REQUIRE(action.sourceMap.description.sourceMap.empty());
     REQUIRE(action.sourceMap.examples.collection.size() == 2);
-    REQUIRE(action.sourceMap.examples.collection[0].requests.collection.size() == 0);
-    REQUIRE(action.sourceMap.examples.collection[0].responses.collection.size() == 1);
-    REQUIRE(action.sourceMap.examples.collection[1].requests.collection.size() == 1);
-    REQUIRE(action.sourceMap.examples.collection[1].responses.collection.size() == 0);
+    REQUIRE(action.sourceMap.examples.collection[0].requests.collection.size()
+        == 0);
+    REQUIRE(action.sourceMap.examples.collection[0].responses.collection.size()
+        == 1);
+    REQUIRE(action.sourceMap.examples.collection[1].requests.collection.size()
+        == 1);
+    REQUIRE(action.sourceMap.examples.collection[1].responses.collection.size()
+        == 0);
 }
 
-// TODO: This test is failing because of a bug in action attributes. Need to fix the bug.
+// TODO: This test is failing because of a bug in action attributes. Need to fix
+// the bug.
 // TEST_CASE("Parse action attributes", "[action]")
 // {
 //    mdp::ByteBuffer source = \
@@ -517,19 +577,22 @@ TEST_CASE("Warn when request is not followed by a response", "[action]")
 //    NamedTypes namedTypes;
 
 //    NamedTypeHelper::build("Coupon", mson::ObjectBaseType, namedTypes);
-//    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action, ExportSourcemapOption,
+//    SectionParserHelper<Action, ActionParser>::parse(source,
+//    ActionSectionType, action, ExportSourcemapOption,
 //    Models(), NULL, namedTypes);
 
 //    REQUIRE(action.report.error.code == Error::OK);
 //    REQUIRE(action.report.warnings.empty());
 
-//    REQUIRE(action.node.attributes.source.typeDefinition.typeSpecification.name.symbol.literal == "Coupon");
+//    REQUIRE(action.node.attributes.source.typeDefinition.typeSpecification.name.symbol.literal
+//    == "Coupon");
 //    REQUIRE(action.node.examples.size() == 2);
 //    REQUIRE(action.node.examples[0].requests.size() == 1);
 //    REQUIRE(action.node.examples[0].requests[0].attributes.source.empty());
 //    REQUIRE(action.node.examples[0].responses.size() == 1);
 //    REQUIRE(action.node.examples[1].requests.size() == 1);
-//    REQUIRE(action.node.examples[1].requests[0].attributes.source.typeDefinition.typeSpecification.name.base ==
+//    REQUIRE(action.node.examples[1].requests[0].attributes.source.typeDefinition.typeSpecification.name.base
+//    ==
 //    mson::StringTypeName);
 //    REQUIRE(action.node.examples[1].responses.size() == 1);
 // }
@@ -550,11 +613,19 @@ TEST_CASE("Named Endpoint", "[named_endpoint]")
     REQUIRE(blueprint.report.warnings.empty());
 
     REQUIRE(blueprint.node.content.elements().size() == 1);
-    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
-    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 1);
-    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).element == Element::ResourceElement);
+    REQUIRE(blueprint.node.content.elements().at(0).element
+        == Element::CategoryElement);
+    REQUIRE(
+        blueprint.node.content.elements().at(0).content.elements().size() == 1);
+    REQUIRE(
+        blueprint.node.content.elements().at(0).content.elements().at(0).element
+        == Element::ResourceElement);
 
-    Resource resource = blueprint.node.content.elements().at(0).content.elements().at(0).content.resource;
+    Resource resource = blueprint.node.content.elements()
+                            .at(0)
+                            .content.elements()
+                            .at(0)
+                            .content.resource;
     REQUIRE(resource.name == "My Named Endpoint");
     REQUIRE(resource.uriTemplate == "/test/endpoint");
     REQUIRE(resource.actions.size() == 1);
@@ -583,12 +654,20 @@ TEST_CASE("Named Endpoints Edge Cases", "[named_endpoint]")
     REQUIRE(blueprint.report.warnings.at(1).code == DuplicateWarning);
 
     REQUIRE(blueprint.node.content.elements().size() == 1);
-    REQUIRE(blueprint.node.content.elements().at(0).element == Element::CategoryElement);
-    REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 3);
-    REQUIRE(blueprint.node.content.elements().at(0).content.elements().at(0).element == Element::ResourceElement);
+    REQUIRE(blueprint.node.content.elements().at(0).element
+        == Element::CategoryElement);
+    REQUIRE(
+        blueprint.node.content.elements().at(0).content.elements().size() == 3);
+    REQUIRE(
+        blueprint.node.content.elements().at(0).content.elements().at(0).element
+        == Element::ResourceElement);
 
     {
-        Resource resource = blueprint.node.content.elements().at(0).content.elements().at(0).content.resource;
+        Resource resource = blueprint.node.content.elements()
+                                .at(0)
+                                .content.elements()
+                                .at(0)
+                                .content.resource;
         REQUIRE(resource.name == "Endpoint 1");
         REQUIRE(resource.uriTemplate == "/e1");
         REQUIRE(resource.actions.size() == 1);
@@ -598,7 +677,11 @@ TEST_CASE("Named Endpoints Edge Cases", "[named_endpoint]")
     }
 
     {
-        Resource resource = blueprint.node.content.elements().at(0).content.elements().at(1).content.resource;
+        Resource resource = blueprint.node.content.elements()
+                                .at(0)
+                                .content.elements()
+                                .at(1)
+                                .content.resource;
         REQUIRE(resource.name == "Endpoint 2");
         REQUIRE(resource.uriTemplate == "/e1");
         REQUIRE(resource.actions.size() == 1);
@@ -608,7 +691,11 @@ TEST_CASE("Named Endpoints Edge Cases", "[named_endpoint]")
     }
 
     {
-        Resource resource = blueprint.node.content.elements().at(0).content.elements().at(2).content.resource;
+        Resource resource = blueprint.node.content.elements()
+                                .at(0)
+                                .content.elements()
+                                .at(2)
+                                .content.resource;
         REQUIRE(resource.name == "Endpoint 3");
         REQUIRE(resource.uriTemplate == "/e1");
         REQUIRE(resource.actions.size() == 1);
@@ -618,7 +705,8 @@ TEST_CASE("Named Endpoints Edge Cases", "[named_endpoint]")
     }
 }
 
-TEST_CASE("Action section containing properties keyword under it", "[action][127]")
+TEST_CASE(
+    "Action section containing properties keyword under it", "[action][127]")
 {
     const mdp::ByteBuffer source
         = "# A [GET /]\n"
@@ -626,7 +714,8 @@ TEST_CASE("Action section containing properties keyword under it", "[action][127
           "+ Response 204";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action, ExportSourcemapOption);
+    SectionParserHelper<Action, ActionParser>::parse(
+        source, ActionSectionType, action, ExportSourcemapOption);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.empty());
@@ -643,7 +732,8 @@ TEST_CASE("Miss leading slash in URI", "[action][350]")
     snowcrash::ParseResult<snowcrash::Blueprint> blueprint;
     snowcrash::SectionParserData pd(0, source, blueprint.node);
     MarkdownNodes nodes;
-    nodes.push_back(mdp::MarkdownNode(mdp::HeaderMarkdownNodeType, NULL, mdp::ByteBuffer(source)));
+    nodes.push_back(mdp::MarkdownNode(
+        mdp::HeaderMarkdownNodeType, NULL, mdp::ByteBuffer(source)));
     Report report;
     SectionProcessor<Action>::checkForTypoMistake(nodes.begin(), pd, report);
 
@@ -654,7 +744,8 @@ TEST_CASE("Miss leading slash in URI", "[action][350]")
         == "URI path in 'A [GET {param}]' is not absolute, it should have a leading forward slash");
 }
 
-TEST_CASE("Detect invalid reference to URI Template parameters in Action", "[action]")
+TEST_CASE(
+    "Detect invalid reference to URI Template parameters in Action", "[action]")
 {
     mdp::ByteBuffer source
         = "## List [GET /orders{?abc}]\n\n"
@@ -665,7 +756,8 @@ TEST_CASE("Detect invalid reference to URI Template parameters in Action", "[act
           "+ Response 200";
 
     ParseResult<Action> action;
-    SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action, ExportSourcemapOption);
+    SectionParserHelper<Action, ActionParser>::parse(
+        source, ActionSectionType, action, ExportSourcemapOption);
 
     REQUIRE(action.report.error.code == Error::OK);
     REQUIRE(action.report.warnings.size() == 3);

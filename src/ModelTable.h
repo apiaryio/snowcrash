@@ -28,7 +28,8 @@ namespace snowcrash
 {
 
     /** Symbol reference matching regex */
-    const char* const ModelReferenceRegex("^[[:blank:]]*\\[" SYMBOL_IDENTIFIER "]\\[][[:blank:]]*$");
+    const char* const ModelReferenceRegex(
+        "^[[:blank:]]*\\[" SYMBOL_IDENTIFIER "]\\[][[:blank:]]*$");
 
     // Resource Object Model Table
     typedef std::map<Identifier, ResourceModel> ModelTable;
@@ -36,9 +37,12 @@ namespace snowcrash
     // Resource Object Model Table source map
     typedef std::map<Identifier, SourceMap<ResourceModel> > ModelSourceMapTable;
 
-    // Checks whether given source data represents reference to a symbol returning true if so,
-    // false otherwise. If source data is represent reference referred symbol name is filled in.
-    inline bool GetModelReference(const mdp::ByteBuffer& sourceData, Identifier& referredModel)
+    // Checks whether given source data represents reference to a symbol
+    // returning true if so,
+    // false otherwise. If source data is represent reference referred symbol
+    // name is filled in.
+    inline bool GetModelReference(
+        const mdp::ByteBuffer& sourceData, Identifier& referredModel)
     {
 
         CaptureGroups captureGroups;
@@ -74,9 +78,12 @@ namespace snowcrash
 
         std::cout << "Resource Model Symbols:\n";
 
-        for (ModelTable::const_iterator it = modelTable.begin(); it != modelTable.end(); ++it) {
+        for (ModelTable::const_iterator it = modelTable.begin();
+             it != modelTable.end();
+             ++it) {
 
-            std::cout << "- " << it->first << " - body: '" << EscapeNewlines(it->second.body) << "'\n";
+            std::cout << "- " << it->first << " - body: '"
+                      << EscapeNewlines(it->second.body) << "'\n";
         }
 
         std::cout << std::endl;

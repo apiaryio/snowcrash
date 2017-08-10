@@ -48,7 +48,8 @@ namespace snowcrash
         /** Source Map of Required flag */
         SourceMap<ParameterUse> use;
 
-        /** Source Map of Default Value, applicable only when `required == false` */
+        /** Source Map of Default Value, applicable only when `required ==
+         * false` */
         SourceMap<Value> defaultValue;
 
         /** Source Map of Example Value */
@@ -96,13 +97,16 @@ namespace snowcrash
         /** Source Map of Payload-specific Headers */
         SourceMap<Headers> headers;
 
-        /** Source Map of Payload-specific Attributes (THIS SHOULD NOT BE HERE - should be under content) */
+        /** Source Map of Payload-specific Attributes (THIS SHOULD NOT BE HERE -
+         * should be under content) */
         SourceMap<Attributes> attributes;
 
-        /** Source Map of Body (THIS SHOULD NOT BE HERE - should be under content) */
+        /** Source Map of Body (THIS SHOULD NOT BE HERE - should be under
+         * content) */
         SourceMap<Asset> body;
 
-        /** Source Map of Schema (THIS SHOULD NOT BE HERE - should be under content) */
+        /** Source Map of Schema (THIS SHOULD NOT BE HERE - should be under
+         * content) */
         SourceMap<Asset> schema;
 
         /** Source Map of Model Reference */
@@ -155,13 +159,16 @@ namespace snowcrash
         /** Action-specific Parameters */
         SourceMap<Parameters> parameters;
 
-        /** Action-specific Attributes (THIS SHOULD NOT BE HERE - should be under content) */
+        /** Action-specific Attributes (THIS SHOULD NOT BE HERE - should be
+         * under content) */
         SourceMap<Attributes> attributes;
 
-        /** Source Map of URI Template (THIS SHOULD NOT BE HERE - should be under element attributes) */
+        /** Source Map of URI Template (THIS SHOULD NOT BE HERE - should be
+         * under element attributes) */
         SourceMap<URITemplate> uriTemplate;
 
-        /** Source Map of Link Relation (THIS SHOULD NOT BE HERE - should be under element attributes) */
+        /** Source Map of Link Relation (THIS SHOULD NOT BE HERE - should be
+         * under element attributes) */
         SourceMap<Relation> relation;
 
         /**
@@ -203,7 +210,8 @@ namespace snowcrash
         /** Model representing this Resource */
         SourceMap<ResourceModel> model;
 
-        /** Source Map of Resource-specific Attributes (THIS SHOULD NOT BE HERE - should be under content) */
+        /** Source Map of Resource-specific Attributes (THIS SHOULD NOT BE HERE
+         * - should be under content) */
         SourceMap<Attributes> attributes;
 
         /** Parameters */
@@ -273,7 +281,8 @@ namespace snowcrash
             Content(const SourceMap<Element>::Content& rhs);
 
             /** Assignment operator */
-            SourceMap<Element>::Content& operator=(const SourceMap<Element>::Content& rhs);
+            SourceMap<Element>::Content& operator=(
+                const SourceMap<Element>::Content& rhs);
 
             /** Destructor */
             ~Content();
@@ -324,7 +333,8 @@ namespace snowcrash
     /**
      *  \brief API Blueprint Sourcemap AST
      *
-     *  This is top-level (or root if you prefer) of API Blueprint Sourcemap abstract syntax tree.
+     *  This is top-level (or root if you prefer) of API Blueprint Sourcemap
+     * abstract syntax tree.
      *  Start reading a parsed API here.
      */
     template <>

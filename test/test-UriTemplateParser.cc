@@ -11,7 +11,8 @@
 
 using namespace snowcrash;
 
-TEST_CASE("Parse a valid uri into seperate parts", "[validuriparser][issue][79]")
+TEST_CASE(
+    "Parse a valid uri into seperate parts", "[validuriparser][issue][79]")
 {
 
     const snowcrash::URI uri = "http://www.test.com/other/{id}";
@@ -27,7 +28,8 @@ TEST_CASE("Parse a valid uri into seperate parts", "[validuriparser][issue][79]"
     REQUIRE(result.report.warnings.size() == 0);
 }
 
-TEST_CASE("Parse an invalid uri into seperate parts", "[invaliduriparser][issue][79]")
+TEST_CASE(
+    "Parse an invalid uri into seperate parts", "[invaliduriparser][issue][79]")
 {
 
     const snowcrash::URI uri = "http://www.test.com/other/{id}[2]";
@@ -43,7 +45,8 @@ TEST_CASE("Parse an invalid uri into seperate parts", "[invaliduriparser][issue]
     REQUIRE(result.report.warnings.size() == 1);
 }
 
-TEST_CASE("Parse uri template for invalid format curly brackets (nested brackets)",
+TEST_CASE(
+    "Parse uri template for invalid format curly brackets (nested brackets)",
     "[invalidcurlybracketparsingnested][issue][78]")
 {
     const snowcrash::URI uri = "http://www.test.com/{id{}}";
@@ -57,7 +60,9 @@ TEST_CASE("Parse uri template for invalid format curly brackets (nested brackets
     REQUIRE(result.report.warnings.size() == 1);
 }
 
-TEST_CASE("Parse uri template for invalid format curly brackets (missing end bracket)",
+TEST_CASE(
+    "Parse uri template for invalid format curly brackets (missing end "
+    "bracket)",
     "[invalidcurlybracketparsingmissingendbracket][issue][78]")
 {
     const snowcrash::URI uri = "http://www.test.com/{id";
@@ -85,10 +90,13 @@ TEST_CASE("Parse uri template for supported level one variable expansion",
     REQUIRE(result.report.warnings.size() == 0);
 }
 
-TEST_CASE("Parse uri template for supported variables with % encoding and explode modifier",
+TEST_CASE(
+    "Parse uri template for supported variables with % encoding and explode "
+    "modifier",
     "[supportedpercentencodedvariablesandexplodemodifier][issue][78]")
 {
-    const snowcrash::URI uri = "http://www.test.com/{id}/{?test%20one,test%20two*}";
+    const snowcrash::URI uri
+        = "http://www.test.com/{id}/{?test%20one,test%20two*}";
 
     URITemplateParser parser;
     ParsedURITemplate result;
@@ -99,9 +107,11 @@ TEST_CASE("Parse uri template for supported variables with % encoding and explod
     REQUIRE(result.report.warnings.size() == 0);
 }
 
-TEST_CASE("Parse uri template for invalid % encoding", "[invalidpercentencoding][issue][78]")
+TEST_CASE("Parse uri template for invalid % encoding",
+    "[invalidpercentencoding][issue][78]")
 {
-    const snowcrash::URI uri = "http://www.test.com/{id}/{?test%20one,test%2Ztwo}";
+    const snowcrash::URI uri
+        = "http://www.test.com/{id}/{?test%20one,test%2Ztwo}";
 
     URITemplateParser parser;
     ParsedURITemplate result;
@@ -112,7 +122,8 @@ TEST_CASE("Parse uri template for invalid % encoding", "[invalidpercentencoding]
     REQUIRE(result.report.warnings.size() == 1);
 }
 
-TEST_CASE("Parse uri template for invalid expansion", "[invalidexpression][issue][78]")
+TEST_CASE("Parse uri template for invalid expansion",
+    "[invalidexpression][issue][78]")
 {
     const snowcrash::URI uri = "http://www.test.com/{@id}/{|test}";
 
@@ -139,7 +150,9 @@ TEST_CASE("Parse uri template for supported level two fragment expansion",
     REQUIRE(result.report.warnings.size() == 0);
 }
 
-TEST_CASE("Parse uri template for supported level three form style query string expansion",
+TEST_CASE(
+    "Parse uri template for supported level three form style query string "
+    "expansion",
     "[supportedlevelthreeformstylequeryexpansionexpression][issue][78]")
 {
     const snowcrash::URI uri = "http://www.test.com/path{?varone,vartwo}";
@@ -181,7 +194,8 @@ TEST_CASE("Parse uri template for unsupported level three label expansion",
     REQUIRE(result.report.warnings.size() == 1);
 }
 
-TEST_CASE("Parse uri template for unsupported level three path segment expansion",
+TEST_CASE(
+    "Parse uri template for unsupported level three path segment expansion",
     "[unsupportedlevelthreepathsegmentexpansionexpression][issue][78]")
 {
     const snowcrash::URI uri = "http://www.test.com/path{/varone}";
@@ -195,7 +209,9 @@ TEST_CASE("Parse uri template for unsupported level three path segment expansion
     REQUIRE(result.report.warnings.size() == 1);
 }
 
-TEST_CASE("Parse uri template for unsupported level three path style parameter expansion",
+TEST_CASE(
+    "Parse uri template for unsupported level three path style parameter "
+    "expansion",
     "[unsupportedlevelthreepathstyleparameterexpression][issue][78]")
 {
     const snowcrash::URI uri = "http://www.test.com/path{;varone,vartwo}";
@@ -209,10 +225,13 @@ TEST_CASE("Parse uri template for unsupported level three path style parameter e
     REQUIRE(result.report.warnings.size() == 1);
 }
 
-TEST_CASE("Parse uri template for supported level three form style query continuation expansion",
+TEST_CASE(
+    "Parse uri template for supported level three form style query "
+    "continuation expansion",
     "[supportedlevelthreeformstylequerycontinuationexpression][issue][78]")
 {
-    const snowcrash::URI uri = "http://www.test.com/{id}?path=test{&varone,vartwo}";
+    const snowcrash::URI uri
+        = "http://www.test.com/{id}?path=test{&varone,vartwo}";
 
     URITemplateParser parser;
     ParsedURITemplate result;
@@ -223,8 +242,8 @@ TEST_CASE("Parse uri template for supported level three form style query continu
     REQUIRE(result.report.warnings.size() == 0);
 }
 
-TEST_CASE(
-    "Parse uri template for invalid variable name, contains spaces", "[invalidvariablenamecontainingspaces][issue][78]")
+TEST_CASE("Parse uri template for invalid variable name, contains spaces",
+    "[invalidvariablenamecontainingspaces][issue][78]")
 {
     const snowcrash::URI uri = "http://www.test.com/path{?varone, vartwo}";
 
@@ -256,7 +275,8 @@ TEST_CASE("Parse uri template for invalid variable name, contains hyphens",
 TEST_CASE("Parse uri template for invalid variable name, contains assignment",
     "[invalidvariablenamecontainingsassignment][issue][78]")
 {
-    const snowcrash::URITemplate uri = "http://www.test.com/{id}{?varone=vartwo}";
+    const snowcrash::URITemplate uri
+        = "http://www.test.com/{id}{?varone=vartwo}";
 
     URITemplateParser parser;
     ParsedURITemplate result;
@@ -283,7 +303,8 @@ TEST_CASE("Parse uri template for invalid variable name, invalid % encoded",
     REQUIRE(result.report.warnings[0].message == "URI template expression \"?varone%2z\" contains invalid characters. Allowed characters for expressions are A-Z a-z 0-9 _ and percent encoded characters");
 }
 
-TEST_CASE("Parse uri template for variable name containing dot", "[validvariablenamecontainingdot][issue][78]")
+TEST_CASE("Parse uri template for variable name containing dot",
+    "[validvariablenamecontainingdot][issue][78]")
 {
     const snowcrash::URITemplate uri = "http://www.test.com/{id}{?varone.data}";
 
@@ -296,10 +317,13 @@ TEST_CASE("Parse uri template for variable name containing dot", "[validvariable
     REQUIRE(result.report.warnings.size() == 0);
 }
 
-TEST_CASE("Parse uri template for invalid variable name containing multiple contiguous dots",
+TEST_CASE(
+    "Parse uri template for invalid variable name containing multiple "
+    "contiguous dots",
     "[invalidvariablenamecontiguousdots][issue][78]")
 {
-    const snowcrash::URITemplate uri = "http://www.test.com/{id}{?varone..data}";
+    const snowcrash::URITemplate uri
+        = "http://www.test.com/{id}{?varone..data}";
 
     URITemplateParser parser;
     ParsedURITemplate result;

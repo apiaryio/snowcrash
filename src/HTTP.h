@@ -19,8 +19,9 @@
  *  defined type due to C++98 string concatenation limitations.
  *  FIXME: To be improved with migration to C++11.
  */
-#define HTTP_REQUEST_METHOD                                                                                            \
-    "(GET|POST|PUT|DELETE|OPTIONS|PATCH|PROPPATCH|LOCK|UNLOCK|COPY|MOVE|MKCOL|HEAD|LINK|UNLINK|CONNECT)"
+#define HTTP_REQUEST_METHOD                                                    \
+    "(GET|POST|PUT|DELETE|OPTIONS|PATCH|PROPPATCH|LOCK|UNLOCK|COPY|MOVE|"      \
+    "MKCOL|HEAD|LINK|UNLINK|CONNECT)"
 
 /**
  *  \brief URI Template.

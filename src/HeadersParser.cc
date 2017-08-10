@@ -6,13 +6,16 @@ using namespace snowcrash;
 static HeaderIterator findHeader(const Headers& headers, const Header& header)
 {
 
-    return std::find_if(
-        headers.begin(), headers.end(), std::bind2nd(MatchFirsts<Header, IEqual<Header::first_type> >(), header));
+    return std::find_if(headers.begin(),
+        headers.end(),
+        std::bind2nd(
+            MatchFirsts<Header, IEqual<Header::first_type> >(), header));
 }
 
 typedef std::vector<std::string> HeadersKeyCollection;
 
-/** Get collection of allowed keywords - workarround due to C++98 restriction - static initialization of vector */
+/** Get collection of allowed keywords - workarround due to C++98 restriction -
+ * static initialization of vector */
 static const HeadersKeyCollection& getAllowedMultipleDefinitions()
 {
 
@@ -20,7 +23,8 @@ static const HeadersKeyCollection& getAllowedMultipleDefinitions()
         HTTPHeaderName::SetCookie, HTTPHeaderName::Link,
     };
 
-    static const HeadersKeyCollection allowedMultipleDefinitions(keys, keys + (sizeof(keys) / sizeof(keys[0])));
+    static const HeadersKeyCollection allowedMultipleDefinitions(
+        keys, keys + (sizeof(keys) / sizeof(keys[0])));
 
     return allowedMultipleDefinitions;
 }
@@ -33,7 +37,9 @@ static bool isAllowedMultipleDefinition(const Header& header)
 
     return std::find_if(keys.begin(),
                keys.end(),
-               std::bind1st(MatchFirstWith<Header, std::string, IEqual<std::string> >(), header))
+               std::bind1st(
+                   MatchFirstWith<Header, std::string, IEqual<std::string> >(),
+                   header))
         != keys.end();
 }
 
@@ -44,7 +50,8 @@ static bool isNotValidTokenChar(const std::string::value_type& c)
     return !(std::isalnum(c) || (validChars.find(c) != std::string::npos));
 }
 
-static std::string::const_iterator findNonValidCharInHeaderName(const std::string& token)
+static std::string::const_iterator findNonValidCharInHeaderName(
+    const std::string& token)
 {
 
     return std::find_if(token.begin(), token.end(), isNotValidTokenChar);
@@ -61,7 +68,8 @@ std::string HeaderNameTokenChecker::getMessage() const
 
     const char invalidChar = *findNonValidCharInHeaderName(headerName);
     std::stringstream ss;
-    ss << "HTTP header name '" << headerName << "' contains illegal character '" << invalidChar << "' (0x" << std::hex
+    ss << "HTTP header name '" << headerName << "' contains illegal character '"
+       << invalidChar << "' (0x" << std::hex
        << static_cast<int16_t>(invalidChar) << ") skipping the header";
 
     return ss.str();
@@ -70,7 +78,8 @@ std::string HeaderNameTokenChecker::getMessage() const
 bool ColonPresentedChecker::operator()() const
 {
 
-    return captures[3].size() >= 1 && (captures[3].find(':') != std::string::npos);
+    return captures[3].size() >= 1
+        && (captures[3].find(':') != std::string::npos);
 }
 
 std::string ColonPresentedChecker::getMessage() const
@@ -85,7 +94,8 @@ std::string ColonPresentedChecker::getMessage() const
 bool HeadersDuplicateChecker::operator()() const
 {
 
-    return findHeader(headers, header) == headers.end() || isAllowedMultipleDefinition(header);
+    return findHeader(headers, header) == headers.end()
+        || isAllowedMultipleDefinition(header);
 }
 
 std::string HeadersDuplicateChecker::getMessage() const
@@ -117,7 +127,8 @@ bool HeaderParserValidator::operator()(const ValidateFunctorBase& rule)
     bool rc = rule();
 
     if (!rc) {
-        out.report.warnings.push_back(Warning(rule.getMessage(), HTTPWarning, sourceMap));
+        out.report.warnings.push_back(
+            Warning(rule.getMessage(), HTTPWarning, sourceMap));
     }
 
     return rc;

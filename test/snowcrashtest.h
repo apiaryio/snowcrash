@@ -61,13 +61,21 @@ namespace snowcrashtest
 
             pd.sectionsContext.push_back(type);
 
-            pd.modelTable.insert(models.modelTable.begin(), models.modelTable.end());
-            pd.modelSourceMapTable.insert(models.modelSourceMapTable.begin(), models.modelSourceMapTable.end());
+            pd.modelTable.insert(
+                models.modelTable.begin(), models.modelTable.end());
+            pd.modelSourceMapTable.insert(models.modelSourceMapTable.begin(),
+                models.modelSourceMapTable.end());
 
-            pd.namedTypeBaseTable.insert(namedTypes.baseTable.begin(), namedTypes.baseTable.end());
-            pd.namedTypeDependencyTable.insert(namedTypes.dependencyTable.begin(), namedTypes.dependencyTable.end());
+            pd.namedTypeBaseTable.insert(
+                namedTypes.baseTable.begin(), namedTypes.baseTable.end());
+            pd.namedTypeDependencyTable.insert(
+                namedTypes.dependencyTable.begin(),
+                namedTypes.dependencyTable.end());
 
-            PARSER::parse(markdownAST.children().begin(), markdownAST.children(), pd, out);
+            PARSER::parse(markdownAST.children().begin(),
+                markdownAST.children(),
+                pd,
+                out);
         }
 
         static void parseMSON(const mdp::ByteBuffer& source,
@@ -107,7 +115,9 @@ namespace snowcrashtest
     struct NamedTypeHelper {
 
         /** Builds an named type entry for testing purposes */
-        static void build(const mson::Literal& literal, const mson::BaseType& baseType, NamedTypes& namedTypes)
+        static void build(const mson::Literal& literal,
+            const mson::BaseType& baseType,
+            NamedTypes& namedTypes)
         {
 
             namedTypes.baseTable[literal] = baseType;
@@ -144,8 +154,12 @@ namespace snowcrashtest
             scpl::Signature signature;
             scpl::SignatureTraits signatureTraits(traits);
 
-            signature = scpl::SignatureSectionProcessorBase<snowcrash::Blueprint>::parseSignature(
-                markdownAST.children().begin(), pd, signatureTraits, out.report);
+            signature
+                = scpl::SignatureSectionProcessorBase<snowcrash::Blueprint>::
+                    parseSignature(markdownAST.children().begin(),
+                        pd,
+                        signatureTraits,
+                        out.report);
 
             return signature;
         }
@@ -158,12 +172,15 @@ namespace snowcrashtest
 
         /**
          * If 'nth' is not given, check that the given sourceMap is of size 1
-         * and also check the first row of the given sourceMap with the given location & length.
+         * and also check the first row of the given sourceMap with the given
+         * location & length.
          *
-         * If 'nth' is given, check that particular row of the given sourceMap with the
+         * If 'nth' is given, check that particular row of the given sourceMap
+         * with the
          * given location & length.
          */
-        static void check(mdp::BytesRangeSet& sourceMap, int loc, int len, size_t nth = 0)
+        static void check(
+            mdp::BytesRangeSet& sourceMap, int loc, int len, size_t nth = 0)
         {
 
             if (nth == 0) {
@@ -179,7 +196,11 @@ namespace snowcrashtest
         /**
          * Test a sourcemap which is of size 2
          */
-        static void check(mdp::BytesRangeSet& sourceMap, int loc1, int len1, int loc2, int len2)
+        static void check(mdp::BytesRangeSet& sourceMap,
+            int loc1,
+            int len1,
+            int loc2,
+            int len2)
         {
 
             REQUIRE(sourceMap.size() == 2);

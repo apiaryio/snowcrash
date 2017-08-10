@@ -30,10 +30,10 @@ namespace snowcrash
      */
 }
 
-#define SOURCE_MAP_COLLECTION(T, TC)                                                                                   \
-    template <>                                                                                                        \
-    struct SourceMap<TC> {                                                                                             \
-        Collection<SourceMap<T> >::type collection;                                                                    \
+#define SOURCE_MAP_COLLECTION(T, TC)                                           \
+    template <>                                                                \
+    struct SourceMap<TC> {                                                     \
+        Collection<SourceMap<T> >::type collection;                            \
     };
 
 namespace snowcrash
@@ -72,14 +72,17 @@ namespace snowcrash
         const SourceMap<mson::Elements>& elements() const;
 
         /** Constructor */
-        SourceMap(const SourceMap<mson::Markdown>& description_ = SourceMap<mson::Markdown>(),
-            const SourceMap<mson::Literal>& value_ = SourceMap<mson::Literal>());
+        SourceMap(const SourceMap<mson::Markdown>& description_
+            = SourceMap<mson::Markdown>(),
+            const SourceMap<mson::Literal>& value_
+            = SourceMap<mson::Literal>());
 
         /** Copy constructor */
         SourceMap(const SourceMap<mson::TypeSection>& rhs);
 
         /** Assignment operator */
-        SourceMap<mson::TypeSection>& operator=(const SourceMap<mson::TypeSection>& rhs);
+        SourceMap<mson::TypeSection>& operator=(
+            const SourceMap<mson::TypeSection>& rhs);
 
         /** Desctructor */
         ~SourceMap();
@@ -127,7 +130,8 @@ namespace snowcrash
 
     /** Source Map structure for Property Member */
     template <>
-    struct SourceMap<mson::PropertyMember> : public SourceMap<mson::ValueMember> {
+    struct SourceMap<mson::PropertyMember>
+        : public SourceMap<mson::ValueMember> {
 
         /** Source Map for Property Name */
         SourceMap<mson::PropertyName> name;
@@ -161,7 +165,8 @@ namespace snowcrash
         const SourceMap<mson::Elements>& elements() const;
 
         /** Builds the structure from group of elements */
-        SourceMap<mson::Element>& operator=(const SourceMap<mson::Elements>& rhs);
+        SourceMap<mson::Element>& operator=(
+            const SourceMap<mson::Elements>& rhs);
 
         /** Constructor */
         SourceMap();
@@ -170,7 +175,8 @@ namespace snowcrash
         SourceMap(const SourceMap<mson::Element>& rhs);
 
         /** Assignment operator */
-        SourceMap<mson::Element>& operator=(const SourceMap<mson::Element>& rhs);
+        SourceMap<mson::Element>& operator=(
+            const SourceMap<mson::Element>& rhs);
 
         /** Destructor */
         ~SourceMap();

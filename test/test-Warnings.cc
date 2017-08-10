@@ -52,7 +52,8 @@ TEST_CASE("Warn about brackets in URI template", "[warnings][79]")
     REQUIRE(blueprint.report.warnings[0].code == URIWarning);
 }
 
-TEST_CASE("Warn about unsupported uri template label expansion", "[warnings][78]")
+TEST_CASE(
+    "Warn about unsupported uri template label expansion", "[warnings][78]")
 {
     mdp::ByteBuffer source
         = "FORMAT: 1A\n"
@@ -72,7 +73,8 @@ TEST_CASE("Warn about unsupported uri template label expansion", "[warnings][78]
     REQUIRE(blueprint.report.warnings[0].code == URIWarning);
 }
 
-TEST_CASE("Warn about unsupported uri template in abbreviated blueprint", "[warnings][78]")
+TEST_CASE("Warn about unsupported uri template in abbreviated blueprint",
+    "[warnings][78]")
 {
     mdp::ByteBuffer source
         = "FORMAT: 1A\n"

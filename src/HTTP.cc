@@ -40,7 +40,8 @@ HTTPMethodTraits snowcrash::GetMethodTrait(HTTPMethod method)
     traits.method = method;
 
     // Following HTTP methods MUST NOT contain response body
-    // FIXME: When refactoring traits don't forget that 'CONNECT' has no body only when 1xx-2xx
+    // FIXME: When refactoring traits don't forget that 'CONNECT' has no body
+    // only when 1xx-2xx
     if (method == HTTPMethodName::Head || method == HTTPMethodName::Connect) {
         traits.allowBody = false;
     }

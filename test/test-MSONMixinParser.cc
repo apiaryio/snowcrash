@@ -22,14 +22,18 @@ TEST_CASE("Mixin block classifier", "[mson][mixin]")
     markdownParser.parse(source, markdownAST);
 
     REQUIRE(!markdownAST.children().empty());
-    REQUIRE(markdownAST.children().front().type == mdp::ListItemMarkdownNodeType);
+    REQUIRE(
+        markdownAST.children().front().type == mdp::ListItemMarkdownNodeType);
     REQUIRE(!markdownAST.children().front().children().empty());
 
-    sectionType = SectionProcessor<mson::Mixin>::sectionType(markdownAST.children().begin());
+    sectionType = SectionProcessor<mson::Mixin>::sectionType(
+        markdownAST.children().begin());
     REQUIRE(sectionType == MSONMixinSectionType);
 
-    markdownAST.children().front().children().front().text = "Include (Address, sample)";
-    sectionType = SectionProcessor<mson::Mixin>::sectionType(markdownAST.children().begin());
+    markdownAST.children().front().children().front().text
+        = "Include (Address, sample)";
+    sectionType = SectionProcessor<mson::Mixin>::sectionType(
+        markdownAST.children().begin());
     REQUIRE(sectionType == MSONMixinSectionType);
 }
 
@@ -118,9 +122,11 @@ TEST_CASE("Parse mson mixin with nested type definition", "[mson][mixin]")
     REQUIRE(mixin.node.typeSpecification.name.symbol.literal == "Person");
     REQUIRE(mixin.node.typeSpecification.name.symbol.variable == false);
     REQUIRE(mixin.node.typeSpecification.nestedTypes.size() == 2);
-    REQUIRE(mixin.node.typeSpecification.nestedTypes[0].base == mson::NumberTypeName);
+    REQUIRE(mixin.node.typeSpecification.nestedTypes[0].base
+        == mson::NumberTypeName);
     REQUIRE(mixin.node.typeSpecification.nestedTypes[0].symbol.empty());
-    REQUIRE(mixin.node.typeSpecification.nestedTypes[1].base == mson::StringTypeName);
+    REQUIRE(mixin.node.typeSpecification.nestedTypes[1].base
+        == mson::StringTypeName);
     REQUIRE(mixin.node.typeSpecification.nestedTypes[1].symbol.empty());
 
     SourceMapHelper::check(mixin.sourceMap.sourceMap, 2, 42);

@@ -22,7 +22,8 @@ TEST_CASE("Recognize relation signature", "[relation]")
     markdownParser.parse(RelationFixture, markdownAST);
 
     REQUIRE(!markdownAST.children().empty());
-    sectionType = SectionProcessor<Relation>::sectionType(markdownAST.children().begin());
+    sectionType = SectionProcessor<Relation>::sectionType(
+        markdownAST.children().begin());
     REQUIRE(sectionType == RelationSectionType);
 }
 
@@ -36,7 +37,8 @@ TEST_CASE("Relation signature without colon", "[relation]")
     markdownParser.parse(source, markdownAST);
 
     REQUIRE(!markdownAST.children().empty());
-    sectionType = SectionProcessor<Relation>::sectionType(markdownAST.children().begin());
+    sectionType = SectionProcessor<Relation>::sectionType(
+        markdownAST.children().begin());
     REQUIRE(sectionType != RelationSectionType);
 }
 
@@ -63,11 +65,13 @@ TEST_CASE("Relation identifier starting with non lower alphabet", "[relation]")
     markdownParser.parse(source, markdownAST);
 
     REQUIRE(!markdownAST.children().empty());
-    sectionType = SectionProcessor<Relation>::sectionType(markdownAST.children().begin());
+    sectionType = SectionProcessor<Relation>::sectionType(
+        markdownAST.children().begin());
     REQUIRE(sectionType == RelationSectionType);
 
     ParseResult<Relation> relation;
-    SectionParserHelper<Relation, RelationParser>::parse(source, RelationSectionType, relation, ExportSourcemapOption);
+    SectionParserHelper<Relation, RelationParser>::parse(
+        source, RelationSectionType, relation, ExportSourcemapOption);
 
     REQUIRE(relation.report.error.code == Error::OK);
     REQUIRE(relation.report.warnings.size() == 1);
@@ -85,11 +89,13 @@ TEST_CASE("Relation identifier containing capital letters", "[relation]")
     markdownParser.parse(source, markdownAST);
 
     REQUIRE(!markdownAST.children().empty());
-    sectionType = SectionProcessor<Relation>::sectionType(markdownAST.children().begin());
+    sectionType = SectionProcessor<Relation>::sectionType(
+        markdownAST.children().begin());
     REQUIRE(sectionType == RelationSectionType);
 
     ParseResult<Relation> relation;
-    SectionParserHelper<Relation, RelationParser>::parse(source, RelationSectionType, relation, ExportSourcemapOption);
+    SectionParserHelper<Relation, RelationParser>::parse(
+        source, RelationSectionType, relation, ExportSourcemapOption);
 
     REQUIRE(relation.report.error.code == Error::OK);
     REQUIRE(relation.report.warnings.size() == 1);
@@ -107,11 +113,13 @@ TEST_CASE("Relation identifier containing special characters", "[relation]")
     markdownParser.parse(source, markdownAST);
 
     REQUIRE(!markdownAST.children().empty());
-    sectionType = SectionProcessor<Relation>::sectionType(markdownAST.children().begin());
+    sectionType = SectionProcessor<Relation>::sectionType(
+        markdownAST.children().begin());
     REQUIRE(sectionType == RelationSectionType);
 
     ParseResult<Relation> relation;
-    SectionParserHelper<Relation, RelationParser>::parse(source, RelationSectionType, relation, ExportSourcemapOption);
+    SectionParserHelper<Relation, RelationParser>::parse(
+        source, RelationSectionType, relation, ExportSourcemapOption);
 
     REQUIRE(relation.report.error.code == Error::OK);
     REQUIRE(relation.report.warnings.size() == 1);
@@ -129,11 +137,13 @@ TEST_CASE("Relation identifier consisting of dots and dashes", "[relation]")
     markdownParser.parse(source, markdownAST);
 
     REQUIRE(!markdownAST.children().empty());
-    sectionType = SectionProcessor<Relation>::sectionType(markdownAST.children().begin());
+    sectionType = SectionProcessor<Relation>::sectionType(
+        markdownAST.children().begin());
     REQUIRE(sectionType == RelationSectionType);
 
     ParseResult<Relation> relation;
-    SectionParserHelper<Relation, RelationParser>::parse(source, RelationSectionType, relation, ExportSourcemapOption);
+    SectionParserHelper<Relation, RelationParser>::parse(
+        source, RelationSectionType, relation, ExportSourcemapOption);
 
     REQUIRE(relation.report.error.code == Error::OK);
     REQUIRE(relation.report.warnings.empty());

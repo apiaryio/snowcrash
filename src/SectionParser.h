@@ -37,11 +37,13 @@ namespace snowcrash
 
             SectionLayout layout = DefaultSectionLayout;
             MarkdownNodeIterator cur = Adapter::startingNode(node, pd);
-            const MarkdownNodes& collection = Adapter::startingNodeSiblings(node, siblings);
+            const MarkdownNodes& collection
+                = Adapter::startingNodeSiblings(node, siblings);
 
             // Signature node
             MarkdownNodeIterator lastCur = cur;
-            cur = SectionProcessor<T>::processSignature(cur, collection, pd, layout, out);
+            cur = SectionProcessor<T>::processSignature(
+                cur, collection, pd, layout, out);
 
             // Exclusive Nested Sections Layout
             if (layout == ExclusiveNestedSectionLayout) {
@@ -65,20 +67,26 @@ namespace snowcrash
                 return Adapter::nextStartingNode(node, siblings, cur);
 
             // Description nodes
-            while (cur != collection.end() && SectionProcessor<T>::isDescriptionNode(cur, pd.sectionContext())) {
+            while (cur != collection.end()
+                && SectionProcessor<T>::isDescriptionNode(
+                       cur, pd.sectionContext())) {
 
                 lastCur = cur;
-                cur = SectionProcessor<T>::processDescription(cur, collection, pd, out);
+                cur = SectionProcessor<T>::processDescription(
+                    cur, collection, pd, out);
 
                 if (lastCur == cur)
                     return Adapter::nextStartingNode(node, siblings, cur);
             }
 
             // Content nodes
-            while (cur != collection.end() && SectionProcessor<T>::isContentNode(cur, pd.sectionContext())) {
+            while (
+                cur != collection.end() && SectionProcessor<T>::isContentNode(
+                                               cur, pd.sectionContext())) {
 
                 lastCur = cur;
-                cur = SectionProcessor<T>::processContent(cur, collection, pd, out);
+                cur = SectionProcessor<T>::processContent(
+                    cur, collection, pd, out);
 
                 if (lastCur == cur)
                     return Adapter::nextStartingNode(node, siblings, cur);
@@ -93,7 +101,8 @@ namespace snowcrash
         }
 
         /** Parse nested sections */
-        static MarkdownNodeIterator parseNestedSections(const MarkdownNodeIterator& node,
+        static MarkdownNodeIterator parseNestedSections(
+            const MarkdownNodeIterator& node,
             const MarkdownNodes& collection,
             SectionParserData& pd,
             const ParseResultRef<T>& out)
@@ -104,27 +113,33 @@ namespace snowcrash
 
             SectionType lastSectionType = UndefinedSectionType;
 
-            SectionProcessor<T>::preprocessNestedSections(node, collection, pd, out);
+            SectionProcessor<T>::preprocessNestedSections(
+                node, collection, pd, out);
 
             // Nested sections
             while (cur != collection.end()) {
 
                 lastCur = cur;
-                SectionType nestedType = SectionProcessor<T>::nestedSectionType(cur);
+                SectionType nestedType
+                    = SectionProcessor<T>::nestedSectionType(cur);
 
                 pd.sectionsContext.push_back(nestedType);
 
                 if (nestedType != UndefinedSectionType) {
-                    cur = SectionProcessor<T>::processNestedSection(cur, collection, pd, out);
+                    cur = SectionProcessor<T>::processNestedSection(
+                        cur, collection, pd, out);
                 } else if (Adapter::nextSkipsUnexpected
-                    || SectionProcessor<T>::isUnexpectedNode(cur, pd.sectionContext())) {
+                    || SectionProcessor<T>::isUnexpectedNode(
+                           cur, pd.sectionContext())) {
 
-                    cur = SectionProcessor<T>::processUnexpectedNode(cur, collection, pd, lastSectionType, out);
+                    cur = SectionProcessor<T>::processUnexpectedNode(
+                        cur, collection, pd, lastSectionType, out);
                 }
 
-                if (cur != collection.end() && (pd.sectionContext() != UndefinedSectionType
-                                                   || (cur->type != mdp::ParagraphMarkdownNodeType
-                                                          && cur->type != mdp::CodeMarkdownNodeType))) {
+                if (cur != collection.end()
+                    && (pd.sectionContext() != UndefinedSectionType
+                           || (cur->type != mdp::ParagraphMarkdownNodeType
+                                  && cur->type != mdp::CodeMarkdownNodeType))) {
 
                     lastSectionType = pd.sectionContext();
                 }
@@ -143,13 +158,17 @@ namespace snowcrash
     struct HeaderSectionAdapter {
 
         /** \return Node to start parsing with */
-        static const MarkdownNodeIterator startingNode(const MarkdownNodeIterator& seed, const SectionParserData& pd)
+        static const MarkdownNodeIterator startingNode(
+            const MarkdownNodeIterator& seed, const SectionParserData& pd)
         {
             if (seed->type != mdp::HeaderMarkdownNodeType) {
                 // ERR: Expected header
                 mdp::CharactersRangeSet sourceMap
-                    = mdp::BytesRangeSetToCharactersRangeSet(seed->sourceMap, pd.sourceCharacterIndex);
-                throw Error("expected header block, e.g. '# <text>'", BusinessError, sourceMap);
+                    = mdp::BytesRangeSetToCharactersRangeSet(
+                        seed->sourceMap, pd.sourceCharacterIndex);
+                throw Error("expected header block, e.g. '# <text>'",
+                    BusinessError,
+                    sourceMap);
             }
 
             return seed;
@@ -164,7 +183,9 @@ namespace snowcrash
 
         /** \return Starting node for next parsing */
         static const MarkdownNodeIterator nextStartingNode(
-            const MarkdownNodeIterator& seed, const MarkdownNodes& siblings, const MarkdownNodeIterator& cur)
+            const MarkdownNodeIterator& seed,
+            const MarkdownNodes& siblings,
+            const MarkdownNodeIterator& cur)
         {
             return cur;
         }
@@ -172,9 +193,11 @@ namespace snowcrash
         /**
          *  \brief Adapter Markdown node skipping behavior trait.
          *
-         *  Adapter trait signalizing that the adapter can possibly skip some Markdown nodes on a nextStartingNode()
+         *  Adapter trait signalizing that the adapter can possibly skip some
+         * Markdown nodes on a nextStartingNode()
          * call.
-         *  If set to true, a call to nextStartingNode() can skip some nodes causing some information loss. False
+         *  If set to true, a call to nextStartingNode() can skip some nodes
+         * causing some information loss. False
          * otherwise.
          */
         static const bool nextSkipsUnexpected = false;
@@ -183,16 +206,22 @@ namespace snowcrash
     /** Parser Adapter for parsing list-defined sections */
     struct ListSectionAdapter {
 
-        static const MarkdownNodeIterator startingNode(const MarkdownNodeIterator& seed, const SectionParserData& pd)
+        static const MarkdownNodeIterator startingNode(
+            const MarkdownNodeIterator& seed, const SectionParserData& pd)
         {
             if (seed->type != mdp::ListItemMarkdownNodeType) {
                 // ERR: Expected list item
                 mdp::CharactersRangeSet sourceMap
-                    = mdp::BytesRangeSetToCharactersRangeSet(seed->sourceMap, pd.sourceCharacterIndex);
-                throw Error("expected list item block, e.g. '+ <text>'", BusinessError, sourceMap);
+                    = mdp::BytesRangeSetToCharactersRangeSet(
+                        seed->sourceMap, pd.sourceCharacterIndex);
+                throw Error("expected list item block, e.g. '+ <text>'",
+                    BusinessError,
+                    sourceMap);
             }
 
-            for (auto it = seed->children().begin(); it != seed->children().end(); ++it) {
+            for (auto it = seed->children().begin();
+                 it != seed->children().end();
+                 ++it) {
                 if (it->sourceMap.begin()->length != 0) {
                     return it;
                 }
@@ -209,7 +238,9 @@ namespace snowcrash
         }
 
         static const MarkdownNodeIterator nextStartingNode(
-            const MarkdownNodeIterator& seed, const MarkdownNodes& siblings, const MarkdownNodeIterator& cur)
+            const MarkdownNodeIterator& seed,
+            const MarkdownNodes& siblings,
+            const MarkdownNodeIterator& cur)
         {
             if (seed == siblings.end())
                 return seed;
@@ -224,7 +255,8 @@ namespace snowcrash
     struct BlueprintSectionAdapter {
 
         /** \return Node to start parsing with */
-        static const MarkdownNodeIterator startingNode(const MarkdownNodeIterator& seed, const SectionParserData& pd)
+        static const MarkdownNodeIterator startingNode(
+            const MarkdownNodeIterator& seed, const SectionParserData& pd)
         {
             return seed;
         }
@@ -238,7 +270,9 @@ namespace snowcrash
 
         /** \return Starting node for next parsing */
         static const MarkdownNodeIterator nextStartingNode(
-            const MarkdownNodeIterator& seed, const MarkdownNodes& siblings, const MarkdownNodeIterator& cur)
+            const MarkdownNodeIterator& seed,
+            const MarkdownNodes& siblings,
+            const MarkdownNodeIterator& cur)
         {
             return cur;
         }

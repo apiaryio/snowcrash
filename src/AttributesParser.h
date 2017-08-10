@@ -18,23 +18,27 @@ namespace snowcrash
 {
 
     /** Attributes matching regex */
-    const char* const AttributesRegex = "^[[:blank:]]*[Aa]ttributes?[[:blank:]]*(\\(.*\\))?$";
+    const char* const AttributesRegex
+        = "^[[:blank:]]*[Aa]ttributes?[[:blank:]]*(\\(.*\\))?$";
 
     /**
      * Attributes section processor
      */
     template <>
-    struct SectionProcessor<Attributes> : public SignatureSectionProcessorBase<Attributes> {
+    struct SectionProcessor<Attributes>
+        : public SignatureSectionProcessorBase<Attributes> {
 
         static SignatureTraits signatureTraits()
         {
 
-            SignatureTraits signatureTraits(SignatureTraits::IdentifierTrait | SignatureTraits::AttributesTrait);
+            SignatureTraits signatureTraits(SignatureTraits::IdentifierTrait
+                | SignatureTraits::AttributesTrait);
 
             return signatureTraits;
         }
 
-        static MarkdownNodeIterator finalizeSignature(const MarkdownNodeIterator& node,
+        static MarkdownNodeIterator finalizeSignature(
+            const MarkdownNodeIterator& node,
             SectionParserData& pd,
             const Signature& signature,
             const ParseResultRef<Attributes>& out)
@@ -46,7 +50,11 @@ namespace snowcrash
                 return node;
             }
 
-            mson::parseTypeDefinition(node, pd, signature.attributes, out.report, out.node.typeDefinition);
+            mson::parseTypeDefinition(node,
+                pd,
+                signature.attributes,
+                out.report,
+                out.node.typeDefinition);
 
             if (pd.exportSourceMap()) {
 
@@ -62,13 +70,17 @@ namespace snowcrash
                 out.node.typeDefinition.baseType = mson::ImplicitObjectBaseType;
             }
 
-            SectionProcessor<mson::ValueMember>::parseRemainingContent(
-                node, pd, signature.remainingContent, out.node.sections, out.sourceMap.sections);
+            SectionProcessor<mson::ValueMember>::parseRemainingContent(node,
+                pd,
+                signature.remainingContent,
+                out.node.sections,
+                out.sourceMap.sections);
 
             return ++MarkdownNodeIterator(node);
         }
 
-        static MarkdownNodeIterator processDescription(const MarkdownNodeIterator& node,
+        static MarkdownNodeIterator processDescription(
+            const MarkdownNodeIterator& node,
             const MarkdownNodes& siblings,
             SectionParserData& pd,
             const ParseResultRef<Attributes>& out)
@@ -78,30 +90,40 @@ namespace snowcrash
                 node, pd, out.node.sections, out.sourceMap.sections);
         }
 
-        static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
+        static MarkdownNodeIterator processNestedSection(
+            const MarkdownNodeIterator& node,
             const MarkdownNodes& siblings,
             SectionParserData& pd,
             const ParseResultRef<Attributes>& out)
         {
 
-            ParseResultRef<mson::TypeSections> typeSections(out.report, out.node.sections, out.sourceMap.sections);
+            ParseResultRef<mson::TypeSections> typeSections(
+                out.report, out.node.sections, out.sourceMap.sections);
 
-            return SectionProcessor<mson::ValueMember>::processNestedMembers<MSONTypeSectionListParser>(
-                node, siblings, pd, typeSections, out.node.typeDefinition.baseType);
+            return SectionProcessor<mson::ValueMember>::
+                processNestedMembers<MSONTypeSectionListParser>(node,
+                    siblings,
+                    pd,
+                    typeSections,
+                    out.node.typeDefinition.baseType);
         }
 
-        static bool isDescriptionNode(const MarkdownNodeIterator& node, SectionType sectionType)
+        static bool isDescriptionNode(
+            const MarkdownNodeIterator& node, SectionType sectionType)
         {
 
-            return SectionProcessor<mson::ValueMember>::isDescriptionNode(node, sectionType);
+            return SectionProcessor<mson::ValueMember>::isDescriptionNode(
+                node, sectionType);
         }
 
         static SectionType sectionType(const MarkdownNodeIterator& node)
         {
 
-            if (node->type == mdp::ListItemMarkdownNodeType && !node->children().empty()) {
+            if (node->type == mdp::ListItemMarkdownNodeType
+                && !node->children().empty()) {
 
-                mdp::ByteBuffer remaining, subject = node->children().front().text;
+                mdp::ByteBuffer remaining,
+                    subject = node->children().front().text;
 
                 subject = GetFirstLine(subject, remaining);
                 TrimString(subject);

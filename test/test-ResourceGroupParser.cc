@@ -38,9 +38,11 @@ TEST_CASE("Resource group block classifier", "[resource_group]")
     markdownParser.parse(source, markdownAST);
 
     REQUIRE(!markdownAST.children().empty());
-    sectionType = SectionProcessor<ResourceGroup>::sectionType(markdownAST.children().begin());
+    sectionType = SectionProcessor<ResourceGroup>::sectionType(
+        markdownAST.children().begin());
     REQUIRE(sectionType == ResourceGroupSectionType);
-    sectionType = SectionProcessor<ResourceGroup>::sectionType(markdownAST.children().begin() + 8);
+    sectionType = SectionProcessor<ResourceGroup>::sectionType(
+        markdownAST.children().begin() + 8);
     REQUIRE(sectionType == ResourceGroupSectionType);
 }
 
@@ -48,7 +50,10 @@ TEST_CASE("Parse canonical resource group", "[resource_group]")
 {
     ParseResult<ResourceGroup> resourceGroup;
     SectionParserHelper<ResourceGroup, ResourceGroupParser>::parse(
-        ResourceGroupFixture, ResourceGroupSectionType, resourceGroup, ExportSourcemapOption);
+        ResourceGroupFixture,
+        ResourceGroupSectionType,
+        resourceGroup,
+        ExportSourcemapOption);
 
     REQUIRE(resourceGroup.report.error.code == Error::OK);
     REQUIRE(resourceGroup.report.warnings.empty());
@@ -57,17 +62,31 @@ TEST_CASE("Parse canonical resource group", "[resource_group]")
     REQUIRE(resourceGroup.node.element == Element::CategoryElement);
     REQUIRE(resourceGroup.node.content.elements().size() == 2);
 
-    REQUIRE(resourceGroup.node.content.elements().at(0).element == Element::CopyElement);
-    REQUIRE(resourceGroup.node.content.elements().at(0).content.copy == "Fiber Optics");
+    REQUIRE(resourceGroup.node.content.elements().at(0).element
+        == Element::CopyElement);
+    REQUIRE(resourceGroup.node.content.elements().at(0).content.copy
+        == "Fiber Optics");
 
-    REQUIRE(resourceGroup.node.content.elements().at(1).element == Element::ResourceElement);
-    REQUIRE(resourceGroup.node.content.elements().at(1).content.resource.uriTemplate == "/resource/{id}");
-    REQUIRE(resourceGroup.node.content.elements().at(1).content.resource.name == "My Resource");
+    REQUIRE(resourceGroup.node.content.elements().at(1).element
+        == Element::ResourceElement);
+    REQUIRE(
+        resourceGroup.node.content.elements().at(1).content.resource.uriTemplate
+        == "/resource/{id}");
+    REQUIRE(resourceGroup.node.content.elements().at(1).content.resource.name
+        == "My Resource");
 
-    SourceMapHelper::check(resourceGroup.sourceMap.attributes.name.sourceMap, 0, 15);
-    SourceMapHelper::check(resourceGroup.sourceMap.content.elements().collection[0].content.copy.sourceMap, 15, 14);
     SourceMapHelper::check(
-        resourceGroup.sourceMap.content.elements().collection[1].content.resource.name.sourceMap, 29, 32);
+        resourceGroup.sourceMap.attributes.name.sourceMap, 0, 15);
+    SourceMapHelper::check(resourceGroup.sourceMap.content.elements()
+                               .collection[0]
+                               .content.copy.sourceMap,
+        15,
+        14);
+    SourceMapHelper::check(resourceGroup.sourceMap.content.elements()
+                               .collection[1]
+                               .content.resource.name.sourceMap,
+        29,
+        32);
 }
 
 TEST_CASE("Parse resource group with empty resource", "[resource_group]")
@@ -88,16 +107,28 @@ TEST_CASE("Parse resource group with empty resource", "[resource_group]")
     REQUIRE(resourceGroup.node.element == Element::CategoryElement);
     REQUIRE(resourceGroup.node.content.elements().size() == 2);
 
-    REQUIRE(resourceGroup.node.content.elements().at(0).element == Element::CopyElement);
+    REQUIRE(resourceGroup.node.content.elements().at(0).element
+        == Element::CopyElement);
     REQUIRE(resourceGroup.node.content.elements().at(0).content.copy == "p1");
 
-    REQUIRE(resourceGroup.node.content.elements().at(1).element == Element::ResourceElement);
-    REQUIRE(resourceGroup.node.content.elements().at(1).content.resource.uriTemplate == "/resource");
+    REQUIRE(resourceGroup.node.content.elements().at(1).element
+        == Element::ResourceElement);
+    REQUIRE(
+        resourceGroup.node.content.elements().at(1).content.resource.uriTemplate
+        == "/resource");
 
-    SourceMapHelper::check(resourceGroup.sourceMap.attributes.name.sourceMap, 0, 13);
-    SourceMapHelper::check(resourceGroup.sourceMap.content.elements().collection[0].content.copy.sourceMap, 13, 3);
     SourceMapHelper::check(
-        resourceGroup.sourceMap.content.elements().collection[1].content.resource.uriTemplate.sourceMap, 16, 12);
+        resourceGroup.sourceMap.attributes.name.sourceMap, 0, 13);
+    SourceMapHelper::check(resourceGroup.sourceMap.content.elements()
+                               .collection[0]
+                               .content.copy.sourceMap,
+        13,
+        3);
+    SourceMapHelper::check(resourceGroup.sourceMap.content.elements()
+                               .collection[1]
+                               .content.resource.uriTemplate.sourceMap,
+        16,
+        12);
 }
 
 TEST_CASE("Parse multiple resource in anonymous group", "[resource_group]")
@@ -120,13 +151,23 @@ TEST_CASE("Parse multiple resource in anonymous group", "[resource_group]")
     REQUIRE(resourceGroup.node.element == Element::CategoryElement);
     REQUIRE(resourceGroup.node.content.elements().size() == 2);
 
-    REQUIRE(resourceGroup.node.content.elements().at(0).element == Element::ResourceElement);
-    REQUIRE(resourceGroup.node.content.elements().at(0).content.resource.uriTemplate == "/r1");
-    REQUIRE(resourceGroup.node.content.elements().at(0).content.resource.description == "p1");
+    REQUIRE(resourceGroup.node.content.elements().at(0).element
+        == Element::ResourceElement);
+    REQUIRE(
+        resourceGroup.node.content.elements().at(0).content.resource.uriTemplate
+        == "/r1");
+    REQUIRE(
+        resourceGroup.node.content.elements().at(0).content.resource.description
+        == "p1");
 
-    REQUIRE(resourceGroup.node.content.elements().at(1).element == Element::ResourceElement);
-    REQUIRE(resourceGroup.node.content.elements().at(1).content.resource.uriTemplate == "/r2");
-    REQUIRE(resourceGroup.node.content.elements().at(1).content.resource.description == "p2");
+    REQUIRE(resourceGroup.node.content.elements().at(1).element
+        == Element::ResourceElement);
+    REQUIRE(
+        resourceGroup.node.content.elements().at(1).content.resource.uriTemplate
+        == "/r2");
+    REQUIRE(
+        resourceGroup.node.content.elements().at(1).content.resource.description
+        == "p2");
 
     REQUIRE(resourceGroup.sourceMap.attributes.name.sourceMap.empty());
     REQUIRE(resourceGroup.sourceMap.content.elements().collection.size() == 2);
@@ -154,8 +195,10 @@ TEST_CASE("Parse multiple resources with payloads", "[resource_group]")
     REQUIRE(resourceGroup.node.element == Element::CategoryElement);
     REQUIRE(resourceGroup.node.content.elements().size() == 2);
 
-    REQUIRE(resourceGroup.node.content.elements().at(0).element == Element::ResourceElement);
-    Resource resource1 = resourceGroup.node.content.elements().at(0).content.resource;
+    REQUIRE(resourceGroup.node.content.elements().at(0).element
+        == Element::ResourceElement);
+    Resource resource1
+        = resourceGroup.node.content.elements().at(0).content.resource;
 
     REQUIRE(resource1.uriTemplate == "/1");
     REQUIRE(resource1.description.empty());
@@ -169,7 +212,8 @@ TEST_CASE("Parse multiple resources with payloads", "[resource_group]")
     REQUIRE(resource1.actions[0].examples[0].requests[0].body.empty());
     REQUIRE(resource1.actions[0].examples[0].responses.empty());
 
-    Resource resource2 = resourceGroup.node.content.elements().at(1).content.resource;
+    Resource resource2
+        = resourceGroup.node.content.elements().at(1).content.resource;
     REQUIRE(resource2.uriTemplate == "/2");
     REQUIRE(resource2.description.empty());
     REQUIRE(resource2.actions.size() == 1);
@@ -223,14 +267,17 @@ TEST_CASE("Parse resource with list in its description", "[resource_group]")
         source, ResourceGroupSectionType, resourceGroup, ExportSourcemapOption);
 
     REQUIRE(resourceGroup.report.error.code == Error::OK);
-    REQUIRE(resourceGroup.report.warnings.size() == 3); // preformatted asset & ignoring unrecognized node & no response
+    REQUIRE(resourceGroup.report.warnings.size()
+        == 3); // preformatted asset & ignoring unrecognized node & no response
 
     REQUIRE(resourceGroup.node.attributes.name.empty());
     REQUIRE(resourceGroup.node.element == Element::CategoryElement);
     REQUIRE(resourceGroup.node.content.elements().size() == 1);
-    REQUIRE(resourceGroup.node.content.elements().at(0).element == Element::ResourceElement);
+    REQUIRE(resourceGroup.node.content.elements().at(0).element
+        == Element::ResourceElement);
 
-    Resource resource = resourceGroup.node.content.elements().at(0).content.resource;
+    Resource resource
+        = resourceGroup.node.content.elements().at(0).content.resource;
     REQUIRE(resource.uriTemplate == "/1");
     REQUIRE(resource.description.empty());
     REQUIRE(resource.actions.size() == 1);
@@ -259,14 +306,22 @@ TEST_CASE("Parse resource groups with hr in description", "[resource_group]")
     REQUIRE(resourceGroup.node.attributes.name == "1");
     REQUIRE(resourceGroup.node.element == Element::CategoryElement);
     REQUIRE(resourceGroup.node.content.elements().size() == 1);
-    REQUIRE(resourceGroup.node.content.elements().at(0).element == Element::CopyElement);
-    REQUIRE(resourceGroup.node.content.elements().at(0).content.copy == "---\n\nA");
+    REQUIRE(resourceGroup.node.content.elements().at(0).element
+        == Element::CopyElement);
+    REQUIRE(
+        resourceGroup.node.content.elements().at(0).content.copy == "---\n\nA");
 
-    SourceMapHelper::check(resourceGroup.sourceMap.attributes.name.sourceMap, 0, 10);
-    SourceMapHelper::check(resourceGroup.sourceMap.content.elements().collection[0].content.copy.sourceMap, 10, 6);
+    SourceMapHelper::check(
+        resourceGroup.sourceMap.attributes.name.sourceMap, 0, 10);
+    SourceMapHelper::check(resourceGroup.sourceMap.content.elements()
+                               .collection[0]
+                               .content.copy.sourceMap,
+        10,
+        6);
 }
 
-TEST_CASE("Make sure method followed by a group does not eat the group", "[resource_group]")
+TEST_CASE("Make sure method followed by a group does not eat the group",
+    "[resource_group]")
 {
     mdp::ByteBuffer source
         = "# Group One\n"
@@ -284,19 +339,23 @@ TEST_CASE("Make sure method followed by a group does not eat the group", "[resou
     REQUIRE(resourceGroup.node.attributes.name == "One");
     REQUIRE(resourceGroup.node.element == Element::CategoryElement);
     REQUIRE(resourceGroup.node.content.elements().size() == 1);
-    REQUIRE(resourceGroup.node.content.elements().at(0).element == Element::ResourceElement);
+    REQUIRE(resourceGroup.node.content.elements().at(0).element
+        == Element::ResourceElement);
 
-    Resource resource = resourceGroup.node.content.elements().at(0).content.resource;
+    Resource resource
+        = resourceGroup.node.content.elements().at(0).content.resource;
     REQUIRE(resource.uriTemplate == "/1");
     REQUIRE(resource.actions.size() == 1);
     REQUIRE(resource.actions[0].method == "POST");
     REQUIRE(resource.actions[0].description.empty());
 
-    SourceMapHelper::check(resourceGroup.sourceMap.attributes.name.sourceMap, 0, 12);
+    SourceMapHelper::check(
+        resourceGroup.sourceMap.attributes.name.sourceMap, 0, 12);
     REQUIRE(resourceGroup.sourceMap.content.elements().collection.size() == 1);
 }
 
-TEST_CASE("Parse resource method abbreviation followed by a foreign method", "[resource_group]")
+TEST_CASE("Parse resource method abbreviation followed by a foreign method",
+    "[resource_group]")
 {
     mdp::ByteBuffer source
         = "# GET /resource\n"
@@ -307,16 +366,19 @@ TEST_CASE("Parse resource method abbreviation followed by a foreign method", "[r
         source, ResourceGroupSectionType, resourceGroup, ExportSourcemapOption);
 
     REQUIRE(resourceGroup.report.error.code == Error::OK);
-    REQUIRE(resourceGroup.report.warnings.size() == 2); // no response && unexpected action POST
+    REQUIRE(resourceGroup.report.warnings.size()
+        == 2); // no response && unexpected action POST
     REQUIRE(resourceGroup.report.warnings[0].code == EmptyDefinitionWarning);
     REQUIRE(resourceGroup.report.warnings[1].code == IgnoringWarning);
 
     REQUIRE(resourceGroup.node.attributes.name.empty());
     REQUIRE(resourceGroup.node.element == Element::CategoryElement);
     REQUIRE(resourceGroup.node.content.elements().size() == 1);
-    REQUIRE(resourceGroup.node.content.elements().at(0).element == Element::ResourceElement);
+    REQUIRE(resourceGroup.node.content.elements().at(0).element
+        == Element::ResourceElement);
 
-    Resource resource = resourceGroup.node.content.elements().at(0).content.resource;
+    Resource resource
+        = resourceGroup.node.content.elements().at(0).content.resource;
     REQUIRE(resource.name.empty());
     REQUIRE(resource.uriTemplate == "/resource");
     REQUIRE(resource.model.name.empty());
@@ -328,7 +390,8 @@ TEST_CASE("Parse resource method abbreviation followed by a foreign method", "[r
     REQUIRE(resourceGroup.sourceMap.content.elements().collection.size() == 1);
 }
 
-TEST_CASE("Parse resource method abbreviation followed by another", "[resource_group]")
+TEST_CASE("Parse resource method abbreviation followed by another",
+    "[resource_group]")
 {
     mdp::ByteBuffer source
         = "# GET /resource\n"
@@ -346,10 +409,13 @@ TEST_CASE("Parse resource method abbreviation followed by another", "[resource_g
     REQUIRE(resourceGroup.node.attributes.name.empty());
     REQUIRE(resourceGroup.node.element == Element::CategoryElement);
     REQUIRE(resourceGroup.node.content.elements().size() == 2);
-    REQUIRE(resourceGroup.node.content.elements().at(0).element == Element::ResourceElement);
-    REQUIRE(resourceGroup.node.content.elements().at(1).element == Element::ResourceElement);
+    REQUIRE(resourceGroup.node.content.elements().at(0).element
+        == Element::ResourceElement);
+    REQUIRE(resourceGroup.node.content.elements().at(1).element
+        == Element::ResourceElement);
 
-    Resource resource = resourceGroup.node.content.elements().at(0).content.resource;
+    Resource resource
+        = resourceGroup.node.content.elements().at(0).content.resource;
     REQUIRE(resource.name.empty());
     REQUIRE(resource.uriTemplate == "/resource");
     REQUIRE(resource.model.name.empty());
@@ -369,7 +435,8 @@ TEST_CASE("Parse resource method abbreviation followed by another", "[resource_g
     REQUIRE(resourceGroup.sourceMap.content.elements().collection.size() == 2);
 }
 
-TEST_CASE("Resource followed by a complete action", "[resource_group][regression][185]")
+TEST_CASE("Resource followed by a complete action",
+    "[resource_group][regression][185]")
 {
     mdp::ByteBuffer source
         = "# Resource [/A]\n"
@@ -386,10 +453,13 @@ TEST_CASE("Resource followed by a complete action", "[resource_group][regression
     REQUIRE(resourceGroup.node.attributes.name.empty());
     REQUIRE(resourceGroup.node.element == Element::CategoryElement);
     REQUIRE(resourceGroup.node.content.elements().size() == 2);
-    REQUIRE(resourceGroup.node.content.elements().at(0).element == Element::ResourceElement);
-    REQUIRE(resourceGroup.node.content.elements().at(1).element == Element::ResourceElement);
+    REQUIRE(resourceGroup.node.content.elements().at(0).element
+        == Element::ResourceElement);
+    REQUIRE(resourceGroup.node.content.elements().at(1).element
+        == Element::ResourceElement);
 
-    Resource resource = resourceGroup.node.content.elements().at(0).content.resource;
+    Resource resource
+        = resourceGroup.node.content.elements().at(0).content.resource;
     REQUIRE(resource.name == "Resource");
     REQUIRE(resource.uriTemplate == "/A");
 
@@ -399,18 +469,24 @@ TEST_CASE("Resource followed by a complete action", "[resource_group][regression
     REQUIRE(resource.actions.size() == 1);
     REQUIRE(resource.actions[0].method == "POST");
 
-    SourceMap<Resource> resourceSM = resourceGroup.sourceMap.content.elements().collection[0].content.resource;
+    SourceMap<Resource> resourceSM = resourceGroup.sourceMap.content.elements()
+                                         .collection[0]
+                                         .content.resource;
     SourceMapHelper::check(resourceSM.name.sourceMap, 0, 16);
     SourceMapHelper::check(resourceSM.uriTemplate.sourceMap, 0, 16);
 
-    resourceSM = resourceGroup.sourceMap.content.elements().collection[1].content.resource;
+    resourceSM = resourceGroup.sourceMap.content.elements()
+                     .collection[1]
+                     .content.resource;
     REQUIRE(resourceSM.name.sourceMap.empty());
     SourceMapHelper::check(resourceSM.uriTemplate.sourceMap, 16, 10);
     REQUIRE(resourceSM.actions.collection.size() == 1);
-    SourceMapHelper::check(resourceSM.actions.collection[0].method.sourceMap, 16, 10);
+    SourceMapHelper::check(
+        resourceSM.actions.collection[0].method.sourceMap, 16, 10);
 }
 
-TEST_CASE("Too eager complete action processing", "[resource_group][regression][187]")
+TEST_CASE(
+    "Too eager complete action processing", "[resource_group][regression][187]")
 {
     mdp::ByteBuffer source
         = "# Group A\n"
@@ -431,8 +507,14 @@ TEST_CASE("Too eager complete action processing", "[resource_group][regression][
     REQUIRE(resourceGroup.node.attributes.name == "A");
     REQUIRE(resourceGroup.node.element == Element::CategoryElement);
     REQUIRE(resourceGroup.node.content.elements().size() == 1);
-    REQUIRE(resourceGroup.node.content.elements().at(0).element == Element::CopyElement);
-    REQUIRE(resourceGroup.node.content.elements().at(0).content.copy == "```\nGET /A\n```\n\nLorem Ipsum");
+    REQUIRE(resourceGroup.node.content.elements().at(0).element
+        == Element::CopyElement);
+    REQUIRE(resourceGroup.node.content.elements().at(0).content.copy
+        == "```\nGET /A\n```\n\nLorem Ipsum");
 
-    SourceMapHelper::check(resourceGroup.sourceMap.content.elements().collection[0].content.copy.sourceMap, 11, 28);
+    SourceMapHelper::check(resourceGroup.sourceMap.content.elements()
+                               .collection[0]
+                               .content.copy.sourceMap,
+        11,
+        28);
 }
