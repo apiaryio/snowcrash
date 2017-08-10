@@ -44,12 +44,12 @@ TEST_CASE("Parse canonical variable value with '_'", "[mson][utility]")
 
 TEST_CASE("Parse escaped value", "[mson][utility]")
 {
-  std::string source = "`_rel_`";
+    std::string source = "`_rel_`";
 
-  Value value = parseValue(source);
+    Value value = parseValue(source);
 
-  REQUIRE(value.literal == "_rel_");
-  REQUIRE(value.variable == false);
+    REQUIRE(value.literal == "_rel_");
+    REQUIRE(value.variable == false);
 }
 
 TEST_CASE("Parse variable value with more than 1 level '*'", "[mson][utility]")
@@ -278,10 +278,10 @@ TEST_CASE("Parse nullable type attribute", "[mson][utility]")
 {
     std::string source = "nullable";
     TypeAttributes typeAttributes = 0;
-    
+
     bool isAttributeParsed;
     isAttributeParsed = parseTypeAttribute(source, typeAttributes);
-    
+
     REQUIRE((typeAttributes & RequiredTypeAttribute) == 0);
     REQUIRE((typeAttributes & OptionalTypeAttribute) == 0);
     REQUIRE((typeAttributes & FixedTypeAttribute) == 0);

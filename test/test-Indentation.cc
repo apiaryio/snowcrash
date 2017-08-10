@@ -23,11 +23,11 @@ void ReportDebugMessage(const std::string& msg)
 
 TEST_CASE("Correct indentation", "[indentation]")
 {
-    mdp::ByteBuffer source = \
-    "# GET /1\n"\
-    "+ Response 200\n"\
-    "\n"\
-    "        { ... }\n";
+    mdp::ByteBuffer source
+        = "# GET /1\n"
+          "+ Response 200\n"
+          "\n"
+          "        { ... }\n";
 
     ParseResult<Action> action;
     SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
@@ -43,10 +43,10 @@ TEST_CASE("Correct indentation", "[indentation]")
 
 TEST_CASE("No Indentation & No Newline", "[indentation]")
 {
-    mdp::ByteBuffer source = \
-    "# GET /1\n"\
-    "+ Response 200\n"\
-    "{ ... }\n";
+    mdp::ByteBuffer source
+        = "# GET /1\n"
+          "+ Response 200\n"
+          "{ ... }\n";
 
     ParseResult<Action> action;
     SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
@@ -64,11 +64,11 @@ TEST_CASE("No Indentation & No Newline", "[indentation]")
 
 TEST_CASE("No Indentation", "[indentation]")
 {
-    mdp::ByteBuffer source = \
-    "# GET /1\n"\
-    "+ Response 200\n"\
-    "\n"\
-    "{ ... }\n";
+    mdp::ByteBuffer source
+        = "# GET /1\n"
+          "+ Response 200\n"
+          "\n"
+          "{ ... }\n";
 
     ParseResult<Action> action;
     SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
@@ -86,10 +86,10 @@ TEST_CASE("No Indentation", "[indentation]")
 
 TEST_CASE("Poor Indentation & No Newline", "[indentation]")
 {
-    mdp::ByteBuffer source = \
-    "# GET /1\n"\
-    "+ Response 200\n"\
-    "    { ... }\n";
+    mdp::ByteBuffer source
+        = "# GET /1\n"
+          "+ Response 200\n"
+          "    { ... }\n";
 
     ParseResult<Action> action;
     SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
@@ -107,11 +107,11 @@ TEST_CASE("Poor Indentation & No Newline", "[indentation]")
 
 TEST_CASE("Poor Indentation", "[indentation]")
 {
-    mdp::ByteBuffer source = \
-    "# GET /1\n"\
-    "+ Response 200\n"\
-    "\n"\
-    "    { ... }\n";
+    mdp::ByteBuffer source
+        = "# GET /1\n"
+          "+ Response 200\n"
+          "\n"
+          "    { ... }\n";
 
     ParseResult<Action> action;
     SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
@@ -129,10 +129,10 @@ TEST_CASE("Poor Indentation", "[indentation]")
 
 TEST_CASE("OK Indentation & No Newline", "[indentation]")
 {
-    mdp::ByteBuffer source = \
-    "# GET /1\n"\
-    "+ Response 200\n"\
-    "        { ... }\n";
+    mdp::ByteBuffer source
+        = "# GET /1\n"
+          "+ Response 200\n"
+          "        { ... }\n";
 
     ParseResult<Action> action;
     SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
@@ -150,12 +150,12 @@ TEST_CASE("OK Indentation & No Newline", "[indentation]")
 
 TEST_CASE("Full syntax - correct", "[indentation]")
 {
-    mdp::ByteBuffer source = \
-    "## GET /1\n"\
-    "+ Response 200\n"\
-    "    + Body\n"\
-    "\n"\
-    "            { ... }\n";
+    mdp::ByteBuffer source
+        = "## GET /1\n"
+          "+ Response 200\n"
+          "    + Body\n"
+          "\n"
+          "            { ... }\n";
 
     ParseResult<Action> action;
     SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
@@ -171,12 +171,12 @@ TEST_CASE("Full syntax - correct", "[indentation]")
 
 TEST_CASE("Full syntax - Poor Body Indentation", "[indentation]")
 {
-    mdp::ByteBuffer source = \
-    "## GET /1\n"\
-    "+ Response 200\n"\
-    "+ Body\n"\
-    "\n"\
-    "        { ... }\n";
+    mdp::ByteBuffer source
+        = "## GET /1\n"
+          "+ Response 200\n"
+          "+ Body\n"
+          "\n"
+          "        { ... }\n";
 
     ParseResult<Action> action;
     SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
@@ -194,12 +194,12 @@ TEST_CASE("Full syntax - Poor Body Indentation", "[indentation]")
 
 TEST_CASE("Full syntax - Poor Body & Body Asset Indentation", "[indentation]")
 {
-    mdp::ByteBuffer source = \
-    "## GET /1\n"\
-    "+ Response 200\n"\
-    "+ Body\n"\
-    "\n"\
-    "    { ... }\n";
+    mdp::ByteBuffer source
+        = "## GET /1\n"
+          "+ Response 200\n"
+          "+ Body\n"
+          "\n"
+          "    { ... }\n";
 
     ParseResult<Action> action;
     SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
@@ -217,11 +217,11 @@ TEST_CASE("Full syntax - Poor Body & Body Asset Indentation", "[indentation]")
 
 TEST_CASE("Full syntax - Poor Body & Body Asset Indentation & No Newline", "[indentation]")
 {
-    mdp::ByteBuffer source = \
-    "## GET /1\n"\
-    "+ Response 200\n"\
-    "+ Body\n"\
-    "    { ... }\n";
+    mdp::ByteBuffer source
+        = "## GET /1\n"
+          "+ Response 200\n"
+          "+ Body\n"
+          "    { ... }\n";
 
     ParseResult<Action> action;
     SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
@@ -239,12 +239,12 @@ TEST_CASE("Full syntax - Poor Body & Body Asset Indentation & No Newline", "[ind
 
 TEST_CASE("Full syntax - No Indentation", "[indentation]")
 {
-    mdp::ByteBuffer source = \
-    "## GET /1\n"\
-    "+ Response 200\n"\
-    "+ Body\n"\
-    "\n"\
-    "{ ... }\n";
+    mdp::ByteBuffer source
+        = "## GET /1\n"
+          "+ Response 200\n"
+          "+ Body\n"
+          "\n"
+          "{ ... }\n";
 
     ParseResult<Action> action;
     SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
@@ -264,11 +264,11 @@ TEST_CASE("Full syntax - No Indentation", "[indentation]")
 
 TEST_CASE("Full syntax - No Indentation & No Newline", "[indentation]")
 {
-    mdp::ByteBuffer source = \
-    "## GET /1\n"\
-    "+ Response 200\n"\
-    "+ Body\n"\
-    "{ ... }\n";
+    mdp::ByteBuffer source
+        = "## GET /1\n"
+          "+ Response 200\n"
+          "+ Body\n"
+          "{ ... }\n";
 
     ParseResult<Action> action;
     SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
@@ -286,13 +286,13 @@ TEST_CASE("Full syntax - No Indentation & No Newline", "[indentation]")
 
 TEST_CASE("Full syntax - Extra indentation", "[indentation]")
 {
-    mdp::ByteBuffer source = \
-    "## GET /1\n"\
-    "+ Response 200\n"\
-    "\n"\
-    "        + Body\n"\
-    "\n"\
-    "                { ... }\n";
+    mdp::ByteBuffer source
+        = "## GET /1\n"
+          "+ Response 200\n"
+          "\n"
+          "        + Body\n"
+          "\n"
+          "                { ... }\n";
 
     ParseResult<Action> action;
     SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);
@@ -310,13 +310,13 @@ TEST_CASE("Full syntax - Extra indentation", "[indentation]")
 
 TEST_CASE("No Indentation & No Newline multi-line", "[indentation]")
 {
-    mdp::ByteBuffer source = \
-    "## GET /1\n"\
-    "+ Response 200\n"\
-    "{\n"\
-    "\n"\
-    "    Hello\n"\
-    "}\n";
+    mdp::ByteBuffer source
+        = "## GET /1\n"
+          "+ Response 200\n"
+          "{\n"
+          "\n"
+          "    Hello\n"
+          "}\n";
 
     ParseResult<Action> action;
     SectionParserHelper<Action, ActionParser>::parse(source, ActionSectionType, action);

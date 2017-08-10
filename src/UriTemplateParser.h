@@ -17,7 +17,8 @@
 #define URI_TEMPLATE_OPERATOR_REGEX "([+|#|.|/|;|?|&])"
 #define URI_TEMPLATE_EXPRESSION_REGEX "^([?|#|+|&]?(([A-Z|a-z|0-9|_|,])*|(%[A-F|a-f|0-9]{2})*)*\\*?)$"
 
-namespace snowcrash {
+namespace snowcrash
+{
 
     /**
     *  \brief URI template parse result.
@@ -48,11 +49,14 @@ namespace snowcrash {
     /**
     *  \brief base class for URI template expression once classified.
     */
-    class ClassifiedExpression {
-    protected :
+    class ClassifiedExpression
+    {
+    protected:
         bool isSupported;
-    public :
-        ClassifiedExpression(const std::string& expression) {
+
+    public:
+        ClassifiedExpression(const std::string& expression)
+        {
             isSupported = false;
             unsupportedWarningText = "";
             innerExpression = expression;
@@ -62,25 +66,31 @@ namespace snowcrash {
 
         snowcrash::Expression innerExpression;
 
-        virtual bool IsExpressionType() const {
+        virtual bool IsExpressionType() const
+        {
             return false;
         }
 
-        bool ContainsSpaces() {
+        bool ContainsSpaces()
+        {
             return innerExpression.find(" ") != std::string::npos;
         }
 
-        bool ContainsAssignment() {
+        bool ContainsAssignment()
+        {
             return innerExpression.find("=") != std::string::npos;
         }
 
-        bool ContainsHyphens() {
+        bool ContainsHyphens()
+        {
             return innerExpression.find("-") != std::string::npos;
         }
 
-        bool IsInvalidExpressionName() {
+        bool IsInvalidExpressionName()
+        {
             std::string tmpExpression = innerExpression;
-            if (tmpExpression.find("..") != std::string::npos) return true;
+            if (tmpExpression.find("..") != std::string::npos)
+                return true;
 
             size_t start_pos = 0;
             while ((start_pos = tmpExpression.find(".", start_pos)) != std::string::npos) {
@@ -91,7 +101,8 @@ namespace snowcrash {
             return !RegexMatch(tmpExpression, URI_TEMPLATE_EXPRESSION_REGEX);
         }
 
-        bool IsSupportedExpressionType() {
+        bool IsSupportedExpressionType()
+        {
             return isSupported;
         }
     };
@@ -99,13 +110,16 @@ namespace snowcrash {
     /**
     *  \brief level one basic variable expansion URI template expression.
     */
-    class VariableExpression : public ClassifiedExpression {
-    public :
-        VariableExpression(const std::string& expression):ClassifiedExpression(expression) {
+    class VariableExpression : public ClassifiedExpression
+    {
+    public:
+        VariableExpression(const std::string& expression) : ClassifiedExpression(expression)
+        {
             isSupported = true;
         }
 
-        bool IsExpressionType() const {
+        bool IsExpressionType() const
+        {
             return !RegexMatch(innerExpression.substr(0, 1), URI_TEMPLATE_OPERATOR_REGEX);
         }
     };
@@ -113,13 +127,16 @@ namespace snowcrash {
     /**
     *  \brief level three query string expansion URI template expression.
     */
-    class QueryStringExpression : public ClassifiedExpression {
-    public :
-        QueryStringExpression(const std::string& expression):ClassifiedExpression(expression) {
-            isSupported =  true;
+    class QueryStringExpression : public ClassifiedExpression
+    {
+    public:
+        QueryStringExpression(const std::string& expression) : ClassifiedExpression(expression)
+        {
+            isSupported = true;
         }
 
-        bool IsExpressionType() const {
+        bool IsExpressionType() const
+        {
             return innerExpression.substr(0, 1) == "?";
         }
     };
@@ -127,13 +144,16 @@ namespace snowcrash {
     /**
     *  \brief level two fragment expansion URI template expression.
     */
-    class FragmentExpression : public ClassifiedExpression {
-    public :
-        FragmentExpression(const std::string& expression):ClassifiedExpression(expression) {
+    class FragmentExpression : public ClassifiedExpression
+    {
+    public:
+        FragmentExpression(const std::string& expression) : ClassifiedExpression(expression)
+        {
             isSupported = true;
         }
 
-        bool IsExpressionType() const {
+        bool IsExpressionType() const
+        {
             return innerExpression.substr(0, 1) == "#";
         }
     };
@@ -141,13 +161,16 @@ namespace snowcrash {
     /**
     *  \brief level two reserved expansion URI template expression.
     */
-    class ReservedExpansionExpression : public ClassifiedExpression {
-    public :
-        ReservedExpansionExpression(const std::string& expression):ClassifiedExpression(expression) {
+    class ReservedExpansionExpression : public ClassifiedExpression
+    {
+    public:
+        ReservedExpansionExpression(const std::string& expression) : ClassifiedExpression(expression)
+        {
             isSupported = true;
         }
 
-        bool IsExpressionType() const {
+        bool IsExpressionType() const
+        {
             return innerExpression.substr(0, 1) == "+";
         }
     };
@@ -155,13 +178,16 @@ namespace snowcrash {
     /**
     *  \brief level three label expansion URI template expression.
     */
-    class LabelExpansionExpression : public ClassifiedExpression {
-    public :
-        LabelExpansionExpression(const std::string& expression):ClassifiedExpression(expression) {
+    class LabelExpansionExpression : public ClassifiedExpression
+    {
+    public:
+        LabelExpansionExpression(const std::string& expression) : ClassifiedExpression(expression)
+        {
             unsupportedWarningText = "URI template label expansion is not supported";
         }
 
-        bool IsExpressionType() const {
+        bool IsExpressionType() const
+        {
             return innerExpression.substr(0, 1) == ".";
         }
     };
@@ -169,13 +195,16 @@ namespace snowcrash {
     /**
     *  \brief level three path segment expansion URI template expression.
     */
-    class PathSegmentExpansionExpression : public ClassifiedExpression {
-    public :
-        PathSegmentExpansionExpression(const std::string& expression):ClassifiedExpression(expression) {
+    class PathSegmentExpansionExpression : public ClassifiedExpression
+    {
+    public:
+        PathSegmentExpansionExpression(const std::string& expression) : ClassifiedExpression(expression)
+        {
             unsupportedWarningText = "URI template path segment expansion is not supported";
         }
 
-        bool IsExpressionType() const {
+        bool IsExpressionType() const
+        {
             return innerExpression.substr(0, 1) == "/";
         }
     };
@@ -183,13 +212,16 @@ namespace snowcrash {
     /**
     *  \brief level three path style parameter expansion URI template expression.
     */
-    class PathStyleParameterExpansionExpression : public ClassifiedExpression {
-    public :
-        PathStyleParameterExpansionExpression(const std::string& expression):ClassifiedExpression(expression) {
+    class PathStyleParameterExpansionExpression : public ClassifiedExpression
+    {
+    public:
+        PathStyleParameterExpansionExpression(const std::string& expression) : ClassifiedExpression(expression)
+        {
             unsupportedWarningText = "URI template path style parameter expansion is not supported";
         }
 
-        bool IsExpressionType() const {
+        bool IsExpressionType() const
+        {
             return innerExpression.substr(0, 1) == ";";
         }
     };
@@ -197,13 +229,16 @@ namespace snowcrash {
     /**
     *  \brief level three form style query continuation expansion URI template expression.
     */
-    class FormStyleQueryContinuationExpression : public ClassifiedExpression {
-    public :
-        FormStyleQueryContinuationExpression(const std::string& expression):ClassifiedExpression(expression) {
+    class FormStyleQueryContinuationExpression : public ClassifiedExpression
+    {
+    public:
+        FormStyleQueryContinuationExpression(const std::string& expression) : ClassifiedExpression(expression)
+        {
             isSupported = true;
         }
 
-        bool IsExpressionType() const {
+        bool IsExpressionType() const
+        {
             return innerExpression.substr(0, 1) == "&";
         }
     };
@@ -211,13 +246,16 @@ namespace snowcrash {
     /**
     *  \brief undefined URI template expression.
     */
-    class UndefinedExpression : public ClassifiedExpression{
-    public :
-        UndefinedExpression(const std::string& expression) :ClassifiedExpression(expression) {
+    class UndefinedExpression : public ClassifiedExpression
+    {
+    public:
+        UndefinedExpression(const std::string& expression) : ClassifiedExpression(expression)
+        {
             unsupportedWarningText = "Unidentified expression";
         }
 
-        bool IsExpressionType() const {
+        bool IsExpressionType() const
+        {
             return false;
         }
     };
@@ -226,14 +264,17 @@ namespace snowcrash {
     *  URI Template Parser Interface
     *  ------------------------------
     */
-    class URITemplateParser{
-    public :
+    class URITemplateParser
+    {
+    public:
         /**
-        *  \brief Parse the URI template into scheme, host and path and then parse for supported URI template expressions
+        *  \brief Parse the URI template into scheme, host and path and then parse for supported URI template
+        * expressions
         *
         *  \param uri        A uri to be parsed.
         */
-        static void parse(const URITemplate& uri, const mdp::CharactersRangeSet& sourceBlock, ParsedURITemplate& result);
+        static void parse(
+            const URITemplate& uri, const mdp::CharactersRangeSet& sourceBlock, ParsedURITemplate& result);
     };
 }
 

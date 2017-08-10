@@ -14,11 +14,11 @@ using namespace snowcrashtest;
 
 TEST_CASE("Parse canonical mson value member", "[mson][value_member]")
 {
-    mdp::ByteBuffer source = \
-    "- red (string, required) - A color";
+    mdp::ByteBuffer source = "- red (string, required) - A color";
 
     ParseResult<mson::ValueMember> valueMember;
-    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(source, MSONValueMemberSectionType, valueMember, ExportSourcemapOption);
+    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(
+        source, MSONValueMemberSectionType, valueMember, ExportSourcemapOption);
 
     REQUIRE(valueMember.report.error.code == Error::OK);
     REQUIRE(valueMember.report.warnings.empty());
@@ -37,12 +37,13 @@ TEST_CASE("Parse canonical mson value member", "[mson][value_member]")
 
 TEST_CASE("Parse mson value member with description not on new line", "[mson][value_member]")
 {
-    mdp::ByteBuffer source = \
-    "- red (string, required) - A color\n"\
-    "  Which is also very nice\n\n";
+    mdp::ByteBuffer source
+        = "- red (string, required) - A color\n"
+          "  Which is also very nice\n\n";
 
     ParseResult<mson::ValueMember> valueMember;
-    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(source, MSONValueMemberSectionType, valueMember, ExportSourcemapOption);
+    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(
+        source, MSONValueMemberSectionType, valueMember, ExportSourcemapOption);
 
     REQUIRE(valueMember.report.error.code == Error::OK);
     REQUIRE(valueMember.report.warnings.empty());
@@ -62,14 +63,15 @@ TEST_CASE("Parse mson value member with description not on new line", "[mson][va
 
 TEST_CASE("Parse mson value member with block description", "[mson][value_member]")
 {
-    mdp::ByteBuffer source = \
-    "- red (string, required) - A color\n\n"\
-    "    Which is also very nice\n\n"\
-    "    - and awesome\n\n"\
-    "and really really nice\n\n";
+    mdp::ByteBuffer source
+        = "- red (string, required) - A color\n\n"
+          "    Which is also very nice\n\n"
+          "    - and awesome\n\n"
+          "and really really nice\n\n";
 
     ParseResult<mson::ValueMember> valueMember;
-    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(source, MSONValueMemberSectionType, valueMember, ExportSourcemapOption);
+    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(
+        source, MSONValueMemberSectionType, valueMember, ExportSourcemapOption);
 
     REQUIRE(valueMember.report.error.code == Error::OK);
     REQUIRE(valueMember.report.warnings.empty());
@@ -89,16 +91,17 @@ TEST_CASE("Parse mson value member with block description", "[mson][value_member
 
 TEST_CASE("Parse mson value member with block description, default and sample", "[mson][value_member]")
 {
-    mdp::ByteBuffer source = \
-    "- red (string) - A color\n\n"\
-    "    Which is also very nice\n\n"\
-    "    - and awesome\n\n"\
-    "    - Default: yellow\n"\
-    "    - Sample\n\n"\
-    "        green\n";
+    mdp::ByteBuffer source
+        = "- red (string) - A color\n\n"
+          "    Which is also very nice\n\n"
+          "    - and awesome\n\n"
+          "    - Default: yellow\n"
+          "    - Sample\n\n"
+          "        green\n";
 
     ParseResult<mson::ValueMember> valueMember;
-    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(source, MSONValueMemberSectionType, valueMember, ExportSourcemapOption);
+    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(
+        source, MSONValueMemberSectionType, valueMember, ExportSourcemapOption);
 
     REQUIRE(valueMember.report.error.code == Error::OK);
     REQUIRE(valueMember.report.warnings.empty());
@@ -124,17 +127,18 @@ TEST_CASE("Parse mson value member with block description, default and sample", 
 
 TEST_CASE("Parse mson value member array with sample", "[mson][value_member]")
 {
-    mdp::ByteBuffer source = \
-    "- (array) - List of colors\n\n"\
-    "    Lots and lots of them\n\n"\
-    "    - Sample\n"\
-    "        - green\n"\
-    "        - red\n"\
-    "        - blue\n"\
-    "        - yellow\n";
+    mdp::ByteBuffer source
+        = "- (array) - List of colors\n\n"
+          "    Lots and lots of them\n\n"
+          "    - Sample\n"
+          "        - green\n"
+          "        - red\n"
+          "        - blue\n"
+          "        - yellow\n";
 
     ParseResult<mson::ValueMember> valueMember;
-    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(source, MSONValueMemberSectionType, valueMember, ExportSourcemapOption);
+    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(
+        source, MSONValueMemberSectionType, valueMember, ExportSourcemapOption);
 
     REQUIRE(valueMember.report.error.code == Error::OK);
     REQUIRE(valueMember.report.warnings.empty());
@@ -156,11 +160,11 @@ TEST_CASE("Parse mson value member array with sample", "[mson][value_member]")
 
 TEST_CASE("Parse mson value member with multiple values", "[mson][value_member]")
 {
-    mdp::ByteBuffer source = \
-    "- 1, yellow, true";
+    mdp::ByteBuffer source = "- 1, yellow, true";
 
     ParseResult<mson::ValueMember> valueMember;
-    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(source, MSONValueMemberSectionType, valueMember, ExportSourcemapOption);
+    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(
+        source, MSONValueMemberSectionType, valueMember, ExportSourcemapOption);
 
     REQUIRE(valueMember.report.error.code == Error::OK);
     REQUIRE(valueMember.report.warnings.empty());
@@ -179,13 +183,14 @@ TEST_CASE("Parse mson value member with multiple values", "[mson][value_member]"
 
 TEST_CASE("Parse mson value member array with items", "[mson][value_member]")
 {
-    mdp::ByteBuffer source = \
-    "- (array)\n"\
-    "    - red (string) - A sample value\n"\
-    "    - green (string)";
+    mdp::ByteBuffer source
+        = "- (array)\n"
+          "    - red (string) - A sample value\n"
+          "    - green (string)";
 
     ParseResult<mson::ValueMember> valueMember;
-    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(source, MSONValueMemberSectionType, valueMember, ExportSourcemapOption);
+    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(
+        source, MSONValueMemberSectionType, valueMember, ExportSourcemapOption);
 
     REQUIRE(valueMember.report.error.code == Error::OK);
     REQUIRE(valueMember.report.warnings.empty());
@@ -220,40 +225,41 @@ TEST_CASE("Parse mson value member array with items", "[mson][value_member]")
 
 TEST_CASE("Check warnings for object in array with defined value", "[mson][value_member]")
 {
-    mdp::ByteBuffer source = \
-    "- (array)\n"\
-    "    - explicit (object)\n"\
-    "    - implicit\n"\
-    "        - k: v\n";
+    mdp::ByteBuffer source
+        = "- (array)\n"
+          "    - explicit (object)\n"
+          "    - implicit\n"
+          "        - k: v\n";
 
     ParseResult<mson::ValueMember> valueMember;
-    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(source, MSONValueMemberSectionType, valueMember, ExportSourcemapOption);
+    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(
+        source, MSONValueMemberSectionType, valueMember, ExportSourcemapOption);
 
     REQUIRE(valueMember.report.error.code == Error::OK);
     REQUIRE(valueMember.report.warnings.size() == 2);
-
 }
 
 TEST_CASE("Check warnings for object with defined value", "[mson][value_member]")
 {
-    mdp::ByteBuffer source = \
-    "- (object)\n"\
-    "    - k: v (object)\n";
+    mdp::ByteBuffer source
+        = "- (object)\n"
+          "    - k: v (object)\n";
 
     ParseResult<mson::ValueMember> valueMember;
-    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(source, MSONValueMemberSectionType, valueMember, ExportSourcemapOption);
+    SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(
+        source, MSONValueMemberSectionType, valueMember, ExportSourcemapOption);
 
     REQUIRE(valueMember.report.error.code == Error::OK);
     REQUIRE(valueMember.report.warnings.size() == 1);
-
 }
 
 TEST_CASE("Parse undisclosed item list", "[mson][value_member]")
 {
-    mdp::ByteBuffer source = \
-    "- item\n"\
-    "    -\n";
+    mdp::ByteBuffer source
+        = "- item\n"
+          "    -\n";
 
     ParseResult<mson::ValueMember> valueMember;
-    REQUIRE_NOTHROW( (SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(source, MSONValueMemberSectionType, valueMember, ExportSourcemapOption)) );
+    REQUIRE_NOTHROW((SectionParserHelper<mson::ValueMember, MSONValueMemberParser>::parse(
+        source, MSONValueMemberSectionType, valueMember, ExportSourcemapOption)));
 }

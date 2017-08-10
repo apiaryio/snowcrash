@@ -10,21 +10,22 @@
 #include "MSONTypeSectionParser.h"
 #include "MSONPropertyMemberParser.h"
 
-namespace snowcrash {
+namespace snowcrash
+{
 
     /** Implementation of processNestedSection */
     MarkdownNodeIterator SectionProcessor<mson::OneOf>::processNestedSection(const MarkdownNodeIterator& node,
-                                                                             const MarkdownNodes& siblings,
-                                                                             SectionParserData& pd,
-                                                                             const ParseResultRef<mson::OneOf>& out) {
+        const MarkdownNodes& siblings,
+        SectionParserData& pd,
+        const ParseResultRef<mson::OneOf>& out)
+    {
 
         MarkdownNodeIterator cur = node;
         mson::Element element;
         SourceMap<mson::Element> elementSM;
 
         switch (pd.sectionContext()) {
-            case MSONMixinSectionType:
-            {
+            case MSONMixinSectionType: {
                 IntermediateParseResult<mson::Mixin> mixin(out.report);
                 cur = MSONMixinParser::parse(node, siblings, pd, mixin);
 
@@ -37,8 +38,7 @@ namespace snowcrash {
                 break;
             }
 
-            case MSONOneOfSectionType:
-            {
+            case MSONOneOfSectionType: {
                 IntermediateParseResult<mson::OneOf> oneOf(out.report);
                 cur = MSONOneOfParser::parse(node, siblings, pd, oneOf);
 
@@ -51,8 +51,7 @@ namespace snowcrash {
                 break;
             }
 
-            case MSONPropertyMembersSectionType:
-            {
+            case MSONPropertyMembersSectionType: {
                 IntermediateParseResult<mson::TypeSection> typeSection(out.report);
                 typeSection.node.baseType = mson::ObjectBaseType;
 
@@ -67,8 +66,7 @@ namespace snowcrash {
                 break;
             }
 
-            case MSONPropertyMemberSectionType:
-            {
+            case MSONPropertyMemberSectionType: {
                 IntermediateParseResult<mson::PropertyMember> propertyMember(out.report);
                 cur = MSONPropertyMemberParser::parse(node, siblings, pd, propertyMember);
 
@@ -97,7 +95,8 @@ namespace snowcrash {
     }
 
     /** Implementation of nestedSectionType */
-    SectionType SectionProcessor<mson::OneOf>::nestedSectionType(const MarkdownNodeIterator& node) {
+    SectionType SectionProcessor<mson::OneOf>::nestedSectionType(const MarkdownNodeIterator& node)
+    {
 
         SectionType nestedType = UndefinedSectionType;
 

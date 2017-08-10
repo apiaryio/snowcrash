@@ -15,19 +15,21 @@
 
 using namespace scpl;
 
-namespace snowcrash {
+namespace snowcrash
+{
 
     /**
      * MSON Value Member Section Processor
      */
-    template<>
+    template <>
     struct SectionProcessor<mson::ValueMember> : public SignatureSectionProcessorBase<mson::ValueMember> {
 
         static Signature parseSignature(const MarkdownNodeIterator& node,
-                                        snowcrash::SectionParserData& pd,
-                                        const SignatureTraits& traits,
-                                        snowcrash::Report& report,
-                                        const mdp::ByteBuffer& subjectOrig = "") {
+            snowcrash::SectionParserData& pd,
+            const SignatureTraits& traits,
+            snowcrash::Report& report,
+            const mdp::ByteBuffer& subjectOrig = "")
+        {
 
             std::string subject = subjectOrig;
 
@@ -38,48 +40,52 @@ namespace snowcrash {
             return SignatureSectionProcessorBase<mson::ValueMember>::parseSignature(node, pd, traits, report, subject);
         }
 
-        static SignatureTraits signatureTraits() {
+        static SignatureTraits signatureTraits()
+        {
 
-            SignatureTraits signatureTraits(SignatureTraits::ValuesTrait |
-                                            SignatureTraits::AttributesTrait |
-                                            SignatureTraits::ContentTrait);
+            SignatureTraits signatureTraits(
+                SignatureTraits::ValuesTrait | SignatureTraits::AttributesTrait | SignatureTraits::ContentTrait);
 
             return signatureTraits;
         }
 
         static MarkdownNodeIterator finalizeSignature(const MarkdownNodeIterator& node,
-                                                      SectionParserData& pd,
-                                                      const Signature& signature,
-                                                      const ParseResultRef<mson::ValueMember>& out) {
+            SectionParserData& pd,
+            const Signature& signature,
+            const ParseResultRef<mson::ValueMember>& out)
+        {
 
-            return SectionProcessor<mson::ValueMember>::useSignatureData(node, pd, signature, out.report, out.node, out.sourceMap);
+            return SectionProcessor<mson::ValueMember>::useSignatureData(
+                node, pd, signature, out.report, out.node, out.sourceMap);
         }
 
         static MarkdownNodeIterator processDescription(const MarkdownNodeIterator& node,
-                                                       const MarkdownNodes& siblings,
-                                                       SectionParserData& pd,
-                                                       const ParseResultRef<mson::ValueMember>& out) {
+            const MarkdownNodes& siblings,
+            SectionParserData& pd,
+            const ParseResultRef<mson::ValueMember>& out)
+        {
 
-            return SectionProcessor<mson::ValueMember>::blockDescription(node, pd, out.node.sections, out.sourceMap.sections);
+            return SectionProcessor<mson::ValueMember>::blockDescription(
+                node, pd, out.node.sections, out.sourceMap.sections);
         }
 
         static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
-                                                         const MarkdownNodes& siblings,
-                                                         SectionParserData& pd,
-                                                         const ParseResultRef<mson::ValueMember>& out) {
+            const MarkdownNodes& siblings,
+            SectionParserData& pd,
+            const ParseResultRef<mson::ValueMember>& out)
+        {
 
             ParseResultRef<mson::TypeSections> typeSections(out.report, out.node.sections, out.sourceMap.sections);
 
-            return SectionProcessor<mson::ValueMember>
-                    ::processNestedMembers<MSONTypeSectionListParser>(node, siblings, pd, typeSections,
-                                                                      out.node.valueDefinition.typeDefinition.baseType);
+            return SectionProcessor<mson::ValueMember>::processNestedMembers<MSONTypeSectionListParser>(
+                node, siblings, pd, typeSections, out.node.valueDefinition.typeDefinition.baseType);
         }
 
-        static bool isDescriptionNode(const MarkdownNodeIterator& node,
-                                      SectionType sectionType) {
+        static bool isDescriptionNode(const MarkdownNodeIterator& node, SectionType sectionType)
+        {
 
-            if (SectionProcessor<mson::ValueMember>::nestedSectionType(node) != MSONSectionType ||
-                node->type == mdp::HeaderMarkdownNodeType) {
+            if (SectionProcessor<mson::ValueMember>::nestedSectionType(node) != MSONSectionType
+                || node->type == mdp::HeaderMarkdownNodeType) {
 
                 return false;
             }
@@ -93,11 +99,12 @@ namespace snowcrash {
 
         static SectionType nestedSectionType(const MarkdownNodeIterator&);
 
-        static void finalize(const MarkdownNodeIterator& node,
-                             SectionParserData& pd,
-                             const ParseResultRef<mson::ValueMember>& out) {
+        static void finalize(
+            const MarkdownNodeIterator& node, SectionParserData& pd, const ParseResultRef<mson::ValueMember>& out)
+        {
 
-            SectionProcessor<mson::ValueMember>::finalizeImplicitBaseType(out.node.valueDefinition.typeDefinition.baseType);
+            SectionProcessor<mson::ValueMember>::finalizeImplicitBaseType(
+                out.node.valueDefinition.typeDefinition.baseType);
         }
 
         /**
@@ -111,11 +118,12 @@ namespace snowcrash {
          * \param sourceMap MSON Value Member source map
          */
         static MarkdownNodeIterator useSignatureData(const MarkdownNodeIterator& node,
-                                                     SectionParserData& pd,
-                                                     const Signature& signature,
-                                                     Report& report,
-                                                     mson::ValueMember& valueMember,
-                                                     SourceMap<mson::ValueMember>& sourceMap) {
+            SectionParserData& pd,
+            const Signature& signature,
+            Report& report,
+            mson::ValueMember& valueMember,
+            SourceMap<mson::ValueMember>& sourceMap)
+        {
 
             valueMember.description = signature.content;
 
@@ -123,14 +131,15 @@ namespace snowcrash {
                 sourceMap.description.sourceMap = node->sourceMap;
             }
 
-            mson::parseTypeDefinition(node, pd, signature.attributes, report, valueMember.valueDefinition.typeDefinition);
+            mson::parseTypeDefinition(
+                node, pd, signature.attributes, report, valueMember.valueDefinition.typeDefinition);
             parseRemainingContent(node, pd, signature.remainingContent, valueMember.sections, sourceMap.sections);
 
             // Check for circular references
             mson::TypeSpecification typeSpecification = valueMember.valueDefinition.typeDefinition.typeSpecification;
 
-            if (typeSpecification.name.base == mson::ArrayTypeName ||
-                typeSpecification.name.base == mson::EnumTypeName) {
+            if (typeSpecification.name.base == mson::ArrayTypeName
+                || typeSpecification.name.base == mson::EnumTypeName) {
 
                 for (mson::TypeNames::iterator it = typeSpecification.nestedTypes.begin();
                      it != typeSpecification.nestedTypes.end();
@@ -140,10 +149,9 @@ namespace snowcrash {
                         mson::addDependency(node, pd, it->symbol.literal, pd.namedTypeContext, report);
                     }
                 }
-            }
-            else if (typeSpecification.name.base == mson::UndefinedTypeName &&
-                     !typeSpecification.name.symbol.literal.empty() &&
-                     !typeSpecification.name.symbol.variable) {
+            } else if (typeSpecification.name.base == mson::UndefinedTypeName
+                && !typeSpecification.name.symbol.literal.empty()
+                && !typeSpecification.name.symbol.variable) {
 
                 mson::addDependency(node, pd, typeSpecification.name.symbol.literal, pd.namedTypeContext, report);
             }
@@ -160,8 +168,7 @@ namespace snowcrash {
                     }
 
                     return ++MarkdownNodeIterator(node);
-                }
-                else if (valueMember.valueDefinition.typeDefinition.baseType == mson::UndefinedBaseType) {
+                } else if (valueMember.valueDefinition.typeDefinition.baseType == mson::UndefinedBaseType) {
                     valueMember.valueDefinition.typeDefinition.baseType = mson::ImplicitValueBaseType;
                 }
             }
@@ -194,10 +201,11 @@ namespace snowcrash {
          * \param sourceMap MSON Type Section collection source map
          */
         static void parseRemainingContent(const MarkdownNodeIterator& node,
-                                          SectionParserData& pd,
-                                          const mdp::ByteBuffer& remainingContent,
-                                          mson::TypeSections& sections,
-                                          SourceMap<mson::TypeSections>& sourceMap) {
+            SectionParserData& pd,
+            const mdp::ByteBuffer& remainingContent,
+            mson::TypeSections& sections,
+            SourceMap<mson::TypeSections>& sourceMap)
+        {
 
             if (remainingContent.empty()) {
                 return;
@@ -226,13 +234,13 @@ namespace snowcrash {
          * \param sourceMap MSON Type Section collection source map
          */
         static MarkdownNodeIterator blockDescription(const MarkdownNodeIterator& node,
-                                                     SectionParserData& pd,
-                                                     mson::TypeSections& sections,
-                                                     SourceMap<mson::TypeSections>& sourceMap) {
+            SectionParserData& pd,
+            mson::TypeSections& sections,
+            SourceMap<mson::TypeSections>& sourceMap)
+        {
 
-            if (sections.empty() ||
-                (sections.size() == 1 &&
-                 sections[0].klass == mson::TypeSection::BlockDescriptionClass)) {
+            if (sections.empty()
+                || (sections.size() == 1 && sections[0].klass == mson::TypeSection::BlockDescriptionClass)) {
 
                 if (sections.empty()) {
 
@@ -274,22 +282,21 @@ namespace snowcrash {
          * \param sections MSON Type Section collection Parse Result
          * \param baseType Base Type of the MSON member to be sent for nested type sections
          */
-        template<typename PARSER>
+        template <typename PARSER>
         static MarkdownNodeIterator processNestedMembers(const MarkdownNodeIterator& node,
-                                                         const MarkdownNodes& siblings,
-                                                         SectionParserData& pd,
-                                                         const ParseResultRef<mson::TypeSections>& sections,
-                                                         mson::BaseType& baseType) {
+            const MarkdownNodes& siblings,
+            SectionParserData& pd,
+            const ParseResultRef<mson::TypeSections>& sections,
+            mson::BaseType& baseType)
+        {
 
             MarkdownNodeIterator cur = node;
 
-            if (pd.sectionContext() == MSONSectionType ||
-                pd.sectionContext() == MSONMixinSectionType ||
-                pd.sectionContext() == MSONOneOfSectionType) {
+            if (pd.sectionContext() == MSONSectionType || pd.sectionContext() == MSONMixinSectionType
+                || pd.sectionContext() == MSONOneOfSectionType) {
 
                 cur = processMSONSection(node, siblings, pd, sections, baseType);
-            }
-            else {
+            } else {
 
                 // Try to resolve base type if not given before parsing further
                 resolveImplicitBaseType(node, pd.sectionContext(), baseType);
@@ -321,17 +328,18 @@ namespace snowcrash {
          * \param baseType Base Type of the MSON member to be sent for nested type sections
          */
         static MarkdownNodeIterator processMSONSection(const MarkdownNodeIterator& node,
-                                                       const MarkdownNodes& siblings,
-                                                       SectionParserData& pd,
-                                                       const ParseResultRef<mson::TypeSections>& sections,
-                                                       mson::BaseType& baseType);
+            const MarkdownNodes& siblings,
+            SectionParserData& pd,
+            const ParseResultRef<mson::TypeSections>& sections,
+            mson::BaseType& baseType);
 
         /**
          * \brief If base type is still undefined, make it implicit string
          *
          * \param MSON member base type
          */
-        static void finalizeImplicitBaseType(mson::BaseType& baseType) {
+        static void finalizeImplicitBaseType(mson::BaseType& baseType)
+        {
 
             if (baseType == mson::UndefinedBaseType) {
                 baseType = mson::ImplicitPrimitiveBaseType;
@@ -345,9 +353,9 @@ namespace snowcrash {
          * \param sectionType Section Type
          * \param baseType Base Type of the MSON member that needs to be resolved
          */
-        static void resolveImplicitBaseType(const MarkdownNodeIterator& node,
-                                            const SectionType& sectionType,
-                                            mson::BaseType& baseType) {
+        static void resolveImplicitBaseType(
+            const MarkdownNodeIterator& node, const SectionType& sectionType, mson::BaseType& baseType)
+        {
 
             if (baseType != mson::UndefinedBaseType) {
                 return;
@@ -356,8 +364,7 @@ namespace snowcrash {
             switch (sectionType) {
                 case MSONSectionType:
                 case MSONOneOfSectionType:
-                case MSONMixinSectionType:
-                {
+                case MSONMixinSectionType: {
                     if (node->type == mdp::ListItemMarkdownNodeType) {
                         baseType = mson::ImplicitObjectBaseType;
                     }
@@ -365,14 +372,12 @@ namespace snowcrash {
                     break;
                 }
 
-                case MSONPropertyMembersSectionType:
-                {
+                case MSONPropertyMembersSectionType: {
                     baseType = mson::ImplicitObjectBaseType;
                     break;
                 }
 
-                case MSONSampleDefaultSectionType:
-                {
+                case MSONSampleDefaultSectionType: {
                     baseType = mson::ImplicitPrimitiveBaseType;
                     break;
                 }

@@ -31,5 +31,7 @@ TEST_CASE("regexmatch/resource-header", "Match resource test")
 
 TEST_CASE("regexmatch/request-payload", "Match request payload test")
 {
-    REQUIRE(RegexMatch("Request My Id (application/json)", "^[Rr]equest([[:space:]]+([A-Za-z0-9_]|[[:space:]])*)?([[:space:]]\\([^\\)]*\\))?$") == true);
+    REQUIRE(RegexMatch("Request My Id (application/json)",
+                "^[Rr]equest([[:space:]]+([A-Za-z0-9_]|[[:space:]])*)?([[:space:]]\\([^\\)]*\\))?$")
+        == true);
 }

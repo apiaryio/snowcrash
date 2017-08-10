@@ -10,7 +10,7 @@
 
 using namespace snowcrash;
 
-DataStructure& DataStructure::operator=(const mson::NamedType &rhs)
+DataStructure& DataStructure::operator=(const mson::NamedType& rhs)
 {
     this->name = rhs.name;
     this->typeDefinition = rhs.typeDefinition;
@@ -62,8 +62,7 @@ Element::Content::~Content()
 {
 }
 
-Element::Element(const Element::Class& element_)
-: element(element_)
+Element::Element(const Element::Class& element_) : element(element_)
 {
 }
 

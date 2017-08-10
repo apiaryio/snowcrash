@@ -13,7 +13,8 @@
 #include "Section.h"
 #include "StringUtility.h"
 
-namespace snowcrash {
+namespace snowcrash
+{
 
     struct CodeBlockUtility {
 
@@ -26,20 +27,15 @@ namespace snowcrash {
          */
         static size_t codeBlockIndentationLevel(const SectionType& type)
         {
-            if (type == BlueprintSectionType ||
-                type == ResourceGroupSectionType ||
-                type == ResourceSectionType ||
-                type == ActionSectionType) {
+            if (type == BlueprintSectionType || type == ResourceGroupSectionType || type == ResourceSectionType
+                || type == ActionSectionType) {
 
                 return 1;
-            }
-            else if (type == RequestBodySectionType ||
-                     type == ResponseBodySectionType ||
-                     type == ModelBodySectionType) {
+            } else if (type == RequestBodySectionType || type == ResponseBodySectionType
+                || type == ModelBodySectionType) {
 
                 return 2;
-            }
-            else {
+            } else {
 
                 return 3;
             }
@@ -51,10 +47,9 @@ namespace snowcrash {
          *  \param  report  Report log
          *  \param  conten  The content retrieved
          */
-        static void contentAsCodeBlock(const MarkdownNodeIterator& node,
-                                       const SectionParserData& pd,
-                                       Report& report,
-                                       mdp::ByteBuffer& content) {
+        static void contentAsCodeBlock(
+            const MarkdownNodeIterator& node, const SectionParserData& pd, Report& report, mdp::ByteBuffer& content)
+        {
 
             checkPossibleReference(node, pd, report);
 
@@ -80,17 +75,15 @@ namespace snowcrash {
             ss << " is expected to be a pre-formatted code block, every of its line indented by exactly ";
             ss << level * 4 << " spaces or " << level << " tabs";
 
-            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-            report.warnings.push_back(Warning(ss.str(),
-                                              IndentationWarning,
-                                              sourceMap));
+            mdp::CharactersRangeSet sourceMap
+                = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+            report.warnings.push_back(Warning(ss.str(), IndentationWarning, sourceMap));
         }
 
         /** \brief  Retrieve the textual content of a signature markdown */
-        static void signatureContentAsCodeBlock(const MarkdownNodeIterator& node,
-                                                const SectionParserData& pd,
-                                                Report& report,
-                                                mdp::ByteBuffer& content) {
+        static void signatureContentAsCodeBlock(
+            const MarkdownNodeIterator& node, const SectionParserData& pd, Report& report, mdp::ByteBuffer& content)
+        {
 
             mdp::ByteBuffer remainingContent;
             GetFirstLine(node->text, remainingContent);
@@ -115,19 +108,18 @@ namespace snowcrash {
             ss << "indent every of its line by ";
             ss << level * 4 << " spaces or " << level << " tabs";
 
-            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-            report.warnings.push_back(Warning(ss.str(),
-                                              IndentationWarning,
-                                              sourceMap));
+            mdp::CharactersRangeSet sourceMap
+                = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+            report.warnings.push_back(Warning(ss.str(), IndentationWarning, sourceMap));
         }
 
         /**
          *  \brief Check for potential excessive indentation of a list section
          *  \return True if code block contains a recognized list section, false otherwise.
          */
-        static bool checkExcessiveIndentation(const MarkdownNodeIterator& node,
-                                              const SectionParserData& pd,
-                                              Report& report) {
+        static bool checkExcessiveIndentation(
+            const MarkdownNodeIterator& node, const SectionParserData& pd, Report& report)
+        {
 
             // Check for possible superfluous indentation of a recognized list items.
             mdp::ByteBuffer r;
@@ -135,8 +127,7 @@ namespace snowcrash {
             TrimString(line);
 
             // If line appears to be a Markdown list.
-            if (line.empty() ||
-                (line[0] != '-' && line[0] != '+' && line[0] != '*'))
+            if (line.empty() || (line[0] != '-' && line[0] != '+' && line[0] != '*'))
                 return false;
 
             // Skip leading Markdown list item mark
@@ -162,15 +153,13 @@ namespace snowcrash {
 
                     if (level > 1)
                         ss << "s";
-                }
-                else {
+                } else {
                     ss << "section is not expected to be indented";
                 }
 
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                report.warnings.push_back(Warning(ss.str(),
-                                                  IndentationWarning,
-                                                  sourceMap));
+                mdp::CharactersRangeSet sourceMap
+                    = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                report.warnings.push_back(Warning(ss.str(), IndentationWarning, sourceMap));
             }
 
             return false;
@@ -182,8 +171,8 @@ namespace snowcrash {
          *  \param  keyValuePair    The output buffer to place the parsed data into
          *  \return True on success, false otherwise
          */
-        static bool keyValueFromLine(const mdp::ByteBuffer& line,
-                                    KeyValuePair& keyValuePair) {
+        static bool keyValueFromLine(const mdp::ByteBuffer& line, KeyValuePair& keyValuePair)
+        {
 
             std::vector<std::string> rawMetadata = SplitOnFirst(line, ':');
             if (rawMetadata.size() != 2)
@@ -203,10 +192,11 @@ namespace snowcrash {
          *  \return asset The value of the asset
          */
         static mdp::ByteBuffer addDanglingAsset(const MarkdownNodeIterator& node,
-                                                SectionParserData& pd,
-                                                SectionType& sectionType,
-                                                Report& report,
-                                                mdp::ByteBuffer& out) {
+            SectionParserData& pd,
+            SectionType& sectionType,
+            Report& report,
+            mdp::ByteBuffer& out)
+        {
 
             mdp::ByteBuffer asset;
 
@@ -222,7 +212,7 @@ namespace snowcrash {
             size_t level = CodeBlockUtility::codeBlockIndentationLevel(sectionType);
 
             if (node->type == mdp::CodeMarkdownNodeType)
-                level--;  // Deduct one level for a code block
+                level--; // Deduct one level for a code block
 
             checkPossibleReference(node, pd, report);
 
@@ -230,12 +220,11 @@ namespace snowcrash {
                 // WARN: Dangling asset
                 std::stringstream ss;
                 ss << "dangling message-body asset, expected a pre-formatted code block, ";
-                ss << "indent every of it's line by " << level*4 << " spaces or " << level << " tabs";
+                ss << "indent every of it's line by " << level * 4 << " spaces or " << level << " tabs";
 
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                report.warnings.push_back(Warning(ss.str(),
-                                                  IndentationWarning,
-                                                  sourceMap));
+                mdp::CharactersRangeSet sourceMap
+                    = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                report.warnings.push_back(Warning(ss.str(), IndentationWarning, sourceMap));
             }
 
             return asset;
@@ -245,25 +234,25 @@ namespace snowcrash {
          *  \brief Check for potential resource model reference and warn about not recognizing them
          *  \return True if code block contains a resource model reference, false otherwise.
          */
-        static bool checkPossibleReference(const MarkdownNodeIterator& node,
-                                           const SectionParserData& pd,
-                                           Report& report) {
+        static bool checkPossibleReference(
+            const MarkdownNodeIterator& node, const SectionParserData& pd, Report& report)
+        {
 
             mdp::ByteBuffer source = node->text;
             Identifier symbol;
 
             TrimString(source);
 
-            if(GetModelReference(source, symbol)) {
+            if (GetModelReference(source, symbol)) {
 
                 std::stringstream ss;
                 ss << "found a possible '" << symbol << "' model reference, ";
-                ss << "a reference must be directly in the " << SectionName(pd.sectionContext()) << " section, indented by 4 spaces or 1 tab, without any additional sections";
+                ss << "a reference must be directly in the " << SectionName(pd.sectionContext())
+                   << " section, indented by 4 spaces or 1 tab, without any additional sections";
 
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                report.warnings.push_back(Warning(ss.str(),
-                                                  IgnoringWarning,
-                                                  sourceMap));
+                mdp::CharactersRangeSet sourceMap
+                    = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                report.warnings.push_back(Warning(ss.str(), IgnoringWarning, sourceMap));
 
                 return true;
             }

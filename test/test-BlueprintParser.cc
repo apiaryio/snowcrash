@@ -12,16 +12,16 @@
 using namespace snowcrash;
 using namespace snowcrashtest;
 
-mdp::ByteBuffer BlueprintFixture = \
-"meta: verse\n\n"\
-"# Snowcrash API\n\n"\
-"## Character\n"\
-"Uncle Enzo\n\n"\
-"# Group First\n"\
-"p1\n"\
-"## My Resource [/resource]\n"\
-"# Group Second\n"\
-"p2\n";
+mdp::ByteBuffer BlueprintFixture
+    = "meta: verse\n\n"
+      "# Snowcrash API\n\n"
+      "## Character\n"
+      "Uncle Enzo\n\n"
+      "# Group First\n"
+      "p1\n"
+      "## My Resource [/resource]\n"
+      "# Group Second\n"
+      "p2\n";
 
 TEST_CASE("Blueprint block classifier", "[blueprint]")
 {
@@ -52,7 +52,8 @@ TEST_CASE("Blueprint block classifier", "[blueprint]")
 TEST_CASE("Parse canonical blueprint", "[blueprint]")
 {
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(BlueprintFixture, BlueprintSectionType, blueprint, ExportSourcemapOption);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        BlueprintFixture, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -90,7 +91,8 @@ TEST_CASE("Parse blueprint with multiple metadata sections", "[blueprint]")
     source += BlueprintFixture;
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -127,16 +129,17 @@ TEST_CASE("Parse blueprint with multiple metadata sections", "[blueprint]")
 
 TEST_CASE("Parse API with Name and abbreviated resource", "[blueprint]")
 {
-    mdp::ByteBuffer source = \
-    "# API\n"\
-    "A\n"\
-    "# GET /resource\n"\
-    "B\n"\
-    "+ Response 200\n\n"\
-    "        {}";
+    mdp::ByteBuffer source
+        = "# API\n"
+          "A\n"
+          "# GET /resource\n"
+          "B\n"
+          "+ Response 200\n\n"
+          "        {}";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -165,12 +168,13 @@ TEST_CASE("Parse API with Name and abbreviated resource", "[blueprint]")
 
 TEST_CASE("Parse nameless blueprint description", "[blueprint]")
 {
-    mdp::ByteBuffer source = \
-    "A\n"\
-    "# B\n";
+    mdp::ByteBuffer source
+        = "A\n"
+          "# B\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.size() == 1);
@@ -191,7 +195,8 @@ TEST_CASE("Parse nameless blueprint with a list description", "[blueprint]")
     mdp::ByteBuffer source = "+ List\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.size() == 1);
@@ -209,17 +214,18 @@ TEST_CASE("Parse nameless blueprint with a list description", "[blueprint]")
 
 TEST_CASE("Parse two groups with the same name", "[blueprint]")
 {
-    mdp::ByteBuffer source = \
-    "# API\n"\
-    "# Group Name\n"\
-    "## /1\n"\
-    "### POST\n"\
-    "+ Request\n\n"\
-    "         {}\n\n"\
-    "# Group Name\n";
+    mdp::ByteBuffer source
+        = "# API\n"
+          "# Group Name\n"
+          "## /1\n"
+          "### POST\n"
+          "+ Request\n\n"
+          "         {}\n\n"
+          "# Group Name\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.size() == 2); // groups with same name & no response
@@ -250,32 +256,35 @@ TEST_CASE("Test parser options - required blueprint name", "[blueprint]")
     REQUIRE(blueprint.report.warnings.size() == 1);
     REQUIRE(blueprint.report.warnings[0].code == APINameWarning);
 
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, RequireBlueprintNameOption);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, RequireBlueprintNameOption);
     REQUIRE(blueprint.report.error.code != Error::OK);
 }
 
 TEST_CASE("Test required blueprint name on blueprint that starts with metadata", "[blueprint]")
 {
-    mdp::ByteBuffer source = \
-    "meta: data\n"\
-    "foo:bar\n\n"\
-    "Hello";
+    mdp::ByteBuffer source
+        = "meta: data\n"
+          "foo:bar\n\n"
+          "Hello";
 
     ParseResult<Blueprint> blueprint;
 
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, RequireBlueprintNameOption);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, RequireBlueprintNameOption);
     REQUIRE(blueprint.report.error.code != Error::OK);
 }
 
 TEST_CASE("Should parse nested lists in description", "[blueprint]")
 {
-    mdp::ByteBuffer source = \
-    "# API\n"\
-    "+ List\n"\
-    "   + Nested Item\n";
+    mdp::ByteBuffer source
+        = "# API\n"
+          "+ List\n"
+          "   + Nested Item\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -292,9 +301,9 @@ TEST_CASE("Should parse nested lists in description", "[blueprint]")
 
 TEST_CASE("Should parse paragraph without final newline", "[blueprint]")
 {
-    mdp::ByteBuffer source = \
-    "# API\n"\
-    "Lorem Ipsum";
+    mdp::ByteBuffer source
+        = "# API\n"
+          "Lorem Ipsum";
 
     ParseResult<Blueprint> blueprint;
     SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint);
@@ -309,12 +318,13 @@ TEST_CASE("Should parse paragraph without final newline", "[blueprint]")
 
 TEST_CASE("Blueprint starting with Resource Group should be parsed", "[blueprint]")
 {
-    mdp::ByteBuffer source = \
-    "# Group Posts\n"\
-    "## /posts";
+    mdp::ByteBuffer source
+        = "# Group Posts\n"
+          "## /posts";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -338,7 +348,8 @@ TEST_CASE("Blueprint starting with Resource should be parsed", "[blueprint]")
     mdp::ByteBuffer source = "# /posts";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -359,15 +370,16 @@ TEST_CASE("Blueprint starting with Resource should be parsed", "[blueprint]")
 
 TEST_CASE("Checking a resource with global resources for duplicates", "[blueprint]")
 {
-    mdp::ByteBuffer source = \
-    "# /posts\n"\
-    "# Group Posts\n"\
-    "## Posts [/posts]\n"\
-    "### Creat a post [POST]\n"\
-    "### List posts [GET]\n";
+    mdp::ByteBuffer source
+        = "# /posts\n"
+          "# Group Posts\n"
+          "## Posts [/posts]\n"
+          "### Creat a post [POST]\n"
+          "### List posts [GET]\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.size() == 3); // 2x no response & duplicate resource
@@ -388,7 +400,6 @@ TEST_CASE("Checking a resource with global resources for duplicates", "[blueprin
     REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(0).content.resource.uriTemplate == "/posts");
     REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(0).content.resource.actions.size() == 2);
 
-
     REQUIRE(blueprint.sourceMap.name.sourceMap.empty());
     REQUIRE(blueprint.sourceMap.description.sourceMap.empty());
     REQUIRE(blueprint.sourceMap.metadata.collection.size() == 0);
@@ -399,21 +410,22 @@ TEST_CASE("Checking a resource with global resources for duplicates", "[blueprin
 
 TEST_CASE("Parsing unexpected blocks", "[blueprint]")
 {
-    mdp::ByteBuffer source = \
-    "FORMAT: 1A\n"\
-    "\n"\
-    "# S\n"\
-    "\n"\
-    "Hello\n"\
-    "\n"\
-    "+ Response\n"\
-    "\n"\
-    "Moar text\n"\
-    "\n"\
-    "# GET /\n";
+    mdp::ByteBuffer source
+        = "FORMAT: 1A\n"
+          "\n"
+          "# S\n"
+          "\n"
+          "Hello\n"
+          "\n"
+          "+ Response\n"
+          "\n"
+          "Moar text\n"
+          "\n"
+          "# GET /\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.size() == 1); // no response
@@ -445,74 +457,74 @@ TEST_CASE("Parsing unexpected blocks", "[blueprint]")
 
 TEST_CASE("Parsing blueprint with mson data structures", "[blueprint]")
 {
-    mdp::ByteBuffer source = \
-    "# Group Plans\n"\
-    "\n"\
-    "## Plans [/plans]\n"\
-    "\n"\
-    "+ Attributes (array[Plan])\n"\
-    "\n"\
-    "### List all plans [GET]\n"\
-    "\n"\
-    "+ Response 200 (application/json)\n"\
-    "    + Attributes (Plans)\n"\
-    "\n"\
-    "### Create a plan [POST]\n"\
-    "\n"\
-    "+ Attributes (Plan Base)\n"\
-    "\n"\
-    "+ Request (application/json)\n"\
-    "\n"\
-    "+ Response 201 (application/json)\n"\
-    "    + Attributes (Plan)\n"\
-    "\n"\
-    "## Plan [/plan/{id}]\n"\
-    "\n"\
-    "+ Parameters\n\n"\
-    "    + id (required, string)\n"\
-    "\n"\
-    "+ Attributes (Plan Base)\n"\
-    "    + type: Plan (default)\n"\
-    "    + created ([Timestamp][])\n"\
-    "\n"\
-    "### Retrieve a plan [GET]\n"\
-    "\n"\
-    "+ Response 200 (application/json)\n"\
-    "    + Attributes (Plan)\n"\
-    "\n"\
-    "### Update a plan [PATCH]\n"\
-    "\n"\
-    "+ Request (application/json)\n"\
-    "    + Attributes (Plan Base)\n"\
-    "\n"\
-    "+ Response 200 (application/json)\n"\
-    "    + Attributes (Plan)\n\n"\
-    "\n"\
-    "### Delete a plan [DELETE]\n"\
-    "\n"\
-    "+ Response 204\n"\
-    "\n"\
-    "# Data Structures\n"\
-    "\n"\
-    "## Plan Base\n"\
-    "Base object for write operations\n"\
-    "\n"\
-    "### Properties\n"\
-    "- name\n"\
-    "- amount (number)\n"\
-    "- trial (optional)\n\n"\
-    "\n"\
-    "## Timestamp (number)\n"\
-    "\n"\
-    "## Coupon [/coupon/{id}]\n"\
-    "\n"\
-    "+ Parameters\n\n"\
-    "    + id (required, string)\n\n"\
-    "\n"\
-    "### Delete a coupon [DELETE]\n"\
-    "\n"\
-    "+ Response 204\n"\
-    "\n";
+    mdp::ByteBuffer source
+        = "# Group Plans\n"
+          "\n"
+          "## Plans [/plans]\n"
+          "\n"
+          "+ Attributes (array[Plan])\n"
+          "\n"
+          "### List all plans [GET]\n"
+          "\n"
+          "+ Response 200 (application/json)\n"
+          "    + Attributes (Plans)\n"
+          "\n"
+          "### Create a plan [POST]\n"
+          "\n"
+          "+ Attributes (Plan Base)\n"
+          "\n"
+          "+ Request (application/json)\n"
+          "\n"
+          "+ Response 201 (application/json)\n"
+          "    + Attributes (Plan)\n"
+          "\n"
+          "## Plan [/plan/{id}]\n"
+          "\n"
+          "+ Parameters\n\n"
+          "    + id (required, string)\n"
+          "\n"
+          "+ Attributes (Plan Base)\n"
+          "    + type: Plan (default)\n"
+          "    + created ([Timestamp][])\n"
+          "\n"
+          "### Retrieve a plan [GET]\n"
+          "\n"
+          "+ Response 200 (application/json)\n"
+          "    + Attributes (Plan)\n"
+          "\n"
+          "### Update a plan [PATCH]\n"
+          "\n"
+          "+ Request (application/json)\n"
+          "    + Attributes (Plan Base)\n"
+          "\n"
+          "+ Response 200 (application/json)\n"
+          "    + Attributes (Plan)\n\n"
+          "\n"
+          "### Delete a plan [DELETE]\n"
+          "\n"
+          "+ Response 204\n"
+          "\n"
+          "# Data Structures\n"
+          "\n"
+          "## Plan Base\n"
+          "Base object for write operations\n"
+          "\n"
+          "### Properties\n"
+          "- name\n"
+          "- amount (number)\n"
+          "- trial (optional)\n\n"
+          "\n"
+          "## Timestamp (number)\n"
+          "\n"
+          "## Coupon [/coupon/{id}]\n"
+          "\n"
+          "+ Parameters\n\n"
+          "    + id (required, string)\n\n"
+          "\n"
+          "### Delete a coupon [DELETE]\n"
+          "\n"
+          "+ Response 204\n"
+          "\n";
 
     mdp::MarkdownParser markdownParser;
     mdp::MarkdownNode markdownAST;
@@ -556,23 +568,26 @@ TEST_CASE("Parsing blueprint with mson data structures", "[blueprint]")
     REQUIRE(blueprint.node.content.elements().at(2).element == Element::CategoryElement);
     REQUIRE(blueprint.node.content.elements().at(2).content.elements().size() == 1);
     REQUIRE(blueprint.node.content.elements().at(1).content.elements().size() == 2);
-    REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(0).content.dataStructure.name.symbol.literal == "Plan Base");
-    REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(1).content.dataStructure.name.symbol.literal == "Timestamp");
+    REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(0).content.dataStructure.name.symbol.literal
+        == "Plan Base");
+    REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(1).content.dataStructure.name.symbol.literal
+        == "Timestamp");
 }
 
 TEST_CASE("Parse blueprint with two named types having the same name", "[blueprint]")
 {
-    mdp::ByteBuffer source = \
-    "# Data Structures\n"\
-    "## Coupon\n"\
-    "- real_name - Coupon's real name\n"\
-    "\n"\
-    "# Coupon [/coupon]\n"\
-    "+ Attributes\n"\
-    "    - name - Coupon name";
+    mdp::ByteBuffer source
+        = "# Data Structures\n"
+          "## Coupon\n"
+          "- real_name - Coupon's real name\n"
+          "\n"
+          "# Coupon [/coupon]\n"
+          "+ Attributes\n"
+          "    - name - Coupon name";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
     REQUIRE(blueprint.report.error.code == MSONError);
     REQUIRE(blueprint.report.warnings.size() == 1);
@@ -589,25 +604,26 @@ TEST_CASE("Parse blueprint with two named types having the same name", "[bluepri
 
 TEST_CASE("Parser blueprint correctly when having a big chain of inheritance in data structures", "[blueprint]")
 {
-    mdp::ByteBuffer source = \
-    "## GET /\n"\
-    "+ Response 200 (application/json)\n"\
-    "    + Attributes (Coupon A)\n"\
-    "\n"\
-    "# Data Structures\n"\
-    "\n"\
-    "## Timestamps (object)\n"\
-    "+ created (number)\n"\
-    "\n"\
-    "## Coupon Base (Timestamps)\n"\
-    "+ percent_off: 25 (number)\n"\
-    "+ redeem_by (number)\n"\
-    "\n"\
-    "## Coupon A (Coupon Base)\n"\
-    "Clone\n";
+    mdp::ByteBuffer source
+        = "## GET /\n"
+          "+ Response 200 (application/json)\n"
+          "    + Attributes (Coupon A)\n"
+          "\n"
+          "# Data Structures\n"
+          "\n"
+          "## Timestamps (object)\n"
+          "+ created (number)\n"
+          "\n"
+          "## Coupon Base (Timestamps)\n"
+          "+ percent_off: 25 (number)\n"
+          "+ redeem_by (number)\n"
+          "\n"
+          "## Coupon A (Coupon Base)\n"
+          "Clone\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -621,30 +637,34 @@ TEST_CASE("Parser blueprint correctly when having a big chain of inheritance in 
     REQUIRE(blueprint.node.content.elements().at(1).element == Element::CategoryElement);
     REQUIRE(blueprint.node.content.elements().at(1).content.elements().size() == 3);
     REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(0).element == Element::DataStructureElement);
-    REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(0).content.dataStructure.name.symbol.literal == "Timestamps");
+    REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(0).content.dataStructure.name.symbol.literal
+        == "Timestamps");
     REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(1).element == Element::DataStructureElement);
-    REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(1).content.dataStructure.name.symbol.literal == "Coupon Base");
+    REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(1).content.dataStructure.name.symbol.literal
+        == "Coupon Base");
     REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(2).element == Element::DataStructureElement);
-    REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(2).content.dataStructure.name.symbol.literal == "Coupon A");
+    REQUIRE(blueprint.node.content.elements().at(1).content.elements().at(2).content.dataStructure.name.symbol.literal
+        == "Coupon A");
 }
 
 TEST_CASE("Report error when coming across a super type reference to non existent named type", "[blueprint]")
 {
-    mdp::ByteBuffer source = \
-    "# Data Structures\n"\
-    "\n"\
-    "## Timestamps (object)\n"\
-    "+ created (number)\n"\
-    "\n"\
-    "## Coupon Base (Timestamp)\n"\
-    "+ percent_off: 25 (number)\n"\
-    "+ redeem_by (number)\n"\
-    "\n"\
-    "## Coupon A (Coupon Base)\n"\
-    "+ id: 25OFF (string)\n";
+    mdp::ByteBuffer source
+        = "# Data Structures\n"
+          "\n"
+          "## Timestamps (object)\n"
+          "+ created (number)\n"
+          "\n"
+          "## Coupon Base (Timestamp)\n"
+          "+ percent_off: 25 (number)\n"
+          "+ redeem_by (number)\n"
+          "\n"
+          "## Coupon A (Coupon Base)\n"
+          "+ id: 25OFF (string)\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == MSONError);
     SourceMapHelper::check(blueprint.report.error.location, 62, 27);
@@ -652,14 +672,15 @@ TEST_CASE("Report error when coming across a super type reference to non existen
 
 TEST_CASE("Report error when a Data Structure inherits from itself", "[blueprint]")
 {
-    mdp::ByteBuffer source = \
-    "# Data Structures\n"\
-    "\n"\
-    "## B (B)\n"\
-    "+ id (string)\n";
+    mdp::ByteBuffer source
+        = "# Data Structures\n"
+          "\n"
+          "## B (B)\n"
+          "+ id (string)\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == MSONError);
     SourceMapHelper::check(blueprint.report.error.location, 19, 9);
@@ -667,14 +688,15 @@ TEST_CASE("Report error when a Data Structure inherits from itself", "[blueprint
 
 TEST_CASE("Report error when named type inherits a sub type in array", "[blueprint]")
 {
-    mdp::ByteBuffer source = \
-    "# Data Structures\n"\
-    "\n"\
-    "## A (array[B])\n"\
-    "## B (A)\n";
+    mdp::ByteBuffer source
+        = "# Data Structures\n"
+          "\n"
+          "## A (array[B])\n"
+          "## B (A)\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == MSONError);
     SourceMapHelper::check(blueprint.report.error.location, 35, 9);
@@ -682,15 +704,16 @@ TEST_CASE("Report error when named type inherits a sub type in array", "[bluepri
 
 TEST_CASE("Report error when data Structure inheritance graph contains a cycle", "[blueprint]")
 {
-    mdp::ByteBuffer source = \
-    "# Data Structures\n"\
-    "\n"\
-    "## A (B)\n"\
-    "## B (C)\n"\
-    "## C (A)\n";
+    mdp::ByteBuffer source
+        = "# Data Structures\n"
+          "\n"
+          "## A (B)\n"
+          "## B (C)\n"
+          "## C (A)\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == MSONError);
     SourceMapHelper::check(blueprint.report.error.location, 19, 9);
@@ -698,17 +721,18 @@ TEST_CASE("Report error when data Structure inheritance graph contains a cycle",
 
 TEST_CASE("Report error when data Structure inheritance graph with only a few of them forming a cycle", "[blueprint]")
 {
-    mdp::ByteBuffer source = \
-    "# Data Structures\n"\
-    "\n"\
-    "## A (B)\n"\
-    "## B (C)\n"\
-    "## C (D)\n"\
-    "## D (E)\n"\
-    "## E (C)\n";
+    mdp::ByteBuffer source
+        = "# Data Structures\n"
+          "\n"
+          "## A (B)\n"
+          "## B (C)\n"
+          "## C (D)\n"
+          "## D (E)\n"
+          "## E (C)\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == MSONError);
     SourceMapHelper::check(blueprint.report.error.location, 37, 9);
@@ -716,15 +740,16 @@ TEST_CASE("Report error when data Structure inheritance graph with only a few of
 
 TEST_CASE("Do not report error when named sub type is referenced in nested members", "[blueprint]")
 {
-    mdp::ByteBuffer source = \
-    "# Data Structures\n"\
-    "\n"\
-    "## A (B)\n"\
-    "## B\n"\
-    "+ person (A)\n";
+    mdp::ByteBuffer source
+        = "# Data Structures\n"
+          "\n"
+          "## A (B)\n"
+          "## B\n"
+          "+ person (A)\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -756,18 +781,19 @@ TEST_CASE("Do not report error when named sub type is referenced in nested membe
 
 TEST_CASE("Do not report error when there are circular references in nested members", "[blueprint]")
 {
-    mdp::ByteBuffer source = \
-    "# Data Structures\n"\
-    "\n"\
-    "## B (C)\n"\
-    "## C\n"\
-    "+ id (A)\n"
-    "\n"\
-    "## A\n"\
-    "+ id (B)\n";
+    mdp::ByteBuffer source
+        = "# Data Structures\n"
+          "\n"
+          "## B (C)\n"
+          "## C\n"
+          "+ id (A)\n"
+          "\n"
+          "## A\n"
+          "+ id (B)\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -812,18 +838,20 @@ TEST_CASE("Do not report error when there are circular references in nested memb
     REQUIRE(idA.valueDefinition.typeDefinition.typeSpecification.name.symbol.literal == "B");
 }
 
-TEST_CASE("Do not report error when named sub type is referenced in nested members when reference happens first", "[blueprint]")
+TEST_CASE("Do not report error when named sub type is referenced in nested members when reference happens first",
+    "[blueprint]")
 {
-    mdp::ByteBuffer source = \
-    "# Data Structures\n"\
-    "\n"\
-    "## B\n"\
-    "+ person (A)\n"\
-    "\n"\
-    "## A (B)\n";
+    mdp::ByteBuffer source
+        = "# Data Structures\n"
+          "\n"
+          "## B\n"
+          "+ person (A)\n"
+          "\n"
+          "## A (B)\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -853,21 +881,23 @@ TEST_CASE("Do not report error when named sub type is referenced in nested membe
     REQUIRE(dsA.typeDefinition.typeSpecification.name.symbol.literal == "B");
 }
 
-TEST_CASE("Do not report error when a resource attributes type is circularly referenced in nested members", "[blueprint]")
+TEST_CASE(
+    "Do not report error when a resource attributes type is circularly referenced in nested members", "[blueprint]")
 {
-    mdp::ByteBuffer source = \
-    "# Post [/]\n"\
-    "\n"\
-    "+ Attributes (B)\n"\
-    "    + id\n"\
-    "\n"\
-    "# Data Structures\n"\
-    "\n"\
-    "## B\n"\
-    "+ posts (Post)\n";
+    mdp::ByteBuffer source
+        = "# Post [/]\n"
+          "\n"
+          "+ Attributes (B)\n"
+          "    + id\n"
+          "\n"
+          "# Data Structures\n"
+          "\n"
+          "## B\n"
+          "+ posts (Post)\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -910,15 +940,16 @@ TEST_CASE("Do not report error when a resource attributes type is circularly ref
 
 TEST_CASE("Report error when named sub type is referenced as mixin", "[blueprint]")
 {
-    mdp::ByteBuffer source = \
-    "# Data Structures\n"\
-    "\n"\
-    "## A (B)\n"\
-    "## B\n"\
-    "+ Include A\n";
+    mdp::ByteBuffer source
+        = "# Data Structures\n"
+          "\n"
+          "## A (B)\n"
+          "## B\n"
+          "+ Include A\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == MSONError);
     SourceMapHelper::check(blueprint.report.error.location, 35, 10);
@@ -926,16 +957,17 @@ TEST_CASE("Report error when named sub type is referenced as mixin", "[blueprint
 
 TEST_CASE("Report error when named sub type is referenced as mixin when reference happens first", "[blueprint]")
 {
-    mdp::ByteBuffer source = \
-    "# Data Structures\n"\
-    "\n"\
-    "## B\n"\
-    "+ Include A\n"\
-    "\n"\
-    "## A (B)\n";
+    mdp::ByteBuffer source
+        = "# Data Structures\n"
+          "\n"
+          "## B\n"
+          "+ Include A\n"
+          "\n"
+          "## A (B)\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == MSONError);
     SourceMapHelper::check(blueprint.report.error.location, 26, 10);
@@ -943,17 +975,18 @@ TEST_CASE("Report error when named sub type is referenced as mixin when referenc
 
 TEST_CASE("Report error when circular reference in mixins", "[blueprint]")
 {
-    mdp::ByteBuffer source = \
-    "# Data Structures\n"\
-    "\n"\
-    "## A\n"\
-    "+ Include B\n"\
-    "\n"\
-    "## B \n" \
-    "+ Include A\n";
+    mdp::ByteBuffer source
+        = "# Data Structures\n"
+          "\n"
+          "## A\n"
+          "+ Include B\n"
+          "\n"
+          "## B \n"
+          "+ Include A\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == MSONError);
     SourceMapHelper::check(blueprint.report.error.location, 45, 10);
@@ -961,15 +994,16 @@ TEST_CASE("Report error when circular reference in mixins", "[blueprint]")
 
 TEST_CASE("Do not report error when named type references itself in array", "[blueprint]")
 {
-    mdp::ByteBuffer source = \
-    "# Data Structures\n"\
-    "\n"\
-    "## Comment\n"\
-    "+ user (string)\n"\
-    "+ children (array[Comment])\n";
+    mdp::ByteBuffer source
+        = "# Data Structures\n"
+          "\n"
+          "## Comment\n"
+          "+ user (string)\n"
+          "+ children (array[Comment])\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -991,7 +1025,7 @@ TEST_CASE("Do not report error when named type references itself in array", "[bl
     REQUIRE(user.name.literal == "user");
     REQUIRE(user.valueDefinition.typeDefinition.baseType == mson::PrimitiveBaseType);
 
-    mson::PropertyMember children  = dsComment.sections[0].content.elements().at(1).content.property;
+    mson::PropertyMember children = dsComment.sections[0].content.elements().at(1).content.property;
     REQUIRE(children.name.literal == "children");
     REQUIRE(children.valueDefinition.typeDefinition.baseType == mson::ValueBaseType);
     REQUIRE(children.valueDefinition.typeDefinition.typeSpecification.nestedTypes.size() == 1);
@@ -1000,16 +1034,17 @@ TEST_CASE("Do not report error when named type references itself in array", "[bl
 
 TEST_CASE("Report error when a named type is defined twice with inheritance", "[blueprint]")
 {
-    mdp::ByteBuffer source = \
-    "# Data Structures\n"\
-    "\n"\
-    "## A (B)\n"\
-    "## B (A)\n"\
-    "## B (C)\n"\
-    "## C (object)\n";
+    mdp::ByteBuffer source
+        = "# Data Structures\n"
+          "\n"
+          "## A (B)\n"
+          "## B (A)\n"
+          "## B (C)\n"
+          "## C (object)\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == MSONError);
     SourceMapHelper::check(blueprint.report.error.location, 19, 9);
@@ -1017,14 +1052,15 @@ TEST_CASE("Report error when a named type is defined twice with inheritance", "[
 
 TEST_CASE("Report error when a named type is defined twice with base type", "[blueprint]")
 {
-    mdp::ByteBuffer source = \
-    "# Data Structures\n"\
-    "\n"\
-    "## A (string)\n"\
-    "## A (object)\n";
+    mdp::ByteBuffer source
+        = "# Data Structures\n"
+          "\n"
+          "## A (string)\n"
+          "## A (object)\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == MSONError);
     SourceMapHelper::check(blueprint.report.error.location, 33, 14);
@@ -1032,15 +1068,16 @@ TEST_CASE("Report error when a named type is defined twice with base type", "[bl
 
 TEST_CASE("Report error when a named type is defined twice, once with base type and other inheritance", "[blueprint]")
 {
-    mdp::ByteBuffer source = \
-    "# Data Structures\n"\
-    "\n"\
-    "## A (B)\n"\
-    "## A (object)\n"\
-    "## B (object)\n";
+    mdp::ByteBuffer source
+        = "# Data Structures\n"
+          "\n"
+          "## A (B)\n"
+          "## A (object)\n"
+          "## B (object)\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == MSONError);
     SourceMapHelper::check(blueprint.report.error.location, 28, 14);
@@ -1048,24 +1085,26 @@ TEST_CASE("Report error when a named type is defined twice, once with base type 
 
 TEST_CASE("Parse mson signature attributes with mismatched square brackets", "[blueprint]")
 {
-    mdp::ByteBuffer source = \
-    "# /\n"\
-    "+ Attributes (array[Note)";
+    mdp::ByteBuffer source
+        = "# /\n"
+          "+ Attributes (array[Note)";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
 }
 
 TEST_CASE("Parse named type mson signature attributes with no closing bracket", "[blueprint]")
 {
-    mdp::ByteBuffer source = \
-    "# Data Structures\n"\
-    "## B (A(";
+    mdp::ByteBuffer source
+        = "# Data Structures\n"
+          "## B (A(";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == MSONError);
     REQUIRE(blueprint.report.error.message == "base type 'A(' is not defined in the document");
@@ -1073,31 +1112,33 @@ TEST_CASE("Parse named type mson signature attributes with no closing bracket", 
 
 TEST_CASE("Parse correctly when a resource named type is non-circularly referenced in action attributes", "[blueprint]")
 {
-    mdp::ByteBuffer source = \
-    "# Question [/question]\n"\
-    "+ Attributes\n"\
-    "    + question\n"\
-    "\n"\
-    "# Choice [/choice]\n"\
-    "## Vote on choice [POST]\n"\
-    "+ Attributes\n"\
-    "    + bla (Question)\n";
+    mdp::ByteBuffer source
+        = "# Question [/question]\n"
+          "+ Attributes\n"
+          "    + question\n"
+          "\n"
+          "# Choice [/choice]\n"
+          "## Vote on choice [POST]\n"
+          "+ Attributes\n"
+          "    + bla (Question)\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
 }
 
 TEST_CASE("Report error when not finding a super type of the nested member", "[blueprint]")
 {
-    mdp::ByteBuffer source = \
-    "# Data Structures\n"\
-    "## A\n"\
-    "+ choice (B)\n";
+    mdp::ByteBuffer source
+        = "# Data Structures\n"
+          "## A\n"
+          "+ choice (B)\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == MSONError);
     REQUIRE(blueprint.report.error.message == "base type 'B' is not defined in the document");
@@ -1105,13 +1146,14 @@ TEST_CASE("Report error when not finding a super type of the nested member", "[b
 
 TEST_CASE("Report error when not finding a nested super type of the nested member", "[blueprint]")
 {
-    mdp::ByteBuffer source = \
-    "# Data Structures\n"\
-    "## A\n"\
-    "+ choice (array[B])\n";
+    mdp::ByteBuffer source
+        = "# Data Structures\n"
+          "## A\n"
+          "+ choice (array[B])\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == MSONError);
     REQUIRE(blueprint.report.error.message == "base type 'B' is not defined in the document");
@@ -1119,13 +1161,14 @@ TEST_CASE("Report error when not finding a nested super type of the nested membe
 
 TEST_CASE("Report error when not finding a mixin type", "[blueprint]")
 {
-    mdp::ByteBuffer source = \
-    "# Data Structures\n"\
-    "## A\n"\
-    "+ Include B\n";
+    mdp::ByteBuffer source
+        = "# Data Structures\n"
+          "## A\n"
+          "+ Include B\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == MSONError);
     REQUIRE(blueprint.report.error.message == "base type 'B' is not defined in the document");
@@ -1133,20 +1176,21 @@ TEST_CASE("Report error when not finding a mixin type", "[blueprint]")
 
 TEST_CASE("When an object contains a mixin of array type", "[blueprint]")
 {
-    mdp::ByteBuffer source = \
-    "# Data Structures\n"\
-    "## C (object)\n"\
-    "+ Include A\n"\
-    "\n"\
-    "## D (object)\n"\
-    "+ Include B";
+    mdp::ByteBuffer source
+        = "# Data Structures\n"
+          "## C (object)\n"
+          "+ Include A\n"
+          "\n"
+          "## D (object)\n"
+          "+ Include B";
 
     NamedTypes namedTypes;
     NamedTypeHelper::build("A", mson::ObjectBaseType, namedTypes);
     NamedTypeHelper::build("B", mson::ValueBaseType, namedTypes);
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint, namedTypes);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint, namedTypes);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.size() == 1);
@@ -1156,20 +1200,21 @@ TEST_CASE("When an object contains a mixin of array type", "[blueprint]")
 
 TEST_CASE("When an array contains a mixin of object type", "[blueprint]")
 {
-    mdp::ByteBuffer source = \
-    "# Data Structures\n"\
-    "## C (array)\n"\
-    "+ Include A\n"\
-    "\n"\
-    "## D (array)\n"\
-    "+ Include B";
+    mdp::ByteBuffer source
+        = "# Data Structures\n"
+          "## C (array)\n"
+          "+ Include A\n"
+          "\n"
+          "## D (array)\n"
+          "+ Include B";
 
     NamedTypes namedTypes;
     NamedTypeHelper::build("A", mson::ObjectBaseType, namedTypes);
     NamedTypeHelper::build("B", mson::ValueBaseType, namedTypes);
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint, namedTypes);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint, namedTypes);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.size() == 1);
@@ -1179,20 +1224,21 @@ TEST_CASE("When an array contains a mixin of object type", "[blueprint]")
 
 TEST_CASE("When an object member contains a mixin of array type", "[blueprint]")
 {
-    mdp::ByteBuffer source = \
-    "# Data Structures\n"\
-    "## C\n"\
-    "+ d (object)\n"\
-    "    + Include A\n"\
-    "+ e (object)\n"\
-    "    + Include B";
+    mdp::ByteBuffer source
+        = "# Data Structures\n"
+          "## C\n"
+          "+ d (object)\n"
+          "    + Include A\n"
+          "+ e (object)\n"
+          "    + Include B";
 
     NamedTypes namedTypes;
     NamedTypeHelper::build("A", mson::ObjectBaseType, namedTypes);
     NamedTypeHelper::build("B", mson::ValueBaseType, namedTypes);
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint, namedTypes);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint, namedTypes);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.size() == 1);
@@ -1202,20 +1248,21 @@ TEST_CASE("When an object member contains a mixin of array type", "[blueprint]")
 
 TEST_CASE("When an array member contains a mixin of object type", "[blueprint]")
 {
-    mdp::ByteBuffer source = \
-    "# Data Structures\n"\
-    "## C\n"\
-    "+ d (array)\n"\
-    "    + Include A\n"\
-    "+ e (array)\n"\
-    "    + Include B";
+    mdp::ByteBuffer source
+        = "# Data Structures\n"
+          "## C\n"
+          "+ d (array)\n"
+          "    + Include A\n"
+          "+ e (array)\n"
+          "    + Include B";
 
     NamedTypes namedTypes;
     NamedTypeHelper::build("A", mson::ObjectBaseType, namedTypes);
     NamedTypeHelper::build("B", mson::ValueBaseType, namedTypes);
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint, namedTypes);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint, namedTypes);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.size() == 1);
@@ -1225,23 +1272,24 @@ TEST_CASE("When an array member contains a mixin of object type", "[blueprint]")
 
 TEST_CASE("Any named type data structure should be able to be overridden when referenced", "[blueprint]")
 {
-    mdp::ByteBuffer source = \
-    "# Tesla\n"\
-    "\n"\
-    "# Data Structures\n"\
-    "## User (object)\n"\
-    "+ username: kyle\n"\
-    "\n"\
-    "# GET /sample\n"\
-    "+ Response 200 (application/json)\n"\
-    "    + Attributes\n"\
-    "        + data (object, required)\n"\
-    "            + users (array, required)\n"\
-    "                + (User)\n"\
-    "                    + relation: family\n";
+    mdp::ByteBuffer source
+        = "# Tesla\n"
+          "\n"
+          "# Data Structures\n"
+          "## User (object)\n"
+          "+ username: kyle\n"
+          "\n"
+          "# GET /sample\n"
+          "+ Response 200 (application/json)\n"
+          "    + Attributes\n"
+          "        + data (object, required)\n"
+          "            + users (array, required)\n"
+          "                + (User)\n"
+          "                    + relation: family\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -1304,19 +1352,20 @@ TEST_CASE("Any named type data structure should be able to be overridden when re
 
 TEST_CASE("Parse attributes with mixin and no base type mentioned for attributes", "[blueprint][362]")
 {
-    mdp::ByteBuffer source = \
-    "# GET /\n"\
-    "+ Response 200\n"\
-    "    + Attributes\n"\
-    "        + Include A\n"\
-    "\n"\
-    "# Data Structures\n"\
-    "\n"\
-    "## A (object)\n"\
-    "+ a: a\n";
+    mdp::ByteBuffer source
+        = "# GET /\n"
+          "+ Response 200\n"
+          "    + Attributes\n"
+          "        + Include A\n"
+          "\n"
+          "# Data Structures\n"
+          "\n"
+          "## A (object)\n"
+          "+ a: a\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -1325,19 +1374,20 @@ TEST_CASE("Parse attributes with mixin and no base type mentioned for attributes
 
 TEST_CASE("Parse attributes with mixin and no base type mentioned for mixin", "[blueprint]")
 {
-    mdp::ByteBuffer source = \
-    "# GET /\n"\
-    "+ Response 200\n"\
-    "    + Attributes (object)\n"\
-    "        + Include A\n"\
-    "\n"\
-    "# Data Structures\n"\
-    "\n"\
-    "## A\n"\
-    "+ a: a\n";
+    mdp::ByteBuffer source
+        = "# GET /\n"
+          "+ Response 200\n"
+          "    + Attributes (object)\n"
+          "        + Include A\n"
+          "\n"
+          "# Data Structures\n"
+          "\n"
+          "## A\n"
+          "+ a: a\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.empty());
@@ -1346,14 +1396,15 @@ TEST_CASE("Parse attributes with mixin and no base type mentioned for mixin", "[
 
 TEST_CASE("Report error when not finding a super type of the nested member from attributes", "[blueprint][354]")
 {
-    mdp::ByteBuffer source = \
-    "# GET /\n"\
-    "+ Response 200\n"\
-    "    + Attributes\n"\
-    "        + data (A)\n";
+    mdp::ByteBuffer source
+        = "# GET /\n"
+          "+ Response 200\n"
+          "    + Attributes\n"
+          "        + data (A)\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == MSONError);
     REQUIRE(blueprint.report.error.message == "base type 'A' is not defined in the document");
@@ -1362,13 +1413,14 @@ TEST_CASE("Report error when not finding a super type of the nested member from 
 
 TEST_CASE("Report error when not finding a super type of the attributes", "[blueprint][354]")
 {
-    mdp::ByteBuffer source = \
-    "# GET /\n"\
-    "+ Response 200\n"\
-    "    + Attributes (A)\n";
+    mdp::ByteBuffer source
+        = "# GET /\n"
+          "+ Response 200\n"
+          "    + Attributes (A)\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption);
 
     REQUIRE(blueprint.report.error.code == MSONError);
     REQUIRE(blueprint.report.error.message == "base type 'A' is not defined in the document");
@@ -1377,18 +1429,18 @@ TEST_CASE("Report error when not finding a super type of the attributes", "[blue
 
 TEST_CASE("Parse blueprint with escaped datastructure", "[blueprint]")
 {
-    mdp::ByteBuffer source = \
-    "# Data Structures\n"\
-    "## `Test`\n"\
-    "- name - test name\n"\
-    "\n"\
-    "# GET /\n"\
-     "+ Response 200 (application/json)\n"\
-     "    + Attributes(Test)\n";
-
+    mdp::ByteBuffer source
+        = "# Data Structures\n"
+          "## `Test`\n"
+          "- name - test name\n"
+          "\n"
+          "# GET /\n"
+          "+ Response 200 (application/json)\n"
+          "    + Attributes(Test)\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.size() == 0);
@@ -1402,21 +1454,20 @@ TEST_CASE("Parse blueprint with escaped datastructure", "[blueprint]")
     REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 1);
 }
 
-
 TEST_CASE("Parse blueprint with escaped datastructure reference", "[blueprint]")
 {
-    mdp::ByteBuffer source = \
-    "# Data Structures\n"\
-    "## Test\n"\
-    "- name - test name\n"\
-    "\n"\
-    "# GET /\n"\
-     "+ Response 200 (application/json)\n"\
-     "    + Attributes(`Test`)\n";
-
+    mdp::ByteBuffer source
+        = "# Data Structures\n"
+          "## Test\n"
+          "- name - test name\n"
+          "\n"
+          "# GET /\n"
+          "+ Response 200 (application/json)\n"
+          "    + Attributes(`Test`)\n";
 
     ParseResult<Blueprint> blueprint;
-    SectionParserHelper<Blueprint, BlueprintParser>::parse(source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
+    SectionParserHelper<Blueprint, BlueprintParser>::parse(
+        source, BlueprintSectionType, blueprint, ExportSourcemapOption, Models(), &blueprint);
 
     REQUIRE(blueprint.report.error.code == Error::OK);
     REQUIRE(blueprint.report.warnings.size() == 0);

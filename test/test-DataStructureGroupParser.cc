@@ -28,15 +28,16 @@ TEST_CASE("Recognize explicit data structures signature", "[data_structure_group
 
 TEST_CASE("Parse canonical data structures", "[data_structure_group]")
 {
-    mdp::ByteBuffer source = \
-    "# Data Structures\n\n"\
-    "## User\n\n"\
-    "- first_name\n"\
-    "- last_name\n\n"\
-    "## Email (array[string])";
+    mdp::ByteBuffer source
+        = "# Data Structures\n\n"
+          "## User\n\n"
+          "- first_name\n"
+          "- last_name\n\n"
+          "## Email (array[string])";
 
     ParseResult<DataStructureGroup> dataStructureGroup;
-    SectionParserHelper<DataStructureGroup, DataStructureGroupParser>::parse(source, DataStructureGroupSectionType, dataStructureGroup, ExportSourcemapOption);
+    SectionParserHelper<DataStructureGroup, DataStructureGroupParser>::parse(
+        source, DataStructureGroupSectionType, dataStructureGroup, ExportSourcemapOption);
 
     REQUIRE(dataStructureGroup.report.error.code == Error::OK);
     REQUIRE(dataStructureGroup.report.warnings.empty());
@@ -59,7 +60,8 @@ TEST_CASE("Parse canonical data structures", "[data_structure_group]")
     REQUIRE(dataStructure.typeDefinition.typeSpecification.name.base == mson::ArrayTypeName);
     REQUIRE(dataStructure.typeDefinition.typeSpecification.nestedTypes.size() == 1);
 
-    SourceMap<DataStructure> dataStructureSM = dataStructureGroup.sourceMap.content.elements().collection[0].content.dataStructure;
+    SourceMap<DataStructure> dataStructureSM
+        = dataStructureGroup.sourceMap.content.elements().collection[0].content.dataStructure;
     SourceMapHelper::check(dataStructureSM.name.sourceMap, 19, 9);
     REQUIRE(dataStructureSM.typeDefinition.sourceMap.empty());
     REQUIRE(dataStructureSM.sections.collection[0].elements().collection.size() == 2);
@@ -71,22 +73,23 @@ TEST_CASE("Parse canonical data structures", "[data_structure_group]")
 
 TEST_CASE("Parse multiple data structures with type sections", "[data_structure_group]")
 {
-    mdp::ByteBuffer source = \
-    "# Data Structures\n"\
-    "\n"\
-    "## User\n"\
-    "\n"\
-    "Some description\n"\
-    "\n"\
-    "### Properties\n"\
-    "\n"\
-    "- first_name\n"\
-    "- last_name\n"\
-    "\n"\
-    "## Email (array[string])";
+    mdp::ByteBuffer source
+        = "# Data Structures\n"
+          "\n"
+          "## User\n"
+          "\n"
+          "Some description\n"
+          "\n"
+          "### Properties\n"
+          "\n"
+          "- first_name\n"
+          "- last_name\n"
+          "\n"
+          "## Email (array[string])";
 
     ParseResult<DataStructureGroup> dataStructureGroup;
-    SectionParserHelper<DataStructureGroup, DataStructureGroupParser>::parse(source, DataStructureGroupSectionType, dataStructureGroup, ExportSourcemapOption);
+    SectionParserHelper<DataStructureGroup, DataStructureGroupParser>::parse(
+        source, DataStructureGroupSectionType, dataStructureGroup, ExportSourcemapOption);
 
     REQUIRE(dataStructureGroup.report.error.code == Error::OK);
     REQUIRE(dataStructureGroup.report.warnings.empty());
@@ -111,7 +114,8 @@ TEST_CASE("Parse multiple data structures with type sections", "[data_structure_
     REQUIRE(dataStructure.typeDefinition.typeSpecification.name.base == mson::ArrayTypeName);
     REQUIRE(dataStructure.typeDefinition.typeSpecification.nestedTypes.size() == 1);
 
-    SourceMap<DataStructure> dataStructureSM = dataStructureGroup.sourceMap.content.elements().collection[0].content.dataStructure;
+    SourceMap<DataStructure> dataStructureSM
+        = dataStructureGroup.sourceMap.content.elements().collection[0].content.dataStructure;
     SourceMapHelper::check(dataStructureSM.name.sourceMap, 19, 9);
     REQUIRE(dataStructureSM.typeDefinition.sourceMap.empty());
     SourceMapHelper::check(dataStructureSM.sections.collection[0].description.sourceMap, 28, 18);

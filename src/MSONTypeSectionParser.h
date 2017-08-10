@@ -14,7 +14,8 @@
 
 using namespace scpl;
 
-namespace snowcrash {
+namespace snowcrash
+{
 
     /** MSON Default Type Section matching regex */
     const char* const MSONDefaultTypeSectionRegex = "^[[:blank:]]*[Dd]efault[[:blank:]]*(:.*)?$";
@@ -31,21 +32,22 @@ namespace snowcrash {
     /**
      * MSON Type Section Section Processor
      */
-    template<>
+    template <>
     struct SectionProcessor<mson::TypeSection> : public SignatureSectionProcessorBase<mson::TypeSection> {
 
-        static SignatureTraits signatureTraits() {
+        static SignatureTraits signatureTraits()
+        {
 
-            SignatureTraits signatureTraits(SignatureTraits::IdentifierTrait |
-                                            SignatureTraits::ValuesTrait);
+            SignatureTraits signatureTraits(SignatureTraits::IdentifierTrait | SignatureTraits::ValuesTrait);
 
             return signatureTraits;
         }
 
         static MarkdownNodeIterator finalizeSignature(const MarkdownNodeIterator& node,
-                                                      SectionParserData& pd,
-                                                      const Signature& signature,
-                                                      const ParseResultRef<mson::TypeSection>& out) {
+            SectionParserData& pd,
+            const Signature& signature,
+            const ParseResultRef<mson::TypeSection>& out)
+        {
 
             bool assignValues = false;
 
@@ -53,49 +55,42 @@ namespace snowcrash {
 
                 out.node.klass = mson::TypeSection::DefaultClass;
                 assignValues = true;
-            }
-            else if (IEqual<std::string>()(signature.identifier, "Sample")) {
+            } else if (IEqual<std::string>()(signature.identifier, "Sample")) {
 
                 out.node.klass = mson::TypeSection::SampleClass;
                 assignValues = true;
-            }
-            else if (IEqual<std::string>()(signature.identifier, "Items") ||
-                     IEqual<std::string>()(signature.identifier, "Members")) {
+            } else if (IEqual<std::string>()(signature.identifier, "Items")
+                || IEqual<std::string>()(signature.identifier, "Members")) {
 
-                if (out.node.baseType != mson::ValueBaseType &&
-                    out.node.baseType != mson::ImplicitValueBaseType) {
+                if (out.node.baseType != mson::ValueBaseType && out.node.baseType != mson::ImplicitValueBaseType) {
 
-                    //WARN: Items/Members should only be allowed for value types
+                    // WARN: Items/Members should only be allowed for value types
                     std::stringstream ss;
 
                     ss << "type section `" << signature.identifier;
                     ss << "` not allowed for a type sub-typed from a primitive or object type";
 
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                    out.report.warnings.push_back(Warning(ss.str(),
-                                                          LogicalErrorWarning,
-                                                          sourceMap));
+                    mdp::CharactersRangeSet sourceMap
+                        = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                    out.report.warnings.push_back(Warning(ss.str(), LogicalErrorWarning, sourceMap));
 
                     return node;
                 }
 
                 out.node.klass = mson::TypeSection::MemberTypeClass;
-            }
-            else if (IEqual<std::string>()(signature.identifier, "Properties")) {
+            } else if (IEqual<std::string>()(signature.identifier, "Properties")) {
 
-                if (out.node.baseType != mson::ObjectBaseType &&
-                    out.node.baseType != mson::ImplicitObjectBaseType) {
+                if (out.node.baseType != mson::ObjectBaseType && out.node.baseType != mson::ImplicitObjectBaseType) {
 
-                    //WARN: Properties should only be allowed for object types
+                    // WARN: Properties should only be allowed for object types
                     std::stringstream ss;
 
                     ss << "type section `" << signature.identifier;
                     ss << "` is only allowed for a type sub-typed from an object type";
 
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                    out.report.warnings.push_back(Warning(ss.str(),
-                                                          LogicalErrorWarning,
-                                                          sourceMap));
+                    mdp::CharactersRangeSet sourceMap
+                        = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                    out.report.warnings.push_back(Warning(ss.str(), LogicalErrorWarning, sourceMap));
 
                     return node;
                 }
@@ -103,20 +98,18 @@ namespace snowcrash {
                 out.node.klass = mson::TypeSection::MemberTypeClass;
             }
 
-            if (assignValues &&
-                (!signature.values.empty() || !signature.value.empty())) {
+            if (assignValues && (!signature.values.empty() || !signature.value.empty())) {
 
-                if (out.node.baseType == mson::PrimitiveBaseType ||
-                    out.node.baseType == mson::ImplicitPrimitiveBaseType) {
+                if (out.node.baseType == mson::PrimitiveBaseType
+                    || out.node.baseType == mson::ImplicitPrimitiveBaseType) {
 
                     out.node.content.value = signature.value;
 
                     if (pd.exportSourceMap()) {
                         out.sourceMap.value.sourceMap = node->sourceMap;
                     }
-                }
-                else if (out.node.baseType == mson::ValueBaseType ||
-                         out.node.baseType == mson::ImplicitValueBaseType) {
+                } else if (out.node.baseType == mson::ValueBaseType
+                    || out.node.baseType == mson::ImplicitValueBaseType) {
 
                     for (size_t i = 0; i < signature.values.size(); i++) {
 
@@ -132,21 +125,23 @@ namespace snowcrash {
                             out.sourceMap.elements().collection.push_back(elementSM);
                         }
                     }
-                }
-                else if (out.node.baseType == mson::ObjectBaseType ||
-                         out.node.baseType == mson::ImplicitObjectBaseType) {
+                } else if (out.node.baseType == mson::ObjectBaseType
+                    || out.node.baseType == mson::ImplicitObjectBaseType) {
 
                     // WARN: sample/default is for an object but it has values in signature
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                    out.report.warnings.push_back(Warning("a sample and/or default type section for a type which is sub-typed from an object cannot have value(s) beside the keyword",
-                                                          LogicalErrorWarning,
-                                                          sourceMap));
+                    mdp::CharactersRangeSet sourceMap
+                        = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                    out.report.warnings.push_back(
+                        Warning("a sample and/or default type section for a type which is sub-typed from an object "
+                                "cannot have value(s) beside the keyword",
+                            LogicalErrorWarning,
+                            sourceMap));
                 }
             }
 
-            if (assignValues && !signature.remainingContent.empty() &&
-                (out.node.baseType == mson::PrimitiveBaseType ||
-                 out.node.baseType == mson::ImplicitPrimitiveBaseType)) {
+            if (assignValues && !signature.remainingContent.empty()
+                && (out.node.baseType == mson::PrimitiveBaseType
+                       || out.node.baseType == mson::ImplicitPrimitiveBaseType)) {
 
                 out.node.content.value += signature.remainingContent;
 
@@ -161,21 +156,19 @@ namespace snowcrash {
         NO_SECTION_DESCRIPTION(mson::TypeSection)
 
         static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator&,
-                                                         const MarkdownNodes&,
-                                                         SectionParserData&,
-                                                         const ParseResultRef<mson::TypeSection>&);
+            const MarkdownNodes&,
+            SectionParserData&,
+            const ParseResultRef<mson::TypeSection>&);
 
-        static SectionType sectionType(const MarkdownNodeIterator& node) {
+        static SectionType sectionType(const MarkdownNodeIterator& node)
+        {
 
             mdp::ByteBuffer subject, remaining;
 
-            if (node->type == mdp::HeaderMarkdownNodeType &&
-                !node->text.empty()) {
+            if (node->type == mdp::HeaderMarkdownNodeType && !node->text.empty()) {
 
                 subject = node->text;
-            }
-            else if (node->type == mdp::ListItemMarkdownNodeType &&
-                     !node->children().empty()) {
+            } else if (node->type == mdp::ListItemMarkdownNodeType && !node->children().empty()) {
 
                 subject = node->children().front().text;
             }
@@ -183,8 +176,7 @@ namespace snowcrash {
             subject = GetFirstLine(subject, remaining);
             TrimString(subject);
 
-            if (RegexMatch(subject, MSONDefaultTypeSectionRegex) ||
-                RegexMatch(subject, MSONSampleTypeSectionRegex)) {
+            if (RegexMatch(subject, MSONDefaultTypeSectionRegex) || RegexMatch(subject, MSONSampleTypeSectionRegex)) {
 
                 return MSONSampleDefaultSectionType;
             }

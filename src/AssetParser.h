@@ -13,10 +13,12 @@
 #include "RegexMatch.h"
 #include "CodeBlockUtility.h"
 
-namespace snowcrash {
+namespace snowcrash
+{
 
     /// Asset signature
-    enum AssetSignature {
+    enum AssetSignature
+    {
         NoAssetSignature = 0,
         BodyAssetSignature,         /// < Explicit body asset
         ImplicitBodyAssetSignature, /// < Body asset using abbreviated syntax
@@ -33,14 +35,15 @@ namespace snowcrash {
     /**
      *  Asset Section Processor
      */
-    template<>
+    template <>
     struct SectionProcessor<Asset> : public SectionProcessorBase<Asset> {
 
         static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
-                                                     const MarkdownNodes& siblings,
-                                                     SectionParserData& pd,
-                                                     SectionLayout& layout,
-                                                     const ParseResultRef<Asset>& out) {
+            const MarkdownNodes& siblings,
+            SectionParserData& pd,
+            SectionLayout& layout,
+            const ParseResultRef<Asset>& out)
+        {
 
             out.node = "";
             CodeBlockUtility::signatureContentAsCodeBlock(node, pd, out.report, out.node);
@@ -55,9 +58,10 @@ namespace snowcrash {
         NO_SECTION_DESCRIPTION(Asset)
 
         static MarkdownNodeIterator processContent(const MarkdownNodeIterator& node,
-                                                   const MarkdownNodes& siblings,
-                                                   SectionParserData& pd,
-                                                   const ParseResultRef<Asset>& out) {
+            const MarkdownNodes& siblings,
+            SectionParserData& pd,
+            const ParseResultRef<Asset>& out)
+        {
 
             mdp::ByteBuffer content;
             CodeBlockUtility::contentAsCodeBlock(node, pd, out.report, content);
@@ -71,15 +75,15 @@ namespace snowcrash {
             return ++MarkdownNodeIterator(node);
         }
 
-        static bool isContentNode(const MarkdownNodeIterator& node,
-                                  SectionType sectionType) {
+        static bool isContentNode(const MarkdownNodeIterator& node, SectionType sectionType)
+        {
 
             return (SectionKeywordSignature(node) == UndefinedSectionType);
         }
 
-        static SectionType sectionType(const MarkdownNodeIterator& node) {
-            if (node->type == mdp::ListItemMarkdownNodeType
-                && !node->children().empty()) {
+        static SectionType sectionType(const MarkdownNodeIterator& node)
+        {
+            if (node->type == mdp::ListItemMarkdownNodeType && !node->children().empty()) {
 
                 AssetSignature signature = assetSignature(node);
 
@@ -100,7 +104,8 @@ namespace snowcrash {
         }
 
         /** Resolve asset signature */
-        static AssetSignature assetSignature(const MarkdownNodeIterator& node) {
+        static AssetSignature assetSignature(const MarkdownNodeIterator& node)
+        {
 
             mdp::ByteBuffer remaining, subject = node->children().front().text;
             subject = GetFirstLine(subject, remaining);

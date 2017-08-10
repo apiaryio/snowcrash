@@ -13,17 +13,19 @@
 #include "BlueprintSourcemap.h"
 #include "Section.h"
 
-namespace snowcrash {
+namespace snowcrash
+{
 
     /**
      *  \brief Blueprint Parser Options.
      *
      *  Controls blueprint parser behavior.
      */
-    enum BlueprintParserOption {
-        RenderDescriptionsOption = (1 << 0),    /// < Render Markdown in description.
-        RequireBlueprintNameOption = (1 << 1),  /// < Treat missing blueprint name as error
-        ExportSourcemapOption = (1 << 2)        /// < Export source maps AST
+    enum BlueprintParserOption
+    {
+        RenderDescriptionsOption = (1 << 0),   /// < Render Markdown in description.
+        RequireBlueprintNameOption = (1 << 1), /// < Treat missing blueprint name as error
+        ExportSourcemapOption = (1 << 2)       /// < Export source maps AST
     };
 
     typedef unsigned int BlueprintParserOptions;
@@ -34,10 +36,10 @@ namespace snowcrash {
      *  State of the parser.
      */
     struct SectionParserData {
-        SectionParserData(BlueprintParserOptions opts,
-                          const mdp::ByteBuffer& src,
-                          const Blueprint& bp)
-        : options(opts), sourceData(src), blueprint(bp) {}
+        SectionParserData(BlueprintParserOptions opts, const mdp::ByteBuffer& src, const Blueprint& bp)
+            : options(opts), sourceData(src), blueprint(bp)
+        {
+        }
 
         /** Parser Options */
         BlueprintParserOptions options;
@@ -77,12 +79,14 @@ namespace snowcrash {
         SectionsStack sectionsContext;
 
         /** \returns Actual Section Context */
-        SectionType sectionContext() const {
+        SectionType sectionContext() const
+        {
             return (sectionsContext.empty()) ? UndefinedSectionType : sectionsContext.back();
         }
 
         /** \returns Parent Section Context */
-        SectionType parentSectionContext() const {
+        SectionType parentSectionContext() const
+        {
             if (sectionsContext.empty())
                 return UndefinedSectionType;
 
@@ -91,11 +95,12 @@ namespace snowcrash {
             if (size == 1)
                 return sectionsContext.back();
             else
-                return sectionsContext[size-2];
+                return sectionsContext[size - 2];
         }
 
         /** \returns True if exporting source maps */
-        bool exportSourceMap() const {
+        bool exportSourceMap() const
+        {
             return options & ExportSourcemapOption;
         }
 

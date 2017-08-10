@@ -53,8 +53,7 @@ SourceMap<Element>::Content::~Content()
 {
 }
 
-SourceMap<Element>::SourceMap(const Element::Class& element_)
-: element(element_)
+SourceMap<Element>::SourceMap(const Element::Class& element_) : element(element_)
 {
 }
 

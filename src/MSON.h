@@ -27,7 +27,8 @@
  * Data types in this document define the MSON AST
  */
 
-namespace mson {
+namespace mson
+{
 
     /** Markdown */
     typedef mdp::ByteBuffer Markdown;
@@ -41,7 +42,8 @@ namespace mson {
      * This is an internal thing to keep track of what kind of type,
      * that particular named type or member is sub-typed from
      */
-    enum BaseType {
+    enum BaseType
+    {
         UndefinedBaseType = 0,     // Undefined
         PrimitiveBaseType,         // Primitive Types
         ImplicitPrimitiveBaseType, // Primitive Types (implicit)
@@ -64,8 +66,9 @@ namespace mson {
     struct Value {
 
         /** Constructor */
-        Value()
-        : variable(false) {}
+        Value() : variable(false)
+        {
+        }
 
         /** Literal value */
         Literal literal;
@@ -84,8 +87,9 @@ namespace mson {
     struct Symbol {
 
         /** Constructor */
-        Symbol()
-        : variable(false) {}
+        Symbol() : variable(false)
+        {
+        }
 
         /** Name of the symbol */
         Literal literal;
@@ -98,7 +102,8 @@ namespace mson {
     };
 
     /** Value of type name if based type */
-    enum BaseTypeName {
+    enum BaseTypeName
+    {
         UndefinedTypeName = 0, // Not a base type name
         BooleanTypeName,       // `boolean` type name
         StringTypeName,        // `string` type name
@@ -112,8 +117,9 @@ namespace mson {
     struct TypeName {
 
         /** Constructor */
-        TypeName(const BaseTypeName& base_ = UndefinedTypeName)
-        : base(base_) {}
+        TypeName(const BaseTypeName& base_ = UndefinedTypeName) : base(base_)
+        {
+        }
 
         /** EITHER Base type's value */
         BaseTypeName base;
@@ -129,14 +135,15 @@ namespace mson {
     typedef std::vector<TypeName> TypeNames;
 
     /** Attribute of a type */
-    enum TypeAttribute {
-        RequiredTypeAttribute  = (1 << 0),  // The type is required
-        OptionalTypeAttribute  = (1 << 1),  // The type is optional
-        FixedTypeAttribute     = (1 << 2),  // The type is fixed
-        SampleTypeAttribute    = (1 << 3),  // The type is a sample
-        DefaultTypeAttribute   = (1 << 4),  // The type is default
-        NullableTypeAttribute  = (1 << 5),  // The type is nullable
-        FixedTypeTypeAttribute = (1 << 6)   // This type works like fixed, but it is unheritable
+    enum TypeAttribute
+    {
+        RequiredTypeAttribute = (1 << 0), // The type is required
+        OptionalTypeAttribute = (1 << 1), // The type is optional
+        FixedTypeAttribute = (1 << 2),    // The type is fixed
+        SampleTypeAttribute = (1 << 3),   // The type is a sample
+        DefaultTypeAttribute = (1 << 4),  // The type is default
+        NullableTypeAttribute = (1 << 5), // The type is nullable
+        FixedTypeTypeAttribute = (1 << 6) // This type works like fixed, but it is unheritable
     };
 
     /** List of type attributes */
@@ -159,8 +166,9 @@ namespace mson {
     struct TypeDefinition {
 
         /** Constructor */
-        TypeDefinition()
-        : baseType(UndefinedBaseType), attributes(0) {}
+        TypeDefinition() : baseType(UndefinedBaseType), attributes(0)
+        {
+        }
 
         /**
          * Base Type (for the type definition)
@@ -203,7 +211,8 @@ namespace mson {
     struct TypeSection {
 
         /** Class of a type section */
-        enum Class {
+        enum Class
+        {
             UndefinedClass = 0,    // Unknown
             BlockDescriptionClass, // Markdown block description
             MemberTypeClass,       // Contains member types
@@ -242,7 +251,9 @@ namespace mson {
 
         /** Constructor */
         TypeSection(const TypeSection::Class& klass_ = TypeSection::UndefinedClass)
-        : baseType(UndefinedBaseType), klass(klass_) {}
+            : baseType(UndefinedBaseType), klass(klass_)
+        {
+        }
 
         /** Base Type (for the parent of the type section) */
         BaseType baseType;
@@ -325,7 +336,8 @@ namespace mson {
     struct Element {
 
         /** Class of an element */
-        enum Class {
+        enum Class
+        {
             UndefinedClass = 0, // Unknown
             PropertyClass,      // Property member
             ValueClass,         // Value member

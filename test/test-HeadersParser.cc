@@ -12,16 +12,16 @@
 using namespace snowcrash;
 using namespace snowcrashtest;
 
-const mdp::ByteBuffer HeadersFixture = \
-"+ Headers\n"\
-"\n"\
-"        Content-Type: application/json\n"\
-"        X-My-Header: Hello World!\n";
+const mdp::ByteBuffer HeadersFixture
+    = "+ Headers\n"
+      "\n"
+      "        Content-Type: application/json\n"
+      "        X-My-Header: Hello World!\n";
 
-const mdp::ByteBuffer HeadersSignatureContentFixture = \
-"+ Headers\n"\
-"        Content-Type: application/json\n"\
-"        X-My-Header: Hello World!\n";
+const mdp::ByteBuffer HeadersSignatureContentFixture
+    = "+ Headers\n"
+      "        Content-Type: application/json\n"
+      "        X-My-Header: Hello World!\n";
 
 TEST_CASE("recognize headers signature", "[headers]")
 {
@@ -37,7 +37,8 @@ TEST_CASE("recognize headers signature", "[headers]")
 TEST_CASE("parse headers fixture", "[headers]")
 {
     ParseResult<Headers> headers;
-    SectionParserHelper<Headers, HeadersParser>::parse(HeadersFixture, HeadersSectionType, headers, ExportSourcemapOption);
+    SectionParserHelper<Headers, HeadersParser>::parse(
+        HeadersFixture, HeadersSectionType, headers, ExportSourcemapOption);
 
     REQUIRE(headers.report.error.code == Error::OK);
     REQUIRE(headers.report.warnings.empty());
@@ -53,7 +54,6 @@ TEST_CASE("parse headers fixture", "[headers]")
     SourceMapHelper::check(headers.sourceMap.collection[1].sourceMap, 58, 25);
 }
 
-
 // This test is commented out because, in real parsing it is never parsed is "one block sourcemap"
 // Just in context of HeaderParser testing.
 // This test is not completly removed, instead it is placed in context of ResourceParser (as in real world)
@@ -61,7 +61,8 @@ TEST_CASE("parse headers fixture", "[headers]")
 TEST_CASE("parse headers fixture with no empty line between signature and content", "[headers]")
 {
     ParseResult<Headers> headers;
-    SectionParserHelper<Headers, HeadersParser>::parse(HeadersSignatureContentFixture, HeadersSectionType, headers, ExportSourcemapOption);
+    SectionParserHelper<Headers, HeadersParser>::parse(
+        HeadersSignatureContentFixture, HeadersSectionType, headers, ExportSourcemapOption);
 
     REQUIRE(headers.report.error.code == Error::OK);
     REQUIRE(headers.report.warnings.size() == 1); // content in signature
@@ -111,7 +112,7 @@ TEST_CASE("parse malformed headers fixture", "[headers]")
 TEST_CASE("Parse header section composed of multiple blocks", "[headers]")
 {
     // Blueprint in question:
-    //R"(
+    // R"(
     //+ Headers
     //    Content-Type   : text/plain
     //
@@ -161,11 +162,11 @@ TEST_CASE("Parse header section with missing headers", "[headers]")
 
 TEST_CASE("Headers parses should return warning on multiple definition of same headers", "[headers][issue][75]")
 {
-    const mdp::ByteBuffer source = \
-    "+ Headers\n"\
-    "\n"\
-    "        Content-Type: application/json\n"\
-    "        Content-Type: application/json\n";
+    const mdp::ByteBuffer source
+        = "+ Headers\n"
+          "\n"
+          "        Content-Type: application/json\n"
+          "        Content-Type: application/json\n";
 
     ParseResult<Headers> headers;
     SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
@@ -176,13 +177,14 @@ TEST_CASE("Headers parses should return warning on multiple definition of same h
     REQUIRE(headers.node.size() == 2);
 }
 
-TEST_CASE("Parse header section with more same headers Set-Cookie and Link - there should not be warning", "[headers][issue][75]")
+TEST_CASE("Parse header section with more same headers Set-Cookie and Link - there should not be warning",
+    "[headers][issue][75]")
 {
-    const mdp::ByteBuffer source = \
-    "+ Headers\n"\
-    "\n"\
-    "        Set-Cookie: abcd\n"\
-    "        Set-Cookie: kockaprede\n";
+    const mdp::ByteBuffer source
+        = "+ Headers\n"
+          "\n"
+          "        Set-Cookie: abcd\n"
+          "        Set-Cookie: kockaprede\n";
 
     ParseResult<Headers> headers;
     SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
@@ -199,11 +201,11 @@ TEST_CASE("Parse header section with more same headers Set-Cookie and Link - the
 
 TEST_CASE("Headers Filed Name should be case insensitive", "[headers][issue][230]")
 {
-    const mdp::ByteBuffer source = \
-    "+ Headers\n"\
-    "\n"\
-    "        Content-Type: application/json\n"\
-    "        content-type: application/json\n";
+    const mdp::ByteBuffer source
+        = "+ Headers\n"
+          "\n"
+          "        Content-Type: application/json\n"
+          "        content-type: application/json\n";
 
     ParseResult<Headers> headers;
     SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
@@ -220,11 +222,11 @@ TEST_CASE("Headers Filed Name should be case insensitive", "[headers][issue][230
 
 TEST_CASE("Aditional test for Header name insenstivity combined with allowed multiple headers", "[headers][issue][230]")
 {
-    const mdp::ByteBuffer source = \
-    "+ Headers\n"\
-    "\n"\
-    "        Set-cookie: abcd\n"\
-    "        Set-Cookie: kockaprede\n";
+    const mdp::ByteBuffer source
+        = "+ Headers\n"
+          "\n"
+          "        Set-cookie: abcd\n"
+          "        Set-Cookie: kockaprede\n";
 
     ParseResult<Headers> headers;
     SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
@@ -242,45 +244,47 @@ TEST_CASE("Aditional test for Header name insenstivity combined with allowed mul
 TEST_CASE("Missing or wrong placed colon in header definition", "[headers][issue][158]")
 {
 
-
-    SECTION("No colon") {
-        const mdp::ByteBuffer source = \
-        "+ Headers\n\n"\
-        "        Set-Cookie chocolate cookie\n";
+    SECTION("No colon")
+    {
+        const mdp::ByteBuffer source
+            = "+ Headers\n\n"
+              "        Set-Cookie chocolate cookie\n";
 
         ParseResult<Headers> headers;
         SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
 
         REQUIRE(headers.report.error.code == Error::OK); // no error
 
-        REQUIRE(headers.report.warnings.size() == 1);    // warning - header is not defined correctly
+        REQUIRE(headers.report.warnings.size() == 1); // warning - header is not defined correctly
         REQUIRE(headers.report.warnings[0].message == "missing colon after header name 'Set-Cookie'");
 
         REQUIRE(headers.node[0].first == "Set-Cookie");
         REQUIRE(headers.node[0].second == "chocolate cookie");
     }
 
-    SECTION("Missing colon - but there is another in value") {
-        const mdp::ByteBuffer source = \
-        "+ Headers\n\n"\
-        "        Last-Modified Sat, 02 Aug 2014 23:10:05 GMT\n";
+    SECTION("Missing colon - but there is another in value")
+    {
+        const mdp::ByteBuffer source
+            = "+ Headers\n\n"
+              "        Last-Modified Sat, 02 Aug 2014 23:10:05 GMT\n";
 
         ParseResult<Headers> headers;
         SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
 
         REQUIRE(headers.report.error.code == Error::OK); // no error
 
-        REQUIRE(headers.report.warnings.size() == 1);    // warning - header is not defined correctly
+        REQUIRE(headers.report.warnings.size() == 1); // warning - header is not defined correctly
         REQUIRE(headers.report.warnings[0].message == "missing colon after header name 'Last-Modified'");
 
         REQUIRE(headers.node[0].first == "Last-Modified");
         REQUIRE(headers.node[0].second == "Sat, 02 Aug 2014 23:10:05 GMT");
     }
 
-    SECTION("More colons") {
-        const mdp::ByteBuffer source = \
-        "+ Headers\n\n"\
-        "        Set-Cookie :: chocolate cookie\n";
+    SECTION("More colons")
+    {
+        const mdp::ByteBuffer source
+            = "+ Headers\n\n"
+              "        Set-Cookie :: chocolate cookie\n";
 
         ParseResult<Headers> headers;
         SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
@@ -293,12 +297,14 @@ TEST_CASE("Missing or wrong placed colon in header definition", "[headers][issue
     }
 }
 
-TEST_CASE("Allow parse nonvalid headers, provide apropriate warning", "[headers][issue][158]") {
+TEST_CASE("Allow parse nonvalid headers, provide apropriate warning", "[headers][issue][158]")
+{
 
-    SECTION("Strange but valid token") {
-        const mdp::ByteBuffer source = \
-        "+ Headers\n\n"\
-        "        # : chocolate cookie\n";
+    SECTION("Strange but valid token")
+    {
+        const mdp::ByteBuffer source
+            = "+ Headers\n\n"
+              "        # : chocolate cookie\n";
 
         ParseResult<Headers> headers;
         SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
@@ -310,17 +316,18 @@ TEST_CASE("Allow parse nonvalid headers, provide apropriate warning", "[headers]
         REQUIRE(headers.node[0].second == "chocolate cookie");
     }
 
-    SECTION("Header has no value - just name") {
-        const mdp::ByteBuffer source = \
-        "+ Headers\n\n"\
-        "        Header:\n";
+    SECTION("Header has no value - just name")
+    {
+        const mdp::ByteBuffer source
+            = "+ Headers\n\n"
+              "        Header:\n";
 
         ParseResult<Headers> headers;
         SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
 
         REQUIRE(headers.report.error.code == Error::OK); // no error
 
-        REQUIRE(headers.report.warnings.size() == 1);    // warning - header name is not defined correctly
+        REQUIRE(headers.report.warnings.size() == 1); // warning - header name is not defined correctly
         REQUIRE(headers.report.warnings[0].message == "HTTP header 'Header' has no value");
 
         REQUIRE(headers.node.size() == 1);
@@ -328,10 +335,11 @@ TEST_CASE("Allow parse nonvalid headers, provide apropriate warning", "[headers]
         REQUIRE(headers.node[0].second == "");
     }
 
-    SECTION("Header has no value and there is no colon presented ") {
-        const mdp::ByteBuffer source = \
-        "+ Headers\n\n"\
-        "        Header\n";
+    SECTION("Header has no value and there is no colon presented ")
+    {
+        const mdp::ByteBuffer source
+            = "+ Headers\n\n"
+              "        Header\n";
 
         ParseResult<Headers> headers;
         SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
@@ -346,75 +354,80 @@ TEST_CASE("Allow parse nonvalid headers, provide apropriate warning", "[headers]
         REQUIRE(headers.node[0].first == "Header");
         REQUIRE(headers.node[0].second == "");
     }
-
 }
 
-TEST_CASE("Skip completely invalid headers", "[headers][drafter-issue][382]") {
-    
-    SECTION("Invalid characters in header name") {
-        const mdp::ByteBuffer source = \
-        "+ Headers\n\n"\
-        "        <Header> : Invalid\n"\
-        "        Header : chocolate cookie\n";
+TEST_CASE("Skip completely invalid headers", "[headers][drafter-issue][382]")
+{
+
+    SECTION("Invalid characters in header name")
+    {
+        const mdp::ByteBuffer source
+            = "+ Headers\n\n"
+              "        <Header> : Invalid\n"
+              "        Header : chocolate cookie\n";
 
         ParseResult<Headers> headers;
         SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
 
         REQUIRE(headers.report.error.code == Error::OK); // no error
 
-        REQUIRE(headers.report.warnings.size() == 1);    // warning - header name is not defined correctly
-        REQUIRE(headers.report.warnings[0].message == "HTTP header name '<Header>' contains illegal character '<' (0x3c) skipping the header");
+        REQUIRE(headers.report.warnings.size() == 1); // warning - header name is not defined correctly
+        REQUIRE(headers.report.warnings[0].message
+            == "HTTP header name '<Header>' contains illegal character '<' (0x3c) skipping the header");
 
         REQUIRE(headers.node.size() == 1);
         REQUIRE(headers.node[0].first == "Header");
         REQUIRE(headers.node[0].second == "chocolate cookie");
     }
 
-    SECTION("Invalid characters in the only header name") {
-        const mdp::ByteBuffer source = \
-        "+ Headers\n\n"\
-        "        <Header> : Invalid\n";
+    SECTION("Invalid characters in the only header name")
+    {
+        const mdp::ByteBuffer source
+            = "+ Headers\n\n"
+              "        <Header> : Invalid\n";
 
         ParseResult<Headers> headers;
         SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
 
-	REQUIRE(headers.report.error.code == Error::OK); // no error
+        REQUIRE(headers.report.error.code == Error::OK); // no error
 
-	REQUIRE(headers.report.warnings.size() == 2);    // warning - header name is not defined correctly
-	REQUIRE(headers.report.warnings[0].message == "HTTP header name '<Header>' contains illegal character '<' (0x3c) skipping the header");
-	REQUIRE(headers.report.warnings[1].message == "no valid headers specified");
-
+        REQUIRE(headers.report.warnings.size() == 2); // warning - header name is not defined correctly
+        REQUIRE(headers.report.warnings[0].message
+            == "HTTP header name '<Header>' contains illegal character '<' (0x3c) skipping the header");
+        REQUIRE(headers.report.warnings[1].message == "no valid headers specified");
     }
 
-    SECTION("Invalid header") {
-        const mdp::ByteBuffer source = \
-        "+ Headers\n\n"\
-        "        :Header: :\n";
+    SECTION("Invalid header")
+    {
+        const mdp::ByteBuffer source
+            = "+ Headers\n\n"
+              "        :Header: :\n";
 
         ParseResult<Headers> headers;
         SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
 
-	REQUIRE(headers.report.error.code == Error::OK); // no error
+        REQUIRE(headers.report.error.code == Error::OK); // no error
 
-	REQUIRE(headers.report.warnings.size() == 2);    // warning - header name is not defined correctly
-	REQUIRE(headers.report.warnings[0].message == "unable to parse HTTP header, expected '<header name> : <header value>', one header per line");
-	REQUIRE(headers.report.warnings[1].message == "no valid headers specified");
+        REQUIRE(headers.report.warnings.size() == 2); // warning - header name is not defined correctly
+        REQUIRE(headers.report.warnings[0].message
+            == "unable to parse HTTP header, expected '<header name> : <header value>', one header per line");
+        REQUIRE(headers.report.warnings[1].message == "no valid headers specified");
     }
 }
 
 TEST_CASE("Parse headers in codefences", "[headers][codefence]")
 {
-    const mdp::ByteBuffer source = \
-    "+ Headers\n"\
-    "    ```\n"\
-    "    Set-Cookie: abcd\n"\
-    "    ```\n";
+    const mdp::ByteBuffer source
+        = "+ Headers\n"
+          "    ```\n"
+          "    Set-Cookie: abcd\n"
+          "    ```\n";
 
     ParseResult<Headers> headers;
     SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
 
     REQUIRE(headers.report.error.code == Error::OK);
-    REQUIRE(headers.report.warnings.empty()); 
+    REQUIRE(headers.report.warnings.empty());
 
     REQUIRE(headers.node.size() == 1);
     REQUIRE(headers.node[0].first == "Set-Cookie");
@@ -423,18 +436,18 @@ TEST_CASE("Parse headers in codefences", "[headers][codefence]")
 
 TEST_CASE("Parse headers with in the middle codefences", "[headers][codefence]")
 {
-    const mdp::ByteBuffer source = \
-    "+ Headers\n"\
-    "        \n"\
-    "        a: b\n"\
-    "        ```\n"\
-    "        \n";
+    const mdp::ByteBuffer source
+        = "+ Headers\n"
+          "        \n"
+          "        a: b\n"
+          "        ```\n"
+          "        \n";
 
     ParseResult<Headers> headers;
     SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
 
     REQUIRE(headers.report.error.code == Error::OK);
-    REQUIRE(headers.report.warnings.size() == 2); 
+    REQUIRE(headers.report.warnings.size() == 2);
 
     REQUIRE(headers.node.size() == 2);
 
@@ -447,17 +460,17 @@ TEST_CASE("Parse headers with in the middle codefences", "[headers][codefence]")
 
 TEST_CASE("Parse headers in codefences with hint", "[headers][codefence]")
 {
-    const mdp::ByteBuffer source = \
-    "+ Headers\n"\
-    "    ```html\n"\
-    "    Set-Cookie: abcd\n"\
-    "    ```\n";
+    const mdp::ByteBuffer source
+        = "+ Headers\n"
+          "    ```html\n"
+          "    Set-Cookie: abcd\n"
+          "    ```\n";
 
     ParseResult<Headers> headers;
     SectionParserHelper<Headers, HeadersParser>::parse(source, HeadersSectionType, headers);
 
     REQUIRE(headers.report.error.code == Error::OK);
-    REQUIRE(headers.report.warnings.empty()); 
+    REQUIRE(headers.report.warnings.empty());
 
     REQUIRE(headers.node.size() == 1);
     REQUIRE(headers.node[0].first == "Set-Cookie");

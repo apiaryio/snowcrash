@@ -20,10 +20,10 @@
 
 using namespace snowcrash;
 
-#define TYPECHECK(T)\
-if ((type = SectionProcessor<T>::sectionType(node)) != UndefinedSectionType) {\
-    return type;\
-}
+#define TYPECHECK(T)                                                                                                   \
+    if ((type = SectionProcessor<T>::sectionType(node)) != UndefinedSectionType) {                                     \
+        return type;                                                                                                   \
+    }
 
 SectionType snowcrash::SectionKeywordSignature(const mdp::MarkdownNodeIterator& node)
 {
@@ -61,11 +61,9 @@ SectionType snowcrash::RecognizeCodeBlockFirstLine(const mdp::ByteBuffer& subjec
 
     if (RegexMatch(subject, HeadersRegex)) {
         return HeadersSectionType;
-    }
-    else if (RegexMatch(subject, BodyRegex)) {
+    } else if (RegexMatch(subject, BodyRegex)) {
         return BodySectionType;
-    }
-    else if (RegexMatch(subject, SchemaRegex)) {
+    } else if (RegexMatch(subject, SchemaRegex)) {
         return SchemaSectionType;
     }
 

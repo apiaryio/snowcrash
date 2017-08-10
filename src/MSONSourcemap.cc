@@ -12,24 +12,18 @@ using namespace snowcrash;
 
 bool SourceMap<mson::NamedType>::empty() const
 {
-    return (name.sourceMap.empty() &&
-            typeDefinition.sourceMap.empty() &&
-            sections.collection.empty());
+    return (name.sourceMap.empty() && typeDefinition.sourceMap.empty() && sections.collection.empty());
 }
 
 bool SourceMap<mson::ValueMember>::empty() const
 {
-    return (description.sourceMap.empty() &&
-            valueDefinition.sourceMap.empty() &&
-            sections.collection.empty());
+    return (description.sourceMap.empty() && valueDefinition.sourceMap.empty() && sections.collection.empty());
 }
 
 bool SourceMap<mson::PropertyMember>::empty() const
 {
-    return (name.sourceMap.empty() &&
-            description.sourceMap.empty() &&
-            valueDefinition.sourceMap.empty() &&
-            sections.collection.empty());
+    return (name.sourceMap.empty() && description.sourceMap.empty() && valueDefinition.sourceMap.empty()
+        && sections.collection.empty());
 }
 
 SourceMap<mson::Elements>& SourceMap<mson::TypeSection>::elements()
@@ -48,8 +42,9 @@ const SourceMap<mson::Elements>& SourceMap<mson::TypeSection>::elements() const
     return *m_elements;
 }
 
-SourceMap<mson::TypeSection>::SourceMap(const SourceMap<mson::Markdown>& description_, const SourceMap<mson::Literal>& value_)
-: description(description_), value(value_)
+SourceMap<mson::TypeSection>::SourceMap(
+    const SourceMap<mson::Markdown>& description_, const SourceMap<mson::Literal>& value_)
+    : description(description_), value(value_)
 {
     m_elements.reset(::new SourceMap<mson::Elements>);
 }
@@ -106,7 +101,7 @@ const SourceMap<mson::Elements>& SourceMap<mson::Element>::elements() const
     return *m_elements;
 }
 
-SourceMap<mson::Element>& SourceMap<mson::Element>::operator=(const SourceMap<mson::Elements> &rhs)
+SourceMap<mson::Element>& SourceMap<mson::Element>::operator=(const SourceMap<mson::Elements>& rhs)
 {
     m_elements.reset(::new SourceMap<mson::Elements>(rhs));
 

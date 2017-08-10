@@ -9,13 +9,15 @@
 #include "MSONOneOfParser.h"
 #include "MSONPropertyMemberParser.h"
 
-namespace snowcrash {
+namespace snowcrash
+{
 
     /** Implementation of processNestedSection */
     MarkdownNodeIterator SectionProcessor<mson::TypeSection>::processNestedSection(const MarkdownNodeIterator& node,
-                                                                                   const MarkdownNodes& siblings,
-                                                                                   SectionParserData& pd,
-                                                                                   const ParseResultRef<mson::TypeSection>& out) {
+        const MarkdownNodes& siblings,
+        SectionParserData& pd,
+        const ParseResultRef<mson::TypeSection>& out)
+    {
 
         MarkdownNodeIterator cur = node;
         SectionType parentSectionType = pd.parentSectionContext();
@@ -27,12 +29,10 @@ namespace snowcrash {
             return cur;
         }
 
-        if (parentSectionType == MSONPropertyMembersSectionType ||
-            parentSectionType == MSONValueMembersSectionType) {
+        if (parentSectionType == MSONPropertyMembersSectionType || parentSectionType == MSONValueMembersSectionType) {
 
             switch (pd.sectionContext()) {
-                case MSONMixinSectionType:
-                {
+                case MSONMixinSectionType: {
                     IntermediateParseResult<mson::Mixin> mixin(out.report);
                     cur = MSONMixinParser::parse(node, siblings, pd, mixin);
 
@@ -45,15 +45,16 @@ namespace snowcrash {
                     break;
                 }
 
-                case MSONOneOfSectionType:
-                {
+                case MSONOneOfSectionType: {
                     if (parentSectionType != MSONPropertyMembersSectionType) {
 
                         // WARN: One of can not be a nested member for a non object structure type
-                        mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                        out.report.warnings.push_back(Warning("one-of can not be a nested member for a type not sub typed from object",
-                                                              LogicalErrorWarning,
-                                                              sourceMap));
+                        mdp::CharactersRangeSet sourceMap
+                            = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                        out.report.warnings.push_back(
+                            Warning("one-of can not be a nested member for a type not sub typed from object",
+                                LogicalErrorWarning,
+                                sourceMap));
 
                         return cur;
                     }
@@ -70,8 +71,7 @@ namespace snowcrash {
                     break;
                 }
 
-                case MSONSectionType:
-                {
+                case MSONSectionType: {
                     if (parentSectionType == MSONPropertyMembersSectionType) {
 
                         IntermediateParseResult<mson::PropertyMember> propertyMember(out.report);
@@ -82,8 +82,7 @@ namespace snowcrash {
                         if (pd.exportSourceMap()) {
                             elementSM.property = propertyMember.sourceMap;
                         }
-                    }
-                    else {
+                    } else {
 
                         IntermediateParseResult<mson::ValueMember> valueMember(out.report);
                         cur = MSONValueMemberParser::parse(node, siblings, pd, valueMember);
@@ -101,30 +100,26 @@ namespace snowcrash {
                 default:
                     break;
             }
-        }
-        else if (parentSectionType == MSONSampleDefaultSectionType) {
+        } else if (parentSectionType == MSONSampleDefaultSectionType) {
 
             switch (pd.sectionContext()) {
                 case MSONMixinSectionType:
-                case MSONOneOfSectionType:
-                {
+                case MSONOneOfSectionType: {
                     // WARN: mixin and oneOf not supported in sample/default
                     std::stringstream ss;
 
-                    ss << "sample and default type sections cannot have `" << SectionName(pd.sectionContext()) << "` type";
+                    ss << "sample and default type sections cannot have `" << SectionName(pd.sectionContext())
+                       << "` type";
 
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                    out.report.warnings.push_back(Warning(ss.str(),
-                                                          LogicalErrorWarning,
-                                                          sourceMap));
+                    mdp::CharactersRangeSet sourceMap
+                        = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                    out.report.warnings.push_back(Warning(ss.str(), LogicalErrorWarning, sourceMap));
                     break;
                 }
 
-                case MSONSectionType:
-                {
-                    if ((out.node.baseType == mson::ValueBaseType ||
-                         out.node.baseType == mson::ImplicitValueBaseType) &&
-                        node->type == mdp::ListItemMarkdownNodeType) {
+                case MSONSectionType: {
+                    if ((out.node.baseType == mson::ValueBaseType || out.node.baseType == mson::ImplicitValueBaseType)
+                        && node->type == mdp::ListItemMarkdownNodeType) {
 
                         IntermediateParseResult<mson::ValueMember> valueMember(out.report);
                         cur = MSONValueMemberParser::parse(node, siblings, pd, valueMember);
@@ -134,10 +129,9 @@ namespace snowcrash {
                         if (pd.exportSourceMap()) {
                             elementSM.value = valueMember.sourceMap;
                         }
-                    }
-                    else if ((out.node.baseType == mson::ObjectBaseType ||
-                              out.node.baseType == mson::ImplicitObjectBaseType) &&
-                             node->type == mdp::ListItemMarkdownNodeType) {
+                    } else if ((out.node.baseType == mson::ObjectBaseType
+                                   || out.node.baseType == mson::ImplicitObjectBaseType)
+                        && node->type == mdp::ListItemMarkdownNodeType) {
 
                         IntermediateParseResult<mson::PropertyMember> propertyMember(out.report);
                         cur = MSONPropertyMemberParser::parse(node, siblings, pd, propertyMember);
@@ -149,8 +143,8 @@ namespace snowcrash {
                         }
                     }
 
-                    if (out.node.baseType == mson::PrimitiveBaseType ||
-                        out.node.baseType == mson::ImplicitPrimitiveBaseType) {
+                    if (out.node.baseType == mson::PrimitiveBaseType
+                        || out.node.baseType == mson::ImplicitPrimitiveBaseType) {
 
                         if (!out.node.content.value.empty()) {
                             TwoNewLines(out.node.content.value);
@@ -186,7 +180,8 @@ namespace snowcrash {
     }
 
     /** Implementation of nestedSectionType */
-    SectionType SectionProcessor<mson::TypeSection>::nestedSectionType(const MarkdownNodeIterator& node) {
+    SectionType SectionProcessor<mson::TypeSection>::nestedSectionType(const MarkdownNodeIterator& node)
+    {
 
         SectionType nestedType = UndefinedSectionType;
 

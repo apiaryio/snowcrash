@@ -43,7 +43,8 @@ TEST_CASE("Relation signature without colon", "[relation]")
 TEST_CASE("Parse canonical link relation", "[relation]")
 {
     ParseResult<Relation> relation;
-    SectionParserHelper<Relation, RelationParser>::parse(RelationFixture, RelationSectionType, relation, ExportSourcemapOption);
+    SectionParserHelper<Relation, RelationParser>::parse(
+        RelationFixture, RelationSectionType, relation, ExportSourcemapOption);
 
     REQUIRE(relation.report.error.code == Error::OK);
     REQUIRE(relation.report.warnings.empty());

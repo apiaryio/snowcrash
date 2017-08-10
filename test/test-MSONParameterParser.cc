@@ -12,18 +12,19 @@
 using namespace snowcrash;
 using namespace snowcrashtest;
 
-const mdp::ByteBuffer ParameterFixture = \
-"+ id: `0000` (enum[number], optional) - Description\n\n"\
-"    + Default: `1234`\n"\
-"    + Members\n"\
-"        + `1234` - The default value\n"\
-"        + `0000`\n"\
-"        + `beef` - I like beef\n";
+const mdp::ByteBuffer ParameterFixture
+    = "+ id: `0000` (enum[number], optional) - Description\n\n"
+      "    + Default: `1234`\n"
+      "    + Members\n"
+      "        + `1234` - The default value\n"
+      "        + `0000`\n"
+      "        + `beef` - I like beef\n";
 
 TEST_CASE("Parse canonical parameter definition with new syntax", "[mson_parameter]")
 {
     ParseResult<MSONParameter> parameter;
-    SectionParserHelper<MSONParameter, MSONParameterParser>::parse(ParameterFixture, MSONParameterSectionType, parameter, ExportSourcemapOption);
+    SectionParserHelper<MSONParameter, MSONParameterParser>::parse(
+        ParameterFixture, MSONParameterSectionType, parameter, ExportSourcemapOption);
 
     REQUIRE(parameter.report.error.code == Error::OK);
     REQUIRE(parameter.report.warnings.empty());
@@ -53,13 +54,14 @@ TEST_CASE("Parse canonical parameter definition with new syntax", "[mson_paramet
 
 TEST_CASE("Parse parameter description when it occurs in different cases", "[mson_parameter]")
 {
-    mdp::ByteBuffer source = \
-    "+ id: 100 - Same line\n"\
-    "    Single newline\n\n"\
-    "    Double newline\n";
+    mdp::ByteBuffer source
+        = "+ id: 100 - Same line\n"
+          "    Single newline\n\n"
+          "    Double newline\n";
 
     ParseResult<MSONParameter> parameter;
-    SectionParserHelper<MSONParameter, MSONParameterParser>::parse(source, MSONParameterSectionType, parameter, ExportSourcemapOption);
+    SectionParserHelper<MSONParameter, MSONParameterParser>::parse(
+        source, MSONParameterSectionType, parameter, ExportSourcemapOption);
 
     REQUIRE(parameter.report.error.code == Error::OK);
     REQUIRE(parameter.report.warnings.empty());
@@ -78,7 +80,8 @@ TEST_CASE("Parse parameter when it has more than 2 traits", "[mson_parameter]")
     mdp::ByteBuffer source = "+ id: 100 (optional, number, tagging)";
 
     ParseResult<MSONParameter> parameter;
-    SectionParserHelper<MSONParameter, MSONParameterParser>::parse(source, MSONParameterSectionType, parameter, ExportSourcemapOption);
+    SectionParserHelper<MSONParameter, MSONParameterParser>::parse(
+        source, MSONParameterSectionType, parameter, ExportSourcemapOption);
 
     REQUIRE(parameter.report.error.code == Error::OK);
     REQUIRE(parameter.report.warnings.size() == 1);
@@ -94,9 +97,9 @@ TEST_CASE("Parse parameter when it has more than 2 traits", "[mson_parameter]")
 
 TEST_CASE("Parse parameter when it has a sample type section", "[mson_parameter]")
 {
-    mdp::ByteBuffer source = \
-    "+ id\n"\
-    "    + Sample: 42";
+    mdp::ByteBuffer source
+        = "+ id\n"
+          "    + Sample: 42";
 
     ParseResult<MSONParameter> parameter;
     SectionParserHelper<MSONParameter, MSONParameterParser>::parse(source, MSONParameterSectionType, parameter);
@@ -111,9 +114,9 @@ TEST_CASE("Parse parameter when it has a sample type section", "[mson_parameter]
 
 TEST_CASE("Warn about implicit required vs default clash in new parameter", "[mson_parameter]")
 {
-    mdp::ByteBuffer source = \
-    "+ id\n"\
-    "    + Default: 42";
+    mdp::ByteBuffer source
+        = "+ id\n"
+          "    + Default: 42";
 
     ParseResult<MSONParameter> parameter;
     SectionParserHelper<MSONParameter, MSONParameterParser>::parse(source, MSONParameterSectionType, parameter);
@@ -129,11 +132,11 @@ TEST_CASE("Warn about implicit required vs default clash in new parameter", "[ms
 
 TEST_CASE("Warn missing example item in values in new parameter syntax", "[mson_parameter]")
 {
-    mdp::ByteBuffer source = \
-    "+ id: `Value1` (optional, enum[string])\n"\
-    "    + Default: `Value2`\n"\
-    "    + Members\n"\
-    "        + `Value2`\n";
+    mdp::ByteBuffer source
+        = "+ id: `Value1` (optional, enum[string])\n"
+          "    + Default: `Value2`\n"
+          "    + Members\n"
+          "        + `Value2`\n";
 
     ParseResult<MSONParameter> parameter;
     SectionParserHelper<MSONParameter, MSONParameterParser>::parse(source, MSONParameterSectionType, parameter);
@@ -149,11 +152,11 @@ TEST_CASE("Warn missing example item in values in new parameter syntax", "[mson_
 
 TEST_CASE("Warn missing default value in values in new parameter syntax", "[mson_parameter]")
 {
-    mdp::ByteBuffer source = \
-    "+ id: `Value2` (optional, enum[string])\n"\
-    "    + Default: `Value1`\n"\
-    "    + Members\n"\
-    "        + `Value2`\n";
+    mdp::ByteBuffer source
+        = "+ id: `Value2` (optional, enum[string])\n"
+          "    + Default: `Value1`\n"
+          "    + Members\n"
+          "        + `Value2`\n";
 
     ParseResult<MSONParameter> parameter;
     SectionParserHelper<MSONParameter, MSONParameterParser>::parse(source, MSONParameterSectionType, parameter);
@@ -184,13 +187,12 @@ TEST_CASE("Parentheses in parameter description with new syntax", "[parameter]")
 
 TEST_CASE("Parse parameter including backtics for escaping, issue drafter#445", "[mson_parameter]")
 {
-    mdp::ByteBuffer source = \
-    "+ `start_time`: `recorded_at` (enum[string], optional)\n"\
-    "\n"\
-    "    + Members\n"\
-    "        + `recorded_at`\n"\
-    "        + `created_at`";
-
+    mdp::ByteBuffer source
+        = "+ `start_time`: `recorded_at` (enum[string], optional)\n"
+          "\n"
+          "    + Members\n"
+          "        + `recorded_at`\n"
+          "        + `created_at`";
 
     ParseResult<MSONParameter> parameter;
     SectionParserHelper<MSONParameter, MSONParameterParser>::parse(source, MSONParameterSectionType, parameter);

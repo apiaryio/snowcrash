@@ -12,8 +12,7 @@
 using namespace snowcrash;
 using namespace snowcrashtest;
 
-const mdp::ByteBuffer AttributesFixture = \
-"+ Attributes (array[[Coupon](#coupon)])";
+const mdp::ByteBuffer AttributesFixture = "+ Attributes (array[[Coupon](#coupon)])";
 
 TEST_CASE("Recognize explicit attributes signature", "[attributes]")
 {
@@ -30,7 +29,8 @@ TEST_CASE("Recognize explicit attributes signature", "[attributes]")
 TEST_CASE("Parse canonical attributes", "[attributes]")
 {
     ParseResult<Attributes> attributes;
-    SectionParserHelper<Attributes, AttributesParser>::parse(AttributesFixture, AttributesSectionType, attributes, ExportSourcemapOption);
+    SectionParserHelper<Attributes, AttributesParser>::parse(
+        AttributesFixture, AttributesSectionType, attributes, ExportSourcemapOption);
 
     REQUIRE(attributes.report.error.code == Error::OK);
     REQUIRE(attributes.report.warnings.empty());
@@ -50,13 +50,14 @@ TEST_CASE("Parse canonical attributes", "[attributes]")
 
 TEST_CASE("Parse attributes with nested members", "[attributes]")
 {
-    mdp::ByteBuffer source = \
-    "+ attribute\n"\
-    "    + message (string) - The blog post article\n"\
-    "    + author: john@appleseed.com (string) - Author of the blog post";
+    mdp::ByteBuffer source
+        = "+ attribute\n"
+          "    + message (string) - The blog post article\n"
+          "    + author: john@appleseed.com (string) - Author of the blog post";
 
     ParseResult<Attributes> attributes;
-    SectionParserHelper<Attributes, AttributesParser>::parse(source, AttributesSectionType, attributes, ExportSourcemapOption);
+    SectionParserHelper<Attributes, AttributesParser>::parse(
+        source, AttributesSectionType, attributes, ExportSourcemapOption);
 
     REQUIRE(attributes.report.error.code == Error::OK);
     REQUIRE(attributes.report.warnings.empty());
@@ -73,7 +74,8 @@ TEST_CASE("Parse attributes with nested members", "[attributes]")
     REQUIRE(element.content.property.name.literal == "message");
     REQUIRE(element.content.property.description == "The blog post article");
     REQUIRE(element.content.property.valueDefinition.values.empty());
-    REQUIRE(element.content.property.valueDefinition.typeDefinition.typeSpecification.name.base == mson::StringTypeName);
+    REQUIRE(
+        element.content.property.valueDefinition.typeDefinition.typeSpecification.name.base == mson::StringTypeName);
 
     element = attributes.node.sections[0].content.elements().at(1);
     REQUIRE(element.klass == mson::Element::PropertyClass);
@@ -81,7 +83,8 @@ TEST_CASE("Parse attributes with nested members", "[attributes]")
     REQUIRE(element.content.property.description == "Author of the blog post");
     REQUIRE(element.content.property.valueDefinition.values.size() == 1);
     REQUIRE(element.content.property.valueDefinition.values[0].literal == "john@appleseed.com");
-    REQUIRE(element.content.property.valueDefinition.typeDefinition.typeSpecification.name.base == mson::StringTypeName);
+    REQUIRE(
+        element.content.property.valueDefinition.typeDefinition.typeSpecification.name.base == mson::StringTypeName);
 
     REQUIRE(attributes.sourceMap.name.sourceMap.empty());
     REQUIRE(attributes.sourceMap.typeDefinition.sourceMap.empty());
@@ -101,15 +104,16 @@ TEST_CASE("Parse attributes with nested members", "[attributes]")
 
 TEST_CASE("Parse attributes with block description", "[attributes]")
 {
-    mdp::ByteBuffer source = \
-    "+ Attributes\n"\
-    "    Awesome description\n\n"\
-    "    + With list\n"\
-    "    + Properties\n"\
-    "        + message (string)";
+    mdp::ByteBuffer source
+        = "+ Attributes\n"
+          "    Awesome description\n\n"
+          "    + With list\n"
+          "    + Properties\n"
+          "        + message (string)";
 
     ParseResult<Attributes> attributes;
-    SectionParserHelper<Attributes, AttributesParser>::parse(source, AttributesSectionType, attributes, ExportSourcemapOption);
+    SectionParserHelper<Attributes, AttributesParser>::parse(
+        source, AttributesSectionType, attributes, ExportSourcemapOption);
 
     REQUIRE(attributes.report.error.code == Error::OK);
     REQUIRE(attributes.report.warnings.empty());
@@ -134,12 +138,13 @@ TEST_CASE("Parse attributes with block description", "[attributes]")
 
 TEST_CASE("Parse type attributes on attributes section", "[attributes]")
 {
-    mdp::ByteBuffer source = \
-    "+ Attributes (fixed)\n"\
-    "    + a: b";
+    mdp::ByteBuffer source
+        = "+ Attributes (fixed)\n"
+          "    + a: b";
 
     ParseResult<Attributes> attributes;
-    SectionParserHelper<Attributes, AttributesParser>::parse(source, AttributesSectionType, attributes, ExportSourcemapOption);
+    SectionParserHelper<Attributes, AttributesParser>::parse(
+        source, AttributesSectionType, attributes, ExportSourcemapOption);
 
     REQUIRE(attributes.report.error.code == Error::OK);
     REQUIRE(attributes.report.warnings.empty());
