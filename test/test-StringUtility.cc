@@ -17,27 +17,27 @@ TEST_CASE("Templates for compare equality", "[utility]")
 {
     SECTION("Testing equality on same types")
     {
-        REQUIRE(IsEqual()(1,1));
-        REQUIRE_FALSE(IsEqual()(1,2));
+        REQUIRE(IsEqual()(1, 1));
+        REQUIRE_FALSE(IsEqual()(1, 2));
 
-        REQUIRE(IsEqual()('a','a'));
-        REQUIRE_FALSE(IsEqual()('a','A'));
+        REQUIRE(IsEqual()('a', 'a'));
+        REQUIRE_FALSE(IsEqual()('a', 'A'));
     }
 
     SECTION("Testing case insensitive equality on same types")
     {
-        REQUIRE(IsIEqual()('a','a'));
-        REQUIRE(IsIEqual()('a','A'));
-        REQUIRE(IsIEqual()('A','a'));
-        REQUIRE(IsIEqual()('A','A'));
+        REQUIRE(IsIEqual()('a', 'a'));
+        REQUIRE(IsIEqual()('a', 'A'));
+        REQUIRE(IsIEqual()('A', 'a'));
+        REQUIRE(IsIEqual()('A', 'A'));
 
-        REQUIRE_FALSE(IsIEqual()('a','b'));
+        REQUIRE_FALSE(IsIEqual()('a', 'b'));
     }
 
     SECTION("Both version should not throw while testing diferent types")
     {
-        REQUIRE_NOTHROW(IsEqual()('a',1)); // allow compare diferent types - not throw
-        REQUIRE_NOTHROW(IsIEqual()('a',1)); // allow compare diferent types - not throw
+        REQUIRE_NOTHROW(IsEqual()('a', 1));  // allow compare diferent types - not throw
+        REQUIRE_NOTHROW(IsIEqual()('a', 1)); // allow compare diferent types - not throw
     }
 }
 
@@ -99,7 +99,7 @@ TEST_CASE("Add two new lines", "[utility]")
 
 TEST_CASE("Get trim info", "[utility]")
 {
-    TrimRange range; 
+    TrimRange range;
     std::string s;
 
     s = "abc";

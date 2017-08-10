@@ -15,10 +15,10 @@ using namespace snowcrashtest;
 
 TEST_CASE("Parse object resource model", "[model_table]")
 {
-    mdp::ByteBuffer source = \
-    "# /resource\n"\
-    "+ Super Model (text/plain)\n\n"\
-    "          {...}\n";
+    mdp::ByteBuffer source
+        = "# /resource\n"
+          "+ Super Model (text/plain)\n\n"
+          "          {...}\n";
 
     // Check we will get error parsing the same symbol again with the same symbol table
     Models models;

@@ -24,7 +24,8 @@
 /** Lead in and out for comma separated values regex */
 #define CSV_LEADINOUT "[[:blank:]]*,?[[:blank:]]*"
 
-namespace snowcrash {
+namespace snowcrash
+{
 
     /* We only allow at the maximum 3 attributes for old syntax parameters */
     const size_t OLD_SYNTAX_MAX_ATTRIBUTES = 3;
@@ -51,46 +52,52 @@ namespace snowcrash {
     const char* const ParameterValuesRegex = "^[[:blank:]]*[Vv]alues[[:blank:]]*$";
 
     /** Values expected content */
-    const char* const ExpectedValuesContent = "nested list of possible parameter values, one element per list item e.g. '`value`'";
+    const char* const ExpectedValuesContent
+        = "nested list of possible parameter values, one element per list item e.g. '`value`'";
 
     /** Additional Traits warning for old syntax */
-    const char* const OldSyntaxAdditionalTraitsWarning = ", expected '([required | optional], [<type>], [`<example value>`])', e.g. '(optional, string, `Hello World`)'";
+    const char* const OldSyntaxAdditionalTraitsWarning
+        = ", expected '([required | optional], [<type>], [`<example value>`])', e.g. '(optional, string, `Hello "
+          "World`)'";
 
     /** Additional Traits warning for new syntax */
-    const char* const NewSyntaxAdditionalTraitsWarning = ", expected '([required | optional], [<type> | enum[<type>])', e.g. '(optional, string)'";
+    const char* const NewSyntaxAdditionalTraitsWarning
+        = ", expected '([required | optional], [<type> | enum[<type>])', e.g. '(optional, string)'";
 
     /* Type wrapped by enum matching regex */
     const char* const EnumRegex = "^enum\\[([^][]+)]$";
 
     /** Parameter Definition Type */
-    enum ParameterType {
+    enum ParameterType
+    {
         NotParameterType = 0,
-        OldParameterType,        /// Parameter defined using the old syntax
-        NewParameterType,        /// Parameter defined using the new MSON-like syntax
+        OldParameterType, /// Parameter defined using the old syntax
+        NewParameterType, /// Parameter defined using the new MSON-like syntax
         UndefinedParameterType = -1
     };
 
     /**
      * Parameter section processor
      */
-    template<>
+    template <>
     struct SectionProcessor<Parameter> : public SignatureSectionProcessorBase<Parameter> {
 
-        static SignatureTraits signatureTraits() {
+        static SignatureTraits signatureTraits()
+        {
 
-            SignatureTraits signatureTraits(SignatureTraits::IdentifierTrait |
-                                            SignatureTraits::ValuesTrait |
-                                            SignatureTraits::AttributesTrait |
-                                            SignatureTraits::ContentTrait,
-                                            Delimiters('=', snowcrash::DescriptionIdentifier));
+            SignatureTraits signatureTraits(SignatureTraits::IdentifierTrait | SignatureTraits::ValuesTrait
+                    | SignatureTraits::AttributesTrait
+                    | SignatureTraits::ContentTrait,
+                Delimiters('=', snowcrash::DescriptionIdentifier));
 
             return signatureTraits;
         }
 
         static MarkdownNodeIterator finalizeSignature(const MarkdownNodeIterator& node,
-                                                      SectionParserData& pd,
-                                                      const Signature& signature,
-                                                      const ParseResultRef<Parameter>& out) {
+            SectionParserData& pd,
+            const Signature& signature,
+            const ParseResultRef<Parameter>& out)
+        {
 
             out.node.name = signature.identifier;
             out.node.description = signature.content;
@@ -122,9 +129,10 @@ namespace snowcrash {
         }
 
         static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
-                                                         const MarkdownNodes& siblings,
-                                                         SectionParserData& pd,
-                                                         const ParseResultRef<Parameter>& out) {
+            const MarkdownNodes& siblings,
+            SectionParserData& pd,
+            const ParseResultRef<Parameter>& out)
+        {
 
             if (pd.sectionContext() != ValuesSectionType) {
                 return node;
@@ -137,10 +145,9 @@ namespace snowcrash {
                 ss << "overshadowing previous 'values' definition";
                 ss << " for parameter '" << out.node.name << "'";
 
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                out.report.warnings.push_back(Warning(ss.str(),
-                                                      RedefinitionWarning,
-                                                      sourceMap));
+                mdp::CharactersRangeSet sourceMap
+                    = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                out.report.warnings.push_back(Warning(ss.str(), RedefinitionWarning, sourceMap));
             }
 
             // Clear any previous values
@@ -158,47 +165,43 @@ namespace snowcrash {
                 std::stringstream ss;
                 ss << "no possible values specified for parameter '" << out.node.name << "'";
 
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                out.report.warnings.push_back(Warning(ss.str(),
-                                                      EmptyDefinitionWarning,
-                                                      sourceMap));
+                mdp::CharactersRangeSet sourceMap
+                    = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                out.report.warnings.push_back(Warning(ss.str(), EmptyDefinitionWarning, sourceMap));
             }
 
             return ++MarkdownNodeIterator(node);
         }
 
-        static void finalize(const MarkdownNodeIterator& node,
-                             SectionParserData& pd,
-                             const ParseResultRef<Parameter>& out) {
+        static void finalize(
+            const MarkdownNodeIterator& node, SectionParserData& pd, const ParseResultRef<Parameter>& out)
+        {
 
             checkDefaultAndRequiredClash<Parameter>(node, pd, out);
             checkExampleAndDefaultValue<Parameter>(node, pd, out);
         }
 
-        static SectionType sectionType(const MarkdownNodeIterator& node) {
+        static SectionType sectionType(const MarkdownNodeIterator& node)
+        {
 
-            if (node->type == mdp::ListItemMarkdownNodeType
-                && !node->children().empty()) {
+            if (node->type == mdp::ListItemMarkdownNodeType && !node->children().empty()) {
 
                 mdp::ByteBuffer subject, remainingContent;
                 subject = GetFirstLine(node->children().front().text, remainingContent);
                 TrimString(subject);
 
                 // Look ahead into nested list items
-                for (MarkdownNodeIterator it = node->children().begin();
-                     it != node->children().end();
-                     ++it) {
+                for (MarkdownNodeIterator it = node->children().begin(); it != node->children().end(); ++it) {
 
-                    if (it->type == mdp::ListItemMarkdownNodeType
-                        && !it->children().empty()) {
+                    if (it->type == mdp::ListItemMarkdownNodeType && !it->children().empty()) {
 
                         mdp::ByteBuffer itSubject, itRemainingContent;
                         itSubject = GetFirstLine(it->children().front().text, itRemainingContent);
                         TrimString(itSubject);
 
-                        if (RegexMatch(itSubject, MSONDefaultTypeSectionRegex) ||
-                            RegexMatch(itSubject, MSONSampleTypeSectionRegex) ||
-                            RegexMatch(itSubject, MSONValueMembersTypeSectionRegex)) {
+                        if (RegexMatch(itSubject, MSONDefaultTypeSectionRegex)
+                            || RegexMatch(itSubject, MSONSampleTypeSectionRegex)
+                            || RegexMatch(itSubject, MSONValueMembersTypeSectionRegex)) {
 
                             return MSONParameterSectionType;
                         }
@@ -223,17 +226,19 @@ namespace snowcrash {
             return UndefinedSectionType;
         }
 
-        static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
+        static SectionType nestedSectionType(const MarkdownNodeIterator& node)
+        {
 
             return SectionProcessor<Values>::sectionType(node);
         }
 
-        template<typename T>
+        template <typename T>
         static void parseAttributes(const mdp::MarkdownNodeIterator& node,
-                                    SectionParserData& pd,
-                                    const std::vector<mdp::ByteBuffer>& attributes,
-                                    const ParseResultRef<T>& out,
-                                    const bool oldSyntax = true) {
+            SectionParserData& pd,
+            const std::vector<mdp::ByteBuffer>& attributes,
+            const ParseResultRef<T>& out,
+            const bool oldSyntax = true)
+        {
 
             out.node.use = UndefinedParameterUse;
             size_t max = oldSyntax ? OLD_SYNTAX_MAX_ATTRIBUTES : NEW_SYNTAX_MAX_ATTRIBUTES;
@@ -251,18 +256,14 @@ namespace snowcrash {
                 if (RegexMatch(attributes[i], ParameterOptionalRegex) && !definedUse) {
                     out.node.use = OptionalParameterUse;
                     definedUse = true;
-                }
-                else if (RegexMatch(attributes[i], ParameterRequiredRegex) && !definedUse) {
+                } else if (RegexMatch(attributes[i], ParameterRequiredRegex) && !definedUse) {
                     out.node.use = RequiredParameterUse;
                     definedUse = true;
-                }
-                else if (oldSyntax &&
-                         RegexCapture(attributes[i], AdditionalTraitsExampleRegex, captureGroups) &&
-                         captureGroups.size() > 1) {
+                } else if (oldSyntax && RegexCapture(attributes[i], AdditionalTraitsExampleRegex, captureGroups)
+                    && captureGroups.size() > 1) {
 
                     out.node.exampleValue = captureGroups[1];
-                }
-                else {
+                } else {
                     if (!out.node.type.empty()) {
                         return warnAboutAdditionalTraits(node, pd, out, oldSyntax);
                     }
@@ -296,21 +297,19 @@ namespace snowcrash {
             }
         }
 
-        template<typename T>
-        static void warnAboutAdditionalTraits(const mdp::MarkdownNodeIterator& node,
-                                              SectionParserData& pd,
-                                              const ParseResultRef<T>& out,
-                                              bool oldSyntax) {
+        template <typename T>
+        static void warnAboutAdditionalTraits(
+            const mdp::MarkdownNodeIterator& node, SectionParserData& pd, const ParseResultRef<T>& out, bool oldSyntax)
+        {
 
             // WARN: Additional parameters traits warning
             std::stringstream ss;
             ss << "unable to parse additional parameter traits";
             ss << (oldSyntax ? OldSyntaxAdditionalTraitsWarning : NewSyntaxAdditionalTraitsWarning);
 
-            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-            out.report.warnings.push_back(Warning(ss.str(),
-                                                  FormattingWarning,
-                                                  sourceMap));
+            mdp::CharactersRangeSet sourceMap
+                = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+            out.report.warnings.push_back(Warning(ss.str(), FormattingWarning, sourceMap));
 
             out.node.type.clear();
             out.node.use = UndefinedParameterUse;
@@ -330,34 +329,32 @@ namespace snowcrash {
             }
         }
 
-        template<typename T>
-        static void checkDefaultAndRequiredClash(const mdp::MarkdownNodeIterator& node,
-                                                 SectionParserData& pd,
-                                                 const ParseResultRef<T>& out) {
+        template <typename T>
+        static void checkDefaultAndRequiredClash(
+            const mdp::MarkdownNodeIterator& node, SectionParserData& pd, const ParseResultRef<T>& out)
+        {
 
             // Check possible required vs default clash
-            if (out.node.use != OptionalParameterUse &&
-                !out.node.defaultValue.empty()) {
+            if (out.node.use != OptionalParameterUse && !out.node.defaultValue.empty()) {
 
                 // WARN: Required vs default clash
                 std::stringstream ss;
-                ss << "specifying parameter '" << out.node.name << "' as required supersedes its default value"\
-                ", declare the parameter as 'optional' to specify its default value";
+                ss << "specifying parameter '" << out.node.name
+                   << "' as required supersedes its default value"
+                      ", declare the parameter as 'optional' to specify its default value";
 
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                out.report.warnings.push_back(Warning(ss.str(),
-                                                      LogicalErrorWarning,
-                                                      sourceMap));
+                mdp::CharactersRangeSet sourceMap
+                    = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                out.report.warnings.push_back(Warning(ss.str(), LogicalErrorWarning, sourceMap));
             }
         }
 
-        template<typename T>
-        static void checkExampleAndDefaultValue(const mdp::MarkdownNodeIterator& node,
-                                                SectionParserData& pd,
-                                                const ParseResultRef<T>& out) {
+        template <typename T>
+        static void checkExampleAndDefaultValue(
+            const mdp::MarkdownNodeIterator& node, SectionParserData& pd, const ParseResultRef<T>& out)
+        {
 
-            if ((out.node.exampleValue.empty() && out.node.defaultValue.empty()) ||
-                out.node.values.empty()) {
+            if ((out.node.exampleValue.empty() && out.node.defaultValue.empty()) || out.node.values.empty()) {
 
                 return;
             }
@@ -368,9 +365,7 @@ namespace snowcrash {
             std::stringstream ss;
             bool printWarning = false;
 
-            for (Collection<Value>::iterator it = out.node.values.begin();
-                 it != out.node.values.end();
-                 ++it) {
+            for (Collection<Value>::iterator it = out.node.values.begin(); it != out.node.values.end(); ++it) {
 
                 if (out.node.exampleValue == *it) {
                     isExampleFound = true;
@@ -381,34 +376,34 @@ namespace snowcrash {
                 }
             }
 
-            if(!out.node.exampleValue.empty() &&
-               !isExampleFound) {
+            if (!out.node.exampleValue.empty() && !isExampleFound) {
 
                 // WARN: missing example in values.
-                ss << "the example value '" << out.node.exampleValue << "' of parameter '"<< out.node.name <<"' is not in its list of expected values";
+                ss << "the example value '" << out.node.exampleValue << "' of parameter '" << out.node.name
+                   << "' is not in its list of expected values";
                 printWarning = true;
             }
 
-            if(!out.node.defaultValue.empty() &&
-               !isDefaultFound) {
+            if (!out.node.defaultValue.empty() && !isDefaultFound) {
 
                 // WARN: missing default in values.
-                ss << "the default value '" << out.node.defaultValue << "' of parameter '"<< out.node.name <<"' is not in its list of expected values";
+                ss << "the default value '" << out.node.defaultValue << "' of parameter '" << out.node.name
+                   << "' is not in its list of expected values";
                 printWarning = true;
             }
 
             if (printWarning) {
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                out.report.warnings.push_back(Warning(ss.str(),
-                                                      LogicalErrorWarning,
-                                                      sourceMap));
+                mdp::CharactersRangeSet sourceMap
+                    = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                out.report.warnings.push_back(Warning(ss.str(), LogicalErrorWarning, sourceMap));
             }
         }
 
         /**
          * \brief Determine the type of parameter using the signature
          */
-        static ParameterType getParameterType(const mdp::ByteBuffer& signature) {
+        static ParameterType getParameterType(const mdp::ByteBuffer& signature)
+        {
 
             mdp::ByteBuffer innerSignature = signature;
             CaptureGroups captureGroups;
@@ -419,13 +414,12 @@ namespace snowcrash {
                 return NotParameterType; // Empty string, invalid
             }
 
-            if (RegexCapture(innerSignature, "^" PARAMETER_IDENTIFIER "[[:blank:]]*", captureGroups) &&
-                !captureGroups[0].empty()) {
+            if (RegexCapture(innerSignature, "^" PARAMETER_IDENTIFIER "[[:blank:]]*", captureGroups)
+                && !captureGroups[0].empty()) {
 
                 innerSignature = innerSignature.substr(captureGroups[0].size());
                 TrimString(innerSignature);
-            }
-            else {
+            } else {
                 return NotParameterType;
             }
 
@@ -460,11 +454,9 @@ namespace snowcrash {
                         }
 
                         TrimString(innerSignature);
-                    }
-                    else if (first == "(") {
+                    } else if (first == "(") {
                         break;
-                    }
-                    else {
+                    } else {
                         innerSignature = innerSignature.substr(1);
                     }
                 }
@@ -480,7 +472,7 @@ namespace snowcrash {
                     return NotParameterType; // Expecting close of attributes
                 }
 
-                std::string attributes = inner.substr(1, inner.length()-1);
+                std::string attributes = inner.substr(1, inner.length() - 1);
 
                 if (RegexMatch(attributes, "enum\\[[^][]+]")) {
                     return NewParameterType;

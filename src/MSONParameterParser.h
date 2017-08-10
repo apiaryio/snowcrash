@@ -15,28 +15,30 @@
 
 using namespace scpl;
 
-namespace snowcrash {
+namespace snowcrash
+{
 
     /**
      * MSON Parameter Section Processor
      */
-    template<>
+    template <>
     struct SectionProcessor<MSONParameter> : public SignatureSectionProcessorBase<MSONParameter> {
 
-        static SignatureTraits signatureTraits() {
+        static SignatureTraits signatureTraits()
+        {
 
-            SignatureTraits signatureTraits(SignatureTraits::IdentifierTrait |
-                                            SignatureTraits::ValuesTrait |
-                                            SignatureTraits::AttributesTrait |
-                                            SignatureTraits::ContentTrait);
+            SignatureTraits signatureTraits(SignatureTraits::IdentifierTrait | SignatureTraits::ValuesTrait
+                | SignatureTraits::AttributesTrait
+                | SignatureTraits::ContentTrait);
 
             return signatureTraits;
         }
 
         static MarkdownNodeIterator finalizeSignature(const MarkdownNodeIterator& node,
-                                                      SectionParserData& pd,
-                                                      const Signature& signature,
-                                                      const ParseResultRef<MSONParameter>& out) {
+            SectionParserData& pd,
+            const Signature& signature,
+            const ParseResultRef<MSONParameter>& out)
+        {
 
             out.node.name = StripBackticks(const_cast<std::string&>(signature.identifier));
             out.node.description = signature.content;
@@ -66,17 +68,17 @@ namespace snowcrash {
         }
 
         static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
-                                                         const MarkdownNodes& siblings,
-                                                         SectionParserData& pd,
-                                                         const ParseResultRef<MSONParameter>& out) {
+            const MarkdownNodes& siblings,
+            SectionParserData& pd,
+            const ParseResultRef<MSONParameter>& out)
+        {
 
             SectionType sectionType = pd.sectionContext();
             MarkdownNodeIterator cur = node;
             IntermediateParseResult<mson::TypeSection> typeSection(out.report);
 
             switch (sectionType) {
-                case MSONSampleDefaultSectionType:
-                {
+                case MSONSampleDefaultSectionType: {
                     typeSection.node.baseType = mson::ImplicitPrimitiveBaseType;
                     cur = MSONTypeSectionListParser::parse(node, siblings, pd, typeSection);
 
@@ -90,8 +92,7 @@ namespace snowcrash {
                         if (pd.exportSourceMap()) {
                             out.sourceMap.defaultValue.sourceMap = typeSection.sourceMap.value.sourceMap;
                         }
-                    }
-                    else if (typeSection.node.klass == mson::TypeSection::SampleClass) {
+                    } else if (typeSection.node.klass == mson::TypeSection::SampleClass) {
                         out.node.exampleValue = typeSection.node.content.value;
                         out.sourceMap.exampleValue.sourceMap = typeSection.sourceMap.value.sourceMap;
                     }
@@ -99,8 +100,7 @@ namespace snowcrash {
                     break;
                 }
 
-                case MSONValueMembersSectionType:
-                {
+                case MSONValueMembersSectionType: {
                     typeSection.node.baseType = mson::ImplicitValueBaseType;
                     cur = MSONTypeSectionListParser::parse(node, siblings, pd, typeSection);
 
@@ -140,15 +140,16 @@ namespace snowcrash {
             return cur;
         }
 
-        static void finalize(const MarkdownNodeIterator& node,
-                             SectionParserData& pd,
-                             const ParseResultRef<MSONParameter>& out) {
+        static void finalize(
+            const MarkdownNodeIterator& node, SectionParserData& pd, const ParseResultRef<MSONParameter>& out)
+        {
 
             SectionProcessor<Parameter>::checkDefaultAndRequiredClash<MSONParameter>(node, pd, out);
             SectionProcessor<Parameter>::checkExampleAndDefaultValue<MSONParameter>(node, pd, out);
         }
 
-        static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
+        static SectionType nestedSectionType(const MarkdownNodeIterator& node)
+        {
 
             SectionType nestedType = UndefinedSectionType;
 

@@ -11,12 +11,14 @@
 
 #include <string>
 
-namespace snowcrash {
+namespace snowcrash
+{
 
     /**
      *  API Blueprint Sections Types.
      */
-    enum SectionType {
+    enum SectionType
+    {
         UndefinedSectionType = 0,       /// < Undefined section
         BlueprintSectionType,           /// < Blueprint overview
         DataStructureGroupSectionType,  /// < Data Structure Group

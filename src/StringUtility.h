@@ -21,50 +21,57 @@
 #include "RegexMatch.h"
 #include "MarkdownParser.h"
 
-namespace snowcrash {
+namespace snowcrash
+{
 
     // Check a character not to be an space of any kind
-    inline bool isSpace(const std::string::value_type i){
-        if(i == ' ' || i == '\t' || i == '\n' || i == '\v' || i == '\f' || i == '\r')
+    inline bool isSpace(const std::string::value_type i)
+    {
+        if (i == ' ' || i == '\t' || i == '\n' || i == '\v' || i == '\f' || i == '\r')
             return true;
         return false;
     }
 
     // Trim string from start
-    inline std::string& TrimStringStart(std::string &s) {
+    inline std::string& TrimStringStart(std::string& s)
+    {
         s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::not1(std::ptr_fun(isSpace))));
         return s;
     }
 
     // Trim string from end
-    inline std::string& TrimStringEnd(std::string &s) {
+    inline std::string& TrimStringEnd(std::string& s)
+    {
         s.erase(std::find_if(s.rbegin(), s.rend(), std::not1(std::ptr_fun(isSpace))).base(), s.end());
         return s;
     }
 
     // Trim both ends of string
-    inline std::string& TrimString(std::string &s) {
+    inline std::string& TrimString(std::string& s)
+    {
         return TrimStringStart(TrimStringEnd(s));
     }
 
-
     // <position form begin, lenght of string>
-    typedef std::tuple<std::string::const_iterator::difference_type, std::string::const_iterator::difference_type> TrimRange;
+    typedef std::tuple<std::string::const_iterator::difference_type, std::string::const_iterator::difference_type>
+        TrimRange;
 
     // Get Trim Info
-    inline TrimRange GetTrimInfo(std::string::const_iterator begin, std::string::const_iterator end) {
+    inline TrimRange GetTrimInfo(std::string::const_iterator begin, std::string::const_iterator end)
+    {
         std::string::const_reverse_iterator rbegin(end);
         std::string::const_reverse_iterator rend(begin);
 
         std::string::const_iterator trim = std::find_if(begin, end, std::not1(std::ptr_fun(isSpace)));
         std::string::const_reverse_iterator rtrim = std::find_if(rbegin, rend, std::not1(std::ptr_fun(isSpace)));
 
-        return std::make_tuple(std::distance(begin, trim),
-                std::distance(rtrim, std::string::const_reverse_iterator(trim)));
+        return std::make_tuple(
+            std::distance(begin, trim), std::distance(rtrim, std::string::const_reverse_iterator(trim)));
     }
 
     // Split string by delim
-    inline std::vector<std::string>& Split(const std::string& s, char delim, std::vector<std::string>& elems) {
+    inline std::vector<std::string>& Split(const std::string& s, char delim, std::vector<std::string>& elems)
+    {
         std::stringstream ss(s);
         std::string item;
         while (std::getline(ss, item, delim)) {
@@ -74,20 +81,21 @@ namespace snowcrash {
     }
 
     // Split string by delim
-    inline std::vector<std::string> Split(const std::string& s, char delim) {
+    inline std::vector<std::string> Split(const std::string& s, char delim)
+    {
         std::vector<std::string> elems;
         Split(s, delim, elems);
         return elems;
     }
 
     // Split string on the first occurrence of delim
-    inline std::vector<std::string> SplitOnFirst(const std::string& s, char delim) {
+    inline std::vector<std::string> SplitOnFirst(const std::string& s, char delim)
+    {
         std::string::size_type pos = s.find(delim);
         std::vector<std::string> elems;
         if (pos == std::string::npos) {
             elems.push_back(s);
-        }
-        else {
+        } else {
             elems.push_back(s.substr(0, pos));
             elems.push_back(s.substr(pos + 1, std::string::npos));
         }
@@ -95,7 +103,8 @@ namespace snowcrash {
     }
 
     // Make sure last two characters are newlines
-    inline std::string& TwoNewLines(std::string& s) {
+    inline std::string& TwoNewLines(std::string& s)
+    {
 
         if (s[s.length() - 1] != '\n') {
             s += "\n";
@@ -115,9 +124,8 @@ namespace snowcrash {
      *  \param  replace A string to replace with.
      *  \return A copy of %s with all occurrences of %find replaced by %replace.
      */
-    inline std::string ReplaceString(const std::string& s,
-                                     const std::string& find,
-                                     const std::string& replace) {
+    inline std::string ReplaceString(const std::string& s, const std::string& find, const std::string& replace)
+    {
         size_t pos = 0;
         std::string target(s);
         while ((pos = target.find(find, pos)) != std::string::npos) {
@@ -134,7 +142,8 @@ namespace snowcrash {
      *  \param  r   Remaining content aftert the extraction
      *  \return First line from the subject string
      */
-    inline std::string GetFirstLine(const std::string& s, std::string& r){
+    inline std::string GetFirstLine(const std::string& s, std::string& r)
+    {
         std::vector<std::string> elem = SplitOnFirst(s, '\n');
         if (elem.empty())
             return std::string();
@@ -149,10 +158,11 @@ namespace snowcrash {
      *  \return true if args era equal
      */
     struct IsEqual {
-        template<typename T1, typename T2>
-            bool operator()(const T1& a1, const T2& a2) const {
-                return a1 == a2;
-            }
+        template <typename T1, typename T2>
+        bool operator()(const T1& a1, const T2& a2) const
+        {
+            return a1 == a2;
+        }
     };
 
     /**
@@ -161,10 +171,11 @@ namespace snowcrash {
      *  \return true if args era equal
      */
     struct IsIEqual {
-        template<typename T1, typename T2>
-            bool operator()(const T1& a1, const T2& a2) const {
-                return std::tolower(a1) == std::tolower(a2);
-            }
+        template <typename T1, typename T2>
+        bool operator()(const T1& a1, const T2& a2) const
+        {
+            return std::tolower(a1) == std::tolower(a2);
+        }
     };
 
     /**
@@ -182,7 +193,8 @@ namespace snowcrash {
      */
 
     template <typename T1, typename T2, typename Predicate>
-    inline bool MatchContainers(const T1& arg1, const T2& arg2, const Predicate& predicate) {
+    inline bool MatchContainers(const T1& arg1, const T2& arg2, const Predicate& predicate)
+    {
         if (arg1.length() != arg2.length()) {
             return false;
         }
@@ -191,14 +203,16 @@ namespace snowcrash {
 
     template <typename T>
     struct Equal : std::binary_function<T, T, bool> {
-        bool operator()(const T& left, const T& right) const {
+        bool operator()(const T& left, const T& right) const
+        {
             return MatchContainers(left, right, IsEqual());
         }
     };
 
     template <typename T>
     struct IEqual : std::binary_function<T, T, bool> {
-        bool operator()(const T& left, const T& right) const {
+        bool operator()(const T& left, const T& right) const
+        {
             return MatchContainers(left, right, IsIEqual());
         }
     };
@@ -217,9 +231,8 @@ namespace snowcrash {
      *
      * \example (begin = 1, subject = "a```b```cd") ----> (return = "```b```", subject = "cd")
      */
-    inline std::string RetrieveEscaped(std::string& subject,
-                                       size_t begin = 0,
-                                       const bool stripEscapeChars = false) {
+    inline std::string RetrieveEscaped(std::string& subject, size_t begin = 0, const bool stripEscapeChars = false)
+    {
 
         size_t levels = 0;
         const char escapeChar = subject[begin];
@@ -258,11 +271,11 @@ namespace snowcrash {
      *
      * \return Substring that has been stripped of enclosing backticks
      */
-    inline std::string StripBackticks(std::string& subject) {
+    inline std::string StripBackticks(std::string& subject)
+    {
 
         // Check if first and last chars are backticks
-        if (subject[0] != '`' ||
-            subject[subject.length() - 1] != '`') {
+        if (subject[0] != '`' || subject[subject.length() - 1] != '`') {
 
             return subject;
         }
@@ -287,7 +300,8 @@ namespace snowcrash {
      *
      * \return Substring which is inside the first [] of the markdown link
      */
-    inline std::string StripMarkdownLink(const std::string& subject) {
+    inline std::string StripMarkdownLink(const std::string& subject)
+    {
 
         // Check if markdown link
         if (subject[0] != mdp::MarkdownBeginReference) {
@@ -300,7 +314,8 @@ namespace snowcrash {
         return linkedString;
     }
 
-    inline std::string ReconstructMarkdownHeader(const mdp::MarkdownNode& node) {
+    inline std::string ReconstructMarkdownHeader(const mdp::MarkdownNode& node)
+    {
         std::string subject;
 
         // we are not able to reconstruct correctly headers
@@ -311,7 +326,7 @@ namespace snowcrash {
         // Solution - we strictly strip whitespace
 
         if (node.type == mdp::HeaderMarkdownNodeType) {
-            subject.reserve(node.text.length() + node.data -1);
+            subject.reserve(node.text.length() + node.data - 1);
             subject.append(node.data, '#');
             subject.append(node.text);
         }

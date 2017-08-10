@@ -15,7 +15,8 @@
 /** Macro for relation regex */
 #define RELATION_REGEX "^[[:blank:]]*[Rr]elation[[:blank:]]*:"
 
-namespace snowcrash {
+namespace snowcrash
+{
 
     /** Link Relation matching regex */
     const char* const RelationRegex = RELATION_REGEX;
@@ -25,14 +26,15 @@ namespace snowcrash {
     /**
      *  Relation Section Processor
      */
-    template<>
+    template <>
     struct SectionProcessor<Relation> : public SectionProcessorBase<Relation> {
 
         static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
-                                                     const MarkdownNodes& siblings,
-                                                     SectionParserData& pd,
-                                                     SectionLayout& layout,
-                                                     const ParseResultRef<Relation>& out) {
+            const MarkdownNodes& siblings,
+            SectionParserData& pd,
+            SectionLayout& layout,
+            const ParseResultRef<Relation>& out)
+        {
 
             mdp::ByteBuffer signature, remainingContent;
             CaptureGroups captureGroups;
@@ -43,13 +45,15 @@ namespace snowcrash {
             if (RegexCapture(signature, RelationIdentifierRegex, captureGroups, 3)) {
                 out.node.str = captureGroups[1];
                 TrimString(out.node.str);
-            }
-            else {
+            } else {
                 // WARN: Relation identifier contains illegal characters
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                out.report.warnings.push_back(Warning("relation identifier contains illegal characters (only lower case letters, numbers, '-' and '.' allowed)",
-                                                      FormattingWarning,
-                                                      sourceMap));
+                mdp::CharactersRangeSet sourceMap
+                    = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                out.report.warnings.push_back(
+                    Warning("relation identifier contains illegal characters (only lower case letters, numbers, '-' "
+                            "and '.' allowed)",
+                        FormattingWarning,
+                        sourceMap));
             }
 
             if (pd.exportSourceMap() && !out.node.str.empty()) {
@@ -61,10 +65,10 @@ namespace snowcrash {
 
         NO_SECTION_DESCRIPTION(Relation)
 
-        static SectionType sectionType(const MarkdownNodeIterator& node) {
+        static SectionType sectionType(const MarkdownNodeIterator& node)
+        {
 
-            if (node->type == mdp::ListItemMarkdownNodeType
-                && !node->children().empty()) {
+            if (node->type == mdp::ListItemMarkdownNodeType && !node->children().empty()) {
 
                 mdp::ByteBuffer remaining, subject = node->children().front().text;
 

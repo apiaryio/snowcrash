@@ -19,41 +19,46 @@
 /** Media type in brackets regex */
 #define MEDIA_TYPE "([[:blank:]]*\\(([^\\)]*)\\))"
 
-namespace snowcrash {
+namespace snowcrash
+{
 
     /** Internal type alias for Collection iterator of Response */
     typedef Collection<Response>::const_iterator ResponseIterator;
     typedef Collection<Request>::const_iterator RequestIterator;
 
     /// Payload signature
-    enum PayloadSignature {
+    enum PayloadSignature
+    {
         NoPayloadSignature = 0,
-        RequestPayloadSignature,    /// < Request payload.
-        ResponsePayloadSignature,   /// < Response payload.
-        ModelPayloadSignature,      /// < Resource Model payload.
+        RequestPayloadSignature,  /// < Request payload.
+        ResponsePayloadSignature, /// < Response payload.
+        ModelPayloadSignature,    /// < Resource Model payload.
         UndefinedPayloadSignature = -1
     };
 
     /** Request matching regex */
-    const char* const RequestRegex = "^[[:blank:]]*[Rr]equest([[:blank:]]" SYMBOL_IDENTIFIER ")?" MEDIA_TYPE "?[[:blank:]]*";
+    const char* const RequestRegex
+        = "^[[:blank:]]*[Rr]equest([[:blank:]]" SYMBOL_IDENTIFIER ")?" MEDIA_TYPE "?[[:blank:]]*";
 
     /** Response matching regex */
     const char* const ResponseRegex = "^[[:blank:]]*[Rr]esponse([[:blank:][:digit:]]+)?" MEDIA_TYPE "?[[:blank:]]*";
 
     /** Model matching regex */
-    const char* const  ModelRegex = "^[[:blank:]]*(" SYMBOL_IDENTIFIER "[[:blank:]]+)?[Mm]odel" MEDIA_TYPE "?[[:blank:]]*$";
+    const char* const ModelRegex
+        = "^[[:blank:]]*(" SYMBOL_IDENTIFIER "[[:blank:]]+)?[Mm]odel" MEDIA_TYPE "?[[:blank:]]*$";
 
     /**
      * Payload Section Processor
      */
-    template<>
+    template <>
     struct SectionProcessor<Payload> : public SectionProcessorBase<Payload> {
 
         static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
-                                                     const MarkdownNodes& siblings,
-                                                     SectionParserData& pd,
-                                                     SectionLayout& layout,
-                                                     const ParseResultRef<Payload>& out) {
+            const MarkdownNodes& siblings,
+            SectionParserData& pd,
+            SectionLayout& layout,
+            const ParseResultRef<Payload>& out)
+        {
 
             mdp::ByteBuffer signature, remainingContent;
             signature = GetFirstLine(node->text, remainingContent);
@@ -61,13 +66,13 @@ namespace snowcrash {
             parseSignature(node, pd, signature, out);
 
             // WARN: missing status code
-            if (out.node.name.empty() &&
-                (pd.sectionContext() == ResponseSectionType || pd.sectionContext() == ResponseBodySectionType)) {
+            if (out.node.name.empty()
+                && (pd.sectionContext() == ResponseSectionType || pd.sectionContext() == ResponseBodySectionType)) {
 
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                out.report.warnings.push_back(Warning("missing response HTTP status code, assuming 'Response 200'",
-                                                      EmptyDefinitionWarning,
-                                                      sourceMap));
+                mdp::CharactersRangeSet sourceMap
+                    = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                out.report.warnings.push_back(Warning(
+                    "missing response HTTP status code, assuming 'Response 200'", EmptyDefinitionWarning, sourceMap));
                 out.node.name = "200";
             }
 
@@ -101,28 +106,27 @@ namespace snowcrash {
         }
 
         static MarkdownNodeIterator processContent(const MarkdownNodeIterator& node,
-                                                   const MarkdownNodes& siblings,
-                                                   SectionParserData& pd,
-                                                   const ParseResultRef<Payload>& out) {
+            const MarkdownNodes& siblings,
+            SectionParserData& pd,
+            const ParseResultRef<Payload>& out)
+        {
 
             mdp::ByteBuffer content;
 
             if (!out.node.reference.id.empty()) {
-                //WARN: ignoring extraneous content after model reference
+                // WARN: ignoring extraneous content after model reference
                 std::stringstream ss;
 
                 ss << "ignoring extraneous content after model reference";
                 ss << ", expected model reference only e.g. '[" << out.node.reference.id << "][]'";
 
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                out.report.warnings.push_back(Warning(ss.str(),
-                                                      IgnoringWarning,
-                                                      sourceMap));
+                mdp::CharactersRangeSet sourceMap
+                    = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                out.report.warnings.push_back(Warning(ss.str(), IgnoringWarning, sourceMap));
             } else {
 
-                if (!out.node.body.empty() ||
-                    node->type != mdp::ParagraphMarkdownNodeType ||
-                    !parseModelReference(node, pd, node->text, out)) {
+                if (!out.node.body.empty() || node->type != mdp::ParagraphMarkdownNodeType
+                    || !parseModelReference(node, pd, node->text, out)) {
 
                     // NOTE: NOT THE CORRECT WAY TO DO THIS
                     // https://github.com/apiaryio/snowcrash/commit/a7c5868e62df0048a85e2f9aeeb42c3b3e0a2f07#commitcomment-7322085
@@ -142,31 +146,31 @@ namespace snowcrash {
         }
 
         static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
-                                                         const MarkdownNodes& siblings,
-                                                         SectionParserData& pd,
-                                                         const ParseResultRef<Payload>& out) {
+            const MarkdownNodes& siblings,
+            SectionParserData& pd,
+            const ParseResultRef<Payload>& out)
+        {
 
             switch (pd.sectionContext()) {
-                case HeadersSectionType:
-                {
+                case HeadersSectionType: {
                     ParseResultRef<Headers> headers(out.report, out.node.headers, out.sourceMap.headers);
                     return HeadersParser::parse(node, siblings, pd, headers);
                 }
 
-                case AttributesSectionType:
-                {
+                case AttributesSectionType: {
                     ParseResultRef<Attributes> attributes(out.report, out.node.attributes, out.sourceMap.attributes);
                     return AttributesParser::parse(node, siblings, pd, attributes);
                 }
 
-                case ParametersSectionType:
-                {
+                case ParametersSectionType: {
                     if (pd.parentSectionContext() != RequestSectionType) {
                         // WARN: Only request section can have parameters section
-                        mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                        out.report.warnings.push_back(Warning("ignoring parameters section in a non request payload section",
-                                                              IgnoringWarning,
-                                                              sourceMap));
+                        mdp::CharactersRangeSet sourceMap
+                            = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                        out.report.warnings.push_back(
+                            Warning("ignoring parameters section in a non request payload section",
+                                IgnoringWarning,
+                                sourceMap));
 
                         return ++MarkdownNodeIterator(node);
                     }
@@ -175,28 +179,30 @@ namespace snowcrash {
                     return ParametersParser::parse(node, siblings, pd, parameters);
                 }
 
-                case BodySectionType:
-                {
+                case BodySectionType: {
                     if (!out.node.body.empty()) {
                         // WARN: Multiple body section
-                        mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                        out.report.warnings.push_back(Warning("ignoring additional 'body' content, it is already defined",
-                                                              RedefinitionWarning,
-                                                              sourceMap));
+                        mdp::CharactersRangeSet sourceMap
+                            = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                        out.report.warnings.push_back(
+                            Warning("ignoring additional 'body' content, it is already defined",
+                                RedefinitionWarning,
+                                sourceMap));
                     }
 
                     ParseResultRef<Asset> asset(out.report, out.node.body, out.sourceMap.body);
                     return AssetParser::parse(node, siblings, pd, asset);
                 }
 
-                case SchemaSectionType:
-                {
+                case SchemaSectionType: {
                     if (!out.node.schema.empty()) {
                         // WARN: Multiple schema section
-                        mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                        out.report.warnings.push_back(Warning("ignoring additional 'schema' content, it is already defined",
-                                                              RedefinitionWarning,
-                                                              sourceMap));
+                        mdp::CharactersRangeSet sourceMap
+                            = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                        out.report.warnings.push_back(
+                            Warning("ignoring additional 'schema' content, it is already defined",
+                                RedefinitionWarning,
+                                sourceMap));
                     }
 
                     ParseResultRef<Asset> asset(out.report, out.node.schema, out.sourceMap.schema);
@@ -211,16 +217,17 @@ namespace snowcrash {
         }
 
         static MarkdownNodeIterator processUnexpectedNode(const MarkdownNodeIterator& node,
-                                                          const MarkdownNodes& siblings,
-                                                          SectionParserData& pd,
-                                                          SectionType& sectionType,
-                                                          const ParseResultRef<Payload>& out) {
+            const MarkdownNodes& siblings,
+            SectionParserData& pd,
+            SectionType& sectionType,
+            const ParseResultRef<Payload>& out)
+        {
 
-            if ((node->type == mdp::ParagraphMarkdownNodeType ||
-                 node->type == mdp::CodeMarkdownNodeType) &&
-                sectionType == BodySectionType) {
+            if ((node->type == mdp::ParagraphMarkdownNodeType || node->type == mdp::CodeMarkdownNodeType)
+                && sectionType == BodySectionType) {
 
-                mdp::ByteBuffer content = CodeBlockUtility::addDanglingAsset(node, pd, sectionType, out.report, out.node.body);
+                mdp::ByteBuffer content
+                    = CodeBlockUtility::addDanglingAsset(node, pd, sectionType, out.report, out.node.body);
 
                 if (pd.exportSourceMap() && !content.empty()) {
                     out.sourceMap.body.sourceMap.append(node->sourceMap);
@@ -232,23 +239,10 @@ namespace snowcrash {
             return SectionProcessorBase<Payload>::processUnexpectedNode(node, siblings, pd, sectionType, out);
         }
 
-        static bool isDescriptionNode(const MarkdownNodeIterator& node,
-                                      SectionType sectionType) {
+        static bool isDescriptionNode(const MarkdownNodeIterator& node, SectionType sectionType)
+        {
 
-            if (!isAbbreviated(sectionType) &&
-                SectionProcessorBase<Payload>::isDescriptionNode(node, sectionType)) {
-
-                return true;
-            }
-
-            return false;
-        }
-
-        static bool isContentNode(const MarkdownNodeIterator& node,
-                                  SectionType sectionType) {
-
-            if (isAbbreviated(sectionType) &&
-                (SectionKeywordSignature(node) == UndefinedSectionType)) {
+            if (!isAbbreviated(sectionType) && SectionProcessorBase<Payload>::isDescriptionNode(node, sectionType)) {
 
                 return true;
             }
@@ -256,10 +250,21 @@ namespace snowcrash {
             return false;
         }
 
-        static SectionType sectionType(const MarkdownNodeIterator& node) {
+        static bool isContentNode(const MarkdownNodeIterator& node, SectionType sectionType)
+        {
 
-            if (node->type == mdp::ListItemMarkdownNodeType
-                && !node->children().empty()) {
+            if (isAbbreviated(sectionType) && (SectionKeywordSignature(node) == UndefinedSectionType)) {
+
+                return true;
+            }
+
+            return false;
+        }
+
+        static SectionType sectionType(const MarkdownNodeIterator& node)
+        {
+
+            if (node->type == mdp::ListItemMarkdownNodeType && !node->children().empty()) {
 
                 SectionType nestedType = UndefinedSectionType;
                 PayloadSignature signature = payloadSignature(node);
@@ -268,9 +273,7 @@ namespace snowcrash {
                     return UndefinedSectionType;
                 }
 
-                for (MarkdownNodeIterator child = node->children().begin();
-                     child != node->children().end();
-                     ++child) {
+                for (MarkdownNodeIterator child = node->children().begin(); child != node->children().end(); ++child) {
 
                     nestedType = nestedSectionType(child);
 
@@ -286,7 +289,8 @@ namespace snowcrash {
             return UndefinedSectionType;
         }
 
-        static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
+        static SectionType nestedSectionType(const MarkdownNodeIterator& node)
+        {
 
             SectionType nestedType = UndefinedSectionType;
 
@@ -321,24 +325,24 @@ namespace snowcrash {
             return UndefinedSectionType;
         }
 
-        static void finalize(const MarkdownNodeIterator& node,
-                             SectionParserData& pd,
-                             const ParseResultRef<Payload>& out) {
+        static void finalize(
+            const MarkdownNodeIterator& node, SectionParserData& pd, const ParseResultRef<Payload>& out)
+        {
 
             SectionType sectionType = pd.sectionContext();
 
             if (sectionType == RequestSectionType || sectionType == RequestBodySectionType) {
 
                 checkRequest(node, pd, out);
-            }
-            else if (sectionType == ResponseSectionType || sectionType == ResponseBodySectionType) {
+            } else if (sectionType == ResponseSectionType || sectionType == ResponseBodySectionType) {
 
                 checkResponse(node, pd, out);
             }
         }
 
         /** Resolve payload signature */
-        static PayloadSignature payloadSignature(const MarkdownNodeIterator& node) {
+        static PayloadSignature payloadSignature(const MarkdownNodeIterator& node)
+        {
 
             mdp::ByteBuffer subject = node->children().front().text;
             mdp::ByteBuffer signature;
@@ -360,8 +364,8 @@ namespace snowcrash {
         }
 
         /** Get SectionType from PayloadSignature and nestedSectionType */
-        static SectionType getSectionType(PayloadSignature signature,
-                                          SectionType nestedType) {
+        static SectionType getSectionType(PayloadSignature signature, SectionType nestedType)
+        {
 
             switch (signature) {
                 case RequestPayloadSignature:
@@ -381,18 +385,19 @@ namespace snowcrash {
         }
 
         /** True if abbreviated section type */
-        static bool isAbbreviated(SectionType sectionType) {
+        static bool isAbbreviated(SectionType sectionType)
+        {
 
-            return (sectionType == RequestBodySectionType ||
-                    sectionType == ResponseBodySectionType ||
-                    sectionType == ModelBodySectionType);
+            return (sectionType == RequestBodySectionType || sectionType == ResponseBodySectionType
+                || sectionType == ModelBodySectionType);
         }
 
         /** Given the signature, parse it */
         static bool parseSignature(const MarkdownNodeIterator& node,
-                                   SectionParserData& pd,
-                                   const mdp::ByteBuffer& signature,
-                                   const ParseResultRef<Payload>& out) {
+            SectionParserData& pd,
+            const mdp::ByteBuffer& signature,
+            const ParseResultRef<Payload>& out)
+        {
 
             const char* regex;
             mdp::ByteBuffer mediaType;
@@ -418,8 +423,7 @@ namespace snowcrash {
                     return true;
             }
 
-            if (RegexCapture(signature, regex, captureGroups, 5) &&
-                !captureGroups.empty()) {
+            if (RegexCapture(signature, regex, captureGroups, 5) && !captureGroups.empty()) {
 
                 mdp::ByteBuffer target = signature;
                 mdp::ByteBuffer::size_type pos = target.find(captureGroups[0]);
@@ -455,21 +459,18 @@ namespace snowcrash {
                             return false;
                     }
 
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                    out.report.warnings.push_back(Warning(ss.str(),
-                                                          FormattingWarning,
-                                                          sourceMap));
+                    mdp::CharactersRangeSet sourceMap
+                        = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                    out.report.warnings.push_back(Warning(ss.str(), FormattingWarning, sourceMap));
 
                     return false;
                 }
 
-                if (pd.sectionContext() == ModelSectionType ||
-                    pd.sectionContext() == ModelBodySectionType) {
+                if (pd.sectionContext() == ModelSectionType || pd.sectionContext() == ModelBodySectionType) {
 
                     out.node.name = captureGroups[2];
                     mediaType = captureGroups[4];
-                } else if (pd.sectionContext() == RequestSectionType ||
-                           pd.sectionContext() == RequestBodySectionType) {
+                } else if (pd.sectionContext() == RequestSectionType || pd.sectionContext() == RequestBodySectionType) {
 
                     out.node.name = captureGroups[1];
                     mediaType = captureGroups[4];
@@ -506,9 +507,10 @@ namespace snowcrash {
 
         /** Given the reference id(name), initializes reference of the payload accordingly (if possible resolve it) */
         static bool parseModelReference(const MarkdownNodeIterator& node,
-                                        SectionParserData& pd,
-                                        mdp::ByteBuffer& source,
-                                        const ParseResultRef<Payload>& out) {
+            SectionParserData& pd,
+            mdp::ByteBuffer& source,
+            const ParseResultRef<Payload>& out)
+        {
 
             Identifier symbol;
 
@@ -547,20 +549,18 @@ namespace snowcrash {
          *  \param  pd       Section parser state
          *  \param  out      Processed output
          */
-        static void assingReferredPayload(SectionParserData& pd,
-                                          const ParseResultRef<Payload>& out) {
+        static void assingReferredPayload(SectionParserData& pd, const ParseResultRef<Payload>& out)
+        {
 
             SourceMap<ResourceModel> modelSM;
             ResourceModel model = pd.modelTable.find(out.node.reference.id)->second;
-
 
             out.node.description = model.description;
             out.node.parameters = model.parameters;
 
             HeaderIterator modelContentTypeIt = std::find_if(model.headers.begin(),
-                                                             model.headers.end(),
-                                                             std::bind2nd(MatchFirstWith<Header, std::string>(),
-                                                                          HTTPHeaderName::ContentType));
+                model.headers.end(),
+                std::bind2nd(MatchFirstWith<Header, std::string>(), HTTPHeaderName::ContentType));
 
             bool isPayloadContentType = !out.node.headers.empty();
             bool isModelContentType = modelContentTypeIt != model.headers.end();
@@ -573,10 +573,9 @@ namespace snowcrash {
                 ss << "ignoring additional " << SectionName(pd.sectionContext()) << " header(s), ";
                 ss << "specify this header(s) in the referenced model definition instead";
 
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(out.node.reference.meta.node->sourceMap, pd.sourceCharacterIndex);
-                out.report.warnings.push_back(Warning(ss.str(),
-                                                      IgnoringWarning,
-                                                      sourceMap));
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(
+                    out.node.reference.meta.node->sourceMap, pd.sourceCharacterIndex);
+                out.report.warnings.push_back(Warning(ss.str(), IgnoringWarning, sourceMap));
             }
 
             if (isPayloadContentType && !isModelContentType) {
@@ -598,7 +597,9 @@ namespace snowcrash {
                 out.sourceMap.schema = modelSM.schema;
 
                 if (isPayloadContentType && !isModelContentType) {
-                    out.sourceMap.headers.collection.insert(out.sourceMap.headers.collection.end(), modelSM.headers.collection.begin(), modelSM.headers.collection.end());
+                    out.sourceMap.headers.collection.insert(out.sourceMap.headers.collection.end(),
+                        modelSM.headers.collection.begin(),
+                        modelSM.headers.collection.end());
                 } else {
                     out.sourceMap.headers = modelSM.headers;
                 }
@@ -611,18 +612,16 @@ namespace snowcrash {
          *  \param  pd       Section parser state
          *  \param  out      Processed output
          */
-        static void checkRequest(const MarkdownNodeIterator& node,
-                                 SectionParserData& pd,
-                                 const ParseResultRef<Payload>& out) {
+        static void checkRequest(
+            const MarkdownNodeIterator& node, SectionParserData& pd, const ParseResultRef<Payload>& out)
+        {
 
             bool warnEmptyBody = false;
 
             mdp::ByteBuffer contentLength;
             mdp::ByteBuffer transferEncoding;
 
-            for (HeaderIterator it = out.node.headers.begin();
-                 it != out.node.headers.end();
-                 ++it) {
+            for (HeaderIterator it = out.node.headers.begin(); it != out.node.headers.end(); ++it) {
 
                 if (it->first == HTTPHeaderName::ContentLength) {
                     contentLength = it->second;
@@ -633,9 +632,8 @@ namespace snowcrash {
                 }
             }
 
-
-            if (out.node.body.empty() && out.node.attributes.empty() &&
-                out.node.reference.meta.state != Reference::StatePending) {
+            if (out.node.body.empty() && out.node.attributes.empty()
+                && out.node.reference.meta.state != Reference::StatePending) {
 
                 // Warn when content-length or transfer-encoding is specified or headers, parameters and body are empty
                 if (out.node.headers.empty() && out.node.parameters.empty()) {
@@ -651,15 +649,16 @@ namespace snowcrash {
                     ss << "empty " << SectionName(RequestSectionType) << " " << SectionName(BodySectionType);
 
                     if (!contentLength.empty()) {
-                        ss << ", expected " << SectionName(BodySectionType) << " for '" << contentLength << "' Content-Length";
+                        ss << ", expected " << SectionName(BodySectionType) << " for '" << contentLength
+                           << "' Content-Length";
                     } else if (!transferEncoding.empty()) {
-                        ss << ", expected " << SectionName(BodySectionType) << " for '" << transferEncoding << "' Transfer-Encoding";
+                        ss << ", expected " << SectionName(BodySectionType) << " for '" << transferEncoding
+                           << "' Transfer-Encoding";
                     }
 
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                    out.report.warnings.push_back(Warning(ss.str(),
-                                                          EmptyDefinitionWarning,
-                                                          sourceMap));
+                    mdp::CharactersRangeSet sourceMap
+                        = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                    out.report.warnings.push_back(Warning(ss.str(), EmptyDefinitionWarning, sourceMap));
                 }
             }
         }
@@ -670,9 +669,9 @@ namespace snowcrash {
          *  \param  pd       Section parser state
          *  \param  out      Processed output
          */
-        static void checkResponse(const MarkdownNodeIterator& node,
-                                  SectionParserData& pd,
-                                  const ParseResultRef<Payload>& out) {
+        static void checkResponse(
+            const MarkdownNodeIterator& node, SectionParserData& pd, const ParseResultRef<Payload>& out)
+        {
 
             HTTPStatusCode code = 200;
 
@@ -682,18 +681,16 @@ namespace snowcrash {
 
             StatusCodeTraits statusCodeTraits = GetStatusCodeTrait(code);
 
-            if (!statusCodeTraits.allowBody &&
-                !out.node.body.empty() &&
-                out.node.reference.meta.state != Reference::StatePending) {
+            if (!statusCodeTraits.allowBody && !out.node.body.empty()
+                && out.node.reference.meta.state != Reference::StatePending) {
 
                 // WARN: not empty body
                 std::stringstream ss;
                 ss << "the " << code << " response MUST NOT include a " << SectionName(BodySectionType);
 
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                out.report.warnings.push_back(Warning(ss.str(),
-                                                      EmptyDefinitionWarning,
-                                                      sourceMap));
+                mdp::CharactersRangeSet sourceMap
+                    = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                out.report.warnings.push_back(Warning(ss.str(), EmptyDefinitionWarning, sourceMap));
             }
         }
 
@@ -703,12 +700,11 @@ namespace snowcrash {
          *  \param  request A request to look for.
          *  \return Iterator pointing to the matching request within given method requests.
          */
-        static RequestIterator findRequest(const TransactionExample& example,
-                                           const Request& request) {
+        static RequestIterator findRequest(const TransactionExample& example, const Request& request)
+        {
 
-            return std::find_if(example.requests.begin(),
-                                example.requests.end(),
-                                std::bind2nd(MatchPayload(), request));
+            return std::find_if(
+                example.requests.begin(), example.requests.end(), std::bind2nd(MatchPayload(), request));
         }
 
         /**
@@ -717,12 +713,11 @@ namespace snowcrash {
          *  \param  response A response to look for.
          *  \return Iterator pointing to the matching response within given method requests.
          */
-        static ResponseIterator findResponse(const TransactionExample& example,
-                                             const Response& response) {
+        static ResponseIterator findResponse(const TransactionExample& example, const Response& response)
+        {
 
-            return std::find_if(example.responses.begin(),
-                                example.responses.end(),
-                                std::bind2nd(MatchPayload(), response));
+            return std::find_if(
+                example.responses.begin(), example.responses.end(), std::bind2nd(MatchPayload(), response));
         }
     };
 

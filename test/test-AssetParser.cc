@@ -12,15 +12,15 @@
 using namespace snowcrash;
 using namespace snowcrashtest;
 
-const mdp::ByteBuffer BodyAssetFixture = \
-"+ Body\n"\
-"\n"\
-"        Lorem Ipsum\n";
+const mdp::ByteBuffer BodyAssetFixture
+    = "+ Body\n"
+      "\n"
+      "        Lorem Ipsum\n";
 
-const mdp::ByteBuffer SchemaAssetFixture = \
-"+ Schema\n"\
-"\n"\
-"        Dolor Sit Amet\n";
+const mdp::ByteBuffer SchemaAssetFixture
+    = "+ Schema\n"
+      "\n"
+      "        Dolor Sit Amet\n";
 
 TEST_CASE("Recognize explicit body signature", "[asset]")
 {
@@ -35,9 +35,9 @@ TEST_CASE("Recognize explicit body signature", "[asset]")
 
 TEST_CASE("Recognize body with content on signature", "[asset]")
 {
-    mdp::ByteBuffer source = \
-    "+ Body\n"\
-    "        Lorem Ipsum\n";
+    mdp::ByteBuffer source
+        = "+ Body\n"
+          "        Lorem Ipsum\n";
 
     mdp::MarkdownParser markdownParser;
     mdp::MarkdownNode markdownAST;
@@ -121,11 +121,11 @@ TEST_CASE("Nested list block inside", "[asset]")
 
 TEST_CASE("Multiline signature", "[asset]")
 {
-    mdp::ByteBuffer source = \
-    "+ Body\n"
-    "  Multiline Signature Content\n"\
-    "\n"\
-    "        Hello World!\n";
+    mdp::ByteBuffer source
+        = "+ Body\n"
+          "  Multiline Signature Content\n"
+          "\n"
+          "        Hello World!\n";
 
     ParseResult<Asset> asset;
     SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, asset, ExportSourcemapOption);
@@ -143,14 +143,14 @@ TEST_CASE("Multiline signature", "[asset]")
 
 TEST_CASE("Multiple blocks", "[asset]")
 {
-    mdp::ByteBuffer source = \
-    "+ Body\n"\
-    "\n"\
-    "    Block 1\n"\
-    "\n"\
-    "        Block 2\n"\
-    "\n"\
-    "    Block 3\n";
+    mdp::ByteBuffer source
+        = "+ Body\n"
+          "\n"
+          "    Block 1\n"
+          "\n"
+          "        Block 2\n"
+          "\n"
+          "    Block 3\n";
 
     ParseResult<Asset> asset;
     SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, asset, ExportSourcemapOption);
@@ -169,10 +169,10 @@ TEST_CASE("Multiple blocks", "[asset]")
 
 TEST_CASE("Extra spaces before signature", "[asset]")
 {
-    mdp::ByteBuffer source = \
-    "+   Body\n"\
-    "\n"\
-    "        Lorem Ipsum\n";
+    mdp::ByteBuffer source
+        = "+   Body\n"
+          "\n"
+          "        Lorem Ipsum\n";
 
     ParseResult<Asset> asset;
     SectionParserHelper<Asset, AssetParser>::parse(source, BodySectionType, asset, ExportSourcemapOption);

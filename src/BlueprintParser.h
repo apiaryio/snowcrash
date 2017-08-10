@@ -18,7 +18,8 @@
 #include "RegexMatch.h"
 #include "CodeBlockUtility.h"
 
-namespace snowcrash {
+namespace snowcrash
+{
 
     const char* const ExpectedAPINameMessage = "expected API name, e.g. '# <API Name>'";
 
@@ -28,19 +29,19 @@ namespace snowcrash {
     /**
      * Blueprint processor
      */
-    template<>
+    template <>
     struct SectionProcessor<Blueprint> : public SectionProcessorBase<Blueprint> {
 
         static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
-                                                     const MarkdownNodes& siblings,
-                                                     SectionParserData& pd,
-                                                     SectionLayout& layout,
-                                                     const ParseResultRef<Blueprint>& out) {
+            const MarkdownNodes& siblings,
+            SectionParserData& pd,
+            SectionLayout& layout,
+            const ParseResultRef<Blueprint>& out)
+        {
 
             MarkdownNodeIterator cur = node;
 
-            while (cur != siblings.end() &&
-                   cur->type == mdp::ParagraphMarkdownNodeType) {
+            while (cur != siblings.end() && cur->type == mdp::ParagraphMarkdownNodeType) {
 
                 IntermediateParseResult<MetadataCollection> metadata(out.report);
 
@@ -54,8 +55,8 @@ namespace snowcrash {
 
                     if (pd.exportSourceMap()) {
                         out.sourceMap.metadata.collection.insert(out.sourceMap.metadata.collection.end(),
-                                                                 metadata.sourceMap.collection.begin(),
-                                                                 metadata.sourceMap.collection.end());
+                            metadata.sourceMap.collection.begin(),
+                            metadata.sourceMap.collection.end());
                     }
                 }
 
@@ -93,14 +94,14 @@ namespace snowcrash {
         }
 
         static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
-                                                         const MarkdownNodes& siblings,
-                                                         SectionParserData& pd,
-                                                         const ParseResultRef<Blueprint>& out) {
+            const MarkdownNodes& siblings,
+            SectionParserData& pd,
+            const ParseResultRef<Blueprint>& out)
+        {
 
             MarkdownNodeIterator cur = node;
 
-            if (pd.sectionContext() == ResourceGroupSectionType ||
-                pd.sectionContext() == ResourceSectionType) {
+            if (pd.sectionContext() == ResourceGroupSectionType || pd.sectionContext() == ResourceSectionType) {
 
                 IntermediateParseResult<ResourceGroup> resourceGroup(out.report);
                 cur = ResourceGroupParser::parse(node, siblings, pd, resourceGroup);
@@ -118,10 +119,9 @@ namespace snowcrash {
 
                     ss << " is already defined";
 
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                    out.report.warnings.push_back(Warning(ss.str(),
-                                                          DuplicateWarning,
-                                                          sourceMap));
+                    mdp::CharactersRangeSet sourceMap
+                        = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                    out.report.warnings.push_back(Warning(ss.str(), DuplicateWarning, sourceMap));
                 }
 
                 out.node.content.elements().push_back(resourceGroup.node);
@@ -129,8 +129,7 @@ namespace snowcrash {
                 if (pd.exportSourceMap()) {
                     out.sourceMap.content.elements().collection.push_back(resourceGroup.sourceMap);
                 }
-            }
-            else if (pd.sectionContext() == DataStructureGroupSectionType) {
+            } else if (pd.sectionContext() == DataStructureGroupSectionType) {
 
                 IntermediateParseResult<DataStructureGroup> dataStructureGroup(out.report);
                 cur = DataStructureGroupParser::parse(node, siblings, pd, dataStructureGroup);
@@ -150,9 +149,10 @@ namespace snowcrash {
          * named types along with their base types and the types they are sub-typed from
          */
         static void preprocessNestedSections(const MarkdownNodeIterator& node,
-                                             const MarkdownNodes& siblings,
-                                             SectionParserData& pd,
-                                             const ParseResultRef<Blueprint>& out) {
+            const MarkdownNodes& siblings,
+            SectionParserData& pd,
+            const ParseResultRef<Blueprint>& out)
+        {
 
             MarkdownNodeIterator cur = node, contextCur;
             SectionType sectionType = UndefinedSectionType;
@@ -177,13 +177,11 @@ namespace snowcrash {
 
                     // If the current node is a Resource or DataStructures section, assign it as context
                     // Otherwise, make sure the current context is not DataStructures section and remove the context
-                    if (sectionType == ResourceSectionType ||
-                        sectionType == DataStructureGroupSectionType) {
+                    if (sectionType == ResourceSectionType || sectionType == DataStructureGroupSectionType) {
 
                         contextSectionType = sectionType;
                         contextCur = cur;
-                    }
-                    else if (contextSectionType != DataStructureGroupSectionType) {
+                    } else if (contextSectionType != DataStructureGroupSectionType) {
 
                         contextSectionType = UndefinedSectionType;
                     }
@@ -191,22 +189,18 @@ namespace snowcrash {
                     // If context is DataStructures section, NamedTypes should be filled
                     if (contextSectionType == DataStructureGroupSectionType) {
 
-                        if (sectionType != MSONSampleDefaultSectionType &&
-                            sectionType != MSONPropertyMembersSectionType &&
-                            sectionType != MSONValueMembersSectionType &&
-                            sectionType != UndefinedSectionType &&
-                            sectionType != DataStructureGroupSectionType) {
+                        if (sectionType != MSONSampleDefaultSectionType && sectionType != MSONPropertyMembersSectionType
+                            && sectionType != MSONValueMembersSectionType
+                            && sectionType != UndefinedSectionType
+                            && sectionType != DataStructureGroupSectionType) {
 
                             contextSectionType = UndefinedSectionType;
-                        }
-                        else if (sectionType == UndefinedSectionType) {
+                        } else if (sectionType == UndefinedSectionType) {
                             fillNamedTypeTables(cur, pd, cur->text, out.report);
                         }
                     }
-                }
-                else if (cur->type == mdp::ListItemMarkdownNodeType &&
-                         contextSectionType == ResourceSectionType &&
-                         sectionType == AttributesSectionType) {
+                } else if (cur->type == mdp::ListItemMarkdownNodeType && contextSectionType == ResourceSectionType
+                    && sectionType == AttributesSectionType) {
 
                     Resource resource;
                     SectionProcessor<Resource>::matchNamedResourceHeader(contextCur, resource);
@@ -221,24 +215,27 @@ namespace snowcrash {
                 }
 
                 cur++;
-
             }
 
             // Resolve all named type base table entries
             resolveNamedTypeTables(pd, out.report);
         }
 
-        static void checkForPossibleSectionMistakes(const MarkdownNodeIterator& node, SectionParserData& pd, Report& report) {
+        static void checkForPossibleSectionMistakes(
+            const MarkdownNodeIterator& node, SectionParserData& pd, Report& report)
+        {
 
             SectionProcessor<Action>::checkForTypoMistake(node, pd, report);
         }
 
-        static SectionType sectionType(const MarkdownNodeIterator& node) {
+        static SectionType sectionType(const MarkdownNodeIterator& node)
+        {
 
             return BlueprintSectionType;
         }
 
-        static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
+        static SectionType nestedSectionType(const MarkdownNodeIterator& node)
+        {
 
             SectionType nestedType = UndefinedSectionType;
 
@@ -266,9 +263,9 @@ namespace snowcrash {
             return UndefinedSectionType;
         }
 
-        static void finalize(const MarkdownNodeIterator& node,
-                             SectionParserData& pd,
-                             const ParseResultRef<Blueprint>& out) {
+        static void finalize(
+            const MarkdownNodeIterator& node, SectionParserData& pd, const ParseResultRef<Blueprint>& out)
+        {
 
             checkLazyReferencing(pd, out);
             out.node.element = Element::CategoryElement;
@@ -283,20 +280,21 @@ namespace snowcrash {
             if (pd.options & RequireBlueprintNameOption) {
 
                 // ERR: No API name specified
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                mdp::CharactersRangeSet sourceMap
+                    = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                 out.report.error = Error(ExpectedAPINameMessage, BusinessError, sourceMap);
 
-            }
-            else if (!out.node.description.empty()) {
+            } else if (!out.node.description.empty()) {
 
                 // WARN: No API name specified
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                mdp::CharactersRangeSet sourceMap
+                    = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                 out.report.warnings.push_back(Warning(ExpectedAPINameMessage, APINameWarning, sourceMap));
             }
         }
 
-        static bool isUnexpectedNode(const MarkdownNodeIterator& node,
-                                     SectionType sectionType) {
+        static bool isUnexpectedNode(const MarkdownNodeIterator& node, SectionType sectionType)
+        {
 
             // Since Blueprint is currently top-level node any unprocessed node should be reported
             return true;
@@ -313,20 +311,21 @@ namespace snowcrash {
          * \param name Name of the named type (only given in case of named resource)
          */
         static void fillNamedTypeTables(const MarkdownNodeIterator& node,
-                                        SectionParserData& pd,
-                                        const mdp::ByteBuffer& subject,
-                                        Report& report,
-                                        const mdp::ByteBuffer& name = "") {
+            SectionParserData& pd,
+            const mdp::ByteBuffer& subject,
+            Report& report,
+            const mdp::ByteBuffer& name = "")
+        {
 
             mdp::ByteBuffer buffer = subject;
             mson::Literal identifier;
             mson::TypeDefinition typeDefinition;
             Report tmpReport;
 
-            SignatureTraits traits(SignatureTraits::IdentifierTrait |
-                                   SignatureTraits::AttributesTrait);
+            SignatureTraits traits(SignatureTraits::IdentifierTrait | SignatureTraits::AttributesTrait);
 
-            Signature signature = SignatureSectionProcessorBase<Blueprint>::parseSignature(node, pd, traits, tmpReport, buffer);
+            Signature signature
+                = SignatureSectionProcessorBase<Blueprint>::parseSignature(node, pd, traits, tmpReport, buffer);
             mson::parseTypeDefinition(node, pd, signature.attributes, tmpReport, typeDefinition);
 
             // Name of the named types cannot be variable
@@ -336,8 +335,7 @@ namespace snowcrash {
 
             if (!name.empty()) {
                 identifier = name;
-            }
-            else {
+            } else {
                 identifier = StripBackticks(signature.identifier);
             }
 
@@ -348,7 +346,8 @@ namespace snowcrash {
                 std::stringstream ss;
                 ss << "named type '" << identifier << "' is defined more than once";
 
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                mdp::CharactersRangeSet sourceMap
+                    = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
                 report.error = Error(ss.str(), MSONError, sourceMap);
                 return;
             }
@@ -374,16 +373,15 @@ namespace snowcrash {
                         }
                     }
                 }
-            }
-            else if (!typeDefinition.typeSpecification.name.symbol.literal.empty() &&
-                     !typeDefinition.typeSpecification.name.symbol.variable) {
+            } else if (!typeDefinition.typeSpecification.name.symbol.literal.empty()
+                && !typeDefinition.typeSpecification.name.symbol.variable) {
 
-                pd.namedTypeInheritanceTable[identifier] = std::make_pair(typeDefinition.typeSpecification.name.symbol.literal, node->sourceMap);
+                pd.namedTypeInheritanceTable[identifier]
+                    = std::make_pair(typeDefinition.typeSpecification.name.symbol.literal, node->sourceMap);
 
                 // Make the sub type dependent on super type
                 pd.namedTypeDependencyTable[identifier].insert(typeDefinition.typeSpecification.name.symbol.literal);
-            }
-            else if (typeDefinition.typeSpecification.name.empty()) {
+            } else if (typeDefinition.typeSpecification.name.empty()) {
 
                 // If there is no specification, an object is assumed
                 pd.namedTypeBaseTable[identifier] = mson::ImplicitObjectBaseType;
@@ -396,23 +394,19 @@ namespace snowcrash {
          * \param pd Section parser data
          * \param report Parse report
          */
-        static void resolveNamedTypeTables(SectionParserData& pd,
-                                           Report& report) {
+        static void resolveNamedTypeTables(SectionParserData& pd, Report& report)
+        {
 
             mson::NamedTypeInheritanceTable::iterator it;
             mson::NamedTypeDependencyTable::iterator depIt;
 
             // First resolve dependency tables
-            for (depIt = pd.namedTypeDependencyTable.begin();
-                 depIt != pd.namedTypeDependencyTable.end();
-                 depIt++) {
+            for (depIt = pd.namedTypeDependencyTable.begin(); depIt != pd.namedTypeDependencyTable.end(); depIt++) {
 
                 resolveNamedTypeDependencyTableEntry(pd, depIt->first, report);
             }
 
-            for (it = pd.namedTypeInheritanceTable.begin();
-                 it != pd.namedTypeInheritanceTable.end();
-                 it++) {
+            for (it = pd.namedTypeInheritanceTable.begin(); it != pd.namedTypeInheritanceTable.end(); it++) {
 
                 resolveNamedTypeBaseTableEntry(pd, it->first, it->second.first, it->second.second, report);
 
@@ -430,9 +424,9 @@ namespace snowcrash {
          * \param identifier The named type whose dependents need to be resolved
          * \param report Parse report
          */
-        static void resolveNamedTypeDependencyTableEntry(SectionParserData& pd,
-                                                         const mson::Literal& identifier,
-                                                         Report& report) {
+        static void resolveNamedTypeDependencyTableEntry(
+            SectionParserData& pd, const mson::Literal& identifier, Report& report)
+        {
 
             std::set<mson::Literal> diffDeps, finalDeps, initialDeps;
 
@@ -440,9 +434,7 @@ namespace snowcrash {
                 initialDeps = pd.namedTypeDependencyTable[identifier];
                 diffDeps.clear();
 
-                for (std::set<mson::Literal>::iterator it = initialDeps.begin();
-                     it != initialDeps.end();
-                     it++) {
+                for (std::set<mson::Literal>::iterator it = initialDeps.begin(); it != initialDeps.end(); it++) {
 
                     std::set<mson::Literal> superTypeDeps = pd.namedTypeDependencyTable[*it];
                     pd.namedTypeDependencyTable[identifier].insert(superTypeDeps.begin(), superTypeDeps.end());
@@ -450,8 +442,11 @@ namespace snowcrash {
 
                 // Check if the list of dependents has grown
                 finalDeps = pd.namedTypeDependencyTable[identifier];
-                std::set_difference(finalDeps.begin(), finalDeps.end(), initialDeps.begin(), initialDeps.end(),
-                                    std::inserter(diffDeps, diffDeps.end()));
+                std::set_difference(finalDeps.begin(),
+                    finalDeps.end(),
+                    initialDeps.begin(),
+                    initialDeps.end(),
+                    std::inserter(diffDeps, diffDeps.end()));
 
             } while (!diffDeps.empty());
         };
@@ -465,10 +460,11 @@ namespace snowcrash {
          * \param report Parse report
          */
         static void resolveNamedTypeBaseTableEntry(SectionParserData& pd,
-                                                   const mson::Literal& subType,
-                                                   const mson::Literal& superType,
-                                                   const mdp::BytesRangeSet& nodeSourceMap,
-                                                   Report& report) {
+            const mson::Literal& subType,
+            const mson::Literal& superType,
+            const mdp::BytesRangeSet& nodeSourceMap,
+            Report& report)
+        {
 
             mson::BaseType baseType;
             mson::NamedTypeBaseTable::iterator it = pd.namedTypeBaseTable.find(subType);
@@ -487,7 +483,8 @@ namespace snowcrash {
                 std::stringstream ss;
                 ss << "base type '" << subType << "' circularly referencing itself";
 
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(nodeSourceMap, pd.sourceCharacterIndex);
+                mdp::CharactersRangeSet sourceMap
+                    = mdp::BytesRangeSetToCharactersRangeSet(nodeSourceMap, pd.sourceCharacterIndex);
                 report.error = Error(ss.str(), MSONError, sourceMap);
                 return;
             }
@@ -509,7 +506,8 @@ namespace snowcrash {
                     std::stringstream ss;
                     ss << "base type '" << superType << "' is not defined in the document";
 
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(nodeSourceMap, pd.sourceCharacterIndex);
+                    mdp::CharactersRangeSet sourceMap
+                        = mdp::BytesRangeSetToCharactersRangeSet(nodeSourceMap, pd.sourceCharacterIndex);
                     report.error = Error(ss.str(), MSONError, sourceMap);
                     return;
                 }
@@ -522,26 +520,23 @@ namespace snowcrash {
                 }
 
                 baseType = pd.namedTypeBaseTable.find(superType)->second;
-            }
-            else {
+            } else {
                 baseType = it->second;
             }
 
             pd.namedTypeBaseTable[subType] = baseType;
         }
 
-        static void parseMetadata(const MarkdownNodeIterator& node,
-                                  SectionParserData& pd,
-                                  const ParseResultRef<MetadataCollection>& out) {
+        static void parseMetadata(
+            const MarkdownNodeIterator& node, SectionParserData& pd, const ParseResultRef<MetadataCollection>& out)
+        {
 
             mdp::ByteBuffer content = node->text;
             TrimStringEnd(content);
 
             std::vector<mdp::ByteBuffer> lines = Split(content, '\n');
 
-            for (std::vector<mdp::ByteBuffer>::iterator it = lines.begin();
-                 it != lines.end();
-                 ++it) {
+            for (std::vector<mdp::ByteBuffer>::iterator it = lines.begin(); it != lines.end(); ++it) {
 
                 Metadata metadata;
 
@@ -561,20 +556,17 @@ namespace snowcrash {
                 // Check duplicates
                 std::vector<mdp::ByteBuffer> duplicateKeys;
 
-                for (MetadataCollectionIterator it = out.node.begin();
-                     it != out.node.end();
-                     ++it) {
+                for (MetadataCollectionIterator it = out.node.begin(); it != out.node.end(); ++it) {
 
                     MetadataCollectionIterator from = it;
                     if (++from == out.node.end())
                         break;
 
-                    MetadataCollectionIterator duplicate = std::find_if(from,
-                                                                        out.node.end(),
-                                                                        std::bind2nd(MatchFirsts<Metadata>(), *it));
+                    MetadataCollectionIterator duplicate
+                        = std::find_if(from, out.node.end(), std::bind2nd(MatchFirsts<Metadata>(), *it));
 
-                    if (duplicate != out.node.end() &&
-                        std::find(duplicateKeys.begin(), duplicateKeys.end(), it->first) == duplicateKeys.end()) {
+                    if (duplicate != out.node.end()
+                        && std::find(duplicateKeys.begin(), duplicateKeys.end(), it->first) == duplicateKeys.end()) {
 
                         duplicateKeys.push_back(it->first);
 
@@ -582,20 +574,20 @@ namespace snowcrash {
                         std::stringstream ss;
                         ss << "duplicate definition of '" << it->first << "'";
 
-                        mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                        out.report.warnings.push_back(Warning(ss.str(),
-                                                              DuplicateWarning,
-                                                              sourceMap));
+                        mdp::CharactersRangeSet sourceMap
+                            = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                        out.report.warnings.push_back(Warning(ss.str(), DuplicateWarning, sourceMap));
                     }
                 }
-            }
-            else if (!out.node.empty()) {
+            } else if (!out.node.empty()) {
 
                 // WARN: malformed metadata block
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                out.report.warnings.push_back(Warning("ignoring possible metadata, expected '<key> : <value>', one one per line",
-                                                      FormattingWarning,
-                                                      sourceMap));
+                mdp::CharactersRangeSet sourceMap
+                    = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                out.report.warnings.push_back(
+                    Warning("ignoring possible metadata, expected '<key> : <value>', one one per line",
+                        FormattingWarning,
+                        sourceMap));
             }
         }
 
@@ -605,16 +597,15 @@ namespace snowcrash {
          * \param blueprint The blueprint which is formed until now
          * \param name The resource group name to be checked
          */
-        static bool isResourceGroupDuplicate(const Blueprint& blueprint,
-                                             mdp::ByteBuffer& name) {
+        static bool isResourceGroupDuplicate(const Blueprint& blueprint, mdp::ByteBuffer& name)
+        {
 
             for (Elements::const_iterator it = blueprint.content.elements().begin();
                  it != blueprint.content.elements().end();
                  ++it) {
 
-                if (it->element == Element::CategoryElement &&
-                    it->category == Element::ResourceGroupCategory &&
-                    it->attributes.name == name) {
+                if (it->element == Element::CategoryElement && it->category == Element::ResourceGroupCategory
+                    && it->attributes.name == name) {
 
                     return true;
                 }
@@ -624,12 +615,13 @@ namespace snowcrash {
         }
 
         /**
-         *  \brief  Checks both blueprint and source map AST to resolve references with `Pending` state (Lazy referencing)
+         *  \brief  Checks both blueprint and source map AST to resolve references with `Pending` state (Lazy
+         * referencing)
          *  \param  pd       Section parser state
          *  \param  out      Processed output
          */
-        static void checkLazyReferencing(SectionParserData& pd,
-                                         const ParseResultRef<Blueprint>& out) {
+        static void checkLazyReferencing(SectionParserData& pd, const ParseResultRef<Blueprint>& out)
+        {
 
             Collection<SourceMap<Element> >::iterator elementSourceMapIt;
 
@@ -653,9 +645,10 @@ namespace snowcrash {
 
         /** Traverses Resource Collection to resolve references with `Pending` state (Lazy referencing) */
         static void checkResourceLazyReferencing(Element& element,
-                                                 Collection<SourceMap<Element> >::iterator& elementSourceMap,
-                                                 SectionParserData& pd,
-                                                 const ParseResultRef<Blueprint>& out) {
+            Collection<SourceMap<Element> >::iterator& elementSourceMap,
+            SectionParserData& pd,
+            const ParseResultRef<Blueprint>& out)
+        {
 
             Collection<SourceMap<Element> >::iterator resourceElementSourceMapIt;
 
@@ -669,7 +662,8 @@ namespace snowcrash {
 
                 if (resourceElementIt->element == Element::ResourceElement) {
                     if (pd.exportSourceMap()) {
-                        checkActionLazyReferencing(resourceElementIt->content.resource, resourceElementSourceMapIt->content.resource, pd, out);
+                        checkActionLazyReferencing(
+                            resourceElementIt->content.resource, resourceElementSourceMapIt->content.resource, pd, out);
                     } else {
                         SourceMap<Resource> tempSourceMap;
                         checkActionLazyReferencing(resourceElementIt->content.resource, tempSourceMap, pd, out);
@@ -684,9 +678,10 @@ namespace snowcrash {
 
         /** Traverses Action Collection to resolve references with `Pending` state (Lazy referencing) */
         static void checkActionLazyReferencing(Resource& resource,
-                                               SourceMap<Resource>& resourceSourceMap,
-                                               SectionParserData& pd,
-                                               const ParseResultRef<Blueprint>& out) {
+            SourceMap<Resource>& resourceSourceMap,
+            SectionParserData& pd,
+            const ParseResultRef<Blueprint>& out)
+        {
 
             Collection<SourceMap<Action> >::iterator actionSourceMapIt;
 
@@ -694,8 +689,7 @@ namespace snowcrash {
                 actionSourceMapIt = resourceSourceMap.actions.collection.begin();
             }
 
-            for (Actions::iterator actionIt = resource.actions.begin();
-                 actionIt != resource.actions.end();
+            for (Actions::iterator actionIt = resource.actions.begin(); actionIt != resource.actions.end();
                  ++actionIt) {
 
                 checkExampleLazyReferencing(*actionIt, actionSourceMapIt, pd, out);
@@ -706,11 +700,13 @@ namespace snowcrash {
             }
         }
 
-        /** Traverses Transaction Example Collection AST to resolve references with `Pending` state (Lazy referencing) */
+        /** Traverses Transaction Example Collection AST to resolve references with `Pending` state (Lazy referencing)
+         */
         static void checkExampleLazyReferencing(Action& action,
-                                                Collection<SourceMap<Action> >::iterator& actionSourceMapIt,
-                                                SectionParserData& pd,
-                                                const ParseResultRef<Blueprint>& out) {
+            Collection<SourceMap<Action> >::iterator& actionSourceMapIt,
+            SectionParserData& pd,
+            const ParseResultRef<Blueprint>& out)
+        {
 
             Collection<SourceMap<TransactionExample> >::iterator exampleSourceMapIt;
 
@@ -733,9 +729,10 @@ namespace snowcrash {
 
         /** Traverses Request Collection to resolve references with `Pending` state (Lazy referencing) */
         static void checkRequestLazyReferencing(TransactionExample& transactionExample,
-                                                Collection<SourceMap<TransactionExample> >::iterator& transactionExampleSourceMapIt,
-                                                SectionParserData& pd,
-                                                const ParseResultRef<Blueprint>& out) {
+            Collection<SourceMap<TransactionExample> >::iterator& transactionExampleSourceMapIt,
+            SectionParserData& pd,
+            const ParseResultRef<Blueprint>& out)
+        {
 
             Collection<SourceMap<Request> >::iterator requestSourceMapIt;
 
@@ -747,16 +744,14 @@ namespace snowcrash {
                  requestIt != transactionExample.requests.end();
                  ++requestIt) {
 
-                if (!requestIt->reference.id.empty() &&
-                    requestIt->reference.meta.state == Reference::StatePending) {
+                if (!requestIt->reference.id.empty() && requestIt->reference.meta.state == Reference::StatePending) {
 
                     if (pd.exportSourceMap()) {
 
                         ParseResultRef<Payload> payload(out.report, *requestIt, *requestSourceMapIt);
                         resolvePendingModels(pd, payload);
                         SectionProcessor<Payload>::checkRequest(requestIt->reference.meta.node, pd, payload);
-                    }
-                    else {
+                    } else {
 
                         SourceMap<Payload> tempSourceMap;
                         ParseResultRef<Payload> payload(out.report, *requestIt, tempSourceMap);
@@ -773,9 +768,10 @@ namespace snowcrash {
 
         /** Traverses Response Collection to resolve references with `Pending` state (Lazy referencing) */
         static void checkResponseLazyReferencing(TransactionExample& transactionExample,
-                                                 Collection<SourceMap<TransactionExample> >::iterator& transactionExampleSourceMapIt,
-                                                 SectionParserData& pd,
-                                                 const ParseResultRef<Blueprint>& out) {
+            Collection<SourceMap<TransactionExample> >::iterator& transactionExampleSourceMapIt,
+            SectionParserData& pd,
+            const ParseResultRef<Blueprint>& out)
+        {
 
             Collection<SourceMap<Response> >::iterator responseSourceMapIt;
 
@@ -787,16 +783,14 @@ namespace snowcrash {
                  responseIt != transactionExample.responses.end();
                  ++responseIt) {
 
-                if (!responseIt->reference.id.empty() &&
-                    responseIt->reference.meta.state == Reference::StatePending) {
+                if (!responseIt->reference.id.empty() && responseIt->reference.meta.state == Reference::StatePending) {
 
                     if (pd.exportSourceMap()) {
 
                         ParseResultRef<Payload> payload(out.report, *responseIt, *responseSourceMapIt);
                         resolvePendingModels(pd, payload);
                         SectionProcessor<Payload>::checkResponse(responseIt->reference.meta.node, pd, payload);
-                    }
-                    else {
+                    } else {
 
                         SourceMap<Payload> tempSourceMap;
                         ParseResultRef<Payload> payload(out.report, *responseIt, tempSourceMap);
@@ -816,8 +810,8 @@ namespace snowcrash {
          *  \param  pd       Section parser data
          *  \param  out      Processed output
          */
-        static void resolvePendingModels(SectionParserData& pd,
-                                         const ParseResultRef<Payload>& out) {
+        static void resolvePendingModels(SectionParserData& pd, const ParseResultRef<Payload>& out)
+        {
 
             if (pd.modelTable.find(out.node.reference.id) == pd.modelTable.end()) {
 
@@ -825,12 +819,12 @@ namespace snowcrash {
                 std::stringstream ss;
                 ss << "Undefined resource model " << out.node.reference.id;
 
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(out.node.reference.meta.node->sourceMap, pd.sourceCharacterIndex);
+                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(
+                    out.node.reference.meta.node->sourceMap, pd.sourceCharacterIndex);
                 out.report.error = Error(ss.str(), ModelError, sourceMap);
 
                 out.node.reference.meta.state = Reference::StateUnresolved;
-            }
-            else {
+            } else {
 
                 out.node.reference.meta.state = Reference::StateResolved;
                 SectionProcessor<Payload>::assingReferredPayload(pd, out);

@@ -12,7 +12,8 @@
 #include "MarkdownNode.h"
 #include "Section.h"
 
-namespace snowcrash {
+namespace snowcrash
+{
 
     /**
      *  \brief Query whether a node has keyword-defined signature.
@@ -29,15 +30,16 @@ namespace snowcrash {
     extern SectionType RecognizeCodeBlockFirstLine(const mdp::ByteBuffer& subject);
 }
 
-namespace scpl {
+namespace scpl
+{
 
     /**
      * \brief Signature data after parsing section using signature traits
      */
     struct Signature {
 
-        mdp::ByteBuffer identifier;              // Signature Identifier
-        mdp::ByteBuffer value;                   // Signature Value (unparsed values)
+        mdp::ByteBuffer identifier; // Signature Identifier
+        mdp::ByteBuffer value;      // Signature Value (unparsed values)
 
         std::vector<mdp::ByteBuffer> values;     // Signature Values
         std::vector<mdp::ByteBuffer> attributes; // Signature Attributes
@@ -60,10 +62,9 @@ namespace scpl {
         static const char AttributeDelimiter = ',';
 
         Delimiters(char valuesDelimiter_ = ':', std::string contentDelimiter_ = "-")
-        :
-        valuesDelimiter(valuesDelimiter_),
-        contentDelimiter(contentDelimiter_)
-        {}
+            : valuesDelimiter(valuesDelimiter_), contentDelimiter(contentDelimiter_)
+        {
+        }
     };
 
     /**
@@ -73,11 +74,12 @@ namespace scpl {
      */
     struct SignatureTraits {
 
-        enum Trait {
+        enum Trait
+        {
             IdentifierTrait = (1 << 0), // Expect an identifier in the signature
-            ValuesTrait     = (1 << 1), // Expect a (list of) value in the signature
+            ValuesTrait = (1 << 1),     // Expect a (list of) value in the signature
             AttributesTrait = (1 << 2), // Expect a list of attributes in the signature
-            ContentTrait    = (1 << 3)  // Expect inline description in the signature
+            ContentTrait = (1 << 3)     // Expect inline description in the signature
         };
 
         typedef unsigned int Traits;
@@ -90,13 +92,13 @@ namespace scpl {
         Delimiters delimiters;
 
         SignatureTraits(Traits traits_ = 0, Delimiters delimiters_ = Delimiters())
-        :
-        identifierTrait(traits_ & IdentifierTrait),
-        valuesTrait(traits_ & ValuesTrait),
-        attributesTrait(traits_ & AttributesTrait),
-        contentTrait(traits_ & ContentTrait),
-        delimiters(delimiters_)
-        {}
+            : identifierTrait(traits_ & IdentifierTrait)
+            , valuesTrait(traits_ & ValuesTrait)
+            , attributesTrait(traits_ & AttributesTrait)
+            , contentTrait(traits_ & ContentTrait)
+            , delimiters(delimiters_)
+        {
+        }
     };
 }
 

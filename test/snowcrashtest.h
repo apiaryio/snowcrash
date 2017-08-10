@@ -13,7 +13,8 @@
 #include "MarkdownParser.h"
 #include "SectionParser.h"
 
-namespace snowcrashtest {
+namespace snowcrashtest
+{
 
     struct Models {
 
@@ -31,12 +32,13 @@ namespace snowcrashtest {
     struct SectionParserHelper {
 
         static void parse(const mdp::ByteBuffer& source,
-                          snowcrash::SectionType type,
-                          const snowcrash::ParseResultRef<T>& out,
-                          const snowcrash::BlueprintParserOptions& opts = 0,
-                          const Models& models = Models(),
-                          snowcrash::ParseResult<snowcrash::Blueprint>* bp = NULL,
-                          const NamedTypes& namedTypes = NamedTypes()) {
+            snowcrash::SectionType type,
+            const snowcrash::ParseResultRef<T>& out,
+            const snowcrash::BlueprintParserOptions& opts = 0,
+            const Models& models = Models(),
+            snowcrash::ParseResult<snowcrash::Blueprint>* bp = NULL,
+            const NamedTypes& namedTypes = NamedTypes())
+        {
 
             mdp::MarkdownParser markdownParser;
             mdp::MarkdownNode markdownAST;
@@ -65,28 +67,25 @@ namespace snowcrashtest {
             pd.namedTypeBaseTable.insert(namedTypes.baseTable.begin(), namedTypes.baseTable.end());
             pd.namedTypeDependencyTable.insert(namedTypes.dependencyTable.begin(), namedTypes.dependencyTable.end());
 
-            PARSER::parse(markdownAST.children().begin(),
-                          markdownAST.children(),
-                          pd,
-                          out);
+            PARSER::parse(markdownAST.children().begin(), markdownAST.children(), pd, out);
         }
 
         static void parseMSON(const mdp::ByteBuffer& source,
-                              snowcrash::SectionType type,
-                              const snowcrash::ParseResultRef<T>& out,
-                              const snowcrash::BlueprintParserOptions& opts = 0,
-                              const NamedTypes& namedTypes = NamedTypes()) {
+            snowcrash::SectionType type,
+            const snowcrash::ParseResultRef<T>& out,
+            const snowcrash::BlueprintParserOptions& opts = 0,
+            const NamedTypes& namedTypes = NamedTypes())
+        {
 
             parse(source, type, out, opts, Models(), NULL, namedTypes);
         }
-
     };
 
     struct ModelHelper {
 
         /** Builds a Symbols entry for testing purposes */
-        static void build(const mdp::ByteBuffer& name,
-                          Models& models) {
+        static void build(const mdp::ByteBuffer& name, Models& models)
+        {
 
             snowcrash::ResourceModel model;
             snowcrash::SourceMap<snowcrash::ResourceModel> modelSM;
@@ -108,9 +107,8 @@ namespace snowcrashtest {
     struct NamedTypeHelper {
 
         /** Builds an named type entry for testing purposes */
-        static void build(const mson::Literal& literal,
-                          const mson::BaseType& baseType,
-                          NamedTypes& namedTypes) {
+        static void build(const mson::Literal& literal, const mson::BaseType& baseType, NamedTypes& namedTypes)
+        {
 
             namedTypes.baseTable[literal] = baseType;
             namedTypes.dependencyTable[literal] = std::set<mson::Literal>();
@@ -123,9 +121,10 @@ namespace snowcrashtest {
     struct SignatureParserHelper {
 
         static scpl::Signature parse(const mdp::ByteBuffer& source,
-                                     const snowcrash::ParseResultRef<snowcrash::Blueprint>& out,
-                                     const scpl::SignatureTraits::Traits traits,
-                                     const mdp::MarkdownNode* node = NULL) {
+            const snowcrash::ParseResultRef<snowcrash::Blueprint>& out,
+            const scpl::SignatureTraits::Traits traits,
+            const mdp::MarkdownNode* node = NULL)
+        {
 
             mdp::MarkdownParser markdownParser;
             mdp::MarkdownNode markdownAST;
@@ -145,8 +144,8 @@ namespace snowcrashtest {
             scpl::Signature signature;
             scpl::SignatureTraits signatureTraits(traits);
 
-            signature = scpl::SignatureSectionProcessorBase<snowcrash::Blueprint>
-                            ::parseSignature(markdownAST.children().begin(), pd, signatureTraits, out.report);
+            signature = scpl::SignatureSectionProcessorBase<snowcrash::Blueprint>::parseSignature(
+                markdownAST.children().begin(), pd, signatureTraits, out.report);
 
             return signature;
         }
@@ -164,7 +163,8 @@ namespace snowcrashtest {
          * If 'nth' is given, check that particular row of the given sourceMap with the
          * given location & length.
          */
-        static void check(mdp::BytesRangeSet& sourceMap, int loc, int len, size_t nth = 0) {
+        static void check(mdp::BytesRangeSet& sourceMap, int loc, int len, size_t nth = 0)
+        {
 
             if (nth == 0) {
 
@@ -179,9 +179,10 @@ namespace snowcrashtest {
         /**
          * Test a sourcemap which is of size 2
          */
-        static void check(mdp::BytesRangeSet& sourceMap, int loc1, int len1, int loc2, int len2) {
+        static void check(mdp::BytesRangeSet& sourceMap, int loc1, int len1, int loc2, int len2)
+        {
 
-            REQUIRE(sourceMap.size() ==  2);
+            REQUIRE(sourceMap.size() == 2);
             check(sourceMap, loc1, len1, 1);
             check(sourceMap, loc2, len2, 2);
         }

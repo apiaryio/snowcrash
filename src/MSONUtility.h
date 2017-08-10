@@ -13,7 +13,8 @@
 
 using namespace scpl;
 
-namespace mson {
+namespace mson
+{
 
     /**
      * \brief Check if the given string is variable
@@ -22,12 +23,12 @@ namespace mson {
      *
      * \return True if variable string
      */
-    inline bool checkVariable(const std::string& subject) {
+    inline bool checkVariable(const std::string& subject)
+    {
 
         std::string emphasisChars = mdp::MarkdownEmphasisChars;
 
-        if (emphasisChars.find(subject[0]) != std::string::npos &&
-            subject[0] == subject[subject.length() - 1]) {
+        if (emphasisChars.find(subject[0]) != std::string::npos && subject[0] == subject[subject.length() - 1]) {
 
             return true;
         }
@@ -42,11 +43,10 @@ namespace mson {
      *
      * \return MSON BaseType
      */
-    inline BaseType parseBaseType(const BaseTypeName& type) {
+    inline BaseType parseBaseType(const BaseTypeName& type)
+    {
 
-        if ((type == StringTypeName) ||
-            (type == NumberTypeName) ||
-            (type == BooleanTypeName)) {
+        if ((type == StringTypeName) || (type == NumberTypeName) || (type == BooleanTypeName)) {
 
             return PrimitiveBaseType;
         }
@@ -55,8 +55,7 @@ namespace mson {
             return ObjectBaseType;
         }
 
-        if ((type == ArrayTypeName) ||
-            (type == EnumTypeName)) {
+        if ((type == ArrayTypeName) || (type == EnumTypeName)) {
 
             return ValueBaseType;
         }
@@ -71,7 +70,8 @@ namespace mson {
      *
      * \return MSON Value
      */
-    inline Value parseValue(const std::string& subject) {
+    inline Value parseValue(const std::string& subject)
+    {
 
         Value value;
         std::string buffer = subject;
@@ -105,7 +105,8 @@ namespace mson {
      *
      * \return MSON Symbol
      */
-    inline Symbol parseSymbol(const std::string& subject) {
+    inline Symbol parseSymbol(const std::string& subject)
+    {
 
         Symbol symbol;
         Value value = parseValue(subject);
@@ -123,29 +124,22 @@ namespace mson {
      * \param typeName MSON Type Name
      * \param isBaseType If false, will be parsed as a symbol
      */
-    inline void parseTypeName(const std::string& subject,
-                              TypeName& typeName,
-                              bool isBaseType = true) {
+    inline void parseTypeName(const std::string& subject, TypeName& typeName, bool isBaseType = true)
+    {
 
         if (isBaseType && subject == "boolean") {
             typeName.base = BooleanTypeName;
-        }
-        else if (isBaseType && subject == "string") {
+        } else if (isBaseType && subject == "string") {
             typeName.base = StringTypeName;
-        }
-        else if (isBaseType && subject == "number") {
+        } else if (isBaseType && subject == "number") {
             typeName.base = NumberTypeName;
-        }
-        else if (isBaseType && subject == "array") {
+        } else if (isBaseType && subject == "array") {
             typeName.base = ArrayTypeName;
-        }
-        else if (isBaseType && subject == "enum") {
+        } else if (isBaseType && subject == "enum") {
             typeName.base = EnumTypeName;
-        }
-        else if (isBaseType && subject == "object") {
+        } else if (isBaseType && subject == "object") {
             typeName.base = ObjectTypeName;
-        }
-        else {
+        } else {
             typeName.symbol = parseSymbol(subject);
         }
     }
@@ -158,33 +152,26 @@ namespace mson {
      *
      * \return True if the given string is a type attribute
      */
-    inline bool parseTypeAttribute(const std::string& attribute,
-                                   TypeAttributes& typeAttributes) {
+    inline bool parseTypeAttribute(const std::string& attribute, TypeAttributes& typeAttributes)
+    {
 
         bool isAttribute = true;
 
         if (attribute == "required") {
             typeAttributes |= RequiredTypeAttribute;
-        }
-        else if (attribute == "optional") {
+        } else if (attribute == "optional") {
             typeAttributes |= OptionalTypeAttribute;
-        }
-        else if (attribute == "fixed") {
+        } else if (attribute == "fixed") {
             typeAttributes |= FixedTypeAttribute;
-        }
-        else if (attribute == "sample") {
+        } else if (attribute == "sample") {
             typeAttributes |= SampleTypeAttribute;
-        }
-        else if (attribute == "default") {
+        } else if (attribute == "default") {
             typeAttributes |= DefaultTypeAttribute;
-        }
-        else if (attribute == "nullable") {
+        } else if (attribute == "nullable") {
             typeAttributes |= NullableTypeAttribute;
-        }
-        else if (attribute == "fixed-type") {
+        } else if (attribute == "fixed-type") {
             typeAttributes |= FixedTypeTypeAttribute;
-        }
-        else {
+        } else {
             isAttribute = false;
         }
 
@@ -197,14 +184,14 @@ namespace mson {
      * \param subject Attribute string representing the type specification
      * \param typeSpecification MSON Type Specification
      */
-    inline void parseTypeSpecification(const std::string& attribute,
-                                       TypeSpecification& typeSpecification) {
+    inline void parseTypeSpecification(const std::string& attribute, TypeSpecification& typeSpecification)
+    {
 
         std::string subject = snowcrash::StripMarkdownLink(attribute);
 
-        bool lookingAtNested = false;    // If true, we are looking at nested types
-        bool lookingForEndLink = false;  // If true, we detected a link text and are looking for the end of it
-        bool alreadyParsedLink = false;  // If true, we already parsed the link text in the link
+        bool lookingAtNested = false;   // If true, we are looking at nested types
+        bool lookingForEndLink = false; // If true, we detected a link text and are looking for the end of it
+        bool alreadyParsedLink = false; // If true, we already parsed the link text in the link
 
         bool trimSubject = false;
 
@@ -213,8 +200,7 @@ namespace mson {
 
         while (i < subject.length()) {
 
-            if (subject[i] == mdp::MarkdownBeginReference &&
-                !alreadyParsedLink) {
+            if (subject[i] == mdp::MarkdownBeginReference && !alreadyParsedLink) {
 
                 trimSubject = true;
 
@@ -227,14 +213,10 @@ namespace mson {
                     }
 
                     lookingAtNested = true;
-                }
-                else {
+                } else {
                     lookingForEndLink = true;
                 }
-            }
-            else if (subject[i] == mdp::MarkdownEndReference &&
-                     lookingAtNested &&
-                     lookingForEndLink) {
+            } else if (subject[i] == mdp::MarkdownEndReference && lookingAtNested && lookingForEndLink) {
 
                 trimSubject = true;
 
@@ -249,17 +231,13 @@ namespace mson {
 
                 alreadyParsedLink = true;
                 lookingForEndLink = false;
-            }
-            else if (subject[i] == scpl::Delimiters::AttributeDelimiter &&
-                     lookingAtNested &&
-                     !lookingForEndLink) {
+            } else if (subject[i] == scpl::Delimiters::AttributeDelimiter && lookingAtNested && !lookingForEndLink) {
 
                 trimSubject = true;
 
                 if (alreadyParsedLink) {
                     alreadyParsedLink = false;
-                }
-                else {
+                } else {
 
                     TypeName typeName;
                     snowcrash::TrimString(buffer);
@@ -270,8 +248,7 @@ namespace mson {
                         typeSpecification.nestedTypes.push_back(typeName);
                     }
                 }
-            }
-            else {
+            } else {
 
                 buffer += subject[i];
                 i++;
@@ -296,8 +273,7 @@ namespace mson {
         }
 
         // Remove the ending square bracket
-        if (lookingAtNested &&
-            buffer[buffer.length() - 1] == mdp::MarkdownEndReference) {
+        if (lookingAtNested && buffer[buffer.length() - 1] == mdp::MarkdownEndReference) {
 
             buffer = buffer.substr(0, buffer.length() - 1);
         }
@@ -309,8 +285,7 @@ namespace mson {
 
         if (lookingAtNested) {
             typeSpecification.nestedTypes.push_back(typeName);
-        }
-        else {
+        } else {
             typeSpecification.name = typeName;
         }
     }
@@ -325,11 +300,12 @@ namespace mson {
      * \param report Parse result report
      */
     inline void addDependency(const mdp::MarkdownNodeIterator& node,
-                              snowcrash::SectionParserData& pd,
-                              const mson::Literal dependency,
-                              const mson::Literal dependent,
-                              snowcrash::Report& report,
-                              bool circularCheck = false) {
+        snowcrash::SectionParserData& pd,
+        const mson::Literal dependency,
+        const mson::Literal dependent,
+        snowcrash::Report& report,
+        bool circularCheck = false)
+    {
 
         // First, check if the type exists
         if (pd.namedTypeDependencyTable.find(dependency) == pd.namedTypeDependencyTable.end()) {
@@ -338,7 +314,8 @@ namespace mson {
             std::stringstream ss;
             ss << "base type '" << dependency << "' is not defined in the document";
 
-            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+            mdp::CharactersRangeSet sourceMap
+                = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
             report.error = snowcrash::Error(ss.str(), snowcrash::MSONError, sourceMap);
             return;
         }
@@ -346,14 +323,14 @@ namespace mson {
         std::set<mson::Literal> dependencyDeps = pd.namedTypeDependencyTable[dependency];
 
         // Second, check if it is circular reference between them
-        if (circularCheck && (dependent == dependency ||
-                              dependencyDeps.find(dependent) != dependencyDeps.end())) {
+        if (circularCheck && (dependent == dependency || dependencyDeps.find(dependent) != dependencyDeps.end())) {
 
             // ERR: Dependency named type circular references itself
             std::stringstream ss;
             ss << "base type '" << dependent << "' circularly referencing itself";
 
-            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+            mdp::CharactersRangeSet sourceMap
+                = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
             report.error = snowcrash::Error(ss.str(), snowcrash::MSONError, sourceMap);
             return;
         }
@@ -386,16 +363,15 @@ namespace mson {
      * \param typeDefinition MSON Type Definition
      */
     inline void parseTypeDefinition(const mdp::MarkdownNodeIterator& node,
-                                    snowcrash::SectionParserData& pd,
-                                    const std::vector<std::string>& attributes,
-                                    snowcrash::Report& report,
-                                    mson::TypeDefinition& typeDefinition) {
+        snowcrash::SectionParserData& pd,
+        const std::vector<std::string>& attributes,
+        snowcrash::Report& report,
+        mson::TypeDefinition& typeDefinition)
+    {
 
         bool foundTypeSpecification = false;
 
-        for (std::vector<std::string>::const_iterator it = attributes.begin();
-             it != attributes.end();
-             it++) {
+        for (std::vector<std::string>::const_iterator it = attributes.begin(); it != attributes.end(); it++) {
 
             // If not a recognized type attribute
             if (!parseTypeAttribute(*it, typeDefinition.attributes)) {
@@ -404,12 +380,11 @@ namespace mson {
                 if (foundTypeSpecification) {
 
                     // WARN: Ignoring unrecognized type attribute
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                    report.warnings.push_back(snowcrash::Warning("ignoring unrecognized type attribute",
-                                                                 snowcrash::IgnoringWarning,
-                                                                 sourceMap));
-                }
-                else {
+                    mdp::CharactersRangeSet sourceMap
+                        = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                    report.warnings.push_back(snowcrash::Warning(
+                        "ignoring unrecognized type attribute", snowcrash::IgnoringWarning, sourceMap));
+                } else {
 
                     foundTypeSpecification = true;
                     parseTypeSpecification(*it, typeDefinition.typeSpecification);
@@ -418,30 +393,32 @@ namespace mson {
         }
 
         typeDefinition.baseType = parseBaseType(typeDefinition.typeSpecification.name.base);
-        NamedTypeBaseTable::iterator it = pd.namedTypeBaseTable.find(typeDefinition.typeSpecification.name.symbol.literal);
+        NamedTypeBaseTable::iterator it
+            = pd.namedTypeBaseTable.find(typeDefinition.typeSpecification.name.symbol.literal);
 
-        if (typeDefinition.baseType == UndefinedBaseType &&
-            it != pd.namedTypeBaseTable.end()) {
+        if (typeDefinition.baseType == UndefinedBaseType && it != pd.namedTypeBaseTable.end()) {
 
             typeDefinition.baseType = it->second;
         }
 
-        if (typeDefinition.baseType == UndefinedBaseType &&
-            !typeDefinition.typeSpecification.name.symbol.literal.empty() &&
-            !typeDefinition.typeSpecification.name.symbol.variable) {
+        if (typeDefinition.baseType == UndefinedBaseType
+            && !typeDefinition.typeSpecification.name.symbol.literal.empty()
+            && !typeDefinition.typeSpecification.name.symbol.variable) {
 
             addDependency(node, pd, typeDefinition.typeSpecification.name.symbol.literal, pd.namedTypeContext, report);
         }
 
-        if (typeDefinition.baseType != ValueBaseType &&
-            typeDefinition.baseType != ImplicitValueBaseType &&
-            !typeDefinition.typeSpecification.nestedTypes.empty()) {
+        if (typeDefinition.baseType != ValueBaseType && typeDefinition.baseType != ImplicitValueBaseType
+            && !typeDefinition.typeSpecification.nestedTypes.empty()) {
 
             // WARN: Nested types for non (array or enum) structure base type
-            mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-            report.warnings.push_back(snowcrash::Warning("nested types should be present only for types which are sub typed from either array or enum structure type",
-                                                         snowcrash::LogicalErrorWarning,
-                                                         sourceMap));
+            mdp::CharactersRangeSet sourceMap
+                = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+            report.warnings.push_back(
+                snowcrash::Warning("nested types should be present only for types which are sub typed from either "
+                                   "array or enum structure type",
+                    snowcrash::LogicalErrorWarning,
+                    sourceMap));
         }
     }
 
@@ -455,10 +432,11 @@ namespace mson {
      * \param propertyName MSON Property Name
      */
     inline void parsePropertyName(const mdp::MarkdownNodeIterator& node,
-                                  snowcrash::SectionParserData& pd,
-                                  const std::string& subject,
-                                  snowcrash::Report& report,
-                                  PropertyName& propertyName) {
+        snowcrash::SectionParserData& pd,
+        const std::string& subject,
+        snowcrash::Report& report,
+        PropertyName& propertyName)
+    {
 
         std::string buffer = subject;
 
@@ -466,18 +444,17 @@ namespace mson {
 
             std::string escapedString = snowcrash::RetrieveEscaped(buffer, 0, true);
 
-            SignatureTraits traits(SignatureTraits::ValuesTrait |
-                                   SignatureTraits::AttributesTrait);
+            SignatureTraits traits(SignatureTraits::ValuesTrait | SignatureTraits::AttributesTrait);
 
-            Signature signature = SignatureSectionProcessorBase<PropertyName>::parseSignature(node, pd, traits, report, escapedString);
+            Signature signature
+                = SignatureSectionProcessorBase<PropertyName>::parseSignature(node, pd, traits, report, escapedString);
 
             if (!signature.value.empty()) {
                 propertyName.variable.values.push_back(parseValue(signature.value));
             }
 
             parseTypeDefinition(node, pd, signature.attributes, report, propertyName.variable.typeDefinition);
-        }
-        else {
+        } else {
             propertyName.literal = snowcrash::StripBackticks(buffer);
         }
     }
@@ -485,16 +462,15 @@ namespace mson {
     /**
      * \brief Check is the given base types are the same after taking the implicitness into account
      */
-    inline bool isSameBaseType(const mson::BaseType lhs,
-                               const mson::BaseType rhs) {
+    inline bool isSameBaseType(const mson::BaseType lhs, const mson::BaseType rhs)
+    {
 
-        if (lhs == rhs ||
-            (lhs == mson::ImplicitObjectBaseType && rhs == mson::ObjectBaseType) ||
-            (lhs == mson::ObjectBaseType && rhs == mson::ImplicitObjectBaseType) ||
-            (lhs == mson::ImplicitValueBaseType && rhs == mson::ValueBaseType) ||
-            (lhs == mson::ValueBaseType && rhs == mson::ImplicitValueBaseType) ||
-            (lhs == mson::ImplicitPrimitiveBaseType && rhs == mson::PrimitiveBaseType) ||
-            (lhs == mson::PrimitiveBaseType && rhs == mson::ImplicitPrimitiveBaseType)) {
+        if (lhs == rhs || (lhs == mson::ImplicitObjectBaseType && rhs == mson::ObjectBaseType)
+            || (lhs == mson::ObjectBaseType && rhs == mson::ImplicitObjectBaseType)
+            || (lhs == mson::ImplicitValueBaseType && rhs == mson::ValueBaseType)
+            || (lhs == mson::ValueBaseType && rhs == mson::ImplicitValueBaseType)
+            || (lhs == mson::ImplicitPrimitiveBaseType && rhs == mson::PrimitiveBaseType)
+            || (lhs == mson::PrimitiveBaseType && rhs == mson::ImplicitPrimitiveBaseType)) {
 
             return true;
         }

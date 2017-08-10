@@ -10,7 +10,8 @@
 
 using namespace snowcrash;
 
-std::string snowcrash::SectionName(const SectionType& section) {
+std::string snowcrash::SectionName(const SectionType& section)
+{
 
     switch (section) {
         case ModelSectionType:

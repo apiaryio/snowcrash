@@ -18,7 +18,8 @@
  *  Data types in this documents define the API Blueprint Sourcemap AST.
  */
 
-namespace snowcrash {
+namespace snowcrash
+{
 
     /** Source Map of Metadata Collection */
     SOURCE_MAP_COLLECTION(Metadata, MetadataCollection)
@@ -32,7 +33,7 @@ namespace snowcrash {
     /**
      * Source Map Structure for Parameter
      */
-    template<>
+    template <>
     struct SourceMap<Parameter> : public SourceMapBase {
 
         /** Source Map of Parameter Name */
@@ -60,7 +61,7 @@ namespace snowcrash {
     /**
      * Source Map Structure for MSON Parameter
      */
-    template<>
+    template <>
     struct SourceMap<MSONParameter> : public SourceMap<Parameter> {
     };
 
@@ -70,7 +71,7 @@ namespace snowcrash {
     /**
      * Source Map Structure for DataStructure
      */
-    template<>
+    template <>
     struct SourceMap<DataStructure> : public SourceMap<mson::NamedType> {
     };
 
@@ -80,7 +81,7 @@ namespace snowcrash {
     /**
      * Source Map Structure for Payload
      */
-    template<>
+    template <>
     struct SourceMap<Payload> : public SourceMapBase {
 
         /** Source Map of a Payload Name */
@@ -117,7 +118,7 @@ namespace snowcrash {
     /**
      *  Source Map Structure for an HTTP transaction example.
      */
-    template<>
+    template <>
     struct SourceMap<TransactionExample> : public SourceMapBase {
 
         /** Source Map of an example name */
@@ -139,7 +140,7 @@ namespace snowcrash {
     /**
      *  Source Map Structure for Action
      */
-    template<>
+    template <>
     struct SourceMap<Action> : public SourceMapBase {
 
         /** Source Map of HTTP method */
@@ -187,7 +188,7 @@ namespace snowcrash {
     /**
      *  Source Map Structure for API Resource
      */
-    template<>
+    template <>
     struct SourceMap<Resource> : public SourceMapBase {
 
         /** Source Map of URI template */
@@ -230,7 +231,7 @@ namespace snowcrash {
     SOURCE_MAP_COLLECTION(Resource, Resources)
 
     /** Forward Declaration for Source Map of Element */
-    template<>
+    template <>
     struct SourceMap<Element>;
 
     /** Source Map of Collection of Elements */
@@ -239,7 +240,7 @@ namespace snowcrash {
     /**
      * Source Map Structure for Element
      */
-    template<>
+    template <>
     struct SourceMap<Element> : public SourceMapBase {
 
         /** Source Map Structure for Attributes of the Element */
@@ -309,14 +310,14 @@ namespace snowcrash {
     /**
      *  Source Map Structure for Group of API Resources (Category Element)
      */
-    template<>
+    template <>
     struct SourceMap<ResourceGroup> : public SourceMap<Element> {
     };
 
     /**
      * Source Map Structure for Group of Data Structures (Category Element)
      */
-    template<>
+    template <>
     struct SourceMap<DataStructureGroup> : public SourceMap<Element> {
     };
 
@@ -326,7 +327,7 @@ namespace snowcrash {
      *  This is top-level (or root if you prefer) of API Blueprint Sourcemap abstract syntax tree.
      *  Start reading a parsed API here.
      */
-    template<>
+    template <>
     struct SourceMap<Blueprint> : public SourceMap<Element> {
 
         /** Source Map of the API Name */

@@ -27,8 +27,8 @@ static bool CheckSource(const mdp::ByteBuffer& source, Report& report)
         mdp::BytesRangeSet rangeSet;
         rangeSet.push_back(mdp::BytesRange(pos, 1));
         report.error = Error("the use of tab(s) '\\t' in source data isn't currently supported, please contact makers",
-                             BusinessError,
-                             mdp::BytesRangeSetToCharactersRangeSet(rangeSet, source));
+            BusinessError,
+            mdp::BytesRangeSetToCharactersRangeSet(rangeSet, source));
         return false;
     }
 
@@ -38,18 +38,18 @@ static bool CheckSource(const mdp::ByteBuffer& source, Report& report)
 
         mdp::BytesRangeSet rangeSet;
         rangeSet.push_back(mdp::BytesRange(pos, 1));
-        report.error = Error("the use of carriage return(s) '\\r' in source data isn't currently supported, please contact makers",
-                             BusinessError,
-                             mdp::BytesRangeSetToCharactersRangeSet(rangeSet, source));
+        report.error = Error(
+            "the use of carriage return(s) '\\r' in source data isn't currently supported, please contact makers",
+            BusinessError,
+            mdp::BytesRangeSetToCharactersRangeSet(rangeSet, source));
         return false;
     }
 
     return true;
 }
 
-int snowcrash::parse(const mdp::ByteBuffer& source,
-                     BlueprintParserOptions options,
-                     const ParseResultRef<Blueprint>& out)
+int snowcrash::parse(
+    const mdp::ByteBuffer& source, BlueprintParserOptions options, const ParseResultRef<Blueprint>& out)
 {
     try {
 
@@ -72,17 +72,14 @@ int snowcrash::parse(const mdp::ByteBuffer& source,
 
         // Parse Blueprint
         BlueprintParser::parse(markdownAST.children().begin(), markdownAST.children(), pd, out);
-    }
-    catch (const Error& e) {
+    } catch (const Error& e) {
         out.report.error = e;
-    }
-    catch (const std::exception& e) {
+    } catch (const std::exception& e) {
 
         std::stringstream ss;
         ss << "parser exception: '" << e.what() << "'";
         out.report.error = Error(ss.str(), ApplicationError);
-    }
-    catch (...) {
+    } catch (...) {
         out.report.error = Error("parser exception has occured", ApplicationError);
     }
 

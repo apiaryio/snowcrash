@@ -14,8 +14,7 @@ using namespace snowcrashtest;
 
 TEST_CASE("OneOf block classifier", "[mson][one_of]")
 {
-    mdp::ByteBuffer source = \
-    "- one Of";
+    mdp::ByteBuffer source = "- one Of";
 
     mdp::MarkdownParser markdownParser;
     mdp::MarkdownNode markdownAST;
@@ -34,10 +33,9 @@ TEST_CASE("OneOf block classifier", "[mson][one_of]")
     REQUIRE(sectionType == MSONOneOfSectionType);
 }
 
-TEST_CASE("OneOf be tolerant on parsing input","[mson][one_of]")
+TEST_CASE("OneOf be tolerant on parsing input", "[mson][one_of]")
 {
-    mdp::ByteBuffer source = \
-    "- one \t Of";
+    mdp::ByteBuffer source = "- one \t Of";
 
     mdp::MarkdownParser markdownParser;
     mdp::MarkdownNode markdownAST;
@@ -50,13 +48,14 @@ TEST_CASE("OneOf be tolerant on parsing input","[mson][one_of]")
 
 TEST_CASE("Parse canonical mson one of", "[mson][one_of]")
 {
-    mdp::ByteBuffer source = \
-    "- One of\n"\
-    "  - state: Andhra Pradesh\n"\
-    "  - province: Madras";
+    mdp::ByteBuffer source
+        = "- One of\n"
+          "  - state: Andhra Pradesh\n"
+          "  - province: Madras";
 
     ParseResult<mson::OneOf> oneOf;
-    SectionParserHelper<mson::OneOf, MSONOneOfParser>::parseMSON(source, MSONOneOfSectionType, oneOf, ExportSourcemapOption);
+    SectionParserHelper<mson::OneOf, MSONOneOfParser>::parseMSON(
+        source, MSONOneOfSectionType, oneOf, ExportSourcemapOption);
 
     REQUIRE(oneOf.report.error.code == Error::OK);
     REQUIRE(oneOf.report.warnings.empty());
@@ -96,7 +95,8 @@ TEST_CASE("Parse mson one of without any nested members", "[mson][one_of]")
     mdp::ByteBuffer source = "- One of\n";
 
     ParseResult<mson::OneOf> oneOf;
-    SectionParserHelper<mson::OneOf, MSONOneOfParser>::parseMSON(source, MSONOneOfSectionType, oneOf, ExportSourcemapOption);
+    SectionParserHelper<mson::OneOf, MSONOneOfParser>::parseMSON(
+        source, MSONOneOfSectionType, oneOf, ExportSourcemapOption);
 
     REQUIRE(oneOf.report.error.code == Error::OK);
     REQUIRE(oneOf.report.warnings.size() == 1);
@@ -108,15 +108,16 @@ TEST_CASE("Parse mson one of without any nested members", "[mson][one_of]")
 
 TEST_CASE("Parse mson one of with one of", "[mson][one_of]")
 {
-    mdp::ByteBuffer source = \
-    "- One of\n"\
-    "    - last_name\n"\
-    "    - one of\n"\
-    "        - given_name\n"\
-    "        - suffixed_name";
+    mdp::ByteBuffer source
+        = "- One of\n"
+          "    - last_name\n"
+          "    - one of\n"
+          "        - given_name\n"
+          "        - suffixed_name";
 
     ParseResult<mson::OneOf> oneOf;
-    SectionParserHelper<mson::OneOf, MSONOneOfParser>::parseMSON(source, MSONOneOfSectionType, oneOf, ExportSourcemapOption);
+    SectionParserHelper<mson::OneOf, MSONOneOfParser>::parseMSON(
+        source, MSONOneOfSectionType, oneOf, ExportSourcemapOption);
 
     REQUIRE(oneOf.report.error.code == Error::OK);
     REQUIRE(oneOf.report.warnings.empty());
@@ -150,15 +151,16 @@ TEST_CASE("Parse mson one of with one of", "[mson][one_of]")
 
 TEST_CASE("Parse mson one of with member group", "[mson][one_of]")
 {
-    mdp::ByteBuffer source = \
-    "- One Of\n"\
-    "    - full_name\n"\
-    "    - Properties\n"\
-    "        - first_name\n"\
-    "        - last_name";
+    mdp::ByteBuffer source
+        = "- One Of\n"
+          "    - full_name\n"
+          "    - Properties\n"
+          "        - first_name\n"
+          "        - last_name";
 
     ParseResult<mson::OneOf> oneOf;
-    SectionParserHelper<mson::OneOf, MSONOneOfParser>::parseMSON(source, MSONOneOfSectionType, oneOf, ExportSourcemapOption);
+    SectionParserHelper<mson::OneOf, MSONOneOfParser>::parseMSON(
+        source, MSONOneOfSectionType, oneOf, ExportSourcemapOption);
 
     REQUIRE(oneOf.report.error.code == Error::OK);
     REQUIRE(oneOf.report.warnings.empty());

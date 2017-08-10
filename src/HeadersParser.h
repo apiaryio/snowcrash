@@ -18,7 +18,8 @@
 
 #include <string.h>
 
-namespace snowcrash {
+namespace snowcrash
+{
 
     /** Headers matching regex */
     const char* const HeadersRegex = "^[[:blank:]]*[Hh]eaders?[[:blank:]]*$";
@@ -39,15 +40,17 @@ namespace snowcrash {
          * data for validation you can inject into functor via c-tor
          */
         virtual bool operator()() const = 0;
-
     };
 
-    /** Functor implementation for check header name is valid token according to specification \see http://tools.ietf.org/html/rfc7230#section-3.2.6 */
+    /** Functor implementation for check header name is valid token according to specification \see
+     * http://tools.ietf.org/html/rfc7230#section-3.2.6 */
     struct HeaderNameTokenChecker : public ValidateFunctorBase {
 
         const std::string& headerName;
 
-        explicit HeaderNameTokenChecker(const std::string& headerName) : headerName(headerName) {}
+        explicit HeaderNameTokenChecker(const std::string& headerName) : headerName(headerName)
+        {
+        }
 
         virtual bool operator()() const;
         virtual std::string getMessage() const;
@@ -58,11 +61,12 @@ namespace snowcrash {
 
         const CaptureGroups& captures;
 
-        explicit ColonPresentedChecker(const CaptureGroups& captures) : captures(captures) {}
+        explicit ColonPresentedChecker(const CaptureGroups& captures) : captures(captures)
+        {
+        }
 
         virtual bool operator()() const;
         virtual std::string getMessage() const;
-
     };
 
     /** Functor implementation to check Headers duplicity */
@@ -71,13 +75,13 @@ namespace snowcrash {
         const Header& header;
         const Headers& headers;
 
-        explicit HeadersDuplicateChecker(const Header& header,
-                                         const Headers& headers)
-            : header(header), headers(headers) {}
+        explicit HeadersDuplicateChecker(const Header& header, const Headers& headers)
+            : header(header), headers(headers)
+        {
+        }
 
         virtual bool operator()() const;
         virtual std::string getMessage() const;
-
     };
 
     /** Functor implementation to check Headers duplicity */
@@ -85,12 +89,12 @@ namespace snowcrash {
 
         const Header& header;
 
-        explicit HeaderValuePresentedChecker(const Header& header)
-            : header(header) {}
+        explicit HeaderValuePresentedChecker(const Header& header) : header(header)
+        {
+        }
 
         virtual bool operator()() const;
         virtual std::string getMessage() const;
-
     };
 
     /** Functor receive and invoke individual Validators and conditionaly push reports  */
@@ -99,25 +103,26 @@ namespace snowcrash {
         const ParseResultRef<Headers>& out;
         mdp::CharactersRangeSet sourceMap;
 
-        HeaderParserValidator(const ParseResultRef<Headers>& out,
-                              mdp::CharactersRangeSet sourceMap)
-            : out(out), sourceMap(sourceMap) {}
+        HeaderParserValidator(const ParseResultRef<Headers>& out, mdp::CharactersRangeSet sourceMap)
+            : out(out), sourceMap(sourceMap)
+        {
+        }
 
         bool operator()(const ValidateFunctorBase& rule);
     };
 
-
     /**
      *  Headers Section Processor
      */
-    template<>
+    template <>
     struct SectionProcessor<Headers> : public SectionProcessorBase<Headers> {
 
         static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
-                                                     const MarkdownNodes& siblings,
-                                                     SectionParserData& pd,
-                                                     SectionLayout& layout,
-                                                     const ParseResultRef<Headers>& out) {
+            const MarkdownNodes& siblings,
+            SectionParserData& pd,
+            SectionLayout& layout,
+            const ParseResultRef<Headers>& out)
+        {
 
             mdp::ByteBuffer content;
             CodeBlockUtility::signatureContentAsCodeBlock(node, pd, out.report, content);
@@ -135,9 +140,10 @@ namespace snowcrash {
         NO_SECTION_DESCRIPTION(Headers)
 
         static MarkdownNodeIterator processContent(const MarkdownNodeIterator& node,
-                                                   const MarkdownNodes& siblings,
-                                                   SectionParserData& pd,
-                                                   const ParseResultRef<Headers>& out) {
+            const MarkdownNodes& siblings,
+            SectionParserData& pd,
+            const ParseResultRef<Headers>& out)
+        {
 
             mdp::ByteBuffer content;
             CodeBlockUtility::contentAsCodeBlock(node, pd, out.report, content);
@@ -147,16 +153,16 @@ namespace snowcrash {
             return ++MarkdownNodeIterator(node);
         }
 
-        static bool isContentNode(const MarkdownNodeIterator& node,
-                                  SectionType sectionType) {
+        static bool isContentNode(const MarkdownNodeIterator& node, SectionType sectionType)
+        {
 
             return (SectionKeywordSignature(node) == UndefinedSectionType);
         }
 
-        static SectionType sectionType(const MarkdownNodeIterator& node) {
+        static SectionType sectionType(const MarkdownNodeIterator& node)
+        {
 
-            if (node->type == mdp::ListItemMarkdownNodeType
-                && !node->children().empty()) {
+            if (node->type == mdp::ListItemMarkdownNodeType && !node->children().empty()) {
 
                 mdp::ByteBuffer subject = node->children().front().text;
                 mdp::ByteBuffer signature;
@@ -172,17 +178,16 @@ namespace snowcrash {
             return UndefinedSectionType;
         }
 
-        static void finalize(const MarkdownNodeIterator& node,
-                             SectionParserData& pd,
-                             const ParseResultRef<Headers>& out) {
+        static void finalize(
+            const MarkdownNodeIterator& node, SectionParserData& pd, const ParseResultRef<Headers>& out)
+        {
 
             if (out.node.empty()) {
 
                 // WARN: No valid headers defined
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                out.report.warnings.push_back(Warning("no valid headers specified",
-                                                      FormattingWarning,
-                                                      sourceMap));
+                mdp::CharactersRangeSet sourceMap
+                    = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                out.report.warnings.push_back(Warning("no valid headers specified", FormattingWarning, sourceMap));
             }
         }
 
@@ -198,9 +203,10 @@ namespace snowcrash {
          * \param sourceMap - just contain source mapping for warning report
          */
         static bool parseHeaderLine(const mdp::ByteBuffer& line,
-                                    Header& header,
-                                    const ParseResultRef<Headers>& out,
-                                    const mdp::CharactersRangeSet sourceMap) {
+            Header& header,
+            const ParseResultRef<Headers>& out,
+            const mdp::CharactersRangeSet sourceMap)
+        {
 
             std::string re = "^ *([^:[:blank:]]+)(( *:? *)(.*)?)$";
 
@@ -209,8 +215,10 @@ namespace snowcrash {
 
             if (!matched) {
                 // WARN: unable to parse header
-                out.report.warnings.push_back(
-                    Warning("unable to parse HTTP header, expected '<header name> : <header value>', one header per line", FormattingWarning, sourceMap));
+                out.report.warnings.push_back(Warning(
+                    "unable to parse HTTP header, expected '<header name> : <header value>', one header per line",
+                    FormattingWarning,
+                    sourceMap));
                 return false;
             }
 
@@ -222,7 +230,7 @@ namespace snowcrash {
             if (!validate(HeaderNameTokenChecker(header.first))) {
                 return false;
             }
-            
+
             validate(ColonPresentedChecker(parts));
             validate(HeadersDuplicateChecker(header, out.node));
             validate(HeaderValuePresentedChecker(header));
@@ -230,9 +238,8 @@ namespace snowcrash {
             return !header.first.empty();
         }
 
-        static bool fetchLine(const std::string& input,
-                              mdp::BytesRange& map,
-                              std::string& line) {
+        static bool fetchLine(const std::string& input, mdp::BytesRange& map, std::string& line)
+        {
 
             if (input.length() < (map.location + map.length)) {
                 return false;
@@ -253,20 +260,22 @@ namespace snowcrash {
             return true;
         }
 
-        static bool isCodeFence(const std::string& line) {
+        static bool isCodeFence(const std::string& line)
+        {
             return (!memcmp(line.c_str(), "```", 3) || !memcmp(line.c_str(), "~~~", 3));
         }
 
         /** Retrieve headers from content */
         static void headersFromContent(const MarkdownNodeIterator& node,
-                                       mdp::BytesRangeSet::const_iterator from,
-                                       mdp::BytesRangeSet::const_iterator to,
-                                       const SectionParserData& pd,
-                                       const ParseResultRef<Headers>& out) {
+            mdp::BytesRangeSet::const_iterator from,
+            mdp::BytesRangeSet::const_iterator to,
+            const SectionParserData& pd,
+            const ParseResultRef<Headers>& out)
+        {
 
             bool inCodeFence = false;
 
-            for (mdp::BytesRangeSet::const_iterator it = from ; it != to ; it++) {
+            for (mdp::BytesRangeSet::const_iterator it = from; it != to; it++) {
 
                 mdp::BytesRange map(*it);
                 std::string line;
@@ -287,7 +296,8 @@ namespace snowcrash {
 
                 mdp::BytesRangeSet byteMap;
                 byteMap.push_back(map);
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(byteMap, pd.sourceCharacterIndex);
+                mdp::CharactersRangeSet sourceMap
+                    = mdp::BytesRangeSetToCharactersRangeSet(byteMap, pd.sourceCharacterIndex);
 
                 if (parseHeaderLine(line, header, out, sourceMap)) {
                     out.node.push_back(header);
@@ -299,15 +309,15 @@ namespace snowcrash {
                     }
                 }
             }
-
         }
 
         /** Inject headers into transaction examples requests and responses */
         static void injectDeprecatedHeaders(SectionParserData& pd,
-                                            const Headers& headers,
-                                            const SourceMap<Headers>& headersSM,
-                                            TransactionExamples& examples,
-                                            SourceMap<TransactionExamples>& examplesSM) {
+            const Headers& headers,
+            const SourceMap<Headers>& headersSM,
+            TransactionExamples& examples,
+            SourceMap<TransactionExamples>& examplesSM)
+        {
 
             Collection<TransactionExample>::iterator exampleIt = examples.begin();
             Collection<SourceMap<TransactionExample> >::iterator exampleSourceMapIt;
@@ -328,15 +338,15 @@ namespace snowcrash {
                 // Requests
                 while (requestIt != exampleIt->requests.end()) {
 
-                     requestIt->headers.insert(requestIt->headers.begin(), headers.begin(), headers.end());
-                     ++requestIt;
+                    requestIt->headers.insert(requestIt->headers.begin(), headers.begin(), headers.end());
+                    ++requestIt;
 
-                     if (pd.exportSourceMap()) {
-                         requestSourceMapIt->headers.collection.insert(requestSourceMapIt->headers.collection.begin(),
-                                                                       headersSM.collection.begin(),
-                                                                       headersSM.collection.end());
-                         ++requestSourceMapIt;
-                     }
+                    if (pd.exportSourceMap()) {
+                        requestSourceMapIt->headers.collection.insert(requestSourceMapIt->headers.collection.begin(),
+                            headersSM.collection.begin(),
+                            headersSM.collection.end());
+                        ++requestSourceMapIt;
+                    }
                 }
 
                 Collection<Response>::iterator responseIt = exampleIt->responses.begin();
@@ -347,15 +357,15 @@ namespace snowcrash {
                 }
 
                 // Responses
-                while(responseIt != exampleIt->responses.end()) {
+                while (responseIt != exampleIt->responses.end()) {
 
                     responseIt->headers.insert(responseIt->headers.begin(), headers.begin(), headers.end());
                     ++responseIt;
 
                     if (pd.exportSourceMap()) {
                         responseSourceMapIt->headers.collection.insert(responseSourceMapIt->headers.collection.begin(),
-                                                                       headersSM.collection.begin(),
-                                                                       headersSM.collection.end());
+                            headersSM.collection.begin(),
+                            headersSM.collection.end());
                         ++responseSourceMapIt;
                     }
                 }
@@ -367,7 +377,6 @@ namespace snowcrash {
                 }
             }
         }
-
     };
 
     /** Headers Section Parser */

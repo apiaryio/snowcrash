@@ -36,7 +36,7 @@ TEST_CASE("Punctuation in identifiers", "[symbol_identifier]")
 TEST_CASE("Non ASCII characters in identifiers", "[symbol_identifier]")
 {
     // Blueprint in question:
-    //R"(
+    // R"(
     //# Kategorii [/]
     //");
 

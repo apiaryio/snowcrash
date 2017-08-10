@@ -14,11 +14,11 @@ using namespace snowcrashtest;
 
 TEST_CASE("Parse canonical mson property member", "[mson][property_member]")
 {
-    mdp::ByteBuffer source = \
-    "- color: red (string, required) - A color";
+    mdp::ByteBuffer source = "- color: red (string, required) - A color";
 
     ParseResult<mson::PropertyMember> propertyMember;
-    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(
+        source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
 
     REQUIRE(propertyMember.report.error.code == Error::OK);
     REQUIRE(propertyMember.report.warnings.empty());
@@ -40,12 +40,13 @@ TEST_CASE("Parse canonical mson property member", "[mson][property_member]")
 
 TEST_CASE("Parse mson property member with description not on new line", "[mson][property_member]")
 {
-    mdp::ByteBuffer source = \
-    "- color: red (string, required) - A color\n"\
-    "  Which is also very nice\n\n";
+    mdp::ByteBuffer source
+        = "- color: red (string, required) - A color\n"
+          "  Which is also very nice\n\n";
 
     ParseResult<mson::PropertyMember> propertyMember;
-    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(
+        source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
 
     REQUIRE(propertyMember.report.error.code == Error::OK);
     REQUIRE(propertyMember.report.warnings.empty());
@@ -70,14 +71,15 @@ TEST_CASE("Parse mson property member with description not on new line", "[mson]
 
 TEST_CASE("Parse mson property member with block description", "[mson][property_member]")
 {
-    mdp::ByteBuffer source = \
-    "- color: red (string, required) - A color\n\n"\
-    "    Which is also very nice\n\n"\
-    "    - and awesome\n\n"\
-    "and really really nice\n\n";
+    mdp::ByteBuffer source
+        = "- color: red (string, required) - A color\n\n"
+          "    Which is also very nice\n\n"
+          "    - and awesome\n\n"
+          "and really really nice\n\n";
 
     ParseResult<mson::PropertyMember> propertyMember;
-    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(
+        source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
 
     REQUIRE(propertyMember.report.error.code == Error::OK);
     REQUIRE(propertyMember.report.warnings.empty());
@@ -101,16 +103,17 @@ TEST_CASE("Parse mson property member with block description", "[mson][property_
 
 TEST_CASE("Parse mson property member with block description, default and sample", "[mson][property_member]")
 {
-    mdp::ByteBuffer source = \
-    "- color: red (string) - A color\n\n"\
-    "    Which is also very nice\n\n"\
-    "    - and awesome\n\n"\
-    "    - Default: yellow\n"\
-    "    - Sample\n\n"\
-    "        green\n";
+    mdp::ByteBuffer source
+        = "- color: red (string) - A color\n\n"
+          "    Which is also very nice\n\n"
+          "    - and awesome\n\n"
+          "    - Default: yellow\n"
+          "    - Sample\n\n"
+          "        green\n";
 
     ParseResult<mson::PropertyMember> propertyMember;
-    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(
+        source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
 
     REQUIRE(propertyMember.report.error.code == Error::OK);
     REQUIRE(propertyMember.report.warnings.empty());
@@ -140,13 +143,14 @@ TEST_CASE("Parse mson property member with block description, default and sample
 
 TEST_CASE("Parse mson property member object with nested members", "[mson][property_member]")
 {
-    mdp::ByteBuffer source = \
-    "- user (object)\n"\
-    "    - first_name: Pavan (string) - A sample value\n"\
-    "    - last_name: Sunkara (string)";
+    mdp::ByteBuffer source
+        = "- user (object)\n"
+          "    - first_name: Pavan (string) - A sample value\n"
+          "    - last_name: Sunkara (string)";
 
     ParseResult<mson::PropertyMember> propertyMember;
-    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(
+        source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
 
     REQUIRE(propertyMember.report.error.code == Error::OK);
     REQUIRE(propertyMember.report.warnings.empty());
@@ -164,14 +168,18 @@ TEST_CASE("Parse mson property member object with nested members", "[mson][prope
     REQUIRE(propertyMember.node.sections[0].content.elements().at(0).klass == mson::Element::PropertyClass);
     REQUIRE(propertyMember.node.sections[0].content.elements().at(0).content.property.name.literal == "first_name");
     REQUIRE(propertyMember.node.sections[0].content.elements().at(0).content.property.name.variable.empty());
-    REQUIRE(propertyMember.node.sections[0].content.elements().at(0).content.property.valueDefinition.values.size() == 1);
-    REQUIRE(propertyMember.node.sections[0].content.elements().at(0).content.property.valueDefinition.values[0].literal == "Pavan");
+    REQUIRE(
+        propertyMember.node.sections[0].content.elements().at(0).content.property.valueDefinition.values.size() == 1);
+    REQUIRE(propertyMember.node.sections[0].content.elements().at(0).content.property.valueDefinition.values[0].literal
+        == "Pavan");
     REQUIRE(propertyMember.node.sections[0].content.elements().at(0).content.property.description == "A sample value");
     REQUIRE(propertyMember.node.sections[0].content.elements().at(1).klass == mson::Element::PropertyClass);
     REQUIRE(propertyMember.node.sections[0].content.elements().at(1).content.property.name.literal == "last_name");
     REQUIRE(propertyMember.node.sections[0].content.elements().at(1).content.property.name.variable.empty());
-    REQUIRE(propertyMember.node.sections[0].content.elements().at(1).content.property.valueDefinition.values.size() == 1);
-    REQUIRE(propertyMember.node.sections[0].content.elements().at(1).content.property.valueDefinition.values[0].literal == "Sunkara");
+    REQUIRE(
+        propertyMember.node.sections[0].content.elements().at(1).content.property.valueDefinition.values.size() == 1);
+    REQUIRE(propertyMember.node.sections[0].content.elements().at(1).content.property.valueDefinition.values[0].literal
+        == "Sunkara");
 
     SourceMapHelper::check(propertyMember.sourceMap.name.sourceMap, 2, 14);
     SourceMapHelper::check(propertyMember.sourceMap.valueDefinition.sourceMap, 2, 14);
@@ -179,21 +187,24 @@ TEST_CASE("Parse mson property member object with nested members", "[mson][prope
 
     REQUIRE(propertyMember.sourceMap.sections.collection.size() == 1);
     REQUIRE(propertyMember.sourceMap.sections.collection[0].elements().collection.size() == 2);
-    SourceMapHelper::check(propertyMember.sourceMap.sections.collection[0].elements().collection[0].property.name.sourceMap, 22, 44);
-    SourceMapHelper::check(propertyMember.sourceMap.sections.collection[0].elements().collection[1].property.name.sourceMap, 72, 27);
+    SourceMapHelper::check(
+        propertyMember.sourceMap.sections.collection[0].elements().collection[0].property.name.sourceMap, 22, 44);
+    SourceMapHelper::check(
+        propertyMember.sourceMap.sections.collection[0].elements().collection[1].property.name.sourceMap, 72, 27);
 }
 
 TEST_CASE("Parse mson array property member with nested properties type section", "[mson][property_member]")
 {
-    mdp::ByteBuffer source = \
-    "- user (array)\n\n"\
-    "    List of users\n"\
-    "    - Properties\n"\
-    "        - first_name\n"\
-    "        - last_name";
+    mdp::ByteBuffer source
+        = "- user (array)\n\n"
+          "    List of users\n"
+          "    - Properties\n"
+          "        - first_name\n"
+          "        - last_name";
 
     ParseResult<mson::PropertyMember> propertyMember;
-    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(
+        source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
 
     REQUIRE(propertyMember.report.error.code == Error::OK);
     REQUIRE(propertyMember.report.warnings.size() == 1);
@@ -208,15 +219,16 @@ TEST_CASE("Parse mson array property member with nested properties type section"
 
 TEST_CASE("Parse mson property member when it has a member group in nested members", "[mson][property_member]")
 {
-    mdp::ByteBuffer source = \
-    "- user (object)\n"\
-    "    - username (string)\n"\
-    "    - Properties\n"\
-    "        - last_name\n"\
-    "    - first_name (string)";
+    mdp::ByteBuffer source
+        = "- user (object)\n"
+          "    - username (string)\n"
+          "    - Properties\n"
+          "        - last_name\n"
+          "    - first_name (string)";
 
     ParseResult<mson::PropertyMember> propertyMember;
-    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(
+        source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
 
     REQUIRE(propertyMember.report.error.code == Error::OK);
     REQUIRE(propertyMember.report.warnings.empty());
@@ -232,26 +244,30 @@ TEST_CASE("Parse mson property member when it has a member group in nested membe
 
     REQUIRE(propertyMember.sourceMap.sections.collection.size() == 2);
     REQUIRE(propertyMember.sourceMap.sections.collection[0].elements().collection.size() == 1);
-    SourceMapHelper::check(propertyMember.sourceMap.sections.collection[0].elements().collection[0].property.name.sourceMap, 22, 18);
+    SourceMapHelper::check(
+        propertyMember.sourceMap.sections.collection[0].elements().collection[0].property.name.sourceMap, 22, 18);
     REQUIRE(propertyMember.sourceMap.sections.collection[1].elements().collection.size() == 2);
-    SourceMapHelper::check(propertyMember.sourceMap.sections.collection[1].elements().collection[0].property.name.sourceMap, 67, 10);
-    SourceMapHelper::check(propertyMember.sourceMap.sections.collection[1].elements().collection[1].property.name.sourceMap, 83, 19);
+    SourceMapHelper::check(
+        propertyMember.sourceMap.sections.collection[1].elements().collection[0].property.name.sourceMap, 67, 10);
+    SourceMapHelper::check(
+        propertyMember.sourceMap.sections.collection[1].elements().collection[1].property.name.sourceMap, 83, 19);
 }
 
 TEST_CASE("Parse mson property member when it has multiple member groups", "[mson][property_member]")
 {
-    mdp::ByteBuffer source = \
-    "- user (object)\n\n"\
-    "    This is good\n"\
-    "    - really\n\n"\
-    "    I am serious\n"\
-    "    - Properties\n"\
-    "        - last_name\n"\
-    "    -  Properties\n"\
-    "        - first_name";
+    mdp::ByteBuffer source
+        = "- user (object)\n\n"
+          "    This is good\n"
+          "    - really\n\n"
+          "    I am serious\n"
+          "    - Properties\n"
+          "        - last_name\n"
+          "    -  Properties\n"
+          "        - first_name";
 
     ParseResult<mson::PropertyMember> propertyMember;
-    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(
+        source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
 
     REQUIRE(propertyMember.report.error.code == Error::OK);
     REQUIRE(propertyMember.report.warnings.empty());
@@ -273,22 +289,25 @@ TEST_CASE("Parse mson property member when it has multiple member groups", "[mso
     SourceMapHelper::check(propertyMember.sourceMap.sections.collection[0].description.sourceMap, 52, 13, 3);
 
     REQUIRE(propertyMember.sourceMap.sections.collection[1].elements().collection.size() == 1);
-    SourceMapHelper::check(propertyMember.sourceMap.sections.collection[1].elements().collection[0].property.name.sourceMap, 92, 10);
+    SourceMapHelper::check(
+        propertyMember.sourceMap.sections.collection[1].elements().collection[0].property.name.sourceMap, 92, 10);
 
     REQUIRE(propertyMember.sourceMap.sections.collection[2].elements().collection.size() == 1);
-    SourceMapHelper::check(propertyMember.sourceMap.sections.collection[2].elements().collection[0].property.name.sourceMap, 130, 10);
+    SourceMapHelper::check(
+        propertyMember.sourceMap.sections.collection[2].elements().collection[0].property.name.sourceMap, 130, 10);
 }
 
 TEST_CASE("Parse mson property member when it has the wrong member group", "[mson][property_member]")
 {
-    mdp::ByteBuffer source = \
-    "- user (array)\n\n"\
-    "    This is good\n"\
-    "    - Properties\n"\
-    "        - last_name";
+    mdp::ByteBuffer source
+        = "- user (array)\n\n"
+          "    This is good\n"
+          "    - Properties\n"
+          "        - last_name";
 
     ParseResult<mson::PropertyMember> propertyMember;
-    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(
+        source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
 
     REQUIRE(propertyMember.report.error.code == Error::OK);
     REQUIRE(propertyMember.report.warnings.size() == 1);
@@ -302,16 +321,18 @@ TEST_CASE("Parse mson property member when it has the wrong member group", "[mso
     SourceMapHelper::check(propertyMember.sourceMap.sections.collection[0].description.sourceMap, 20, 13);
 }
 
-TEST_CASE("Parse mson property member when it is an object and has no sub-type specified and with member group", "[mson][property_member]")
+TEST_CASE("Parse mson property member when it is an object and has no sub-type specified and with member group",
+    "[mson][property_member]")
 {
-    mdp::ByteBuffer source = \
-    "- user\n\n"\
-    "    This is good\n"\
-    "    - Properties\n"\
-    "        - last_name: sunkara (string)";
+    mdp::ByteBuffer source
+        = "- user\n\n"
+          "    This is good\n"
+          "    - Properties\n"
+          "        - last_name: sunkara (string)";
 
     ParseResult<mson::PropertyMember> propertyMember;
-    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(
+        source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
 
     REQUIRE(propertyMember.report.error.code == Error::OK);
     REQUIRE(propertyMember.report.warnings.empty());
@@ -328,8 +349,10 @@ TEST_CASE("Parse mson property member when it is an object and has no sub-type s
     REQUIRE(propertyMember.node.sections[1].content.elements().size() == 1);
     REQUIRE(propertyMember.node.sections[1].content.elements().at(0).klass == mson::Element::PropertyClass);
     REQUIRE(propertyMember.node.sections[1].content.elements().at(0).content.property.name.literal == "last_name");
-    REQUIRE(propertyMember.node.sections[1].content.elements().at(0).content.property.valueDefinition.values.size() == 1);
-    REQUIRE(propertyMember.node.sections[1].content.elements().at(0).content.property.valueDefinition.values[0].literal == "sunkara");
+    REQUIRE(
+        propertyMember.node.sections[1].content.elements().at(0).content.property.valueDefinition.values.size() == 1);
+    REQUIRE(propertyMember.node.sections[1].content.elements().at(0).content.property.valueDefinition.values[0].literal
+        == "sunkara");
     REQUIRE(propertyMember.node.sections[1].content.elements().at(0).content.property.sections.empty());
 
     SourceMapHelper::check(propertyMember.sourceMap.name.sourceMap, 2, 6);
@@ -337,20 +360,25 @@ TEST_CASE("Parse mson property member when it is an object and has no sub-type s
     SourceMapHelper::check(propertyMember.sourceMap.sections.collection[0].description.sourceMap, 12, 13);
 
     REQUIRE(propertyMember.sourceMap.sections.collection[1].elements().collection.size() == 1);
-    SourceMapHelper::check(propertyMember.sourceMap.sections.collection[1].elements().collection[0].property.name.sourceMap, 52, 27);
-    SourceMapHelper::check(propertyMember.sourceMap.sections.collection[1].elements().collection[0].property.valueDefinition.sourceMap, 52, 27);
+    SourceMapHelper::check(
+        propertyMember.sourceMap.sections.collection[1].elements().collection[0].property.name.sourceMap, 52, 27);
+    SourceMapHelper::check(
+        propertyMember.sourceMap.sections.collection[1].elements().collection[0].property.valueDefinition.sourceMap,
+        52,
+        27);
 }
 
 TEST_CASE("Parse mson property member when it is an object and has no sub-type specified", "[mson][property_member]")
 {
-    mdp::ByteBuffer source = \
-    "- user\n\n"\
-    "    - last_name: sunkara (string)\n\n"\
-    "    Some random para node\n"\
-    "    - first_name: pavan (string)";
+    mdp::ByteBuffer source
+        = "- user\n\n"
+          "    - last_name: sunkara (string)\n\n"
+          "    Some random para node\n"
+          "    - first_name: pavan (string)";
 
     ParseResult<mson::PropertyMember> propertyMember;
-    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(
+        source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
 
     REQUIRE(propertyMember.report.error.code == Error::OK);
     REQUIRE(propertyMember.report.warnings.size() == 1);
@@ -368,14 +396,18 @@ TEST_CASE("Parse mson property member when it is an object and has no sub-type s
 
     REQUIRE(propertyMember.node.sections[0].content.elements().at(0).klass == mson::Element::PropertyClass);
     REQUIRE(propertyMember.node.sections[0].content.elements().at(0).content.property.name.literal == "last_name");
-    REQUIRE(propertyMember.node.sections[0].content.elements().at(0).content.property.valueDefinition.values.size() == 1);
-    REQUIRE(propertyMember.node.sections[0].content.elements().at(0).content.property.valueDefinition.values[0].literal == "sunkara");
+    REQUIRE(
+        propertyMember.node.sections[0].content.elements().at(0).content.property.valueDefinition.values.size() == 1);
+    REQUIRE(propertyMember.node.sections[0].content.elements().at(0).content.property.valueDefinition.values[0].literal
+        == "sunkara");
     REQUIRE(propertyMember.node.sections[0].content.elements().at(0).content.property.sections.empty());
 
     REQUIRE(propertyMember.node.sections[0].content.elements().at(1).klass == mson::Element::PropertyClass);
     REQUIRE(propertyMember.node.sections[0].content.elements().at(1).content.property.name.literal == "first_name");
-    REQUIRE(propertyMember.node.sections[0].content.elements().at(1).content.property.valueDefinition.values.size() == 1);
-    REQUIRE(propertyMember.node.sections[0].content.elements().at(1).content.property.valueDefinition.values[0].literal == "pavan");
+    REQUIRE(
+        propertyMember.node.sections[0].content.elements().at(1).content.property.valueDefinition.values.size() == 1);
+    REQUIRE(propertyMember.node.sections[0].content.elements().at(1).content.property.valueDefinition.values[0].literal
+        == "pavan");
     REQUIRE(propertyMember.node.sections[0].content.elements().at(1).content.property.sections.empty());
 
     SourceMapHelper::check(propertyMember.sourceMap.name.sourceMap, 2, 5);
@@ -384,21 +416,30 @@ TEST_CASE("Parse mson property member when it is an object and has no sub-type s
     REQUIRE(propertyMember.sourceMap.sections.collection.size() == 1);
     REQUIRE(propertyMember.sourceMap.sections.collection[0].elements().collection.size() == 2);
 
-    SourceMapHelper::check(propertyMember.sourceMap.sections.collection[0].elements().collection[0].property.name.sourceMap, 14, 28);
-    SourceMapHelper::check(propertyMember.sourceMap.sections.collection[0].elements().collection[0].property.valueDefinition.sourceMap, 14, 28);
-    SourceMapHelper::check(propertyMember.sourceMap.sections.collection[0].elements().collection[1].property.name.sourceMap, 75, 26);
-    SourceMapHelper::check(propertyMember.sourceMap.sections.collection[0].elements().collection[1].property.valueDefinition.sourceMap, 75, 26);
+    SourceMapHelper::check(
+        propertyMember.sourceMap.sections.collection[0].elements().collection[0].property.name.sourceMap, 14, 28);
+    SourceMapHelper::check(
+        propertyMember.sourceMap.sections.collection[0].elements().collection[0].property.valueDefinition.sourceMap,
+        14,
+        28);
+    SourceMapHelper::check(
+        propertyMember.sourceMap.sections.collection[0].elements().collection[1].property.name.sourceMap, 75, 26);
+    SourceMapHelper::check(
+        propertyMember.sourceMap.sections.collection[0].elements().collection[1].property.valueDefinition.sourceMap,
+        75,
+        26);
 }
 
 TEST_CASE("Parse mson property member when it is a string and has no sub-type specified", "[mson][property_member]")
 {
-    mdp::ByteBuffer source = \
-    "- username\n\n"\
-    "    Some block description\n\n"\
-    "    - Sample: Pavan, Sunkara";
+    mdp::ByteBuffer source
+        = "- username\n\n"
+          "    Some block description\n\n"
+          "    - Sample: Pavan, Sunkara";
 
     ParseResult<mson::PropertyMember> propertyMember;
-    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(
+        source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
 
     REQUIRE(propertyMember.report.error.code == Error::OK);
     REQUIRE(propertyMember.report.warnings.empty());
@@ -425,12 +466,13 @@ TEST_CASE("Parse mson property member when it is a string and has no sub-type sp
 
 TEST_CASE("Parse mson property member when no sub-type specified and no nested sections", "[mson][property_member]")
 {
-    mdp::ByteBuffer source = \
-    "- username\n\n"\
-    "    Some block description";
+    mdp::ByteBuffer source
+        = "- username\n\n"
+          "    Some block description";
 
     ParseResult<mson::PropertyMember> propertyMember;
-    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(
+        source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
 
     REQUIRE(propertyMember.report.error.code == Error::OK);
     REQUIRE(propertyMember.report.warnings.empty());
@@ -453,16 +495,17 @@ TEST_CASE("Parse mson property member when no sub-type specified and no nested s
 
 TEST_CASE("Parse mson property member when containing a mixin", "[mson][property_member]")
 {
-    mdp::ByteBuffer source = \
-    "- formal_person (object)\n"\
-    "  - prefix: Mr\n"\
-    "  - Include Person";
+    mdp::ByteBuffer source
+        = "- formal_person (object)\n"
+          "  - prefix: Mr\n"
+          "  - Include Person";
 
     NamedTypes namedTypes;
     NamedTypeHelper::build("Person", mson::ObjectBaseType, namedTypes);
 
     ParseResult<mson::PropertyMember> propertyMember;
-    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption, Models(), NULL, namedTypes);
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(
+        source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption, Models(), NULL, namedTypes);
 
     REQUIRE(propertyMember.report.error.code == Error::OK);
     REQUIRE(propertyMember.report.warnings.empty());
@@ -474,7 +517,8 @@ TEST_CASE("Parse mson property member when containing a mixin", "[mson][property
 
     REQUIRE(propertyMember.node.sections[0].content.elements().at(0).klass == mson::Element::PropertyClass);
     REQUIRE(propertyMember.node.sections[0].content.elements().at(1).klass == mson::Element::MixinClass);
-    REQUIRE(propertyMember.node.sections[0].content.elements().at(1).content.mixin.typeSpecification.name.symbol.literal == "Person");
+    REQUIRE(propertyMember.node.sections[0].content.elements().at(1).content.mixin.typeSpecification.name.symbol.literal
+        == "Person");
 
     SourceMapHelper::check(propertyMember.sourceMap.name.sourceMap, 2, 23);
     SourceMapHelper::check(propertyMember.sourceMap.valueDefinition.sourceMap, 2, 23);
@@ -482,21 +526,24 @@ TEST_CASE("Parse mson property member when containing a mixin", "[mson][property
     REQUIRE(propertyMember.sourceMap.sections.collection.size() == 1);
     REQUIRE(propertyMember.sourceMap.sections.collection[0].elements().collection.size() == 2);
 
-    SourceMapHelper::check(propertyMember.sourceMap.sections.collection[0].elements().collection[0].property.name.sourceMap, 29, 11);
-    SourceMapHelper::check(propertyMember.sourceMap.sections.collection[0].elements().collection[1].mixin.sourceMap, 44, 14);
+    SourceMapHelper::check(
+        propertyMember.sourceMap.sections.collection[0].elements().collection[0].property.name.sourceMap, 29, 11);
+    SourceMapHelper::check(
+        propertyMember.sourceMap.sections.collection[0].elements().collection[1].mixin.sourceMap, 44, 14);
 }
 
 TEST_CASE("Parse mson property member when containing an oneOf", "[mson][property_member]")
 {
-    mdp::ByteBuffer source = \
-    "- formal_person (object)\n"\
-    "    - first_name\n"\
-    "    - One Of\n"\
-    "        - last_name\n"\
-    "        - given_name: Smith";
+    mdp::ByteBuffer source
+        = "- formal_person (object)\n"
+          "    - first_name\n"
+          "    - One Of\n"
+          "        - last_name\n"
+          "        - given_name: Smith";
 
     ParseResult<mson::PropertyMember> propertyMember;
-    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(
+        source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
 
     REQUIRE(propertyMember.report.error.code == Error::OK);
     REQUIRE(propertyMember.report.warnings.empty());
@@ -521,7 +568,8 @@ TEST_CASE("Parse mson property member when containing an oneOf", "[mson][propert
 
     REQUIRE(propertyMember.sourceMap.sections.collection.size() == 1);
     REQUIRE(propertyMember.sourceMap.sections.collection[0].elements().collection.size() == 2);
-    SourceMapHelper::check(propertyMember.sourceMap.sections.collection[0].elements().collection[0].property.name.sourceMap, 31, 11);
+    SourceMapHelper::check(
+        propertyMember.sourceMap.sections.collection[0].elements().collection[0].property.name.sourceMap, 31, 11);
 
     SourceMap<mson::OneOf> oneOfSM = propertyMember.sourceMap.sections.collection[0].elements().collection[1].oneOf();
     REQUIRE(oneOfSM.collection.size() == 2);
@@ -531,11 +579,11 @@ TEST_CASE("Parse mson property member when containing an oneOf", "[mson][propert
 
 TEST_CASE("Parse mson property member containing a list of values and no type specification", "[mson][property_member]")
 {
-    mdp::ByteBuffer source = \
-    "- list: 1, 2, 3";
+    mdp::ByteBuffer source = "- list: 1, 2, 3";
 
     ParseResult<mson::PropertyMember> propertyMember;
-    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(
+        source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
 
     REQUIRE(propertyMember.report.error.code == Error::OK);
     REQUIRE(propertyMember.report.warnings.empty());
@@ -555,11 +603,11 @@ TEST_CASE("Parse mson property member containing a list of values and no type sp
 
 TEST_CASE("Parse mson property containing list of value with string type specification", "[mson][property_member]")
 {
-    mdp::ByteBuffer source = \
-    "- list: 1, 2, 3 (string)";
+    mdp::ByteBuffer source = "- list: 1, 2, 3 (string)";
 
     ParseResult<mson::PropertyMember> propertyMember;
-    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(
+        source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
 
     REQUIRE(propertyMember.report.error.code == Error::OK);
     REQUIRE(propertyMember.report.warnings.empty());
@@ -577,11 +625,11 @@ TEST_CASE("Parse mson property containing list of value with string type specifi
 
 TEST_CASE("Parse fixed type attribute on array with primitive nested type", "[mson][property_member][now]")
 {
-    mdp::ByteBuffer source = \
-    "+ s (array[string], fixed-type)";
+    mdp::ByteBuffer source = "+ s (array[string], fixed-type)";
 
     ParseResult<mson::PropertyMember> propertyMember;
-    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
+    SectionParserHelper<mson::PropertyMember, MSONPropertyMemberParser>::parse(
+        source, MSONPropertyMemberSectionType, propertyMember, ExportSourcemapOption);
 
     REQUIRE(propertyMember.report.error.code == Error::OK);
     REQUIRE(propertyMember.report.warnings.empty());
@@ -590,7 +638,8 @@ TEST_CASE("Parse fixed type attribute on array with primitive nested type", "[ms
     REQUIRE(propertyMember.node.valueDefinition.typeDefinition.attributes == mson::FixedTypeTypeAttribute);
     REQUIRE(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.name.base == mson::ArrayTypeName);
     REQUIRE(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.nestedTypes.size() == 1);
-    REQUIRE(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.nestedTypes[0].base == mson::StringTypeName);
+    REQUIRE(propertyMember.node.valueDefinition.typeDefinition.typeSpecification.nestedTypes[0].base
+        == mson::StringTypeName);
     REQUIRE(propertyMember.node.valueDefinition.typeDefinition.baseType == mson::ValueBaseType);
     REQUIRE(propertyMember.node.sections.empty());
 }

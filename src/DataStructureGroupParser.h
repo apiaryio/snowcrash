@@ -13,7 +13,8 @@
 
 using namespace scpl;
 
-namespace snowcrash {
+namespace snowcrash
+{
 
     /** Data structure group matching regex */
     const char* const DataStructureGroupRegex = "^[[:blank:]]*[Dd]ata[[:blank:]]+[Ss]tructures?[[:blank:]]*$";
@@ -21,15 +22,16 @@ namespace snowcrash {
     /**
      * Data structure group section processor
      */
-    template<>
+    template <>
     struct SectionProcessor<DataStructureGroup> : public SectionProcessorBase<DataStructureGroup> {
 
         NO_SECTION_DESCRIPTION(DataStructureGroup)
 
         static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
-                                                         const MarkdownNodes& siblings,
-                                                         SectionParserData& pd,
-                                                         const ParseResultRef<DataStructureGroup>& out) {
+            const MarkdownNodes& siblings,
+            SectionParserData& pd,
+            const ParseResultRef<DataStructureGroup>& out)
+        {
 
             MarkdownNodeIterator cur = node;
 
@@ -44,10 +46,9 @@ namespace snowcrash {
                     std::stringstream ss;
                     ss << "named type with name '" << namedType.node.name.symbol.literal << "' already exists";
 
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                    out.report.warnings.push_back(Warning(ss.str(),
-                                                          DuplicateWarning,
-                                                          sourceMap));
+                    mdp::CharactersRangeSet sourceMap
+                        = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                    out.report.warnings.push_back(Warning(ss.str(), DuplicateWarning, sourceMap));
                     return cur;
                 }
 
@@ -71,9 +72,9 @@ namespace snowcrash {
             return cur;
         }
 
-        static void finalize(const MarkdownNodeIterator& node,
-                             SectionParserData& pd,
-                             const ParseResultRef<DataStructureGroup>& out) {
+        static void finalize(
+            const MarkdownNodeIterator& node, SectionParserData& pd, const ParseResultRef<DataStructureGroup>& out)
+        {
 
             out.node.element = Element::CategoryElement;
             out.node.category = Element::DataStructureGroupCategory;
@@ -85,10 +86,10 @@ namespace snowcrash {
             }
         }
 
-        static SectionType sectionType(const MarkdownNodeIterator& node) {
+        static SectionType sectionType(const MarkdownNodeIterator& node)
+        {
 
-            if (node->type == mdp::HeaderMarkdownNodeType &&
-                !node->text.empty()) {
+            if (node->type == mdp::HeaderMarkdownNodeType && !node->text.empty()) {
 
                 mdp::ByteBuffer remaining, subject = node->text;
 
@@ -103,13 +104,15 @@ namespace snowcrash {
             return UndefinedSectionType;
         }
 
-        static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
+        static SectionType nestedSectionType(const MarkdownNodeIterator& node)
+        {
 
             return SectionProcessor<mson::NamedType>::sectionType(node);
         }
 
-        static SectionTypes upperSectionTypes() {
-            return {DataStructureGroupSectionType, ResourceGroupSectionType, ResourceSectionType};
+        static SectionTypes upperSectionTypes()
+        {
+            return { DataStructureGroupSectionType, ResourceGroupSectionType, ResourceSectionType };
         }
 
         /**
@@ -118,8 +121,8 @@ namespace snowcrash {
          * \param blueprint The blueprint which is formed until now
          * \param name The named type name to be checked
          */
-        static bool isNamedTypeDuplicate(const Blueprint& blueprint,
-                                         mdp::ByteBuffer& name) {
+        static bool isNamedTypeDuplicate(const Blueprint& blueprint, mdp::ByteBuffer& name)
+        {
 
             for (Elements::const_iterator it = blueprint.content.elements().begin();
                  it != blueprint.content.elements().end();
@@ -131,14 +134,14 @@ namespace snowcrash {
                          subIt != it->content.elements().end();
                          ++subIt) {
 
-                        if (subIt->element == Element::ResourceElement &&
-                            subIt->content.resource.attributes.name.symbol.literal == name) {
+                        if (subIt->element == Element::ResourceElement
+                            && subIt->content.resource.attributes.name.symbol.literal == name) {
 
                             return true;
                         }
 
-                        if (subIt->element == Element::DataStructureElement &&
-                            subIt->content.dataStructure.name.symbol.literal == name) {
+                        if (subIt->element == Element::DataStructureElement
+                            && subIt->content.dataStructure.name.symbol.literal == name) {
 
                             return true;
                         }

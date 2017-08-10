@@ -57,7 +57,7 @@ const Elements& TypeSection::Content::elements() const
 }
 
 TypeSection::Content::Content(const Markdown& description_, const Literal& value_)
-: description(description_), value(value_)
+    : description(description_), value(value_)
 {
     m_elements.reset(::new Elements);
 }
@@ -84,23 +84,19 @@ TypeSection::Content::~Content()
 
 bool TypeSection::empty() const
 {
-    return (this->klass == TypeSection::UndefinedClass &&
-            this->content.value.empty() &&
-            this->content.description.empty() &&
-            this->content.elements().empty());
+    return (this->klass == TypeSection::UndefinedClass && this->content.value.empty()
+        && this->content.description.empty()
+        && this->content.elements().empty());
 }
 
 bool NamedType::empty() const
 {
-    return (this->typeDefinition.empty() &&
-            this->name.empty() &&
-            this->sections.empty());
+    return (this->typeDefinition.empty() && this->name.empty() && this->sections.empty());
 }
 
 bool ValueMember::empty() const
 {
-    return (this->valueDefinition.empty() && this->sections.empty() &&
-            this->description.empty());
+    return (this->valueDefinition.empty() && this->sections.empty() && this->description.empty());
 }
 
 bool PropertyName::empty() const
@@ -110,8 +106,7 @@ bool PropertyName::empty() const
 
 bool PropertyMember::empty() const
 {
-    return (this->name.empty() && this->description.empty() &&
-            this->sections.empty() && this->valueDefinition.empty());
+    return (this->name.empty() && this->description.empty() && this->sections.empty() && this->valueDefinition.empty());
 }
 
 OneOf& Element::Content::oneOf()
@@ -180,8 +175,7 @@ Element::Content::~Content()
 {
 }
 
-Element::Element(const Element::Class& klass_)
-: klass(klass_)
+Element::Element(const Element::Class& klass_) : klass(klass_)
 {
 }
 
@@ -265,7 +259,7 @@ void Element::build(const Value& value)
  *
  * \param elements Group of elements
  */
-void Element::buildFromElements(const Elements &elements)
+void Element::buildFromElements(const Elements& elements)
 {
     this->klass = Element::GroupClass;
     this->content = elements;

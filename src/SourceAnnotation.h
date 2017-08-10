@@ -13,8 +13,8 @@
 #include <vector>
 #include "ByteBuffer.h"
 
-namespace snowcrash {
-
+namespace snowcrash
+{
 
     /**
      *  \brief  A source data annotation.
@@ -34,13 +34,16 @@ namespace snowcrash {
          *
          *  Creates an empty annotation with the default annotation code.
          */
-        SourceAnnotation() : code(OK) {}
+        SourceAnnotation() : code(OK)
+        {
+        }
 
         /**
          *  \brief  %SourceAnnotation copy constructor.
          *  \param  rhs  An annotation to be copied.
          */
-        SourceAnnotation(const SourceAnnotation& rhs) {
+        SourceAnnotation(const SourceAnnotation& rhs)
+        {
 
             this->message = rhs.message;
             this->code = rhs.code;
@@ -54,8 +57,9 @@ namespace snowcrash {
          *  \param  location    A location of the annotation.
          */
         SourceAnnotation(const std::string& message,
-                         int code = OK,
-                         const mdp::CharactersRangeSet& location = mdp::CharactersRangeSet()) {
+            int code = OK,
+            const mdp::CharactersRangeSet& location = mdp::CharactersRangeSet())
+        {
 
             this->message = message;
             this->code = code;
@@ -66,13 +70,16 @@ namespace snowcrash {
         }
 
         /** \brief  %SourceAnnotation destructor. */
-        ~SourceAnnotation() {}
+        ~SourceAnnotation()
+        {
+        }
 
         /**
          *  \brief  %SourceAnnotation assignment operator
          *  \param  rhs  An annotation to be assigned to this annotation.
          */
-        SourceAnnotation& operator=(const SourceAnnotation& rhs) {
+        SourceAnnotation& operator=(const SourceAnnotation& rhs)
+        {
             this->message = rhs.message;
             this->code = rhs.code;
             this->location = rhs.location;
@@ -97,7 +104,8 @@ namespace snowcrash {
     /**
      *  Error codes
      */
-    enum ErrorCode {
+    enum ErrorCode
+    {
         NoError = 0,
         ApplicationError = 1,
         BusinessError = 2,
@@ -113,7 +121,8 @@ namespace snowcrash {
     /**
      *  Warning codes
      */
-    enum WarningCode {
+    enum WarningCode
+    {
         NoWarning = 0,
         APINameWarning = 1,
         DuplicateWarning = 2,
@@ -149,7 +158,8 @@ namespace snowcrash {
          *
          *  NOTE: A binding does not need to wrap this action.
          */
-        Report& operator+=(const Report& rhs) {
+        Report& operator+=(const Report& rhs)
+        {
             error = rhs.error;
             warnings.insert(warnings.end(), rhs.warnings.begin(), rhs.warnings.end());
             return *this;

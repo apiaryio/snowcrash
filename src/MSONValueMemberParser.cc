@@ -9,10 +9,12 @@
 #include "MSONOneOfParser.h"
 #include "MSONPropertyMemberParser.h"
 
-namespace snowcrash {
+namespace snowcrash
+{
 
     /** Implementation of nestedSectionType */
-    SectionType SectionProcessor<mson::ValueMember>::nestedSectionType(const MarkdownNodeIterator& node) {
+    SectionType SectionProcessor<mson::ValueMember>::nestedSectionType(const MarkdownNodeIterator& node)
+    {
 
         SectionType nestedType = UndefinedSectionType;
 
@@ -42,10 +44,11 @@ namespace snowcrash {
 
     /** Implementation of resolveAndProcessMSONSection */
     MarkdownNodeIterator SectionProcessor<mson::ValueMember>::processMSONSection(const MarkdownNodeIterator& node,
-                                                                                 const MarkdownNodes& siblings,
-                                                                                 SectionParserData& pd,
-                                                                                 const ParseResultRef<mson::TypeSections>& sections,
-                                                                                 mson::BaseType& baseType) {
+        const MarkdownNodes& siblings,
+        SectionParserData& pd,
+        const ParseResultRef<mson::TypeSections>& sections,
+        mson::BaseType& baseType)
+    {
 
         MarkdownNodeIterator cur = node;
 
@@ -65,8 +68,8 @@ namespace snowcrash {
         resolveImplicitBaseType(node, pd.sectionContext(), baseType);
 
         // Build a section to indicate nested members
-        if (sections.node.empty() ||
-            (!sections.node.empty() && sections.node.back().klass != mson::TypeSection::MemberTypeClass)) {
+        if (sections.node.empty()
+            || (!sections.node.empty() && sections.node.back().klass != mson::TypeSection::MemberTypeClass)) {
 
             mson::TypeSection typeSection(mson::TypeSection::MemberTypeClass);
 
@@ -91,29 +94,29 @@ namespace snowcrash {
             if (!isSameBaseType(baseType, mixin.node.baseType)) {
 
                 // WARN: Mixin base type should be compatible with the parent base type
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                sections.report.warnings.push_back(Warning("mixin base type should be the same as parent base type. objects should contain object mixins. arrays should contain array mixins",
-                                                           LogicalErrorWarning,
-                                                           sourceMap));
-            }
-            else {
+                mdp::CharactersRangeSet sourceMap
+                    = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                sections.report.warnings.push_back(
+                    Warning("mixin base type should be the same as parent base type. objects should contain object "
+                            "mixins. arrays should contain array mixins",
+                        LogicalErrorWarning,
+                        sourceMap));
+            } else {
                 element.build(mixin.node);
 
                 if (pd.exportSourceMap()) {
                     elementSM.mixin = mixin.sourceMap;
                 }
             }
-        }
-        else if (pd.sectionContext() == MSONOneOfSectionType) {
+        } else if (pd.sectionContext() == MSONOneOfSectionType) {
 
-            if (baseType != mson::ObjectBaseType &&
-                baseType != mson::ImplicitObjectBaseType) {
+            if (baseType != mson::ObjectBaseType && baseType != mson::ImplicitObjectBaseType) {
 
                 // WARN: One of can not be a nested member for a non object structure type
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                sections.report.warnings.push_back(Warning("one of may be a nested member of a object sub-types only",
-                                                           LogicalErrorWarning,
-                                                           sourceMap));
+                mdp::CharactersRangeSet sourceMap
+                    = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                sections.report.warnings.push_back(Warning(
+                    "one of may be a nested member of a object sub-types only", LogicalErrorWarning, sourceMap));
 
                 return cur;
             }
@@ -126,76 +129,74 @@ namespace snowcrash {
             if (pd.exportSourceMap()) {
                 elementSM = oneOf.sourceMap;
             }
-        }
-        else {
+        } else {
 
-            if ((baseType == mson::ValueBaseType ||
-                 baseType == mson::ImplicitValueBaseType) &&
-                node->type == mdp::ListItemMarkdownNodeType) {
+            if ((baseType == mson::ValueBaseType || baseType == mson::ImplicitValueBaseType)
+                && node->type == mdp::ListItemMarkdownNodeType) {
 
                 IntermediateParseResult<mson::ValueMember> valueMember(sections.report);
                 cur = MSONValueMemberParser::parse(node, siblings, pd, valueMember);
 
                 element.build(valueMember.node);
 
-                if ((valueMember.node.valueDefinition.typeDefinition.baseType ==  mson::ImplicitObjectBaseType ||
-                     valueMember.node.valueDefinition.typeDefinition.baseType ==  mson::ObjectBaseType) &&
-                    !valueMember.node.valueDefinition.values.empty()) {
-                    // WARN: object definition contain value 
+                if ((valueMember.node.valueDefinition.typeDefinition.baseType == mson::ImplicitObjectBaseType
+                        || valueMember.node.valueDefinition.typeDefinition.baseType == mson::ObjectBaseType)
+                    && !valueMember.node.valueDefinition.values.empty()) {
+                    // WARN: object definition contain value
                     // e.g
                     // - a (array)
                     //   - key (object)
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                    sections.report.warnings.push_back(Warning("array member definition of type 'object' contains value. You should use type definition without value eg. '- (object)'",
-                                                               LogicalErrorWarning,
-                                                               sourceMap));
+                    mdp::CharactersRangeSet sourceMap
+                        = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                    sections.report.warnings.push_back(
+                        Warning("array member definition of type 'object' contains value. You should use type "
+                                "definition without value eg. '- (object)'",
+                            LogicalErrorWarning,
+                            sourceMap));
                 }
 
                 if (pd.exportSourceMap()) {
                     elementSM.value = valueMember.sourceMap;
                 }
-            }
-            else if ((baseType == mson::ObjectBaseType ||
-                      baseType == mson::ImplicitObjectBaseType) &&
-                     node->type == mdp::ListItemMarkdownNodeType) {
+            } else if ((baseType == mson::ObjectBaseType || baseType == mson::ImplicitObjectBaseType)
+                && node->type == mdp::ListItemMarkdownNodeType) {
 
                 IntermediateParseResult<mson::PropertyMember> propertyMember(sections.report);
                 cur = MSONPropertyMemberParser::parse(node, siblings, pd, propertyMember);
 
                 element.build(propertyMember.node);
 
-                if ((propertyMember.node.valueDefinition.typeDefinition.baseType ==  mson::ImplicitObjectBaseType ||
-                     propertyMember.node.valueDefinition.typeDefinition.baseType ==  mson::ObjectBaseType) &&
-                    !propertyMember.node.valueDefinition.values.empty()) {
-                    // WARN: object definition contain value 
+                if ((propertyMember.node.valueDefinition.typeDefinition.baseType == mson::ImplicitObjectBaseType
+                        || propertyMember.node.valueDefinition.typeDefinition.baseType == mson::ObjectBaseType)
+                    && !propertyMember.node.valueDefinition.values.empty()) {
+                    // WARN: object definition contain value
                     // e.g
                     // - key: value (object)
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                    sections.report.warnings.push_back(Warning("'object' with value definition. You should use type definition without value eg. '- key (object)'",
-                                                               LogicalErrorWarning,
-                                                               sourceMap));
+                    mdp::CharactersRangeSet sourceMap
+                        = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                    sections.report.warnings.push_back(
+                        Warning("'object' with value definition. You should use type definition without value eg. '- "
+                                "key (object)'",
+                            LogicalErrorWarning,
+                            sourceMap));
                 }
 
                 if (pd.exportSourceMap()) {
                     elementSM.property = propertyMember.sourceMap;
                 }
-            }
-            else if (baseType == mson::PrimitiveBaseType ||
-                     baseType == mson::ImplicitPrimitiveBaseType) {
+            } else if (baseType == mson::PrimitiveBaseType || baseType == mson::ImplicitPrimitiveBaseType) {
 
                 // WARN: Primitive type members should not have nested members
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                sections.report.warnings.push_back(Warning("sub-types of primitive types should not have nested members",
-                                                           LogicalErrorWarning,
-                                                           sourceMap));
-            }
-            else {
+                mdp::CharactersRangeSet sourceMap
+                    = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                sections.report.warnings.push_back(Warning(
+                    "sub-types of primitive types should not have nested members", LogicalErrorWarning, sourceMap));
+            } else {
 
                 // WARN: Ignoring unrecognized block in mson nested members
-                mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                sections.report.warnings.push_back(Warning("ignorning unrecognized block",
-                                                           IgnoringWarning,
-                                                           sourceMap));
+                mdp::CharactersRangeSet sourceMap
+                    = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                sections.report.warnings.push_back(Warning("ignorning unrecognized block", IgnoringWarning, sourceMap));
 
                 cur = ++MarkdownNodeIterator(node);
             }

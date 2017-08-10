@@ -11,33 +11,37 @@
 
 TEST_CASE("Parse simple blueprint with C interface", "[cinterface]")
 {
-    mdp::ByteBuffer source = \
-    "FORMAT: 1A\n"\
-    "\n"\
-    "# My API\n"\
-    "Description of *My API*.\n"\
-    "\n"\
-    "## Message [/message]\n"\
-    "### GET\n"\
-    "+ Response 200 (text/plain)\n"\
-    "\n"\
-    "        Hello World!\n"\
-    "\n"\
-    "# Group test\n"\
-    "\n"\
-    "## Message [/message]\n";
+    mdp::ByteBuffer source
+        = "FORMAT: 1A\n"
+          "\n"
+          "# My API\n"
+          "Description of *My API*.\n"
+          "\n"
+          "## Message [/message]\n"
+          "### GET\n"
+          "+ Response 200 (text/plain)\n"
+          "\n"
+          "        Hello World!\n"
+          "\n"
+          "# Group test\n"
+          "\n"
+          "## Message [/message]\n";
 
     sc_report_t* report;
     sc_blueprint_t* blueprint;
     sc_sm_blueprint_t* sm_blueprint;
 
-    sc_c_parse(source.c_str(), SC_REQUIRE_BLUEPRINT_NAME_OPTION | SC_EXPORT_SORUCEMAP_OPTION, &report, &blueprint, &sm_blueprint);
+    sc_c_parse(source.c_str(),
+        SC_REQUIRE_BLUEPRINT_NAME_OPTION | SC_EXPORT_SORUCEMAP_OPTION,
+        &report,
+        &blueprint,
+        &sm_blueprint);
 
     const sc_warnings_t* warns = sc_warnings_handler(report);
     REQUIRE(sc_warnings_size(warns) == 1);
 
     const sc_warning_t* warn = sc_warning_handler(warns, 0);
-    REQUIRE(std::string(sc_warning_message(warn)) == "the resource '/message' is already defined" );
+    REQUIRE(std::string(sc_warning_message(warn)) == "the resource '/message' is already defined");
 
     const sc_metadata_collection_t* meta_col = sc_metadata_collection_handle(blueprint);
     const sc_sm_metadata_collection_t* sm_meta_col = sc_sm_metadata_collection_handle(sm_blueprint);
@@ -46,8 +50,8 @@ TEST_CASE("Parse simple blueprint with C interface", "[cinterface]")
     REQUIRE(sc_sm_metadata_collection_size(sm_meta_col) == 1);
 
     const sc_metadata_t* meta = sc_metadata_handle(meta_col, 0);
-    REQUIRE(std::string(sc_metadata_key(meta)) == "FORMAT" );
-    REQUIRE(std::string(sc_metadata_value(meta)) == "1A" );
+    REQUIRE(std::string(sc_metadata_key(meta)) == "FORMAT");
+    REQUIRE(std::string(sc_metadata_value(meta)) == "1A");
 
     const sc_source_map_t* sm_meta = sc_sm_metadata(sc_sm_metadata_handle(sm_meta_col, 0));
 
@@ -119,7 +123,7 @@ TEST_CASE("Parse simple blueprint with C interface", "[cinterface]")
 
     REQUIRE(sc_source_map_size(sm_trans_name) == 0);
 
-    const sc_payload_collection_t* resp_col =  sc_payload_collection_handle_responses(trans);
+    const sc_payload_collection_t* resp_col = sc_payload_collection_handle_responses(trans);
     const sc_sm_payload_collection_t* sm_resp_col = sc_sm_payload_collection_handle_responses(sm_trans);
 
     REQUIRE(sc_payload_collection_size(resp_col) == 1);
@@ -175,32 +179,36 @@ TEST_CASE("Parse simple blueprint with C interface", "[cinterface]")
 
 TEST_CASE("Parse blueprint with multiple requests and responses via C interface", "[cinterface]")
 {
-    const std::string blueprintSource = \
-    "# /resource\n"\
-    "## GET\n"\
-    "\n"\
-    "+ request A\n"\
-    "\n"\
-    "        A\n"\
-    "\n"\
-    "+ response 200\n"\
-    "\n"\
-    "        200-A\n"\
-    "\n"\
-    "+ request B\n"\
-    "\n"\
-    "        B\n"\
-    "\n"\
-    "+ response 200\n"\
-    "\n"\
-    "        200-B\n"\
-    "\n";
+    const std::string blueprintSource
+        = "# /resource\n"
+          "## GET\n"
+          "\n"
+          "+ request A\n"
+          "\n"
+          "        A\n"
+          "\n"
+          "+ response 200\n"
+          "\n"
+          "        200-A\n"
+          "\n"
+          "+ request B\n"
+          "\n"
+          "        B\n"
+          "\n"
+          "+ response 200\n"
+          "\n"
+          "        200-B\n"
+          "\n";
 
     sc_report_t* report;
     sc_blueprint_t* blueprint;
     sc_sm_blueprint_t* sm_blueprint;
 
-    sc_c_parse(blueprintSource.c_str(), SC_RENDER_DESCRIPTIONS_OPTION | SC_EXPORT_SORUCEMAP_OPTION, &report, &blueprint, &sm_blueprint);
+    sc_c_parse(blueprintSource.c_str(),
+        SC_RENDER_DESCRIPTIONS_OPTION | SC_EXPORT_SORUCEMAP_OPTION,
+        &report,
+        &blueprint,
+        &sm_blueprint);
 
     const sc_resource_group_collection_t* res_gr_col = sc_resource_group_collection_handle(blueprint);
     const sc_sm_resource_group_collection_t* sm_res_gr_col = sc_sm_resource_group_collection_handle(sm_blueprint);
@@ -264,29 +272,29 @@ TEST_CASE("Parse blueprint with multiple requests and responses via C interface"
 
 TEST_CASE("CBlueprint issue on sc_resource_group_handle", "[cinterface]")
 {
-    const std::string blueprintSource = \
-    "# My API\n"\
-    "\n"\
-    "# Group A\n"\
-    "## /Resource A1\n"\
-    "### GET\n"\
-    "+ Response 200\n"\
-    "\n"\
-    "        A1\n"\
-    "\n"\
-    "# Group B\n"\
-    "## /Resource B1\n"\
-    "### GET\n"\
-    "+ Response 200\n"\
-    "\n"\
-    "        B1\n"\
-    "\n"\
-    "## /Resource B2\n"\
-    "### GET\n"\
-    "+ Response 200\n"\
-    "\n"\
-    "        B2\n"\
-    "\n";
+    const std::string blueprintSource
+        = "# My API\n"
+          "\n"
+          "# Group A\n"
+          "## /Resource A1\n"
+          "### GET\n"
+          "+ Response 200\n"
+          "\n"
+          "        A1\n"
+          "\n"
+          "# Group B\n"
+          "## /Resource B1\n"
+          "### GET\n"
+          "+ Response 200\n"
+          "\n"
+          "        B1\n"
+          "\n"
+          "## /Resource B2\n"
+          "### GET\n"
+          "+ Response 200\n"
+          "\n"
+          "        B2\n"
+          "\n";
 
     sc_report_t* report;
     sc_blueprint_t* blueprint;
@@ -319,22 +327,22 @@ TEST_CASE("CBlueprint issue on sc_resource_group_handle", "[cinterface]")
 
 TEST_CASE("Parse blueprint with multiple reference via C interface", "[cinterface]")
 {
-    const std::string blueprintSource = \
-    "#api name\n\n"\
-    "# Resource 1 [/1]\n"\
-    "+ Model (text/plain)\n\n"\
-    "        `resource model` 1\n\n"\
-    "# Resource 2 [/2]\n"\
-    "## Retrieve [GET]\n\n"\
-    "+ Response 200\n\n"\
-    "    [Resource 1][]\n\n"\
-    "# Resource 3 [/3]\n"\
-    "## Retrieve [GET]\n\n"\
-    "+ Response 200\n\n"\
-    "    [Resource 4][]\n\n"\
-    "# Resource 4 [/4]\n"\
-    "+ Model (text/plain)\n\n"\
-    "        `resource model` 4\n";
+    const std::string blueprintSource
+        = "#api name\n\n"
+          "# Resource 1 [/1]\n"
+          "+ Model (text/plain)\n\n"
+          "        `resource model` 1\n\n"
+          "# Resource 2 [/2]\n"
+          "## Retrieve [GET]\n\n"
+          "+ Response 200\n\n"
+          "    [Resource 1][]\n\n"
+          "# Resource 3 [/3]\n"
+          "## Retrieve [GET]\n\n"
+          "+ Response 200\n\n"
+          "    [Resource 4][]\n\n"
+          "# Resource 4 [/4]\n"
+          "+ Model (text/plain)\n\n"
+          "        `resource model` 4\n";
 
     sc_report_t* report;
     sc_blueprint_t* blueprint;
@@ -351,7 +359,7 @@ TEST_CASE("Parse blueprint with multiple reference via C interface", "[cinterfac
     const sc_resource_collection_t* sm_res_gr_col = sc_resource_collection_handle(res_gr);
     REQUIRE(sc_resource_collection_size(sm_res_gr_col) == 4);
 
-    const sc_resource_t *res = sc_resource_handle(sm_res_gr_col, 1);
+    const sc_resource_t* res = sc_resource_handle(sm_res_gr_col, 1);
     REQUIRE(std::string(sc_resource_uritemplate(res)) == "/2");
     REQUIRE(std::string(sc_resource_name(res)) == "Resource 2");
 

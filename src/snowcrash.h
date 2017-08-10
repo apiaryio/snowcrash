@@ -26,7 +26,8 @@
  *  for details on how to write a Snow Crash binding.
  */
 
-namespace snowcrash {
+namespace snowcrash
+{
 
     /**
      *  \brief Parse the source data into a blueprint abstract source tree (AST).
@@ -36,9 +37,7 @@ namespace snowcrash {
      *  \param out          Output buffer to store parsing result into.
      *  \return Error status code. Zero represents success, non-zero a failure.
      */
-    int parse(const mdp::ByteBuffer& source,
-              BlueprintParserOptions options,
-              const ParseResultRef<Blueprint>& out);
+    int parse(const mdp::ByteBuffer& source, BlueprintParserOptions options, const ParseResultRef<Blueprint>& out);
 }
 
 #endif

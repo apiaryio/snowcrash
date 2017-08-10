@@ -27,10 +27,8 @@ bool snowcrash::RegexMatch(const string& target, const string& expression)
     try {
         regex pattern(expression, regex_constants::extended);
         return regex_search(target, pattern);
-    }
-    catch (const regex_error&) {
-    }
-    catch (...) {
+    } catch (const regex_error&) {
+    } catch (...) {
     }
 
     return false;
@@ -39,14 +37,14 @@ bool snowcrash::RegexMatch(const string& target, const string& expression)
 string snowcrash::RegexCaptureFirst(const string& target, const string& expression)
 {
     CaptureGroups groups;
-    if (!RegexCapture(target, expression, groups) ||
-        groups.size() < 2)
+    if (!RegexCapture(target, expression, groups) || groups.size() < 2)
         return string();
 
     return groups[1];
 }
 
-bool snowcrash::RegexCapture(const string& target, const string& expression, CaptureGroups& captureGroups, size_t groupSize)
+bool snowcrash::RegexCapture(
+    const string& target, const string& expression, CaptureGroups& captureGroups, size_t groupSize)
 {
     if (target.empty() || expression.empty())
         return false;
@@ -60,18 +58,14 @@ bool snowcrash::RegexCapture(const string& target, const string& expression, Cap
         if (!regex_search(target, result, pattern))
             return false;
 
-        for (match_results<string::const_iterator>::const_iterator it = result.begin();
-             it != result.end();
-             ++it) {
+        for (match_results<string::const_iterator>::const_iterator it = result.begin(); it != result.end(); ++it) {
 
             captureGroups.push_back(*it);
         }
 
         return true;
-    }
-    catch (const regex_error&) {
-    }
-    catch (...) {
+    } catch (const regex_error&) {
+    } catch (...) {
     }
 
     return false;

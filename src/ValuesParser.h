@@ -16,7 +16,8 @@
 /** Parameter Value regex */
 #define PARAMETER_VALUE "`([^`]+)`"
 
-namespace snowcrash {
+namespace snowcrash
+{
 
     /** Parameter Values matching regex */
     const char* const ValuesRegex = "^[[:blank:]]*[Vv]alues[[:blank:]]*$";
@@ -24,13 +25,14 @@ namespace snowcrash {
     /**
      * Values section processor
      */
-    template<>
+    template <>
     struct SectionProcessor<Values> : public SectionProcessorBase<Values> {
 
         static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
-                                                         const MarkdownNodes& siblings,
-                                                         SectionParserData& pd,
-                                                         const ParseResultRef<Values>& out) {
+            const MarkdownNodes& siblings,
+            SectionParserData& pd,
+            const ParseResultRef<Values>& out)
+        {
 
             if (pd.sectionContext() == ValueSectionType) {
 
@@ -55,10 +57,9 @@ namespace snowcrash {
                     ss << "ignoring the '" << content << "' element";
                     ss << ", expected '`" << content << "`'";
 
-                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                    out.report.warnings.push_back(Warning(ss.str(),
-                                                          IgnoringWarning,
-                                                          sourceMap));
+                    mdp::CharactersRangeSet sourceMap
+                        = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                    out.report.warnings.push_back(Warning(ss.str(), IgnoringWarning, sourceMap));
                 }
 
                 return ++MarkdownNodeIterator(node);
@@ -69,10 +70,10 @@ namespace snowcrash {
 
         NO_SECTION_DESCRIPTION(Values)
 
-        static SectionType sectionType(const MarkdownNodeIterator& node) {
+        static SectionType sectionType(const MarkdownNodeIterator& node)
+        {
 
-            if (node->type == mdp::ListItemMarkdownNodeType
-                && !node->children().empty()) {
+            if (node->type == mdp::ListItemMarkdownNodeType && !node->children().empty()) {
 
                 mdp::ByteBuffer subject = node->children().front().text;
                 TrimString(subject);
@@ -85,16 +86,15 @@ namespace snowcrash {
             return UndefinedSectionType;
         }
 
-        static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
+        static SectionType nestedSectionType(const MarkdownNodeIterator& node)
+        {
 
-            if (node->type == mdp::ListItemMarkdownNodeType
-                && !node->children().empty()) {
+            if (node->type == mdp::ListItemMarkdownNodeType && !node->children().empty()) {
 
                 mdp::ByteBuffer subject = node->children().front().text;
                 TrimString(subject);
 
-                if (node->children().size() == 1 &&
-                    !subject.empty()) {
+                if (node->children().size() == 1 && !subject.empty()) {
 
                     return ValueSectionType;
                 }
