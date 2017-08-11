@@ -35,6 +35,7 @@ if /i "%1"=="x64"           set target_arch=x64&goto arg-ok
 if /i "%1"=="noprojgen"     set noprojgen=1&goto arg-ok
 if /i "%1"=="nobuild"       set nobuild=1&goto arg-ok
 if /i "%1"=="test"          set test=test&goto arg-ok
+if /i "%1"=="MSVC2015"      set GYP_MSVS_VERSION=2015&goto arg-ok
 if /i "%1"=="MSVC2013"      set GYP_MSVS_VERSION=2013&goto arg-ok
 if /i "%1"=="MSVC2012"      set GYP_MSVS_VERSION=2012&goto arg-ok
 if /i "%1"=="MSVC2010"      set GYP_MSVS_VERSION=2010&goto arg-ok
@@ -52,11 +53,11 @@ if "%config%"=="Debug" set debug_arg=--debug
 :project-gen
 @rem Skip project generation if requested.
 if defined noprojgen goto msbuild
-if "%GYP_MSVS_VERSION%"=="" set GYP_MSVS_VERSION=2012
+if "%GYP_MSVS_VERSION%"=="" set GYP_MSVS_VERSION=2015
 
 @rem Generate the VS project.
 SETLOCAL
-  if defined VS120COMNTOOLS call "%VS120COMNTOOLS%\VCVarsQueryRegistry.bat"
+  if defined VS140COMNTOOLS call "%VS140COMNTOOLS%\VCVarsQueryRegistry.bat"
   if not defined inttest python configure %debug_arg% --dest-cpu=%target_arch%
   if errorlevel 1 goto create-msvs-files-failed
   if not exist build/snowcrash.sln goto create-msvs-files-failed
@@ -69,11 +70,21 @@ ENDLOCAL
 :msbuild
 @rem Skip project generation if requested.
 if defined nobuild goto exit
+if "%GYP_MSVS_VERSION%"=="2015" goto vc-set-2015
+if "%GYP_MSVS_VERSION%"=="2013" goto vc-set-2013
 if "%GYP_MSVS_VERSION%"=="2012" goto vc-set-2012
 if "%GYP_MSVS_VERSION%"=="2010" goto vc-set-2010
 if "%GYP_MSVS_VERSION%"=="2008" goto vc-set-2008
 
-@rem Look for Visual Studio 2013
+@rem Look for Visual Studio 2015
+:vc-set-2015
+if not defined VS140COMNTOOLS goto vc-set-2013
+if not exist "%VS140COMNTOOLS%\..\..\vc\vcvarsall.bat" goto vc-set-2013
+call "%VS140COMNTOOLS%\..\..\vc\vcvarsall.bat"
+if not defined VCINSTALLDIR goto msbuild-not-found
+goto msbuild-found
+
+:vc-set-2013
 if not defined VS120COMNTOOLS goto vc-set-2012
 if not exist "%VS120COMNTOOLS%\..\..\vc\vcvarsall.bat" goto vc-set-2012
 call "%VS120COMNTOOLS%\..\..\vc\vcvarsall.bat"
