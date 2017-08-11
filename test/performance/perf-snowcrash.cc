@@ -158,7 +158,6 @@ int main(int argc, const char* argv[])
 
     std::cout << "parsing '" << inputFileName << "' " << TestRunCount << "-times (" << result << "):\n";
     std::cout << "total: " << total << "s mean: " << mean << " +/- " << stddev << "s\n";
-    
     // FIXME: Instruments helper
     //::sleep(20);
 }

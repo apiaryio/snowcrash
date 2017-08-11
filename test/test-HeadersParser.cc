@@ -297,7 +297,8 @@ TEST_CASE("Missing or wrong placed colon in header definition", "[headers][issue
     }
 }
 
-TEST_CASE("Allow parse nonvalid headers, provide appropriate warning", "[headers][issue][158]") {
+TEST_CASE("Allow parse nonvalid headers, provide appropriate warning", "[headers][issue][158]")
+{
 
     SECTION("Strange but valid token")
     {

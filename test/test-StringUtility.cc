@@ -36,8 +36,8 @@ TEST_CASE("Templates for compare equality", "[utility]")
 
     SECTION("Both version should not throw while testing different types")
     {
-        REQUIRE_NOTHROW(IsEqual()('a',1)); // allow compare different types - not throw
-        REQUIRE_NOTHROW(IsIEqual()('a',1)); // allow compare different types - not throw
+        REQUIRE_NOTHROW(IsEqual()('a', 1));  // allow compare different types - not throw
+        REQUIRE_NOTHROW(IsIEqual()('a', 1)); // allow compare different types - not throw
     }
 }
 
