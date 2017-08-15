@@ -79,8 +79,7 @@ int snowcrash::parse(
         std::stringstream ss;
         ss << "parser exception: '" << e.what() << "'";
         out.report.error = Error(ss.str(), ApplicationError);
-    }
-    catch (...) {
+    } catch (...) {
         out.report.error = Error("parser exception has occurred", ApplicationError);
     }
 
