@@ -36,8 +36,10 @@ TEST_CASE("Templates for compare equality", "[utility]")
 
     SECTION("Both version should not throw while testing diferent types")
     {
-        REQUIRE_NOTHROW(IsEqual()('a', 1));  // allow compare diferent types - not throw
-        REQUIRE_NOTHROW(IsIEqual()('a', 1)); // allow compare diferent types - not throw
+        REQUIRE_NOTHROW(
+            IsEqual()('a', 1)); // allow compare diferent types - not throw
+        REQUIRE_NOTHROW(
+            IsIEqual()('a', 1)); // allow compare diferent types - not throw
     }
 }
 
@@ -45,22 +47,28 @@ TEST_CASE("Container comparation", "[utility]")
 {
     REQUIRE(MatchContainers(std::string("abc"), std::string("abc"), IsEqual()));
 
-    REQUIRE_FALSE(MatchContainers(std::string("ABC"), std::string("abc"), IsEqual()));
+    REQUIRE_FALSE(
+        MatchContainers(std::string("ABC"), std::string("abc"), IsEqual()));
 
-    REQUIRE(MatchContainers(std::string("abc"), std::string("abc"), IsIEqual()));
-    REQUIRE(MatchContainers(std::string("abc"), std::string("ABC"), IsIEqual()));
+    REQUIRE(
+        MatchContainers(std::string("abc"), std::string("abc"), IsIEqual()));
+    REQUIRE(
+        MatchContainers(std::string("abc"), std::string("ABC"), IsIEqual()));
 
-    REQUIRE_FALSE(MatchContainers(std::string("def"), std::string("ABC"), IsIEqual()));
+    REQUIRE_FALSE(
+        MatchContainers(std::string("def"), std::string("ABC"), IsIEqual()));
 }
 
 TEST_CASE("Comapare string", "[utility]")
 {
     REQUIRE(Equal<std::string>()(std::string("abc"), std::string("abc")));
-    REQUIRE_FALSE(Equal<std::string>()(std::string("abcd"), std::string("abc")));
+    REQUIRE_FALSE(
+        Equal<std::string>()(std::string("abcd"), std::string("abc")));
 
     REQUIRE(IEqual<std::string>()(std::string("abc"), std::string("ABC")));
     REQUIRE(IEqual<std::string>()(std::string("ABC"), std::string("ABC")));
-    REQUIRE_FALSE(IEqual<std::string>()(std::string("abcd"), std::string("abc")));
+    REQUIRE_FALSE(
+        IEqual<std::string>()(std::string("abcd"), std::string("abc")));
 }
 
 TEST_CASE("Remove markdown link")

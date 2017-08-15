@@ -12,7 +12,8 @@
 
 // FIXME: Migrate to C++11.
 // Naive implementation of regex matching using POSIX regex
-bool snowcrash::RegexMatch(const std::string& target, const std::string& expression)
+bool snowcrash::RegexMatch(
+    const std::string& target, const std::string& expression)
 {
     if (target.empty() || expression.empty())
         return false;
@@ -42,7 +43,8 @@ bool snowcrash::RegexMatch(const std::string& target, const std::string& express
     return false;
 }
 
-std::string snowcrash::RegexCaptureFirst(const std::string& target, const std::string& expression)
+std::string snowcrash::RegexCaptureFirst(
+    const std::string& target, const std::string& expression)
 {
     CaptureGroups groups;
     if (!RegexCapture(target, expression, groups) || groups.size() < 2)
@@ -51,8 +53,10 @@ std::string snowcrash::RegexCaptureFirst(const std::string& target, const std::s
     return groups[1];
 }
 
-bool snowcrash::RegexCapture(
-    const std::string& target, const std::string& expression, CaptureGroups& captureGroups, size_t groupSize)
+bool snowcrash::RegexCapture(const std::string& target,
+    const std::string& expression,
+    CaptureGroups& captureGroups,
+    size_t groupSize)
 {
     if (target.empty() || expression.empty())
         return false;
@@ -76,7 +80,9 @@ bool snowcrash::RegexCapture(
                 if (pmatch[i].rm_so == -1 || pmatch[i].rm_eo == -1)
                     captureGroups.push_back(std::string());
                 else
-                    captureGroups.push_back(std::string(target, pmatch[i].rm_so, pmatch[i].rm_eo - pmatch[i].rm_so));
+                    captureGroups.push_back(std::string(target,
+                        pmatch[i].rm_so,
+                        pmatch[i].rm_eo - pmatch[i].rm_so));
             }
 
             delete[] pmatch;

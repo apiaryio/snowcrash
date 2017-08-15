@@ -23,9 +23,11 @@ namespace snowcrash
      */
     enum BlueprintParserOption
     {
-        RenderDescriptionsOption = (1 << 0),   /// < Render Markdown in description.
-        RequireBlueprintNameOption = (1 << 1), /// < Treat missing blueprint name as error
-        ExportSourcemapOption = (1 << 2)       /// < Export source maps AST
+        RenderDescriptionsOption
+        = (1 << 0), /// < Render Markdown in description.
+        RequireBlueprintNameOption
+        = (1 << 1), /// < Treat missing blueprint name as error
+        ExportSourcemapOption = (1 << 2) /// < Export source maps AST
     };
 
     typedef unsigned int BlueprintParserOptions;
@@ -36,7 +38,9 @@ namespace snowcrash
      *  State of the parser.
      */
     struct SectionParserData {
-        SectionParserData(BlueprintParserOptions opts, const mdp::ByteBuffer& src, const Blueprint& bp)
+        SectionParserData(BlueprintParserOptions opts,
+            const mdp::ByteBuffer& src,
+            const Blueprint& bp)
             : options(opts), sourceData(src), blueprint(bp)
         {
         }
@@ -68,7 +72,8 @@ namespace snowcrash
         /** Source Data */
         const mdp::ByteBuffer& sourceData;
 
-        /** Source - map of bytes to character position - performance optimalization */
+        /** Source - map of bytes to character position - performance
+         * optimalization */
         mdp::ByteBufferCharacterIndex sourceCharacterIndex;
 
         /** AST being parsed **/
@@ -81,7 +86,8 @@ namespace snowcrash
         /** \returns Actual Section Context */
         SectionType sectionContext() const
         {
-            return (sectionsContext.empty()) ? UndefinedSectionType : sectionsContext.back();
+            return (sectionsContext.empty()) ? UndefinedSectionType :
+                                               sectionsContext.back();
         }
 
         /** \returns Parent Section Context */

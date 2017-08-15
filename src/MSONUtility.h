@@ -28,7 +28,8 @@ namespace mson
 
         std::string emphasisChars = mdp::MarkdownEmphasisChars;
 
-        if (emphasisChars.find(subject[0]) != std::string::npos && subject[0] == subject[subject.length() - 1]) {
+        if (emphasisChars.find(subject[0]) != std::string::npos
+            && subject[0] == subject[subject.length() - 1]) {
 
             return true;
         }
@@ -46,7 +47,8 @@ namespace mson
     inline BaseType parseBaseType(const BaseTypeName& type)
     {
 
-        if ((type == StringTypeName) || (type == NumberTypeName) || (type == BooleanTypeName)) {
+        if ((type == StringTypeName) || (type == NumberTypeName)
+            || (type == BooleanTypeName)) {
 
             return PrimitiveBaseType;
         }
@@ -78,7 +80,8 @@ namespace mson
 
         if (checkVariable(subject)) {
 
-            std::string escapedString = snowcrash::RetrieveEscaped(buffer, 0, true);
+            std::string escapedString
+                = snowcrash::RetrieveEscaped(buffer, 0, true);
 
             value.literal = escapedString;
             value.variable = true;
@@ -124,7 +127,8 @@ namespace mson
      * \param typeName MSON Type Name
      * \param isBaseType If false, will be parsed as a symbol
      */
-    inline void parseTypeName(const std::string& subject, TypeName& typeName, bool isBaseType = true)
+    inline void parseTypeName(
+        const std::string& subject, TypeName& typeName, bool isBaseType = true)
     {
 
         if (isBaseType && subject == "boolean") {
@@ -145,14 +149,16 @@ namespace mson
     }
 
     /**
-     * \brief Check Type Attribute from a string and fill list of type attributes accordingly
+     * \brief Check Type Attribute from a string and fill list of type
+     * attributes accordingly
      *
      * \param attribute String that needs to be checked for attribute
      * \param typeAttributes List of type attributes
      *
      * \return True if the given string is a type attribute
      */
-    inline bool parseTypeAttribute(const std::string& attribute, TypeAttributes& typeAttributes)
+    inline bool parseTypeAttribute(
+        const std::string& attribute, TypeAttributes& typeAttributes)
     {
 
         bool isAttribute = true;
@@ -184,14 +190,17 @@ namespace mson
      * \param subject Attribute string representing the type specification
      * \param typeSpecification MSON Type Specification
      */
-    inline void parseTypeSpecification(const std::string& attribute, TypeSpecification& typeSpecification)
+    inline void parseTypeSpecification(
+        const std::string& attribute, TypeSpecification& typeSpecification)
     {
 
         std::string subject = snowcrash::StripMarkdownLink(attribute);
 
-        bool lookingAtNested = false;   // If true, we are looking at nested types
-        bool lookingForEndLink = false; // If true, we detected a link text and are looking for the end of it
-        bool alreadyParsedLink = false; // If true, we already parsed the link text in the link
+        bool lookingAtNested = false; // If true, we are looking at nested types
+        bool lookingForEndLink = false; // If true, we detected a link text and
+                                        // are looking for the end of it
+        bool alreadyParsedLink
+            = false; // If true, we already parsed the link text in the link
 
         bool trimSubject = false;
 
@@ -200,7 +209,8 @@ namespace mson
 
         while (i < subject.length()) {
 
-            if (subject[i] == mdp::MarkdownBeginReference && !alreadyParsedLink) {
+            if (subject[i] == mdp::MarkdownBeginReference
+                && !alreadyParsedLink) {
 
                 trimSubject = true;
 
@@ -216,7 +226,9 @@ namespace mson
                 } else {
                     lookingForEndLink = true;
                 }
-            } else if (subject[i] == mdp::MarkdownEndReference && lookingAtNested && lookingForEndLink) {
+            } else if (subject[i] == mdp::MarkdownEndReference
+                && lookingAtNested
+                && lookingForEndLink) {
 
                 trimSubject = true;
 
@@ -231,7 +243,9 @@ namespace mson
 
                 alreadyParsedLink = true;
                 lookingForEndLink = false;
-            } else if (subject[i] == scpl::Delimiters::AttributeDelimiter && lookingAtNested && !lookingForEndLink) {
+            } else if (subject[i] == scpl::Delimiters::AttributeDelimiter
+                && lookingAtNested
+                && !lookingForEndLink) {
 
                 trimSubject = true;
 
@@ -273,7 +287,8 @@ namespace mson
         }
 
         // Remove the ending square bracket
-        if (lookingAtNested && buffer[buffer.length() - 1] == mdp::MarkdownEndReference) {
+        if (lookingAtNested
+            && buffer[buffer.length() - 1] == mdp::MarkdownEndReference) {
 
             buffer = buffer.substr(0, buffer.length() - 1);
         }
@@ -291,11 +306,13 @@ namespace mson
     }
 
     /**
-     * \brief Add a dependency to the dependency list of the dependents while checking for circular references
+     * \brief Add a dependency to the dependency list of the dependents while
+     * checking for circular references
      *
      * \param node Current markdown node iterator
      * \param pd Section parser data
-     * \param dependency The named type which should be added to the dependency list
+     * \param dependency The named type which should be added to the dependency
+     * list
      * \param dependent The named type to which the dependency should be added
      * \param report Parse result report
      */
@@ -308,44 +325,57 @@ namespace mson
     {
 
         // First, check if the type exists
-        if (pd.namedTypeDependencyTable.find(dependency) == pd.namedTypeDependencyTable.end()) {
+        if (pd.namedTypeDependencyTable.find(dependency)
+            == pd.namedTypeDependencyTable.end()) {
 
             // ERR: We cannot find the dependency type
             std::stringstream ss;
-            ss << "base type '" << dependency << "' is not defined in the document";
+            ss << "base type '" << dependency
+               << "' is not defined in the document";
 
             mdp::CharactersRangeSet sourceMap
-                = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-            report.error = snowcrash::Error(ss.str(), snowcrash::MSONError, sourceMap);
+                = mdp::BytesRangeSetToCharactersRangeSet(
+                    node->sourceMap, pd.sourceCharacterIndex);
+            report.error
+                = snowcrash::Error(ss.str(), snowcrash::MSONError, sourceMap);
             return;
         }
 
-        std::set<mson::Literal> dependencyDeps = pd.namedTypeDependencyTable[dependency];
+        std::set<mson::Literal> dependencyDeps
+            = pd.namedTypeDependencyTable[dependency];
 
         // Second, check if it is circular reference between them
-        if (circularCheck && (dependent == dependency || dependencyDeps.find(dependent) != dependencyDeps.end())) {
+        if (circularCheck
+            && (dependent == dependency
+                   || dependencyDeps.find(dependent) != dependencyDeps.end())) {
 
             // ERR: Dependency named type circular references itself
             std::stringstream ss;
-            ss << "base type '" << dependent << "' circularly referencing itself";
+            ss << "base type '" << dependent
+               << "' circularly referencing itself";
 
             mdp::CharactersRangeSet sourceMap
-                = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-            report.error = snowcrash::Error(ss.str(), snowcrash::MSONError, sourceMap);
+                = mdp::BytesRangeSetToCharactersRangeSet(
+                    node->sourceMap, pd.sourceCharacterIndex);
+            report.error
+                = snowcrash::Error(ss.str(), snowcrash::MSONError, sourceMap);
             return;
         }
 
         // Third, check if the dependency is already in the list
-        if (pd.namedTypeDependencyTable[dependent].find(dependency) != pd.namedTypeDependencyTable[dependent].end()) {
+        if (pd.namedTypeDependencyTable[dependent].find(dependency)
+            != pd.namedTypeDependencyTable[dependent].end()) {
             return;
         }
 
-        for (mson::NamedTypeDependencyTable::iterator it = pd.namedTypeDependencyTable.begin();
+        for (mson::NamedTypeDependencyTable::iterator it
+             = pd.namedTypeDependencyTable.begin();
              it != pd.namedTypeDependencyTable.end();
              ++it) {
 
             // If the entry is dependent itself or contain dependent in its list
-            if (it->first == dependent || it->second.find(dependent) != it->second.end()) {
+            if (it->first == dependent
+                || it->second.find(dependent) != it->second.end()) {
 
                 it->second.insert(dependency);
                 it->second.insert(dependencyDeps.begin(), dependencyDeps.end());
@@ -371,7 +401,9 @@ namespace mson
 
         bool foundTypeSpecification = false;
 
-        for (std::vector<std::string>::const_iterator it = attributes.begin(); it != attributes.end(); it++) {
+        for (std::vector<std::string>::const_iterator it = attributes.begin();
+             it != attributes.end();
+             it++) {
 
             // If not a recognized type attribute
             if (!parseTypeAttribute(*it, typeDefinition.attributes)) {
@@ -381,22 +413,28 @@ namespace mson
 
                     // WARN: Ignoring unrecognized type attribute
                     mdp::CharactersRangeSet sourceMap
-                        = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                        = mdp::BytesRangeSetToCharactersRangeSet(
+                            node->sourceMap, pd.sourceCharacterIndex);
                     report.warnings.push_back(snowcrash::Warning(
-                        "ignoring unrecognized type attribute", snowcrash::IgnoringWarning, sourceMap));
+                        "ignoring unrecognized type attribute",
+                        snowcrash::IgnoringWarning,
+                        sourceMap));
                 } else {
 
                     foundTypeSpecification = true;
-                    parseTypeSpecification(*it, typeDefinition.typeSpecification);
+                    parseTypeSpecification(
+                        *it, typeDefinition.typeSpecification);
                 }
             }
         }
 
-        typeDefinition.baseType = parseBaseType(typeDefinition.typeSpecification.name.base);
-        NamedTypeBaseTable::iterator it
-            = pd.namedTypeBaseTable.find(typeDefinition.typeSpecification.name.symbol.literal);
+        typeDefinition.baseType
+            = parseBaseType(typeDefinition.typeSpecification.name.base);
+        NamedTypeBaseTable::iterator it = pd.namedTypeBaseTable.find(
+            typeDefinition.typeSpecification.name.symbol.literal);
 
-        if (typeDefinition.baseType == UndefinedBaseType && it != pd.namedTypeBaseTable.end()) {
+        if (typeDefinition.baseType == UndefinedBaseType
+            && it != pd.namedTypeBaseTable.end()) {
 
             typeDefinition.baseType = it->second;
         }
@@ -405,17 +443,24 @@ namespace mson
             && !typeDefinition.typeSpecification.name.symbol.literal.empty()
             && !typeDefinition.typeSpecification.name.symbol.variable) {
 
-            addDependency(node, pd, typeDefinition.typeSpecification.name.symbol.literal, pd.namedTypeContext, report);
+            addDependency(node,
+                pd,
+                typeDefinition.typeSpecification.name.symbol.literal,
+                pd.namedTypeContext,
+                report);
         }
 
-        if (typeDefinition.baseType != ValueBaseType && typeDefinition.baseType != ImplicitValueBaseType
+        if (typeDefinition.baseType != ValueBaseType
+            && typeDefinition.baseType != ImplicitValueBaseType
             && !typeDefinition.typeSpecification.nestedTypes.empty()) {
 
             // WARN: Nested types for non (array or enum) structure base type
             mdp::CharactersRangeSet sourceMap
-                = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                = mdp::BytesRangeSetToCharactersRangeSet(
+                    node->sourceMap, pd.sourceCharacterIndex);
             report.warnings.push_back(
-                snowcrash::Warning("nested types should be present only for types which are sub typed from either "
+                snowcrash::Warning("nested types should be present only for "
+                                   "types which are sub typed from either "
                                    "array or enum structure type",
                     snowcrash::LogicalErrorWarning,
                     sourceMap));
@@ -442,35 +487,51 @@ namespace mson
 
         if (checkVariable(subject)) {
 
-            std::string escapedString = snowcrash::RetrieveEscaped(buffer, 0, true);
+            std::string escapedString
+                = snowcrash::RetrieveEscaped(buffer, 0, true);
 
-            SignatureTraits traits(SignatureTraits::ValuesTrait | SignatureTraits::AttributesTrait);
+            SignatureTraits traits(SignatureTraits::ValuesTrait
+                | SignatureTraits::AttributesTrait);
 
             Signature signature
-                = SignatureSectionProcessorBase<PropertyName>::parseSignature(node, pd, traits, report, escapedString);
+                = SignatureSectionProcessorBase<PropertyName>::parseSignature(
+                    node, pd, traits, report, escapedString);
 
             if (!signature.value.empty()) {
-                propertyName.variable.values.push_back(parseValue(signature.value));
+                propertyName.variable.values.push_back(
+                    parseValue(signature.value));
             }
 
-            parseTypeDefinition(node, pd, signature.attributes, report, propertyName.variable.typeDefinition);
+            parseTypeDefinition(node,
+                pd,
+                signature.attributes,
+                report,
+                propertyName.variable.typeDefinition);
         } else {
             propertyName.literal = snowcrash::StripBackticks(buffer);
         }
     }
 
     /**
-     * \brief Check is the given base types are the same after taking the implicitness into account
+     * \brief Check is the given base types are the same after taking the
+     * implicitness into account
      */
-    inline bool isSameBaseType(const mson::BaseType lhs, const mson::BaseType rhs)
+    inline bool isSameBaseType(
+        const mson::BaseType lhs, const mson::BaseType rhs)
     {
 
-        if (lhs == rhs || (lhs == mson::ImplicitObjectBaseType && rhs == mson::ObjectBaseType)
-            || (lhs == mson::ObjectBaseType && rhs == mson::ImplicitObjectBaseType)
-            || (lhs == mson::ImplicitValueBaseType && rhs == mson::ValueBaseType)
-            || (lhs == mson::ValueBaseType && rhs == mson::ImplicitValueBaseType)
-            || (lhs == mson::ImplicitPrimitiveBaseType && rhs == mson::PrimitiveBaseType)
-            || (lhs == mson::PrimitiveBaseType && rhs == mson::ImplicitPrimitiveBaseType)) {
+        if (lhs == rhs || (lhs == mson::ImplicitObjectBaseType
+                              && rhs == mson::ObjectBaseType)
+            || (lhs == mson::ObjectBaseType
+                   && rhs == mson::ImplicitObjectBaseType)
+            || (lhs == mson::ImplicitValueBaseType
+                   && rhs == mson::ValueBaseType)
+            || (lhs == mson::ValueBaseType
+                   && rhs == mson::ImplicitValueBaseType)
+            || (lhs == mson::ImplicitPrimitiveBaseType
+                   && rhs == mson::PrimitiveBaseType)
+            || (lhs == mson::PrimitiveBaseType
+                   && rhs == mson::ImplicitPrimitiveBaseType)) {
 
             return true;
         }

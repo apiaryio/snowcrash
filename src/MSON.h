@@ -57,7 +57,8 @@ namespace mson
     typedef std::map<Literal, BaseType> NamedTypeBaseTable;
 
     /** Named Types inheritance table */
-    typedef std::map<Literal, std::pair<Literal, mdp::BytesRangeSet> > NamedTypeInheritanceTable;
+    typedef std::map<Literal, std::pair<Literal, mdp::BytesRangeSet> >
+        NamedTypeInheritanceTable;
 
     /** Named Types dependency table */
     typedef std::map<Literal, std::set<Literal> > NamedTypeDependencyTable;
@@ -143,7 +144,8 @@ namespace mson
         SampleTypeAttribute = (1 << 3),   // The type is a sample
         DefaultTypeAttribute = (1 << 4),  // The type is default
         NullableTypeAttribute = (1 << 5), // The type is nullable
-        FixedTypeTypeAttribute = (1 << 6) // This type works like fixed, but it is unheritable
+        FixedTypeTypeAttribute
+        = (1 << 6) // This type works like fixed, but it is unheritable
     };
 
     /** List of type attributes */
@@ -234,7 +236,8 @@ namespace mson
             const Elements& elements() const;
 
             /** Constructor */
-            Content(const Markdown& description_ = Markdown(), const Literal& value_ = Literal());
+            Content(const Markdown& description_ = Markdown(),
+                const Literal& value_ = Literal());
 
             /** Copy constructor */
             Content(const TypeSection::Content& rhs);
@@ -250,7 +253,8 @@ namespace mson
         };
 
         /** Constructor */
-        TypeSection(const TypeSection::Class& klass_ = TypeSection::UndefinedClass)
+        TypeSection(
+            const TypeSection::Class& klass_ = TypeSection::UndefinedClass)
             : baseType(UndefinedBaseType), klass(klass_)
         {
         }

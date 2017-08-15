@@ -24,17 +24,20 @@ namespace snowcrash
      * MSON Mixin Section Processor
      */
     template <>
-    struct SectionProcessor<mson::Mixin> : public SignatureSectionProcessorBase<mson::Mixin> {
+    struct SectionProcessor<mson::Mixin>
+        : public SignatureSectionProcessorBase<mson::Mixin> {
 
         static SignatureTraits signatureTraits()
         {
 
-            SignatureTraits signatureTraits(SignatureTraits::IdentifierTrait | SignatureTraits::AttributesTrait);
+            SignatureTraits signatureTraits(SignatureTraits::IdentifierTrait
+                | SignatureTraits::AttributesTrait);
 
             return signatureTraits;
         }
 
-        static MarkdownNodeIterator finalizeSignature(const MarkdownNodeIterator& node,
+        static MarkdownNodeIterator finalizeSignature(
+            const MarkdownNodeIterator& node,
             SectionParserData& pd,
             const Signature& signature,
             const ParseResultRef<mson::Mixin>& out)
@@ -43,26 +46,34 @@ namespace snowcrash
             CaptureGroups captureGroups;
             std::vector<mdp::ByteBuffer> attributes = signature.attributes;
 
-            if (RegexCapture(signature.identifier, MSONMixinRegex, captureGroups, 2) && !captureGroups[1].empty()) {
+            if (RegexCapture(
+                    signature.identifier, MSONMixinRegex, captureGroups, 2)
+                && !captureGroups[1].empty()) {
 
                 // Get the type name and insert it into attributes
-                std::string typeName = signature.identifier.substr(captureGroups[1].length());
+                std::string typeName
+                    = signature.identifier.substr(captureGroups[1].length());
                 attributes.insert(attributes.begin(), typeName);
             }
 
-            mson::parseTypeDefinition(node, pd, attributes, out.report, out.node);
+            mson::parseTypeDefinition(
+                node, pd, attributes, out.report, out.node);
 
             if (pd.exportSourceMap()) {
                 out.sourceMap.sourceMap = node->sourceMap;
             }
 
-            if ((out.node.baseType == mson::PrimitiveBaseType) || (out.node.baseType == mson::UndefinedBaseType)) {
+            if ((out.node.baseType == mson::PrimitiveBaseType)
+                || (out.node.baseType == mson::UndefinedBaseType)) {
 
                 // WARN: invalid mixin base type
                 mdp::CharactersRangeSet sourceMap
-                    = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                out.report.warnings.push_back(
-                    Warning("mixin type may not include a type of a primitive sub-type", FormattingWarning, sourceMap));
+                    = mdp::BytesRangeSetToCharactersRangeSet(
+                        node->sourceMap, pd.sourceCharacterIndex);
+                out.report.warnings.push_back(Warning(
+                    "mixin type may not include a type of a primitive sub-type",
+                    FormattingWarning,
+                    sourceMap));
             }
 
             // Check circular references
@@ -70,8 +81,12 @@ namespace snowcrash
                 && !out.node.typeSpecification.name.symbol.literal.empty()
                 && !out.node.typeSpecification.name.symbol.variable) {
 
-                mson::addDependency(
-                    node, pd, out.node.typeSpecification.name.symbol.literal, pd.namedTypeContext, out.report, true);
+                mson::addDependency(node,
+                    pd,
+                    out.node.typeSpecification.name.symbol.literal,
+                    pd.namedTypeContext,
+                    out.report,
+                    true);
             }
 
             return ++MarkdownNodeIterator(node);
@@ -82,7 +97,8 @@ namespace snowcrash
         static SectionType sectionType(const MarkdownNodeIterator& node)
         {
 
-            if (node->type == mdp::ListItemMarkdownNodeType && !node->children().empty()) {
+            if (node->type == mdp::ListItemMarkdownNodeType
+                && !node->children().empty()) {
 
                 mdp::ByteBuffer subject = node->children().front().text;
 

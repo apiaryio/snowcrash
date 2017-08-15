@@ -17,17 +17,20 @@ namespace snowcrash
 {
 
     /** Data structure group matching regex */
-    const char* const DataStructureGroupRegex = "^[[:blank:]]*[Dd]ata[[:blank:]]+[Ss]tructures?[[:blank:]]*$";
+    const char* const DataStructureGroupRegex
+        = "^[[:blank:]]*[Dd]ata[[:blank:]]+[Ss]tructures?[[:blank:]]*$";
 
     /**
      * Data structure group section processor
      */
     template <>
-    struct SectionProcessor<DataStructureGroup> : public SectionProcessorBase<DataStructureGroup> {
+    struct SectionProcessor<DataStructureGroup>
+        : public SectionProcessorBase<DataStructureGroup> {
 
         NO_SECTION_DESCRIPTION(DataStructureGroup)
 
-        static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
+        static MarkdownNodeIterator processNestedSection(
+            const MarkdownNodeIterator& node,
             const MarkdownNodes& siblings,
             SectionParserData& pd,
             const ParseResultRef<DataStructureGroup>& out)
@@ -40,15 +43,20 @@ namespace snowcrash
                 IntermediateParseResult<mson::NamedType> namedType(out.report);
                 cur = MSONNamedTypeParser::parse(node, siblings, pd, namedType);
 
-                if (isNamedTypeDuplicate(pd.blueprint, namedType.node.name.symbol.literal)) {
+                if (isNamedTypeDuplicate(
+                        pd.blueprint, namedType.node.name.symbol.literal)) {
 
                     // WARN: duplicate named type
                     std::stringstream ss;
-                    ss << "named type with name '" << namedType.node.name.symbol.literal << "' already exists";
+                    ss << "named type with name '"
+                       << namedType.node.name.symbol.literal
+                       << "' already exists";
 
                     mdp::CharactersRangeSet sourceMap
-                        = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                    out.report.warnings.push_back(Warning(ss.str(), DuplicateWarning, sourceMap));
+                        = mdp::BytesRangeSetToCharactersRangeSet(
+                            node->sourceMap, pd.sourceCharacterIndex);
+                    out.report.warnings.push_back(
+                        Warning(ss.str(), DuplicateWarning, sourceMap));
                     return cur;
                 }
 
@@ -61,19 +69,24 @@ namespace snowcrash
 
                     SourceMap<Element> elementSM(Element::DataStructureElement);
 
-                    elementSM.content.dataStructure.name = namedType.sourceMap.name;
-                    elementSM.content.dataStructure.typeDefinition = namedType.sourceMap.typeDefinition;
-                    elementSM.content.dataStructure.sections = namedType.sourceMap.sections;
+                    elementSM.content.dataStructure.name
+                        = namedType.sourceMap.name;
+                    elementSM.content.dataStructure.typeDefinition
+                        = namedType.sourceMap.typeDefinition;
+                    elementSM.content.dataStructure.sections
+                        = namedType.sourceMap.sections;
 
-                    out.sourceMap.content.elements().collection.push_back(elementSM);
+                    out.sourceMap.content.elements().collection.push_back(
+                        elementSM);
                 }
             }
 
             return cur;
         }
 
-        static void finalize(
-            const MarkdownNodeIterator& node, SectionParserData& pd, const ParseResultRef<DataStructureGroup>& out)
+        static void finalize(const MarkdownNodeIterator& node,
+            SectionParserData& pd,
+            const ParseResultRef<DataStructureGroup>& out)
         {
 
             out.node.element = Element::CategoryElement;
@@ -89,7 +102,8 @@ namespace snowcrash
         static SectionType sectionType(const MarkdownNodeIterator& node)
         {
 
-            if (node->type == mdp::HeaderMarkdownNodeType && !node->text.empty()) {
+            if (node->type == mdp::HeaderMarkdownNodeType
+                && !node->text.empty()) {
 
                 mdp::ByteBuffer remaining, subject = node->text;
 
@@ -112,7 +126,9 @@ namespace snowcrash
 
         static SectionTypes upperSectionTypes()
         {
-            return { DataStructureGroupSectionType, ResourceGroupSectionType, ResourceSectionType };
+            return { DataStructureGroupSectionType,
+                ResourceGroupSectionType,
+                ResourceSectionType };
         }
 
         /**
@@ -121,27 +137,33 @@ namespace snowcrash
          * \param blueprint The blueprint which is formed until now
          * \param name The named type name to be checked
          */
-        static bool isNamedTypeDuplicate(const Blueprint& blueprint, mdp::ByteBuffer& name)
+        static bool isNamedTypeDuplicate(
+            const Blueprint& blueprint, mdp::ByteBuffer& name)
         {
 
-            for (Elements::const_iterator it = blueprint.content.elements().begin();
+            for (Elements::const_iterator it
+                 = blueprint.content.elements().begin();
                  it != blueprint.content.elements().end();
                  ++it) {
 
                 if (it->element == Element::CategoryElement) {
 
-                    for (Elements::const_iterator subIt = it->content.elements().begin();
+                    for (Elements::const_iterator subIt
+                         = it->content.elements().begin();
                          subIt != it->content.elements().end();
                          ++subIt) {
 
                         if (subIt->element == Element::ResourceElement
-                            && subIt->content.resource.attributes.name.symbol.literal == name) {
+                            && subIt->content.resource.attributes.name.symbol
+                                    .literal
+                                == name) {
 
                             return true;
                         }
 
                         if (subIt->element == Element::DataStructureElement
-                            && subIt->content.dataStructure.name.symbol.literal == name) {
+                            && subIt->content.dataStructure.name.symbol.literal
+                                == name) {
 
                             return true;
                         }
@@ -154,7 +176,8 @@ namespace snowcrash
     };
 
     /** Data Structures Parser */
-    typedef SectionParser<DataStructureGroup, HeaderSectionAdapter> DataStructureGroupParser;
+    typedef SectionParser<DataStructureGroup, HeaderSectionAdapter>
+        DataStructureGroupParser;
 }
 
 #endif

@@ -27,7 +27,8 @@ namespace snowcrash
     // Check a character not to be an space of any kind
     inline bool isSpace(const std::string::value_type i)
     {
-        if (i == ' ' || i == '\t' || i == '\n' || i == '\v' || i == '\f' || i == '\r')
+        if (i == ' ' || i == '\t' || i == '\n' || i == '\v' || i == '\f'
+            || i == '\r')
             return true;
         return false;
     }
@@ -35,14 +36,18 @@ namespace snowcrash
     // Trim string from start
     inline std::string& TrimStringStart(std::string& s)
     {
-        s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::not1(std::ptr_fun(isSpace))));
+        s.erase(s.begin(),
+            std::find_if(s.begin(), s.end(), std::not1(std::ptr_fun(isSpace))));
         return s;
     }
 
     // Trim string from end
     inline std::string& TrimStringEnd(std::string& s)
     {
-        s.erase(std::find_if(s.rbegin(), s.rend(), std::not1(std::ptr_fun(isSpace))).base(), s.end());
+        s.erase(
+            std::find_if(s.rbegin(), s.rend(), std::not1(std::ptr_fun(isSpace)))
+                .base(),
+            s.end());
         return s;
     }
 
@@ -53,24 +58,29 @@ namespace snowcrash
     }
 
     // <position form begin, lenght of string>
-    typedef std::tuple<std::string::const_iterator::difference_type, std::string::const_iterator::difference_type>
+    typedef std::tuple<std::string::const_iterator::difference_type,
+        std::string::const_iterator::difference_type>
         TrimRange;
 
     // Get Trim Info
-    inline TrimRange GetTrimInfo(std::string::const_iterator begin, std::string::const_iterator end)
+    inline TrimRange GetTrimInfo(
+        std::string::const_iterator begin, std::string::const_iterator end)
     {
         std::string::const_reverse_iterator rbegin(end);
         std::string::const_reverse_iterator rend(begin);
 
-        std::string::const_iterator trim = std::find_if(begin, end, std::not1(std::ptr_fun(isSpace)));
-        std::string::const_reverse_iterator rtrim = std::find_if(rbegin, rend, std::not1(std::ptr_fun(isSpace)));
+        std::string::const_iterator trim
+            = std::find_if(begin, end, std::not1(std::ptr_fun(isSpace)));
+        std::string::const_reverse_iterator rtrim
+            = std::find_if(rbegin, rend, std::not1(std::ptr_fun(isSpace)));
 
-        return std::make_tuple(
-            std::distance(begin, trim), std::distance(rtrim, std::string::const_reverse_iterator(trim)));
+        return std::make_tuple(std::distance(begin, trim),
+            std::distance(rtrim, std::string::const_reverse_iterator(trim)));
     }
 
     // Split string by delim
-    inline std::vector<std::string>& Split(const std::string& s, char delim, std::vector<std::string>& elems)
+    inline std::vector<std::string>& Split(
+        const std::string& s, char delim, std::vector<std::string>& elems)
     {
         std::stringstream ss(s);
         std::string item;
@@ -89,7 +99,8 @@ namespace snowcrash
     }
 
     // Split string on the first occurrence of delim
-    inline std::vector<std::string> SplitOnFirst(const std::string& s, char delim)
+    inline std::vector<std::string> SplitOnFirst(
+        const std::string& s, char delim)
     {
         std::string::size_type pos = s.find(delim);
         std::vector<std::string> elems;
@@ -124,7 +135,9 @@ namespace snowcrash
      *  \param  replace A string to replace with.
      *  \return A copy of %s with all occurrences of %find replaced by %replace.
      */
-    inline std::string ReplaceString(const std::string& s, const std::string& find, const std::string& replace)
+    inline std::string ReplaceString(const std::string& s,
+        const std::string& find,
+        const std::string& replace)
     {
         size_t pos = 0;
         std::string target(s);
@@ -193,7 +206,8 @@ namespace snowcrash
      */
 
     template <typename T1, typename T2, typename Predicate>
-    inline bool MatchContainers(const T1& arg1, const T2& arg2, const Predicate& predicate)
+    inline bool MatchContainers(
+        const T1& arg1, const T2& arg2, const Predicate& predicate)
     {
         if (arg1.length() != arg2.length()) {
             return false;
@@ -218,20 +232,26 @@ namespace snowcrash
     };
 
     /**
-     * \brief Retrieve the string enclosed by the given matching escaping characters
+     * \brief Retrieve the string enclosed by the given matching escaping
+     * characters
      *
-     *        Please note that the subject will be stripped of the escaped string
+     *        Please note that the subject will be stripped of the escaped
+     * string
      *        and the characters before it
      *
      * \param subject String that needs to be parsed
      * \param begin Character representing the beginning of the escaped string
-     * \param stripEscapeChars If true, strip the escape characters from the result string
+     * \param stripEscapeChars If true, strip the escape characters from the
+     * result string
      *
      * \return Returns the escaped string
      *
-     * \example (begin = 1, subject = "a```b```cd") ----> (return = "```b```", subject = "cd")
+     * \example (begin = 1, subject = "a```b```cd") ----> (return = "```b```",
+     * subject = "cd")
      */
-    inline std::string RetrieveEscaped(std::string& subject, size_t begin = 0, const bool stripEscapeChars = false)
+    inline std::string RetrieveEscaped(std::string& subject,
+        size_t begin = 0,
+        const bool stripEscapeChars = false)
     {
 
         size_t levels = 0;
@@ -265,7 +285,8 @@ namespace snowcrash
     /**
      * \brief Strip the enclosing backticks and return the string in the middle.
      *
-     *        If there are no matching enclosing bacticks, return the whole string.
+     *        If there are no matching enclosing bacticks, return the whole
+     * string.
      *
      * \param subject String that needs to be stripped of enclosing backticks
      *
@@ -292,7 +313,8 @@ namespace snowcrash
     }
 
     /**
-     * \brief If the given string is a markdown link, return the string which is being linked
+     * \brief If the given string is a markdown link, return the string which is
+     * being linked
      *
      *        If there is no link, return the whole string
      *
@@ -308,7 +330,8 @@ namespace snowcrash
             return subject;
         }
 
-        std::string linkedString = RegexCaptureFirst(subject, mdp::MarkdownLinkRegex);
+        std::string linkedString
+            = RegexCaptureFirst(subject, mdp::MarkdownLinkRegex);
         TrimString(linkedString);
 
         return linkedString;
@@ -320,7 +343,8 @@ namespace snowcrash
 
         // we are not able to reconstruct correctly headers
         // there is missing info about spacing on both sides
-        // node.sourceMap - contain length, but we dont now count of space on both sides
+        // node.sourceMap - contain length, but we dont now count of space on
+        // both sides
         // it we are not able to distinguis between "a  ", " a " and "  a".
         //
         // Solution - we strictly strip whitespace

@@ -306,11 +306,13 @@ TEST_CASE("Parse typed type attribute", "[mson][utility]")
     REQUIRE((typeAttributes & SampleTypeAttribute) == 0);
     REQUIRE((typeAttributes & DefaultTypeAttribute) == 0);
     REQUIRE((typeAttributes & NullableTypeAttribute) == 0);
-    REQUIRE((typeAttributes & FixedTypeTypeAttribute) == FixedTypeTypeAttribute);
+    REQUIRE(
+        (typeAttributes & FixedTypeTypeAttribute) == FixedTypeTypeAttribute);
     REQUIRE(isAttributeParsed);
 }
 
-TEST_CASE("Parse required type attribute enclosed in backticks", "[mson][utility]")
+TEST_CASE(
+    "Parse required type attribute enclosed in backticks", "[mson][utility]")
 {
     std::string source = "`required`";
     TypeAttributes typeAttributes = 0;
@@ -422,7 +424,11 @@ TEST_CASE("Parse canonical type definition", "[mson][utility]")
     markdownParser.parse(source, markdownAST);
     snowcrash::SectionParserData pd(0, source, blueprint);
 
-    parseTypeDefinition(markdownAST.children().begin(), pd, attributes, typeDefinition.report, typeDefinition.node);
+    parseTypeDefinition(markdownAST.children().begin(),
+        pd,
+        attributes,
+        typeDefinition.report,
+        typeDefinition.node);
 
     REQUIRE(typeDefinition.report.error.code == snowcrash::Error::OK);
     REQUIRE(typeDefinition.report.warnings.empty());
@@ -433,7 +439,8 @@ TEST_CASE("Parse canonical type definition", "[mson][utility]")
     REQUIRE(typeDefinition.node.attributes == RequiredTypeAttribute);
 }
 
-TEST_CASE("Parse type definition with non recognized type attribute", "[mson][utility]")
+TEST_CASE("Parse type definition with non recognized type attribute",
+    "[mson][utility]")
 {
     std::vector<std::string> attributes;
     snowcrash::ParseResult<TypeDefinition> typeDefinition;
@@ -451,19 +458,27 @@ TEST_CASE("Parse type definition with non recognized type attribute", "[mson][ut
 
     pd.namedTypeBaseTable["Person"] = mson::ObjectBaseType;
 
-    parseTypeDefinition(markdownAST.children().begin(), pd, attributes, typeDefinition.report, typeDefinition.node);
+    parseTypeDefinition(markdownAST.children().begin(),
+        pd,
+        attributes,
+        typeDefinition.report,
+        typeDefinition.node);
 
     REQUIRE(typeDefinition.report.error.code == snowcrash::Error::OK);
     REQUIRE(typeDefinition.report.warnings.size() == 1);
 
-    REQUIRE(typeDefinition.node.typeSpecification.name.base == UndefinedTypeName);
-    REQUIRE(typeDefinition.node.typeSpecification.name.symbol.literal == "Person");
-    REQUIRE(typeDefinition.node.typeSpecification.name.symbol.variable == false);
+    REQUIRE(
+        typeDefinition.node.typeSpecification.name.base == UndefinedTypeName);
+    REQUIRE(
+        typeDefinition.node.typeSpecification.name.symbol.literal == "Person");
+    REQUIRE(
+        typeDefinition.node.typeSpecification.name.symbol.variable == false);
     REQUIRE(typeDefinition.node.typeSpecification.nestedTypes.empty());
     REQUIRE(typeDefinition.node.attributes == 0);
 }
 
-TEST_CASE("Parse type definition when non-structure type has nested types", "[mson][utility]")
+TEST_CASE("Parse type definition when non-structure type has nested types",
+    "[mson][utility]")
 {
     std::vector<std::string> attributes;
     snowcrash::ParseResult<TypeDefinition> typeDefinition;
@@ -480,15 +495,23 @@ TEST_CASE("Parse type definition when non-structure type has nested types", "[ms
 
     pd.namedTypeBaseTable["Person"] = mson::ObjectBaseType;
 
-    parseTypeDefinition(markdownAST.children().begin(), pd, attributes, typeDefinition.report, typeDefinition.node);
+    parseTypeDefinition(markdownAST.children().begin(),
+        pd,
+        attributes,
+        typeDefinition.report,
+        typeDefinition.node);
 
     REQUIRE(typeDefinition.report.error.code == snowcrash::Error::OK);
     REQUIRE(typeDefinition.report.warnings.size() == 1);
-    REQUIRE(typeDefinition.report.warnings[0].code == snowcrash::LogicalErrorWarning);
+    REQUIRE(typeDefinition.report.warnings[0].code
+        == snowcrash::LogicalErrorWarning);
 
-    REQUIRE(typeDefinition.node.typeSpecification.name.base == UndefinedTypeName);
-    REQUIRE(typeDefinition.node.typeSpecification.name.symbol.literal == "Person");
-    REQUIRE(typeDefinition.node.typeSpecification.name.symbol.variable == false);
+    REQUIRE(
+        typeDefinition.node.typeSpecification.name.base == UndefinedTypeName);
+    REQUIRE(
+        typeDefinition.node.typeSpecification.name.symbol.literal == "Person");
+    REQUIRE(
+        typeDefinition.node.typeSpecification.name.symbol.variable == false);
     REQUIRE(typeDefinition.node.typeSpecification.nestedTypes.size() == 2);
     REQUIRE(typeDefinition.node.attributes == 0);
 }
@@ -586,7 +609,11 @@ TEST_CASE("Parse canonical property name", "[mson][utility]")
     markdownParser.parse(source, markdownAST);
     snowcrash::SectionParserData pd(0, source, blueprint);
 
-    parsePropertyName(markdownAST.children().begin(), pd, id, propertyName.report, propertyName.node);
+    parsePropertyName(markdownAST.children().begin(),
+        pd,
+        id,
+        propertyName.report,
+        propertyName.node);
 
     REQUIRE(propertyName.report.error.code == snowcrash::Error::OK);
     REQUIRE(propertyName.report.warnings.empty());
@@ -608,9 +635,14 @@ TEST_CASE("Parse variable property name", "[mson][utility]")
     markdownParser.parse(source, markdownAST);
     snowcrash::SectionParserData pd(0, source, blueprint);
 
-    parsePropertyName(markdownAST.children().begin(), pd, id, propertyName.report, propertyName.node);
+    parsePropertyName(markdownAST.children().begin(),
+        pd,
+        id,
+        propertyName.report,
+        propertyName.node);
 
-    REQUIRE(propertyName.report.error.code == snowcrash::MSONError); // Unknown named type
+    REQUIRE(propertyName.report.error.code
+        == snowcrash::MSONError); // Unknown named type
     REQUIRE(propertyName.report.warnings.empty());
 
     REQUIRE(propertyName.node.literal.empty());
@@ -618,9 +650,15 @@ TEST_CASE("Parse variable property name", "[mson][utility]")
     REQUIRE(propertyName.node.variable.values[0].literal == "rel");
     REQUIRE(propertyName.node.variable.values[0].variable == false);
     REQUIRE(propertyName.node.variable.typeDefinition.attributes == 0);
-    REQUIRE(propertyName.node.variable.typeDefinition.typeSpecification.name.base == UndefinedTypeName);
-    REQUIRE(propertyName.node.variable.typeDefinition.typeSpecification.name.symbol.literal == "Custom String");
-    REQUIRE(propertyName.node.variable.typeDefinition.typeSpecification.name.symbol.variable == false);
+    REQUIRE(
+        propertyName.node.variable.typeDefinition.typeSpecification.name.base
+        == UndefinedTypeName);
+    REQUIRE(propertyName.node.variable.typeDefinition.typeSpecification.name
+                .symbol.literal
+        == "Custom String");
+    REQUIRE(propertyName.node.variable.typeDefinition.typeSpecification.name
+                .symbol.variable
+        == false);
 }
 
 TEST_CASE("Parse multi-value variable property name", "[mson][utility]")
@@ -638,7 +676,11 @@ TEST_CASE("Parse multi-value variable property name", "[mson][utility]")
 
     pd.namedTypeBaseTable["Custom"] = mson::ValueBaseType;
 
-    parsePropertyName(markdownAST.children().begin(), pd, id, propertyName.report, propertyName.node);
+    parsePropertyName(markdownAST.children().begin(),
+        pd,
+        id,
+        propertyName.report,
+        propertyName.node);
 
     REQUIRE(propertyName.report.error.code == snowcrash::Error::OK);
     REQUIRE(propertyName.report.warnings.empty());
@@ -648,7 +690,13 @@ TEST_CASE("Parse multi-value variable property name", "[mson][utility]")
     REQUIRE(propertyName.node.variable.values[0].literal == "1, 2");
     REQUIRE(propertyName.node.variable.values[0].variable == false);
     REQUIRE(propertyName.node.variable.typeDefinition.attributes == 0);
-    REQUIRE(propertyName.node.variable.typeDefinition.typeSpecification.name.base == UndefinedTypeName);
-    REQUIRE(propertyName.node.variable.typeDefinition.typeSpecification.name.symbol.literal == "Custom");
-    REQUIRE(propertyName.node.variable.typeDefinition.typeSpecification.name.symbol.variable == false);
+    REQUIRE(
+        propertyName.node.variable.typeDefinition.typeSpecification.name.base
+        == UndefinedTypeName);
+    REQUIRE(propertyName.node.variable.typeDefinition.typeSpecification.name
+                .symbol.literal
+        == "Custom");
+    REQUIRE(propertyName.node.variable.typeDefinition.typeSpecification.name
+                .symbol.variable
+        == false);
 }

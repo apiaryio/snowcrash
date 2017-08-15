@@ -39,7 +39,8 @@ SourceMap<Element>::Content::Content(const SourceMap<Element>::Content& rhs)
     m_elements.reset(::new SourceMap<Elements>(*rhs.m_elements.get()));
 }
 
-SourceMap<Element>::Content& SourceMap<Element>::Content::operator=(const SourceMap<Element>::Content& rhs)
+SourceMap<Element>::Content& SourceMap<Element>::Content::operator=(
+    const SourceMap<Element>::Content& rhs)
 {
     this->copy = rhs.copy;
     this->resource = rhs.resource;
@@ -53,7 +54,8 @@ SourceMap<Element>::Content::~Content()
 {
 }
 
-SourceMap<Element>::SourceMap(const Element::Class& element_) : element(element_)
+SourceMap<Element>::SourceMap(const Element::Class& element_)
+    : element(element_)
 {
 }
 

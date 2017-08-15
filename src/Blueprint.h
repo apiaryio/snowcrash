@@ -478,7 +478,8 @@ namespace snowcrash
     /**
      *  \brief API Blueprint AST
      *
-     *  This is top-level (or root if you prefer) of API Blueprint abstract syntax tree.
+     *  This is top-level (or root if you prefer) of API Blueprint abstract
+     * syntax tree.
      *  Start reading a parsed API here.
      */
     struct Blueprint : public Element {

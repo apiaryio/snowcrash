@@ -20,12 +20,14 @@
 
 using namespace snowcrash;
 
-#define TYPECHECK(T)                                                                                                   \
-    if ((type = SectionProcessor<T>::sectionType(node)) != UndefinedSectionType) {                                     \
-        return type;                                                                                                   \
+#define TYPECHECK(T)                                                           \
+    if ((type = SectionProcessor<T>::sectionType(node))                        \
+        != UndefinedSectionType) {                                             \
+        return type;                                                           \
     }
 
-SectionType snowcrash::SectionKeywordSignature(const mdp::MarkdownNodeIterator& node)
+SectionType snowcrash::SectionKeywordSignature(
+    const mdp::MarkdownNodeIterator& node)
 {
     // Note: Every-keyword defined section should be listed here...
     SectionType type = UndefinedSectionType;
@@ -44,7 +46,8 @@ SectionType snowcrash::SectionKeywordSignature(const mdp::MarkdownNodeIterator& 
     /*
      *  NOTE: Order is important. Resource MUST preceed the Action.
      *
-     *  This is because an HTTP Request Method + URI is recognized as both %ActionSectionType and %ResourceSectionType.
+     *  This is because an HTTP Request Method + URI is recognized as both
+     * %ActionSectionType and %ResourceSectionType.
      *  This is not optimal and should be addressed in the future.
      */
     TYPECHECK(Resource)
@@ -55,7 +58,8 @@ SectionType snowcrash::SectionKeywordSignature(const mdp::MarkdownNodeIterator& 
     return type;
 }
 
-SectionType snowcrash::RecognizeCodeBlockFirstLine(const mdp::ByteBuffer& subject)
+SectionType snowcrash::RecognizeCodeBlockFirstLine(
+    const mdp::ByteBuffer& subject)
 {
     SectionType type = UndefinedSectionType;
 

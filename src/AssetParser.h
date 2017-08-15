@@ -38,7 +38,8 @@ namespace snowcrash
     template <>
     struct SectionProcessor<Asset> : public SectionProcessorBase<Asset> {
 
-        static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
+        static MarkdownNodeIterator processSignature(
+            const MarkdownNodeIterator& node,
             const MarkdownNodes& siblings,
             SectionParserData& pd,
             SectionLayout& layout,
@@ -46,7 +47,8 @@ namespace snowcrash
         {
 
             out.node = "";
-            CodeBlockUtility::signatureContentAsCodeBlock(node, pd, out.report, out.node);
+            CodeBlockUtility::signatureContentAsCodeBlock(
+                node, pd, out.report, out.node);
 
             if (pd.exportSourceMap() && !out.node.empty()) {
                 out.sourceMap.sourceMap.append(node->sourceMap);
@@ -57,7 +59,8 @@ namespace snowcrash
 
         NO_SECTION_DESCRIPTION(Asset)
 
-        static MarkdownNodeIterator processContent(const MarkdownNodeIterator& node,
+        static MarkdownNodeIterator processContent(
+            const MarkdownNodeIterator& node,
             const MarkdownNodes& siblings,
             SectionParserData& pd,
             const ParseResultRef<Asset>& out)
@@ -75,7 +78,8 @@ namespace snowcrash
             return ++MarkdownNodeIterator(node);
         }
 
-        static bool isContentNode(const MarkdownNodeIterator& node, SectionType sectionType)
+        static bool isContentNode(
+            const MarkdownNodeIterator& node, SectionType sectionType)
         {
 
             return (SectionKeywordSignature(node) == UndefinedSectionType);
@@ -83,7 +87,8 @@ namespace snowcrash
 
         static SectionType sectionType(const MarkdownNodeIterator& node)
         {
-            if (node->type == mdp::ListItemMarkdownNodeType && !node->children().empty()) {
+            if (node->type == mdp::ListItemMarkdownNodeType
+                && !node->children().empty()) {
 
                 AssetSignature signature = assetSignature(node);
 

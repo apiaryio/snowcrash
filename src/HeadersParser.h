@@ -42,13 +42,15 @@ namespace snowcrash
         virtual bool operator()() const = 0;
     };
 
-    /** Functor implementation for check header name is valid token according to specification \see
+    /** Functor implementation for check header name is valid token according to
+     * specification \see
      * http://tools.ietf.org/html/rfc7230#section-3.2.6 */
     struct HeaderNameTokenChecker : public ValidateFunctorBase {
 
         const std::string& headerName;
 
-        explicit HeaderNameTokenChecker(const std::string& headerName) : headerName(headerName)
+        explicit HeaderNameTokenChecker(const std::string& headerName)
+            : headerName(headerName)
         {
         }
 
@@ -56,12 +58,14 @@ namespace snowcrash
         virtual std::string getMessage() const;
     };
 
-    /** Functor implementation for check header contains colon character between name and value */
+    /** Functor implementation for check header contains colon character between
+     * name and value */
     struct ColonPresentedChecker : public ValidateFunctorBase {
 
         const CaptureGroups& captures;
 
-        explicit ColonPresentedChecker(const CaptureGroups& captures) : captures(captures)
+        explicit ColonPresentedChecker(const CaptureGroups& captures)
+            : captures(captures)
         {
         }
 
@@ -75,7 +79,8 @@ namespace snowcrash
         const Header& header;
         const Headers& headers;
 
-        explicit HeadersDuplicateChecker(const Header& header, const Headers& headers)
+        explicit HeadersDuplicateChecker(
+            const Header& header, const Headers& headers)
             : header(header), headers(headers)
         {
         }
@@ -89,7 +94,8 @@ namespace snowcrash
 
         const Header& header;
 
-        explicit HeaderValuePresentedChecker(const Header& header) : header(header)
+        explicit HeaderValuePresentedChecker(const Header& header)
+            : header(header)
         {
         }
 
@@ -97,13 +103,15 @@ namespace snowcrash
         virtual std::string getMessage() const;
     };
 
-    /** Functor receive and invoke individual Validators and conditionaly push reports  */
+    /** Functor receive and invoke individual Validators and conditionaly push
+     * reports  */
     struct HeaderParserValidator {
 
         const ParseResultRef<Headers>& out;
         mdp::CharactersRangeSet sourceMap;
 
-        HeaderParserValidator(const ParseResultRef<Headers>& out, mdp::CharactersRangeSet sourceMap)
+        HeaderParserValidator(const ParseResultRef<Headers>& out,
+            mdp::CharactersRangeSet sourceMap)
             : out(out), sourceMap(sourceMap)
         {
         }
@@ -117,7 +125,8 @@ namespace snowcrash
     template <>
     struct SectionProcessor<Headers> : public SectionProcessorBase<Headers> {
 
-        static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
+        static MarkdownNodeIterator processSignature(
+            const MarkdownNodeIterator& node,
             const MarkdownNodes& siblings,
             SectionParserData& pd,
             SectionLayout& layout,
@@ -125,7 +134,8 @@ namespace snowcrash
         {
 
             mdp::ByteBuffer content;
-            CodeBlockUtility::signatureContentAsCodeBlock(node, pd, out.report, content);
+            CodeBlockUtility::signatureContentAsCodeBlock(
+                node, pd, out.report, content);
 
             // drop first line (it contain " + Headers")
             // we need just "content"
@@ -139,7 +149,8 @@ namespace snowcrash
 
         NO_SECTION_DESCRIPTION(Headers)
 
-        static MarkdownNodeIterator processContent(const MarkdownNodeIterator& node,
+        static MarkdownNodeIterator processContent(
+            const MarkdownNodeIterator& node,
             const MarkdownNodes& siblings,
             SectionParserData& pd,
             const ParseResultRef<Headers>& out)
@@ -148,12 +159,14 @@ namespace snowcrash
             mdp::ByteBuffer content;
             CodeBlockUtility::contentAsCodeBlock(node, pd, out.report, content);
 
-            headersFromContent(node, node->sourceMap.begin(), node->sourceMap.end(), pd, out);
+            headersFromContent(
+                node, node->sourceMap.begin(), node->sourceMap.end(), pd, out);
 
             return ++MarkdownNodeIterator(node);
         }
 
-        static bool isContentNode(const MarkdownNodeIterator& node, SectionType sectionType)
+        static bool isContentNode(
+            const MarkdownNodeIterator& node, SectionType sectionType)
         {
 
             return (SectionKeywordSignature(node) == UndefinedSectionType);
@@ -162,7 +175,8 @@ namespace snowcrash
         static SectionType sectionType(const MarkdownNodeIterator& node)
         {
 
-            if (node->type == mdp::ListItemMarkdownNodeType && !node->children().empty()) {
+            if (node->type == mdp::ListItemMarkdownNodeType
+                && !node->children().empty()) {
 
                 mdp::ByteBuffer subject = node->children().front().text;
                 mdp::ByteBuffer signature;
@@ -178,16 +192,21 @@ namespace snowcrash
             return UndefinedSectionType;
         }
 
-        static void finalize(
-            const MarkdownNodeIterator& node, SectionParserData& pd, const ParseResultRef<Headers>& out)
+        static void finalize(const MarkdownNodeIterator& node,
+            SectionParserData& pd,
+            const ParseResultRef<Headers>& out)
         {
 
             if (out.node.empty()) {
 
                 // WARN: No valid headers defined
                 mdp::CharactersRangeSet sourceMap
-                    = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
-                out.report.warnings.push_back(Warning("no valid headers specified", FormattingWarning, sourceMap));
+                    = mdp::BytesRangeSetToCharactersRangeSet(
+                        node->sourceMap, pd.sourceCharacterIndex);
+                out.report.warnings.push_back(
+                    Warning("no valid headers specified",
+                        FormattingWarning,
+                        sourceMap));
             }
         }
 
@@ -199,7 +218,8 @@ namespace snowcrash
          *
          * \param line - contains individual line with header definition
          * \param header - is filled by name and value if definition is valid
-         * \param out - "report" member can receive warning while checking validity
+         * \param out - "report" member can receive warning while checking
+         * validity
          * \param sourceMap - just contain source mapping for warning report
          */
         static bool parseHeaderLine(const mdp::ByteBuffer& line,
@@ -215,10 +235,11 @@ namespace snowcrash
 
             if (!matched) {
                 // WARN: unable to parse header
-                out.report.warnings.push_back(Warning(
-                    "unable to parse HTTP header, expected '<header name> : <header value>', one header per line",
-                    FormattingWarning,
-                    sourceMap));
+                out.report.warnings.push_back(
+                    Warning("unable to parse HTTP header, expected '<header "
+                            "name> : <header value>', one header per line",
+                        FormattingWarning,
+                        sourceMap));
                 return false;
             }
 
@@ -238,14 +259,16 @@ namespace snowcrash
             return !header.first.empty();
         }
 
-        static bool fetchLine(const std::string& input, mdp::BytesRange& map, std::string& line)
+        static bool fetchLine(
+            const std::string& input, mdp::BytesRange& map, std::string& line)
         {
 
             if (input.length() < (map.location + map.length)) {
                 return false;
             }
 
-            TrimRange trim = GetTrimInfo(input.begin() + map.location, input.begin() + map.location + map.length);
+            TrimRange trim = GetTrimInfo(input.begin() + map.location,
+                input.begin() + map.location + map.length);
 
             map.length = std::get<1>(trim);
 
@@ -262,7 +285,8 @@ namespace snowcrash
 
         static bool isCodeFence(const std::string& line)
         {
-            return (!memcmp(line.c_str(), "```", 3) || !memcmp(line.c_str(), "~~~", 3));
+            return (!memcmp(line.c_str(), "```", 3)
+                || !memcmp(line.c_str(), "~~~", 3));
         }
 
         /** Retrieve headers from content */
@@ -297,7 +321,8 @@ namespace snowcrash
                 mdp::BytesRangeSet byteMap;
                 byteMap.push_back(map);
                 mdp::CharactersRangeSet sourceMap
-                    = mdp::BytesRangeSetToCharactersRangeSet(byteMap, pd.sourceCharacterIndex);
+                    = mdp::BytesRangeSetToCharactersRangeSet(
+                        byteMap, pd.sourceCharacterIndex);
 
                 if (parseHeaderLine(line, header, out, sourceMap)) {
                     out.node.push_back(header);
@@ -319,8 +344,10 @@ namespace snowcrash
             SourceMap<TransactionExamples>& examplesSM)
         {
 
-            Collection<TransactionExample>::iterator exampleIt = examples.begin();
-            Collection<SourceMap<TransactionExample> >::iterator exampleSourceMapIt;
+            Collection<TransactionExample>::iterator exampleIt
+                = examples.begin();
+            Collection<SourceMap<TransactionExample> >::iterator
+                exampleSourceMapIt;
 
             if (pd.exportSourceMap()) {
                 exampleSourceMapIt = examplesSM.collection.begin();
@@ -328,42 +355,52 @@ namespace snowcrash
 
             while (exampleIt != examples.end()) {
 
-                Collection<Request>::iterator requestIt = exampleIt->requests.begin();
+                Collection<Request>::iterator requestIt
+                    = exampleIt->requests.begin();
                 Collection<SourceMap<Request> >::iterator requestSourceMapIt;
 
                 if (pd.exportSourceMap()) {
-                    requestSourceMapIt = exampleSourceMapIt->requests.collection.begin();
+                    requestSourceMapIt
+                        = exampleSourceMapIt->requests.collection.begin();
                 }
 
                 // Requests
                 while (requestIt != exampleIt->requests.end()) {
 
-                    requestIt->headers.insert(requestIt->headers.begin(), headers.begin(), headers.end());
+                    requestIt->headers.insert(requestIt->headers.begin(),
+                        headers.begin(),
+                        headers.end());
                     ++requestIt;
 
                     if (pd.exportSourceMap()) {
-                        requestSourceMapIt->headers.collection.insert(requestSourceMapIt->headers.collection.begin(),
+                        requestSourceMapIt->headers.collection.insert(
+                            requestSourceMapIt->headers.collection.begin(),
                             headersSM.collection.begin(),
                             headersSM.collection.end());
                         ++requestSourceMapIt;
                     }
                 }
 
-                Collection<Response>::iterator responseIt = exampleIt->responses.begin();
+                Collection<Response>::iterator responseIt
+                    = exampleIt->responses.begin();
                 Collection<SourceMap<Response> >::iterator responseSourceMapIt;
 
                 if (pd.exportSourceMap()) {
-                    responseSourceMapIt = exampleSourceMapIt->responses.collection.begin();
+                    responseSourceMapIt
+                        = exampleSourceMapIt->responses.collection.begin();
                 }
 
                 // Responses
                 while (responseIt != exampleIt->responses.end()) {
 
-                    responseIt->headers.insert(responseIt->headers.begin(), headers.begin(), headers.end());
+                    responseIt->headers.insert(responseIt->headers.begin(),
+                        headers.begin(),
+                        headers.end());
                     ++responseIt;
 
                     if (pd.exportSourceMap()) {
-                        responseSourceMapIt->headers.collection.insert(responseSourceMapIt->headers.collection.begin(),
+                        responseSourceMapIt->headers.collection.insert(
+                            responseSourceMapIt->headers.collection.begin(),
                             headersSM.collection.begin(),
                             headersSM.collection.end());
                         ++responseSourceMapIt;

@@ -57,7 +57,8 @@ int gettimeofday(struct timeval* tv, struct timezone* tz)
     if (tz) {
         rez = GetTimeZoneInformation(&tz_winapi);
         tz->tz_dsttime = (rez == 2) ? true : false;
-        tz->tz_minuteswest = tz_winapi.Bias + ((rez == 2) ? tz_winapi.DaylightBias : 0);
+        tz->tz_minuteswest
+            = tz_winapi.Bias + ((rez == 2) ? tz_winapi.DaylightBias : 0);
     }
 
     return 0;
@@ -72,7 +73,8 @@ int gettimeofday(struct timeval* tv, struct timezone* tz)
  *  \param  stddev  Standard deviation.
  *  \return Result code of snowcrash::parse operation.
  */
-static int testfunc(const std::string& input, double& total, double& mean, double& stddev)
+static int testfunc(
+    const std::string& input, double& total, double& mean, double& stddev)
 {
     struct timeval stime, etime;
     double t = 0, sum = 0, sum2 = 0;
@@ -98,7 +100,8 @@ static int testfunc(const std::string& input, double& total, double& mean, doubl
         resultCode = blueprint.report.error.code;
 
         // Compute the time taken and add it to the sums.
-        t = (etime.tv_sec - stime.tv_sec) + (etime.tv_usec - stime.tv_usec) / 1000000.0;
+        t = (etime.tv_sec - stime.tv_sec)
+            + (etime.tv_usec - stime.tv_usec) / 1000000.0;
         sum += t;
         sum2 += t * t;
     }
@@ -112,8 +115,10 @@ static int testfunc(const std::string& input, double& total, double& mean, doubl
 
 void help()
 {
-    std::cout << "usage: perf-snowcrash [options] ... <input file>" << std::endl << std::endl;
-    std::cout << "API Blueprint Parser Performance Test Tool" << std::endl << std::endl;
+    std::cout << "usage: perf-snowcrash [options] ... <input file>" << std::endl
+              << std::endl;
+    std::cout << "API Blueprint Parser Performance Test Tool" << std::endl
+              << std::endl;
     std::cout << "options:" << std::endl << std::endl;
     std::cout << "  -h, --help    display this help message" << std::endl;
     exit(0);
@@ -143,7 +148,8 @@ int main(int argc, const char* argv[])
     std::string inputFileName = argv[1];
     inputFileStream.open(inputFileName.c_str());
     if (!inputFileStream.is_open()) {
-        std::cerr << "fatal: unable to open input file '" << inputFileName << "'\n";
+        std::cerr << "fatal: unable to open input file '" << inputFileName
+                  << "'\n";
         exit(EXIT_FAILURE);
     }
 
@@ -156,8 +162,10 @@ int main(int argc, const char* argv[])
     double mean = 0, total = 0, stddev = 0;
     int result = testfunc(inputStream.str(), total, mean, stddev);
 
-    std::cout << "parsing '" << inputFileName << "' " << TestRunCount << "-times (" << result << "):\n";
-    std::cout << "total: " << total << "s mean: " << mean << " +/- " << stddev << "s\n";
+    std::cout << "parsing '" << inputFileName << "' " << TestRunCount
+              << "-times (" << result << "):\n";
+    std::cout << "total: " << total << "s mean: " << mean << " +/- " << stddev
+              << "s\n";
 
     // FIXME: Intstrumetns helper
     //::sleep(20);

@@ -32,7 +32,7 @@ BraceWrapping:
   IndentBraces: false
 BreakBeforeTernaryOperators: false
 BreakConstructorInitializersBeforeComma: true
-ColumnLimit:     120
+ColumnLimit:     80
 CommentPragmas:  '^ IWYU pragma:'
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
 ConstructorInitializerIndentWidth: 4

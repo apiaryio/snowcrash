@@ -22,33 +22,39 @@ namespace snowcrash
      * MSON Parameter Section Processor
      */
     template <>
-    struct SectionProcessor<MSONParameter> : public SignatureSectionProcessorBase<MSONParameter> {
+    struct SectionProcessor<MSONParameter>
+        : public SignatureSectionProcessorBase<MSONParameter> {
 
         static SignatureTraits signatureTraits()
         {
 
-            SignatureTraits signatureTraits(SignatureTraits::IdentifierTrait | SignatureTraits::ValuesTrait
+            SignatureTraits signatureTraits(SignatureTraits::IdentifierTrait
+                | SignatureTraits::ValuesTrait
                 | SignatureTraits::AttributesTrait
                 | SignatureTraits::ContentTrait);
 
             return signatureTraits;
         }
 
-        static MarkdownNodeIterator finalizeSignature(const MarkdownNodeIterator& node,
+        static MarkdownNodeIterator finalizeSignature(
+            const MarkdownNodeIterator& node,
             SectionParserData& pd,
             const Signature& signature,
             const ParseResultRef<MSONParameter>& out)
         {
 
-            out.node.name = StripBackticks(const_cast<std::string&>(signature.identifier));
+            out.node.name = StripBackticks(
+                const_cast<std::string&>(signature.identifier));
             out.node.description = signature.content;
             out.node.exampleValue = signature.value;
 
             if (!signature.remainingContent.empty()) {
-                out.node.description += "\n" + signature.remainingContent + "\n";
+                out.node.description
+                    += "\n" + signature.remainingContent + "\n";
             }
 
-            SectionProcessor<Parameter>::parseAttributes(node, pd, signature.attributes, out, false);
+            SectionProcessor<Parameter>::parseAttributes(
+                node, pd, signature.attributes, out, false);
 
             if (pd.exportSourceMap()) {
                 if (!out.node.name.empty()) {
@@ -67,7 +73,8 @@ namespace snowcrash
             return ++MarkdownNodeIterator(node);
         }
 
-        static MarkdownNodeIterator processNestedSection(const MarkdownNodeIterator& node,
+        static MarkdownNodeIterator processNestedSection(
+            const MarkdownNodeIterator& node,
             const MarkdownNodes& siblings,
             SectionParserData& pd,
             const ParseResultRef<MSONParameter>& out)
@@ -80,21 +87,26 @@ namespace snowcrash
             switch (sectionType) {
                 case MSONSampleDefaultSectionType: {
                     typeSection.node.baseType = mson::ImplicitPrimitiveBaseType;
-                    cur = MSONTypeSectionListParser::parse(node, siblings, pd, typeSection);
+                    cur = MSONTypeSectionListParser::parse(
+                        node, siblings, pd, typeSection);
 
                     if (typeSection.node.content.value.empty()) {
                         break;
                     }
 
-                    if (typeSection.node.klass == mson::TypeSection::DefaultClass) {
+                    if (typeSection.node.klass
+                        == mson::TypeSection::DefaultClass) {
                         out.node.defaultValue = typeSection.node.content.value;
 
                         if (pd.exportSourceMap()) {
-                            out.sourceMap.defaultValue.sourceMap = typeSection.sourceMap.value.sourceMap;
+                            out.sourceMap.defaultValue.sourceMap
+                                = typeSection.sourceMap.value.sourceMap;
                         }
-                    } else if (typeSection.node.klass == mson::TypeSection::SampleClass) {
+                    } else if (typeSection.node.klass
+                        == mson::TypeSection::SampleClass) {
                         out.node.exampleValue = typeSection.node.content.value;
-                        out.sourceMap.exampleValue.sourceMap = typeSection.sourceMap.value.sourceMap;
+                        out.sourceMap.exampleValue.sourceMap
+                            = typeSection.sourceMap.value.sourceMap;
                     }
 
                     break;
@@ -102,7 +114,8 @@ namespace snowcrash
 
                 case MSONValueMembersSectionType: {
                     typeSection.node.baseType = mson::ImplicitValueBaseType;
-                    cur = MSONTypeSectionListParser::parse(node, siblings, pd, typeSection);
+                    cur = MSONTypeSectionListParser::parse(
+                        node, siblings, pd, typeSection);
 
                     out.node.values.clear();
 
@@ -110,22 +123,32 @@ namespace snowcrash
                         out.sourceMap.values.collection.clear();
                     }
 
-                    for (size_t i = 0; i < typeSection.node.content.elements().size(); i++) {
-                        mson::ValueMember valueMember = typeSection.node.content.elements().at(i).content.value;
+                    for (size_t i = 0;
+                         i < typeSection.node.content.elements().size();
+                         i++) {
+                        mson::ValueMember valueMember
+                            = typeSection.node.content.elements()
+                                  .at(i)
+                                  .content.value;
                         SourceMap<mson::ValueMember> valueMemberSM;
 
                         if (pd.exportSourceMap()) {
-                            valueMemberSM = typeSection.sourceMap.elements().collection.at(i).value;
+                            valueMemberSM = typeSection.sourceMap.elements()
+                                                .collection.at(i)
+                                                .value;
                         }
 
                         if (valueMember.valueDefinition.values.size() == 1) {
-                            out.node.values.push_back(valueMember.valueDefinition.values[0].literal);
+                            out.node.values.push_back(
+                                valueMember.valueDefinition.values[0].literal);
 
                             if (pd.exportSourceMap()) {
                                 SourceMap<Value> valueSM;
-                                valueSM.sourceMap = valueMemberSM.valueDefinition.sourceMap;
+                                valueSM.sourceMap
+                                    = valueMemberSM.valueDefinition.sourceMap;
 
-                                out.sourceMap.values.collection.push_back(valueSM);
+                                out.sourceMap.values.collection.push_back(
+                                    valueSM);
                             }
                         }
                     }
@@ -140,12 +163,15 @@ namespace snowcrash
             return cur;
         }
 
-        static void finalize(
-            const MarkdownNodeIterator& node, SectionParserData& pd, const ParseResultRef<MSONParameter>& out)
+        static void finalize(const MarkdownNodeIterator& node,
+            SectionParserData& pd,
+            const ParseResultRef<MSONParameter>& out)
         {
 
-            SectionProcessor<Parameter>::checkDefaultAndRequiredClash<MSONParameter>(node, pd, out);
-            SectionProcessor<Parameter>::checkExampleAndDefaultValue<MSONParameter>(node, pd, out);
+            SectionProcessor<Parameter>::
+                checkDefaultAndRequiredClash<MSONParameter>(node, pd, out);
+            SectionProcessor<Parameter>::
+                checkExampleAndDefaultValue<MSONParameter>(node, pd, out);
         }
 
         static SectionType nestedSectionType(const MarkdownNodeIterator& node)
@@ -161,7 +187,8 @@ namespace snowcrash
     };
 
     /** MSON Parameter Section Parser */
-    typedef SectionParser<MSONParameter, ListSectionAdapter> MSONParameterParser;
+    typedef SectionParser<MSONParameter, ListSectionAdapter>
+        MSONParameterParser;
 }
 
 #endif

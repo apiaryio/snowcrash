@@ -21,7 +21,8 @@ namespace snowcrash
     /** Link Relation matching regex */
     const char* const RelationRegex = RELATION_REGEX;
 
-    const char* const RelationIdentifierRegex = RELATION_REGEX "[[:blank:]]*([a-z][a-z0-9.-]*)?[[:blank:]]*$";
+    const char* const RelationIdentifierRegex
+        = RELATION_REGEX "[[:blank:]]*([a-z][a-z0-9.-]*)?[[:blank:]]*$";
 
     /**
      *  Relation Section Processor
@@ -29,7 +30,8 @@ namespace snowcrash
     template <>
     struct SectionProcessor<Relation> : public SectionProcessorBase<Relation> {
 
-        static MarkdownNodeIterator processSignature(const MarkdownNodeIterator& node,
+        static MarkdownNodeIterator processSignature(
+            const MarkdownNodeIterator& node,
             const MarkdownNodes& siblings,
             SectionParserData& pd,
             SectionLayout& layout,
@@ -42,15 +44,18 @@ namespace snowcrash
             signature = GetFirstLine(node->text, remainingContent);
             TrimString(signature);
 
-            if (RegexCapture(signature, RelationIdentifierRegex, captureGroups, 3)) {
+            if (RegexCapture(
+                    signature, RelationIdentifierRegex, captureGroups, 3)) {
                 out.node.str = captureGroups[1];
                 TrimString(out.node.str);
             } else {
                 // WARN: Relation identifier contains illegal characters
                 mdp::CharactersRangeSet sourceMap
-                    = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceCharacterIndex);
+                    = mdp::BytesRangeSetToCharactersRangeSet(
+                        node->sourceMap, pd.sourceCharacterIndex);
                 out.report.warnings.push_back(
-                    Warning("relation identifier contains illegal characters (only lower case letters, numbers, '-' "
+                    Warning("relation identifier contains illegal characters "
+                            "(only lower case letters, numbers, '-' "
                             "and '.' allowed)",
                         FormattingWarning,
                         sourceMap));
@@ -68,9 +73,11 @@ namespace snowcrash
         static SectionType sectionType(const MarkdownNodeIterator& node)
         {
 
-            if (node->type == mdp::ListItemMarkdownNodeType && !node->children().empty()) {
+            if (node->type == mdp::ListItemMarkdownNodeType
+                && !node->children().empty()) {
 
-                mdp::ByteBuffer remaining, subject = node->children().front().text;
+                mdp::ByteBuffer remaining,
+                    subject = node->children().front().text;
 
                 subject = GetFirstLine(subject, remaining);
                 TrimString(subject);
