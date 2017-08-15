@@ -1,7 +1,9 @@
 version: 1.0.{build}
 
+image: Visual Studio 2015
+
 install:
   - git submodule update --init --recursive
 
 build_script:
-  - vcbuild.bat MSVC2013 test
+  - vcbuild.bat MSVC2015 test
