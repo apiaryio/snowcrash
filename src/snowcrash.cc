@@ -80,7 +80,7 @@ int snowcrash::parse(
         ss << "parser exception: '" << e.what() << "'";
         out.report.error = Error(ss.str(), ApplicationError);
     } catch (...) {
-        out.report.error = Error("parser exception has occured", ApplicationError);
+        out.report.error = Error("parser exception has occurred", ApplicationError);
     }
 
     return out.report.error.code;

@@ -185,7 +185,7 @@ TEST_CASE("Parentheses in parameter description with new syntax", "[parameter]")
     REQUIRE(parameter.node.description == "lorem (ipsum) dolor");
 }
 
-TEST_CASE("Parse parameter including backtics for escaping, issue drafter#445", "[mson_parameter]")
+TEST_CASE("Parse parameter including backticks for escaping, issue drafter#445", "[mson_parameter]")
 {
     mdp::ByteBuffer source
         = "+ `start_time`: `recorded_at` (enum[string], optional)\n"

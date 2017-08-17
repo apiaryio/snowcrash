@@ -126,7 +126,7 @@ bool helpRequest(const std::string& arg)
 
 int main(int argc, const char* argv[])
 {
-    // FIXME: Intstrumetns helper
+    // FIXME: Instruments helper
     //::sleep(20);
 
     if (argc != 2) {
@@ -159,6 +159,6 @@ int main(int argc, const char* argv[])
     std::cout << "parsing '" << inputFileName << "' " << TestRunCount << "-times (" << result << "):\n";
     std::cout << "total: " << total << "s mean: " << mean << " +/- " << stddev << "s\n";
 
-    // FIXME: Intstrumetns helper
+    // FIXME: Instruments helper
     //::sleep(20);
 }

@@ -172,7 +172,7 @@ namespace snowcrash
      * \brief Check Parameter validity in URI template
      */
 
-    // It must either be in path "{param" or at the begining
+    // It must either be in path "{param" or at the beginning
     // "?param" or in the list ",param". And any of the params
     // must end either with "}" or ",".
 

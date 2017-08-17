@@ -42,10 +42,10 @@ namespace snowcrash
     /** Parameter Optional matching regex */
     const char* const ParameterOptionalRegex = "^[[:blank:]]*[Oo]ptional[[:blank:]]*$";
 
-    /** Additonal Parameter Traits Example matching regex */
+    /** Additional Parameter Traits Example matching regex */
     const char* const AdditionalTraitsExampleRegex = "`([^`]*)`";
 
-    /** Additonal Parameter Traits Use matching regex */
+    /** Additional Parameter Traits Use matching regex */
     const char* const AdditionalTraitsUseRegex = "([Oo]ptional|[Rr]equired)";
 
     /** Parameter Values matching regex */

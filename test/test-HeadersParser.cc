@@ -56,7 +56,7 @@ TEST_CASE("parse headers fixture", "[headers]")
 
 // This test is commented out because, in real parsing it is never parsed is "one block sourcemap"
 // Just in context of HeaderParser testing.
-// This test is not completly removed, instead it is placed in context of ResourceParser (as in real world)
+// This test is not completely removed, instead it is placed in context of ResourceParser (as in real world)
 
 TEST_CASE("parse headers fixture with no empty line between signature and content", "[headers]")
 {
@@ -220,7 +220,7 @@ TEST_CASE("Headers Filed Name should be case insensitive", "[headers][issue][230
     REQUIRE(headers.node[1].second == "application/json");
 }
 
-TEST_CASE("Aditional test for Header name insenstivity combined with allowed multiple headers", "[headers][issue][230]")
+TEST_CASE("Additional test for Header name insensitivity combined with allowed multiple headers", "[headers][issue][230]")
 {
     const mdp::ByteBuffer source
         = "+ Headers\n"
@@ -297,7 +297,7 @@ TEST_CASE("Missing or wrong placed colon in header definition", "[headers][issue
     }
 }
 
-TEST_CASE("Allow parse nonvalid headers, provide apropriate warning", "[headers][issue][158]")
+TEST_CASE("Allow parse nonvalid headers, provide appropriate warning", "[headers][issue][158]")
 {
 
     SECTION("Strange but valid token")

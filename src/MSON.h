@@ -409,7 +409,7 @@ namespace mson
 
         void buildFromElements(const Elements& elements);
 
-        /** Desctructor */
+        /** Destructor */
         ~Element();
     };
 }

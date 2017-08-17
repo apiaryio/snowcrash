@@ -34,14 +34,14 @@ TEST_CASE("Templates for compare equality", "[utility]")
         REQUIRE_FALSE(IsIEqual()('a', 'b'));
     }
 
-    SECTION("Both version should not throw while testing diferent types")
+    SECTION("Both version should not throw while testing different types")
     {
-        REQUIRE_NOTHROW(IsEqual()('a', 1));  // allow compare diferent types - not throw
-        REQUIRE_NOTHROW(IsIEqual()('a', 1)); // allow compare diferent types - not throw
+        REQUIRE_NOTHROW(IsEqual()('a', 1));  // allow compare different types - not throw
+        REQUIRE_NOTHROW(IsIEqual()('a', 1)); // allow compare different types - not throw
     }
 }
 
-TEST_CASE("Container comparation", "[utility]")
+TEST_CASE("Container comparison", "[utility]")
 {
     REQUIRE(MatchContainers(std::string("abc"), std::string("abc"), IsEqual()));
 
@@ -53,7 +53,7 @@ TEST_CASE("Container comparation", "[utility]")
     REQUIRE_FALSE(MatchContainers(std::string("def"), std::string("ABC"), IsIEqual()));
 }
 
-TEST_CASE("Comapare string", "[utility]")
+TEST_CASE("Compare string", "[utility]")
 {
     REQUIRE(Equal<std::string>()(std::string("abc"), std::string("abc")));
     REQUIRE_FALSE(Equal<std::string>()(std::string("abcd"), std::string("abc")));

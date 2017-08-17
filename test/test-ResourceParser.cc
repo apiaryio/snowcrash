@@ -189,7 +189,7 @@ TEST_CASE("Parse multiple methods", "[resource]")
     SectionParserHelper<Resource, ResourceParser>::parse(source, ResourceSectionType, resource, ExportSourcemapOption);
 
     REQUIRE(resource.report.error.code == Error::OK);
-    REQUIRE(resource.report.warnings.size() == 2); // empty reuqest asset & no response
+    REQUIRE(resource.report.warnings.size() == 2); // empty request asset & no response
 
     REQUIRE(resource.node.uriTemplate == "/1");
     REQUIRE(resource.node.description == "A");
@@ -616,7 +616,7 @@ TEST_CASE("Parse named resource with lazy referencing with both response and req
     REQUIRE(resource.actions[0].examples[0].responses[0].reference.meta.state == Reference::StateResolved);
 }
 
-TEST_CASE("Expect to have a warning when 100 responce's reference has a body", "[resource][model]")
+TEST_CASE("Expect to have a warning when 100 responses reference has a body", "[resource][model]")
 {
     mdp::ByteBuffer source
         = "# API\n"
@@ -688,7 +688,7 @@ TEST_CASE("Parse root resource", "[resource]")
     REQUIRE(resource.sourceMap.actions.collection.empty());
 }
 
-TEST_CASE("Parse resource with invalid URI Tempalte", "[resource]")
+TEST_CASE("Parse resource with invalid URI Template", "[resource]")
 {
     mdp::ByteBuffer source = "# Resource [/id{? limit}]\n";
 
@@ -1020,7 +1020,7 @@ TEST_CASE("Relation identifiers should be unique for a resource", "[resource]")
           "+ Relation: create\n"
           "+ Response 204\n"
           "\n"
-          "### Delte [DELETE]\n"
+          "### Delete [DELETE]\n"
           "+ Relation: create\n"
           "+ Response 204";
 

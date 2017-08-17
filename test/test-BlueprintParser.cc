@@ -1427,7 +1427,7 @@ TEST_CASE("Report error when not finding a super type of the attributes", "[blue
     REQUIRE(blueprint.report.warnings.empty());
 }
 
-TEST_CASE("Parse blueprint with escaped datastructure", "[blueprint]")
+TEST_CASE("Parse blueprint with escaped data structure", "[blueprint]")
 {
     mdp::ByteBuffer source
         = "# Data Structures\n"
@@ -1454,7 +1454,7 @@ TEST_CASE("Parse blueprint with escaped datastructure", "[blueprint]")
     REQUIRE(blueprint.node.content.elements().at(0).content.elements().size() == 1);
 }
 
-TEST_CASE("Parse blueprint with escaped datastructure reference", "[blueprint]")
+TEST_CASE("Parse blueprint with escaped data structure reference", "[blueprint]")
 {
     mdp::ByteBuffer source
         = "# Data Structures\n"
