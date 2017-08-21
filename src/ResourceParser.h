@@ -57,7 +57,7 @@ namespace snowcrash
                 if (!captureGroups[2].empty()) {
                     return processNestedAction(node, node->parent().children(), pd, layout, out);
                 }
-            } else if (RegexCapture(node->text, NamedEndpointHeaderRegex, captureGroups, 5)) {
+            } else if (RegexCapture(node->text, NamedEndpointHeaderRegex, captureGroups, 4)) {
 
                 out.node.name = captureGroups[1];
                 TrimString(out.node.name);
@@ -317,7 +317,7 @@ namespace snowcrash
 
             CaptureGroups captureGroups;
 
-            if (RegexCapture(node->text, NamedResourceHeaderRegex, captureGroups, 4)) {
+            if (RegexCapture(node->text, NamedResourceHeaderRegex, captureGroups, 3)) {
 
                 resource.name = captureGroups[1];
                 TrimString(resource.name);
