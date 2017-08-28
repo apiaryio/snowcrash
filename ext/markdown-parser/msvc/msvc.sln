@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "markdown", "markdown\markdown.vcproj", "{288550BA-B6D6-4254-B5E3-9E8CE20970AE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{08CAEF5D-9ED7-4CB1-844D-D39AA17D3AD6} = {08CAEF5D-9ED7-4CB1-844D-D39AA17D3AD6}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sundown", "sundown\sundown.vcproj", "{08CAEF5D-9ED7-4CB1-844D-D39AA17D3AD6}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test-markdown", "test-markdown\test-markdown.vcproj", "{DB045416-DCDB-45D3-904C-C1F15D608FC3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{288550BA-B6D6-4254-B5E3-9E8CE20970AE} = {288550BA-B6D6-4254-B5E3-9E8CE20970AE}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{288550BA-B6D6-4254-B5E3-9E8CE20970AE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{288550BA-B6D6-4254-B5E3-9E8CE20970AE}.Debug|Win32.Build.0 = Debug|Win32
+		{288550BA-B6D6-4254-B5E3-9E8CE20970AE}.Release|Win32.ActiveCfg = Release|Win32
+		{288550BA-B6D6-4254-B5E3-9E8CE20970AE}.Release|Win32.Build.0 = Release|Win32
+		{08CAEF5D-9ED7-4CB1-844D-D39AA17D3AD6}.Debug|Win32.ActiveCfg = Debug|Win32
+		{08CAEF5D-9ED7-4CB1-844D-D39AA17D3AD6}.Debug|Win32.Build.0 = Debug|Win32
+		{08CAEF5D-9ED7-4CB1-844D-D39AA17D3AD6}.Release|Win32.ActiveCfg = Release|Win32
+		{08CAEF5D-9ED7-4CB1-844D-D39AA17D3AD6}.Release|Win32.Build.0 = Release|Win32
+		{DB045416-DCDB-45D3-904C-C1F15D608FC3}.Debug|Win32.ActiveCfg = Debug|Win32
+		{DB045416-DCDB-45D3-904C-C1F15D608FC3}.Debug|Win32.Build.0 = Debug|Win32
+		{DB045416-DCDB-45D3-904C-C1F15D608FC3}.Release|Win32.ActiveCfg = Release|Win32
+		{DB045416-DCDB-45D3-904C-C1F15D608FC3}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

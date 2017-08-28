@@ -1,0 +1,58 @@
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# OS X and Xcode specific
+.DS_Store
+build/
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+*.xcworkspace
+!default.xcworkspace
+xcuserdata
+profile
+*.moved-aside
+DerivedData
+.idea/
+
+# MSVC specific
+*.suo
+*.ncb
+*.user
+*.vcxproj
+*.sdf
+*.opensdf
+*.filters
+msvc/_UpgradeReport_Files/
+msvc/Backup/
+msvc/UpgradeLog.htm
+msvc/UpgradeLog.XML
+
+# Eclipse specific
+.project
+.cproject
+.settings

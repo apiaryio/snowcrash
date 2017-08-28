@@ -1,0 +1,448 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		BB2672EE19067E6A0053EEFA /* ByteBuffer.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB2672ED19067E6A0053EEFA /* ByteBuffer.cc */; };
+		BB2672F019067EA90053EEFA /* test-ByteBuffer.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB2672EF19067EA90053EEFA /* test-ByteBuffer.cc */; };
+		BB8C3E6C1923F04E00EF36FA /* libmarkdownparser.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBAE529B18FEBFAE00D98223 /* libmarkdownparser.a */; };
+		BB955A44190119CE006684B8 /* ByteBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = BB955A43190119CE006684B8 /* ByteBuffer.h */; };
+		BB955A4619011A5F006684B8 /* MarkdownParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB955A4519011A5F006684B8 /* MarkdownParser.cc */; };
+		BB955A4819011A71006684B8 /* MarkdownParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BB955A4719011A71006684B8 /* MarkdownParser.h */; };
+		BB955A5D190125CF006684B8 /* test-libmarkdownparser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB955A5B190125CF006684B8 /* test-libmarkdownparser.cc */; };
+		BB955A5E190125CF006684B8 /* test-MarkdownParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB955A5C190125CF006684B8 /* test-MarkdownParser.cc */; };
+		BBAE52B018FEC16B00D98223 /* autolink.c in Sources */ = {isa = PBXBuildFile; fileRef = BBAE52A518FEC16B00D98223 /* autolink.c */; };
+		BBAE52B118FEC16B00D98223 /* autolink.h in Headers */ = {isa = PBXBuildFile; fileRef = BBAE52A618FEC16B00D98223 /* autolink.h */; };
+		BBAE52B218FEC16B00D98223 /* buffer.c in Sources */ = {isa = PBXBuildFile; fileRef = BBAE52A718FEC16B00D98223 /* buffer.c */; };
+		BBAE52B318FEC16B00D98223 /* buffer.h in Headers */ = {isa = PBXBuildFile; fileRef = BBAE52A818FEC16B00D98223 /* buffer.h */; };
+		BBAE52B418FEC16B00D98223 /* html_blocks.h in Headers */ = {isa = PBXBuildFile; fileRef = BBAE52A918FEC16B00D98223 /* html_blocks.h */; };
+		BBAE52B518FEC16B00D98223 /* markdown.c in Sources */ = {isa = PBXBuildFile; fileRef = BBAE52AA18FEC16B00D98223 /* markdown.c */; };
+		BBAE52B618FEC16B00D98223 /* markdown.h in Headers */ = {isa = PBXBuildFile; fileRef = BBAE52AB18FEC16B00D98223 /* markdown.h */; };
+		BBAE52B718FEC16B00D98223 /* src_map.c in Sources */ = {isa = PBXBuildFile; fileRef = BBAE52AC18FEC16B00D98223 /* src_map.c */; };
+		BBAE52B818FEC16B00D98223 /* src_map.h in Headers */ = {isa = PBXBuildFile; fileRef = BBAE52AD18FEC16B00D98223 /* src_map.h */; };
+		BBAE52B918FEC16B00D98223 /* stack.c in Sources */ = {isa = PBXBuildFile; fileRef = BBAE52AE18FEC16B00D98223 /* stack.c */; };
+		BBAE52BA18FEC16B00D98223 /* stack.h in Headers */ = {isa = PBXBuildFile; fileRef = BBAE52AF18FEC16B00D98223 /* stack.h */; };
+		BBAE52CF18FEDF5200D98223 /* houdini_href_e.c in Sources */ = {isa = PBXBuildFile; fileRef = BBAE52C918FEDF5200D98223 /* houdini_href_e.c */; };
+		BBAE52D018FEDF5200D98223 /* houdini_html_e.c in Sources */ = {isa = PBXBuildFile; fileRef = BBAE52CA18FEDF5200D98223 /* houdini_html_e.c */; };
+		BBAE52D118FEDF5200D98223 /* houdini.h in Headers */ = {isa = PBXBuildFile; fileRef = BBAE52CB18FEDF5200D98223 /* houdini.h */; };
+		BBAE52D218FEDF5200D98223 /* html_smartypants.c in Sources */ = {isa = PBXBuildFile; fileRef = BBAE52CC18FEDF5200D98223 /* html_smartypants.c */; };
+		BBAE52D318FEDF5200D98223 /* html.c in Sources */ = {isa = PBXBuildFile; fileRef = BBAE52CD18FEDF5200D98223 /* html.c */; };
+		BBAE52D418FEDF5200D98223 /* html.h in Headers */ = {isa = PBXBuildFile; fileRef = BBAE52CE18FEDF5200D98223 /* html.h */; };
+		BBE7FEC21922E27300A1649E /* MarkdownNode.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBE7FEC01922E27300A1649E /* MarkdownNode.cc */; };
+		BBE7FEC31922E27300A1649E /* MarkdownNode.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE7FEC11922E27300A1649E /* MarkdownNode.h */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		BB8C3E6A1923F04100EF36FA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BBAE529318FEBFAE00D98223 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BBAE529A18FEBFAE00D98223;
+			remoteInfo = libmarkdownparser;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		BB955A4B19011E85006684B8 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		BB2672ED19067E6A0053EEFA /* ByteBuffer.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ByteBuffer.cc; path = src/ByteBuffer.cc; sourceTree = "<group>"; };
+		BB2672EF19067EA90053EEFA /* test-ByteBuffer.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-ByteBuffer.cc"; path = "test/test-ByteBuffer.cc"; sourceTree = SOURCE_ROOT; };
+		BB955A43190119CE006684B8 /* ByteBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ByteBuffer.h; path = src/ByteBuffer.h; sourceTree = "<group>"; };
+		BB955A4519011A5F006684B8 /* MarkdownParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = MarkdownParser.cc; path = src/MarkdownParser.cc; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
+		BB955A4719011A71006684B8 /* MarkdownParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MarkdownParser.h; path = src/MarkdownParser.h; sourceTree = "<group>"; };
+		BB955A4D19011E85006684B8 /* test-libmarkdownparser */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "test-libmarkdownparser"; sourceTree = BUILT_PRODUCTS_DIR; };
+		BB955A5B190125CF006684B8 /* test-libmarkdownparser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "test-libmarkdownparser.cc"; path = "test/test-libmarkdownparser.cc"; sourceTree = SOURCE_ROOT; };
+		BB955A5C190125CF006684B8 /* test-MarkdownParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = "test-MarkdownParser.cc"; path = "test/test-MarkdownParser.cc"; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
+		BBAE529B18FEBFAE00D98223 /* libmarkdownparser.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libmarkdownparser.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		BBAE52A518FEC16B00D98223 /* autolink.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = autolink.c; sourceTree = "<group>"; };
+		BBAE52A618FEC16B00D98223 /* autolink.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = autolink.h; sourceTree = "<group>"; };
+		BBAE52A718FEC16B00D98223 /* buffer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = buffer.c; sourceTree = "<group>"; };
+		BBAE52A818FEC16B00D98223 /* buffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = buffer.h; sourceTree = "<group>"; };
+		BBAE52A918FEC16B00D98223 /* html_blocks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = html_blocks.h; sourceTree = "<group>"; };
+		BBAE52AA18FEC16B00D98223 /* markdown.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = markdown.c; sourceTree = "<group>"; };
+		BBAE52AB18FEC16B00D98223 /* markdown.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = markdown.h; sourceTree = "<group>"; };
+		BBAE52AC18FEC16B00D98223 /* src_map.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = src_map.c; sourceTree = "<group>"; };
+		BBAE52AD18FEC16B00D98223 /* src_map.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = src_map.h; sourceTree = "<group>"; };
+		BBAE52AE18FEC16B00D98223 /* stack.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stack.c; sourceTree = "<group>"; };
+		BBAE52AF18FEC16B00D98223 /* stack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stack.h; sourceTree = "<group>"; };
+		BBAE52C918FEDF5200D98223 /* houdini_href_e.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = houdini_href_e.c; path = ext/sundown/html/houdini_href_e.c; sourceTree = SOURCE_ROOT; };
+		BBAE52CA18FEDF5200D98223 /* houdini_html_e.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = houdini_html_e.c; path = ext/sundown/html/houdini_html_e.c; sourceTree = SOURCE_ROOT; };
+		BBAE52CB18FEDF5200D98223 /* houdini.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = houdini.h; path = ext/sundown/html/houdini.h; sourceTree = SOURCE_ROOT; };
+		BBAE52CC18FEDF5200D98223 /* html_smartypants.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = html_smartypants.c; path = ext/sundown/html/html_smartypants.c; sourceTree = SOURCE_ROOT; };
+		BBAE52CD18FEDF5200D98223 /* html.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = html.c; path = ext/sundown/html/html.c; sourceTree = SOURCE_ROOT; };
+		BBAE52CE18FEDF5200D98223 /* html.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = html.h; path = ext/sundown/html/html.h; sourceTree = SOURCE_ROOT; };
+		BBE7FEC01922E27300A1649E /* MarkdownNode.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MarkdownNode.cc; path = src/MarkdownNode.cc; sourceTree = "<group>"; };
+		BBE7FEC11922E27300A1649E /* MarkdownNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MarkdownNode.h; path = src/MarkdownNode.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		BB955A4A19011E85006684B8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BB8C3E6C1923F04E00EF36FA /* libmarkdownparser.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BBAE529818FEBFAE00D98223 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		BB955A4E19011E85006684B8 /* test-libmarkdownparser */ = {
+			isa = PBXGroup;
+			children = (
+				BB2672EF19067EA90053EEFA /* test-ByteBuffer.cc */,
+				BB955A5B190125CF006684B8 /* test-libmarkdownparser.cc */,
+				BB955A5C190125CF006684B8 /* test-MarkdownParser.cc */,
+			);
+			path = "test-libmarkdownparser";
+			sourceTree = "<group>";
+		};
+		BBAE529218FEBFAE00D98223 = {
+			isa = PBXGroup;
+			children = (
+				BBAE52A418FEC16B00D98223 /* sundown */,
+				BBAE52A218FEC10400D98223 /* libmarkdownparser */,
+				BB955A4E19011E85006684B8 /* test-libmarkdownparser */,
+				BBAE529C18FEBFAE00D98223 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		BBAE529C18FEBFAE00D98223 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				BBAE529B18FEBFAE00D98223 /* libmarkdownparser.a */,
+				BB955A4D19011E85006684B8 /* test-libmarkdownparser */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		BBAE52A218FEC10400D98223 /* libmarkdownparser */ = {
+			isa = PBXGroup;
+			children = (
+				BB2672ED19067E6A0053EEFA /* ByteBuffer.cc */,
+				BB955A43190119CE006684B8 /* ByteBuffer.h */,
+				BBE7FEC01922E27300A1649E /* MarkdownNode.cc */,
+				BBE7FEC11922E27300A1649E /* MarkdownNode.h */,
+				BB955A4519011A5F006684B8 /* MarkdownParser.cc */,
+				BB955A4719011A71006684B8 /* MarkdownParser.h */,
+			);
+			name = libmarkdownparser;
+			sourceTree = "<group>";
+		};
+		BBAE52A418FEC16B00D98223 /* sundown */ = {
+			isa = PBXGroup;
+			children = (
+				BBAE52C818FEDF4600D98223 /* html */,
+				BBAE52A518FEC16B00D98223 /* autolink.c */,
+				BBAE52A618FEC16B00D98223 /* autolink.h */,
+				BBAE52A718FEC16B00D98223 /* buffer.c */,
+				BBAE52A818FEC16B00D98223 /* buffer.h */,
+				BBAE52A918FEC16B00D98223 /* html_blocks.h */,
+				BBAE52AA18FEC16B00D98223 /* markdown.c */,
+				BBAE52AB18FEC16B00D98223 /* markdown.h */,
+				BBAE52AC18FEC16B00D98223 /* src_map.c */,
+				BBAE52AD18FEC16B00D98223 /* src_map.h */,
+				BBAE52AE18FEC16B00D98223 /* stack.c */,
+				BBAE52AF18FEC16B00D98223 /* stack.h */,
+			);
+			name = sundown;
+			path = ext/sundown/src;
+			sourceTree = "<group>";
+		};
+		BBAE52C818FEDF4600D98223 /* html */ = {
+			isa = PBXGroup;
+			children = (
+				BBAE52C918FEDF5200D98223 /* houdini_href_e.c */,
+				BBAE52CA18FEDF5200D98223 /* houdini_html_e.c */,
+				BBAE52CB18FEDF5200D98223 /* houdini.h */,
+				BBAE52CC18FEDF5200D98223 /* html_smartypants.c */,
+				BBAE52CD18FEDF5200D98223 /* html.c */,
+				BBAE52CE18FEDF5200D98223 /* html.h */,
+			);
+			name = html;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		BBAE529918FEBFAE00D98223 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BBAE52B418FEC16B00D98223 /* html_blocks.h in Headers */,
+				BBAE52D418FEDF5200D98223 /* html.h in Headers */,
+				BBAE52B318FEC16B00D98223 /* buffer.h in Headers */,
+				BBAE52B118FEC16B00D98223 /* autolink.h in Headers */,
+				BBAE52BA18FEC16B00D98223 /* stack.h in Headers */,
+				BB955A44190119CE006684B8 /* ByteBuffer.h in Headers */,
+				BBAE52B618FEC16B00D98223 /* markdown.h in Headers */,
+				BBAE52B818FEC16B00D98223 /* src_map.h in Headers */,
+				BB955A4819011A71006684B8 /* MarkdownParser.h in Headers */,
+				BBAE52D118FEDF5200D98223 /* houdini.h in Headers */,
+				BBE7FEC31922E27300A1649E /* MarkdownNode.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		BB955A4C19011E85006684B8 /* test-libmarkdownparser */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BB955A5319011E85006684B8 /* Build configuration list for PBXNativeTarget "test-libmarkdownparser" */;
+			buildPhases = (
+				BB955A4919011E85006684B8 /* Sources */,
+				BB955A4A19011E85006684B8 /* Frameworks */,
+				BB955A4B19011E85006684B8 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				BB8C3E6B1923F04100EF36FA /* PBXTargetDependency */,
+			);
+			name = "test-libmarkdownparser";
+			productName = "test-libmarkdownparser";
+			productReference = BB955A4D19011E85006684B8 /* test-libmarkdownparser */;
+			productType = "com.apple.product-type.tool";
+		};
+		BBAE529A18FEBFAE00D98223 /* libmarkdownparser */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BBAE529F18FEBFAE00D98223 /* Build configuration list for PBXNativeTarget "libmarkdownparser" */;
+			buildPhases = (
+				BBAE529718FEBFAE00D98223 /* Sources */,
+				BBAE529818FEBFAE00D98223 /* Frameworks */,
+				BBAE529918FEBFAE00D98223 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = libmarkdownparser;
+			productName = markdownparser;
+			productReference = BBAE529B18FEBFAE00D98223 /* libmarkdownparser.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		BBAE529318FEBFAE00D98223 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0600;
+				ORGANIZATIONNAME = "Apiary Inc.";
+			};
+			buildConfigurationList = BBAE529618FEBFAE00D98223 /* Build configuration list for PBXProject "markdownparser" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = BBAE529218FEBFAE00D98223;
+			productRefGroup = BBAE529C18FEBFAE00D98223 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				BBAE529A18FEBFAE00D98223 /* libmarkdownparser */,
+				BB955A4C19011E85006684B8 /* test-libmarkdownparser */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		BB955A4919011E85006684B8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BB955A5D190125CF006684B8 /* test-libmarkdownparser.cc in Sources */,
+				BB2672F019067EA90053EEFA /* test-ByteBuffer.cc in Sources */,
+				BB955A5E190125CF006684B8 /* test-MarkdownParser.cc in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BBAE529718FEBFAE00D98223 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BBAE52B918FEC16B00D98223 /* stack.c in Sources */,
+				BBAE52D018FEDF5200D98223 /* houdini_html_e.c in Sources */,
+				BB2672EE19067E6A0053EEFA /* ByteBuffer.cc in Sources */,
+				BBAE52D318FEDF5200D98223 /* html.c in Sources */,
+				BBE7FEC21922E27300A1649E /* MarkdownNode.cc in Sources */,
+				BBAE52B018FEC16B00D98223 /* autolink.c in Sources */,
+				BBAE52B518FEC16B00D98223 /* markdown.c in Sources */,
+				BBAE52B218FEC16B00D98223 /* buffer.c in Sources */,
+				BBAE52D218FEDF5200D98223 /* html_smartypants.c in Sources */,
+				BBAE52B718FEC16B00D98223 /* src_map.c in Sources */,
+				BBAE52CF18FEDF5200D98223 /* houdini_href_e.c in Sources */,
+				BB955A4619011A5F006684B8 /* MarkdownParser.cc in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		BB8C3E6B1923F04100EF36FA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BBAE529A18FEBFAE00D98223 /* libmarkdownparser */;
+			targetProxy = BB8C3E6A1923F04100EF36FA /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		BB955A5419011E85006684B8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					CATCH_NO_EXCEPT,
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = "./test/**";
+			};
+			name = Debug;
+		};
+		BB955A5519011E85006684B8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
+				GCC_PREPROCESSOR_DEFINITIONS = CATCH_NO_EXCEPT;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = "./test/**";
+			};
+			name = Release;
+		};
+		BBAE529D18FEBFAE00D98223 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				ONLY_ACTIVE_ARCH = YES;
+			};
+			name = Debug;
+		};
+		BBAE529E18FEBFAE00D98223 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+			};
+			name = Release;
+		};
+		BBAE52A018FEBFAE00D98223 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				EXECUTABLE_PREFIX = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		BBAE52A118FEBFAE00D98223 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				EXECUTABLE_PREFIX = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		BB955A5319011E85006684B8 /* Build configuration list for PBXNativeTarget "test-libmarkdownparser" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BB955A5419011E85006684B8 /* Debug */,
+				BB955A5519011E85006684B8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BBAE529618FEBFAE00D98223 /* Build configuration list for PBXProject "markdownparser" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BBAE529D18FEBFAE00D98223 /* Debug */,
+				BBAE529E18FEBFAE00D98223 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BBAE529F18FEBFAE00D98223 /* Build configuration list for PBXNativeTarget "libmarkdownparser" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BBAE52A018FEBFAE00D98223 /* Debug */,
+				BBAE52A118FEBFAE00D98223 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = BBAE529318FEBFAE00D98223 /* Project object */;
+}
