@@ -26,7 +26,7 @@ SUNDOWN_INCLUDES = -Iext/sundown/src/ -Iext/sundown/html/
 INCLUDES = -I$(SRC_PATH) $(SUNDOWN_INCLUDES)
 
 # Test include paths
-TEST_INCLUDES = $(INCLUDES) -I$(TEST_SRC_PATH) -Itest/ext/Catch/single_include
+TEST_INCLUDES = $(INCLUDES) -I$(TEST_SRC_PATH) -I../../test/vendor/Catch/single_include
 
 # Markdown parser objects
 LIB_SRC = $(shell find $(SRC_PATH)/ -name '*.$(CXX_SRC_EXT)')
