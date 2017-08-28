@@ -14,12 +14,14 @@
 #include <iostream>
 #include "ByteBuffer.h"
 
-namespace mdp {
+namespace mdp
+{
 
     /**
      *  AST block node types
      */
-    enum MarkdownNodeType {
+    enum MarkdownNodeType
+    {
         RootMarkdownNodeType = 0,
         CodeMarkdownNodeType,
         QuoteMarkdownNodeType,
@@ -43,7 +45,8 @@ namespace mdp {
     /**
      *  AST node
      */
-    class MarkdownNode {
+    class MarkdownNode
+    {
     public:
         typedef int Data;
 
@@ -64,7 +67,7 @@ namespace mdp {
         const MarkdownNode& parent() const;
 
         /** Sets parent node */
-        void setParent(MarkdownNode *parent);
+        void setParent(MarkdownNode* parent);
 
         /** True if section's parent is specified, false otherwise */
         bool hasParent() const;
@@ -75,9 +78,9 @@ namespace mdp {
 
         /** Constructor */
         MarkdownNode(MarkdownNodeType type_ = UndefinedMarkdownNodeType,
-                MarkdownNode *parent_ = NULL,
-                const ByteBuffer& text_ = ByteBuffer(),
-                const Data& data_ = Data());
+            MarkdownNode* parent_ = NULL,
+            const ByteBuffer& text_ = ByteBuffer(),
+            const Data& data_ = Data());
 
         /** Copy constructor */
         MarkdownNode(const MarkdownNode& rhs);
