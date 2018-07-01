@@ -40,12 +40,6 @@ namespace snowcrash
             const ParseResultRef<Attributes>& out)
         {
 
-            if (!IEqual<std::string>()(signature.identifier, "Attribute")
-                && !IEqual<std::string>()(signature.identifier, "Attributes")) {
-
-                return node;
-            }
-
             mson::parseTypeDefinition(node, pd, signature.attributes, out.report, out.node.typeDefinition);
 
             if (pd.exportSourceMap()) {
