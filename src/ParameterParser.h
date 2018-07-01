@@ -440,27 +440,6 @@ namespace snowcrash
                     return NotParameterType; // No sample or default value
                 }
 
-                // Traverse over the value
-                while (!innerSignature.empty()) {
-
-                    std::string first = innerSignature.substr(0, 1);
-
-                    if (first == "`") {
-                        std::string escaped = RetrieveEscaped(innerSignature);
-
-                        // If empty value is returned
-                        if (escaped.empty()) {
-                            innerSignature.clear();
-                        }
-
-                        TrimString(innerSignature);
-                    } else if (first == "(") {
-                        break;
-                    } else {
-                        innerSignature = innerSignature.substr(1);
-                    }
-                }
-
                 return firstChar == ":" ? NewParameterType : OldParameterType;
             }
 
